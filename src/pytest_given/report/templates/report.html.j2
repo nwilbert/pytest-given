@@ -205,6 +205,7 @@
     </div>
   </div>
 
+  <div class="scenario-list">
   {% for scenario in scenarios %}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
   <div class="scenario {{ scenario.status }}"
@@ -350,6 +351,7 @@
     </div>
   </div>
   {% endfor %}
+  </div>
 
   </div>{# end .view-main #}
   </div>{# end .view-layout #}
@@ -367,7 +369,7 @@
               :aria-pressed="selectedStory === $el.dataset.storyId"
               @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">{{ story.title }}</div>
-        <div class="story-sidebar-meta">{{ story.activities | length }} activities · {{ scns | length | plural('scenario') }}</div>
+        <div class="story-sidebar-meta meta-list"><span>{{ story.activities | length }} activities</span><span>{{ scns | length | plural('scenario') }}</span></div>
       </button>
       {% endfor %}
     </div>
@@ -381,7 +383,7 @@
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
-            <div class="header-context">{{ story.activities | length }} activities · {{ total_scns | plural('scenario') }}</div>
+            <div class="header-context meta-list"><span>{{ story.activities | length }} activities</span><span>{{ total_scns | plural('scenario') }}</span></div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
           </div>
@@ -410,7 +412,7 @@
               <span class="cov-chip cov-uncovered">no coverage</span>
               {% else %}
               {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
-              <span class="cov-chip {{ cov_class }}">{{ cov.total | plural('scenario') }}{% if cov.failed %} · {{ cov.failed }} failing{% endif %}{% if cov.skipped %} · {{ cov.skipped }} skipped{% endif %}</span>
+              <span class="cov-chip {{ cov_class }} meta-list"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span>{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span>{{ cov.skipped }} skipped</span>{% endif %}</span>
               {% endif %}
               {#- Revealed by CSS once the row is selected (see .activity-jump),
                   so the row keeps one meaning per click: the row selects, this
@@ -426,8 +428,9 @@
         </div>
         <div class="scn-act-strip-section">
           <div class="story-section-heading">Scenarios</div>
+          <div class="scenario-list">
           {% for scn in story_scns %}
-          <div class="scenario {{ scn.status }}" style="margin-bottom: var(--space-sm);"
+          <div class="scenario {{ scn.status }}"
                {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
                   the `"` its own string literals need. #}
                data-covers='{{ scn_covers.get(scn.id, []) | tojson }}'
@@ -454,6 +457,7 @@
             {% endif %}
           </div>
           {% endfor %}
+          </div>
         </div>
         {% if story.source %}
         <div class="scenario-source">{{ source_link(story.source) }}</div>
@@ -511,9 +515,9 @@
       <div class="header">
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
-          <div class="header-context">
-            {{ glossary.terms | length | plural('term') }}{% if not all_uncategorized %}{% for kind in glossary_view.kinds %} ·
-            {{ kind.summary }}{% endfor %}{% endif %}
+          <div class="header-context meta-list">
+            <span>{{ glossary.terms | length | plural('term') }}</span>{% if not all_uncategorized %}{% for kind in glossary_view.kinds %}
+            <span>{{ kind.summary }}</span>{% endfor %}{% endif %}
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
@@ -531,6 +535,7 @@
           <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
         </div>
         {% endif %}
+        <div class="entry-list">
         {% for entry in group.entries %}
         {% set term = entry.term %}
         {% set agg = entry.aggregation %}
@@ -551,7 +556,7 @@
             </span>
             <div class="entry-body">
               <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
-              <div class="entry-summary">{{ entry.summary }}</div>
+              <div class="entry-summary meta-list">{% for part in entry.summary %}<span>{{ part }}</span>{% endfor %}</div>
             </div>
             {{ anchor_link('view=glossary&term=' ~ term.id) }}
           </div>
@@ -598,6 +603,7 @@
           </div>
         </div>
         {% endfor %}
+        </div>
       </div>
       {% endfor %}
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>

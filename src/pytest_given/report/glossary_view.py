@@ -62,7 +62,9 @@ class TermEntry:
     scenario_ids: list[NodeId]
     show_instances: bool
     show_forms: bool
-    summary: str
+    # The counts a term is summarized by, each its own phrase — the template
+    # spaces them, so no separator glyph is baked into the text.
+    summary: tuple[str, ...]
 
 
 # A term's kind as the Glossary view keys on it: the model's three, plus the
@@ -202,7 +204,7 @@ def _term_entry(
         scenario_ids=scenario_ids,
         show_instances=show_instances,
         show_forms=kind_key == 'verb' and bool(aggregation.forms),
-        summary=' · '.join(
+        summary=tuple(
             part
             for part in (
                 _some(len(aggregation.instances), 'instance') if show_instances else '',

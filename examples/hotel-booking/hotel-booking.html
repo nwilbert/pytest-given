@@ -264,11 +264,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding-top: var(--space-lg);
 }
 .sidebar-label {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
 /* The sort control shares the caption line with the section label and stays in
@@ -289,10 +287,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   border-bottom: 1.5px solid transparent;
   padding: 0 0 1px;
   font-family: inherit;
-  font-size: 0.6875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text-muted);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -441,7 +437,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .nav-group-active .nav-group-name { font-weight: 600; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
-.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
+.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); font-variant-numeric: tabular-nums; }
 /* Keeps a childless row's name aligned with its siblings that carry a
    chevron, so one level reads as one column. Only the module tree has any, so
    the flat axes leave it out rather than indent every row past nothing. */
@@ -510,13 +506,23 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .collapse-chevron-up { transform: rotate(-135deg); margin-bottom: -2px; }
 
-/* === Scenario Cards === */
-.scenario {
+/* === Scenario rows ===
+   One surface per list with a rule between rows, not a card per row: the
+   status stripe on the left edge is the row's own mark and stays. `margin-top:
+   -1px` under `overflow: hidden` lets the first *visible* row's rule vanish
+   under the surface's border, whichever row that is after filtering. */
+.scenario-list,
+.entry-list,
+.activity-timeline {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.scenario {
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
   padding: var(--space-md) var(--space-lg);
-  margin-bottom: var(--space-sm);
   border-left: 3px solid var(--color-passed);
 }
 .scenario.failed { border-left-color: var(--color-failed); }
@@ -587,21 +593,23 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   transition: opacity 0.1s;
 }
 .scenario-header:hover .scenario-name--goto::after { opacity: 0.6; }
+/* Neutral at rest: a tag is a label until it is the filter, and only then
+   does it take the accent. */
 .scenario-tag {
   display: inline-block;
-  background: var(--color-accent-tint);
-  color: var(--color-accent);
+  background: var(--bg-page);
+  color: var(--text-secondary);
   font-size: var(--font-size-sm);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   white-space: nowrap;
   flex-shrink: 0;
 }
-.scenario-tag:hover { border-color: var(--color-accent); }
+.scenario-tag:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .scenario-tag.active-tag { background: var(--color-accent); color: var(--on-accent); border-color: var(--color-accent); font-weight: 600; }
-.scenario-tag-more { background: transparent; border: 1px dashed var(--color-accent); }
+.scenario-tag-more { background: transparent; border-style: dashed; }
 .scenario-tag-more:hover { background: var(--color-accent-tint); border-style: solid; }
 .scenario-meta {
   display: flex;
@@ -611,15 +619,27 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   justify-content: flex-end;
 }
 .scenario-status { font-size: var(--font-size-sm); font-weight: 500; }
-.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); }
+.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .scenario-status.passed { color: var(--color-passed); }
 .scenario-status.failed { color: var(--color-failed); }
 .scenario-status.skipped { color: var(--color-skipped); }
 
-/* Steps */
-.steps { padding-top: var(--space-md); padding-left: var(--space-xl); font-size: var(--font-size-base); line-height: 1.8; }
-.phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
-.phase-steps { padding-left: var(--space-lg); }
+/* Narration: the keyword sits in a fixed left gutter, in the ink at medium
+   weight; steps align beside it. Structure comes from alignment, so the accent
+   stays reserved for interaction. Grid auto-placement does the rest — a label
+   is pinned to column 1 and so starts a row, each step is pinned to column 2
+   and so takes the next row. */
+.steps {
+  display: grid;
+  grid-template-columns: 3.75em 1fr;
+  column-gap: var(--space-sm);
+  padding-top: var(--space-md);
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}
+.phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
+.phase-steps { grid-column: 2; min-width: 0; }
 .step-text { color: var(--text-secondary); }
 .step-expand,
 .attachment-expand {
@@ -826,11 +846,9 @@ span.param-highlight {
   margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
 }
 .attachment-panel-label {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   padding: var(--space-sm) 0 var(--space-xs);
 }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks
@@ -1081,18 +1099,17 @@ span.param-highlight {
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 /* === Activity timeline === */
-.activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+.activity-timeline { margin-bottom: var(--space-xl); }
 .activity-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.activity-row:hover { border-color: var(--color-accent); }
+.activity-row:hover:not(.activity-row-highlight) { background: var(--bg-page); }
 .activity-num {
   min-width: 24px;
   padding: 0;
@@ -1111,6 +1128,10 @@ span.param-highlight {
 .activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
 .activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+
+/* Counts side by side, separated by space rather than a glyph. */
+.meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
+.cov-chip.meta-list { display: inline-flex; gap: var(--space-sm); }
 
 /* === Coverage chip === */
 .activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
@@ -1170,11 +1191,9 @@ span.param-highlight {
 .scn-act-strip-section { margin-top: var(--space-xl); }
 /* Section label separating the scenario list from the activity timeline above. */
 .story-section-heading {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
 
@@ -1217,7 +1236,7 @@ span.param-highlight {
   font-size: var(--font-size-md);
   font-weight: 700;
 }
-.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 /* Kind colors for kind headers and term pills: the same ink, wash and edge
    the narration gives each kind, so one kind is one color across both views.
@@ -1242,10 +1261,8 @@ span.param-highlight {
 
 /* === Glossary entry layout === */
 .entry {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
 }
 .entry-head {
   display: flex;
@@ -1268,8 +1285,6 @@ span.param-highlight {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 .entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
@@ -1514,6 +1529,7 @@ span.param-highlight {
     </div>
   </div>
 
+  <div class="scenario-list">
   <div class="scenario passed"
        x-show="isVisible(0)"
        id="scenario-0"
@@ -1555,7 +1571,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L154">examples/hotel-booking/test_hotel_booking.py:154</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L154">examples/hotel-booking/test_hotel_booking.py:154</a></div>
       
     </div>
     </div>
@@ -1607,7 +1623,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L169">examples/hotel-booking/test_hotel_booking.py:169</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L169">examples/hotel-booking/test_hotel_booking.py:169</a></div>
       
     </div>
     </div>
@@ -1629,7 +1645,7 @@ span.param-highlight {
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">29ms</span>
+        <span class="scenario-duration">32ms</span>
       </span>
     </div>
 
@@ -1769,7 +1785,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L202">examples/hotel-booking/test_hotel_booking.py:202</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L202">examples/hotel-booking/test_hotel_booking.py:202</a></div>
       
     </div>
     </div>
@@ -1815,12 +1831,13 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L244">examples/hotel-booking/test_hotel_booking.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L244">examples/hotel-booking/test_hotel_booking.py:244</a></div>
       
     </div>
     </div>
   </div>
   
+  </div>
 
   </div>
   </div>
@@ -1838,7 +1855,7 @@ span.param-highlight {
               :aria-pressed="selectedStory === $el.dataset.storyId"
               @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">Book a Group Trip</div>
-        <div class="story-sidebar-meta">7 activities · 3 scenarios</div>
+        <div class="story-sidebar-meta meta-list"><span>7 activities</span><span>3 scenarios</span></div>
       </button>
       
       
@@ -1847,7 +1864,7 @@ span.param-highlight {
               :aria-pressed="selectedStory === $el.dataset.storyId"
               @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">Cancel a Booking</div>
-        <div class="story-sidebar-meta">3 activities · 1 scenario</div>
+        <div class="story-sidebar-meta meta-list"><span>3 activities</span><span>1 scenario</span></div>
       </button>
       
     </div>
@@ -1870,7 +1887,7 @@ span.param-highlight {
             <div class="header-title">Book a Group Trip<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=stories&amp;story=book-a-group-trip"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
-            <div class="header-context">7 activities · 3 scenarios</div>
+            <div class="header-context meta-list"><span>7 activities</span><span>3 scenarios</span></div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
           </div>
@@ -1895,7 +1912,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">1 scenario</span>
+              <span class="cov-chip cov-passed meta-list"><span>1 scenario</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="book-a-group-trip:1">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -1921,7 +1938,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">2 scenarios</span>
+              <span class="cov-chip cov-passed meta-list"><span>2 scenarios</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="book-a-group-trip:2">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -1951,7 +1968,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-mixed">2 scenarios · 1 failing</span>
+              <span class="cov-chip cov-mixed meta-list"><span>2 scenarios</span><span>1 failing</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="book-a-group-trip:3">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -1977,7 +1994,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-mixed">2 scenarios · 1 failing</span>
+              <span class="cov-chip cov-mixed meta-list"><span>2 scenarios</span><span>1 failing</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="book-a-group-trip:4">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -2003,7 +2020,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">1 scenario</span>
+              <span class="cov-chip cov-passed meta-list"><span>1 scenario</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="book-a-group-trip:5">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -2033,7 +2050,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">1 scenario</span>
+              <span class="cov-chip cov-passed meta-list"><span>1 scenario</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="book-a-group-trip:6">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -2066,8 +2083,9 @@ span.param-highlight {
         </div>
         <div class="scn-act-strip-section">
           <div class="story-section-heading">Scenarios</div>
+          <div class="scenario-list">
           
-          <div class="scenario passed" style="margin-bottom: var(--space-sm);"
+          <div class="scenario passed"
                
                data-covers='[1, 2]'
                x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
@@ -2098,7 +2116,7 @@ span.param-highlight {
             
           </div>
           
-          <div class="scenario passed" style="margin-bottom: var(--space-sm);"
+          <div class="scenario passed"
                
                data-covers='[2, 3, 4, 5, 6]'
                x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
@@ -2144,7 +2162,7 @@ span.param-highlight {
             
           </div>
           
-          <div class="scenario failed" style="margin-bottom: var(--space-sm);"
+          <div class="scenario failed"
                
                data-covers='[3, 4]'
                x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
@@ -2175,9 +2193,10 @@ span.param-highlight {
             
           </div>
           
+          </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
         
       </div>
       
@@ -2190,7 +2209,7 @@ span.param-highlight {
             <div class="header-title">Cancel a Booking<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=stories&amp;story=cancel-a-booking"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
-            <div class="header-context">3 activities · 1 scenario</div>
+            <div class="header-context meta-list"><span>3 activities</span><span>1 scenario</span></div>
             <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
                     @click="clearActivityHighlights()">Deselect</button>
           </div>
@@ -2215,7 +2234,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">1 scenario</span>
+              <span class="cov-chip cov-passed meta-list"><span>1 scenario</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="cancel-a-booking:1">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -2241,7 +2260,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">1 scenario</span>
+              <span class="cov-chip cov-passed meta-list"><span>1 scenario</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="cancel-a-booking:2">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -2267,7 +2286,7 @@ span.param-highlight {
             <div class="activity-cov">
               
               
-              <span class="cov-chip cov-passed">1 scenario</span>
+              <span class="cov-chip cov-passed meta-list"><span>1 scenario</span></span>
               
               <button type="button" class="use-chip activity-jump"
                       data-activity-jump="cancel-a-booking:3">Open in Scenarios <span aria-hidden="true">→</span></button>
@@ -2278,8 +2297,9 @@ span.param-highlight {
         </div>
         <div class="scn-act-strip-section">
           <div class="story-section-heading">Scenarios</div>
+          <div class="scenario-list">
           
-          <div class="scenario passed" style="margin-bottom: var(--space-sm);"
+          <div class="scenario passed"
                
                data-covers='[1, 2, 3]'
                x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
@@ -2315,9 +2335,10 @@ span.param-highlight {
             
           </div>
           
+          </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L122">examples/hotel-booking/test_hotel_booking.py:122</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L122">examples/hotel-booking/test_hotel_booking.py:122</a></div>
         
       </div>
       
@@ -2392,11 +2413,11 @@ span.param-highlight {
       <div class="header">
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
-          <div class="header-context">
-            13 terms ·
-            3 actors ·
-            5 work objects ·
-            5 verbs
+          <div class="header-context meta-list">
+            <span>13 terms</span>
+            <span>3 actors</span>
+            <span>5 work objects</span>
+            <span>5 verbs</span>
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
@@ -2414,6 +2435,7 @@ span.param-highlight {
           <span class="kind-meta" x-text="visibleTermLabel('actor')"></span>
         </div>
         
+        <div class="entry-list">
         
         
         
@@ -2434,7 +2456,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Person booking accommodation on behalf of a group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">1 instance · 1 story · 3 scenarios</div>
+              <div class="entry-summary meta-list"><span>1 instance</span><span>1 story</span><span>3 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=organizer"
@@ -2469,7 +2491,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L65">examples/hotel-booking/test_hotel_booking.py:65</a></div>
                 
               </div>
             </div>
@@ -2495,7 +2517,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Individual traveler in the group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">2 instances · 2 stories · 3 scenarios</div>
+              <div class="entry-summary meta-list"><span>2 instances</span><span>2 stories</span><span>3 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=guest"
@@ -2534,7 +2556,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L66">examples/hotel-booking/test_hotel_booking.py:66</a></div>
                 
               </div>
             </div>
@@ -2560,7 +2582,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Automated reservation back-end.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">2 stories · 3 scenarios</div>
+              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=booking-system"
@@ -2590,13 +2612,14 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L67">examples/hotel-booking/test_hotel_booking.py:67</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+        </div>
       </div>
       
       
@@ -2607,6 +2630,7 @@ span.param-highlight {
           <span class="kind-meta" x-text="visibleTermLabel('object')"></span>
         </div>
         
+        <div class="entry-list">
         
         
         
@@ -2627,7 +2651,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">1 instance · 1 story · 2 scenarios</div>
+              <div class="entry-summary meta-list"><span>1 instance</span><span>1 story</span><span>2 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=room"
@@ -2662,7 +2686,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L69">examples/hotel-booking/test_hotel_booking.py:69</a></div>
                 
               </div>
             </div>
@@ -2688,7 +2712,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">A reservation for one or more rooms.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">2 stories · 3 scenarios</div>
+              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=booking"
@@ -2718,7 +2742,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L70">examples/hotel-booking/test_hotel_booking.py:70</a></div>
                 
               </div>
             </div>
@@ -2744,7 +2768,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Money transferred for a booking.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">2 stories · 3 scenarios</div>
+              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=payment"
@@ -2774,7 +2798,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L71">examples/hotel-booking/test_hotel_booking.py:71</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L71">examples/hotel-booking/test_hotel_booking.py:71</a></div>
                 
               </div>
             </div>
@@ -2800,7 +2824,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Notification of a successful booking.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">2 stories · 3 scenarios</div>
+              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=confirmation"
@@ -2830,7 +2854,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L72">examples/hotel-booking/test_hotel_booking.py:72</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L72">examples/hotel-booking/test_hotel_booking.py:72</a></div>
                 
               </div>
             </div>
@@ -2856,7 +2880,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def"><span class="entry-def-badge" >Undefined</span></div>
-              <div class="entry-summary">1 story</div>
+              <div class="entry-summary meta-list"><span>1 story</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=loyalty-points"
@@ -2877,13 +2901,14 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L113">examples/hotel-booking/test_hotel_booking.py:113</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L113">examples/hotel-booking/test_hotel_booking.py:113</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+        </div>
       </div>
       
       
@@ -2894,6 +2919,7 @@ span.param-highlight {
           <span class="kind-meta" x-text="visibleTermLabel('verb')"></span>
         </div>
         
+        <div class="entry-list">
         
         
         
@@ -2914,7 +2940,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Guarantee a paid booking so its rooms are held for arrival.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">1 story · 1 scenario</div>
+              <div class="entry-summary meta-list"><span>1 story</span><span>1 scenario</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=confirm"
@@ -2949,7 +2975,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L74">examples/hotel-booking/test_hotel_booking.py:74</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L74">examples/hotel-booking/test_hotel_booking.py:74</a></div>
                 
               </div>
             </div>
@@ -2975,7 +3001,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Refuse a payment, leaving its booking pending.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">1 scenario</div>
+              <div class="entry-summary meta-list"><span>1 scenario</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=decline"
@@ -2996,7 +3022,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
                 
               </div>
             </div>
@@ -3022,7 +3048,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Withdraw a booking before arrival.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">1 story · 1 scenario</div>
+              <div class="entry-summary meta-list"><span>1 story</span><span>1 scenario</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=cancel"
@@ -3057,7 +3083,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
                 
               </div>
             </div>
@@ -3083,7 +3109,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def">Return the payment for a cancelled booking.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary">1 story · 1 scenario</div>
+              <div class="entry-summary meta-list"><span>1 story</span><span>1 scenario</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=refund"
@@ -3118,7 +3144,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L82">examples/hotel-booking/test_hotel_booking.py:82</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L82">examples/hotel-booking/test_hotel_booking.py:82</a></div>
                 
               </div>
             </div>
@@ -3144,7 +3170,7 @@ span.param-highlight {
             </span>
             <div class="entry-body">
               <div class="entry-def"><span class="entry-def-badge" >Undefined</span></div>
-              <div class="entry-summary">1 story</div>
+              <div class="entry-summary meta-list"><span>1 story</span></div>
             </div>
             <button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=redeems"
@@ -3165,13 +3191,14 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/hotel-booking/test_hotel_booking.py#L112">examples/hotel-booking/test_hotel_booking.py:112</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/hotel-booking/test_hotel_booking.py#L112">examples/hotel-booking/test_hotel_booking.py:112</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+        </div>
       </div>
       
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
@@ -3190,7 +3217,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-20T10:01:25.540836+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"verb\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"verb\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"verb\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"verb\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"verb\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Carol picks a suite for the group\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Carol completes the booking for both guests\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"failed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Payment is declined \\u2014 the booking is not finalized\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"cancel-a-booking\",\"narration\":{\"text\":\"Alice cancels her booking and is refunded\"}}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"]},\"scenario_activities\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":[1,2],\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":[2,3,4,5,6],\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":[3,4],\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":[1,2,3]},\"activity_labels\":{\"book-a-group-trip:1\":\"Carol searches for Room\",\"book-a-group-trip:2\":\"Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Booking System confirms Booking\",\"book-a-group-trip:6\":\"Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Carol redeems loyalty points\",\"cancel-a-booking:1\":\"Alice cancels Booking\",\"cancel-a-booking:2\":\"Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Booking System sends Confirmation to Alice\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-20T10:05:08.598816+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"verb\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"verb\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"verb\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"verb\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"verb\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Carol picks a suite for the group\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Carol completes the booking for both guests\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"failed\",\"story_id\":\"book-a-group-trip\",\"narration\":{\"text\":\"Payment is declined \\u2014 the booking is not finalized\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"cancel-a-booking\",\"narration\":{\"text\":\"Alice cancels her booking and is refunded\"}}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"]},\"scenario_activities\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":[1,2],\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":[2,3,4,5,6],\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":[3,4],\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":[1,2,3]},\"activity_labels\":{\"book-a-group-trip:1\":\"Carol searches for Room\",\"book-a-group-trip:2\":\"Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Booking System confirms Booking\",\"book-a-group-trip:6\":\"Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Carol redeems loyalty points\",\"cancel-a-booking:1\":\"Alice cancels Booking\",\"cancel-a-booking:2\":\"Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Booking System sends Confirmation to Alice\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"}}");
 // --- Hash helpers ---
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3501,7 +3528,8 @@ function reportApp() {
       if (this.search) parts.push('"' + this.search + '"');
       // Term/tag/module filters each have their own removable chip, so they
       // are not repeated here — but they do suppress "All Scenarios".
-      if (parts.length) return parts.join(' · ');
+      // An em space: this lands in one x-text, so the gap has to be a character.
+      if (parts.length) return parts.join('\u2003');
       const chipped = this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.activityFilter;
       return chipped ? '' : 'All Scenarios';

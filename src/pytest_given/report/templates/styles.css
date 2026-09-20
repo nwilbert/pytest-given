@@ -244,11 +244,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding-top: var(--space-lg);
 }
 .sidebar-label {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
 /* The sort control shares the caption line with the section label and stays in
@@ -269,10 +267,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   border-bottom: 1.5px solid transparent;
   padding: 0 0 1px;
   font-family: inherit;
-  font-size: 0.6875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text-muted);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -421,7 +417,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .nav-group-active .nav-group-name { font-weight: 600; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
-.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
+.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); font-variant-numeric: tabular-nums; }
 /* Keeps a childless row's name aligned with its siblings that carry a
    chevron, so one level reads as one column. Only the module tree has any, so
    the flat axes leave it out rather than indent every row past nothing. */
@@ -490,13 +486,23 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .collapse-chevron-up { transform: rotate(-135deg); margin-bottom: -2px; }
 
-/* === Scenario Cards === */
-.scenario {
+/* === Scenario rows ===
+   One surface per list with a rule between rows, not a card per row: the
+   status stripe on the left edge is the row's own mark and stays. `margin-top:
+   -1px` under `overflow: hidden` lets the first *visible* row's rule vanish
+   under the surface's border, whichever row that is after filtering. */
+.scenario-list,
+.entry-list,
+.activity-timeline {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.scenario {
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
   padding: var(--space-md) var(--space-lg);
-  margin-bottom: var(--space-sm);
   border-left: 3px solid var(--color-passed);
 }
 .scenario.failed { border-left-color: var(--color-failed); }
@@ -567,21 +573,23 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   transition: opacity 0.1s;
 }
 .scenario-header:hover .scenario-name--goto::after { opacity: 0.6; }
+/* Neutral at rest: a tag is a label until it is the filter, and only then
+   does it take the accent. */
 .scenario-tag {
   display: inline-block;
-  background: var(--color-accent-tint);
-  color: var(--color-accent);
+  background: var(--bg-page);
+  color: var(--text-secondary);
   font-size: var(--font-size-sm);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   white-space: nowrap;
   flex-shrink: 0;
 }
-.scenario-tag:hover { border-color: var(--color-accent); }
+.scenario-tag:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .scenario-tag.active-tag { background: var(--color-accent); color: var(--on-accent); border-color: var(--color-accent); font-weight: 600; }
-.scenario-tag-more { background: transparent; border: 1px dashed var(--color-accent); }
+.scenario-tag-more { background: transparent; border-style: dashed; }
 .scenario-tag-more:hover { background: var(--color-accent-tint); border-style: solid; }
 .scenario-meta {
   display: flex;
@@ -591,15 +599,27 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   justify-content: flex-end;
 }
 .scenario-status { font-size: var(--font-size-sm); font-weight: 500; }
-.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); }
+.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .scenario-status.passed { color: var(--color-passed); }
 .scenario-status.failed { color: var(--color-failed); }
 .scenario-status.skipped { color: var(--color-skipped); }
 
-/* Steps */
-.steps { padding-top: var(--space-md); padding-left: var(--space-xl); font-size: var(--font-size-base); line-height: 1.8; }
-.phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
-.phase-steps { padding-left: var(--space-lg); }
+/* Narration: the keyword sits in a fixed left gutter, in the ink at medium
+   weight; steps align beside it. Structure comes from alignment, so the accent
+   stays reserved for interaction. Grid auto-placement does the rest — a label
+   is pinned to column 1 and so starts a row, each step is pinned to column 2
+   and so takes the next row. */
+.steps {
+  display: grid;
+  grid-template-columns: 3.75em 1fr;
+  column-gap: var(--space-sm);
+  padding-top: var(--space-md);
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}
+.phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
+.phase-steps { grid-column: 2; min-width: 0; }
 .step-text { color: var(--text-secondary); }
 .step-expand,
 .attachment-expand {
@@ -806,11 +826,9 @@ span.param-highlight {
   margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
 }
 .attachment-panel-label {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   padding: var(--space-sm) 0 var(--space-xs);
 }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks
@@ -1061,18 +1079,17 @@ span.param-highlight {
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 /* === Activity timeline === */
-.activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+.activity-timeline { margin-bottom: var(--space-xl); }
 .activity-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.activity-row:hover { border-color: var(--color-accent); }
+.activity-row:hover:not(.activity-row-highlight) { background: var(--bg-page); }
 .activity-num {
   min-width: 24px;
   padding: 0;
@@ -1091,6 +1108,10 @@ span.param-highlight {
 .activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
 .activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+
+/* Counts side by side, separated by space rather than a glyph. */
+.meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
+.cov-chip.meta-list { display: inline-flex; gap: var(--space-sm); }
 
 /* === Coverage chip === */
 .activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
@@ -1150,11 +1171,9 @@ span.param-highlight {
 .scn-act-strip-section { margin-top: var(--space-xl); }
 /* Section label separating the scenario list from the activity timeline above. */
 .story-section-heading {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
 
@@ -1197,7 +1216,7 @@ span.param-highlight {
   font-size: var(--font-size-md);
   font-weight: 700;
 }
-.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 /* Kind colors for kind headers and term pills: the same ink, wash and edge
    the narration gives each kind, so one kind is one color across both views.
@@ -1222,10 +1241,8 @@ span.param-highlight {
 
 /* === Glossary entry layout === */
 .entry {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
 }
 .entry-head {
   display: flex;
@@ -1248,8 +1265,6 @@ span.param-highlight {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 .entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 

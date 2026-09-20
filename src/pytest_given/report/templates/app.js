@@ -308,7 +308,8 @@ function reportApp() {
       if (this.search) parts.push('"' + this.search + '"');
       // Term/tag/module filters each have their own removable chip, so they
       // are not repeated here — but they do suppress "All Scenarios".
-      if (parts.length) return parts.join(' · ');
+      // An em space: this lands in one x-text, so the gap has to be a character.
+      if (parts.length) return parts.join('\u2003');
       const chipped = this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.activityFilter;
       return chipped ? '' : 'All Scenarios';

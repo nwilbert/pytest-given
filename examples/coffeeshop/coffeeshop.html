@@ -264,11 +264,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding-top: var(--space-lg);
 }
 .sidebar-label {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
 /* The sort control shares the caption line with the section label and stays in
@@ -289,10 +287,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   border-bottom: 1.5px solid transparent;
   padding: 0 0 1px;
   font-family: inherit;
-  font-size: 0.6875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text-muted);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -441,7 +437,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .nav-group-active .nav-group-name { font-weight: 600; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
-.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); }
+.nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); font-variant-numeric: tabular-nums; }
 /* Keeps a childless row's name aligned with its siblings that carry a
    chevron, so one level reads as one column. Only the module tree has any, so
    the flat axes leave it out rather than indent every row past nothing. */
@@ -510,13 +506,23 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .collapse-chevron-up { transform: rotate(-135deg); margin-bottom: -2px; }
 
-/* === Scenario Cards === */
-.scenario {
+/* === Scenario rows ===
+   One surface per list with a rule between rows, not a card per row: the
+   status stripe on the left edge is the row's own mark and stays. `margin-top:
+   -1px` under `overflow: hidden` lets the first *visible* row's rule vanish
+   under the surface's border, whichever row that is after filtering. */
+.scenario-list,
+.entry-list,
+.activity-timeline {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.scenario {
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
   padding: var(--space-md) var(--space-lg);
-  margin-bottom: var(--space-sm);
   border-left: 3px solid var(--color-passed);
 }
 .scenario.failed { border-left-color: var(--color-failed); }
@@ -587,21 +593,23 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   transition: opacity 0.1s;
 }
 .scenario-header:hover .scenario-name--goto::after { opacity: 0.6; }
+/* Neutral at rest: a tag is a label until it is the filter, and only then
+   does it take the accent. */
 .scenario-tag {
   display: inline-block;
-  background: var(--color-accent-tint);
-  color: var(--color-accent);
+  background: var(--bg-page);
+  color: var(--text-secondary);
   font-size: var(--font-size-sm);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   white-space: nowrap;
   flex-shrink: 0;
 }
-.scenario-tag:hover { border-color: var(--color-accent); }
+.scenario-tag:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .scenario-tag.active-tag { background: var(--color-accent); color: var(--on-accent); border-color: var(--color-accent); font-weight: 600; }
-.scenario-tag-more { background: transparent; border: 1px dashed var(--color-accent); }
+.scenario-tag-more { background: transparent; border-style: dashed; }
 .scenario-tag-more:hover { background: var(--color-accent-tint); border-style: solid; }
 .scenario-meta {
   display: flex;
@@ -611,15 +619,27 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   justify-content: flex-end;
 }
 .scenario-status { font-size: var(--font-size-sm); font-weight: 500; }
-.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); }
+.scenario-duration { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .scenario-status.passed { color: var(--color-passed); }
 .scenario-status.failed { color: var(--color-failed); }
 .scenario-status.skipped { color: var(--color-skipped); }
 
-/* Steps */
-.steps { padding-top: var(--space-md); padding-left: var(--space-xl); font-size: var(--font-size-base); line-height: 1.8; }
-.phase-label { font-weight: 600; color: var(--text-muted); margin-top: var(--space-xs); }
-.phase-steps { padding-left: var(--space-lg); }
+/* Narration: the keyword sits in a fixed left gutter, in the ink at medium
+   weight; steps align beside it. Structure comes from alignment, so the accent
+   stays reserved for interaction. Grid auto-placement does the rest — a label
+   is pinned to column 1 and so starts a row, each step is pinned to column 2
+   and so takes the next row. */
+.steps {
+  display: grid;
+  grid-template-columns: 3.75em 1fr;
+  column-gap: var(--space-sm);
+  padding-top: var(--space-md);
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}
+.phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
+.phase-steps { grid-column: 2; min-width: 0; }
 .step-text { color: var(--text-secondary); }
 .step-expand,
 .attachment-expand {
@@ -826,11 +846,9 @@ span.param-highlight {
   margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
 }
 .attachment-panel-label {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   padding: var(--space-sm) 0 var(--space-xs);
 }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks
@@ -1081,18 +1099,17 @@ span.param-highlight {
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 /* === Activity timeline === */
-.activity-timeline { display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-xl); }
+.activity-timeline { margin-bottom: var(--space-xl); }
 .activity-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.activity-row:hover { border-color: var(--color-accent); }
+.activity-row:hover:not(.activity-row-highlight) { background: var(--bg-page); }
 .activity-num {
   min-width: 24px;
   padding: 0;
@@ -1111,6 +1128,10 @@ span.param-highlight {
 .activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
 .activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+
+/* Counts side by side, separated by space rather than a glyph. */
+.meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
+.cov-chip.meta-list { display: inline-flex; gap: var(--space-sm); }
 
 /* === Coverage chip === */
 .activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
@@ -1170,11 +1191,9 @@ span.param-highlight {
 .scn-act-strip-section { margin-top: var(--space-xl); }
 /* Section label separating the scenario list from the activity timeline above. */
 .story-section-heading {
-  color: var(--text-muted);
-  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   margin-bottom: var(--space-sm);
 }
 
@@ -1217,7 +1236,7 @@ span.param-highlight {
   font-size: var(--font-size-md);
   font-weight: 700;
 }
-.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
+.kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 /* Kind colors for kind headers and term pills: the same ink, wash and edge
    the narration gives each kind, so one kind is one color across both views.
@@ -1242,10 +1261,8 @@ span.param-highlight {
 
 /* === Glossary entry layout === */
 .entry {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
 }
 .entry-head {
   display: flex;
@@ -1268,8 +1285,6 @@ span.param-highlight {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 .entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
@@ -1502,6 +1517,7 @@ span.param-highlight {
     </div>
   </div>
 
+  <div class="scenario-list">
   <div class="scenario passed"
        x-show="isVisible(0)"
        id="scenario-0"
@@ -1553,7 +1569,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1608,7 +1624,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1650,7 +1666,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1775,7 +1791,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1863,7 +1879,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -1907,7 +1923,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
@@ -1993,7 +2009,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
@@ -2035,7 +2051,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2079,7 +2095,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2251,7 +2267,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
@@ -2329,7 +2345,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
@@ -2438,7 +2454,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
@@ -2488,7 +2504,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -2546,7 +2562,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
@@ -2568,7 +2584,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">80ms</span>
+        <span class="scenario-duration">77ms</span>
       </span>
     </div>
 
@@ -2640,7 +2656,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
@@ -2681,7 +2697,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
@@ -2766,12 +2782,13 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/0f93786abb4d54a4cc04e3df7c633ea6ba3c2164/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/69d4faed477b42cabd1b87c5825f8d541e83eb0a/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
   </div>
   
+  </div>
 
   </div>
   </div>
@@ -2794,7 +2811,7 @@ Total:        $2.00</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-20T10:01:25.107398+00:00\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario name)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"story_id\":null,\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_activities\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":[],\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":[],\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":[],\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":[],\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":[],\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":[],\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":[],\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":[],\"examples/coffeeshop/test_coffeeshop.py::test_failing\":[],\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":[],\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":[]},\"activity_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-20T10:05:08.153809+00:00\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario name)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"story_id\":null,\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_activities\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":[],\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":[],\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":[],\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":[],\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":[],\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":[],\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":[],\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":[],\"examples/coffeeshop/test_coffeeshop.py::test_failing\":[],\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":[],\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":[]},\"activity_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
 // --- Hash helpers ---
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3105,7 +3122,8 @@ function reportApp() {
       if (this.search) parts.push('"' + this.search + '"');
       // Term/tag/module filters each have their own removable chip, so they
       // are not repeated here — but they do suppress "All Scenarios".
-      if (parts.length) return parts.join(' · ');
+      // An em space: this lands in one x-text, so the gap has to be a character.
+      if (parts.length) return parts.join('\u2003');
       const chipped = this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.activityFilter;
       return chipped ? '' : 'All Scenarios';

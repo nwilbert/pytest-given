@@ -551,9 +551,10 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    # The template emits exactly two `</script>` tags (data block + alpine block).
-    # An unescaped attachment payload or narration would add more.
-    assert content.count('</script>') == 2
+    # The template emits exactly three `</script>` tags (theme head script,
+    # data block, alpine block). An unescaped attachment payload or narration
+    # would add more.
+    assert content.count('</script>') == 3
     # The escaped form must be present in the embedded JSON.
     assert '<\\/script>' in content
 
@@ -591,9 +592,9 @@ def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    # Two literal `</script>` tags only (data block + alpine block); an
-    # unescaped node id in any blob would add a third.
-    assert content.count('</script>') == 2
+    # Three literal `</script>` tags only (theme head script, data block,
+    # alpine block); an unescaped node id in any blob would add a fourth.
+    assert content.count('</script>') == 3
 
 
 def test_render_escapes_comment_open_in_report_data(tmp_path: Path) -> None:
@@ -636,8 +637,8 @@ def test_render_escapes_comment_open_in_report_data(tmp_path: Path) -> None:
     script_start = content.index('window.__REPORT_DATA__')
     assert '<!--' not in content[script_start:]
     assert '\\u003C!--' in content
-    # Both script blocks still close, so the document is not swallowed.
-    assert content.count('</script>') == 2
+    # All three script blocks still close, so the document is not swallowed.
+    assert content.count('</script>') == 3
     assert content.rstrip().endswith('</html>')
 
 
