@@ -984,6 +984,7 @@
 <li>The <code>#scenario=</code> deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.</li>
 <li><code>pytest-given report</code> reports a non-UTF-8 input file as an error rather than crashing with a traceback.</li>
 <li>A <code>dead-term</code> finding states the criterion the rule actually applies: a term ref in a <code>@scenario</code> name keeps a term alive, which the old message did not mention.</li>
+<li>The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from <code>parameters.cases[].error</code>, where they live; the scenario's own <code>error</code> is <code>null</code> there and the old recipe printed an empty message. The skill also starts from a committed or CI-published report when one exists, instead of always rerunning the suite.</li>
 </ul>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
