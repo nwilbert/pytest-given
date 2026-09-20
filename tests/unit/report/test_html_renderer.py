@@ -2196,3 +2196,25 @@ def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
     app_data = _embedded_app_data(content)
     assert app_data['scenario_activities'] == {'test.py::test_x': [1]}
     assert app_data['activity_labels'] == {'book-a-room:1': 'Carol searches for Room'}
+
+
+def test_render_emits_the_configured_theme_as_the_document_default() -> None:
+    """`data-theme-default` is the contract with the head script: it is the
+    only place the configured theme reaches the page."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'p',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [],
+        }
+    )
+    assert 'data-theme-default="dark"' in render_html_string(
+        report, source_link_template=None, theme='dark'
+    )
+    assert 'data-theme-default="auto"' in render_html_string(
+        report, source_link_template=None
+    )

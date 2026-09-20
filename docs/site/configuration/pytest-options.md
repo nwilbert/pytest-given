@@ -13,6 +13,7 @@ The *checks* are not opt-in. Every run builds the report it would have written, 
 | `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template, **HTML only**. Renders a clickable file:line anchor on each scenario card, story panel, and expanded glossary term card. Also settable as the `given_source_link` ini. See [Source links](source-links.md). |
 | `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](source-links.md#traceback-frames). |
 | `--given-lint` / `--no-given-lint` | `false` | Run the narration lint; an error-level finding fails the run. Also settable as the `given_lint` ini, which either form overrides. See [Narration lint](narration-lint.md). |
+| `--given-theme=light\|dark\|auto` | `auto` | Theme the HTML report opens in; `auto` follows the viewer's system. The report's own Light / Dark / System control overrides it per browser. Also settable as the `given_theme` ini. |
 
 Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection. A path that could not be a report file (a `.py` test path, say) is refused before the suite runs rather than written over.
 

@@ -25,6 +25,7 @@ from ..model import PytestGivenError, ReportData, report_from_dict
 from .html_renderer import render_html_string
 from .md_renderer import render_md
 from .story_view import build_coverage_records
+from .theme import DEFAULT_THEME, Theme
 
 # Where a bare --given-json / --given-html / `pytest-given report` writes.
 # Report-layout facts, so both entry points read them from here rather than
@@ -46,6 +47,7 @@ class SinkConfig:
     md_path: Path | None = None
     md_to_stdout: bool = False
     source_link_template: str | None = None
+    theme: Theme = DEFAULT_THEME
 
     def __post_init__(self) -> None:
         _require_suffix('JSON', self.json_path, ('.json',))
@@ -144,7 +146,9 @@ def render_sinks(
             RenderedFile(
                 config.html_path,
                 render_html_string(
-                    report, source_link_template=config.source_link_template
+                    report,
+                    source_link_template=config.source_link_template,
+                    theme=config.theme,
                 ),
             )
         )

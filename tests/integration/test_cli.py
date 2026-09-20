@@ -367,3 +367,12 @@ def test_cli_refuses_an_unknown_source_link_preset_on_a_markdown_run(
     err = capsys.readouterr().err
     assert '--source-link' in err
     assert 'Traceback' not in err
+
+
+def test_report_theme_flag_sets_the_report_default(tmp_path: Path) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()), encoding='utf-8')
+    html_path = tmp_path / 'report.html'
+    rc = main(['report', str(json_path), '-o', str(html_path), '--theme', 'dark'])
+    assert rc == 0
+    assert 'data-theme-default="dark"' in html_path.read_text(encoding='utf-8')

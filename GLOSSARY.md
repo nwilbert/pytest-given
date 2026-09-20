@@ -55,6 +55,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
 | **Source link** | A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card, resolved from the `given_source_link` config — a preset name like `vscode` / `github`, or a raw URL template. Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default. |
+| **Theme** | The HTML report's colour scheme — `light`, `dark`, or `auto` (follow the viewer's system). The `given_theme` config sets the default a report opens in; a viewer's own choice from the report's theme control, once made, wins over it in that browser. |
 
 ## Narration lint
 

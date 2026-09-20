@@ -1,8 +1,9 @@
 """The plugin's options: declaration, and the one place they are resolved.
 
 `pytest_configure` parses every option into a single `GivenConfig` before the
-suite runs, so a typo in a rule name — and, on an HTML run, in a source-link
-preset — is a `UsageError` up front rather than a surprise after the last test.
+suite runs, so a typo in a rule name, a theme — and, on an HTML run, a
+source-link preset — is a `UsageError` up front rather than a surprise after
+the last test.
 The preset is resolved only for an HTML run because the `github` one shells out
 to `git remote`, which a run that writes no HTML should not pay for.
 """
@@ -18,8 +19,11 @@ from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     SOURCE_LINK_HELP,
+    THEME_HELP,
     SinkConfig,
+    Theme,
     resolve_source_link_template,
+    resolve_theme,
 )
 from .state import GivenConfig, store_given_config
 
@@ -89,6 +93,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             'the given_lint ini for one run.'
         ),
     )
+    group.addoption(
+        '--given-theme',
+        default=None,
+        help=THEME_HELP + ' Overrides the given_theme ini for one run.',
+    )
     parser.addini(
         'given_source_link',
         type='string',
@@ -123,6 +132,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
             'run.'
         ),
     )
+    parser.addini(
+        'given_theme',
+        type='string',
+        default='auto',
+        help=(
+            'Theme the HTML report opens in: light, dark or auto (CLI flag '
+            'overrides this).'
+        ),
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -143,7 +161,11 @@ def pytest_configure(config: pytest.Config) -> None:
             if config.getoption('given_html') is not None
             else None
         )
-        sinks = _resolve_sinks(config, source_link_template)
+        theme = resolve_theme(
+            _cli_over_ini(config, 'given_theme', str),
+            setting=_setting_spelling(config, 'given_theme'),
+        )
+        sinks = _resolve_sinks(config, source_link_template, theme)
     except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
     store_given_config(
@@ -200,7 +222,7 @@ def _resolve_title(config: pytest.Config) -> str | None:
 
 
 def _resolve_sinks(
-    config: pytest.Config, source_link_template: str | None
+    config: pytest.Config, source_link_template: str | None, theme: Theme
 ) -> SinkConfig:
     """The three sink flags, resolved into the pytest-free shape `report/`
     reads. CLI-only, so there is no ini precedence to settle here.
@@ -218,6 +240,7 @@ def _resolve_sinks(
             md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
             md_to_stdout=md_opt == '-',
             source_link_template=source_link_template,
+            theme=theme,
         )
     except PytestGivenError as error:
         raise PytestGivenError(

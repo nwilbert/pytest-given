@@ -47,6 +47,7 @@ from .story_view import (
     build_story_rollups,
 )
 from .text import plural
+from .theme import DEFAULT_THEME, Theme
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
@@ -88,11 +89,13 @@ def _inline_md(text: str | None) -> Markup:
 def render_html_string(
     report: ReportData,
     source_link_template: str | None,
+    theme: Theme = DEFAULT_THEME,
 ) -> str:
     """Render a report model to a self-contained HTML document.
 
     `source_link_template` is the already-resolved template string (preset
     expansion happens before this point). None disables source linking.
+    `theme` is the default the page opens in until the viewer picks one.
 
     Returns the document rather than writing it — `sinks` owns the writing.
     """
@@ -101,7 +104,7 @@ def render_html_string(
     param_color_map = _build_param_color_map(report.scenarios)
     env = _build_env(report, source_link_template, param_color_map)
     return env.get_template('report.html.j2').render(
-        **_render_context(report, param_color_map)
+        **_render_context(report, param_color_map, theme)
     )
 
 
@@ -160,7 +163,7 @@ def _make_param_color_class(
 
 
 def _render_context(
-    report: ReportData, param_color_map: ParamColorMap
+    report: ReportData, param_color_map: ParamColorMap, theme: Theme
 ) -> dict[str, object]:
     """Everything `report.html.j2` reads, in three groups: the report model
     itself, the precomputed aggregations, and the JSON blobs the page's Alpine
@@ -173,6 +176,7 @@ def _render_context(
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
         'metadata': report.metadata,
+        'theme_default': theme,
         'scenarios': report.scenarios,
         'stories': report.stories,
         'glossary': report.glossary,

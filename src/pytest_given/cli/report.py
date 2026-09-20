@@ -9,8 +9,12 @@ from typing import Any
 from ..model import PytestGivenError
 from ..report import (
     DEFAULT_HTML_PATH,
+    DEFAULT_THEME,
     SOURCE_LINK_HELP,
+    THEME_HELP,
+    THEMES,
     SinkConfig,
+    Theme,
     emit_sinks,
     resolve_source_link_template,
 )
@@ -37,6 +41,12 @@ def add_report_parser(
         help=SOURCE_LINK_HELP,
     )
     report_parser.add_argument(
+        '--theme',
+        choices=THEMES,
+        default=DEFAULT_THEME,
+        help=THEME_HELP,
+    )
+    report_parser.add_argument(
         '--format',
         choices=['html', 'md'],
         default=None,
@@ -58,7 +68,7 @@ def run_report(args: argparse.Namespace) -> int:
         print(f'Error: {json_file} not found', file=sys.stderr)
         return 1
     try:
-        config = _sink_config(args.output, args.source_link, args.format)
+        config = _sink_config(args.output, args.source_link, args.format, args.theme)
         rendered = emit_sinks(_load_report(json_file), config, str(json_file))
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
         # A file that is not UTF-8 at all never reaches the JSON parser, and
@@ -87,7 +97,9 @@ def _load_report(json_file: Path) -> dict[str, Any]:
     return report_dict
 
 
-def _sink_config(output: Path | None, source_link: str, fmt: str | None) -> SinkConfig:
+def _sink_config(
+    output: Path | None, source_link: str, fmt: str | None, theme: Theme
+) -> SinkConfig:
     """The one sink this invocation writes.
 
     Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
@@ -103,6 +115,7 @@ def _sink_config(output: Path | None, source_link: str, fmt: str | None) -> Sink
     return SinkConfig(
         html_path=output or DEFAULT_HTML_PATH,
         source_link_template=source_link_template,
+        theme=theme,
     )
 
 
