@@ -1,7 +1,7 @@
 # Report identity and dark mode — design
 
 **Date:** 2026-09-20
-**Status:** approved 2026-09-20; palette settled on a side-by-side mockup
+**Status:** implemented 2026-09-20; palette settled on a side-by-side mockup
 
 ## Goal
 

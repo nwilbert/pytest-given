@@ -190,8 +190,24 @@
 - **then** the title reaches the JSON metadata
 - **then** the title also heads the Markdown rendering
 
+## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
+`tests/integration/test_plugin.py:2591::test_given_theme_cli_flag_sets_the_report_default` · configuration
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with --given-theme=dark
+- **then** the test passes
+- **then** the page declares dark as its default «theme»
+
+## ✓ An unknown «theme» stops the run before it collects
+`tests/integration/test_plugin.py:2640::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+
+- **given** a suite that would otherwise pass
+- **when** the suite runs with a misspelled «theme», and no HTML sink
+- **then** the run ends as a usage error, naming the flag the user typed
+- **then** no test ran: the run stopped at configure, before collection
+
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2665::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2757::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
