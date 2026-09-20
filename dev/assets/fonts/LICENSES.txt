@@ -4,11 +4,13 @@ served by the pytest-given documentation site instead of a third-party font CDN.
 Both are licensed under the SIL Open Font License, Version 1.1, reproduced
 below.
 
-Inter (inter-*.woff2)
-  Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
+Source Sans 3 (source-sans-3-*.woff2)
+  Copyright 2010-2024 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+  https://github.com/adobe-fonts/source-sans
 
-JetBrains Mono (jetbrains-mono-*.woff2)
-  Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+Source Code Pro (source-code-pro-*.woff2)
+  (c) 2023 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+  https://github.com/adobe-fonts/source-code-pro
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

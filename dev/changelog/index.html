@@ -20,7 +20,7 @@
         
       
       
-      <link rel="icon" href="../assets/favicon.svg">
+      <link rel="icon" href="../assets/logo.svg">
       <meta name="generator" content="zensical-0.0.61">
     
     
@@ -960,9 +960,14 @@
 <li>The bundled skills ship under <code>pytest_given/.agents/skills/</code> in the wheel, so downstream projects can also install them with <a href="https://library-skills.io">library-skills</a> (<code>uvx library-skills install --claude</code>) alongside the skills of their other dependencies. <code>pytest-given skills install</code> keeps working as before.</li>
 <li>The JSON report carries a top-level <code>coverage</code> key — one record per story activity with <code>tracked</code> and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.</li>
 <li>The documentation lives at <a href="https://nwilbert.github.io/pytest-given/">https://nwilbert.github.io/pytest-given/</a>; the README keeps the overview and quick start, and the bundled skills and the <code>--given-source-link</code> / <code>--source-link</code> help text point at the site.</li>
+<li><code>--given-theme</code> / <code>given_theme</code> (and <code>--theme</code> on <code>pytest-given report</code>) set whether the HTML report opens light, dark, or following the viewer's system.</li>
+<li>The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li>The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.</li>
+<li>The documentation site is set in Source Sans 3 and Source Code Pro.</li>
+<li>The HTML report inlines its stylesheet and script without their source comments, which takes about 29 KB off every report; line numbers are preserved, so a browser stack trace still maps onto <code>app.js</code>.</li>
 <li>Story coverage matches on glossary terms alone: an instance in an activity (<code>guest('Alice')</code>) is now covered by a step naming the bare term, and vice versa — activities that differed only by instance are no longer told apart by narration, only by an <code>activity=</code> pin.</li>
 <li>The authoring skill's and README's glossary snippets keep generic verbs (<em>searches for</em>, <em>adds</em>) as bare activity strings instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.</li>
 </ul>

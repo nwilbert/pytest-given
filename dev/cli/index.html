@@ -22,7 +22,7 @@
         
       
       
-      <link rel="icon" href="../assets/favicon.svg">
+      <link rel="icon" href="../assets/logo.svg">
       <meta name="generator" content="zensical-0.0.61">
     
     
@@ -894,6 +894,7 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>--source-link<span class="o">=</span>vscode
 </code></pre></div>
 <p><code>--source-link</code> accepts the same presets and raw templates as <code>--given-source-link</code> (see <a href="../configuration/source-links/">Source links</a>); omit it (or pass <code>--source-link=none</code>) to render plain file:line text without an anchor. On a <code>--format md</code> run it is validated but unused.</p>
+<p><code>--theme=light|dark|auto</code> sets the theme the report opens in, like <code>--given-theme</code> (default <code>auto</code>).</p>
 <p>Pass <code>--format md</code> for Markdown instead of HTML; it is also inferred from the <code>-o</code> extension, so <code>-o report.md</code> needs no <code>--format</code>. Omit <code>-o</code> with <code>--format md</code> to print to stdout — bare, unlike the plugin's <code>--given-md=-</code>, which fences its output in <code>&lt;!-- pytest-given:md:start --&gt;</code> markers so it can be found in pytest's mixed output.</p>
 <p>The same script owns <code>skills install</code> — see <a href="../ai-agents/#agent-skills">Agent skills</a>.</p>
 
