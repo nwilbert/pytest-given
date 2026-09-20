@@ -963,6 +963,7 @@
 <h2 id="scenario"><code>@scenario</code><a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
 <p><code>@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)</code></p>
 <p>Required for a test to appear in the report. <code>story=</code> / <code>activities=</code> bind it to a domain story (see <a href="../domain-storytelling/">Domain Storytelling</a>) — <code>activities=</code> requires <code>story=</code> and takes an <code>int</code> or a sequence of them, never a string; <code>group_parametrized=False</code> declines parametrize merging. The decorated function is returned unwrapped.</p>
+<p><code>tags=</code> takes free-form strings. A <code>/</code> nests a tag in the report's Tags sidebar the way a <code>.</code> nests modules: <code>ticket/ABC-123</code> files under a <code>ticket</code> heading, and selecting the heading filters to every tag beneath it. Tags are report metadata, not pytest marks.</p>
 <h2 id="given-when-then"><code>given</code> / <code>when</code> / <code>then</code><a class="headerlink" href="#given-when-then" title="Permanent link">&para;</a></h2>
 <p><code>given(text)</code>, <code>when(text)</code>, <code>then(text)</code></p>
 <p>Dual-purpose: use as a <strong>context manager</strong> inside a test body, or as a <strong>decorator</strong> on a fixture or helper function.</p>
