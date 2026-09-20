@@ -15,7 +15,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Narration** | The human-readable text on a step or scenario name. A `Narration` bundles the flat rendered `text` with `parts` — empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces. The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks. |
 | **Phase** | The category of a step: `given`, `when`, or `then`. A step has exactly one phase. |
 | **when_then** | A step-authoring helper that emits a `when` action and its `then` outcome as two sibling steps from a single `with` block. Used mainly to narrate an expected raise (`with when_then('the action', 'the error is raised'), pytest.raises(...)`), so the action and its outcome stay distinct steps. |
-| **Tag** | Free-form string label attached via `@scenario(name, tags=[...])`. Used by the report's filter UI. |
+| **Tag** | Free-form string label attached via `@scenario(name, tags=[...])`. Used by the report's filter UI, where a `/` nests it (`ticket/ABC-123` under `ticket`) and selecting a prefix filters to every tag beneath it. |
 | **Attachment** | A labeled blob (text or JSON) bound to the currently-active step via `attach(label, content)`. |
 
 ## Parametrization

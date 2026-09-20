@@ -15,6 +15,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
+- A `/` in a tag nests it in the HTML report's Tags sidebar (`ticket/ABC-123` under a `ticket` heading), and selecting the heading filters to every tag beneath it, as a package does for its modules.
 - The bundled skills ship under `pytest_given/.agents/skills/` in the wheel, so downstream projects can also install them with [library-skills](https://library-skills.io) (`uvx library-skills install --claude`) alongside the skills of their other dependencies. `pytest-given skills install` keeps working as before.
 - The JSON report carries a top-level `coverage` key — one record per story activity with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
 - The documentation lives at <https://nwilbert.github.io/pytest-given/>; the README keeps the overview and quick start, and the bundled skills and the `--given-source-link` / `--source-link` help text point at the site.

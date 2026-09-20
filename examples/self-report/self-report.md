@@ -1878,21 +1878,21 @@
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_glossary_view.py:323::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_glossary_view.py:322::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» activity
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_glossary_view.py:356::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_glossary_view.py:355::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_glossary_view.py:445::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_glossary_view.py:444::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built
@@ -2059,7 +2059,7 @@
     ```
 
 ## ✓ The JSON report carries each «activity»'s «coverage»
-`tests/unit/report/test_sinks.py:183::test_json_sink_carries_per_activity_coverage`
+`tests/unit/report/test_sinks.py:174::test_json_sink_carries_per_activity_coverage`
 
 - **given** a «Story» with a covered, an uncovered, an untracked «Activity»
 - **when** the JSON sink is rendered
@@ -2067,7 +2067,7 @@
 - **then** the rest of the report is the input dict, unchanged
 
 ## ✓ A re-rendered report recomputes «coverage» rather than carrying it
-`tests/unit/report/test_sinks.py:217::test_json_sink_replaces_incoming_coverage`
+`tests/unit/report/test_sinks.py:208::test_json_sink_replaces_incoming_coverage`
 
 - **given** a saved report dict whose `coverage` no longer matches its steps
 - **when** `pytest-given report` re-renders it to JSON

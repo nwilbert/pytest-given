@@ -65,12 +65,28 @@ const SIDEBAR_MAX = 480;
 const SIDEBAR_DEFAULT = 260;
 const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)));
 
+// Two browse axes are trees: modules split on '.', tags on '/'. A filter on
+// either selects its own key and everything below it — a package takes its
+// modules, `ticket` takes `ticket/ABC-123`.
+const MODULE_SEP = '.';
+const TAG_SEP = '/';
+function underPrefix(key, filter, sep) {
+  return key === filter || key.startsWith(filter + sep);
+}
+
+// Every prefix of a key, the key itself included: `a.b.c` -> a, a.b, a.b.c.
+function prefixesOf(key, sep) {
+  const parts = key.split(sep);
+  return parts.map((_, i) => parts.slice(0, i + 1).join(sep));
+}
+
 // Segments every module shares carry no information — `tests` above a suite
 // rooted there is a row and an indent that say nothing. Never eats a module's
-// last segment, or a lone module would render nameless.
+// last segment, or a lone module would render nameless. Tags get no such
+// stripping: a shared tag prefix is a heading the author wrote on purpose.
 function commonDepth(modules) {
   if (!modules.length) return 0;
-  const split = modules.map(m => m.split('.'));
+  const split = modules.map(m => m.split(MODULE_SEP));
   const first = split[0];
   let i = 0;
   while (i < first.length - 1
@@ -114,6 +130,40 @@ function reportApp() {
     skipped: data.scenarios.filter(s => s.status === 'skipped').length,
   };
   const moduleSkipDepth = commonDepth(allModules);
+  function termLabel(id) {
+    if (id === NO_TERMS) return 'no terms';
+    // Term ids are slugs ('file-glossary'); the report speaks canonical
+    // names ('File glossary'). Falls back to the id for an unknown term.
+    return lookup(termNames, id, id);
+  }
+  function tagLabel(tag) {
+    return tag === NO_TAGS ? 'untagged' : tag;
+  }
+  // The browse axes. A node counts scenarios, not keys — a scenario tagged
+  // `ticket/A` and `ticket/B` is one row under `ticket` — so `reach` lists
+  // once per scenario every key it counts under: each of its own keys and
+  // every prefix of them. Term ids are slugs and never split, so the same
+  // tree renders them flat. Whether an axis nests at all is read off the
+  // whole report, not the filtered rows: the chevron gutter would otherwise
+  // shift every label as a filter hides the last branch.
+  const reachOf = (keys, sep) => [...new Set(keys.flatMap(key => prefixesOf(key, sep)))];
+  const axes = {
+    modules: {
+      sep: MODULE_SEP, skip: moduleSkipDepth, label: name => name,
+      reach: data.scenarios.map(s => prefixesOf(s.module, MODULE_SEP)),
+      nests: allModules.some(m => m.split(MODULE_SEP).length > moduleSkipDepth + 1),
+    },
+    tags: {
+      sep: TAG_SEP, skip: 0, label: tagLabel,
+      reach: data.scenarios.map(s => reachOf(s.tags.length ? s.tags : [NO_TAGS], TAG_SEP)),
+      nests: data.scenarios.some(s => s.tags.some(tag => tag.includes(TAG_SEP))),
+    },
+    terms: {
+      sep: TAG_SEP, skip: 0, label: termLabel,
+      reach: data.scenarios.map(s => lookup(scenarioTerms, s.id, [NO_TERMS])),
+      nests: false,
+    },
+  };
   // Closure variables, not state: writing one from inside a reactive effect
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
@@ -283,74 +333,60 @@ function reportApp() {
       return value;
     },
     // Every axis renders as the same flat list of rows carrying their own
-    // `depth`, so one template serves all three. Tags and terms are depth 0
-    // throughout; only modules nest, and only their interior rows have
-    // children to expand.
+    // `depth`, so one template serves all three; only interior rows have
+    // children to expand. Whether the axis nests at all decides the chevron
+    // gutter: a flat list keeps none, one hierarchical key gives every row
+    // the spacer so leaves align.
     get groups() {
-      return this.view === 'modules' ? this._moduleRows() : this._flatRows();
+      return this._treeRows(axes[this.view], this._activeFilters());
     },
-    _flatRows() {
-      const grouped = {};
-      const isTerms = this.view === 'terms';
-      for (const i of this._visible()) {
-        const s = data.scenarios[i];
-        const ids = isTerms ? scenarioTerms[s.id] || [] : s.tags;
-        for (const k of ids.length ? ids : [isTerms ? NO_TERMS : NO_TAGS]) {
-          if (!grouped[k]) {
-            grouped[k] = {
-              id: k,
-              name: isTerms ? this.termLabel(k) : this.tagLabel(k),
-              depth: 0,
-              count: 0,
-              hasChildren: false,
-            };
-          }
-          grouped[k].count++;
-        }
-      }
-      return this._ordered(Object.values(grouped));
+    get groupsNest() {
+      return axes[this.view].nests;
     },
-    // A module path tree, flattened depth-first into rows. A row is visible
-    // only while every ancestor is expanded, so collapsing a package hides
-    // the subtree without rebuilding it.
-    _moduleRows() {
+    // The selected keys on the current axis, as a list even for the
+    // single-select module axis, so the tree and its active check read one
+    // shape.
+    _activeFilters() {
+      if (this.view === 'terms') return this.termFilters;
+      if (this.view === 'tags') return this.tagFilters;
+      return this.moduleFilter ? [this.moduleFilter] : [];
+    },
+    // A path tree, flattened depth-first into rows. A row is visible only
+    // while every ancestor is expanded, so collapsing a node hides the
+    // subtree without rebuilding it. `skip` drops leading segments from every
+    // row (module depth comes from every module in the report, not the
+    // filtered subset: selecting a package narrows the tree to it, and a
+    // prefix recomputed from that subset would strip the selected row itself
+    // out of view); `filters` are the active prefix filters.
+    _treeRows({ sep, skip, reach, label }, filters) {
       const counts = {};
       for (const i of this._visible()) {
-        const m = data.scenarios[i].module;
-        counts[m] = (counts[m] || 0) + 1;
+        for (const id of reach[i]) counts[id] = (counts[id] || 0) + 1;
       }
-      const modules = Object.keys(counts);
-      if (!modules.length) return [];
-      // Depth comes from every module in the report, not the filtered subset:
-      // selecting a package narrows the tree to it, and a prefix recomputed
-      // from that subset would strip the selected row itself out of view.
-      const skip = moduleSkipDepth;
       const root = {};
-      for (const m of modules) {
+      for (const id of Object.keys(counts)) {
         let node = root;
-        const parts = m.split('.');
-        for (let i = skip; i < parts.length; i++) {
-          const key = parts.slice(0, i + 1).join('.');
-          node = (node[key] || (node[key] = { __id: key, __name: parts[i], __kids: {} })).__kids;
+        const prefixes = prefixesOf(id, sep);
+        for (let i = skip; i < prefixes.length; i++) {
+          const key = prefixes[i];
+          const name = key.slice(key.lastIndexOf(sep) + 1);
+          node = (node[key] || (node[key] = { __id: key, __name: name, __kids: {} })).__kids;
         }
       }
       const rows = [];
       const walk = (kids, depth, visible) => {
-        const level = Object.values(kids).map(node => {
-          const id = node.__id;
-          const own = counts[id] || 0;
-          const sub = Object.keys(node.__kids).length;
-          return { node, id, name: node.__name, depth, hasChildren: sub > 0,
-                   count: own + this._subtreeCount(node, counts) };
-        });
-        for (const row of this._ordered(level)) {
+        const level = Object.values(kids).map(node => ({
+          node, id: node.__id, name: label(node.__name), depth,
+          hasChildren: Object.keys(node.__kids).length > 0, count: counts[node.__id],
+        }));
+        for (const row of this._ordered(level, filters)) {
           if (visible) rows.push(row);
-          // A package on the path to the selected module opens whether or not
-          // it was expanded by hand, so the selected row is never stranded
-          // inside a collapsed ancestor — on a `#module=` deep link there was
-          // no chance to expand it, and after a click it must stay visible to
-          // be clicked again.
-          const onPath = this.moduleFilter && this.moduleFilter.startsWith(row.id + '.');
+          // A node on the path to a selected one opens whether or not it was
+          // expanded by hand, so the selected row is never stranded inside a
+          // collapsed ancestor — on a `#module=` or `#tag=` deep link there
+          // was no chance to expand it, and after a click it must stay
+          // visible to be clicked again.
+          const onPath = filters.some(filter => filter.startsWith(row.id + sep));
           walk(row.node.__kids, depth + 1,
                visible && (!!this.expandedGroups[row.id] || onPath));
         }
@@ -358,18 +394,14 @@ function reportApp() {
       walk(root, 0, true);
       return rows.map(({ node, ...row }) => row);
     },
-    _subtreeCount(node, counts) {
-      return Object.values(node.__kids).reduce(
-        (n, kid) => n + (counts[kid.__id] || 0) + this._subtreeCount(kid, counts), 0);
-    },
     // Selected groups pin to the top so what you filtered by stays in view:
     // arriving from the Glossary tab, the term you came for is the first row
     // rather than somewhere down the list. Below the pin the sort toggle
     // decides, with ties alphabetical so the order stays stable.
-    _ordered(rows) {
+    _ordered(rows, filters) {
       const byCount = this.sortBy === 'count';
       return rows.sort((a, b) =>
-        (this.isGroupActive(a) ? 0 : 1) - (this.isGroupActive(b) ? 0 : 1)
+        (filters.includes(a.id) ? 0 : 1) - (filters.includes(b.id) ? 0 : 1)
         || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
@@ -382,14 +414,16 @@ function reportApp() {
       // A scenario has exactly one module, so this axis is single-select. The
       // filter is a path prefix, not an exact id: selecting a package in the
       // browse tree takes everything under it.
-      if (this.moduleFilter && s.module !== this.moduleFilter
-          && !s.module.startsWith(this.moduleFilter + '.')) return false;
+      if (this.moduleFilter && !underPrefix(s.module, this.moduleFilter, MODULE_SEP)) {
+        return false;
+      }
       // Tags and terms are set-valued, so several of them narrow with AND:
-      // the scenario must carry every selected one, not any of them.
+      // the scenario must carry every selected one, not any of them. A tag
+      // filter is a prefix like the module filter, met by any tag under it.
       for (const tag of this.tagFilters) {
         if (tag === NO_TAGS) {
           if (s.tags.length) return false;
-        } else if (!s.tags.includes(tag)) return false;
+        } else if (!s.tags.some(own => underPrefix(own, tag, TAG_SEP))) return false;
       }
       // Read off the scenario's own term list, not the term's scenario list:
       // one index either way, but a term names thousands of scenarios and a
@@ -555,46 +589,41 @@ function reportApp() {
     clearModuleFilter() {
       this.moduleFilter = null;
     },
-    termLabel(id) {
-      if (id === NO_TERMS) return 'no terms';
-      // Term ids are slugs ('file-glossary'); the report speaks canonical
-      // names ('File glossary'). Falls back to the id for an unknown term.
-      return lookup(termNames, id, id);
-    },
-    tagLabel(tag) {
-      return tag === NO_TAGS ? 'untagged' : tag;
-    },
+    termLabel,
+    tagLabel,
     isGroupActive(group) {
-      if (this.view === 'terms') return this.termFilters.includes(group.id);
-      if (this.view === 'tags') return this.tagFilters.includes(group.id);
-      return this.moduleFilter === group.id;
+      return this._activeFilters().includes(group.id);
     },
     onGroupClick(group) {
+      const selecting = !this.isGroupActive(group);
       // In the Terms view the group name is the filter control: unlike a tag,
       // a term has no pill on the scenario card to filter from, so the sidebar
       // owns that affordance. The chevron still expands (its own click stops
       // propagation before reaching here).
       if (this.view === 'terms') {
-        this.termFilters = this.termFilters.includes(group.id)
-          ? this.termFilters.filter(t => t !== group.id)
-          : [...this.termFilters, group.id];
+        this.termFilters = selecting
+          ? [...this.termFilters, group.id]
+          : this.termFilters.filter(t => t !== group.id);
       } else if (this.view === 'tags') {
         this.filterByTag(group.id);
       } else {
-        const selecting = this.moduleFilter !== group.id;
         this.moduleFilter = selecting ? group.id : null;
-        // Selecting a package opens it as well: the click that narrows to a
-        // package is nearly always the one that wants to see what is in it,
-        // and hitting the chevron is the fussier target. Deselecting leaves
-        // the tree open — collapsing under the cursor loses the reader's place.
-        if (selecting && group.hasChildren) this.expandedGroups[group.id] = true;
       }
+      // Selecting a package or tag prefix opens it as well: the click that
+      // narrows to one is nearly always the one that wants to see what is in
+      // it, and hitting the chevron is the fussier target. Deselecting leaves
+      // the tree open — collapsing under the cursor loses the reader's place.
+      if (selecting && group.hasChildren) this.expandedGroups[group.id] = true;
     },
     filterByTag(tag) {
       if (this.tagFilters.includes(tag)) {
         this.tagFilters = this.tagFilters.filter(t => t !== tag);
       } else {
-        this.tagFilters = [...this.tagFilters, tag];
+        // One active node per path, as in the module tree: `ticket` AND
+        // `ticket/CS-42` is just `ticket/CS-42`, so selecting an ancestor
+        // widens to it and selecting a descendant narrows to it.
+        const related = other => underPrefix(other, tag, TAG_SEP) || underPrefix(tag, other, TAG_SEP);
+        this.tagFilters = [...this.tagFilters.filter(other => !related(other)), tag];
         this.view = 'tags';
       }
     },

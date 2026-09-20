@@ -161,7 +161,7 @@ def validate_coin(machine, amount):
 
 @scenario(
     'Helper functions can record their own steps',
-    tags=['checkout', 'validation'],
+    tags=['checkout', 'validation', 'ticket/CS-42'],
 )
 def test_buy_with_validation(machine):
     with when('I insert $2'):
@@ -177,7 +177,7 @@ def test_buy_with_validation(machine):
 
 @scenario(
     'Top-level `given` block and deeply nested steps',
-    tags=['checkout', 'loyalty', 'discounts'],
+    tags=['checkout', 'loyalty', 'discounts', 'ticket/CS-7'],
 )
 def test_complex_order(machine):
     with given('a loyalty card with 5 points'):
@@ -214,7 +214,7 @@ def buy_coffee(machine):
 
 @scenario(
     'An expected error, narrated as when + then (when_then)',
-    tags=['checkout', 'validation'],
+    tags=['checkout', 'validation', 'ticket/CS-42'],
 )
 def test_sold_out_is_rejected(machine):
     with given('a machine that has sold its last coffee'):

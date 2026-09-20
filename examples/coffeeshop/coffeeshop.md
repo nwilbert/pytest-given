@@ -131,7 +131,7 @@
   ```
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:162::test_buy_with_validation` · checkout, validation
+`examples/coffeeshop/test_coffeeshop.py:162::test_buy_with_validation` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -149,7 +149,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:178::test_complex_order` · checkout, loyalty, discounts
+`examples/coffeeshop/test_coffeeshop.py:178::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -178,7 +178,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:215::test_sold_out_is_rejected` · checkout, validation
+`examples/coffeeshop/test_coffeeshop.py:215::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee

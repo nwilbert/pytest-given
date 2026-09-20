@@ -75,8 +75,9 @@ jq -r '.scenarios[] | select(.status == "failed")
 jq -r '.scenarios[] | select([.. | .term_id? // empty] | index("waitlist"))
        | .narration.text' report.json
 
-# Scenarios by tag
+# Scenarios by tag, or by a tag prefix (`ticket/ABC-123` nests under `ticket`)
 jq -r '.scenarios[] | select(.tags | index("validation")) | .narration.text' report.json
+jq -r '.scenarios[] | select(.tags | any(startswith("ticket/"))) | .narration.text' report.json
 
 # Scenarios implementing a story
 jq -r '.scenarios[] | select(.story_id == "lend-and-return-a-book") | .narration.text' report.json

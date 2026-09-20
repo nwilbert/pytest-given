@@ -103,7 +103,9 @@
             chevron expands — the chevron stops propagation so it opens a
             package without filtering by it, and selecting a package opens it
             too (see `onGroupClick`), so the common case needs no aim. Only a
-            module package has children, so only it renders a chevron.
+            module package or tag prefix has children, so only those render a
+            chevron; the spacer aligns the leaves beside them and stays out
+            of an axis that does not nest at all.
             `--nav-indent` is what makes the flat row list read as a tree.
             The row keeps its own @click so the padding stays clickable; the
             inner button is what the keyboard reaches, and stops propagation so
@@ -116,7 +118,7 @@
                     :aria-expanded="!!expandedGroups[group.id]"
                     :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
                     @click.stop="toggleGroup(group.id)"></button>
-            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && view === 'modules'"></span>
+            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && groupsNest"></span>
             <button type="button" class="btn-reset nav-group-select"
                     :aria-pressed="isGroupActive(group)"
                     @click.stop="onGroupClick(group)">
