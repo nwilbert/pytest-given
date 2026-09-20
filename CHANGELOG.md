@@ -43,6 +43,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `#scenario=` deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.
 - `pytest-given report` reports a non-UTF-8 input file as an error rather than crashing with a traceback.
 - A `dead-term` finding states the criterion the rule actually applies: a term ref in a `@scenario` name keeps a term alive, which the old message did not mention.
+- The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from `parameters.cases[].error`, where they live; the scenario's own `error` is `null` there and the old recipe printed an empty message. The skill also starts from a committed or CI-published report when one exists, instead of always rerunning the suite.
 
 ### Changed
 

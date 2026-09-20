@@ -23,7 +23,7 @@ coverage[]    one entry per story activity — which scenarios cover it
 | `duration_ms` | Wall-clock time for the test |
 | `steps[]` | Recursive step tree (see below) |
 | `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
-| `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames` |
+| `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames`. **Always `null` on a parametrized scenario**, even a failed one: its errors are per case in `parameters.cases[].error`, same shape |
 | `source` | `{relpath, line}` — the test function's definition site |
 | `story_id` / `activity_ids` | Story binding from `@scenario(..., story=...)` |
 
@@ -67,9 +67,14 @@ Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`La
 jq -r '.scenarios[] | .status + "  " + .narration.text
        + " — " + .source.relpath + ":" + (.source.line|tostring)' report.json
 
-# Failing scenarios with the failure message
+# Failing scenarios with the failure message — a parametrized scenario's
+# `.error` is null; its failures live per case, so read both
 jq -r '.scenarios[] | select(.status == "failed")
-       | .narration.text + ": " + .error.message' report.json
+       | .narration.text + ": "
+       + (.error.message
+          // ([.parameters.cases[] | select(.status == "failed")
+              | "[" + (.values | map(tostring) | join(", ")) + "] " + .error.message]
+             | join("; ")))' report.json
 
 # Scenarios whose narration references a term (any step depth: use recursion for nested steps)
 jq -r '.scenarios[] | select([.. | .term_id? // empty] | index("waitlist"))

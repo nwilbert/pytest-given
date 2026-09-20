@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] review the navigation skill
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 
 ## Next
