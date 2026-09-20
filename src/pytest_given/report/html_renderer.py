@@ -5,6 +5,7 @@ Everything the page displays is rendered into the markup here; the one
 JSON blob beside it is what `app.js` seeds its state from.
 """
 
+import base64
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -282,9 +283,11 @@ def _app_data(report: ReportData) -> dict[str, object]:
 
 
 def _bundled_assets() -> dict[str, Markup]:
-    """The stylesheet and scripts inlined into the page — the whole reason the
-    report needs no server and no external asset."""
-    return {
+    """The stylesheet, scripts and fonts inlined into the page — the whole
+    reason the report needs no server and no external asset. The fonts stay
+    binary on disk and become `data:` URLs here, so the two woff2 files are
+    the only copies to update."""
+    assets = {
         name: Markup((_TEMPLATES_DIR / filename).read_text(encoding='utf-8'))
         for name, filename in (
             ('css', 'styles.css'),
@@ -292,6 +295,13 @@ def _bundled_assets() -> dict[str, Markup]:
             ('alpine_js', 'alpine.min.js'),
         )
     }
+    for name, filename in (
+        ('font_sans_b64', 'fonts/source-sans-3-latin-wght-normal.woff2'),
+        ('font_mono_b64', 'fonts/source-code-pro-latin-wght-normal.woff2'),
+    ):
+        encoded = base64.b64encode((_TEMPLATES_DIR / filename).read_bytes())
+        assets[name] = Markup(encoded.decode('ascii'))
+    return assets
 
 
 def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:

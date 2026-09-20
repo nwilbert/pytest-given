@@ -674,6 +674,7 @@ def test_render_self_contained(tmp_path: Path) -> None:
     assert '<script>' in content
     assert 'src="http' not in content
     assert 'href="http' not in content
+    assert content.count('data:font/woff2;base64,') == 2
 
 
 def test_render_clickable_tag_badges(tmp_path: Path) -> None:

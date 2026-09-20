@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
 <style>
+{#- Fontsource variable latin subsets (OFL 1.1, see THIRD-PARTY-LICENSES),
+    inlined so the report stays one file. Upright only: nothing in the report
+    is set in italic, so no face is embedded for the browser to synthesise. -#}
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("data:font/woff2;base64,{{ font_sans_b64 }}") format("woff2-variations"); }
+@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("data:font/woff2;base64,{{ font_mono_b64 }}") format("woff2-variations"); }
 {{ css }}
 {# One rule per parametrize column, generated for this report's column count.
    See report/palette.py for how the ring is derived; styles.css holds only the

@@ -156,6 +156,7 @@ _WHEEL_SKILLS_DIR = 'pytest_given/.agents/skills/'
 _REQUIRED_WHEEL_PATHS = (
     'pytest_given/py.typed',
     'pytest_given/report/templates/',
+    'pytest_given/report/templates/fonts/',
     _WHEEL_SKILLS_DIR,
 )
 
