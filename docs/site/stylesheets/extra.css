@@ -2,37 +2,44 @@
    to a third-party font CDN; `font = false` in zensical.toml drops the theme's
    Google Fonts link. Licences: assets/fonts/LICENSES.txt. */
 @font-face {
-  font-family: "Inter";
+  font-family: "Source Sans 3";
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 200 900;
   font-display: swap;
-  src: url("../assets/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+  src: url("../assets/fonts/source-sans-3-latin-wght-normal.woff2") format("woff2-variations");
 }
 @font-face {
-  font-family: "Inter";
+  font-family: "Source Sans 3";
   font-style: italic;
-  font-weight: 100 900;
+  font-weight: 200 900;
   font-display: swap;
-  src: url("../assets/fonts/inter-latin-wght-italic.woff2") format("woff2-variations");
+  src: url("../assets/fonts/source-sans-3-latin-wght-italic.woff2") format("woff2-variations");
 }
 @font-face {
-  font-family: "JetBrains Mono";
+  font-family: "Source Code Pro";
   font-style: normal;
-  font-weight: 100 800;
+  font-weight: 200 900;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations");
+  src: url("../assets/fonts/source-code-pro-latin-wght-normal.woff2") format("woff2-variations");
 }
 @font-face {
-  font-family: "JetBrains Mono";
+  font-family: "Source Code Pro";
   font-style: italic;
-  font-weight: 100 800;
+  font-weight: 200 900;
   font-display: swap;
-  src: url("../assets/fonts/jetbrains-mono-latin-wght-italic.woff2") format("woff2-variations");
+  src: url("../assets/fonts/source-code-pro-latin-wght-italic.woff2") format("woff2-variations");
 }
 :root {
-  --md-text-font: "Inter";
-  --md-code-font: "JetBrains Mono";
+  --md-text-font: "Source Sans 3";
+  --md-code-font: "Source Code Pro";
 }
+/* Source Sans 3 has a smaller x-height than the theme's default face, so the
+   same nominal size reads smaller; a step up keeps the body at the size the
+   pages were laid out for. */
+.md-typeset { font-size: 0.85rem; }
+/* Code keeps its previous absolute size (13.6px): it scales off the body, and
+   the body step above would otherwise carry it up too. */
+.md-typeset code { font-size: 0.8em; }
 
 /* Aubergine brand colour: links, active nav, tab underline, hero. */
 :root > * {

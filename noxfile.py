@@ -435,7 +435,9 @@ def docs_build(session: nox.Session) -> None:
 
 
 _DIAGRAM_SOURCE = _DOCS_SITE / 'assets' / 'pytest-given-diagram.svg'
-_DIAGRAM_FONT = _DOCS_SITE / 'assets' / 'fonts' / 'inter-latin-wght-normal.woff2'
+_DIAGRAM_FONT = (
+    _DOCS_SITE / 'assets' / 'fonts' / 'source-sans-3-latin-wght-normal.woff2'
+)
 _DIAGRAM_README_COPY = Path('docs/pytest-given-diagram.svg')
 
 # The site defines these tokens from the theme's variables (stylesheets/extra.css);
@@ -475,7 +477,7 @@ def diagram(session: nox.Session) -> None:
 
     On the site the SVG is inlined, so page CSS supplies the font and the colour
     tokens; GitHub and PyPI render the README copy as an image, so it embeds the
-    Inter subset the site already ships and resolves the tokens itself. A pure
+    Source Sans 3 subset the site already ships and resolves the tokens itself. A pure
     text transform: same inputs, same bytes. Rerun after editing the source SVG
     or the token lists above, and commit the result.
     """
@@ -484,12 +486,12 @@ def diagram(session: nox.Session) -> None:
     standalone_style = (
         '  <style>\n'
         '    @font-face {\n'
-        '      font-family: "Inter";\n'
-        '      font-weight: 100 900;\n'
+        '      font-family: "Source Sans 3";\n'
+        '      font-weight: 200 900;\n'
         f'      src: url("data:font/woff2;base64,{font}") format("woff2");\n'
         '    }\n'
         '    svg {\n'
-        '      font-family: "Inter", system-ui, sans-serif;\n'
+        '      font-family: "Source Sans 3", system-ui, sans-serif;\n'
         + _token_block(_DIAGRAM_TOKENS_LIGHT, '    ')
         + '    }\n'
         '    @media (prefers-color-scheme: dark) {\n'
