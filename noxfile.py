@@ -429,7 +429,6 @@ def _build_docs(session: nox.Session) -> None:
             for font in sorted(_REPORT_FONTS.glob('*.woff2'))
         ),
         (_REPORT_LOGO, _DOCS_SITE / 'assets' / 'logo.svg'),
-        (_REPORT_LOGO, _DOCS_SITE / 'assets' / 'favicon.svg'),
     ]
     for source, target in staged:
         target.parent.mkdir(parents=True, exist_ok=True)

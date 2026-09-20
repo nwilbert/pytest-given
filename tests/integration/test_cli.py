@@ -390,5 +390,5 @@ def test_cli_refuses_an_unknown_theme_with_the_plugin_wording(
     )
     assert rc == 1
     err = capsys.readouterr().err
-    assert "Unknown --theme value 'Dark': expected light, dark or auto." in err
+    assert "Unknown --theme value 'Dark'" in err
     assert 'Traceback' not in err

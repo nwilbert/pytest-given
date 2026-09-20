@@ -18,6 +18,7 @@ from ..model import PytestGivenError
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
+    DEFAULT_THEME,
     SOURCE_LINK_HELP,
     THEME_HELP,
     SinkConfig,
@@ -135,11 +136,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addini(
         'given_theme',
         type='string',
-        default='auto',
-        help=(
-            'Theme the HTML report opens in: light, dark or auto (CLI flag '
-            'overrides this).'
-        ),
+        default=DEFAULT_THEME,
+        help=THEME_HELP + ' (CLI flag overrides this.)',
     )
 
 

@@ -1,9 +1,14 @@
+import colorsys
 import math
 import re
 
-from pytest_given.report.palette import param_column_colors
+import pytest
+
+from pytest_given.report.html_renderer import _TEMPLATES_DIR
+from pytest_given.report.palette import Surface, param_column_colors
 
 _HEX = re.compile(r'^#[0-9a-f]{6}$')
+_STYLES = (_TEMPLATES_DIR / 'styles.css').read_text(encoding='utf-8')
 
 
 def _srgb(hex_color: str) -> tuple[float, float, float]:
@@ -33,17 +38,16 @@ def _chromaticity(hex_color: str) -> tuple[float, float, float]:
 
 def _hue_degrees(hex_color: str) -> float:
     """sRGB hue angle, enough to check two colours are the same hue."""
-    red, green, blue = _srgb(hex_color)
-    high, low = max(red, green, blue), min(red, green, blue)
-    if high == low:
-        return 0.0
-    if high == red:
-        hue = (green - blue) / (high - low) % 6
-    elif high == green:
-        hue = (blue - red) / (high - low) + 2
-    else:
-        hue = (red - green) / (high - low) + 4
-    return hue * 60
+    return colorsys.rgb_to_hsv(*_srgb(hex_color))[0] * 360
+
+
+def _theme_tokens(surface: Surface) -> dict[str, str]:
+    """The colour tokens the stylesheet sets for one theme, read from its own
+    block so the guarantee follows a retuned token rather than a stale copy."""
+    selector = ':root' if surface == 'light' else '[data-theme="dark"]'
+    block = re.search(re.escape(selector) + r' \{(.*?)\n\}', _STYLES, re.DOTALL)
+    assert block is not None, selector
+    return dict(re.findall(r'(--[\w-]+): (#[0-9a-f]{6});', block.group(1)))
 
 
 def _contrast(hex_color: str, background: str) -> float:
@@ -85,23 +89,37 @@ def test_param_column_colors_of_a_count_extend_the_shorter_ones() -> None:
         assert param_column_colors(count + 1)[:count] == param_column_colors(count)
 
 
-def test_param_column_colors_meet_wcag_aa_on_every_background_they_land_on() -> None:
+@pytest.mark.parametrize('surface', ['light', 'dark'])
+def test_param_column_colors_meet_wcag_aa_on_every_background_they_land_on(
+    surface: Surface,
+) -> None:
     # A parameter value renders over the surface, the page, the hovered row's
-    # accent tint and the failed row's tint. AA for body text is 4.5:1.
-    backgrounds = ('#ffffff', '#f4f6f9', '#ece6f1', '#fdeee4')
+    # accent tint and the failed row's tint — on the dark theme the last is the
+    # lightest and so the tightest. AA for body text is 4.5:1.
+    tokens = _theme_tokens(surface)
+    backgrounds = [
+        tokens[name]
+        for name in (
+            '--bg-surface',
+            '--bg-page',
+            '--color-accent-tint',
+            '--color-failed-tint',
+        )
+    ]
     for count in range(1, 25):
-        for color in param_column_colors(count):
+        for color in param_column_colors(count, surface):
             for background in backgrounds:
                 assert _contrast(color, background) >= 4.5, (
                     f'{color} on {background} at count={count}'
                 )
 
 
-def test_param_column_colors_share_one_lightness() -> None:
+@pytest.mark.parametrize('surface', ['light', 'dark'])
+def test_param_column_colors_share_one_lightness(surface: Surface) -> None:
     # Every column sits at the same lightness, so hue does all the separating.
     # Darkening a column to separate it only drains its hue away, which is what
     # made an earlier two-band version hard to read.
-    luminances = [_relative_luminance(c) for c in param_column_colors(8)]
+    luminances = [_relative_luminance(c) for c in param_column_colors(8, surface)]
     assert max(luminances) - min(luminances) < 0.01
 
 
@@ -120,19 +138,6 @@ def test_param_column_colors_hold_neighbouring_indices_far_apart() -> None:
         assert closest >= 0.45, f'{closest:.3f} at count={count}: {colors}'
 
 
-def test_dark_param_column_colors_meet_wcag_aa_on_every_dark_background() -> None:
-    # On the dark theme a value renders over the surface, the page, the hovered
-    # row's accent tint and the failed row's tint; the last is the lightest and
-    # so the tightest.
-    backgrounds = ('#1f1a27', '#16121b', '#2f2439', '#412c36')
-    for count in range(1, 25):
-        for color in param_column_colors(count, 'dark'):
-            for background in backgrounds:
-                assert _contrast(color, background) >= 4.5, (
-                    f'{color} on {background} at count={count}'
-                )
-
-
 def test_dark_param_column_colors_keep_the_light_hues_index_for_index() -> None:
     # Column N is the same hue in both themes, only lighter — a reader who
     # flips the theme mid-read must not see the columns swap colours. The
@@ -146,8 +151,3 @@ def test_dark_param_column_colors_keep_the_light_hues_index_for_index() -> None:
         apart = abs(_hue_degrees(light_color) - _hue_degrees(dark_color))
         assert min(apart, 360 - apart) < 30, (light_color, dark_color)
         assert _relative_luminance(dark_color) > _relative_luminance(light_color)
-
-
-def test_dark_param_column_colors_share_one_lightness() -> None:
-    luminances = [_relative_luminance(c) for c in param_column_colors(8, 'dark')]
-    assert max(luminances) - min(luminances) < 0.01

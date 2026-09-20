@@ -19,4 +19,4 @@ def test_resolve_theme_names_the_setting_and_the_choices_in_its_error() -> None:
         resolve_theme('Dark', setting='given_theme')
     message = str(excinfo.value)
     assert message.startswith("Unknown given_theme value 'Dark'")
-    assert 'light, dark or auto' in message
+    assert 'light, dark, auto' in message

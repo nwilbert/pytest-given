@@ -2,7 +2,7 @@
    Every colour the sheet uses is a token here, redefined once for the dark
    theme below; no hex literal survives past this block. `data-theme` is set
    by the head script in report.html.j2 before first paint — there is no
-   prefers-color-scheme block, "system" is decided once, in JS. */
+   prefers-color-scheme block, "auto" is decided once, in JS. */
 :root {
   --font-family: "Source Sans 3", system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: "Source Code Pro", 'SF Mono', Monaco, 'Cascadia Code', monospace;
@@ -243,12 +243,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   margin-top: var(--space-xl);
   padding-top: var(--space-lg);
 }
-.sidebar-label {
+/* The one caption register: sidebar section labels, the story view's section
+   heading and the attachment payload's label. */
+.sidebar-label, .story-section-heading, .attachment-panel-label {
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
   font-weight: 600;
-  margin-bottom: var(--space-sm);
 }
+.sidebar-label { margin-bottom: var(--space-sm); }
 /* The sort control shares the caption line with the section label and stays in
    the label's own register — no box, no fill — so the section keeps a single
    bordered control: choosing a browse axis is the decision, ordering it is a
@@ -737,7 +739,6 @@ span.param-highlight {
 .error-block {
   margin-top: var(--space-sm);
   background: var(--bg-traceback);
-  border: 0;
   border-left: 3px solid var(--color-failed);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: var(--space-md);
@@ -845,12 +846,7 @@ span.param-highlight {
 .attachment-panel-body {
   margin: 0 var(--space-md) var(--space-sm) var(--space-xl);
 }
-.attachment-panel-label {
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  padding: var(--space-sm) 0 var(--space-xs);
-}
+.attachment-panel-label { padding: var(--space-sm) 0 var(--space-xs); }
 /* The table's own surface is `--bg-page`, so a payload on `--bg-page` sinks
    into it; on the card color it reads as the document it is.
 
@@ -1033,7 +1029,6 @@ span.param-highlight {
 }
 /* The theme control is the sidebar's segmented toggle, sized to sit inline
    with the meta text rather than fill a sidebar row. */
-.topbar-meta .seg-toggle { display: inline-flex; }
 .topbar-meta .seg-btn { flex: none; padding: 2px 9px; }
 
 /* === Tab strip === */
@@ -1111,12 +1106,13 @@ span.param-highlight {
 
 /* Counts side by side, separated by space rather than a glyph. */
 .meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
-.cov-chip.meta-list { display: inline-flex; gap: var(--space-sm); }
 
 /* === Coverage chip === */
 .activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
+/* A flex row so its counts, when there are several, sit a space apart. */
 .cov-chip {
-  display: inline-block;
+  display: inline-flex;
+  gap: var(--space-sm);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
@@ -1170,12 +1166,7 @@ span.param-highlight {
 }
 .scn-act-strip-section { margin-top: var(--space-xl); }
 /* Section label separating the scenario list from the activity timeline above. */
-.story-section-heading {
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  margin-bottom: var(--space-sm);
-}
+.story-section-heading { margin-bottom: var(--space-sm); }
 
 /* Kind filter rows in sidebar */
 .kind-filter-row {

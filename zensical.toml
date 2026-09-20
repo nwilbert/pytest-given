@@ -32,7 +32,7 @@ nav = [
 [project.theme]
 font = false # fonts are self-hosted, see stylesheets/extra.css
 logo = "assets/logo.svg"
-favicon = "assets/favicon.svg"
+favicon = "assets/logo.svg"
 features = [
   "navigation.tabs",
   "navigation.tabs.sticky",

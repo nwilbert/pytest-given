@@ -25,6 +25,6 @@ def resolve_theme(value: str, setting: str) -> Theme:
     flag or ini they actually wrote."""
     if value not in THEMES:
         raise PytestGivenError(
-            f'Unknown {setting} value {value!r}: expected light, dark or auto.'
+            f'Unknown {setting} value {value!r}: expected one of {", ".join(THEMES)}.'
         )
     return cast('Theme', value)

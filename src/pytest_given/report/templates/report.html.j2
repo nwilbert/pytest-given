@@ -5,39 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {#- Resolves the theme before the stylesheet parses, so a dark report never
     flashes light. Order: the viewer's saved choice, then the configured
-    default (`auto` = follow the system). All three choices are stored
-    explicitly — an absent key, not "system", is what means "use the default",
-    so a viewer's System beats a report configured dark. Plain script, no
-    Alpine: it runs before the bundle exists. It also owns the storage key and
-    the choice → theme rule as `window.__REPORT_THEME__`, so app.js answers
-    the toggle with the same function that painted the page. -#}
+    default. All three choices are stored explicitly — an absent key, not
+    "auto", is what means "use the default", so a viewer's System beats a
+    report configured dark. Plain script, no Alpine: it runs before the bundle
+    exists. It owns the whole mechanism — storage, the choice → theme rule and
+    the follow-the-system listener — and hands app.js `window.__REPORT_THEME__`
+    with the resolved `choice` and a `set` the toggle calls. -#}
 <script>
 (function () {
   var root = document.documentElement;
   var key = 'pytest-given-theme';
   var darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  function apply(choice) {
-    var dark = choice === 'dark' || (choice === 'system' && darkScheme.matches);
-    root.setAttribute('data-theme', dark ? 'dark' : 'light');
-  }
   var stored = null;
   try { stored = localStorage.getItem(key); } catch (error) { /* no storage: this page only */ }
-  var choice = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : null;
-  var configured = root.getAttribute('data-theme-default');
-  var wanted = choice || (configured === 'auto' ? 'system' : configured);
-  apply(wanted);
-  root.setAttribute('data-theme-choice', wanted);
-  window.__REPORT_THEME__ = { key: key, darkScheme: darkScheme, apply: apply };
+  var theme = {
+    choice: (stored === 'light' || stored === 'dark' || stored === 'auto') ? stored : root.getAttribute('data-theme-default'),
+    set: function (choice) {
+      theme.choice = choice;
+      apply();
+      try { localStorage.setItem(key, choice); } catch (error) { /* no storage: this page only */ }
+    }
+  };
+  function apply() {
+    var dark = theme.choice === 'dark' || (theme.choice === 'auto' && darkScheme.matches);
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }
+  apply();
+  darkScheme.addEventListener('change', apply);
+  window.__REPORT_THEME__ = theme;
 })();
 </script>
 <title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,{{ logo_svg_b64 }}">
+<link rel="icon" type="image/svg+xml" href="{{ data_url('logo.svg') }}">
 <style>
 {#- Fontsource variable latin subsets (OFL 1.1, see THIRD-PARTY-LICENSES),
     inlined so the report stays one file. Upright only: nothing in the report
     is set in italic, so no face is embedded for the browser to synthesise. -#}
-@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("data:font/woff2;base64,{{ font_sans_b64 }}") format("woff2-variations"); }
-@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("data:font/woff2;base64,{{ font_mono_b64 }}") format("woff2-variations"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("{{ data_url('fonts/source-sans-3-latin-wght-normal.woff2') }}") format("woff2-variations"); }
+@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("{{ data_url('fonts/source-code-pro-latin-wght-normal.woff2') }}") format("woff2-variations"); }
 {{ css }}
 {# One token and one rule per parametrize column, generated for this report's
    column count. Like every other colour, the token is set once per theme and
@@ -69,7 +74,7 @@
       <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'system' }" :aria-pressed="themeChoice === 'system'" @click="setTheme('system')">System</button>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
       </div>
     </div>
   </header>
@@ -421,7 +426,7 @@
               <span class="cov-chip cov-uncovered">no coverage</span>
               {% else %}
               {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
-              <span class="cov-chip {{ cov_class }} meta-list"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span>{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span>{{ cov.skipped }} skipped</span>{% endif %}</span>
+              <span class="cov-chip {{ cov_class }}"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span>{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span>{{ cov.skipped }} skipped</span>{% endif %}</span>
               {% endif %}
               {#- Revealed by CSS once the row is selected (see .activity-jump),
                   so the row keeps one meaning per click: the row selects, this

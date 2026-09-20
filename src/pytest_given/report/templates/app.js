@@ -67,9 +67,8 @@ const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round
 
 // --- Theme ---
 // The head script in report.html.j2 painted the page before Alpine loaded and
-// left its storage key, media query and apply() on this global; this half only
-// answers the viewer and remembers the choice, under one key for every
-// pytest-given report this browser opens.
+// owns the mechanism; this side only mirrors its `choice` for the toggle and
+// calls its `set`.
 const theme = window.__REPORT_THEME__;
 
 // Two browse axes are trees: modules split on '.', tags on '/'. A filter on
@@ -190,9 +189,8 @@ function reportApp() {
     // property of the window it is read in, not of the view a link points at,
     // and it would otherwise travel to whoever the link is shared with.
     sidebarWidth: SIDEBAR_DEFAULT,
-    // What the toggle highlights: the head script's resolution of saved
-    // choice → configured default, so the control agrees with the paint.
-    themeChoice: document.documentElement.getAttribute('data-theme-choice') || 'system',
+    // What the toggle highlights, so the control agrees with the paint.
+    themeChoice: theme.choice,
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
@@ -500,8 +498,7 @@ function reportApp() {
     },
     setTheme(choice) {
       this.themeChoice = choice;
-      theme.apply(choice);
-      try { localStorage.setItem(theme.key, choice); } catch (error) { /* no storage: this page only */ }
+      theme.set(choice);
     },
     toggleStep(stepId) {
       this._toggle(this.expandedSteps, stepId);
@@ -741,8 +738,6 @@ function reportApp() {
       // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
-      // "System" tracks the OS setting while the page is open.
-      theme.darkScheme.addEventListener('change', () => { if (this.themeChoice === 'system') theme.apply('system'); });
       // Capture phase + stopPropagation so a term pill inside a clickable
       // container navigates without also triggering that container's click.
       document.addEventListener('click', (event) => {

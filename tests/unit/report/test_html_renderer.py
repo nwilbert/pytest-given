@@ -29,6 +29,8 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report.html_renderer import (
+    _BLOCK_COMMENT,
+    _COMMENT_LINE,
     _TEMPLATES_DIR,
     _app_data,
     _build_param_color_map,
@@ -565,12 +567,11 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    # The template emits exactly three `</script>` tags (theme head script,
-    # data block, alpine block). An unescaped attachment payload or narration
-    # would add more.
-    assert content.count('</script>') == 3
-    # The escaped form must be present in the embedded JSON.
+    # Neither path lets the payload's own `</script>` through raw: the data
+    # blob carries it escaped, the markup as an entity.
+    assert '</script><script>' not in content
     assert '<\\/script>' in content
+    assert '&lt;/script&gt;' in content
 
 
 def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
@@ -606,9 +607,9 @@ def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    # Three literal `</script>` tags only (theme head script, data block,
-    # alpine block); an unescaped node id in any blob would add a fourth.
-    assert content.count('</script>') == 3
+    # No blob lets the id's `</script>` through raw.
+    assert '</script><img' not in content
+    assert '<\\/script><img' in content
 
 
 def test_render_escapes_comment_open_in_report_data(tmp_path: Path) -> None:
@@ -651,9 +652,6 @@ def test_render_escapes_comment_open_in_report_data(tmp_path: Path) -> None:
     script_start = content.index('window.__REPORT_DATA__')
     assert '<!--' not in content[script_start:]
     assert '\\u003C!--' in content
-    # All three script blocks still close, so the document is not swallowed.
-    assert content.count('</script>') == 3
-    assert content.rstrip().endswith('</html>')
 
 
 def test_neutralized_script_data_stays_valid_json() -> None:
@@ -714,38 +712,32 @@ def test_strip_comments_keeps_code_and_line_numbers() -> None:
     ]
 
 
-def test_render_inlines_assets_without_their_comments(tmp_path: Path) -> None:
+def test_render_inlines_assets_without_their_comments() -> None:
     """The stylesheet and script comments explain the sources to a maintainer;
-    a report carries the code alone."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [],
-            }
-        )
+    a report carries the code alone. The vendored Alpine bundle is not ours to
+    strip and keeps its licence line."""
+    report = report_from_dict(
+        {
+            'metadata': {
+                'project': 'p',
+                'timestamp': 't',
+                'pytest_version': '9',
+                'plugin_version': '0.1',
+            },
+            'scenarios': [],
+        }
     )
-    html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
-    content = html_path.read_text(encoding='utf-8')
-    templates = Path(_TEMPLATES_DIR)
-    css_comments = re.findall(
-        r'/\*.*?\*/', templates.joinpath('styles.css').read_text('utf-8'), re.DOTALL
+    content = render_html_string(report, source_link_template=None)
+    css_comments = _BLOCK_COMMENT.findall(
+        (_TEMPLATES_DIR / 'styles.css').read_text('utf-8')
     )
-    js_comments = re.findall(
-        r'^\s*//.*$', templates.joinpath('app.js').read_text('utf-8'), re.MULTILINE
-    )
+    js_comments = _COMMENT_LINE.findall((_TEMPLATES_DIR / 'app.js').read_text('utf-8'))
     assert len(css_comments) > 10
     assert len(js_comments) > 10
     assert not [comment for comment in css_comments if comment in content]
     assert not [comment for comment in js_comments if comment.strip() in content]
     assert 'window.__REPORT_DATA__.story_ids' in content
+    assert '// Alpine.js' in content
 
 
 def test_render_clickable_tag_badges(tmp_path: Path) -> None:

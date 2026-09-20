@@ -142,6 +142,7 @@ def _build_env(
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
+    env.globals['data_url'] = _data_url
     return env
 
 
@@ -289,29 +290,32 @@ def _app_data(report: ReportData) -> dict[str, object]:
 
 
 def _bundled_assets() -> dict[str, Markup]:
-    """The stylesheet, scripts, fonts and logo inlined into the page — the
-    whole reason the report needs no server and no external asset. The fonts
-    and the logo stay as files on disk and become `data:` URLs here, so those
-    files are the only copies to update (the docs site stages its logo and
-    favicon from the same SVG, see noxfile.py)."""
-    assets = {
-        name: Markup(
-            _strip_comments((_TEMPLATES_DIR / filename).read_text(encoding='utf-8'))
-        )
-        for name, filename in (
-            ('css', 'styles.css'),
-            ('app_js', 'app.js'),
-            ('alpine_js', 'alpine.min.js'),
-        )
+    """The stylesheet and scripts inlined into the page — the whole reason the
+    report needs no server and no external asset. Our own two lose their
+    comments; the vendored Alpine bundle is already minified and keeps its
+    licence line."""
+    css, app_js, alpine_js = (
+        (_TEMPLATES_DIR / filename).read_text(encoding='utf-8')
+        for filename in ('styles.css', 'app.js', 'alpine.min.js')
+    )
+    return {
+        'css': Markup(_strip_comments(css)),
+        'app_js': Markup(_strip_comments(app_js)),
+        'alpine_js': Markup(alpine_js),
     }
-    for name, filename in (
-        ('font_sans_b64', 'fonts/source-sans-3-latin-wght-normal.woff2'),
-        ('font_mono_b64', 'fonts/source-code-pro-latin-wght-normal.woff2'),
-        ('logo_svg_b64', 'logo.svg'),
-    ):
-        encoded = base64.b64encode((_TEMPLATES_DIR / filename).read_bytes())
-        assets[name] = Markup(encoded.decode('ascii'))
-    return assets
+
+
+_DATA_URL_MIME = {'.woff2': 'font/woff2', '.svg': 'image/svg+xml'}
+
+
+def _data_url(filename: str) -> Markup:
+    """Jinja global: a binary asset under `templates/` as a `data:` URL, so
+    the template names each font and the logo beside the rule that uses it.
+    The files stay the only copies to update — the docs site stages its logo
+    and favicon from the same SVG, see noxfile.py."""
+    path = _TEMPLATES_DIR / filename
+    encoded = base64.b64encode(path.read_bytes()).decode('ascii')
+    return Markup(f'data:{_DATA_URL_MIME[path.suffix]};base64,{encoded}')
 
 
 _BLOCK_COMMENT = re.compile(r'/\*.*?\*/', re.DOTALL)

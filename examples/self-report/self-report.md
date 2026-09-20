@@ -1915,7 +1915,7 @@
 - **then** each «Term» maps to the scenario exactly once
 
 ## ✓ «Parameter coloring» marks placeholders and table headers
-`tests/unit/report/test_html_renderer.py:225::test_render_parametrized_step_with_structured_narration` · parametrization
+`tests/unit/report/test_html_renderer.py:227::test_render_parametrized_step_with_structured_narration` · parametrization
 
 - **given** a «Report» holding a «Parametrized scenario» with a «Parameter table»
 - **when** the «Renderer» renders the HTML page
