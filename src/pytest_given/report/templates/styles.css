@@ -500,14 +500,27 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   overflow: hidden;
 }
 .scenario {
+  position: relative;
   border-top: 1px solid var(--border);
   margin-top: -1px;
-  padding: var(--space-md) var(--space-lg);
-  border-left: 3px solid var(--color-passed);
+  padding: var(--space-md) var(--space-lg) var(--space-md) calc(var(--space-lg) + 5px);
 }
-.scenario.failed { border-left-color: var(--color-failed); }
-.scenario.skipped { border-left-color: var(--color-skipped); }
-.scenario-expanded { border-left-width: 5px; }
+/* The status mark: a short rounded bar inset from the rules above and below,
+   so each row carries its own rather than the list carrying one long stripe
+   that the surface's corners clip. Width stays constant when a row expands;
+   the open body is cue enough. */
+.scenario::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--color-passed);
+}
+.scenario.failed::before { background: var(--color-failed); }
+.scenario.skipped::before { background: var(--color-skipped); }
 .scenario-header {
   display: flex;
   justify-content: space-between;
