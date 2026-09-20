@@ -120,7 +120,7 @@ function reportApp() {
   // whole definition N times in the markup.
   const termsById = new Map(glossaryTerms.map((t) => [t.id, t]));
   const termScenarios = data.term_scenarios || {};
-  // __termScenarios is term -> scenarios; the sidebar needs the inverse.
+  // termScenarios is term -> scenarios; the sidebar needs the inverse.
   const scenarioTerms = {};
   for (const [termId, ids] of Object.entries(termScenarios)) {
     for (const sid of ids) (scenarioTerms[sid] || (scenarioTerms[sid] = [])).push(termId);

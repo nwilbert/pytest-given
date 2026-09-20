@@ -29,12 +29,14 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report.html_renderer import (
+    _TEMPLATES_DIR,
     _app_data,
     _build_param_color_map,
     _inline_md,
     _make_activity_part_filter,
     _make_narration_filter,
     _neutralize_script_data,
+    _strip_comments,
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -688,6 +690,62 @@ def test_render_self_contained(tmp_path: Path) -> None:
     assert 'src="http' not in content
     assert 'href="http' not in content
     assert content.count('data:font/woff2;base64,') == 2
+
+
+def test_strip_comments_keeps_code_and_line_numbers() -> None:
+    """Whole comments go, but every remaining token stays on its original
+    line, so a browser stack trace still maps onto the source file."""
+    source = (
+        '/* banner\n   over two lines */\n'
+        'a { color: red; }\n'
+        '  // a full-line note\n'
+        'b = 1; // a trailing note stays: telling it from a string needs a parser\n'
+        "c = 'http://x'; /* inline */ d = 2;\n"
+    )
+    stripped = _strip_comments(source)
+    assert stripped.count('\n') == source.count('\n')
+    assert stripped.splitlines() == [
+        '',
+        '',
+        'a { color: red; }',
+        '',
+        'b = 1; // a trailing note stays: telling it from a string needs a parser',
+        "c = 'http://x';  d = 2;",
+    ]
+
+
+def test_render_inlines_assets_without_their_comments(tmp_path: Path) -> None:
+    """The stylesheet and script comments explain the sources to a maintainer;
+    a report carries the code alone."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'p',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [],
+            }
+        )
+    )
+    html_path = tmp_path / 'report.html'
+    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    content = html_path.read_text(encoding='utf-8')
+    templates = Path(_TEMPLATES_DIR)
+    css_comments = re.findall(
+        r'/\*.*?\*/', templates.joinpath('styles.css').read_text('utf-8'), re.DOTALL
+    )
+    js_comments = re.findall(
+        r'^\s*//.*$', templates.joinpath('app.js').read_text('utf-8'), re.MULTILINE
+    )
+    assert len(css_comments) > 10
+    assert len(js_comments) > 10
+    assert not [comment for comment in css_comments if comment in content]
+    assert not [comment for comment in js_comments if comment.strip() in content]
+    assert 'window.__REPORT_DATA__.story_ids' in content
 
 
 def test_render_clickable_tag_badges(tmp_path: Path) -> None:
@@ -1648,8 +1706,9 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert '__termScenarios' in content
-    assert 'test.py::test_x' in content
+    assert _embedded_app_data(content)['term_scenarios'] == {
+        'guest': ['test.py::test_x']
+    }
     assert 'data-scenario-id="test.py::test_x"' in content
 
 

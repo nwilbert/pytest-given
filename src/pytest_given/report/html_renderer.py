@@ -7,6 +7,7 @@ JSON blob beside it is what `app.js` seeds its state from.
 
 import base64
 import json
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -294,7 +295,9 @@ def _bundled_assets() -> dict[str, Markup]:
     files are the only copies to update (the docs site stages its logo and
     favicon from the same SVG, see noxfile.py)."""
     assets = {
-        name: Markup((_TEMPLATES_DIR / filename).read_text(encoding='utf-8'))
+        name: Markup(
+            _strip_comments((_TEMPLATES_DIR / filename).read_text(encoding='utf-8'))
+        )
         for name, filename in (
             ('css', 'styles.css'),
             ('app_js', 'app.js'),
@@ -309,6 +312,24 @@ def _bundled_assets() -> dict[str, Markup]:
         encoded = base64.b64encode((_TEMPLATES_DIR / filename).read_bytes())
         assets[name] = Markup(encoded.decode('ascii'))
     return assets
+
+
+_BLOCK_COMMENT = re.compile(r'/\*.*?\*/', re.DOTALL)
+_COMMENT_LINE = re.compile(r'^[ \t]*//.*$', re.MULTILINE)
+
+
+def _strip_comments(source: str) -> str:
+    """Drops the block comments and the comment-only lines of our own CSS and
+    JS — about a third of each file is prose meant for a maintainer, not a
+    report. Every comment is replaced by the newlines it spanned, so a line
+    number in a browser stack trace still points at the same line of the
+    source file. A trailing `//` stays: telling it from one inside a string
+    takes a tokenizer, and those notes are short. Assumes no string literal
+    contains `/*` and no template literal has a line starting with `//`."""
+    without_blocks = _BLOCK_COMMENT.sub(
+        lambda match: '\n' * match.group().count('\n'), source
+    )
+    return _COMMENT_LINE.sub('', without_blocks)
 
 
 def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
