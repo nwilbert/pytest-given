@@ -20,6 +20,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The JSON report carries a top-level `coverage` key — one record per story activity with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
 - The documentation lives at <https://nwilbert.github.io/pytest-given/>; the README keeps the overview and quick start, and the bundled skills and the `--given-source-link` / `--source-link` help text point at the site.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
+- The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.
 
 ### Changed
 

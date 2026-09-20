@@ -3,6 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{#- Resolves the theme before the stylesheet parses, so a dark report never
+    flashes light. Order: the viewer's saved choice, then the configured
+    default (`auto` = follow the system). All three choices are stored
+    explicitly — an absent key, not "system", is what means "use the default",
+    so a viewer's System beats a report configured dark. Plain script, no
+    Alpine: it runs before the bundle exists. -#}
+<script>
+(function () {
+  var root = document.documentElement;
+  var stored = null;
+  try { stored = localStorage.getItem('pytest-given-theme'); } catch (error) { /* no storage: this page only */ }
+  var choice = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : null;
+  var configured = root.getAttribute('data-theme-default');
+  var wanted = choice || (configured === 'auto' ? 'system' : configured);
+  var dark = wanted === 'dark' || (wanted === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  root.setAttribute('data-theme-choice', wanted);
+})();
+</script>
 <title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
 <style>
 {#- Fontsource variable latin subsets (OFL 1.1, see THIRD-PARTY-LICENSES),
@@ -31,7 +50,18 @@
 
   <header class="topbar">
     <div class="topbar-title">{{ metadata.title or metadata.project }}</div>
-    <div class="topbar-meta">pytest {{ metadata.pytest_version }} · pytest-given {{ metadata.plugin_version }} · <span x-text="formattedTimestamp"></span></div>
+    <div class="topbar-meta">
+      <span>pytest {{ metadata.pytest_version }}</span>
+      <span>pytest-given {{ metadata.plugin_version }}</span>
+      <span x-text="formattedTimestamp"></span>
+      {#- Text, not an icon: the current state has to be readable without
+          hovering. `aria-pressed` on each segment is the accessible state. -#}
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button type="button" class="btn-reset theme-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
+        <button type="button" class="btn-reset theme-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
+        <button type="button" class="btn-reset theme-btn" :class="{ active: themeChoice === 'system' }" :aria-pressed="themeChoice === 'system'" @click="setTheme('system')">System</button>
+      </div>
+    </div>
   </header>
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist

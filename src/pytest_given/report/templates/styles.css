@@ -1,39 +1,53 @@
-/* === Design Tokens === */
+/* === Design Tokens ===
+   Every colour the sheet uses is a token here, redefined once for the dark
+   theme below; no hex literal survives past this block. `data-theme` is set
+   by the head script in report.html.j2 before first paint — there is no
+   prefers-color-scheme block, "system" is decided once, in JS. */
 :root {
   --font-family: "Source Sans 3", system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: "Source Code Pro", 'SF Mono', Monaco, 'Cascadia Code', monospace;
-  --font-size-sm: 0.75rem;
-  --font-size-base: 0.8125rem;
-  --font-size-md: 0.875rem;
-  --font-size-lg: 1.25rem;
+  --font-size-sm: 0.75rem;     /* 12px: labels, counts, timings */
+  --font-size-base: 0.8125rem; /* 13px: chrome */
+  --font-size-md: 0.875rem;    /* 14px: narration and titles */
+  --font-size-lg: 1.0625rem;   /* 17px: a view's heading */
+  --font-size-xl: 1.375rem;    /* 22px: the report title */
 
-  --bg-page: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-sidebar: #ffffff;
-  --border: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
+  --bg-page: #f4f6f9;
+  --bg-surface: #ffffff;
+  /* The traceback block only. Other code-like surfaces (attachment payloads,
+     inline code) sit on --bg-page: meaning lives in the failed-red rule, not
+     in a fill. */
+  --bg-traceback: #f4f6f9;
+  --border: #e1e5eb;
+  --text-primary: #1a1d24;
+  --text-secondary: #58606d;
+  --text-muted: #646b78;
 
-  --color-passed: #16a34a;
-  --color-failed: #dc2626;
-  --color-skipped: #ea580c;
+  /* Aubergine marks interaction and active state only — tabs, selected
+     filters, links, focus rings, the resize seam. It never fills a surface. */
+  --color-accent: #5b2c6f;
+  --color-accent-tint: #ece6f1;
+  --color-accent-tint-strong: #dccbe6;
+  --on-accent: #ffffff;
 
-  --color-accent: #2563eb;
-  --color-accent-bg: #dbeafe;
-  /* Accent as *text*. The brand accent is only 4.24:1 on its own tint, under
-     AA, so anything that sets accent-colored text uses this darker value
-     (5.49:1 on the tint, 6.41:1 on --bg-page) — the way the status
-     pills pair #166534 with a green tint rather than reusing --color-passed.
-     --color-accent itself stays the border/glyph color, where the 3:1
-     threshold for UI components applies. */
-  --color-accent-text: #1d4ed8;
+  --color-passed: #1a6f43;
+  --color-passed-tint: #dcefe4;
+  --color-failed: #b3261e;
+  --color-failed-tint: #fdeee4;
+  --color-skipped: #9a5300;
+  --color-skipped-tint: #fbecd5;
 
-  --color-error-bg: #fef2f2;
-  --color-error-border: #fecaca;
+  /* Term-ref kinds: the wash says "this is a term", the ink says which kind
+     (see the term-ref comment further down). The edge is the pill border and
+     the sidebar swatch. */
+  --term-actor-ink: #8a4310;    --term-actor-wash: #fde5d3;    --term-actor-edge: #f0b48a;
+  --term-object-ink: #0f6e64;   --term-object-wash: #d5f2ee;   --term-object-edge: #7fd5c9;
+  --term-verb-ink: #5f2d9a;     --term-verb-wash: #ece0f7;     --term-verb-edge: #c6aef0;
+  --term-kindless-ink: #545962; --term-kindless-wash: #e9ecf0; --term-kindless-edge: #c9ccd3;
 
-  --color-skip-bg: #fff7ed;
-  --color-skip-border: #fed7aa;
+  --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
+  /* Inline code inside the tooltip, which is inverted (ink on bg). */
+  --bg-tip-code: rgba(255, 255, 255, 0.14);
 
   --space-xs: 4px;
   --space-sm: 8px;
@@ -43,8 +57,41 @@
 
   --radius-sm: 4px;
   --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-pill: 9999px;
 }
+[data-theme="dark"] {
+  --bg-page: #16121b;
+  --bg-surface: #1f1a27;
+  --bg-traceback: #412c36;
+  --border: #332b3e;
+  --text-primary: #ece8f1;
+  --text-secondary: #a9a2b5;
+  --text-muted: #948da1;
+
+  --color-accent: #c9a6dc;
+  --color-accent-tint: #2f2439;
+  --color-accent-tint-strong: #3d2f4c;
+  --on-accent: #16121b;
+
+  --color-passed: #6fcf97;
+  --color-passed-tint: #2c3739;
+  --color-failed: #f28b82;
+  --color-failed-tint: #412c36;
+  --color-skipped: #f0b45c;
+  --color-skipped-tint: #40332f;
+
+  --term-actor-ink: #f5b47a;    --term-actor-wash: #47302b;    --term-actor-edge: #7a4a2e;
+  --term-object-ink: #7fded0;   --term-object-wash: #21383f;   --term-object-edge: #2a6b62;
+  --term-verb-ink: #cbb5f7;     --term-verb-wash: #372e4d;     --term-verb-edge: #5b4886;
+  --term-kindless-ink: #b8b2c2; --term-kindless-wash: #312c38; --term-kindless-edge: #4a4455;
+
+  --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
+  --bg-tip-code: rgba(0, 0, 0, 0.12);
+  /* Native controls (checkboxes, scrollbars) take the browser's dark styling. */
+  color-scheme: dark;
+}
+/* The theme flips as one repaint; nothing tweens between the two palettes. */
 
 /* === Reset & Base === */
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -109,7 +156,7 @@ body {
   /* Set on <body> by the resize handle below; the fallback is what the page
      renders at before Alpine binds it, and if scripting is off. */
   width: var(--sidebar-w, 260px);
-  background: var(--bg-sidebar);
+  background: var(--bg-surface);
   padding: var(--space-lg);
   flex-shrink: 0;
   overflow-y: auto;
@@ -230,9 +277,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
 }
-.sort-btn:hover { color: var(--color-accent-text); }
+.sort-btn:hover { color: var(--color-accent); }
 .sort-btn-active {
-  color: var(--color-accent-text);
+  color: var(--color-accent);
   border-bottom-color: var(--color-accent);
 }
 .sort-btn:focus-visible {
@@ -251,13 +298,13 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   border-radius: var(--radius-pill);
   cursor: pointer;
   border: 1px solid var(--border);
-  background: var(--bg-card);
+  background: var(--bg-surface);
   color: var(--text-muted);
   user-select: none;
 }
-.status-pill.active-passed { background: #dcfce7; color: #166534; border-color: var(--color-passed); }
-.status-pill.active-failed { background: #fee2e2; color: #991b1b; border-color: var(--color-failed); }
-.status-pill.active-skipped { background: #ffedd5; color: #9a3412; border-color: var(--color-skipped); }
+.status-pill.active-passed { background: var(--color-passed-tint); color: var(--color-passed); border-color: var(--color-passed); }
+.status-pill.active-failed { background: var(--color-failed-tint); color: var(--color-failed); border-color: var(--color-failed); }
+.status-pill.active-skipped { background: var(--color-skipped-tint); color: var(--color-skipped); border-color: var(--color-skipped); }
 .status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
 
 
@@ -277,15 +324,15 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding: 4px;
   cursor: pointer;
   border-left: 1px solid var(--border);
-  background: var(--bg-card);
+  background: var(--bg-surface);
   color: var(--text-muted);
   user-select: none;
 }
 .seg-btn { border-top: 0; border-right: 0; border-bottom: 0; }
 .seg-btn:first-child { border-left: none; }
 .seg-btn.active {
-  background: var(--color-accent-bg);
-  color: var(--color-accent-text);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
   font-weight: 500;
 }
 
@@ -349,10 +396,10 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   transition: transform 0.15s ease;
 }
 .nav-group-toggle-open::before { transform: rotate(45deg); }
-.nav-group-toggle:hover { background: var(--color-accent-bg); color: var(--color-accent-text); }
+.nav-group-toggle:hover { background: var(--color-accent-tint); color: var(--color-accent); }
 /* On a selected row the accent tint is already the background, so a hovered
    chevron inverts instead — a light square inset into the selection. */
-.nav-group-active .nav-group-toggle:hover { background: var(--bg-card); }
+.nav-group-active .nav-group-toggle:hover { background: var(--bg-surface); }
 .nav-group-toggle:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
@@ -365,12 +412,12 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 /* Tint + border rather than a solid fill, matching every other selected
    surface in the sidebar. The border also separates two selected rows. */
 .nav-group-active {
-  background: var(--color-accent-bg);
-  color: var(--color-accent-text);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
   border-color: var(--color-accent);
 }
 .nav-group-active .nav-group-toggle { color: var(--color-accent); }
-.nav-group-active .nav-group-count { color: var(--color-accent-text); opacity: 0.75; }
+.nav-group-active .nav-group-count { color: var(--color-accent); opacity: 0.75; }
 .nav-group-active .nav-group-name { font-weight: 600; }
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
@@ -429,7 +476,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   align-items: center;
   gap: 6px;
 }
-.collapse-all-btn:hover { background: var(--bg-page); border-color: var(--color-accent); color: var(--color-accent-text); }
+.collapse-all-btn:hover { background: var(--bg-page); border-color: var(--color-accent); color: var(--color-accent); }
 .collapse-chevron {
   display: inline-block;
   width: 6px;
@@ -445,7 +492,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 /* === Scenario Cards === */
 .scenario {
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--space-md) var(--space-lg);
@@ -522,8 +569,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .scenario-header:hover .scenario-name--goto::after { opacity: 0.6; }
 .scenario-tag {
   display: inline-block;
-  background: var(--color-accent-bg);
-  color: var(--color-accent-text);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
   font-size: var(--font-size-sm);
   padding: 1px 7px;
   border-radius: var(--radius-pill);
@@ -533,9 +580,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   flex-shrink: 0;
 }
 .scenario-tag:hover { border-color: var(--color-accent); }
-.scenario-tag.active-tag { background: var(--color-accent); color: #fff; border-color: var(--color-accent); font-weight: 600; }
+.scenario-tag.active-tag { background: var(--color-accent); color: var(--on-accent); border-color: var(--color-accent); font-weight: 600; }
 .scenario-tag-more { background: transparent; border: 1px dashed var(--color-accent); }
-.scenario-tag-more:hover { background: var(--color-accent-bg); border-style: solid; }
+.scenario-tag-more:hover { background: var(--color-accent-tint); border-style: solid; }
 .scenario-meta {
   display: flex;
   align-items: center;
@@ -618,7 +665,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   padding: var(--space-sm) var(--space-md);
   color: var(--text-muted);
   font-weight: 600;
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border-bottom: 2px solid var(--border);
 }
 .param-table td {
@@ -626,19 +673,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
 }
-.param-table tr.failed-row { background: var(--color-error-bg); }
+.param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
 /* A payload panel is not a case: it carries no cells to highlight and no row
    to substitute from, so hovering it must not look like hovering a case row. */
-.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-bg); }
+.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-tint); }
 
 /* Crosshair: hovering a th/td highlights the column header, every cell in the
    column, and any narration placeholder bound to that parameter. */
 .param-table th.param-highlight,
-.param-table td.param-highlight { background: var(--color-accent-bg); }
-.param-table tbody tr:hover td.param-highlight { background: #bfdbfe; }
+.param-table td.param-highlight { background: var(--color-accent-tint); }
+.param-table tbody tr:hover td.param-highlight { background: var(--color-accent-tint-strong); }
 span.param-highlight {
-  background: var(--color-accent-bg);
+  background: var(--color-accent-tint);
   border-radius: 2px;
 }
 
@@ -649,23 +696,24 @@ span.param-highlight {
 /* Error */
 .error-block {
   margin-top: var(--space-sm);
-  background: var(--color-error-bg);
-  border-radius: var(--radius-md);
+  background: var(--bg-traceback);
+  border: 0;
+  border-left: 3px solid var(--color-failed);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: var(--space-md);
-  border: 1px solid var(--color-error-border);
 }
-.error-message { color: var(--color-failed); font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-xs); }
+.error-message { color: var(--color-failed); font-family: var(--font-mono); font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-xs); white-space: pre-wrap; }
 .error-toggle {
   margin-top: var(--space-xs);
   background: transparent;
-  border: 1px solid var(--color-error-border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 2px var(--space-sm);
   font-size: var(--font-size-sm);
   color: var(--text-muted);
   cursor: pointer;
 }
-.error-toggle:hover { background: rgba(0, 0, 0, 0.04); color: var(--text-secondary); }
+.error-toggle:hover { background: var(--bg-surface); color: var(--text-secondary); }
 .error-frames {
   margin-top: var(--space-sm);
   display: flex;
@@ -673,13 +721,10 @@ span.param-highlight {
   gap: var(--space-xs);
 }
 .error-frame {
-  border-left: 3px solid var(--color-failed);
+  border-left: 2px solid var(--border);
   padding: var(--space-xs) var(--space-sm);
-  background: rgba(220, 53, 69, 0.04);
 }
 .error-frame-internal {
-  border-left-color: var(--text-muted);
-  background: rgba(0, 0, 0, 0.02);
   opacity: 0.75;
 }
 .error-frame-loc {
@@ -704,10 +749,6 @@ span.param-highlight {
 }
 .error-tail {
   margin-top: var(--space-sm);
-  padding: var(--space-sm);
-  background: rgba(220, 53, 69, 0.08);
-  border-left: 3px solid var(--color-failed);
-  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   white-space: pre-wrap;
@@ -718,16 +759,15 @@ span.param-highlight {
 /* Skip reason */
 .skip-reason {
   margin-top: var(--space-sm);
-  background: var(--color-skip-bg);
-  border: 1px solid var(--color-skip-border);
+  background: var(--color-skipped-tint);
   border-left: 3px solid var(--color-skipped);
-  border-radius: var(--radius-md);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: var(--space-md);
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
 .skip-reason-label {
-  color: #9a3412;
+  color: var(--color-skipped);
   font-weight: 600;
   margin-right: var(--space-xs);
 }
@@ -782,7 +822,7 @@ span.param-highlight {
    to fit a payload that rarely wants it. Only a payload wider than the card
    now hits the table's `max-width` and scrolls inside its own box. */
 .attachment-panel .attachment-content {
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   margin-top: 0;
 }
@@ -883,15 +923,15 @@ span.param-highlight {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
-.term-ref-actor { background: #ffe4d6; color: #92400e; }
-.term-ref-object { background: #d9f7f3; color: #0f766e; }
-.term-ref-verb { background: #f4e8ff; color: #6d28d9; }
-/* Warm stone for the ink rather than a slate: against slate-900 body text a
-   slate separates on lightness alone and reads as body text lightened —
-   receding, the opposite of marked. */
+.term-ref-actor { background: var(--term-actor-wash); color: var(--term-actor-ink); }
+.term-ref-object { background: var(--term-object-wash); color: var(--term-object-ink); }
+.term-ref-verb { background: var(--term-verb-wash); color: var(--term-verb-ink); }
+/* The kindless ink is a grey that differs from the body ink in hue, not only
+   lightness: a lighter body ink reads as body text lightened — receding, the
+   opposite of marked. */
 .term-ref-unknown {
-  background: #ebebea;
-  color: #57534e;
+  background: var(--term-kindless-wash);
+  color: var(--term-kindless-ink);
   cursor: default;
 }
 .term-ref--link { cursor: pointer; }
@@ -911,8 +951,8 @@ span.param-highlight {
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   background: var(--text-primary);
-  color: var(--bg-card);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  color: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
   font-size: var(--font-size-sm);
   line-height: 1.4;
   pointer-events: none;
@@ -926,34 +966,57 @@ span.param-highlight {
 .term-tip-def code {
   font-family: var(--font-mono);
   font-size: 0.9em;
-  background: rgba(0, 0, 0, 0.05);
   padding: 0.1em 0.3em;
   border-radius: var(--radius-sm);
 }
+.entry-def code { background: var(--bg-page); }
+.term-tip-def code { background: var(--bg-tip-code); }
 
 /* === Topbar === */
 .topbar {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-lg);
   margin-bottom: var(--space-lg);
 }
 .topbar-title {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--text-primary);
 }
 .topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
   color: var(--text-muted);
   font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
 }
+/* Three explicit states, shown as text: a viewer can read which one is on.
+   Marked like the sidebar's segmented toggle (tint + accent text). */
+.theme-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.theme-btn {
+  padding: 2px 9px;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  border-left: 1px solid var(--border);
+}
+.theme-btn:first-child { border-left: 0; }
+.theme-btn:hover { color: var(--color-accent); }
+.theme-btn.active {
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.theme-btn:focus-visible { outline-offset: -2px; }
 
 /* === Tab strip === */
-:root {
-  --color-mixed: #d97706;
-  --color-uncovered: #94a3b8;
-}
 .frame-nav {
   display: flex;
   gap: var(--space-xs);
@@ -972,9 +1035,9 @@ span.param-highlight {
   font-weight: 500;
   transition: color 0.15s, border-color 0.15s;
 }
-.nav-tab:hover { color: var(--color-accent-text); }
+.nav-tab:hover { color: var(--color-accent); }
 .nav-tab-active {
-  color: var(--color-accent-text);
+  color: var(--color-accent);
   border-bottom-color: var(--color-accent);
 }
 
@@ -988,11 +1051,11 @@ span.param-highlight {
   border: 1px solid transparent;
   margin-bottom: var(--space-xs);
 }
-.story-sidebar-item:hover { background: var(--bg-card); border-color: var(--border); }
+.story-sidebar-item:hover { background: var(--bg-surface); border-color: var(--border); }
 .story-sidebar-item.active {
-  background: var(--color-accent-bg);
+  background: var(--color-accent-tint);
   border-color: var(--color-accent);
-  color: var(--color-accent-text);
+  color: var(--color-accent);
 }
 .story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
@@ -1003,7 +1066,7 @@ span.param-highlight {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
@@ -1017,7 +1080,7 @@ span.param-highlight {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-card);
+  background: var(--bg-surface);
   color: var(--text-secondary);
   border: 1px solid var(--border);
   border-radius: 50%;
@@ -1038,14 +1101,14 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-weight: 600;
 }
-.cov-chip.cov-passed { background: #dcfce7; color: #166534; }
-.cov-chip.cov-failed { background: #fee2e2; color: #991b1b; }
-.cov-chip.cov-mixed { background: #ffedd5; color: #9a3412; }
-.cov-chip.cov-uncovered { background: #f3f4f6; color: var(--text-muted); }
+.cov-chip.cov-passed { background: var(--color-passed-tint); color: var(--color-passed); }
+.cov-chip.cov-failed { background: var(--color-failed-tint); color: var(--color-failed); }
+.cov-chip.cov-mixed { background: var(--color-skipped-tint); color: var(--color-skipped); }
+.cov-chip.cov-uncovered { background: var(--bg-page); color: var(--text-muted); }
 .cov-chip.cov-untracked {
   background: transparent;
   color: var(--text-muted);
-  border: 1px dashed var(--border-color, #d1d5db);
+  border: 1px dashed var(--border);
   cursor: help;
 }
 
@@ -1061,7 +1124,7 @@ span.param-highlight {
   text-decoration: none;
   cursor: pointer;
 }
-.use-chip:hover { border-color: var(--color-accent); color: var(--color-accent-text); }
+.use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
 /* Non-interactive chips (term instances, verb forms): no link affordance. */
 .use-chip--static { cursor: default; }
 .use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
@@ -1105,17 +1168,17 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
-.kind-filter-row input[type="checkbox"] { flex-shrink: 0; }
+.kind-filter-row input[type="checkbox"] { flex-shrink: 0; accent-color: var(--color-accent); }
 .kind-swatch {
   width: 12px;
   height: 12px;
   border-radius: 2px;
   flex-shrink: 0;
 }
-.kind-swatch-actor { background: #fcd34d; }
-.kind-swatch-object { background: #5eead4; }
-.kind-swatch-verb { background: #c4b5fd; }
-.kind-swatch-kindless { background: #d6d3d1; }
+.kind-swatch-actor { background: var(--term-actor-edge); }
+.kind-swatch-object { background: var(--term-object-edge); }
+.kind-swatch-verb { background: var(--term-verb-edge); }
+.kind-swatch-kindless { background: var(--term-kindless-edge); }
 
 /* === Kind section headers === */
 .glossary-empty {
@@ -1136,14 +1199,13 @@ span.param-highlight {
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); }
 
-/* Kind colors for kind headers and term pills. Kindless carries the same
-   stone the narration gives it, so one kind is one color across both views,
-   and on the same ramp-100 fill / ramp-300 border pattern as the three kinds.
-   Its border stays dashed — the catalog's own mark for "not a kind". */
-.term-actor { color: #92400e; }
-.term-obj { color: #0f766e; }
-.term-verb { color: #6d28d9; }
-.term-kindless { color: #57534e; }
+/* Kind colors for kind headers and term pills: the same ink, wash and edge
+   the narration gives each kind, so one kind is one color across both views.
+   The kindless border stays dashed — the catalog's own mark for "not a kind". */
+.term-actor { color: var(--term-actor-ink); }
+.term-obj { color: var(--term-object-ink); }
+.term-verb { color: var(--term-verb-ink); }
+.term-kindless { color: var(--term-kindless-ink); }
 
 /* === Term pills === */
 .term-pill {
@@ -1153,14 +1215,14 @@ span.param-highlight {
   font-weight: 600;
   font-size: var(--font-size-md);
 }
-.term-pill.term-actor { background: #fef3c7; border: 1px solid #fcd34d; }
-.term-pill.term-obj { background: #ccfbf1; border: 1px solid #5eead4; }
-.term-pill.term-verb { background: #ede9fe; border: 1px solid #c4b5fd; }
-.term-pill.term-kindless { background: #f5f5f4; border: 1px dashed #d6d3d1; }
+.term-pill.term-actor { background: var(--term-actor-wash); border: 1px solid var(--term-actor-edge); }
+.term-pill.term-obj { background: var(--term-object-wash); border: 1px solid var(--term-object-edge); }
+.term-pill.term-verb { background: var(--term-verb-wash); border: 1px solid var(--term-verb-edge); }
+.term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
 
 /* === Glossary entry layout === */
 .entry {
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-sm);
@@ -1218,8 +1280,8 @@ span.param-highlight {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  background: var(--color-accent-bg);
-  color: var(--color-accent-text);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
   border: 1px solid var(--color-accent);
   /* Matches the selected sidebar group rather than the pill radius tags and
      status use: a chip and a highlighted row are the same filter drawn in two
@@ -1245,7 +1307,7 @@ span.param-highlight {
   margin: 0;
   font-size: 0.875rem;
   line-height: 1;
-  color: var(--color-accent-text);
+  color: var(--color-accent);
   cursor: pointer;
   opacity: 0.7;
 }
@@ -1268,17 +1330,17 @@ span.param-highlight {
 }
 
 /* === Activity highlighting (multi-select) === */
-/* selected activity's timeline row: light-blue card (same tint as scenarios) */
-.activity-row-highlight { background: var(--color-accent-bg); }
-/* action bubbles: white when unselected, solid blue when selected */
-.scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-card); }
+/* A selected activity's timeline row takes the accent tint, like a selected
+   sidebar row; its bubble and the matching scenario bubbles go solid accent. */
+.activity-row-highlight { background: var(--color-accent-tint); }
+.scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-surface); }
 .activity-num-highlight,
 .activity-num-highlight:hover,
 .use-chip-highlight,
 .use-chip-highlight:hover {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 /* === Anchor link affordance === */

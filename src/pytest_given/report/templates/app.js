@@ -65,6 +65,17 @@ const SIDEBAR_MAX = 480;
 const SIDEBAR_DEFAULT = 260;
 const clampSidebar = w => Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, Math.round(w)));
 
+// --- Theme ---
+// The head script in report.html.j2 already painted the page from the same
+// three inputs; this half answers the viewer and remembers them. Stored under
+// one key for every pytest-given report this browser opens.
+const THEME_KEY = 'pytest-given-theme';
+const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(choice) {
+  const dark = choice === 'dark' || (choice === 'system' && darkScheme.matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+
 // Two browse axes are trees: modules split on '.', tags on '/'. A filter on
 // either selects its own key and everything below it — a package takes its
 // modules, `ticket` takes `ticket/ABC-123`.
@@ -183,6 +194,9 @@ function reportApp() {
     // property of the window it is read in, not of the view a link points at,
     // and it would otherwise travel to whoever the link is shared with.
     sidebarWidth: SIDEBAR_DEFAULT,
+    // What the toggle highlights: the head script's resolution of saved
+    // choice → configured default, so the control agrees with the paint.
+    themeChoice: document.documentElement.getAttribute('data-theme-choice') || 'system',
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
@@ -487,6 +501,11 @@ function reportApp() {
     resetSidebar() {
       this.sidebarWidth = SIDEBAR_DEFAULT;
     },
+    setTheme(choice) {
+      this.themeChoice = choice;
+      applyTheme(choice);
+      try { localStorage.setItem(THEME_KEY, choice); } catch (error) { /* no storage: this page only */ }
+    },
     toggleStep(stepId) {
       this._toggle(this.expandedSteps, stepId);
     },
@@ -725,6 +744,8 @@ function reportApp() {
       // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
+      // "System" tracks the OS setting while the page is open.
+      darkScheme.addEventListener('change', () => { if (this.themeChoice === 'system') applyTheme('system'); });
       // Capture phase + stopPropagation so a term pill inside a clickable
       // container navigates without also triggering that container's click.
       document.addEventListener('click', (event) => {
