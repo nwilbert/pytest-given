@@ -12,11 +12,10 @@ from ..report import (
     DEFAULT_THEME,
     SOURCE_LINK_HELP,
     THEME_HELP,
-    THEMES,
     SinkConfig,
-    Theme,
     emit_sinks,
     resolve_source_link_template,
+    resolve_theme,
 )
 
 
@@ -42,7 +41,6 @@ def add_report_parser(
     )
     report_parser.add_argument(
         '--theme',
-        choices=THEMES,
         default=DEFAULT_THEME,
         help=THEME_HELP,
     )
@@ -98,24 +96,26 @@ def _load_report(json_file: Path) -> dict[str, Any]:
 
 
 def _sink_config(
-    output: Path | None, source_link: str, fmt: str | None, theme: Theme
+    output: Path | None, source_link: str, fmt: str | None, theme: str
 ) -> SinkConfig:
     """The one sink this invocation writes.
 
     Markdown with no `-o` goes to stdout; HTML always needs a file, so it falls
     back to the default path rather than to stdout.
 
-    `--source-link` is resolved whichever format was asked for, so a bogus
-    preset is refused rather than silently ignored on a Markdown run that has
-    nowhere to put the links.
+    `--source-link` and `--theme` are resolved whichever format was asked for,
+    so a bogus value is refused rather than silently ignored on a Markdown run
+    that has nowhere to put it. Resolved here rather than by argparse
+    `choices`, so the plugin and the CLI reject a typo with the same words.
     """
     source_link_template = resolve_source_link_template(source_link, '--source-link')
+    resolved_theme = resolve_theme(theme, '--theme')
     if (fmt or _infer_format(output)) == 'md':
         return SinkConfig(md_path=output, md_to_stdout=output is None)
     return SinkConfig(
         html_path=output or DEFAULT_HTML_PATH,
         source_link_template=source_link_template,
-        theme=theme,
+        theme=resolved_theme,
     )
 
 

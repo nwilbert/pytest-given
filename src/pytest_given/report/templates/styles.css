@@ -326,11 +326,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .seg-btn { border-top: 0; border-right: 0; border-bottom: 0; }
 .seg-btn:first-child { border-left: none; }
+.seg-btn:hover { color: var(--color-accent); }
 .seg-btn.active {
   background: var(--color-accent-tint);
   color: var(--color-accent);
   font-weight: 500;
 }
+/* Inset: the toggle clips overflow, so a ring outside the segment is cut. */
+.seg-btn:focus-visible { outline-offset: -2px; }
 
 /* Navigation tree */
 .nav-tree { font-size: var(--font-size-base); margin-top: var(--space-md); }
@@ -499,10 +502,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
-.scenario {
-  position: relative;
+.scenario,
+.activity-row,
+.entry {
   border-top: 1px solid var(--border);
   margin-top: -1px;
+}
+.scenario {
+  position: relative;
   padding: var(--space-md) var(--space-lg) var(--space-md) calc(var(--space-lg) + 5px);
 }
 /* The status mark: a short rounded bar inset from the rules above and below,
@@ -1024,28 +1031,10 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
 }
-/* Three explicit states, shown as text: a viewer can read which one is on.
-   Marked like the sidebar's segmented toggle (tint + accent text). */
-.theme-toggle {
-  display: inline-flex;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.theme-btn {
-  padding: 2px 9px;
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  border-left: 1px solid var(--border);
-}
-.theme-btn:first-child { border-left: 0; }
-.theme-btn:hover { color: var(--color-accent); }
-.theme-btn.active {
-  background: var(--color-accent-tint);
-  color: var(--color-accent);
-  font-weight: 600;
-}
-.theme-btn:focus-visible { outline-offset: -2px; }
+/* The theme control is the sidebar's segmented toggle, sized to sit inline
+   with the meta text rather than fill a sidebar row. */
+.topbar-meta .seg-toggle { display: inline-flex; }
+.topbar-meta .seg-btn { flex: none; padding: 2px 9px; }
 
 /* === Tab strip === */
 .frame-nav {
@@ -1097,8 +1086,6 @@ span.param-highlight {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
-  border-top: 1px solid var(--border);
-  margin-top: -1px;
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
@@ -1253,10 +1240,6 @@ span.param-highlight {
 .term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
 
 /* === Glossary entry layout === */
-.entry {
-  border-top: 1px solid var(--border);
-  margin-top: -1px;
-}
 .entry-head {
   display: flex;
   align-items: flex-start;

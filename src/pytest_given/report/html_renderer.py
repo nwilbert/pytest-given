@@ -186,12 +186,17 @@ def _render_context(
         'story_rollups': build_story_rollups(report, coverage),
         'scn_covers': scn_covers,
         'scenario_slugs': scenario_slugs,
-        # The colors themselves, emitted as `.param-color-N` rules beside the
-        # stylesheet. They are generated per report rather than sitting in
-        # styles.css, because how many a report needs is a property of the
-        # report.
-        'param_colors': param_column_colors(len(param_color_map)),
-        'param_colors_dark': param_column_colors(len(param_color_map), 'dark'),
+        # The colors themselves, one (light, dark) pair per column, emitted as
+        # `--param-color-N` tokens beside the stylesheet. They are generated
+        # per report rather than sitting in styles.css, because how many a
+        # report needs is a property of the report.
+        'param_colors': list(
+            zip(
+                param_column_colors(len(param_color_map), 'light'),
+                param_column_colors(len(param_color_map), 'dark'),
+                strict=True,
+            )
+        ),
         'app_data_js': _script_json_parse(
             _app_data(report)
             | {

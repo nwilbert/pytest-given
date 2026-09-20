@@ -315,12 +315,24 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         t'stylesheet so a term ref bound to a column takes the column ink'
     ):
         rules = re.findall(
-            r'\.param-color-(\d+), th\.param-color-\1 \{ color: (#[0-9a-f]{6}); \}',
+            r'\.param-color-(\d+), th\.param-color-\1 '
+            r'\{ color: var\(--param-color-\1\); \}',
             content,
         )
-        assert [index for index, _ in rules] == ['0', '1']
-        assert len({color for _, color in rules}) == 2
+        assert rules == ['0', '1']
         assert content.index('.param-color-0,') > content.index('.term-ref-actor {')
+    with then(
+        t'each column ink is a token set once per theme, so the dark theme '
+        t'only redefines the token'
+    ):
+        light = re.findall(r':root \{ --param-color-(\d+): (#[0-9a-f]{6}); \}', content)
+        dark = re.findall(
+            r'\[data-theme="dark"\] \{ --param-color-(\d+): (#[0-9a-f]{6}); \}',
+            content,
+        )
+        assert [index for index, _ in light] == ['0', '1']
+        assert [index for index, _ in dark] == ['0', '1']
+        assert len({color for _, color in light + dark}) == 4
 
 
 def test_render_grouped_placeholder_drops_format_spec_and_conversion(
@@ -2219,50 +2231,4 @@ def test_render_emits_the_configured_theme_as_the_document_default() -> None:
     )
     assert 'data-theme-default="auto"' in render_html_string(
         report, source_link_template=None
-    )
-
-
-def test_render_emits_a_dark_color_rule_per_parametrize_column() -> None:
-    """Both rule sets ride in every report; the dark one is scoped to the
-    theme attribute the head script sets, after the light one so it wins."""
-    report = report_from_dict(
-        {
-            'metadata': {
-                'project': 'p',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
-            'scenarios': [
-                {
-                    'id': 'test_x',
-                    'narration': _narration('x'),
-                    'module': 'mod',
-                    'status': 'passed',
-                    'duration_ms': 0,
-                    'steps': [],
-                    'tags': [],
-                    'parameters': {
-                        'columns': [
-                            {'id': 'euros', 'name': 'euros', 'kind': 'param'},
-                            {'id': 'expect', 'name': 'expect', 'kind': 'param'},
-                        ],
-                        'cases': [
-                            {'values': [1, True], 'status': 'passed', 'error': None}
-                        ],
-                    },
-                    'error': None,
-                }
-            ],
-        }
-    )
-    content = render_html_string(report, source_link_template=None)
-    dark = re.findall(
-        r'\[data-theme="dark"\] \.param-color-(\d+), \[data-theme="dark"\] '
-        r'th\.param-color-\1 \{ color: (#[0-9a-f]{6}); \}',
-        content,
-    )
-    assert [index for index, _ in dark] == ['0', '1']
-    assert content.index('[data-theme="dark"] .param-color-0') > content.index(
-        'th.param-color-1 { color:'
     )

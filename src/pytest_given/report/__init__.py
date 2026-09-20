@@ -20,14 +20,13 @@ from .source_link import (
     detect_commit_sha,
     resolve_source_link_template,
 )
-from .theme import DEFAULT_THEME, THEME_HELP, THEMES, Theme, resolve_theme
+from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
     'DEFAULT_THEME',
     'SOURCE_LINK_HELP',
-    'THEMES',
     'THEME_HELP',
     'RenderedFile',
     'RenderedSinks',

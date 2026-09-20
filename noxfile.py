@@ -399,16 +399,19 @@ def examples(session: nox.Session) -> None:
 
 
 _DOCS_SITE = Path('docs/site')
+_REPORT_FONTS = Path('src/pytest_given/report/templates/fonts')
 
 
 def _build_docs(session: nox.Session) -> None:
     """Stage the files the site embeds, then build it strictly.
 
     The staged files are single-sourced elsewhere in the repo: the full-size
-    diagram the Home page links to (the README copy, see `diagram`), and every
-    example's rendered report (one `<name>/<name>.html` per example directory).
-    Each copy lands under docs_dir (Zensical builds everything there and has no
-    exclude list), and every target is gitignored. CHANGELOG.md needs no copy:
+    diagram the Home page links to (the README copy, see `diagram`), every
+    example's rendered report (one `<name>/<name>.html` per example directory),
+    and the two upright font faces the report package embeds (the site's italic
+    faces have no other home and stay committed). Each copy lands under
+    docs_dir (Zensical builds everything there and has no exclude list), and
+    every target is gitignored. CHANGELOG.md needs no copy:
     docs/site/changelog.md embeds it with a pymdownx.snippets include.
     """
     _sync(session, 'docs')
@@ -417,6 +420,10 @@ def _build_docs(session: nox.Session) -> None:
         *(
             (report, _DOCS_SITE / 'examples' / report.name)
             for report in sorted(Path('examples').glob('*/*.html'))
+        ),
+        *(
+            (font, _DOCS_SITE / 'assets' / 'fonts' / font.name)
+            for font in sorted(_REPORT_FONTS.glob('*.woff2'))
         ),
     ]
     for source, target in staged:
@@ -435,9 +442,7 @@ def docs_build(session: nox.Session) -> None:
 
 
 _DIAGRAM_SOURCE = _DOCS_SITE / 'assets' / 'pytest-given-diagram.svg'
-_DIAGRAM_FONT = (
-    _DOCS_SITE / 'assets' / 'fonts' / 'source-sans-3-latin-wght-normal.woff2'
-)
+_DIAGRAM_FONT = _REPORT_FONTS / 'source-sans-3-latin-wght-normal.woff2'
 _DIAGRAM_README_COPY = Path('docs/pytest-given-diagram.svg')
 
 # The site defines these tokens from the theme's variables (stylesheets/extra.css);

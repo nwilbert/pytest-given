@@ -376,3 +376,19 @@ def test_report_theme_flag_sets_the_report_default(tmp_path: Path) -> None:
     rc = main(['report', str(json_path), '-o', str(html_path), '--theme', 'dark'])
     assert rc == 0
     assert 'data-theme-default="dark"' in html_path.read_text(encoding='utf-8')
+
+
+def test_cli_refuses_an_unknown_theme_with_the_plugin_wording(
+    tmp_path: Path, capsys
+) -> None:
+    """One resolver for both entry points: the CLI names the flag the user
+    typed, in the same words `--given-theme` uses."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()), encoding='utf-8')
+    rc = main(
+        ['report', str(json_path), '-o', str(tmp_path / 'o.html'), '--theme', 'Dark']
+    )
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert "Unknown --theme value 'Dark': expected light, dark or auto." in err
+    assert 'Traceback' not in err

@@ -8,18 +8,26 @@
     default (`auto` = follow the system). All three choices are stored
     explicitly — an absent key, not "system", is what means "use the default",
     so a viewer's System beats a report configured dark. Plain script, no
-    Alpine: it runs before the bundle exists. -#}
+    Alpine: it runs before the bundle exists. It also owns the storage key and
+    the choice → theme rule as `window.__REPORT_THEME__`, so app.js answers
+    the toggle with the same function that painted the page. -#}
 <script>
 (function () {
   var root = document.documentElement;
+  var key = 'pytest-given-theme';
+  var darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+  function apply(choice) {
+    var dark = choice === 'dark' || (choice === 'system' && darkScheme.matches);
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  }
   var stored = null;
-  try { stored = localStorage.getItem('pytest-given-theme'); } catch (error) { /* no storage: this page only */ }
+  try { stored = localStorage.getItem(key); } catch (error) { /* no storage: this page only */ }
   var choice = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : null;
   var configured = root.getAttribute('data-theme-default');
   var wanted = choice || (configured === 'auto' ? 'system' : configured);
-  var dark = wanted === 'dark' || (wanted === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  apply(wanted);
   root.setAttribute('data-theme-choice', wanted);
+  window.__REPORT_THEME__ = { key: key, darkScheme: darkScheme, apply: apply };
 })();
 </script>
 <title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
@@ -30,15 +38,16 @@
 @font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("data:font/woff2;base64,{{ font_sans_b64 }}") format("woff2-variations"); }
 @font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("data:font/woff2;base64,{{ font_mono_b64 }}") format("woff2-variations"); }
 {{ css }}
-{# One rule per parametrize column, generated for this report's column count.
-   See report/palette.py for how the ring is derived; styles.css holds only the
-   properties every column shares. The `th` half of each selector is there to
-   outrank `.param-table th`, which sets a color of its own. #}
-{%- for color in param_colors %}
-.param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: {{ color }}; }
-{%- endfor %}
-{%- for color in param_colors_dark %}
-[data-theme="dark"] .param-color-{{ loop.index0 }}, [data-theme="dark"] th.param-color-{{ loop.index0 }} { color: {{ color }}; }
+{# One token and one rule per parametrize column, generated for this report's
+   column count. Like every other colour, the token is set once per theme and
+   the rule only reads it. See report/palette.py for how the ring is derived;
+   styles.css holds only the properties every column shares. The `th` half of
+   the selector is there to outrank `.param-table th`, which sets a color of
+   its own. #}
+{%- for light, dark in param_colors %}
+:root { --param-color-{{ loop.index0 }}: {{ light }}; }
+[data-theme="dark"] { --param-color-{{ loop.index0 }}: {{ dark }}; }
+.param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: var(--param-color-{{ loop.index0 }}); }
 {%- endfor %}
 </style>
 </head>
@@ -56,10 +65,10 @@
       <span x-text="formattedTimestamp"></span>
       {#- Text, not an icon: the current state has to be readable without
           hovering. `aria-pressed` on each segment is the accessible state. -#}
-      <div class="theme-toggle" role="group" aria-label="Theme">
-        <button type="button" class="btn-reset theme-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
-        <button type="button" class="btn-reset theme-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
-        <button type="button" class="btn-reset theme-btn" :class="{ active: themeChoice === 'system' }" :aria-pressed="themeChoice === 'system'" @click="setTheme('system')">System</button>
+      <div class="seg-toggle" role="group" aria-label="Theme">
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'system' }" :aria-pressed="themeChoice === 'system'" @click="setTheme('system')">System</button>
       </div>
     </div>
   </header>
@@ -211,8 +220,7 @@
   <div class="scenario {{ scenario.status }}"
        x-show="isVisible({{ loop.index0 }})"
        id="scenario-{{ loop.index0 }}"
-       data-scenario-id="{{ scenario.id }}"
-       :class="{ 'scenario-expanded': expandedScenarios[{{ loop.index0 }}] }">
+       data-scenario-id="{{ scenario.id }}">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ loop.index0 }})"{% endif %}>
       <div style="display:flex; align-items:center;">
         {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ loop.index0 }}" :aria-expanded="!!expandedScenarios[{{ loop.index0 }}]" :aria-label="(expandedScenarios[{{ loop.index0 }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ loop.index0 }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
@@ -247,7 +255,7 @@
       {% if scenario.skip_reason %}
       <div class="skip-reason">
         <span class="skip-reason-label">Skipped:</span>
-        <span class="skip-reason-text">{{ scenario.skip_reason }}</span>
+        <span>{{ scenario.skip_reason }}</span>
       </div>
       {% endif %}
       <div class="steps">

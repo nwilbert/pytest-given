@@ -2578,15 +2578,6 @@ def test_given_title_cli_overrides_ini(pytester, tmp_path):
 
 # --- The theme the HTML report opens in ---
 
-_ONE_SCENARIO_SUITE = """
-    from pytest_given import scenario, when
-
-    @scenario("A")
-    def test_a():
-        with when("x"):
-            pass
-    """
-
 
 @scenario(
     t'`--given-theme` sets the {pg["Theme"].low} the HTML {pg["Report"].low} opens in',
@@ -2594,7 +2585,7 @@ _ONE_SCENARIO_SUITE = """
 )
 def test_given_theme_cli_flag_sets_the_report_default(pytester, tmp_path):
     with given(t'a suite with one {pg["Scenario"].low}'):
-        pytester.makepyfile(_ONE_SCENARIO_SUITE)
+        pytester.makepyfile(_SUITE)
         html_path = tmp_path / 'report.html'
     with when('the suite runs with --given-theme=dark'):
         result = pytester.runpytest(f'--given-html={html_path}', '--given-theme=dark')
@@ -2611,7 +2602,7 @@ def test_given_theme_ini_sets_the_report_default(pytester, tmp_path):
         given_theme = light
         """
     )
-    pytester.makepyfile(_ONE_SCENARIO_SUITE)
+    pytester.makepyfile(_SUITE)
     html_path = tmp_path / 'report.html'
     pytester.runpytest(f'--given-html={html_path}').assert_outcomes(passed=1)
     assert 'data-theme-default="light"' in html_path.read_text(encoding='utf-8')
@@ -2624,14 +2615,14 @@ def test_given_theme_flag_wins_over_the_ini(pytester, tmp_path):
         given_theme = light
         """
     )
-    pytester.makepyfile(_ONE_SCENARIO_SUITE)
+    pytester.makepyfile(_SUITE)
     html_path = tmp_path / 'report.html'
     pytester.runpytest(f'--given-html={html_path}', '--given-theme=dark')
     assert 'data-theme-default="dark"' in html_path.read_text(encoding='utf-8')
 
 
 def test_given_theme_absent_follows_the_system(pytester, tmp_path):
-    pytester.makepyfile(_ONE_SCENARIO_SUITE)
+    pytester.makepyfile(_SUITE)
     html_path = tmp_path / 'report.html'
     pytester.runpytest(f'--given-html={html_path}')
     assert 'data-theme-default="auto"' in html_path.read_text(encoding='utf-8')
@@ -2645,7 +2636,7 @@ def test_an_unknown_theme_fails_before_the_suite_runs(pytester):
     """Validated on every run, not only HTML runs: it is a set lookup with no
     side effects, so a typo in pyproject.toml fails the next run outright."""
     with given('a suite that would otherwise pass'):
-        pytester.makepyfile(_ONE_SCENARIO_SUITE)
+        pytester.makepyfile(_SUITE)
     with when(t'the suite runs with a misspelled {pg["Theme"].low}, and no HTML sink'):
         result = pytester.runpytest('--given-theme=Dark')
     with then('the run ends as a usage error, naming the flag the user typed'):
@@ -2662,7 +2653,7 @@ def test_an_unknown_theme_ini_names_the_ini(pytester):
         given_theme = night
         """
     )
-    pytester.makepyfile(_ONE_SCENARIO_SUITE)
+    pytester.makepyfile(_SUITE)
     result = pytester.runpytest()
     assert result.ret == pytest.ExitCode.USAGE_ERROR
     result.stderr.fnmatch_lines(["*Unknown given_theme value 'night'*"])

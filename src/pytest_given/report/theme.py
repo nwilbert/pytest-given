@@ -6,7 +6,7 @@ from `<html data-theme-default>`, so the value has to be one of the three
 spellings it understands — a typo would silently render light.
 """
 
-from typing import Literal
+from typing import Literal, cast
 
 from ..model import PytestGivenError
 
@@ -23,9 +23,8 @@ THEME_HELP = (
 def resolve_theme(value: str, setting: str) -> Theme:
     """`setting` is how the user spelled the option, so the error quotes the
     flag or ini they actually wrote."""
-    theme = next((candidate for candidate in THEMES if candidate == value), None)
-    if theme is None:
+    if value not in THEMES:
         raise PytestGivenError(
             f'Unknown {setting} value {value!r}: expected light, dark or auto.'
         )
-    return theme
+    return cast('Theme', value)
