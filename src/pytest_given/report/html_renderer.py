@@ -190,6 +190,7 @@ def _render_context(
         # styles.css, because how many a report needs is a property of the
         # report.
         'param_colors': param_column_colors(len(param_color_map)),
+        'param_colors_dark': param_column_colors(len(param_color_map), 'dark'),
         'app_data_js': _script_json_parse(
             _app_data(report)
             | {

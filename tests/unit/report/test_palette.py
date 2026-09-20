@@ -31,6 +31,21 @@ def _chromaticity(hex_color: str) -> tuple[float, float, float]:
     return tuple(c / total for c in channels)  # type: ignore[return-value]
 
 
+def _hue_degrees(hex_color: str) -> float:
+    """sRGB hue angle, enough to check two colours are the same hue."""
+    red, green, blue = _srgb(hex_color)
+    high, low = max(red, green, blue), min(red, green, blue)
+    if high == low:
+        return 0.0
+    if high == red:
+        hue = (green - blue) / (high - low) % 6
+    elif high == green:
+        hue = (blue - red) / (high - low) + 2
+    else:
+        hue = (red - green) / (high - low) + 4
+    return hue * 60
+
+
 def _contrast(hex_color: str, background: str) -> float:
     lo, hi = sorted((_relative_luminance(hex_color), _relative_luminance(background)))
     return (hi + 0.05) / (lo + 0.05)
@@ -71,9 +86,9 @@ def test_param_column_colors_of_a_count_extend_the_shorter_ones() -> None:
 
 
 def test_param_column_colors_meet_wcag_aa_on_every_background_they_land_on() -> None:
-    # A parameter value renders over the card, the page, the hovered row's
-    # accent tint and the failed row's red tint. AA for body text is 4.5:1.
-    backgrounds = ('#ffffff', '#f8fafc', '#dbeafe', '#fef2f2')
+    # A parameter value renders over the surface, the page, the hovered row's
+    # accent tint and the failed row's tint. AA for body text is 4.5:1.
+    backgrounds = ('#ffffff', '#f4f6f9', '#ece6f1', '#fdeee4')
     for count in range(1, 25):
         for color in param_column_colors(count):
             for background in backgrounds:
@@ -103,3 +118,36 @@ def test_param_column_colors_hold_neighbouring_indices_far_apart() -> None:
         points = [_chromaticity(color) for color in colors]
         closest = min(math.dist(points[i], points[i + 1]) for i in range(count - 1))
         assert closest >= 0.45, f'{closest:.3f} at count={count}: {colors}'
+
+
+def test_dark_param_column_colors_meet_wcag_aa_on_every_dark_background() -> None:
+    # On the dark theme a value renders over the surface, the page, the hovered
+    # row's accent tint and the failed row's tint; the last is the lightest and
+    # so the tightest.
+    backgrounds = ('#1f1a27', '#16121b', '#2f2439', '#412c36')
+    for count in range(1, 25):
+        for color in param_column_colors(count, 'dark'):
+            for background in backgrounds:
+                assert _contrast(color, background) >= 4.5, (
+                    f'{color} on {background} at count={count}'
+                )
+
+
+def test_dark_param_column_colors_keep_the_light_hues_index_for_index() -> None:
+    # Column N is the same hue in both themes, only lighter — a reader who
+    # flips the theme mid-read must not see the columns swap colours. The
+    # tolerance is loose because an sRGB hue angle drifts with chroma even at
+    # one LCh hue (blues most, ~23°); a swapped index would be off by the
+    # ring's step, ~100°.
+    light = param_column_colors(8)
+    dark = param_column_colors(8, 'dark')
+    assert len(dark) == 8
+    for light_color, dark_color in zip(light, dark, strict=True):
+        apart = abs(_hue_degrees(light_color) - _hue_degrees(dark_color))
+        assert min(apart, 360 - apart) < 30, (light_color, dark_color)
+        assert _relative_luminance(dark_color) > _relative_luminance(light_color)
+
+
+def test_dark_param_column_colors_share_one_lightness() -> None:
+    luminances = [_relative_luminance(c) for c in param_column_colors(8, 'dark')]
+    assert max(luminances) - min(luminances) < 0.01

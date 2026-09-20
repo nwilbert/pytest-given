@@ -13,6 +13,9 @@
 {%- for color in param_colors %}
 .param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: {{ color }}; }
 {%- endfor %}
+{%- for color in param_colors_dark %}
+[data-theme="dark"] .param-color-{{ loop.index0 }}, [data-theme="dark"] th.param-color-{{ loop.index0 }} { color: {{ color }}; }
+{%- endfor %}
 </style>
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">

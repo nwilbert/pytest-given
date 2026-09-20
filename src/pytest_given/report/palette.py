@@ -2,7 +2,9 @@
 
 A report needs one color per parametrize column, for a count it only learns at
 render time — and every *prefix* of the sequence has to stay well spread, since
-a two-column table only ever sees the first two entries.
+a two-column table only ever sees the first two entries. The dark theme renders
+the same ring at a second lightness, so a column keeps its hue when the theme
+flips.
 
 Colors come off a ring: one lightness at full chroma, stepped by colorfulness
 rather than by angle. An index picks its place on that ring by the golden
@@ -19,6 +21,7 @@ sit in their own slot beside a glyph.
 import bisect
 import functools
 import math
+from typing import Literal
 
 from ..model import Status
 
@@ -58,6 +61,14 @@ _GOLDEN_RATIO_CONJUGATE = 0.6180339887498949
 # identify a word's color by its hue, and darkening only drains the hue away.
 _LIGHTNESS = 43.0
 
+type Surface = Literal['light', 'dark']
+
+# The dark theme's lightness, chosen the same way: as *dark* as AA allows on
+# every dark background a value lands on, so the hue keeps as much chroma as it
+# can. The failed row's tint (#412c36) is the lightest of them and sets the
+# floor — 4.5:1 needs Y ≥ 0.33, which is L* 64; 65 leaves a margin.
+_LIGHTNESS_BY_SURFACE: dict[Surface, float] = {'light': _LIGHTNESS, 'dark': 65.0}
+
 # How finely the ring is sampled when measuring its circumference. One degree
 # resolves the placement to well under a just-noticeable difference.
 _HUE_SAMPLES = 360
@@ -76,17 +87,20 @@ _EPSILON = 216 / 24389
 _KAPPA = 24389 / 27
 
 
-def param_column_colors(count: int) -> list[str]:
+def param_column_colors(count: int, surface: Surface = 'light') -> list[str]:
     """`count` hex colors for the parametrize columns, column 0 first.
 
     An index always resolves to the same color, whatever the count — the count
-    only says how many of them this report needs."""
-    return [_column_color(index) for index in range(count)]
+    only says how many of them this report needs. Both surfaces walk the ring
+    at the light lightness and differ only in the lightness they render at,
+    which is what keeps column N one hue in both themes."""
+    lightness = _LIGHTNESS_BY_SURFACE[surface]
+    return [_column_color(index, lightness) for index in range(count)]
 
 
-def _column_color(index: int) -> str:
+def _column_color(index: int, lightness: float) -> str:
     hue = _hue_at(_HUE_OFFSET + index * _GOLDEN_RATIO_CONJUGATE)
-    return _lch_to_hex(_LIGHTNESS, _max_chroma(_LIGHTNESS, hue), hue)
+    return _lch_to_hex(lightness, _max_chroma(lightness, hue), hue)
 
 
 def _hue_at(fraction: float) -> float:
