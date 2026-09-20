@@ -191,7 +191,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:2591::test_given_theme_cli_flag_sets_the_report_default` · configuration
+`tests/integration/test_plugin.py:2582::test_given_theme_cli_flag_sets_the_report_default` · configuration
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -199,7 +199,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:2640::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:2631::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -207,7 +207,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2757::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:2748::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -1921,6 +1921,7 @@
 - **when** the «Renderer» renders the HTML page
 - **then** «Parameter coloring» classes mark the grouped placeholder and the table headers
 - **then** the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink
+- **then** each column ink is a token set once per theme, so the dark theme only redefines the token
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
 `tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`

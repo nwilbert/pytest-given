@@ -3,7 +3,6 @@
 ## Now
 
 - [ ] review the navigation skill
-- [ ] Use the Given/When/Then logo (`docs/site/assets/logo.svg`) as the HTML report's favicon, inlined as a data URI like the fonts
 - [ ] Strip comments from `styles.css` and `app.js` when `_bundled_assets` inlines them — about 29 KB (9%) of a small report is comment text; keep the sources commented
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
 

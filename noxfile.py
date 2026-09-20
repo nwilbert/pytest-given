@@ -399,7 +399,9 @@ def examples(session: nox.Session) -> None:
 
 
 _DOCS_SITE = Path('docs/site')
-_REPORT_FONTS = Path('src/pytest_given/report/templates/fonts')
+_REPORT_TEMPLATES = Path('src/pytest_given/report/templates')
+_REPORT_FONTS = _REPORT_TEMPLATES / 'fonts'
+_REPORT_LOGO = _REPORT_TEMPLATES / 'logo.svg'
 
 
 def _build_docs(session: nox.Session) -> None:
@@ -408,8 +410,9 @@ def _build_docs(session: nox.Session) -> None:
     The staged files are single-sourced elsewhere in the repo: the full-size
     diagram the Home page links to (the README copy, see `diagram`), every
     example's rendered report (one `<name>/<name>.html` per example directory),
-    and the two upright font faces the report package embeds (the site's italic
-    faces have no other home and stay committed). Each copy lands under
+    the two upright font faces the report package embeds (the site's italic
+    faces have no other home and stay committed), and the report's logo, which
+    is the site's logo and favicon alike. Each copy lands under
     docs_dir (Zensical builds everything there and has no exclude list), and
     every target is gitignored. CHANGELOG.md needs no copy:
     docs/site/changelog.md embeds it with a pymdownx.snippets include.
@@ -425,6 +428,8 @@ def _build_docs(session: nox.Session) -> None:
             (font, _DOCS_SITE / 'assets' / 'fonts' / font.name)
             for font in sorted(_REPORT_FONTS.glob('*.woff2'))
         ),
+        (_REPORT_LOGO, _DOCS_SITE / 'assets' / 'logo.svg'),
+        (_REPORT_LOGO, _DOCS_SITE / 'assets' / 'favicon.svg'),
     ]
     for source, target in staged:
         target.parent.mkdir(parents=True, exist_ok=True)

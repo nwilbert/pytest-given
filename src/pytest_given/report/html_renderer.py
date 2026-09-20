@@ -288,10 +288,11 @@ def _app_data(report: ReportData) -> dict[str, object]:
 
 
 def _bundled_assets() -> dict[str, Markup]:
-    """The stylesheet, scripts and fonts inlined into the page — the whole
-    reason the report needs no server and no external asset. The fonts stay
-    binary on disk and become `data:` URLs here, so the two woff2 files are
-    the only copies to update."""
+    """The stylesheet, scripts, fonts and logo inlined into the page — the
+    whole reason the report needs no server and no external asset. The fonts
+    and the logo stay as files on disk and become `data:` URLs here, so those
+    files are the only copies to update (the docs site stages its logo and
+    favicon from the same SVG, see noxfile.py)."""
     assets = {
         name: Markup((_TEMPLATES_DIR / filename).read_text(encoding='utf-8'))
         for name, filename in (
@@ -303,6 +304,7 @@ def _bundled_assets() -> dict[str, Markup]:
     for name, filename in (
         ('font_sans_b64', 'fonts/source-sans-3-latin-wght-normal.woff2'),
         ('font_mono_b64', 'fonts/source-code-pro-latin-wght-normal.woff2'),
+        ('logo_svg_b64', 'logo.svg'),
     ):
         encoded = base64.b64encode((_TEMPLATES_DIR / filename).read_bytes())
         assets[name] = Markup(encoded.decode('ascii'))
