@@ -3,6 +3,7 @@
 ## Now
 
 - [ ] Enable optional custom IDs for activities (`str` instead of the current `int` numbers)
+- [ ] Make the docs sections for https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/ more explicit. Check for other pages that are too dense / unstructured.
 
 ## Next
 
