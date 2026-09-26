@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-26T10:27:57.829241+00:00",
+    "timestamp": "2026-09-26T10:43:46.963744+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "29413847b0e72f8a1e0fb4f279c42bfa091ac8cd",
+    "commit_sha": "0a0fccac8809f59a65d4600eea4ee4b03c52c499",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -53,7 +53,7 @@
           "attachments": [
             {
               "label": "Machine state",
-              "content": "{\n  \"coffees\": 9,\n  \"price\": 2\n}",
+              "content": "{\n  \"coffees\": 9,\n  \"price\": 2,\n  \"water_ml\": 1000\n}",
               "content_type": "json"
             }
           ],
@@ -66,7 +66,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 22
+        "line": 32
       },
       "story_id": null,
       "activity_ids": []
@@ -138,7 +138,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 34
+        "line": 44
       },
       "story_id": null,
       "activity_ids": []
@@ -193,7 +193,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 45
+        "line": 55
       },
       "story_id": null,
       "activity_ids": []
@@ -309,7 +309,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 54
+        "line": 64
       },
       "story_id": null,
       "activity_ids": []
@@ -412,7 +412,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 66
+        "line": 76
       },
       "story_id": null,
       "activity_ids": []
@@ -501,7 +501,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 78
+        "line": 88
       },
       "story_id": null,
       "activity_ids": []
@@ -568,10 +568,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the machine has dispensed {cup_size} ml, one coffee fewer",
+            "text": "the tank is down {cup_size} ml and the machine has one fewer coffee",
             "parts": [
               {
-                "value": "the machine has dispensed "
+                "value": "the tank is down "
               },
               {
                 "name": "cup_size",
@@ -580,7 +580,7 @@
                 "conversion": null
               },
               {
-                "value": " ml, one coffee fewer"
+                "value": " ml and the machine has one fewer coffee"
               }
             ]
           },
@@ -619,7 +619,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 89
+        "line": 99
       },
       "story_id": null,
       "activity_ids": []
@@ -689,10 +689,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the machine has dispensed 200 ml, one coffee fewer",
+            "text": "the tank is down 200 ml and the machine has one fewer coffee",
             "parts": [
               {
-                "value": "the machine has dispensed "
+                "value": "the tank is down "
               },
               {
                 "rendered": "200",
@@ -701,7 +701,7 @@
                 "conversion": null
               },
               {
-                "value": " ml, one coffee fewer"
+                "value": " ml and the machine has one fewer coffee"
               }
             ]
           },
@@ -716,7 +716,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 100
+        "line": 109
       },
       "story_id": null,
       "activity_ids": []
@@ -797,10 +797,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the machine has dispensed 400 ml, one coffee fewer",
+            "text": "the tank is down 400 ml and the machine has one fewer coffee",
             "parts": [
               {
-                "value": "the machine has dispensed "
+                "value": "the tank is down "
               },
               {
                 "rendered": "400",
@@ -809,7 +809,7 @@
                 "conversion": null
               },
               {
-                "value": " ml, one coffee fewer"
+                "value": " ml and the machine has one fewer coffee"
               }
             ]
           },
@@ -824,7 +824,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 100
+        "line": 109
       },
       "story_id": null,
       "activity_ids": []
@@ -993,7 +993,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 119
+        "line": 127
       },
       "story_id": null,
       "activity_ids": []
@@ -1100,7 +1100,7 @@
               "attachments": [
                 {
                   "label": "Final state",
-                  "content": "{\n  \"coffees\": 9,\n  \"price\": 2\n}",
+                  "content": "{\n  \"coffees\": 9,\n  \"price\": 2,\n  \"water_ml\": 1000\n}",
                   "content_type": "json"
                 }
               ],
@@ -1118,7 +1118,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 166
+        "line": 174
       },
       "story_id": null,
       "activity_ids": []
@@ -1280,7 +1280,7 @@
           "attachments": [
             {
               "label": "Final machine state",
-              "content": "{\n  \"coffees\": 7,\n  \"price\": 2\n}",
+              "content": "{\n  \"coffees\": 7,\n  \"price\": 2,\n  \"water_ml\": 1000\n}",
               "content_type": "json"
             }
           ],
@@ -1293,7 +1293,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 182
+        "line": 190
       },
       "story_id": null,
       "activity_ids": []
@@ -1363,7 +1363,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 219
+        "line": 227
       },
       "story_id": null,
       "activity_ids": []
@@ -1446,7 +1446,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 236
+        "line": 244
       },
       "story_id": null,
       "activity_ids": []
@@ -1575,7 +1575,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 255,
+            "lineno": 263,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -1586,7 +1586,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 252
+        "line": 260
       },
       "story_id": null,
       "activity_ids": []
@@ -1607,7 +1607,7 @@
       "skip_reason": "demonstrates skipped status",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 258
+        "line": 266
       },
       "story_id": null,
       "activity_ids": []
@@ -1652,7 +1652,7 @@
       "skip_reason": "awaiting fixture",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 265
+        "line": 273
       },
       "story_id": null,
       "activity_ids": []

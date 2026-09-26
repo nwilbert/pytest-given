@@ -20,10 +20,11 @@
 - **when** «Carol» submits the «Payment» for the «Booking»
 - **then** the «Booking System» «confirms» the «Booking»
 - **then** the «Booking System» sends the «Confirmation» to «Alice» and «Bob»
-- **then** «Alice» and «Bob» can check in to the «Deluxe Suite»
+- **when** «Alice» and «Bob» check in to the «Deluxe Suite»
+- **then** both guests are checked in
 
 ## ✗ Payment is declined — the booking is not finalized · 4 cases
-`examples/hotel-booking/test_hotel_booking.py:216::test_payment_declined`
+`examples/hotel-booking/test_hotel_booking.py:220::test_payment_declined`
 
 - **given** our organizer «Carol»
 - **given** our guest «Alice»
@@ -42,10 +43,10 @@
 
 - **gift card, partial balance** — failed:
   > assert 'unsupported payment method' == 'partial balance'
-  > test_hotel_booking.py:252 in test_payment_declined
+  > test_hotel_booking.py:256 in test_payment_declined
 
 ## ✓ Alice cancels her booking and is refunded
-`examples/hotel-booking/test_hotel_booking.py:261::test_cancel_booking`
+`examples/hotel-booking/test_hotel_booking.py:265::test_cancel_booking`
 
 - **given** our guest «Alice»
 - **given** «Alice» has a confirmed «Booking» she paid for

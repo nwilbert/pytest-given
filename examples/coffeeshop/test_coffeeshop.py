@@ -4,11 +4,21 @@ import pytest
 
 from pytest_given import Template, attach, given, scenario, then, when, when_then
 
+TANK_ML = 1000
+
 
 @pytest.fixture
 @given('a coffee machine')
 def machine():
-    return {'coffees': 10, 'price': 2}
+    return {'coffees': 10, 'price': 2, 'water_ml': TANK_ML}
+
+
+def brew(machine, cup_size):
+    """The machine under test: one coffee, drawing the cup's water from the tank."""
+    if cup_size > machine['water_ml']:
+        raise ValueError(f'not enough water for a {cup_size} ml cup')
+    machine['water_ml'] -= cup_size
+    machine['coffees'] -= 1
 
 
 @pytest.fixture
@@ -90,11 +100,10 @@ def test_neutral_highlight(machine):
 @pytest.mark.parametrize('cup_size', [200, 300])
 def test_brew(machine, cup_size):
     with when(t'I brew a {cup_size} ml cup'):
-        machine['coffees'] -= 1
-        machine['dispensed_ml'] = cup_size
-    with then(t'the machine has dispensed {cup_size} ml, one coffee fewer'):
-        assert machine['dispensed_ml'] == cup_size
-        assert machine['coffees'] < 10
+        brew(machine, cup_size)
+    with then(t'the tank is down {cup_size} ml and the machine has one fewer coffee'):
+        assert machine['water_ml'] == TANK_ML - cup_size
+        assert machine['coffees'] == 9
 
 
 @scenario(
@@ -109,10 +118,9 @@ def test_serve(machine, cup_size):
         with given('the barista reaches for a takeaway cup'):
             machine['takeaway'] = True
     with when(t'I order a {cup_size} ml cup'):
-        machine['coffees'] -= 1
-        machine['dispensed_ml'] = cup_size
-    with then(t'the machine has dispensed {cup_size} ml, one coffee fewer'):
-        assert machine['dispensed_ml'] == cup_size
+        brew(machine, cup_size)
+    with then(t'the tank is down {cup_size} ml and the machine has one fewer coffee'):
+        assert machine['water_ml'] == TANK_ML - cup_size
         assert machine['coffees'] == 9
 
 

@@ -1,7 +1,7 @@
 # pytest-given — Coffee Shop Example
 
 ## ✓ Basic scenario with when/then and a JSON attachment
-`examples/coffeeshop/test_coffeeshop.py:22::test_buy_coffee` · checkout
+`examples/coffeeshop/test_coffeeshop.py:32::test_buy_coffee` · checkout
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -10,12 +10,13 @@
     ```
     {
       "coffees": 9,
-      "price": 2
+      "price": 2,
+      "water_ml": 1000
     }
     ```
 
 ## ✓ Plain text attachment
-`examples/coffeeshop/test_coffeeshop.py:34::test_text_attachment`
+`examples/coffeeshop/test_coffeeshop.py:44::test_text_attachment`
 
 - **given** a coffee machine
 - **given** a printed receipt
@@ -29,14 +30,14 @@
 - **then** it shows the $2.00 total
 
 ## ✓ Generator fixture with teardown
-`examples/coffeeshop/test_coffeeshop.py:45::test_generator_fixture`
+`examples/coffeeshop/test_coffeeshop.py:55::test_generator_fixture`
 
 - **given** a database connection
 - **when** I run a query
 - **then** the connection is open and the query was logged
 
 ## ✓ Parametrized test (renders as a parameter table) · 3 cases
-`examples/coffeeshop/test_coffeeshop.py:54::test_pricing` · pricing
+`examples/coffeeshop/test_coffeeshop.py:64::test_pricing` · pricing
 
 - **given** a coffee machine
 - **when** I insert ${euros}
@@ -49,7 +50,7 @@
 | 3 | True | ✓ |
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:66::test_annotated_given_label`
+`examples/coffeeshop/test_coffeeshop.py:76::test_annotated_given_label`
 
 - **given** a coffee machine
 - **given** an order for a {cup_size} ml cup
@@ -62,7 +63,7 @@
 | 350 | ✓ |
 
 ## ✓ T-string with a non-parametrize value (neutral highlight)
-`examples/coffeeshop/test_coffeeshop.py:78::test_neutral_highlight`
+`examples/coffeeshop/test_coffeeshop.py:88::test_neutral_highlight`
 
 - **given** a coffee machine
 - **given** I have some coins in hand
@@ -70,11 +71,11 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:89::test_brew`
+`examples/coffeeshop/test_coffeeshop.py:99::test_brew`
 
 - **given** a coffee machine
 - **when** I brew a {cup_size} ml cup
-- **then** the machine has dispensed {cup_size} ml, one coffee fewer
+- **then** the tank is down {cup_size} ml and the machine has one fewer coffee
 
 | cup_size | |
 |---|---|
@@ -82,22 +83,22 @@
 | 300 | ✓ |
 
 ## ✓ Serve a 200 ml cup (one scenario per case) [200]
-`examples/coffeeshop/test_coffeeshop.py:100::test_serve`
+`examples/coffeeshop/test_coffeeshop.py:109::test_serve`
 
 - **given** a coffee machine
 - **when** I order a 200 ml cup
-- **then** the machine has dispensed 200 ml, one coffee fewer
+- **then** the tank is down 200 ml and the machine has one fewer coffee
 
 ## ✓ Serve a 400 ml cup (one scenario per case) [400]
-`examples/coffeeshop/test_coffeeshop.py:100::test_serve`
+`examples/coffeeshop/test_coffeeshop.py:109::test_serve`
 
 - **given** a coffee machine
 - **given** the barista reaches for a takeaway cup
 - **when** I order a 400 ml cup
-- **then** the machine has dispensed 400 ml, one coffee fewer
+- **then** the tank is down 400 ml and the machine has one fewer coffee
 
 ## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:119::test_flavor_columns` · pricing
+`examples/coffeeshop/test_coffeeshop.py:127::test_flavor_columns` · pricing
 
 - **given** a coffee machine
 - **given** the machine is primed for {flavor}
@@ -131,7 +132,7 @@
   ```
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:166::test_buy_with_validation` · checkout, validation, ticket/CS-42
+`examples/coffeeshop/test_coffeeshop.py:174::test_buy_with_validation` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -144,12 +145,13 @@
       ```
       {
         "coffees": 9,
-        "price": 2
+        "price": 2,
+        "water_ml": 1000
       }
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:182::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
+`examples/coffeeshop/test_coffeeshop.py:190::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -173,12 +175,13 @@
     ```
     {
       "coffees": 7,
-      "price": 2
+      "price": 2,
+      "water_ml": 1000
     }
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:219::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42
+`examples/coffeeshop/test_coffeeshop.py:227::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -186,7 +189,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:236::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
+`examples/coffeeshop/test_coffeeshop.py:244::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
@@ -195,20 +198,20 @@
 - **then** a coffee is dispensed
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:252::test_failing`
+`examples/coffeeshop/test_coffeeshop.py:260::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
 
 > assert 10 == 20
-> test_coffeeshop.py:255 in test_failing
+> test_coffeeshop.py:263 in test_failing
 
 ## ○ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:258::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py:266::test_skipped` — reason: demonstrates skipped status
 
 
 ## ○ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:265::test_parametrized_all_skipped` — reason: awaiting fixture
+`examples/coffeeshop/test_coffeeshop.py:273::test_parametrized_all_skipped` — reason: awaiting fixture
 
 
 | n | |

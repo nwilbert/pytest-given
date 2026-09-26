@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-26T10:27:58.265396+00:00",
+    "timestamp": "2026-09-26T10:43:47.403893+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "29413847b0e72f8a1e0fb4f279c42bfa091ac8cd",
+    "commit_sha": "0a0fccac8809f59a65d4600eea4ee4b03c52c499",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -403,9 +403,9 @@
           "fixture_name": null
         },
         {
-          "phase": "then",
+          "phase": "when",
           "narration": {
-            "text": "Alice and Bob can check in to the Deluxe Suite",
+            "text": "Alice and Bob check in to the Deluxe Suite",
             "parts": [
               {
                 "term_id": "guest",
@@ -421,7 +421,7 @@
                 "expression": "guest(\"Bob\")"
               },
               {
-                "value": " can check in to the "
+                "value": " check in to the "
               },
               {
                 "term_id": "room",
@@ -429,6 +429,17 @@
                 "expression": "room(\"Deluxe Suite\")"
               }
             ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both guests are checked in",
+            "parts": []
           },
           "children": [],
           "attachments": [],
@@ -739,7 +750,7 @@
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 252,
+                  "lineno": 256,
                   "func": "test_payment_declined",
                   "code": "    assert processor_response == decline_reason",
                   "is_internal": false
@@ -754,7 +765,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 216
+        "line": 220
       },
       "story_id": "book-a-group-trip",
       "activity_ids": []
@@ -937,7 +948,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 261
+        "line": 265
       },
       "story_id": "cancel-a-booking",
       "activity_ids": []

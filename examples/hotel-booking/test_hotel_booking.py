@@ -202,12 +202,16 @@ def test_complete_booking(carol, alice, bob):
     ):
         booking_state['notified'] = list(booking_state['guests'])
         assert set(booking_state['notified']) == {'Alice', 'Bob'}
-    with then(
-        t'{guest("Alice")} and {guest("Bob")} can check in to the '
-        t'{room("Deluxe Suite")}'
+    with when(
+        t'{guest("Alice")} and {guest("Bob")} check in to the {room("Deluxe Suite")}'
     ):
-        assert booking_state['confirmed']
-        assert booking_state['room'] == 'Deluxe Suite'
+        checked_in = [
+            name
+            for name in (alice['name'], bob['name'])
+            if booking_state['confirmed'] and name in booking_state['guests']
+        ]
+    with then('both guests are checked in'):
+        assert checked_in == ['Alice', 'Bob']
 
 
 SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
