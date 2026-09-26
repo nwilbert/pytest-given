@@ -350,9 +350,36 @@ def test_compute_coverage_drops_pins_naming_no_sentence_of_the_story():
     assert compute_coverage(_scenario_with_steps(pins=[1, 99]), index) == {
         SentenceId(1)
     }
+    # The step's narration matches sentence 1, so an empty result shows the
+    # stale pin still took the step out of matching rather than falling back.
     assert (
-        compute_coverage(_scenario_with_steps(_step('when', pins=[99])), index) == set()
+        compute_coverage(_scenario_with_steps(_matching_step(pins=[99])), index)
+        == set()
     )
+
+
+def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
+    """A pinned step contributes exactly its pins, even where its narration
+    fits another sentence; the scenario's other steps are still matched."""
+    matched = _guest_search_room_story().sentences[0]
+    pinned = Sentence(
+        id=SentenceId(2),
+        clauses=(
+            _clause(
+                _entity('guest', 'Guest'),
+                ClauseWord(text='books'),
+                _entity('booking', 'Booking'),
+            ),
+        ),
+    )
+    index = build_story_index(
+        Story(id=StoryId('s'), title='S', sentences=(matched, pinned))
+    )
+    pinned_step = _matching_step(pins=[2])
+    assert compute_coverage(_scenario_with_steps(pinned_step), index) == {SentenceId(2)}
+    assert compute_coverage(
+        _scenario_with_steps(pinned_step, _matching_step()), index
+    ) == {SentenceId(1), SentenceId(2)}
 
 
 def test_compute_coverage_matches_a_step_pinned_into_another_story():
@@ -430,8 +457,7 @@ def test_is_coverage_eligible_false_for_all_bare_sentence():
 def test_compute_coverage_excludes_under_anchored_sentence():
     """A sentence with fewer than two distinct terms is excluded from
     narration matching (replaces the old 'empty refs matches every step'
-    behavior). A pin still reaches it — the sibling
-    scenario below."""
+    behavior). A pin still reaches it — the sibling scenario below."""
     with given(t'a {pg["Story"]} whose {pg["Sentence"]} is all bare words'):
         a = Sentence(
             id=SentenceId(1),

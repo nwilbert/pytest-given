@@ -2026,7 +2026,12 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                         ],
                     },
                     'story_ids': [f'story{_BREAKOUT}'],
-                    'pins': [{'story_id': f'story{_BREAKOUT}', 'sentence_id': 1}],
+                    'pins': [
+                        {
+                            'story_id': f'story{_BREAKOUT}',
+                            'sentence_id': f'act{_BREAKOUT}',
+                        }
+                    ],
                 }
             ],
             'stories': [

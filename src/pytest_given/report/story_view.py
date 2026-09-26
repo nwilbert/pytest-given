@@ -47,9 +47,9 @@ class SentenceCoverage:
     def untracked(self) -> bool:
         """Whether the report can say nothing about this sentence.
 
-        Ineligibility alone no longer settles it: a pin covers an
-        under-anchored sentence that narration matching cannot reach, and a
-        covered sentence must never render as untracked.
+        Ineligibility alone no longer settles it: a pin covers an under-anchored
+        sentence that narration matching cannot reach, and a covered sentence
+        must never render as untracked.
         """
         return not self.eligible and not self.total
 
