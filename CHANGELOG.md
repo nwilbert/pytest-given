@@ -16,7 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - A `/` in a tag nests it in the HTML report's Tags sidebar (`ticket/ABC-123` under a `ticket` heading), and selecting the heading filters to every tag beneath it, as a package does for its modules.
-- The bundled skills ship under `pytest_given/.agents/skills/` in the wheel, so downstream projects can also install them with [library-skills](https://library-skills.io) (`uvx library-skills install --claude`) alongside the skills of their other dependencies. `pytest-given skills install` keeps working as before.
+- The bundled skills ship under `pytest_given/.agents/skills/` in the wheel, so downstream projects can also install them with [library-skills](https://library-skills.io) (`uvx library-skills install --claude`) alongside the skills of their other dependencies.
 - The JSON report carries a top-level `coverage` key — one record per story sentence with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
 - The documentation lives at <https://nwilbert.github.io/pytest-given/>; the README keeps the overview and quick start, and the bundled skills and the `--given-source-link` / `--source-link` help text point at the site.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
@@ -31,9 +31,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The HTML report says *Sentence* where it said *Activity*, and the Glossary view groups activity terms under *Activities* instead of *Verbs*.
 - The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.
 - The documentation site is set in Source Sans 3 and Source Code Pro.
-- The HTML report inlines its stylesheet and script without their source comments, which takes about 29 KB off every report; line numbers are preserved, so a browser stack trace still maps onto `app.js`.
+- The HTML report inlines its stylesheet and script without their source comments, keeping line numbers so a browser stack trace still maps onto `app.js`.
 - Story coverage matches on glossary terms alone: an instance in a sentence (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — sentences that differed only by instance are no longer told apart by narration, only by an `activity=` pin.
 - The authoring skill's and README's glossary snippets keep generic verbs (*searches for*, *adds*) as bare strings in sentences instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.
+- The `attachment-labels` and varying-`str` grouping refusals name the parametrize case they found, and the latter now points at `group_parametrized=False` as a way out.
+- The reviewing skill ships `references/pairs.md`, a script pairing each scenario's narration with its test's source, and audits the rules the release notes announce; both skills flag alternation `match=` pins and a `when` that narrates arrangement while its body acts.
+- The authoring skill's `stories.md` spells out the directional instance rule of coverage matching (and its consequence: write sentences with bare handles), that two sentences with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's `coverage` key instead of reimplementing the rule.
 
 ### Fixed
 
@@ -48,16 +51,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `#scenario=` deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.
 - `pytest-given report` reports a non-UTF-8 input file as an error rather than crashing with a traceback.
 - A `dead-term` finding states the criterion the rule actually applies: a term ref in a `@scenario` name keeps a term alive, which the old message did not mention.
-- The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from `parameters.cases[].error`, where they live; the scenario's own `error` is `null` there and the old recipe printed an empty message. The skill also starts from a committed or CI-published report when one exists, instead of always rerunning the suite.
-
-### Changed
-
-- The `attachment-labels` and varying-`str` grouping refusals name the parametrize case they found, and the latter now points at `group_parametrized=False` as a way out.
-- The reviewing skill ships `references/pairs.md` — a script pairing each
-  scenario's narration with its test's source — and audits the rules the
-  release notes announce. Both skills now flag alternation `match=` pins and a
-  `when` that narrates arrangement while its body acts.
-- The authoring skill's `stories.md` spells out the directional instance rule of coverage matching (and its consequence: write sentences with bare handles), that two sentences with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's `coverage` key instead of reimplementing the rule.
+- The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from `parameters.cases[].error`, where they live, and starts from a committed or CI-published report when one exists instead of always rerunning the suite.
 
 ## [0.2.0] - 2026-09-04
 
