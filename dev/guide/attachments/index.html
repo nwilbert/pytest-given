@@ -16,7 +16,7 @@
         <link rel="prev" href="../parametrized/">
       
       
-        <link rel="next" href="../domain-storytelling/">
+        <link rel="next" href="../glossary/">
       
       
         
@@ -594,6 +594,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../domain-storytelling/" class="md-nav__link">
         
   
@@ -890,13 +917,13 @@
 
 <h1 id="attachments">Attachments<a class="headerlink" href="#attachments" title="Permanent link">&para;</a></h1>
 <p><code>attach(label, content)</code></p>
-<p>Attach data to the current step. Strings are stored verbatim; other types are JSON-serialized.</p>
+<p>Attach data to the current step. Strings are stored as they are; other values are stored as JSON.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">attach</span><span class="p">(</span><span class="s1">&#39;Receipt&#39;</span><span class="p">,</span> <span class="s1">&#39;Coffee x1     $2.00&#39;</span><span class="p">)</span>             <span class="c1"># text</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">attach</span><span class="p">(</span><span class="s1">&#39;Machine state&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;coffees&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>  <span class="c1"># JSON</span>
 </code></pre></div>
-<p>An attachment binds to the step being recorded, so the call belongs inside a <code>given</code> / <code>when</code> / <code>then</code> block — attaching from the test body with no step open raises.</p>
-<p>The label is a plain <code>str</code>; a <code>Template</code> or t-string label raises — build it with an f-string if it needs interpolating.</p>
-<p>In a parametrized scenario the label must read the same in every case; a payload that varies becomes a parameter-table column headed by that label, with a badge on the step pointing at it (see <a href="../parametrized/">Parametrized scenarios</a>).</p>
+<p>An attachment belongs to the current step, so call <code>attach</code> inside a <code>given</code>, <code>when</code> or <code>then</code> block. Calling it outside a step raises an error.</p>
+<p>The label must be a plain string; a <code>Template</code> or t-string raises an error. Use an f-string if the label needs a value.</p>
+<p>In a parametrized scenario, the label must be the same in every case. If the content differs between cases, it becomes a column in the parameter table, named after the label. The step shows a badge that points to that column (see <a href="../parametrized/">Parametrized scenarios</a>).</p>
 
 
 

@@ -579,6 +579,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guide/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guide/domain-storytelling/" class="md-nav__link">
         
   
@@ -731,6 +758,23 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  pytest options
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="././" class="md-nav__link md-nav__link--active">
         
   
@@ -746,6 +790,70 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Flags
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flag-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Flag order
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pytest-xdist" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        pytest-xdist
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ini-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Ini settings
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -889,8 +997,9 @@
 
 
 <h1 id="pytest-options">pytest options<a class="headerlink" href="#pytest-options" title="Permanent link">&para;</a></h1>
-<p>All report outputs are opt-in — a bare <code>pytest</code> writes nothing. Each <code>--given-*</code> flag enables its own sink independently, and they combine freely (e.g. pass both <code>--given-json</code> and <code>--given-html</code> to get both files from one run).</p>
-<p>The <em>checks</em> are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the <a href="../../guide/parametrized/">parametrize rules</a> among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.</p>
+<p>A plain <code>pytest</code> run writes no report. Each <code>--given-*</code> output flag turns on one report format, and you can combine them. For example, pass both <code>--given-json</code> and <code>--given-html</code> to get both files from one run.</p>
+<p>The checks, however, always run. Every run builds the report, even if it doesn't write it. So a step that can't be reported correctly, like one that breaks the <a href="../../guide/parametrized/#rejected-authoring-forms">parametrize rules</a>, fails every run, not just the first run that writes a report.</p>
+<h2 id="flags">Flags<a class="headerlink" href="#flags" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -903,48 +1012,56 @@
 <tr>
 <td><code>--given-json[=PATH]</code></td>
 <td>off</td>
-<td>Write JSON report data (bare → <code>given-report/report-data.json</code>).</td>
+<td>Write the JSON report data. Without a path: <code>given-report/report-data.json</code>.</td>
 </tr>
 <tr>
 <td><code>--given-html[=PATH]</code></td>
 <td>off</td>
-<td>Write the HTML report (bare → <code>given-report/report.html</code>).</td>
+<td>Write the HTML report. Without a path: <code>given-report/report.html</code>.</td>
 </tr>
 <tr>
 <td><code>--given-md[=PATH]</code></td>
 <td>off</td>
-<td>Write the Markdown report; <strong>bare renders to stdout</strong>, between <code>&lt;!-- pytest-given:md:start --&gt;</code> and <code>&lt;!-- pytest-given:md:end --&gt;</code> markers.</td>
+<td>Write the Markdown report. <strong>Without a path, it prints to stdout</strong>, between <code>&lt;!-- pytest-given:md:start --&gt;</code> and <code>&lt;!-- pytest-given:md:end --&gt;</code> markers.</td>
 </tr>
 <tr>
 <td><code>--given-title=TEXT</code></td>
 <td>rootdir name</td>
-<td>Name the report, shown as the Markdown heading and the HTML tab title and topbar. Also settable as the <code>given_title</code> ini.</td>
+<td>The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: <code>given_title</code>.</td>
 </tr>
 <tr>
 <td><code>--given-source-link=PRESET</code></td>
 <td><code>none</code></td>
-<td>Editor preset (<code>vscode</code>, <code>cursor</code>, <code>zed</code>, <code>pycharm</code>, <code>github</code>) or raw URL template, <strong>HTML only</strong>. Renders a clickable file:line anchor on each scenario card, story panel, and expanded glossary term card. Also settable as the <code>given_source_link</code> ini. See <a href="../source-links/">Source links</a>.</td>
+<td>An editor preset (<code>vscode</code>, <code>cursor</code>, <code>zed</code>, <code>pycharm</code>, <code>github</code>) or a URL template. <strong>HTML only.</strong> Adds a clickable file:line link to each scenario card, story panel, and expanded glossary term. Ini setting: <code>given_source_link</code>. See <a href="../source-links/">Source links</a>.</td>
 </tr>
 <tr>
 <td><code>--given-all-frames</code></td>
 <td>off</td>
-<td>Keep internal <code>pluggy</code>/<code>_pytest</code>/pytest-given frames in failure tracebacks. See <a href="../source-links/#traceback-frames">Traceback frames</a>.</td>
+<td>Keep pytest's and pytest-given's internal frames (<code>pluggy</code>, <code>_pytest</code>, pytest-given) in failure tracebacks. See <a href="../source-links/#traceback-frames">Traceback frames</a>.</td>
 </tr>
 <tr>
 <td><code>--given-lint</code> / <code>--no-given-lint</code></td>
 <td><code>false</code></td>
-<td>Run the narration lint; an error-level finding fails the run. Also settable as the <code>given_lint</code> ini, which either form overrides. See <a href="../narration-lint/">Narration lint</a>.</td>
+<td>Turn the narration lint on or off. A finding with severity <code>error</code> fails the run. Ini setting: <code>given_lint</code>; both flags override it. See <a href="../narration-lint/">Narration lint</a>.</td>
 </tr>
 <tr>
 <td><code>--given-theme=light\|dark\|auto</code></td>
 <td><code>auto</code></td>
-<td>Theme the HTML report opens in; <code>auto</code> follows the viewer's system. The report's own Light / Dark / System control overrides it per browser. Also settable as the <code>given_theme</code> ini.</td>
+<td>The theme the HTML report opens in. <code>auto</code> follows the viewer's system setting. The report's own Light / Dark / System switch overrides it in each browser. Ini setting: <code>given_theme</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>Put a bare <code>--given-json</code> / <code>--given-html</code> / <code>--given-md</code> <strong>last</strong> on the command line, or use the <code>=PATH</code> form (<code>--given-html=out.html</code>, not <code>--given-html out.html</code>) — argparse treats a path token right after a bare flag as that flag's value, not a test selection. A path that could not be a report file (a <code>.py</code> test path, say) is refused before the suite runs rather than written over.</p>
-<p><strong>Not compatible with <code>pytest-xdist</code>.</strong> Under <code>-n</code>, tests run in worker processes whose recordings never reach the controller: the run passes and the report comes out empty. Generate reports from a non-distributed run.</p>
-<p>The ini settings live in <code>[tool.pytest]</code>, pytest 9's native TOML table. The legacy <code>[tool.pytest.ini_options]</code> is still read, but the two are mutually exclusive — pytest raises <code>UsageError</code> if both are present.</p>
+<h2 id="flag-order">Flag order<a class="headerlink" href="#flag-order" title="Permanent link">&para;</a></h2>
+<p>If an output flag has no <code>=PATH</code>, pytest reads the next word on the command line as its path, not as a test to run. To avoid this, either:</p>
+<ul>
+<li>put <code>--given-json</code>, <code>--given-html</code> or <code>--given-md</code> <strong>last</strong> on the command line, or</li>
+<li>use the <code>=PATH</code> form: <code>--given-html=out.html</code>, not <code>--given-html out.html</code>.</li>
+</ul>
+<p>If that path can't be a report file, like a <code>.py</code> test file, pytest-given stops before running the tests, so it never overwrites your test.</p>
+<h2 id="pytest-xdist">pytest-xdist<a class="headerlink" href="#pytest-xdist" title="Permanent link">&para;</a></h2>
+<p><strong>pytest-given doesn't work with <code>pytest-xdist</code>.</strong> With <code>-n</code>, tests run in worker processes, and their steps never reach the main process. The run passes, but the report is empty. Generate reports from a run without <code>-n</code>.</p>
+<h2 id="ini-settings">Ini settings<a class="headerlink" href="#ini-settings" title="Permanent link">&para;</a></h2>
+<p>Put ini settings in <code>[tool.pytest]</code> in <code>pyproject.toml</code> (pytest 9's native TOML table). pytest still reads the older <code>[tool.pytest.ini_options]</code>, but you can't use both: pytest raises <code>UsageError</code> if both are present.</p>
 
 
 

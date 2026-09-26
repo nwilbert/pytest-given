@@ -579,6 +579,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../guide/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guide/domain-storytelling/" class="md-nav__link">
         
   
@@ -893,10 +920,11 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pytest-given<span class="w"> </span>report<span class="w"> </span>path/to/report-data.json<span class="w"> </span>-o<span class="w"> </span>path/to/report.html<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>--source-link<span class="o">=</span>vscode
 </code></pre></div>
-<p><code>--source-link</code> accepts the same presets and raw templates as <code>--given-source-link</code> (see <a href="../configuration/source-links/">Source links</a>); omit it (or pass <code>--source-link=none</code>) to render plain file:line text without an anchor. On a <code>--format md</code> run it is validated but unused.</p>
-<p><code>--theme=light|dark|auto</code> sets the theme the report opens in, like <code>--given-theme</code> (default <code>auto</code>).</p>
-<p>Pass <code>--format md</code> for Markdown instead of HTML; it is also inferred from the <code>-o</code> extension, so <code>-o report.md</code> needs no <code>--format</code>. Omit <code>-o</code> with <code>--format md</code> to print to stdout — bare, unlike the plugin's <code>--given-md=-</code>, which fences its output in <code>&lt;!-- pytest-given:md:start --&gt;</code> markers so it can be found in pytest's mixed output.</p>
-<p>The same script owns <code>skills install</code> — see <a href="../ai-agents/#agent-skills">Agent skills</a>.</p>
+<p><code>--source-link</code> takes the same presets and URL templates as <code>--given-source-link</code> (see <a href="../configuration/source-links/">Source links</a>). Without it (or with <code>--source-link=none</code>), file:line is shown as plain text, without a link. With <code>--format md</code>, the option is checked but has no effect.</p>
+<p><code>--theme=light|dark|auto</code> sets the theme the report opens in, like <code>--given-theme</code>. The default is <code>auto</code>.</p>
+<p>Pass <code>--format md</code> to get Markdown instead of HTML. You can also just use a <code>.md</code> file name: <code>-o report.md</code> needs no <code>--format</code>.</p>
+<p>With <code>--format md</code> and no <code>-o</code>, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no <code>&lt;!-- pytest-given:md:start --&gt;</code> markers; the plugin only adds them to separate the report from pytest's own output.</p>
+<p>The same command also installs the agent skills with <code>pytest-given skills install</code>; see <a href="../ai-agents/#agent-skills">Agent skills</a>.</p>
 
 
 

@@ -584,6 +584,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../guide/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guide/domain-storytelling/" class="md-nav__link">
         
   
@@ -943,7 +970,7 @@
 <ul>
 <li><strong>Context economy.</strong> <code>pytest --given-md</code> renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (<code>-k</code>, <code>--lf</code>, node ids).</li>
 <li><strong>Structured queries.</strong> <code>--given-json</code> + <code>jq</code> filter scenarios by tag, status, or glossary term.</li>
-<li><strong>A controlled vocabulary.</strong> A <code>Glossary</code> — or a <code>FileGlossary</code> over the <code>GLOSSARY.md</code> you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.</li>
+<li><strong>A controlled vocabulary.</strong> A <a href="../guide/glossary/"><code>Glossary</code></a> — or a <code>FileGlossary</code> over the <code>GLOSSARY.md</code> you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.</li>
 <li><strong>Early, typed errors.</strong> Misusing a step-text form (a t-string on a decorator, a <code>Template</code> in a test body) raises <code>PytestGivenError</code> immediately with a clear message — cheap for an agent to learn from.</li>
 </ul>
 <p>Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; the bundled <a href="https://github.com/nwilbert/pytest-given/blob/main/src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md">authoring skill</a> ships a battle-tested set of rules for keeping narration truthful.</p>

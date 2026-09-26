@@ -584,6 +584,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guide/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guide/domain-storytelling/" class="md-nav__link">
         
   
@@ -620,6 +647,23 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Narration lint
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="././" class="md-nav__link md-nav__link--active">
         
   
@@ -635,6 +679,59 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Rules
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Configuration
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Output
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -889,8 +986,10 @@
 
 
 <h1 id="narration-lint">Narration lint<a class="headerlink" href="#narration-lint" title="Permanent link">&para;</a></h1>
-<p><code>--given-lint</code> runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and <code>when_then</code> pairs are all attributed correctly.</p>
-<p>Each rule has a fixed default severity; there is no master level. A <code>warn</code> finding prints in the terminal summary; an <code>error</code> finding also fails the run.</p>
+<p><code>--given-lint</code> checks the scenarios of a test run for steps whose text doesn't match their code. It checks the steps that actually ran, so steps from decorated helpers, fixtures, and <code>when_then</code> are all handled correctly.</p>
+<p>When the lint is off, it costs nothing: pytest-given records nothing extra, and the reports are exactly the same as with the lint on.</p>
+<h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
+<p>Each rule has a default severity. A <code>warn</code> finding is printed in the terminal summary. An <code>error</code> finding is printed too, and also fails the run.</p>
 <table>
 <thead>
 <tr>
@@ -903,46 +1002,47 @@
 <tr>
 <td><code>empty-step</code></td>
 <td><code>error</code></td>
-<td>A step whose body does nothing (only constants/<code>pass</code>, or — for <code>when</code>/<code>then</code> — only an <code>attach(...)</code> call).</td>
+<td>A step whose body does nothing: it only contains constants or <code>pass</code>, or, for <code>when</code> and <code>then</code>, only an <code>attach(...)</code> call.</td>
 </tr>
 <tr>
 <td><code>then-without-check</code></td>
 <td><code>error</code></td>
-<td>A <code>then</code> whose body contains no <code>assert</code> and no checking call — a call whose name starts with <code>assert</code>, or <code>pytest.raises</code> / <code>pytest.warns</code> / <code>pytest.fail</code>. Nothing else counts, <code>pytest.approx</code> included.</td>
+<td>A <code>then</code> without an <code>assert</code> or a checking call. Checking calls are calls whose name starts with <code>assert</code>, and <code>pytest.raises</code>, <code>pytest.warns</code> and <code>pytest.fail</code>. Nothing else counts, not even <code>pytest.approx</code>.</td>
 </tr>
 <tr>
 <td><code>missing-phase</code></td>
 <td><code>warn</code></td>
-<td>A passed scenario that doesn't cover all three Given/When/Then phases. Fixture <code>@given</code>s and <code>Annotated[..., given(...)]</code> parameters count; each logical scenario is evaluated once regardless of parametrization.</td>
+<td>A passed scenario that is missing one of the phases Given, When or Then. <code>@given</code> fixtures and <code>Annotated[..., given(...)]</code> parameters count as <code>given</code> steps. A parametrized scenario is checked once, not once per case.</td>
 </tr>
 <tr>
 <td><code>check-outside-then</code></td>
 <td><code>warn</code></td>
-<td>An <code>assert</code> inside a <code>given</code> or <code>when</code> (the <code>when</code> half of a <code>when_then</code> pair is exempt).</td>
+<td>An <code>assert</code> inside a <code>given</code> or <code>when</code>. The <code>when</code> part of a <code>when_then</code> is allowed to contain one.</td>
 </tr>
 <tr>
 <td><code>action-in-then</code></td>
 <td><code>warn</code></td>
-<td>A scenario where no <code>when</code> performs an action and a <code>then</code> folds the action into its assertion.</td>
+<td>A scenario where no <code>when</code> performs an action, and a <code>then</code> performs it inside its assertion instead.</td>
 </tr>
 <tr>
 <td><code>unused-interpolation</code></td>
 <td><code>warn</code></td>
-<td>A <code>with</code>-anchored step whose narration interpolates <code>{name}</code> — a t-string value or a parameter-table placeholder — that the step body never uses.</td>
+<td>A <code>with</code> step whose text contains a <code>{name}</code> (a t-string value or a parameter-table placeholder) that the step's body doesn't use.</td>
 </tr>
 <tr>
 <td><code>tag-shadows-term</code></td>
 <td><code>warn</code></td>
-<td>A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms.</td>
+<td>A scenario tag that matches a glossary term, so the same concept has two names.</td>
 </tr>
 <tr>
 <td><code>dead-term</code></td>
 <td><code>off</code></td>
-<td>A glossary term referenced by no scenario or step narration and no story sentence. Opt in on suites whose glossary is meant to be fully exercised.</td>
+<td>A glossary term that no step, scenario name, or story sentence uses. Turn this on if every glossary term should be used.</td>
 </tr>
 </tbody>
 </table>
-<p>Override severities per rule with <code>given_lint_rules</code>, and exempt individual subjects with <code>given_lint_ignore</code> — bare node-id globs, or scoped to one rule with a <code>rule-id:</code> prefix:</p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>Change a rule's severity with <code>given_lint_rules</code>. Skip findings for specific tests with <code>given_lint_ignore</code>: each entry is a node-id pattern (with <code>*</code> wildcards), optionally limited to one rule with a <code>rule-id:</code> prefix.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[tool.pytest]</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">given_lint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">given_lint_rules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
@@ -954,13 +1054,14 @@
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="s2">&quot;tests/unit/test_math.py::test_constant_is_stable&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">]</span>
 </code></pre></div>
-<p>An ignore entry that suppresses no finding is itself an error-level <code>stale-ignore</code> finding — the list can only shrink, never rot. <code>--given-lint</code> and <code>--no-given-lint</code> each override the <code>given_lint</code> ini for a single run.</p>
-<p>Findings print one aligned row each — severity, rule, subject, message, and the source location the rule fired at:</p>
+<p>An ignore entry that no longer matches any finding causes a <code>stale-ignore</code> error. This keeps the list from growing out of date.</p>
+<p>To turn the lint on or off for a single run, pass <code>--given-lint</code> or <code>--no-given-lint</code>. Both override the <code>given_lint</code> setting.</p>
+<h2 id="output">Output<a class="headerlink" href="#output" title="Permanent link">&para;</a></h2>
+<p>Each finding is printed on one line, with its severity, rule, test, message, and source location:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>============= pytest-given: narration lint (2 findings, 1 error) ==============
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ERROR empty-step     tests/test_shop.py::test_buy   given &#39;a coin&#39; has no code (test_shop.py:12)
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>WARN  missing-phase  tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
 </code></pre></div>
-<p>The lint is zero-cost when off: nothing extra is captured, and report artifacts are byte-identical with the lint on or off.</p>
 
 
 

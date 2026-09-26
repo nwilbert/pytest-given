@@ -664,6 +664,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../domain-storytelling/" class="md-nav__link">
         
   
@@ -959,15 +986,21 @@
 
 
 <h1 id="scenarios-steps">Scenarios &amp; steps<a class="headerlink" href="#scenarios-steps" title="Permanent link">&para;</a></h1>
-<p>Everything a narrated test uses: the decorator that puts it in the report, and the step context managers that describe it.</p>
+<p>A narrated test uses two things: the <code>@scenario</code> decorator, which puts the test in the report, and the steps <code>given</code>, <code>when</code> and <code>then</code>, which describe what it does.</p>
 <h2 id="scenario"><code>@scenario</code><a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
 <p><code>@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)</code></p>
-<p>Required for a test to appear in the report. <code>stories=</code> (one story or several) and <code>pins=</code> (one sentence handle or several) bind it to domain stories — see <a href="../domain-storytelling/">Domain Storytelling</a>; <code>group_parametrized=False</code> declines parametrize merging. The decorated function is returned unwrapped.</p>
-<p><code>tags=</code> takes free-form strings. A <code>/</code> nests a tag in the report's Tags sidebar the way a <code>.</code> nests modules: <code>ticket/ABC-123</code> files under a <code>ticket</code> heading, and selecting the heading filters to every tag beneath it. Tags are report metadata, not pytest marks.</p>
+<p>Only tests with <code>@scenario</code> appear in the report. The decorator returns your function unchanged.</p>
+<ul>
+<li><code>stories=</code> takes one story or a list of stories, and <code>pins=</code> one sentence handle or a list. Both link the scenario to domain stories; see <a href="../domain-storytelling/">Domain Storytelling</a>.</li>
+<li><code>group_parametrized=False</code> turns off grouping for a parametrized test; see <a href="../parametrized/#declining-the-merge">Parametrized scenarios</a>.</li>
+</ul>
+<p><code>tags=</code> takes any strings. Use <code>/</code> to nest tags in the report's Tags sidebar: <code>ticket/ABC-123</code> appears under a <code>ticket</code> heading, and selecting the heading shows all tags below it. Tags only affect the report; they are not pytest marks.</p>
 <h2 id="given-when-then"><code>given</code> / <code>when</code> / <code>then</code><a class="headerlink" href="#given-when-then" title="Permanent link">&para;</a></h2>
 <p><code>given(text, *, pins=None)</code>, <code>when(text, *, pins=None)</code>, <code>then(text, *, pins=None)</code></p>
-<p>Dual-purpose: use as a <strong>context manager</strong> inside a test body, or as a <strong>decorator</strong> on a fixture or helper function. <code>pins=</code> binds the step to story sentences instead of narration matching, and <code>pins=[]</code> opts it out of matching — see <a href="../domain-storytelling/">Domain Storytelling</a>.</p>
-<p>As context managers:</p>
+<p>You can use a step in four places: as a <strong>context manager</strong> in a test body, as a <strong>decorator</strong> on a fixture or a helper function, or as an <strong><code>Annotated</code> label</strong> on a test parameter.</p>
+<p><code>pins=</code> links the step to specific story sentences; see <a href="../domain-storytelling/#pins">Pins</a>.</p>
+<h3 id="in-a-test-body">In a test body<a class="headerlink" href="#in-a-test-body" title="Permanent link">&para;</a></h3>
+<p>Each <code>with</code> block narrates the code inside it:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">given</span><span class="p">(</span><span class="s1">&#39;an empty cart&#39;</span><span class="p">):</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">cart</span> <span class="o">=</span> <span class="p">[]</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="s1">&#39;I add an item&#39;</span><span class="p">):</span>
@@ -975,16 +1008,33 @@
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">with</span> <span class="n">then</span><span class="p">(</span><span class="s1">&#39;the cart has one item&#39;</span><span class="p">):</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 </code></pre></div>
-<p>Pick the phase by <strong>role</strong>, not syntax: all arrangement belongs in <code>given</code> — including state-mutating setup calls (<code>machine.insert(200)</code>, seeding a database) — <code>when</code> performs the one action under test, and <code>then</code> only observes its outcome. The <a href="../../configuration/narration-lint/">narration lint</a> catches the usual slips: an arrangement hiding in a second <code>when</code>, an action folded into a <code>then</code>'s assertion.</p>
-<p>A step recorded in a test with no <code>@scenario</code> is a no-op that warns with <code>pytest_given.PytestGivenWarning</code> — silence it with <code>filterwarnings = ["ignore::pytest_given.PytestGivenWarning"]</code> if a shared helper is used from both narrated and plain tests.</p>
-<p>As a fixture decorator (<strong>only <code>@given</code> is allowed</strong> — fixtures are setup, so <code>@when</code>/<code>@then</code> on a fixture is rejected at runtime):</p>
+<h3 id="choosing-the-phase">Choosing the phase<a class="headerlink" href="#choosing-the-phase" title="Permanent link">&para;</a></h3>
+<p>Choose the phase by what the code does:</p>
+<ul>
+<li><code>given</code> sets things up. This includes setup calls that change state, like <code>machine.insert(200)</code> or seeding a database.</li>
+<li><code>when</code> performs the one action under test.</li>
+<li><code>then</code> only checks the outcome.</li>
+</ul>
+<p>The <a href="../../configuration/narration-lint/">narration lint</a> catches common mistakes, like setup hidden in a second <code>when</code>, or an action done inside a <code>then</code>'s assertion.</p>
+<h3 id="steps-outside-a-scenario">Steps outside a scenario<a class="headerlink" href="#steps-outside-a-scenario" title="Permanent link">&para;</a></h3>
+<p>A step in a test without <code>@scenario</code> does nothing, except emit a <code>pytest_given.PytestGivenWarning</code>. If you share a helper between narrated and plain tests, you can silence the warning with <code>filterwarnings = ["ignore::pytest_given.PytestGivenWarning"]</code>.</p>
+<h3 id="on-fixtures">On fixtures<a class="headerlink" href="#on-fixtures" title="Permanent link">&para;</a></h3>
+<p>Fixtures are setup, so <strong>only <code>@given</code> is allowed</strong> on a fixture. <code>@when</code> or <code>@then</code> on a fixture raises an error when the fixture runs:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nd">@given</span><span class="p">(</span><span class="s1">&#39;a coffee machine&#39;</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">machine</span><span class="p">():</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;coffees&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
 </code></pre></div>
-<p>Generator fixtures work too, but only their setup is narrated: the post-<code>yield</code> block runs outside the recording, and a step or <code>attach</code> there raises <code>PytestGivenError</code>. A fixture's label must be a plain string — <code>@given(Template(...))</code> on a fixture raises; move the step into a helper function if the label has to vary.</p>
-<p>As a call-site label with <code>Annotated</code> (<strong>only <code>given</code> is allowed</strong>) — attach a <code>given</code> step to a fixture or a <code>@pytest.mark.parametrize</code> value from the test signature. This is the way to surface a parametrized input as a <code>given</code> (a direct parametrize value otherwise appears only in the parameter table), and it can label an undecorated or built-in fixture, or override a decorated fixture's label for one scenario:</p>
+<p>Generator fixtures work too, but only the part before <code>yield</code> is narrated. The teardown after <code>yield</code> isn't recorded, and a step or <code>attach</code> there raises <code>PytestGivenError</code>.</p>
+<p>A fixture's label must be a plain string; <code>@given(Template(...))</code> on a fixture raises an error. If the label needs to change, move the step into a helper function.</p>
+<h3 id="on-test-parameters">On test parameters<a class="headerlink" href="#on-test-parameters" title="Permanent link">&para;</a></h3>
+<p>With <code>Annotated</code>, you can add a <code>given</code> step to a test parameter: a fixture or a <code>@pytest.mark.parametrize</code> value. Use it to:</p>
+<ul>
+<li>show a parametrized value as a <code>given</code> step (otherwise it only appears in the parameter table)</li>
+<li>label a fixture that has no <code>@given</code>, including pytest's built-in fixtures</li>
+<li>replace a fixture's <code>@given</code> label in one scenario</li>
+</ul>
+<p>Only <code>given</code> is allowed here:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">&#39;Underpayment is rejected&#39;</span><span class="p">)</span>
@@ -999,8 +1049,10 @@
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="p">):</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="n">buy_coffee</span><span class="p">(</span><span class="n">machine</span><span class="p">,</span> <span class="n">cents</span><span class="p">)</span>
 </code></pre></div>
-<p>A <code>Template</code> placeholder renders as <code>{col}</code> in the grouped view and as the concrete value per row. <code>when</code>/<code>then</code> are rejected here — the action and its outcome belong in the test body. A label's <code>pins=</code> works as on any step; on a decorated fixture it replaces the pins of the fixture's own label, not those of steps inside its body, and <code>pins=[]</code> clears them.</p>
-<p>As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use <code>pytest_given.Template</code> and reference the helper's parameters:</p>
+<p>The report shows a <code>Template</code> placeholder as <code>{cents}</code> in the grouped scenario, and the actual value in each row of the parameter table. <code>when</code> and <code>then</code> raise an error here, because the action and its check belong in the test body.</p>
+<p>The label takes <code>pins=</code> like any step. On a fixture with its own <code>@given(..., pins=...)</code>, the label's pins replace the fixture's pins; <code>pins=[]</code> removes them. Pins of steps inside the fixture body stay as they are.</p>
+<h3 id="on-helper-functions">On helper functions<a class="headerlink" href="#on-helper-functions" title="Permanent link">&para;</a></h3>
+<p><code>given</code>, <code>when</code> and <code>then</code> can all decorate a helper function. The helper then records a step each time it's called. To put argument values into the step text, use <code>pytest_given.Template</code> with the helper's parameter names:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@when</span><span class="p">(</span><span class="s1">&#39;inserting money&#39;</span><span class="p">)</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">amount</span><span class="p">):</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="o">...</span>
@@ -1009,18 +1061,19 @@
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">amount</span><span class="p">):</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="o">...</span>
 </code></pre></div>
-<p><code>async def</code> helpers decorate the same way — the step wraps the awaited body — as do async generator fixtures.</p>
-<p>Steps nest <strong>within a phase</strong> — a <code>when</code> inside a <code>when</code>, to break one action into named sub-actions:</p>
+<p>This works the same for <code>async def</code> helpers and async generator fixtures.</p>
+<h3 id="nesting-steps">Nesting steps<a class="headerlink" href="#nesting-steps" title="Permanent link">&para;</a></h3>
+<p>You can nest steps <strong>of the same phase</strong>, for example to split one action into named sub-actions:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="s1">&#39;I place a large order&#39;</span><span class="p">):</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="s1">&#39;I select 3 coffees&#39;</span><span class="p">):</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="n">order_count</span> <span class="o">=</span> <span class="mi">3</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="s1">&#39;I apply loyalty discount&#39;</span><span class="p">):</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="o">...</span>
 </code></pre></div>
-<p>Crossing phases is rejected: a <code>then</code> opened inside a <code>when</code> raises <code>PytestGivenError</code>. That covers decorated helpers too — a <code>@when</code> helper called from inside a <code>given</code> block raises — so a helper used from more than one phase should stay undecorated and be narrated at its call site.</p>
+<p>Nesting a different phase raises <code>PytestGivenError</code>, for example a <code>then</code> inside a <code>when</code>. This includes decorated helpers: calling a <code>@when</code> helper inside a <code>given</code> block raises too. So if you call a helper from more than one phase, don't decorate it; narrate it where you call it instead.</p>
 <h2 id="when_then"><code>when_then</code><a class="headerlink" href="#when_then" title="Permanent link">&para;</a></h2>
 <p><code>when_then(when_text, then_text)</code></p>
-<p>When a single call is both the action under test and the thing you assert about — most often an expected raise — pair it with <code>pytest.raises</code> and let <code>when_then</code> narrate both an action and its outcome from one <code>with</code>:</p>
+<p>Sometimes one call is both the action and the thing you check, most often when you expect an exception. Combine <code>when_then</code> with <code>pytest.raises</code> to narrate the action and its outcome in one <code>with</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">when_then</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">&#39;Sold out is rejected&#39;</span><span class="p">)</span>
@@ -1034,7 +1087,7 @@
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="p">):</span>
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="n">buy_coffee</span><span class="p">(</span><span class="n">machine</span><span class="p">)</span>
 </code></pre></div>
-<p>The body runs inside the <code>when</code>; the sibling <code>then</code> is emitted once the body exits cleanly (e.g. after the inner <code>pytest.raises</code> catches the error). If the body raises uncaught, the <code>when</code> is recorded, the <code>then</code> is skipped, and the exception propagates.</p>
+<p>The body runs as the <code>when</code> step. The <code>then</code> step is recorded after the body finishes without an error (here: after <code>pytest.raises</code> catches the exception). If an exception escapes the body, only the <code>when</code> is recorded, and the exception propagates as usual.</p>
 
 
 
