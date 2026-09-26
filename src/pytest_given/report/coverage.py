@@ -49,28 +49,14 @@ def build_coverage_map(report: ReportData) -> CoverageMap:
     presentation, and it is the only reason `StoryIndex` would have to be part
     of another module's vocabulary.
     """
-    indexes = {story.id: build_story_index(story) for story in report.stories}
+    indexes = [build_story_index(story) for story in report.stories]
     result: CoverageMap = {}
     for scenario in report.scenarios:
-        # The stories it names, then those its pins point into, each once.
-        candidates = dict.fromkeys(
-            [
-                *scenario.story_ids,
-                *(pin.story_id for pin in scenario.pins or ()),
-                *(
-                    pin.story_id
-                    for step in iter_steps(scenario.steps)
-                    for pin in step.pins or ()
-                ),
-            ]
-        )
         per_story: dict[StoryId, set[SentenceId]] = {}
-        for story_id in candidates:
-            if story_id not in indexes:
-                continue
-            covered = compute_coverage(scenario, indexes[story_id])
-            if covered or story_id in scenario.story_ids:
-                per_story[story_id] = covered
+        for index in indexes:
+            covered = compute_coverage(scenario, index)
+            if covered or index.story_id in scenario.story_ids:
+                per_story[index.story_id] = covered
         result[scenario.id] = per_story
     return result
 

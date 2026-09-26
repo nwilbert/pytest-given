@@ -25,11 +25,9 @@ from ..model import (
     SourceLocation,
     Status,
     Step,
-    Story,
     StoryId,
 )
 from .source import PACKAGE_ROOT
-from .story import registered_stories
 from .template import Template, narration_from
 
 if TYPE_CHECKING:
@@ -193,11 +191,6 @@ class Collector:
         return list(self._scenarios)
 
     @property
-    def stories(self) -> list[Story]:
-        """Every story declared this session, in declaration order."""
-        return registered_stories()
-
-    @property
     def active_fixture_descriptor(self) -> StepDescriptor | None:
         """The descriptor pinned for the current fixture call, or None.
 
@@ -321,24 +314,23 @@ class Collector:
         self,
         root: Step,
         *,
-        override_narration: Narration | None = None,
-        override_pins: tuple[Pin, ...] | None = None,
+        label: StepDescriptor | None = None,
     ) -> None:
         """Deep-copy a fixture's recorded root into the active scenario's steps.
 
-        An Annotated label on the fixture parameter retells the grafted root:
-        *override_narration* replaces its narration, and *override_pins*, when
-        given (`()` included), its pins. The recorded children and attachments
-        are preserved.
+        *label*, an Annotated label on the fixture parameter, retells the
+        grafted root: its narration replaces the root's, and its pins, when
+        given (`()` included), the root's pins. The recorded children and
+        attachments are preserved.
         """
         # Grafting runs from the setup hook of an annotated item, which opened
         # the scenario before fixtures ran; nothing closes it until logreport.
         assert self._current_scenario is not None
         grafted = copy.deepcopy(root)
-        if override_narration is not None:
-            grafted.narration = override_narration
-        if override_pins is not None:
-            grafted.pins = override_pins
+        if label is not None:
+            grafted.narration = label.narration
+            if label.pins is not None:
+                grafted.pins = label.pins
         self._current_scenario.steps.append(grafted)
 
     def graft_leaf_given(

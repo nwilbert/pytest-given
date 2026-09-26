@@ -571,7 +571,7 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         pins=adopt_pytest_given['graft'],
     ):
         collector.graft_recording(
-            recording.root, override_narration=_n('a fancy machine')
+            recording.root, label=StepDescriptor('given', 'a fancy machine')
         )
         recorded = collector.finish_scenario(status='passed')
     with then('the grafted root shows the override text and keeps its children'):
@@ -682,7 +682,9 @@ def test_graft_override_pins_retell_only_the_root(override, expected):
     )
     collector = Collector()
     collector.start_scenario('id', 'a', 'mod', [])
-    collector.graft_recording(root, override_pins=override)
+    collector.graft_recording(
+        root, label=StepDescriptor('given', 'a room', pins=override)
+    )
     grafted = collector.finish_scenario(status='passed').steps[0]
     assert grafted.pins == expected
     assert grafted.children[0].pins == (_pin('a'),)

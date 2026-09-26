@@ -42,6 +42,7 @@ from .steps import (
 )
 from .story import (
     clause,
+    registered_stories,
     sentence,
     story,
 )
@@ -71,6 +72,7 @@ __all__ = [
     'is_internal_path',
     'item_source',
     'parse_short_repr',
+    'registered_stories',
     'resolve_glossary',
     'resolved_placeholder_part',
     'restore_capture_state',

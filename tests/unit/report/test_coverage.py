@@ -391,8 +391,15 @@ def _search_and_book_story():
         (None, [2], {2}),
         ([], None, set()),
         ([], [2], {2}),
+        ([1], [2], {1, 2}),
     ],
-    ids=['nothing-pinned', 'step-pinned', 'scenario-pinned', 'both-pinned'],
+    ids=[
+        'nothing-pinned',
+        'step-pinned',
+        'scenario-pinned',
+        'both-pinned',
+        'scenario-and-step-pinned',
+    ],
 )
 def test_narration_matching_runs_only_where_nothing_pins(
     scenario_pins: Annotated[
@@ -416,11 +423,9 @@ def test_narration_matching_runs_only_where_nothing_pins(
 def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
     """A pinned step contributes exactly its pins, even where its narration
     fits another sentence; the scenario's other steps are still matched."""
-    index = build_story_index(_search_and_book_story())
-    pinned_step = _matching_step(pins=[2])
-    assert compute_coverage(_scenario_with_steps(pinned_step), index) == {SentenceId(2)}
     assert compute_coverage(
-        _scenario_with_steps(pinned_step, _matching_step()), index
+        _scenario_with_steps(_matching_step(pins=[2]), _matching_step()),
+        build_story_index(_search_and_book_story()),
     ) == {SentenceId(1), SentenceId(2)}
 
 
@@ -438,14 +443,6 @@ def test_a_scenario_pinned_into_another_story_matches_no_step_in_this_one():
         compute_coverage(scenario_, build_story_index(_guest_search_room_story()))
         == set()
     )
-
-
-def test_a_scenario_pin_and_its_step_pins_add_up():
-    scenario_ = _scenario_with_steps(_matching_step(pins=[2]), pins=[1])
-    assert compute_coverage(scenario_, build_story_index(_search_and_book_story())) == {
-        SentenceId(1),
-        SentenceId(2),
-    }
 
 
 def test_a_scenario_naming_no_story_is_not_matched():

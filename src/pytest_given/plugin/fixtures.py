@@ -178,12 +178,8 @@ def _graft_recorded_fixtures(
         if key not in scopes:
             continue
         name = recording.root.fixture_name
-        descriptor = descriptors.get(name) if name is not None else None
-        collector.graft_recording(
-            recording.root,
-            override_narration=None if descriptor is None else descriptor.narration,
-            override_pins=None if descriptor is None else descriptor.pins,
-        )
+        label = descriptors.get(name) if name is not None else None
+        collector.graft_recording(recording.root, label=label)
         grafted.add(name)
         if scopes[key] == 'function':
             to_drop.append(key)

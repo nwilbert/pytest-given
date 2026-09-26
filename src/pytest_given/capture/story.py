@@ -84,13 +84,16 @@ class Story(BaseStory, _GlossaryCarrier):
             raise PytestGivenError(
                 f'story {self.title!r} has no sentence {key!r}; {detail}'
             )
-        return SentenceHandle(pin=Pin(story_id=self.id, sentence_id=found.id))
+        return self._handle(found)
 
     def __iter__(self) -> Iterator[SentenceHandle]:
         """The story's sentence handles in order. Without it, iteration would
         fall back to `__getitem__(0)`, which no sentence answers to."""
         for one in self.sentences:
-            yield SentenceHandle(pin=Pin(story_id=self.id, sentence_id=one.id))
+            yield self._handle(one)
+
+    def _handle(self, one: Sentence) -> SentenceHandle:
+        return SentenceHandle(pin=Pin(story_id=self.id, sentence_id=one.id))
 
 
 def _find_sentence(sentences: tuple[Sentence, ...], key: int | str) -> Sentence | None:

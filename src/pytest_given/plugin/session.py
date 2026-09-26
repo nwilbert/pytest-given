@@ -17,6 +17,7 @@ from ..capture import (
     begin_capture_session,
     capture_snapshot,
     infer_glossary_kinds,
+    registered_stories,
     resolve_glossary,
     restore_capture_state,
 )
@@ -166,7 +167,7 @@ def _build_report(session: pytest.Session) -> _SessionReport:
     scenarios = group_parametrized(
         collector.scenarios, session_state(config).param_info
     )
-    stories = collector.stories
+    stories = registered_stories()
     # Registered plugins include class instances; only modules can declare a
     # conftest glossary, so the filter is the caller's and `resolve_glossary`
     # keeps a precise signature.

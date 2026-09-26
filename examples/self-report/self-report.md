@@ -1932,7 +1932,7 @@
 - **when** «Coverage» is computed against the «Story»
 - **then** only the pinned «Sentence» is covered, matching never ran
 
-## ✓ A «step» is narration-matched only where neither it nor its «scenario» «pins» · 4 cases
+## ✓ A «step» is narration-matched only where neither it nor its «scenario» «pins» · 5 cases
 `tests/unit/report/test_coverage.py:383::test_narration_matching_runs_only_where_nothing_pins`
 
 - **given** a scenario with pins={scenario_pins}
@@ -1946,23 +1946,24 @@
 | None | [2] | {2} | ✓ |
 | [] | None | set() | ✓ |
 | [] | [2] | {2} | ✓ |
+| [1] | [2] | {1, 2} | ✓ |
 
 ## ✓ A «sentence» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:459::test_is_coverage_eligible_true_for_two_distinct_terms`
+`tests/unit/report/test_coverage.py:456::test_is_coverage_eligible_true_for_two_distinct_terms`
 
 - **given** a «Sentence» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «sentence» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:481::test_is_coverage_eligible_false_for_one_distinct_term`
+`tests/unit/report/test_coverage.py:478::test_is_coverage_eligible_false_for_one_distinct_term`
 
 - **given** a «Sentence» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «sentence» is never covered by narration matching
-`tests/unit/report/test_coverage.py:511::test_compute_coverage_excludes_under_anchored_sentence`
+`tests/unit/report/test_coverage.py:508::test_compute_coverage_excludes_under_anchored_sentence`
 
 - **given** a «Story» whose «Sentence» is all bare words
 - **given** a «Scenario» narrating one «Term ref»
@@ -1970,7 +1971,7 @@
 - **then** «Coverage» excludes the under-anchored «Sentence»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:535::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:532::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Sentence»
 - **given** the covering «term refs» in a nested child «Step»
@@ -1978,7 +1979,7 @@
 - **then** the nested «Step» still counts and the «Sentence» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «sentence»
-`tests/unit/report/test_coverage.py:572::test_compute_coverage_explicit_step_binding_covers_eligible_sentence`
+`tests/unit/report/test_coverage.py:569::test_compute_coverage_explicit_step_binding_covers_eligible_sentence`
 
 - **given** a «Story» with a coverage-eligible «Sentence»
 - **given** a «Step» «bound» to it explicitly by id
@@ -1986,7 +1987,7 @@
 - **then** «Coverage» counts it directly, without narration matching
 
 ## ✓ An explicit binding covers an under-anchored «sentence»
-`tests/unit/report/test_coverage.py:601::test_compute_coverage_explicit_binding_covers_under_anchored_sentence`
+`tests/unit/report/test_coverage.py:598::test_compute_coverage_explicit_binding_covers_under_anchored_sentence`
 
 - **given** a «Story» whose «Sentence» is under-anchored
 - **given** a «Step» «bound» to it explicitly by id
