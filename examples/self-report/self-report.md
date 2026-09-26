@@ -183,7 +183,7 @@
 - **then** the «scenario» fails, saying it pins that «story» itself
 
 ## ✓ A «step» «pin» into an unbound «story» is refused
-`tests/integration/test_plugin.py:1973::test_step_pin_into_an_unbound_story_is_refused` · validation
+`tests/integration/test_plugin.py:1975::test_step_pin_into_an_unbound_story_is_refused` · validation
 
 - **given** a «step» pinning a «story» its «scenario» does not bind
   - 📎 suite:
@@ -206,7 +206,7 @@
 - **then** the «scenario» fails, pointing at @scenario(stories=...)
 
 ## ✓ A «fixture recording» whose «pin» does not fit is refused at «graft»
-`tests/integration/test_plugin.py:2009::test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft` · validation
+`tests/integration/test_plugin.py:2012::test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft` · validation
 
 - **given** a module-scoped «step fixture» pinning a «story» that only the first «scenario» using it binds
   - 📎 suite:
@@ -242,7 +242,7 @@
 - **then** the first «scenario» passes and the second errors at «graft», naming the «step fixture» and the offending step
 
 ## ✓ An Annotated label carrying a «pin» is refused
-`tests/integration/test_plugin.py:2066::test_annotated_label_carrying_a_pin_is_refused` · validation
+`tests/integration/test_plugin.py:2070::test_annotated_label_carrying_a_pin_is_refused` · validation
 
 - **given** a «scenario» whose Annotated given(...) label carries a «pin»
   - 📎 suite:
@@ -269,7 +269,7 @@
 - **then** the run fails, saying the label cannot carry a «pin»
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2611::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2616::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -292,14 +292,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2624::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2629::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2645::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2650::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -307,7 +307,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2665::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2670::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -315,7 +315,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2698::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2703::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -335,7 +335,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2730::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2735::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -344,7 +344,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:2833::test_given_theme_cli_flag_sets_the_report_default` · configuration
+`tests/integration/test_plugin.py:2838::test_given_theme_cli_flag_sets_the_report_default` · configuration
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -352,7 +352,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:2882::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:2887::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -360,7 +360,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:2999::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3004::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -1903,21 +1903,21 @@
 - **then** only the pinned «Sentence» is covered, matching never ran
 
 ## ✓ A «sentence» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:375::test_is_coverage_eligible_true_for_two_distinct_terms`
+`tests/unit/report/test_coverage.py:402::test_is_coverage_eligible_true_for_two_distinct_terms`
 
 - **given** a «Sentence» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «sentence» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:397::test_is_coverage_eligible_false_for_one_distinct_term`
+`tests/unit/report/test_coverage.py:424::test_is_coverage_eligible_false_for_one_distinct_term`
 
 - **given** a «Sentence» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «sentence» is never covered by narration matching
-`tests/unit/report/test_coverage.py:427::test_compute_coverage_excludes_under_anchored_sentence`
+`tests/unit/report/test_coverage.py:454::test_compute_coverage_excludes_under_anchored_sentence`
 
 - **given** a «Story» whose «Sentence» is all bare words
 - **given** a «Scenario» narrating one «Term ref»
@@ -1925,7 +1925,7 @@
 - **then** «Coverage» excludes the under-anchored «Sentence»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:452::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:478::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Sentence»
 - **given** the covering «term refs» in a nested child «Step»
@@ -1933,7 +1933,7 @@
 - **then** the nested «Step» still counts and the «Sentence» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «sentence»
-`tests/unit/report/test_coverage.py:489::test_compute_coverage_explicit_step_binding_covers_eligible_sentence`
+`tests/unit/report/test_coverage.py:515::test_compute_coverage_explicit_step_binding_covers_eligible_sentence`
 
 - **given** a «Story» with a coverage-eligible «Sentence»
 - **given** a «Step» «bound» to it explicitly by id
@@ -1941,7 +1941,7 @@
 - **then** «Coverage» counts it directly, without narration matching
 
 ## ✓ An explicit binding covers an under-anchored «sentence»
-`tests/unit/report/test_coverage.py:518::test_compute_coverage_explicit_binding_covers_under_anchored_sentence`
+`tests/unit/report/test_coverage.py:544::test_compute_coverage_explicit_binding_covers_under_anchored_sentence`
 
 - **given** a «Story» whose «Sentence» is under-anchored
 - **given** a «Step» «bound» to it explicitly by id

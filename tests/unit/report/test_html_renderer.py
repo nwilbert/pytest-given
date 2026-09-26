@@ -2266,6 +2266,7 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
     app_data = _embedded_app_data(content)
     assert app_data['scenario_sentences'] == {'test.py::test_x': {'book-a-room': [1]}}
     assert app_data['sentence_labels'] == {'book-a-room:1': 'Carol searches for Room'}
+    assert app_data['story_titles'] == {'book-a-room': 'Book a Room'}
 
 
 def test_render_emits_the_configured_theme_as_the_document_default() -> None:

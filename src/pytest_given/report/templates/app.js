@@ -109,6 +109,7 @@ function reportApp() {
   // markup paints that prose as pills, unreadable as a filter label.
   const scenarioSentences = data.scenario_sentences || {};
   const sentenceLabels = data.sentence_labels || {};
+  const storyTitles = data.story_titles || {};
   const hasGlossary = glossaryTerms.length > 0;
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
@@ -587,10 +588,13 @@ function reportApp() {
     sentenceLabel(key) {
       if (!key) return '';
       // The timeline number means nothing in the Scenarios view, so the chip
-      // leads with the prose and keeps the number as the pointer back.
-      const number = key.split(':')[1];
+      // leads with the prose and keeps the number as the pointer back. With
+      // several stories a number is ambiguous, so it names its story too.
+      const [storyId, number] = key.split(':');
+      const storyTitle = storyIds.length > 1 ? lookup(storyTitles, storyId, '') : '';
+      const pointer = storyTitle ? `${storyTitle}, sentence ${number}` : `Sentence ${number}`;
       const text = lookup(sentenceLabels, key, '');
-      return text ? `Sentence ${number}: ${text}` : `Sentence ${number}`;
+      return text ? `${pointer}: ${text}` : pointer;
     },
     removeTermFilter(id) {
       this.termFilters = this.termFilters.filter(t => t !== id);

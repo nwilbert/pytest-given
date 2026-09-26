@@ -22,7 +22,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.
 - The Stories timeline shows a named sentence's name beside its coverage.
-- A scenario can bind several stories (`@scenario(stories=[a, b])`), and the Stories tab lists it under each.
+- A scenario can bind several stories (`@scenario(stories=[a, b])`), the Stories tab lists it under each, and the Scenarios view's sentence filter names its story when a report has several.
 
 ### Changed
 
