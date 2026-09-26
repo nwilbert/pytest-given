@@ -49,7 +49,7 @@ Booking System). `test_cancel_booking` covers all three of its sentences.
 `test_check_in_then_cancel` binds both stories with `stories=`: Alice checks in
 to the Deluxe Suite (sentence 8 of the first story), then cancels a later
 booking (the `'cancel'` sentence of the second), so the Stories tab lists it
-under each.
+under each; the stay she has checked in to can no longer be cancelled.
 """
 
 import pytest
@@ -63,6 +63,7 @@ from pytest_given import (
     story,
     then,
     when,
+    when_then,
 )
 
 # Ubiquitous language for group bookings.
@@ -326,9 +327,17 @@ def test_check_in_then_cancel(alice):
         }
     with when(t'{guest("Alice")} checks in to the {room("Deluxe Suite")}'):
         check_in(current_stay)
+    with then('her current stay is checked in'):
+        assert current_stay['status'] == 'checked in'
     with when(t'{guest("Alice")} {cancel("cancels")} her later {booking}'):
         cancel_before_arrival(later_stay)
     with then('the later booking is cancelled'):
         assert later_stay['status'] == 'cancelled'
-    with then('her current stay is still checked in'):
-        assert current_stay['status'] == 'checked in'
+    with (
+        when_then(
+            'she tries to cancel the stay she has checked in to',
+            'the cancellation is refused',
+        ),
+        pytest.raises(ValueError, match='after arrival'),
+    ):
+        cancel_before_arrival(current_stay)
