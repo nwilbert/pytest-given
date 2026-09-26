@@ -41,11 +41,11 @@
 | gift card | partial balance | ✗ |
 
 - **gift card, partial balance** — failed:
-  > assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}
-  > test_hotel_booking.py:248 in test_payment_declined
+  > assert 'unsupported payment method' == 'partial balance'
+  > test_hotel_booking.py:252 in test_payment_declined
 
 ## ✓ Alice cancels her booking and is refunded
-`examples/hotel-booking/test_hotel_booking.py:258::test_cancel_booking`
+`examples/hotel-booking/test_hotel_booking.py:261::test_cancel_booking`
 
 - **given** our guest «Alice»
 - **given** «Alice» has a confirmed «Booking» she paid for

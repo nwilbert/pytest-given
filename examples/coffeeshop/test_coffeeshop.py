@@ -91,7 +91,9 @@ def test_neutral_highlight(machine):
 def test_brew(machine, cup_size):
     with when(t'I brew a {cup_size} ml cup'):
         machine['coffees'] -= 1
-    with then('the machine has one fewer coffee'):
+        machine['dispensed_ml'] = cup_size
+    with then(t'the machine has dispensed {cup_size} ml, one coffee fewer'):
+        assert machine['dispensed_ml'] == cup_size
         assert machine['coffees'] < 10
 
 
@@ -108,7 +110,9 @@ def test_serve(machine, cup_size):
             machine['takeaway'] = True
     with when(t'I order a {cup_size} ml cup'):
         machine['coffees'] -= 1
-    with then('the machine has one fewer coffee'):
+        machine['dispensed_ml'] = cup_size
+    with then(t'the machine has dispensed {cup_size} ml, one coffee fewer'):
+        assert machine['dispensed_ml'] == cup_size
         assert machine['coffees'] == 9
 
 

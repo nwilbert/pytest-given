@@ -220,8 +220,8 @@ SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
         ('credit card', 'insufficient funds'),
         ('debit card', 'expired card'),
         ('bank transfer', 'fraud check failed'),
-        # Gift cards aren't wired into the decline handler yet — this case
-        # fails on the supported-method guard until the feature lands.
+        # Gift cards aren't wired into the payment processor yet — this case
+        # fails until the feature lands.
         ('gift card', 'partial balance'),
     ],
 )
@@ -239,13 +239,16 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
         t'{organizer("Carol")} submits the {payment} '
         t'by {payment_method} for the {booking}'
     ):
-        # Payment processor reports the parametrized decline reason.
-        processor_response = decline_reason
+        # The processor declines a supported method for the parametrized
+        # reason, and rejects an unsupported one outright.
+        if payment_method in SUPPORTED_PAYMENT_METHODS:
+            processor_response = decline_reason
+        else:
+            processor_response = 'unsupported payment method'
     with then(
         t'the {booking_system} {decline("declines")} the {payment} '
         t'because of {decline_reason}'
     ):
-        assert payment_method in SUPPORTED_PAYMENT_METHODS
         assert processor_response == decline_reason
         assert not booking_state['paid']
     with then(
