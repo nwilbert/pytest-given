@@ -85,7 +85,8 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 - **[Step context managers](https://nwilbert.github.io/pytest-given/dev/guide/scenarios/)**: `with given(...)`, `when(...)`, `then(...)` blocks in plain pytest tests, nesting within a phase.
 - **[Narrated fixtures](https://nwilbert.github.io/pytest-given/dev/guide/scenarios/)**: `@given` on a fixture, or `Annotated[..., given(...)]` on a parameter, records setup as a step.
 - **[Parametrized scenarios](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/)**: one narrated tree plus a parameter table per case, or one scenario per case on request.
-- **[Domain Storytelling](https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/)**: a glossary of ubiquitous-language terms, Domain Stories as sequences of sentences, and per-sentence coverage in the report.
+- **[Glossary](https://nwilbert.github.io/pytest-given/dev/guide/glossary/)**: ubiquitous-language terms, declared in code or loaded from a `GLOSSARY.md`, rendered as highlighted term refs in the narration.
+- **[Domain Storytelling](https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/)**: Domain Stories as sequences of sentences, and per-sentence coverage in the report.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
 - **[Agent skills](https://nwilbert.github.io/pytest-given/dev/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.
 

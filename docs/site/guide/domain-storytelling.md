@@ -1,68 +1,14 @@
 # Domain Storytelling
 
-Three optional pillars layer **Domain-Driven Design** on top of the core surface. Adopt any one independently — or all three for a full vocabulary-and-story workflow. The HTML report adds a tabbed view: **Scenarios** (always present), **Stories**, and **Glossary** (each only shown when populated).
+[Domain Storytelling](https://domainstorytelling.org/quick-start-guide) describes how a domain works as short stories. With pytest-given you write these stories in code, and the report shows which scenarios cover each sentence of a story.
 
-The vocabulary is [Domain Storytelling](https://domainstorytelling.org/quick-start-guide)'s own: **actors** and **work objects** connected by **activities** form **sentences**, and a story numbers its sentences. An activity is what Domain Storytelling draws as an arrow labelled with a verb.
+Stories are made of [glossary](glossary.md) terms. In Domain Storytelling, **actors** do **activities** with **work objects**. "Carol selects a room" has an actor (Carol), an activity (selects), and a work object (room). A story is a numbered list of such **sentences**. Domain Storytelling diagrams draw each activity as an arrow labelled with a verb.
 
-**1. Ubiquitous-language `Glossary`** — declare the actors, work objects, and activities your tests speak about:
+The HTML report shows stories in a **Stories** tab.
 
-```python
-from pytest_given import Glossary
+## Domain stories
 
-g = Glossary()
-guest = g.actor('Guest', definition='Person booking accommodation.')
-room = g.work_object('Room', definition='A bookable hotel room.')
-book = g.activity('book', definition='Reserve a room for a stay.')
-```
-
-Use the captured handles directly in t-strings — `t'a {guest} {book("books")} a {room}'`. Each interpolation becomes a washed, kind-colored word in the rendered step, with the term's definition as a tooltip. Glossary terms feed the Glossary tab.
-
-Reference a term with the lightest surface form that fits the sentence — the same three forms on every handle (captured or looked up):
-
-- **Bare** — `{guest}` renders the term's canonical text. Use it whenever the word appears as-is; restating it as `guest('Guest')` is redundant.
-- **`.low`** — `{guest.low}` renders the canonical lowercased, the common mid-sentence form, instead of the equivalent `guest('guest')`.
-- **Callable override** — `guest('Alice')` supplies any other surface: an activity inflection (`book('books')`), a plural (`room('rooms')`), or a concrete instance.
-
-**Loading a Markdown glossary file instead** — if your project already keeps a `GLOSSARY.md`, point `FileGlossary` at it rather than declaring terms in code:
-
-```python
-from pathlib import Path
-from pytest_given import FileGlossary
-
-g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
-```
-
-The file must contain at least one GFM pipe table. By default the first column is the term and the second is the description; override with `term_column`, `description_column`, and `kind_column` (each accepts a 0-based index or a header name, case-insensitive):
-
-```python
-g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning', kind_column='Kind')
-```
-
-Access terms by name — `g['Guest']` (case-insensitive). A `FileGlossary` is a **closed vocabulary**: unlike a code-defined `Glossary`, both `g['foo']` and `g('foo')` only look up, and both raise on an unknown name — new vocabulary is added as a row in the file. The returned handle is usable inline everywhere a code-defined handle is:
-
-```python
-# In a story sentence:
-sentence(g['Guest'], g['book']('books'), g['Room'])
-
-# In a t-string step:
-with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
-    ...
-```
-
-**Kinds** — a term's kind is either declared (`g.actor(...)` / `g.work_object(...)` / `g.activity(...)`, or a `kind_column`) or **inferred from clause slot positions** at session finish: position 0 → actor, odd positions (the verb slots) → activity, even positions ≥ 2 → work object. A declared kind is never silently overridden — it is checked against its slot when `sentence(...)` is constructed, so misplacing it raises `PytestGivenError` naming the term and its kind. Inference then handles only the undeclared terms, and raises at session finish if one turns up in a verb slot and an actor or noun slot; add a `kind_column` to disambiguate.
-
-**Kindless and undefined terms** — a term no story sentence references stays kindless; on a code-defined glossary `g('foo')` declares one the team hasn't classified yet (`g['foo']` only looks up, and raises if unknown), showing an *Undefined* badge until `definition=` is supplied. Every declared term reaches the report, referenced or not; kindless ones render under a neutral wash and collect under **Uncategorized** in the Glossary tab.
-
-**Discovery** — the plugin finds the glossary in one of two ways: off any `story(...)` that references it (a story records its glossary at construction), or, failing that, by scanning `conftest.py` module attributes for a `Glossary` / `FileGlossary` instance. A suite with no stories — glossary-only mode — therefore has to bind the instance **by name** in a `conftest.py`:
-
-```python
-# conftest.py
-from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
-```
-
-`import tests.ubiquitous_language` binds a module, not a glossary, so the scan finds nothing and the Glossary tab renders empty. Note that a suite supports **one glossary**: two distinct instances reaching the report raise `PytestGivenError`.
-
-**2. Domain Stories** — model a flow as a sequence of `sentence(...)` rows tied together by `story(...)`:
+Create a story with `story(...)`, passing a name and a list of `sentence(...)` calls:
 
 ```python
 from pytest_given import sentence, story
@@ -73,9 +19,21 @@ book_a_group_trip = story('Book a Group Trip', [
 ])
 ```
 
-A sentence reads left-to-right: actor → activity → work object (with optional connective words). Any part may be a bare string instead of a glossary handle — generic verbs like *searches for* belong there; only vocabulary with a domain-specific meaning earns a glossary row — but a sentence needs at least two distinct glossary terms to be matched by narration; under-anchored sentences render as "not coverage-tracked" unless a step pins them explicitly.
+Here `organizer` and `room` are glossary handles.
 
-A sentence usually has one arrow chain. When it has several under one number — an actor handing a work object to two recipients, or two actors doing something side by side — give it one `clause(...)` per arrow chain:
+### Sentences
+
+A sentence reads left to right: actor, activity, work object. Connecting words like `'to'` can go in between.
+
+Each part can be a glossary handle or a plain string. Use plain strings for generic verbs like *searches for*. Only words with a specific meaning in your domain need a glossary entry.
+
+Handles from a [file glossary](glossary.md#file-glossary) work the same way: `sentence(g['Guest'], g['book']('books'), g['Room'])`.
+
+A sentence needs at least two different glossary terms. With fewer, pytest-given can't match it against step text, and the report marks it as "not coverage-tracked". You can still cover such a sentence with a [pin](#pins).
+
+### Clauses
+
+Sometimes one sentence has more than one arrow: an actor hands a work object to two people, or two actors do something at the same time. Write one `clause(...)` per arrow chain:
 
 ```python
 sentence(
@@ -84,9 +42,25 @@ sentence(
 )
 ```
 
-A clause alternates node / edge / node …, so it has an odd length ≥ 3 and ends on an entity; each clause starts at its own actor. Covering a multi-clause sentence takes a step referencing every term across all of its clauses.
+The parts of a clause alternate: an actor or work object, then an activity or connecting word, then an actor or work object again, and so on. A clause starts with its actor and ends with an actor or work object, so it always has an odd number of parts, at least three.
 
-**3. Scenario ↔ sentence binding** — link a scenario (and individual steps) to the story it implements:
+To cover a sentence with several clauses, one step must mention every glossary term from all of its clauses.
+
+### Kind inference
+
+If a term has no declared [kind](glossary.md#kinds), pytest-given infers it from the term's position in story sentences when the test session finishes:
+
+- first position: **actor**
+- an activity position (2nd, 4th, …): **activity**
+- any other position (3rd, 5th, …): **work object**
+
+If a term's kind is declared, pytest-given checks it against its position when the sentence is created. A term in the wrong position raises `PytestGivenError`, naming the term and its kind.
+
+If an undeclared term appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a `kind_column` to your file glossary) to fix it.
+
+## Scenario↔sentence binding
+
+Tell pytest-given which story a scenario implements with `stories=`:
 
 ```python
 @scenario('Carol selects a suite', stories=book_a_group_trip)
@@ -95,15 +69,43 @@ def test_select_suite(carol):
         ...
 ```
 
-Each step's term references are matched against the story's sentences to compute coverage. The Stories tab shows the timeline with a coverage chip per sentence and the scenarios that touch it; selecting a sentence offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. The JSON report carries the same per-sentence result under a top-level `coverage` key.
+pytest-given then works out which sentences of the story the scenario covers. By default it matches the step text against the sentences. With pins, you state the covered sentences yourself.
 
-A sentence can be named — the story's second row above takes `name='select'` — and a story hands out **sentence handles** by name or number: `book_a_group_trip['select']`, `book_a_group_trip[2]`. Numbers are positions, so inserting a row renumbers the rows after it; a name stays put. A handle is what **pins** take:
+### Narration matching
 
-- `given(text, pins=book_a_group_trip['select'])` pins a step. The step covers exactly the named sentences, in whatever story, and is not narration-matched at all. `pins=[]` opts a step out of matching without pinning anything.
-- `@scenario(..., pins=book_a_group_trip['select'])` pins the whole scenario. It covers those sentences plus its steps' pins, and none of its steps is narration-matched; `pins=[]` keeps only the steps' pins.
-- `@scenario(..., stories=[book_a_group_trip, check_in])` matches narration against several stories at once — `check_in` here stands for another story defined the same way. The scenario is listed under each, with its chips for that story, and under any other story a pin reaches.
+A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: `{room}`, `{room.low}` and `room('Deluxe Suite')` all count as the term *Room*.
 
-So narration matching runs only where nothing pins, and `pins=None` (the default) leaves the level above in charge:
+To match against several stories, pass a list: `stories=[book_a_group_trip, check_in]`, where `check_in` is another story. The scenario then appears under each of these stories.
+
+### Coverage in the report
+
+The Stories tab shows each story as a timeline of its sentences. Each sentence has a coverage chip and lists the scenarios that cover it. Select a sentence and choose *Open in Scenarios* to see only those scenarios. Every story you declare appears in the tab, even if no scenario covers it.
+
+The JSON report contains the same data under the top-level `coverage` key.
+
+### Sentence handles
+
+To refer to one sentence, get a **sentence handle** from the story, by name or by number:
+
+```python
+book_a_group_trip['select']  # by name, set with name='select' above
+book_a_group_trip[2]         # by number
+```
+
+Numbers are positions in the list, so they change when you insert a sentence before them. Names don't change.
+
+### Pins
+
+A **pin** states which sentences a step or scenario covers, instead of relying on narration matching. Pass sentence handles to `pins=`:
+
+- **On a step**, like `given(text, pins=book_a_group_trip['select'])`: the step covers exactly these sentences, from any story. Its text is not matched.
+- **On a scenario**, like `@scenario(..., pins=book_a_group_trip['select'])`: the scenario covers these sentences, plus whatever its steps pin. The text of its steps is not matched.
+
+`pins=[]` turns off narration matching without pinning anything. On a step, it affects only that step. On a scenario, it affects all its steps, but steps with their own pins still count.
+
+A pin can point into a story that isn't in the scenario's `stories=`. The scenario then also appears under that story.
+
+The default, `pins=None`, means "no pins at this level". So narration matching only happens where no level sets pins. This table shows what a step contributes:
 
 | scenario `pins=` | step `pins=` | the step contributes |
 |---|---|---|
@@ -112,7 +114,10 @@ So narration matching runs only where nothing pins, and `pins=None` (the default
 | a list, `[]` included | `None` | nothing |
 | a list, `[]` included | a list | exactly its pins |
 
-Every story the suite declares appears in the Stories tab, covered or not. A scenario pin is an assertion no narration backs: it covers its sentences even when the test fails early or is skipped (the chip shows the scenario's status), so keep one only where the body really exercises the sentence. A pin also reaches under-anchored sentences, which narration matching skips.
+Use scenario pins with care: no step text backs them up. A pinned sentence counts as covered even if the test fails early or is skipped (its chip then shows the scenario's status). Only pin a sentence if the test really exercises it.
 
-The [domain-storytelling](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and [file-backed glossary](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) design specs carry the full surface; the [examples](../examples.md) show it end to end.
+Pins also work for sentences with fewer than two glossary terms, which narration matching can't cover.
 
+## Examples
+
+The hotel-booking and file-glossary-booking [examples](../examples.md) show stories and coverage in use.

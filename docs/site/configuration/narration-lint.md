@@ -1,21 +1,27 @@
 # Narration lint
 
-`--given-lint` runs a rule catalog over the scenarios the run just recorded, catching steps whose narration lies about their body. The AST rules analyze exactly the steps the run identified (there is no parallel static discovery), so decorated helpers, fixtures, and `when_then` pairs are all attributed correctly.
+`--given-lint` checks the scenarios of a test run for steps whose text doesn't match their code. It checks the steps that actually ran, so steps from decorated helpers, fixtures, and `when_then` are all handled correctly.
 
-Each rule has a fixed default severity; there is no master level. A `warn` finding prints in the terminal summary; an `error` finding also fails the run.
+When the lint is off, it costs nothing: pytest-given records nothing extra, and the reports are exactly the same as with the lint on.
+
+## Rules
+
+Each rule has a default severity. A `warn` finding is printed in the terminal summary. An `error` finding is printed too, and also fails the run.
 
 | Rule | Default | Catches |
 |------|---------|---------|
-| `empty-step` | `error` | A step whose body does nothing (only constants/`pass`, or — for `when`/`then` — only an `attach(...)` call). |
-| `then-without-check` | `error` | A `then` whose body contains no `assert` and no checking call — a call whose name starts with `assert`, or `pytest.raises` / `pytest.warns` / `pytest.fail`. Nothing else counts, `pytest.approx` included. |
-| `missing-phase` | `warn` | A passed scenario that doesn't cover all three Given/When/Then phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count; each logical scenario is evaluated once regardless of parametrization. |
-| `check-outside-then` | `warn` | An `assert` inside a `given` or `when` (the `when` half of a `when_then` pair is exempt). |
-| `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
-| `unused-interpolation` | `warn` | A `with`-anchored step whose narration interpolates `{name}` — a t-string value or a parameter-table placeholder — that the step body never uses. |
-| `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
-| `dead-term` | `off` | A glossary term referenced by no scenario or step narration and no story sentence. Opt in on suites whose glossary is meant to be fully exercised. |
+| `empty-step` | `error` | A step whose body does nothing: it only contains constants or `pass`, or, for `when` and `then`, only an `attach(...)` call. |
+| `then-without-check` | `error` | A `then` without an `assert` or a checking call. Checking calls are calls whose name starts with `assert`, and `pytest.raises`, `pytest.warns` and `pytest.fail`. Nothing else counts, not even `pytest.approx`. |
+| `missing-phase` | `warn` | A passed scenario that is missing one of the phases Given, When or Then. `@given` fixtures and `Annotated[..., given(...)]` parameters count as `given` steps. A parametrized scenario is checked once, not once per case. |
+| `check-outside-then` | `warn` | An `assert` inside a `given` or `when`. The `when` part of a `when_then` is allowed to contain one. |
+| `action-in-then` | `warn` | A scenario where no `when` performs an action, and a `then` performs it inside its assertion instead. |
+| `unused-interpolation` | `warn` | A `with` step whose text contains a `{name}` (a t-string value or a parameter-table placeholder) that the step's body doesn't use. |
+| `tag-shadows-term` | `warn` | A scenario tag that matches a glossary term, so the same concept has two names. |
+| `dead-term` | `off` | A glossary term that no step, scenario name, or story sentence uses. Turn this on if every glossary term should be used. |
 
-Override severities per rule with `given_lint_rules`, and exempt individual subjects with `given_lint_ignore` — bare node-id globs, or scoped to one rule with a `rule-id:` prefix:
+## Configuration
+
+Change a rule's severity with `given_lint_rules`. Skip findings for specific tests with `given_lint_ignore`: each entry is a node-id pattern (with `*` wildcards), optionally limited to one rule with a `rule-id:` prefix.
 
 ```toml
 [tool.pytest]
@@ -30,15 +36,16 @@ given_lint_ignore = [
 ]
 ```
 
-An ignore entry that suppresses no finding is itself an error-level `stale-ignore` finding — the list can only shrink, never rot. `--given-lint` and `--no-given-lint` each override the `given_lint` ini for a single run.
+An ignore entry that no longer matches any finding causes a `stale-ignore` error. This keeps the list from growing out of date.
 
-Findings print one aligned row each — severity, rule, subject, message, and the source location the rule fired at:
+To turn the lint on or off for a single run, pass `--given-lint` or `--no-given-lint`. Both override the `given_lint` setting.
+
+## Output
+
+Each finding is printed on one line, with its severity, rule, test, message, and source location:
 
 ```
 ============= pytest-given: narration lint (2 findings, 1 error) ==============
 ERROR empty-step     tests/test_shop.py::test_buy   given 'a coin' has no code (test_shop.py:12)
 WARN  missing-phase  tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
 ```
-
-The lint is zero-cost when off: nothing extra is captured, and report artifacts are byte-identical with the lint on or off.
-

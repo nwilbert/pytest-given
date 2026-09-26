@@ -1,6 +1,12 @@
 # Parametrized scenarios
 
-Parametrized tests are automatically grouped into a single scenario with a parameter table. The grouped step tree comes from a **baseline case** — the first that passed — and anything varying across cases is promoted into a column of the table: a parametrize argument, a t-string interpolation whose value differs per case (the step keeps a `{name}` placeholder pointing at the column), and an attachment whose payload differs (the step keeps a content-less badge).
+## Grouping
+
+pytest-given groups all cases of a parametrized test into one scenario with a parameter table. The report shows the steps once, taken from the first case that passed (the **baseline case**). Anything that differs between cases becomes a column in the parameter table:
+
+- a parametrize argument
+- a t-string value that differs between cases. The step shows a `{name}` placeholder that points to the column.
+- an attachment whose content differs between cases. The step shows a badge that points to the column, instead of the content.
 
 ```python
 @scenario('Pricing')
@@ -12,7 +18,9 @@ def test_pricing(machine, euros, expect):
         assert can_buy == expect
 ```
 
-For a parametrized **scenario name**, use `pytest_given.Template` — deferred substitution against the parametrize columns:
+## Scenario names
+
+To put parameter values into the scenario name, use `pytest_given.Template`. Its placeholders are filled in from the parametrize arguments:
 
 ```python
 from pytest_given import Template, scenario
@@ -23,18 +31,25 @@ def test_brew(cup_size):
     ...
 ```
 
-The `Template` name and the glossary-handle t-string name from the [step-text table](step-text.md) don't combine: a title needing both a term ref and a per-case value isn't expressible today.
+A name can't contain both a parameter value and a glossary term ref. A `Template` name has no term refs, and a t-string name (see [Step text](step-text.md)) can only contain glossary handles.
 
-What a column cannot carry is a case that narrates a *different sentence*. When the narration genuinely branches per case, add `group_parametrized=False` to the `@scenario` above to decline the merge. Each case then becomes its own scenario with no parameter table, titled by its parametrize id — `Brew 200 ml [200]` for the `Template` above, whose placeholders are substituted per case first (a plain-string name is suffixed the same way). Every case carries the id, including one whose name already renders its values. On a test that isn't parametrized the argument raises at collection.
+## Declining the merge
 
-**Six authoring forms are rejected outright** in a parametrized scenario, because each would make the grouped tree lie. Every one fails the run and writes no report — the message names the fix:
+Grouping only works when all cases have the same steps, with different values. If the steps really differ from case to case, add `group_parametrized=False` to `@scenario`.
+
+Each case then becomes its own scenario, without a parameter table. Its name ends with the parametrize id, like `Brew 200 ml [200]` for the example above. A `Template` name gets its placeholders filled in first; a plain string name gets the id added the same way. Every case gets the id, even if its name already shows its values.
+
+`group_parametrized=False` on a test that isn't parametrized raises an error at collection.
+
+## Rejected authoring forms
+
+Some ways of writing steps would make the grouped scenario show the wrong text. pytest-given rejects them: the run fails, no report is written, and the error message tells you how to fix it.
 
 | # | Rejected | Fix |
 |---|---|---|
-| 1 | A plain `str` (usually an f-string) whose text differs per case | Narrate with a t-string so the varying part is a placeholder, not case 1's text |
-| 2 | A varying interpolation that isn't a bare name — `t'{cup_size * 0.01}'`, `t'{m.balance}'` | Bind it to a local and narrate that local |
-| 3 | An interpolation naming a parametrize column that no longer holds the case's value | Rename the local that rebound the name — or, if the body mutated the value in place before narrating it, bind the result to its own name and narrate that |
-| 4 | A term ref that names a different term or reads differently between cases — including one bound to a parametrize column | Split the term ref from the value: `given(t"{pg['Customer']} {name} places an order")` |
-| 5 | A step whose set of `attach` labels differs between cases | Keep the label constant and let the content vary — that's what the attachment column is for |
-| 6 | Passed cases that narrate different templates — a different step structure, a differently shaped narration, different wording, a different interpolated expression, or a step pinned to different sentences | Decline the merge with `@scenario(..., group_parametrized=False)` and let each case be its own scenario (for a varying `pins=` pin, give the step one sentence instead) |
-
+| 1 | A plain string (usually an f-string) whose text differs between cases | Use a t-string, so the changing part becomes a placeholder instead of showing the first case's text |
+| 2 | A changing t-string value that isn't a plain variable name, like `t'{cup_size * 0.01}'` or `t'{m.balance}'` | Assign it to a local variable and use that in the t-string |
+| 3 | A t-string value named after a parametrize argument, when the variable no longer holds that argument's value | If you reassigned the variable, give the new value a new name. If the test changed the value in place, assign the result to a new variable and use that |
+| 4 | A term ref that names a different term or reads differently between cases, including one that takes its text from a parametrize argument | Keep the term ref and the value apart: `given(t"{pg['Customer']} {name} places an order")` |
+| 5 | A step whose `attach` labels differ between cases | Keep the labels the same and let only the content differ; the parameter table gets a column for it |
+| 6 | Passed cases whose steps differ in any other way: different steps, different wording, a different t-string expression, or different pins | Add `group_parametrized=False` to `@scenario` so each case becomes its own scenario. For pins that differ, pin the step to one sentence instead |

@@ -1,23 +1,35 @@
 # pytest options
 
-All report outputs are opt-in — a bare `pytest` writes nothing. Each `--given-*` flag enables its own sink independently, and they combine freely (e.g. pass both `--given-json` and `--given-html` to get both files from one run).
+A plain `pytest` run writes no report. Each `--given-*` output flag turns on one report format, and you can combine them. For example, pass both `--given-json` and `--given-html` to get both files from one run.
 
-The *checks* are not opt-in. Every run builds the report it would have written, so an authoring form that cannot be narrated honestly — the [parametrize rules](../guide/parametrized.md) among them — fails the run whether or not a sink was configured, rather than surfacing on the first run that happens to ask for HTML.
+The checks, however, always run. Every run builds the report, even if it doesn't write it. So a step that can't be reported correctly, like one that breaks the [parametrize rules](../guide/parametrized.md#rejected-authoring-forms), fails every run, not just the first run that writes a report.
+
+## Flags
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--given-json[=PATH]` | off | Write JSON report data (bare → `given-report/report-data.json`). |
-| `--given-html[=PATH]` | off | Write the HTML report (bare → `given-report/report.html`). |
-| `--given-md[=PATH]` | off | Write the Markdown report; **bare renders to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
-| `--given-title=TEXT` | rootdir name | Name the report, shown as the Markdown heading and the HTML tab title and topbar. Also settable as the `given_title` ini. |
-| `--given-source-link=PRESET` | `none` | Editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or raw URL template, **HTML only**. Renders a clickable file:line anchor on each scenario card, story panel, and expanded glossary term card. Also settable as the `given_source_link` ini. See [Source links](source-links.md). |
-| `--given-all-frames` | off | Keep internal `pluggy`/`_pytest`/pytest-given frames in failure tracebacks. See [Traceback frames](source-links.md#traceback-frames). |
-| `--given-lint` / `--no-given-lint` | `false` | Run the narration lint; an error-level finding fails the run. Also settable as the `given_lint` ini, which either form overrides. See [Narration lint](narration-lint.md). |
-| `--given-theme=light\|dark\|auto` | `auto` | Theme the HTML report opens in; `auto` follows the viewer's system. The report's own Light / Dark / System control overrides it per browser. Also settable as the `given_theme` ini. |
+| `--given-json[=PATH]` | off | Write the JSON report data. Without a path: `given-report/report-data.json`. |
+| `--given-html[=PATH]` | off | Write the HTML report. Without a path: `given-report/report.html`. |
+| `--given-md[=PATH]` | off | Write the Markdown report. **Without a path, it prints to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
+| `--given-title=TEXT` | rootdir name | The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: `given_title`. |
+| `--given-source-link=PRESET` | `none` | An editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or a URL template. **HTML only.** Adds a clickable file:line link to each scenario card, story panel, and expanded glossary term. Ini setting: `given_source_link`. See [Source links](source-links.md). |
+| `--given-all-frames` | off | Keep pytest's and pytest-given's internal frames (`pluggy`, `_pytest`, pytest-given) in failure tracebacks. See [Traceback frames](source-links.md#traceback-frames). |
+| `--given-lint` / `--no-given-lint` | `false` | Turn the narration lint on or off. A finding with severity `error` fails the run. Ini setting: `given_lint`; both flags override it. See [Narration lint](narration-lint.md). |
+| `--given-theme=light\|dark\|auto` | `auto` | The theme the HTML report opens in. `auto` follows the viewer's system setting. The report's own Light / Dark / System switch overrides it in each browser. Ini setting: `given_theme`. |
 
-Put a bare `--given-json` / `--given-html` / `--given-md` **last** on the command line, or use the `=PATH` form (`--given-html=out.html`, not `--given-html out.html`) — argparse treats a path token right after a bare flag as that flag's value, not a test selection. A path that could not be a report file (a `.py` test path, say) is refused before the suite runs rather than written over.
+## Flag order
 
-**Not compatible with `pytest-xdist`.** Under `-n`, tests run in worker processes whose recordings never reach the controller: the run passes and the report comes out empty. Generate reports from a non-distributed run.
+If an output flag has no `=PATH`, pytest reads the next word on the command line as its path, not as a test to run. To avoid this, either:
 
-The ini settings live in `[tool.pytest]`, pytest 9's native TOML table. The legacy `[tool.pytest.ini_options]` is still read, but the two are mutually exclusive — pytest raises `UsageError` if both are present.
+- put `--given-json`, `--given-html` or `--given-md` **last** on the command line, or
+- use the `=PATH` form: `--given-html=out.html`, not `--given-html out.html`.
 
+If that path can't be a report file, like a `.py` test file, pytest-given stops before running the tests, so it never overwrites your test.
+
+## pytest-xdist
+
+**pytest-given doesn't work with `pytest-xdist`.** With `-n`, tests run in worker processes, and their steps never reach the main process. The run passes, but the report is empty. Generate reports from a run without `-n`.
+
+## Ini settings
+
+Put ini settings in `[tool.pytest]` in `pyproject.toml` (pytest 9's native TOML table). pytest still reads the older `[tool.pytest.ini_options]`, but you can't use both: pytest raises `UsageError` if both are present.

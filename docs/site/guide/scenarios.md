@@ -1,22 +1,29 @@
 # Scenarios & steps
 
-Everything a narrated test uses: the decorator that puts it in the report, and the step context managers that describe it.
+A narrated test uses two things: the `@scenario` decorator, which puts the test in the report, and the steps `given`, `when` and `then`, which describe what it does.
 
 ## `@scenario`
 
 `@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)`
 
-Required for a test to appear in the report. `stories=` (one story or several) and `pins=` (one sentence handle or several) bind it to domain stories — see [Domain Storytelling](domain-storytelling.md); `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
+Only tests with `@scenario` appear in the report. The decorator returns your function unchanged.
 
-`tags=` takes free-form strings. A `/` nests a tag in the report's Tags sidebar the way a `.` nests modules: `ticket/ABC-123` files under a `ticket` heading, and selecting the heading filters to every tag beneath it. Tags are report metadata, not pytest marks.
+- `stories=` takes one story or a list of stories, and `pins=` one sentence handle or a list. Both link the scenario to domain stories; see [Domain Storytelling](domain-storytelling.md).
+- `group_parametrized=False` turns off grouping for a parametrized test; see [Parametrized scenarios](parametrized.md#declining-the-merge).
+
+`tags=` takes any strings. Use `/` to nest tags in the report's Tags sidebar: `ticket/ABC-123` appears under a `ticket` heading, and selecting the heading shows all tags below it. Tags only affect the report; they are not pytest marks.
 
 ## `given` / `when` / `then`
 
 `given(text, *, pins=None)`, `when(text, *, pins=None)`, `then(text, *, pins=None)`
 
-Dual-purpose: use as a **context manager** inside a test body, or as a **decorator** on a fixture or helper function. `pins=` binds the step to story sentences instead of narration matching, and `pins=[]` opts it out of matching — see [Domain Storytelling](domain-storytelling.md).
+You can use a step in four places: as a **context manager** in a test body, as a **decorator** on a fixture or a helper function, or as an **`Annotated` label** on a test parameter.
 
-As context managers:
+`pins=` links the step to specific story sentences; see [Pins](domain-storytelling.md#pins).
+
+### In a test body
+
+Each `with` block narrates the code inside it:
 
 ```python
 with given('an empty cart'):
@@ -27,11 +34,23 @@ with then('the cart has one item'):
     assert len(cart) == 1
 ```
 
-Pick the phase by **role**, not syntax: all arrangement belongs in `given` — including state-mutating setup calls (`machine.insert(200)`, seeding a database) — `when` performs the one action under test, and `then` only observes its outcome. The [narration lint](../configuration/narration-lint.md) catches the usual slips: an arrangement hiding in a second `when`, an action folded into a `then`'s assertion.
+### Choosing the phase
 
-A step recorded in a test with no `@scenario` is a no-op that warns with `pytest_given.PytestGivenWarning` — silence it with `filterwarnings = ["ignore::pytest_given.PytestGivenWarning"]` if a shared helper is used from both narrated and plain tests.
+Choose the phase by what the code does:
 
-As a fixture decorator (**only `@given` is allowed** — fixtures are setup, so `@when`/`@then` on a fixture is rejected at runtime):
+- `given` sets things up. This includes setup calls that change state, like `machine.insert(200)` or seeding a database.
+- `when` performs the one action under test.
+- `then` only checks the outcome.
+
+The [narration lint](../configuration/narration-lint.md) catches common mistakes, like setup hidden in a second `when`, or an action done inside a `then`'s assertion.
+
+### Steps outside a scenario
+
+A step in a test without `@scenario` does nothing, except emit a `pytest_given.PytestGivenWarning`. If you share a helper between narrated and plain tests, you can silence the warning with `filterwarnings = ["ignore::pytest_given.PytestGivenWarning"]`.
+
+### On fixtures
+
+Fixtures are setup, so **only `@given` is allowed** on a fixture. `@when` or `@then` on a fixture raises an error when the fixture runs:
 
 ```python
 @pytest.fixture
@@ -40,9 +59,19 @@ def machine():
     return {'coffees': 10, 'price': 2}
 ```
 
-Generator fixtures work too, but only their setup is narrated: the post-`yield` block runs outside the recording, and a step or `attach` there raises `PytestGivenError`. A fixture's label must be a plain string — `@given(Template(...))` on a fixture raises; move the step into a helper function if the label has to vary.
+Generator fixtures work too, but only the part before `yield` is narrated. The teardown after `yield` isn't recorded, and a step or `attach` there raises `PytestGivenError`.
 
-As a call-site label with `Annotated` (**only `given` is allowed**) — attach a `given` step to a fixture or a `@pytest.mark.parametrize` value from the test signature. This is the way to surface a parametrized input as a `given` (a direct parametrize value otherwise appears only in the parameter table), and it can label an undecorated or built-in fixture, or override a decorated fixture's label for one scenario:
+A fixture's label must be a plain string; `@given(Template(...))` on a fixture raises an error. If the label needs to change, move the step into a helper function.
+
+### On test parameters
+
+With `Annotated`, you can add a `given` step to a test parameter: a fixture or a `@pytest.mark.parametrize` value. Use it to:
+
+- show a parametrized value as a `given` step (otherwise it only appears in the parameter table)
+- label a fixture that has no `@given`, including pytest's built-in fixtures
+- replace a fixture's `@given` label in one scenario
+
+Only `given` is allowed here:
 
 ```python
 from typing import Annotated
@@ -60,9 +89,13 @@ def test_rejects_underpayment(
         buy_coffee(machine, cents)
 ```
 
-A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. `when`/`then` are rejected here — the action and its outcome belong in the test body. A label's `pins=` works as on any step; on a decorated fixture it replaces the pins of the fixture's own label, not those of steps inside its body, and `pins=[]` clears them.
+The report shows a `Template` placeholder as `{cents}` in the grouped scenario, and the actual value in each row of the parameter table. `when` and `then` raise an error here, because the action and its check belong in the test body.
 
-As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
+The label takes `pins=` like any step. On a fixture with its own `@given(..., pins=...)`, the label's pins replace the fixture's pins; `pins=[]` removes them. Pins of steps inside the fixture body stay as they are.
+
+### On helper functions
+
+`given`, `when` and `then` can all decorate a helper function. The helper then records a step each time it's called. To put argument values into the step text, use `pytest_given.Template` with the helper's parameter names:
 
 ```python
 @when('inserting money')
@@ -74,9 +107,11 @@ def insert(amount):
     ...
 ```
 
-`async def` helpers decorate the same way — the step wraps the awaited body — as do async generator fixtures.
+This works the same for `async def` helpers and async generator fixtures.
 
-Steps nest **within a phase** — a `when` inside a `when`, to break one action into named sub-actions:
+### Nesting steps
+
+You can nest steps **of the same phase**, for example to split one action into named sub-actions:
 
 ```python
 with when('I place a large order'):
@@ -86,13 +121,13 @@ with when('I place a large order'):
         ...
 ```
 
-Crossing phases is rejected: a `then` opened inside a `when` raises `PytestGivenError`. That covers decorated helpers too — a `@when` helper called from inside a `given` block raises — so a helper used from more than one phase should stay undecorated and be narrated at its call site.
+Nesting a different phase raises `PytestGivenError`, for example a `then` inside a `when`. This includes decorated helpers: calling a `@when` helper inside a `given` block raises too. So if you call a helper from more than one phase, don't decorate it; narrate it where you call it instead.
 
 ## `when_then`
 
 `when_then(when_text, then_text)`
 
-When a single call is both the action under test and the thing you assert about — most often an expected raise — pair it with `pytest.raises` and let `when_then` narrate both an action and its outcome from one `with`:
+Sometimes one call is both the action and the thing you check, most often when you expect an exception. Combine `when_then` with `pytest.raises` to narrate the action and its outcome in one `with`:
 
 ```python
 from pytest_given import when_then
@@ -109,5 +144,5 @@ def test_sold_out(machine):
         buy_coffee(machine)
 ```
 
-The body runs inside the `when`; the sibling `then` is emitted once the body exits cleanly (e.g. after the inner `pytest.raises` catches the error). If the body raises uncaught, the `when` is recorded, the `then` is skipped, and the exception propagates.
+The body runs as the `when` step. The `then` step is recorded after the body finishes without an error (here: after `pytest.raises` catches the exception). If an exception escapes the body, only the `when` is recorded, and the exception propagates as usual.
 

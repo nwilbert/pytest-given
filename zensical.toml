@@ -16,6 +16,7 @@ nav = [
     { "Step text & placeholders" = "guide/step-text.md" },
     { "Parametrized scenarios" = "guide/parametrized.md" },
     { "Attachments" = "guide/attachments.md" },
+    { "Glossary" = "guide/glossary.md" },
     { "Domain Storytelling" = "guide/domain-storytelling.md" },
     { "Narration lint" = "configuration/narration-lint.md" },
     { "Working with AI agents" = "ai-agents.md" },

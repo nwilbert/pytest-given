@@ -2,9 +2,7 @@
 
 ## Now
 
-- [ ] Make the docs sections for https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/ more explicit. Check for other pages that are too dense / unstructured.
 - [ ] Review report readability with frontend design skill.
-- [ ] Add Domain Storytelling link in docs.
 
 ## Next
 
