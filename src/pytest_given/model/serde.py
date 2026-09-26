@@ -214,8 +214,6 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
 
 
 def _pins_from_list(items: list[dict[str, Any]] | None) -> tuple[Pin, ...]:
-    """Old reports carry `story_id` / `activity_ids` instead; they are not read,
-    so such a report replays without its story bindings."""
     return tuple(
         Pin(
             story_id=StoryId(item['story_id']),
@@ -273,8 +271,6 @@ def _frame_from_dict(d: dict[str, Any]) -> TracebackFrame:
 def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
     if d is None:
         return None
-    if 'columns' not in d:
-        raise _stale_report_error("a parameter table with 'names' but no 'columns'")
     return ParameterTable(
         columns=[_param_column_from_dict(c) for c in d['columns']],
         cases=[_param_case_from_dict(c) for c in d.get('cases', [])],
@@ -310,19 +306,6 @@ _COLUMN_KINDS: tuple[ColumnKind, ...] = ('param', 'derived', 'attachment')
 def _term_kind(value: object) -> TermKind | None:
     """A glossary term's kind, which is legitimately absent while deferred."""
     return None if value is None else _literal(value, _TERM_KINDS, 'glossary term kind')
-
-
-def _stale_report_error(shape: str) -> PytestGivenError:
-    """A JSON report predating the case-column change.
-
-    There is no migration — the missing fields are grouping-time knowledge the
-    saved report never recorded — so the message says the one thing that fixes
-    it rather than leaving a bare `KeyError` to surface.
-    """
-    return PytestGivenError(
-        f'This JSON report predates pytest-given 0.2 ({shape}). There is no '
-        f'migration: re-run the suite to regenerate it.'
-    )
 
 
 def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
@@ -374,8 +357,6 @@ def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
             conversion=d.get('conversion'),
         )
     if 'name' in d:
-        if 'column_id' not in d:
-            raise _stale_report_error("a placeholder part with no 'column_id'")
         return NarrationPlaceholder(
             name=d['name'],
             column_id=ColumnId(d['column_id']),
