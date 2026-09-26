@@ -20,7 +20,7 @@ def test_pay():
         ...
 ```
 
-- A sentence may have a **name**, which stays stable when rows are inserted, unlike its number.
+- A sentence may have a **name**, which stays stable when sentences are inserted, unlike its number.
 - A pin is written with a **sentence handle**, `the_story['name']` or `the_story[3]`, which
   carries its story. Steps and scenarios both take it as `pins=`.
 - A scenario pin replaces narration matching for its story instead of capping what matching finds.
@@ -231,8 +231,8 @@ Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead
     (`book_a_room['cancel']`).
   - A new **Pin** row: what a sentence handle in `pins=` is recorded as, as a term handle is
     recorded as a term ref. A pin binds explicitly and replaces narration matching for its story.
-  - The *Sentence* row gains number and name. *Scenario↔activity binding* becomes
-    *Scenario↔sentence binding*: `stories=` plus pins. *Coverage* refers to *Pin*.
+  - The *Sentence* row gains number and name. *Scenario↔sentence binding* becomes `stories=` plus
+    pins. *Coverage* refers to *Pin*.
 - Site guide:
   - `domain-storytelling.md`: handles, names, multi-story binding, the pin table, and unbacked
     scenario pins.
@@ -295,10 +295,10 @@ Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead
   - The glossary row would stay, since it still has to say that the binding replaces matching.
   - Matching is itself a step's term refs reaching a sentence, so "ref" would blur the difference
     between pinned and matched coverage.
-- **`sentences=` as the keyword.** Accurate, but it says only what is passed, not that it overrides
-  matching, and it reads less naturally on a scenario than the old `activities=`.
-- **`covers=` as the keyword.** It matches the report's `Covers:` chips, but it names the result,
-  which matching also produces, and invites the reading "these as well as whatever matching finds".
+- **`sentences=` as the keyword.** It names only what is passed, not the override, and reads less
+  naturally on a scenario than the old `activities=`.
+- **`covers=` as the keyword.** It matches the `Covers:` chips but names the result (see "Why
+  `pins=`"), and invites the reading "these as well as whatever matching finds".
 
 ## Forward notes
 

@@ -40,15 +40,10 @@ Its "Possible sentence structures" figure shows sentences with several arrows un
 - **4**: A hands over w to B and C. One activity arrow fans out to two recipients.
 - **5**: A collaborates on w, and B collaborates on w. Two activity arrows, both numbered 5.
 
-Compared with our names:
-
-- Our `Activity` is a Domain Storytelling **sentence**: a numbered row that may span several
-  arrows.
-- Our `verb` kind is a Domain Storytelling **activity**.
-- Our path is a linear walk through one sentence's arrows. Domain Storytelling has no name for it:
-  sentence 4 is one activity but two paths, because a path is linear and repeats the shared
-  `A hands over w`. "Path" is also the most overloaded word in code, where it reads as a file path
-  first.
+So our `Activity` is their sentence and our `verb` kind their activity. Our path is a linear walk
+through one sentence's arrows, which Domain Storytelling doesn't name: sentence 4 is one activity
+but two paths, since a path is linear and repeats the shared `A hands over w`. "Path" is also the
+most overloaded word in code, where it reads as a file path first.
 
 Two current texts contradict the source: the glossary's *Path* row ("a branching segment inside a
 story … share a prefix"), and the guide's "alternate sentences" for the paths of one activity.
@@ -71,13 +66,12 @@ Model (`model/schema.py`):
   `ActivityWord` → `ClauseWord`
 - `TermKind` `'verb'` → `'activity'`
 
-Private names follow the public ones (`_PinnedActivity`, `_activity_path_from_dict`, …). After the
-rename, a grep for `activit` and `verb` should find only the pin surface and the grammar words
-below.
+Private names follow the public ones (`_PinnedActivity`, `_activity_path_from_dict`, …). No old
+name survives outside the pin surface and the grammar words below.
 
-**Left to the pins spec.** Everything the pins spec replaces keeps its name here, so nothing is
-renamed twice: `activity_id=`, step `activity=`, `@scenario(story=, activities=)`,
-`Scenario.story_id`, and `activity_ids` on scenarios and steps.
+**Left to the pins spec.** The pin surface keeps its names here, since the pins spec replaces it and
+nothing should be renamed twice: `activity_id=`, step `activity=`, `@scenario(activities=)`, and
+`activity_ids` on scenarios and steps.
 
 **Kept.** Grammar words that describe positions or forms, not the kind:
 
@@ -133,10 +127,11 @@ New and rewritten rows:
   Domain Storytelling draws as an arrow labelled with a verb. Activities accept inflections: calling
   `book('books')` records *books* as a surface form of the canonical *book*.
 - **Clause** (was *Path*): One linear walk through a sentence's arrows, a node/edge alternation
-  starting actor → verb → noun, constructed by `clause(...)`. A sentence whose arrows branch, such
-  as an actor handing a work object to two recipients, takes one clause per branch. Domain
-  Storytelling names no such unit.
-- **Clause part** (was *Activity Part*): the same definition, "a bare clause word".
+  starting actor → verb → noun, constructed by `clause(...)`. A sentence with several arrow chains
+  under one number, such as an actor handing a work object to two recipients, takes one clause per
+  chain. Domain Storytelling names no such unit.
+- **Clause part** (was *Activity Part*): unchanged apart from "bare clause word" for "bare path
+  word".
 
 Rows that change a word:
 
@@ -148,13 +143,14 @@ Rows that change a word:
 - *Inflection*: "a surface form of an Activity term".
 - *Story*: "a sequence of sentences", `story('Title', [sentence(...), ...])`.
 - *Kind inference*, *Kindless*: "story sentences", "never in a sentence".
-- *Scenario↔activity binding* and *Coverage*: "sentence" for the row. The pins spec rewrites both.
+- *Scenario↔activity binding* becomes *Scenario↔sentence binding*, and *Coverage* says "sentence".
+  The pins spec rewrites both.
 
 ### Docs and skills
 
 - Site guide:
   - `domain-storytelling.md`: the vocabulary, the mapping to Domain Storytelling with a link to the
-    quick-start guide, and "one clause per branch" in place of "alternate sentences".
+    quick-start guide, and "one clause per arrow chain" in place of "alternate sentences".
   - `scenarios.md`, `parametrized.md`, `index.md`, `examples.md`, `narration-lint.md`: the new
     names.
 - `README.md`: the new names.
@@ -169,10 +165,9 @@ vocabulary of their time.
 
 ### Self-report and examples
 
-- `tests/ubiquitous_language.py`: `sentence(...)`, `pg['Sentence']`. The row "developer captures
-  story as activity" now reads "as sentence".
-- `hotel-booking` and `file-glossary-booking` move to the new names, including the example file
-  glossary's kind column.
+- `tests/ubiquitous_language.py`: `sentence(...)`, `pg['Sentence']`. The sentence "developer
+  captures story as activity" now reads "as sentence".
+- `hotel-booking` and `file-glossary-booking` move to the new names.
 - `hotel-booking` gains a sentence whose clauses start at different actors, the quick-start
   figure's sentence 5. No test or example has that shape today.
 - Tests follow mechanically, including scenario titles that name the old terms. One new scenario:
