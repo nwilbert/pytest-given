@@ -126,11 +126,28 @@ def sentence_handles(pins: Pins | None) -> tuple[SentenceHandle, ...]:
         and not isinstance(items, str)
         and all(isinstance(item, SentenceHandle) for item in items)
     ):
-        return tuple(items)
-    raise PytestGivenError(
-        f'pins= takes sentence handles, got {pins!r}. Look the sentence up on '
-        f"its story: pins=the_story['name'] or pins=the_story[3]."
+        # A sentence pinned twice is one pin; order of first mention stays.
+        return tuple(dict.fromkeys(items))
+    whole_story = (
+        ' To narration-match a whole story, bind it with stories= instead.'
+        if isinstance(pins, BaseStory)
+        else ''
     )
+    raise PytestGivenError(
+        f'pins= takes sentence handles, got {argument_text(pins)}. Look the '
+        f"sentence up on its story: pins=the_story['name'] or "
+        f'pins=the_story[3].{whole_story}'
+    )
+
+
+def argument_text(value: object) -> str:
+    """A wrong argument as an error names it: a story by its title, anything
+    else by its repr while that stays short. A story's or glossary's full repr
+    runs to pages."""
+    if isinstance(value, BaseStory):
+        return f'the story {value.title!r}'
+    text = repr(value)
+    return text if len(text) <= 60 else f'a {type(value).__name__}'
 
 
 def carried_glossaries(node: object) -> frozenset[Glossary]:
@@ -282,7 +299,7 @@ def story(title: str, sentences: Sequence[UnnumberedSentence] = ()) -> Story:
         for position, one in enumerate(sentences, start=1)
     )
     _check_unique_names(title, numbered)
-    glossaries = union_glossaries(one._glossaries for one in sentences)
+    glossaries = union_glossaries(carried_glossaries(one) for one in sentences)
     _check_single_glossary(title, glossaries)
     return Story(
         id=sid, title=title, sentences=numbered, source=source, _glossaries=glossaries

@@ -16,7 +16,7 @@ from ..model import (
     Story,
 )
 from .steps import StepDescriptor
-from .story import Pins, sentence_handles
+from .story import Pins, argument_text, sentence_handles
 from .template import (
     ResolvedName,
     StepText,
@@ -117,7 +117,7 @@ def _matched_stories(stories: Story | Sequence[Story] | None) -> tuple[Story, ..
         return tuple({story.id: story for story in items}.values())
     raise PytestGivenError(
         f'@scenario(stories=...) takes a Story or a sequence of them; '
-        f'got {type(stories).__name__}: {stories!r}'
+        f'got {argument_text(stories)}'
     )
 
 

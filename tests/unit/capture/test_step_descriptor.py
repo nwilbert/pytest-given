@@ -1015,6 +1015,62 @@ def test_scenario_rejects_a_non_story():
         scenario('x', stories='not-a-story')  # type: ignore[arg-type]
 
 
+def test_pins_given_a_whole_story_point_at_stories_briefly():
+    """A story's repr carries its glossary; the message names it by title."""
+    the_story = _two_sentence_story('Whole Story')
+    with pytest.raises(PytestGivenError) as raised:
+        given('x', pins=the_story)  # type: ignore[arg-type]
+    message = str(raised.value)
+    assert "the story 'Whole Story'" in message
+    assert 'stories=' in message
+    assert len(message) < 300
+
+
+def test_stories_given_a_non_story_stay_brief():
+    glossary = Glossary()
+    glossary.actor('Guest')
+    glossary.work_object('Room')
+    with pytest.raises(PytestGivenError) as raised:
+        scenario('x', stories=glossary)  # type: ignore[arg-type]
+    message = str(raised.value)
+    assert 'a Glossary' in message
+    assert len(message) < 300
+
+
+def test_a_sentence_pinned_twice_is_recorded_once():
+    the_story = _two_sentence_story('Pinned Twice')
+    assert given('x', pins=[the_story[1], the_story['cancel'], the_story[1]]).pins == (
+        the_story[1].pin,
+        the_story[2].pin,
+    )
+    assert scenario('x', pins=[the_story[2], the_story['cancel']]).pins == (
+        the_story[2].pin,
+    )
+
+
+def test_a_decorated_helper_records_and_checks_its_pins():
+    bound = _two_sentence_story('Helper Bound')
+    unbound = _two_sentence_story('Helper Unbound')
+
+    @when('the helper runs', pins=bound['cancel'])
+    def pinned_helper() -> None: ...
+
+    @when('the stray helper runs', pins=unbound[1])
+    def stray_helper() -> None: ...
+
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [], stories=(bound,))
+    set_active_collector(collector)
+    try:
+        pinned_helper()
+        with pytest.raises(PytestGivenError, match=r"'Helper Unbound'.*does not bind"):
+            stray_helper()
+    finally:
+        set_active_collector(None)
+    recorded = collector.finish_scenario(status='passed')
+    assert recorded.steps[0].pins == (bound[2].pin,)
+
+
 def test_scenario_defaults_to_no_stories_and_no_pins():
     deco = scenario('x')
     assert deco.stories == ()
