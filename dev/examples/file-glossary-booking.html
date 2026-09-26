@@ -74,7 +74,7 @@
 
   --term-actor-ink: #8a4310;    --term-actor-wash: #fde5d3;    --term-actor-edge: #f0b48a;
   --term-object-ink: #0f6e64;   --term-object-wash: #d5f2ee;   --term-object-edge: #7fd5c9;
-  --term-verb-ink: #5f2d9a;     --term-verb-wash: #ece0f7;     --term-verb-edge: #c6aef0;
+  --term-activity-ink: #5f2d9a; --term-activity-wash: #ece0f7; --term-activity-edge: #c6aef0;
   --term-kindless-ink: #545962; --term-kindless-wash: #e9ecf0; --term-kindless-edge: #c9ccd3;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
@@ -115,7 +115,7 @@
 
   --term-actor-ink: #f5b47a;    --term-actor-wash: #47302b;    --term-actor-edge: #7a4a2e;
   --term-object-ink: #7fded0;   --term-object-wash: #21383f;   --term-object-edge: #2a6b62;
-  --term-verb-ink: #cbb5f7;     --term-verb-wash: #372e4d;     --term-verb-edge: #5b4886;
+  --term-activity-ink: #cbb5f7; --term-activity-wash: #372e4d; --term-activity-edge: #5b4886;
   --term-kindless-ink: #b8b2c2; --term-kindless-wash: #312c38; --term-kindless-edge: #4a4455;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
@@ -530,14 +530,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 .scenario-list,
 .entry-list,
-.activity-timeline {
+.sentence-timeline {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .scenario,
-.activity-row,
+.sentence-row,
 .entry {
   border-top: 1px solid var(--border);
   margin-top: -1px;
@@ -978,7 +978,7 @@ span.param-highlight {
 
 .term-ref-actor,
 .term-ref-object,
-.term-ref-verb,
+.term-ref-activity,
 .term-ref-unknown {
   padding: 1px 3px;
   border-radius: 3px;
@@ -991,7 +991,7 @@ span.param-highlight {
 }
 .term-ref-actor { background: var(--term-actor-wash); color: var(--term-actor-ink); }
 .term-ref-object { background: var(--term-object-wash); color: var(--term-object-ink); }
-.term-ref-verb { background: var(--term-verb-wash); color: var(--term-verb-ink); }
+.term-ref-activity { background: var(--term-activity-wash); color: var(--term-activity-ink); }
 
 
 
@@ -1004,7 +1004,7 @@ span.param-highlight {
 
 
 .term-ref--link:hover { text-decoration: underline; }
-.activity-word {
+.clause-word {
   color: var(--text-secondary);
 }
 
@@ -1108,16 +1108,16 @@ span.param-highlight {
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 
-.activity-timeline { margin-bottom: var(--space-xl); }
-.activity-row {
+.sentence-timeline { margin-bottom: var(--space-xl); }
+.sentence-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.activity-row:hover:not(.activity-row-highlight) { background: var(--bg-page); }
-.activity-num {
+.sentence-row:hover:not(.sentence-row-highlight) { background: var(--bg-page); }
+.sentence-num {
   min-width: 24px;
   padding: 0;
   height: 24px;
@@ -1132,15 +1132,15 @@ span.param-highlight {
   font-weight: 600;
   flex-shrink: 0;
 }
-.activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
-.activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+.sentence-row:hover .sentence-num:not(.sentence-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
+.sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 
 .meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
 
 
-.activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
+.sentence-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
 
 .cov-chip {
   display: inline-flex;
@@ -1162,6 +1162,18 @@ span.param-highlight {
 }
 
 
+
+.sentence-name {
+  padding: 1px 7px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+
 .use-chip {
   display: inline-block;
   padding: 2px 8px;
@@ -1177,7 +1189,7 @@ span.param-highlight {
 
 .use-chip--static { cursor: default; }
 .use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
-.scn-act-strip {
+.scn-sentence-strip {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -1185,9 +1197,9 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   flex-wrap: wrap;
 }
-.scn-act-label { color: var(--text-muted); font-weight: 600; }
+.scn-sentence-label { color: var(--text-muted); font-weight: 600; }
 
-.scn-act-strip .use-chip {
+.scn-sentence-strip .use-chip {
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
@@ -1196,7 +1208,7 @@ span.param-highlight {
   align-items: center;
   justify-content: center;
 }
-.scn-act-strip-section { margin-top: var(--space-xl); }
+.scn-sentence-strip-section { margin-top: var(--space-xl); }
 
 .story-section-heading { margin-bottom: var(--space-sm); }
 
@@ -1219,7 +1231,7 @@ span.param-highlight {
 }
 .kind-swatch-actor { background: var(--term-actor-edge); }
 .kind-swatch-object { background: var(--term-object-edge); }
-.kind-swatch-verb { background: var(--term-verb-edge); }
+.kind-swatch-activity { background: var(--term-activity-edge); }
 .kind-swatch-kindless { background: var(--term-kindless-edge); }
 
 
@@ -1246,7 +1258,7 @@ span.param-highlight {
 
 .term-actor { color: var(--term-actor-ink); }
 .term-obj { color: var(--term-object-ink); }
-.term-verb { color: var(--term-verb-ink); }
+.term-activity { color: var(--term-activity-ink); }
 .term-kindless { color: var(--term-kindless-ink); }
 
 
@@ -1259,7 +1271,7 @@ span.param-highlight {
 }
 .term-pill.term-actor { background: var(--term-actor-wash); border: 1px solid var(--term-actor-edge); }
 .term-pill.term-obj { background: var(--term-object-wash); border: 1px solid var(--term-object-edge); }
-.term-pill.term-verb { background: var(--term-verb-wash); border: 1px solid var(--term-verb-edge); }
+.term-pill.term-activity { background: var(--term-activity-wash); border: 1px solid var(--term-activity-edge); }
 .term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
 
 
@@ -1351,14 +1363,14 @@ span.param-highlight {
 
 
 
-.activity-jump {
+.sentence-jump {
   display: none;
   font: inherit;
   font-size: var(--font-size-sm);
   white-space: nowrap;
 }
-.activity-row-highlight .activity-jump { display: inline-block; }
-.activity-jump:focus-visible {
+.sentence-row-highlight .sentence-jump { display: inline-block; }
+.sentence-jump:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -1366,10 +1378,10 @@ span.param-highlight {
 
 
 
-.activity-row-highlight { background: var(--color-accent-tint); }
-.scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-surface); }
-.activity-num-highlight,
-.activity-num-highlight:hover,
+.sentence-row-highlight { background: var(--color-accent-tint); }
+.scn-sentence-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-surface); }
+.sentence-num-highlight,
+.sentence-num-highlight:hover,
 .use-chip-highlight,
 .use-chip-highlight:hover {
   background: var(--color-accent);
@@ -1513,9 +1525,9 @@ span.param-highlight {
           Term: <span x-text="termLabel(termId)"></span>
           <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
         </span>
-      </template><span class="filter-chip" x-show="activityFilter" x-cloak>
-        <span class="filter-chip-text" x-text="activityLabel(activityFilter)" :title="activityLabel(activityFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearActivityFilter()" aria-label="Clear activity filter">×</button>
+      </template><span class="filter-chip" x-show="sentenceFilter" x-cloak>
+        <span class="filter-chip-text" x-text="sentenceLabel(sentenceFilter)" :title="sentenceLabel(sentenceFilter)"></span>
+        <button type="button" class="filter-chip-x" @click="clearSentenceFilter()" aria-label="Clear sentence filter">×</button>
       </span>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
         <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
@@ -1551,7 +1563,7 @@ span.param-highlight {
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span> is available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book">books</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="book">books</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span> receives a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span></div>
           </div><div class="phase-steps">
@@ -1563,7 +1575,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1594,7 +1606,7 @@ span.param-highlight {
       <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
             <div class="step-text">no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span> is available</div>
           </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span> <span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book">books</span> a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div>
+            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="book">books</span> a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div>
           </div><div class="phase-label">Then</div><div class="phase-steps">
             <div class="step-text">no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> is issued</div>
           </div><div class="phase-steps">
@@ -1606,7 +1618,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1630,7 +1642,7 @@ span.param-highlight {
               :aria-pressed="selectedStory === $el.dataset.storyId"
               @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">Book a Room</div>
-        <div class="story-sidebar-meta meta-list"><span>3 activities</span><span>2 scenarios</span></div>
+        <div class="story-sidebar-meta meta-list"><span>3 sentences</span><span>2 scenarios</span></div>
       </button>
       
     </div>
@@ -1653,29 +1665,29 @@ span.param-highlight {
             <div class="header-title">Book a Room<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=stories&amp;story=book-a-room"
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></div>
-            <div class="header-context meta-list"><span>3 activities</span><span>2 scenarios</span></div>
-            <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
-                    @click="clearActivityHighlights()">Deselect</button>
+            <div class="header-context meta-list"><span>3 sentences</span><span>2 scenarios</span></div>
+            <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
+                    @click="clearSentenceHighlights()">Deselect</button>
           </div>
         </div>
-        <div class="activity-timeline">
+        <div class="sentence-timeline">
           
           
-          <div class="activity-row" id="activity-book-a-room-1"
-               data-activity-id="1"
-               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
-            <button type="button" class="btn-reset activity-num" data-activity-id="1"
-                    :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }"
-                    :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                    aria-label="Select activity 1">1</button>
-            <div class="activity-body">
+          <div class="sentence-row" id="sentence-book-a-room-1"
+               data-sentence-id="1"
+               :class="{ 'sentence-row-highlight': highlightedSentences[$el.dataset.sentenceId] }">
+            <button type="button" class="btn-reset sentence-num" data-sentence-id="1"
+                    :class="{ 'sentence-num-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                    :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                    aria-label="Select sentence 1">1</button>
+            <div class="sentence-body">
               
-              <div class="activity-path">
-                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span><span class="activity-word">browses</span><span class="activity-word">listings</span>
+              <div class="sentence-clause">
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span><span class="clause-word">browses</span><span class="clause-word">listings</span>
               </div>
               
             </div>
-            <div class="activity-cov">
+            <div class="sentence-cov">
               
               <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
               
@@ -1683,66 +1695,67 @@ span.param-highlight {
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-room-2"
-               data-activity-id="2"
-               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
-            <button type="button" class="btn-reset activity-num" data-activity-id="2"
-                    :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }"
-                    :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                    aria-label="Select activity 2">2</button>
-            <div class="activity-body">
+          <div class="sentence-row" id="sentence-book-a-room-2"
+               data-sentence-id="2"
+               :class="{ 'sentence-row-highlight': highlightedSentences[$el.dataset.sentenceId] }">
+            <button type="button" class="btn-reset sentence-num" data-sentence-id="2"
+                    :class="{ 'sentence-num-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                    :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                    aria-label="Select sentence 2">2</button>
+            <div class="sentence-body">
               
-              <div class="activity-path">
-                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span><span class="term-ref-verb term-ref--link has-term-tip" data-term-id="book">books</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span>
+              <div class="sentence-clause">
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span><span class="term-ref-activity term-ref--link has-term-tip" data-term-id="book">books</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span>
               </div>
               
             </div>
-            <div class="activity-cov">
+            <div class="sentence-cov">
               
               
               <span class="cov-chip cov-passed"><span>2 scenarios</span></span>
               
-              <button type="button" class="use-chip activity-jump"
-                      data-activity-jump="book-a-room:2">Open in Scenarios <span aria-hidden="true">→</span></button>
+              <button type="button" class="use-chip sentence-jump"
+                      data-sentence-jump="book-a-room:2">Open in Scenarios <span aria-hidden="true">→</span></button>
               
             </div>
           </div>
           
           
-          <div class="activity-row" id="activity-book-a-room-3"
-               data-activity-id="3"
-               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
-            <button type="button" class="btn-reset activity-num" data-activity-id="3"
-                    :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }"
-                    :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                    aria-label="Select activity 3">3</button>
-            <div class="activity-body">
+          <div class="sentence-row" id="sentence-book-a-room-3"
+               data-sentence-id="3"
+               :class="{ 'sentence-row-highlight': highlightedSentences[$el.dataset.sentenceId] }">
+            <button type="button" class="btn-reset sentence-num" data-sentence-id="3"
+                    :class="{ 'sentence-num-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                    :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                    aria-label="Select sentence 3">3</button>
+            <div class="sentence-body">
               
-              <div class="activity-path">
-                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span><span class="activity-word">receives</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span>
+              <div class="sentence-clause">
+                <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Guest</span><span class="clause-word">receives</span><span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span>
               </div>
               
             </div>
-            <div class="activity-cov">
+            <div class="sentence-cov">
               
               
               <span class="cov-chip cov-passed"><span>1 scenario</span></span>
               
-              <button type="button" class="use-chip activity-jump"
-                      data-activity-jump="book-a-room:3">Open in Scenarios <span aria-hidden="true">→</span></button>
+              <button type="button" class="use-chip sentence-jump"
+                      data-sentence-jump="book-a-room:3">Open in Scenarios <span aria-hidden="true">→</span></button>
               
             </div>
           </div>
           
         </div>
-        <div class="scn-act-strip-section">
+        <div class="scn-sentence-strip-section">
           <div class="story-section-heading">Scenarios</div>
           <div class="scenario-list">
+          
           
           <div class="scenario passed"
                
                data-covers='[2, 3]'
-               x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
+               x-show="sentenceSelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <button type="button" class="btn-reset scenario-name scenario-name--goto"
@@ -1753,27 +1766,28 @@ span.param-highlight {
               </span>
             </div>
             
-            <div class="scn-act-strip">
-              <span class="scn-act-label">Covers:</span>
+            <div class="scn-sentence-strip">
+              <span class="scn-sentence-label">Covers:</span>
               
-              <button type="button" class="btn-reset use-chip" data-activity-id="2"
-                      :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }"
-                      :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                      aria-label="Select activity 2">2</button>
+              <button type="button" class="btn-reset use-chip" data-sentence-id="2"
+                      :class="{ 'use-chip-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                      :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                      aria-label="Select sentence 2">2</button>
               
-              <button type="button" class="btn-reset use-chip" data-activity-id="3"
-                      :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }"
-                      :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                      aria-label="Select activity 3">3</button>
+              <button type="button" class="btn-reset use-chip" data-sentence-id="3"
+                      :class="{ 'use-chip-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                      :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                      aria-label="Select sentence 3">3</button>
               
             </div>
             
           </div>
           
+          
           <div class="scenario passed"
                
                data-covers='[2]'
-               x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
+               x-show="sentenceSelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <button type="button" class="btn-reset scenario-name scenario-name--goto"
@@ -1784,13 +1798,13 @@ span.param-highlight {
               </span>
             </div>
             
-            <div class="scn-act-strip">
-              <span class="scn-act-label">Covers:</span>
+            <div class="scn-sentence-strip">
+              <span class="scn-sentence-label">Covers:</span>
               
-              <button type="button" class="btn-reset use-chip" data-activity-id="2"
-                      :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }"
-                      :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                      aria-label="Select activity 2">2</button>
+              <button type="button" class="btn-reset use-chip" data-sentence-id="2"
+                      :class="{ 'use-chip-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                      :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                      aria-label="Select sentence 2">2</button>
               
             </div>
             
@@ -1799,7 +1813,7 @@ span.param-highlight {
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1840,9 +1854,9 @@ span.param-highlight {
         </label>
         
         <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.verb">
-          <span class="kind-swatch kind-swatch-verb"></span>
-          <span>Verbs</span>
+          <input type="checkbox" x-model="glossaryKindFilter.activity">
+          <span class="kind-swatch kind-swatch-activity"></span>
+          <span>Activities</span>
           <span class="nav-group-count">1</span>
         </label>
         
@@ -1876,7 +1890,7 @@ span.param-highlight {
             <span>6 terms</span>
             <span>1 actor</span>
             <span>2 work objects</span>
-            <span>1 verb</span>
+            <span>1 activity</span>
             <span>2 uncategorized</span>
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
@@ -1944,7 +1958,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -2011,7 +2025,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -2065,7 +2079,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -2076,11 +2090,11 @@ span.param-highlight {
       </div>
       
       
-      <div x-show="glossaryKindFilter.verb && visibleTermCount('verb') > 0">
+      <div x-show="glossaryKindFilter.activity && visibleTermCount('activity') > 0">
         
         <div class="kind-header">
-          <span class="kind-title term-verb">Verbs</span>
-          <span class="kind-meta" x-text="visibleTermLabel('verb')"></span>
+          <span class="kind-title term-activity">Activities</span>
+          <span class="kind-meta" x-text="visibleTermLabel('activity')"></span>
         </div>
         
         <div class="entry-list">
@@ -2100,7 +2114,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="book" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-verb">book</span>
+              <span class="term-pill term-activity">book</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2139,7 +2153,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -2199,7 +2213,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2239,7 +2253,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a0bc72bd36d7c1b272a2b13501d0dd38ad387eab/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2265,7 +2279,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-20T12:56:59.531546+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"verb\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-room\",\"narration\":{\"text\":\"Guest books an available room\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"story_id\":\"book-a-room\",\"narration\":{\"text\":\"Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"]},\"scenario_activities\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":[2,3],\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":[2]},\"activity_labels\":{\"book-a-room:1\":\"Guest browses listings\",\"book-a-room:2\":\"Guest books Room\",\"book-a-room:3\":\"Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-26T15:04:05.712087+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest books an available room\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -2307,7 +2321,7 @@ function deserializeStory(params) {
 
 
 
-  const fromFilter = (params.get('activity-filter') || '').split(':')[0];
+  const fromFilter = (params.get('sentence-filter') || '').split(':')[0];
   if (ids.includes(fromFilter)) return fromFilter;
   return ids[0] || null;
 }
@@ -2375,8 +2389,8 @@ function reportApp() {
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
 
 
-  const scenarioActivities = data.scenario_activities || {};
-  const activityLabels = data.activity_labels || {};
+  const scenarioSentences = data.scenario_sentences || {};
+  const sentenceLabels = data.sentence_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
 
@@ -2461,7 +2475,7 @@ function reportApp() {
     themeChoice: theme.choice,
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
-    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
+    glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
     expandedTerms: {},
     showPassed: true,
@@ -2478,23 +2492,23 @@ function reportApp() {
 
 
 
-    activityFilter: null,
+    sentenceFilter: null,
     _suppressHashWrite: false,
-    highlightedActivities: {},
+    highlightedSentences: {},
 
 
     _toggle(map, key) {
       if (map[key]) delete map[key];
       else map[key] = true;
     },
-    get anyActivitiesHighlighted() {
-      return Object.keys(this.highlightedActivities).length > 0;
+    get anySentencesHighlighted() {
+      return Object.keys(this.highlightedSentences).length > 0;
     },
-    toggleActivityHighlight(id) {
-      this._toggle(this.highlightedActivities, id);
+    toggleSentenceHighlight(id) {
+      this._toggle(this.highlightedSentences, id);
     },
-    clearActivityHighlights() {
-      this.highlightedActivities = {};
+    clearSentenceHighlights() {
+      this.highlightedSentences = {};
     },
 
 
@@ -2502,13 +2516,13 @@ function reportApp() {
     selectStory(id) {
       if (this.selectedStory === id) return;
       this.selectedStory = id;
-      this.highlightedActivities = {};
+      this.highlightedSentences = {};
     },
 
 
-    activitySelectionMatches(coveredIds) {
-      if (!this.anyActivitiesHighlighted) return true;
-      return coveredIds.some(id => this.highlightedActivities[id]);
+    sentenceSelectionMatches(coveredIds) {
+      if (!this.anySentencesHighlighted) return true;
+      return coveredIds.some(id => this.highlightedSentences[id]);
     },
 
 
@@ -2540,7 +2554,7 @@ function reportApp() {
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
-      return ['actor', 'object', 'verb', 'kindless'].some(k => counts[k] > 0);
+      return ['actor', 'object', 'activity', 'kindless'].some(k => counts[k] > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -2573,7 +2587,7 @@ function reportApp() {
 
       if (parts.length) return parts.join('\u2003');
       const chipped = this.termFilters.length || this.tagFilters.length
-        || this.moduleFilter || this.activityFilter;
+        || this.moduleFilter || this.sentenceFilter;
       return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
@@ -2595,7 +2609,7 @@ function reportApp() {
     _visible() {
       const state = [
         this.showPassed, this.showFailed, this.showSkipped,
-        this.moduleFilter, this.activityFilter, this.search,
+        this.moduleFilter, this.sentenceFilter, this.search,
         this.tagFilters, this.termFilters,
       ];
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
@@ -2715,12 +2729,10 @@ function reportApp() {
           }
         }
       }
-      if (this.activityFilter) {
-        const [storyId, activityId] = this.activityFilter.split(':');
-        if (s.story_id !== storyId) return false;
-        if (!(scenarioActivities[s.id] || []).includes(Number(activityId))) {
-          return false;
-        }
+      if (this.sentenceFilter) {
+        const [storyId, sentenceId] = this.sentenceFilter.split(':');
+        const covered = (scenarioSentences[s.id] || {})[storyId] || [];
+        if (!covered.includes(Number(sentenceId))) return false;
       }
       if (query && !searchHaystacks[index].includes(query)) return false;
       return true;
@@ -2816,7 +2828,7 @@ function reportApp() {
       this.tagFilters = [];
       this.termFilters = [];
       this.moduleFilter = null;
-      this.activityFilter = null;
+      this.sentenceFilter = null;
       this.search = '';
       this.showPassed = true;
       this.showFailed = true;
@@ -2841,25 +2853,22 @@ function reportApp() {
 
       if (hasGlossary) this.view = 'terms';
     },
-    filterScenariosByActivity(key) {
+    filterScenariosBySentence(key) {
 
       this.resetFilters();
-      this.activityFilter = key;
+      this.sentenceFilter = key;
 
 
-      this.highlightedActivities = { [key.split(':')[1]]: true };
+      this.highlightedSentences = { [key.split(':')[1]]: true };
       this.mainView = 'scenarios';
     },
-    clearActivityFilter() {
-      this.activityFilter = null;
+    clearSentenceFilter() {
+      this.sentenceFilter = null;
     },
-    activityLabel(key) {
+    sentenceLabel(key) {
       if (!key) return '';
 
-
-      const number = key.split(':')[1];
-      const text = lookup(activityLabels, key, '');
-      return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
+      return lookup(sentenceLabels, key, `Sentence ${key.split(':')[1]}`);
     },
     removeTermFilter(id) {
       this.termFilters = this.termFilters.filter(t => t !== id);
@@ -2998,7 +3007,7 @@ function reportApp() {
 
 
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'activityFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -3016,18 +3025,18 @@ function reportApp() {
         this.goToTerm(pill.dataset.termId);
       }, true);
       document.addEventListener('click', (event) => {
-        const chip = event.target.closest('[data-activity-id]');
+        const chip = event.target.closest('[data-sentence-id]');
         if (!chip) return;
 
 
-        if (event.target.closest('[data-activity-jump]')) return;
-        this.toggleActivityHighlight(chip.dataset.activityId);
+        if (event.target.closest('[data-sentence-jump]')) return;
+        this.toggleSentenceHighlight(chip.dataset.sentenceId);
       });
 
       document.addEventListener('click', (event) => {
-        const jump = event.target.closest('[data-activity-jump]');
+        const jump = event.target.closest('[data-sentence-jump]');
         if (!jump) return;
-        this.filterScenariosByActivity(jump.dataset.activityJump);
+        this.filterScenariosBySentence(jump.dataset.sentenceJump);
       });
 
       document.addEventListener('click', (event) => {
@@ -3128,8 +3137,8 @@ function reportApp() {
       } else {
         this.termFilters = [];
       }
-      if (params.has('activity-filter')) this.activityFilter = params.get('activity-filter');
-      else this.activityFilter = null;
+      if (params.has('sentence-filter')) this.sentenceFilter = params.get('sentence-filter');
+      else this.sentenceFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -3147,8 +3156,8 @@ function reportApp() {
 
 
 
-      this.highlightedActivities = this.activityFilter
-        ? { [this.activityFilter.split(':')[1]]: true }
+      this.highlightedSentences = this.sentenceFilter
+        ? { [this.sentenceFilter.split(':')[1]]: true }
         : {};
 
 
@@ -3179,7 +3188,7 @@ function reportApp() {
       if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
-      if (this.activityFilter) params.set('activity-filter', this.activityFilter);
+      if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
 
       const shown = [];
       if (this.showPassed) shown.push('passed');

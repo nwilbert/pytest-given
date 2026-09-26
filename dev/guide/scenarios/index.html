@@ -961,12 +961,12 @@
 <h1 id="scenarios-steps">Scenarios &amp; steps<a class="headerlink" href="#scenarios-steps" title="Permanent link">&para;</a></h1>
 <p>Everything a narrated test uses: the decorator that puts it in the report, and the step context managers that describe it.</p>
 <h2 id="scenario"><code>@scenario</code><a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
-<p><code>@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)</code></p>
-<p>Required for a test to appear in the report. <code>story=</code> / <code>activities=</code> bind it to a domain story (see <a href="../domain-storytelling/">Domain Storytelling</a>) — <code>activities=</code> requires <code>story=</code> and takes an <code>int</code> or a sequence of them, never a string; <code>group_parametrized=False</code> declines parametrize merging. The decorated function is returned unwrapped.</p>
+<p><code>@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)</code></p>
+<p>Required for a test to appear in the report. <code>stories=</code> (one story or several) and <code>pins=</code> (one sentence handle or several) bind it to domain stories — see <a href="../domain-storytelling/">Domain Storytelling</a>; <code>group_parametrized=False</code> declines parametrize merging. The decorated function is returned unwrapped.</p>
 <p><code>tags=</code> takes free-form strings. A <code>/</code> nests a tag in the report's Tags sidebar the way a <code>.</code> nests modules: <code>ticket/ABC-123</code> files under a <code>ticket</code> heading, and selecting the heading filters to every tag beneath it. Tags are report metadata, not pytest marks.</p>
 <h2 id="given-when-then"><code>given</code> / <code>when</code> / <code>then</code><a class="headerlink" href="#given-when-then" title="Permanent link">&para;</a></h2>
-<p><code>given(text)</code>, <code>when(text)</code>, <code>then(text)</code></p>
-<p>Dual-purpose: use as a <strong>context manager</strong> inside a test body, or as a <strong>decorator</strong> on a fixture or helper function.</p>
+<p><code>given(text, *, pins=None)</code>, <code>when(text, *, pins=None)</code>, <code>then(text, *, pins=None)</code></p>
+<p>Dual-purpose: use as a <strong>context manager</strong> inside a test body, or as a <strong>decorator</strong> on a fixture or helper function. <code>pins=</code> binds the step to story sentences instead of narration matching, and <code>pins=[]</code> opts it out of matching — see <a href="../domain-storytelling/">Domain Storytelling</a>.</p>
 <p>As context managers:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">given</span><span class="p">(</span><span class="s1">&#39;an empty cart&#39;</span><span class="p">):</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">cart</span> <span class="o">=</span> <span class="p">[]</span>
@@ -999,7 +999,7 @@
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="p">):</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="n">buy_coffee</span><span class="p">(</span><span class="n">machine</span><span class="p">,</span> <span class="n">cents</span><span class="p">)</span>
 </code></pre></div>
-<p>A <code>Template</code> placeholder renders as <code>{col}</code> in the grouped view and as the concrete value per row. <code>when</code>/<code>then</code> are rejected here — the action and its outcome belong in the test body.</p>
+<p>A <code>Template</code> placeholder renders as <code>{col}</code> in the grouped view and as the concrete value per row. <code>when</code>/<code>then</code> are rejected here — the action and its outcome belong in the test body. A label's <code>pins=</code> works as on any step; on a decorated fixture it replaces the pins of the fixture's own label, not those of steps inside its body, and <code>pins=[]</code> clears them.</p>
 <p>As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use <code>pytest_given.Template</code> and reference the helper's parameters:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@when</span><span class="p">(</span><span class="s1">&#39;inserting money&#39;</span><span class="p">)</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="n">amount</span><span class="p">):</span>

@@ -957,19 +957,36 @@
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A <code>/</code> in a tag nests it in the HTML report's Tags sidebar (<code>ticket/ABC-123</code> under a <code>ticket</code> heading), and selecting the heading filters to every tag beneath it, as a package does for its modules.</li>
-<li>The bundled skills ship under <code>pytest_given/.agents/skills/</code> in the wheel, so downstream projects can also install them with <a href="https://library-skills.io">library-skills</a> (<code>uvx library-skills install --claude</code>) alongside the skills of their other dependencies. <code>pytest-given skills install</code> keeps working as before.</li>
-<li>The JSON report carries a top-level <code>coverage</code> key — one record per story activity with <code>tracked</code> and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.</li>
+<li>The bundled skills ship under <code>pytest_given/.agents/skills/</code> in the wheel, so downstream projects can also install them with <a href="https://library-skills.io">library-skills</a> (<code>uvx library-skills install --claude</code>) alongside the skills of their other dependencies.</li>
+<li>The JSON report carries a top-level <code>coverage</code> key — one record per story sentence with <code>tracked</code> and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.</li>
 <li>The documentation lives at <a href="https://nwilbert.github.io/pytest-given/">https://nwilbert.github.io/pytest-given/</a>; the README keeps the overview and quick start, and the bundled skills and the <code>--given-source-link</code> / <code>--source-link</code> help text point at the site.</li>
 <li><code>--given-theme</code> / <code>given_theme</code> (and <code>--theme</code> on <code>pytest-given report</code>) set whether the HTML report opens light, dark, or following the viewer's system.</li>
 <li>The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.</li>
+<li>The Stories timeline shows a named sentence's name beside its coverage.</li>
+<li>A scenario can bind several stories (<code>@scenario(stories=[a, b])</code>), the Stories tab lists it under each, and the Scenarios view's sentence filter names its story when a report has several.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li><strong>Breaking.</strong> <code>sentence(..., activity_id=N)</code> is removed: sentences are numbered by position, so name the sentence (<code>name=</code>) and pin it by name.</li>
+<li><strong>Breaking.</strong> Pins take sentence handles under <code>pins=</code>: <code>given(..., activity=3)</code> becomes <code>given(..., pins=the_story[3])</code>, and <code>@scenario(activities=[2, 3])</code> becomes <code>pins=[the_story[2], the_story[3]]</code>, or <code>the_story['name']</code> for a named sentence.</li>
+<li><strong>Breaking.</strong> <code>@scenario(story=)</code> is now <code>stories=</code> and takes one story or several.</li>
+<li><strong>Breaking.</strong> <code>@scenario(pins=)</code> covers exactly the pinned sentences plus its steps' pins, with no narration matching in any story; <code>pins=[]</code> on a step or scenario opts out of narration matching without pinning anything.</li>
+<li><strong>Breaking.</strong> In the JSON report, <code>scenarios[].story_id</code> is now <code>story_ids</code>, and <code>activity_ids</code> on scenarios and steps is now <code>pins</code> (<code>[{story_id, sentence_id}]</code>, <code>null</code> when not given); regenerate saved reports.</li>
+<li><strong>Breaking.</strong> <code>activity()</code> is now <code>sentence()</code>, <code>path()</code> is now <code>clause()</code>, and <code>Glossary.verb()</code> is now <code>Glossary.activity()</code>: rename the calls and imports.</li>
+<li><strong>Breaking.</strong> A file glossary's kind column says <code>activity</code> where it said <code>verb</code>.</li>
+<li><strong>Breaking.</strong> In the JSON report, <code>stories[].activities[]</code> is now <code>stories[].sentences[]</code> with <code>clauses</code> in place of <code>paths</code>, the term kind <code>"verb"</code> is now <code>"activity"</code>, and <code>coverage[].activity_id</code> is now <code>sentence_id</code>. Regenerate saved reports: <code>pytest-given report</code> rejects a <code>verb</code> kind.</li>
+<li><strong>Breaking.</strong> The report's <code>#activity-filter=</code> link parameter is now <code>#sentence-filter=</code>.</li>
+<li>The report lists every story the run declares, not only those a scenario binds, so a story no scenario covers shows with no coverage. A story whose <code>story()</code> call ran before the session started (a module still imported from an earlier <code>pytest.main()</code> in the same process) is left out with a warning.</li>
+<li>The HTML report says <em>Sentence</em> where it said <em>Activity</em>, and the Glossary view groups activity terms under <em>Activities</em> instead of <em>Verbs</em>.</li>
 <li>The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.</li>
 <li>The documentation site is set in Source Sans 3 and Source Code Pro.</li>
-<li>The HTML report inlines its stylesheet and script without their source comments, which takes about 29 KB off every report; line numbers are preserved, so a browser stack trace still maps onto <code>app.js</code>.</li>
-<li>Story coverage matches on glossary terms alone: an instance in an activity (<code>guest('Alice')</code>) is now covered by a step naming the bare term, and vice versa — activities that differed only by instance are no longer told apart by narration, only by an <code>activity=</code> pin.</li>
-<li>The authoring skill's and README's glossary snippets keep generic verbs (<em>searches for</em>, <em>adds</em>) as bare activity strings instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.</li>
+<li>The HTML report inlines its stylesheet and script without their source comments, keeping line numbers so a browser stack trace still maps onto <code>app.js</code>.</li>
+<li>Story coverage matches on glossary terms alone: an instance in a sentence (<code>guest('Alice')</code>) is now covered by a step naming the bare term, and vice versa — sentences that differed only by instance are no longer told apart by narration, only by a pin.</li>
+<li>The authoring skill's and README's glossary snippets keep generic verbs (<em>searches for</em>, <em>adds</em>) as bare strings in sentences instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.</li>
+<li>The <code>attachment-labels</code> and varying-<code>str</code> grouping refusals name the parametrize case they found, and the latter now points at <code>group_parametrized=False</code> as a way out.</li>
+<li>The reviewing skill ships <code>references/pairs.md</code>, a script pairing each scenario's narration with its test's source, and audits the rules the release notes announce; both skills flag alternation <code>match=</code> pins and a <code>when</code> that narrates arrangement while its body acts.</li>
+<li>The authoring skill's <code>stories.md</code> spells out the directional instance rule of coverage matching (and its consequence: write sentences with bare handles), that two sentences with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's <code>coverage</code> key instead of reimplementing the rule.</li>
+<li>The authoring, reviewing and navigating skills describe sentence handles, <code>pins=</code> and <code>stories=</code>, and the reviewing skill checks that each scenario-pinned sentence is exercised by the test body.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -980,20 +997,12 @@
 <li>A refused scenario on a run with no <code>--given-*</code> sink no longer reports itself under a "report not written" heading.</li>
 <li>An unknown <code>--given-source-link</code> preset is reported under the flag the user typed rather than under the <code>given_source_link</code> ini name.</li>
 <li>A report whose rendering fails unexpectedly still discards the previous run's report rather than leaving it on disk reading as current.</li>
-<li>A step <code>activity=</code> recorded from a <code>@given</code> fixture scoped wider than <code>function</code>, pulled in by a test without <code>@scenario</code>, now raises a <code>PytestGivenError</code> naming the cause instead of a bare <code>AssertionError</code>.</li>
+<li>A step pin recorded from a <code>@given</code> fixture scoped wider than <code>function</code>, first set up by a test without <code>@scenario</code>, is recorded and counts in every scenario the fixture reaches, instead of failing with a bare <code>AssertionError</code>.</li>
 <li>The <code>#scenario=</code> deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.</li>
 <li><code>pytest-given report</code> reports a non-UTF-8 input file as an error rather than crashing with a traceback.</li>
 <li>A <code>dead-term</code> finding states the criterion the rule actually applies: a term ref in a <code>@scenario</code> name keeps a term alive, which the old message did not mention.</li>
-<li>The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from <code>parameters.cases[].error</code>, where they live; the scenario's own <code>error</code> is <code>null</code> there and the old recipe printed an empty message. The skill also starts from a committed or CI-published report when one exists, instead of always rerunning the suite.</li>
-</ul>
-<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
-<ul>
-<li>The <code>attachment-labels</code> and varying-<code>str</code> grouping refusals name the parametrize case they found, and the latter now points at <code>group_parametrized=False</code> as a way out.</li>
-<li>The reviewing skill ships <code>references/pairs.md</code> — a script pairing each
-  scenario's narration with its test's source — and audits the rules the
-  release notes announce. Both skills now flag alternation <code>match=</code> pins and a
-  <code>when</code> that narrates arrangement while its body acts.</li>
-<li>The authoring skill's <code>stories.md</code> spells out the directional instance rule of coverage matching (and its consequence: write activities with bare handles), that two activities with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's <code>coverage</code> key instead of reimplementing the rule.</li>
+<li>An <code>Annotated</code> <code>given(...)</code> label carrying a pin records it instead of silently dropping it, replacing the pins of the fixture step it relabels (<code>pins=[]</code> clears them), and a pin on a step fixture's own <code>@given(...)</code> label is now recorded instead of dropped.</li>
+<li>The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from <code>parameters.cases[].error</code>, where they live, and starts from a committed or CI-published report when one exists instead of always rerunning the suite.</li>
 </ul>
 <h2 id="020-2026-09-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0">0.2.0</a> - 2026-09-04<a class="headerlink" href="#020-2026-09-04" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
@@ -1016,7 +1025,7 @@
 <li>A selected activity in the Stories view offers <strong>Open in Scenarios</strong>, filtering
   the Scenarios view down to the scenarios covering it.</li>
 </ul>
-<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <h4 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>Breaking.</strong> <code>--given-lint</code> is a plain boolean flag: write <code>--given-lint</code> and
