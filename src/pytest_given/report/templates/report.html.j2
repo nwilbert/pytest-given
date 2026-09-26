@@ -413,8 +413,6 @@
                     :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
                     aria-label="Select sentence {{ sentence.id }}">{{ sentence.id }}</button>
             <div class="sentence-body">
-              {#- Quoted, so a sentence named '3' never reads as sentence 3. -#}
-              {% if sentence.name %}<span class="sentence-name">'{{ sentence.name }}'</span>{% endif %}
               {% for clause in sentence.clauses %}
               <div class="sentence-clause">
                 {% for part in clause.parts %}{{ part | clause_part }}{% endfor %}
@@ -422,6 +420,9 @@
               {% endfor %}
             </div>
             <div class="sentence-cov">
+              {#- A reference key for authors pinning the sentence, so it sits
+                  with the other metadata rather than in the prose. -#}
+              {% if sentence.name %}<span class="sentence-name" title="Sentence name, for pinning it">{{ sentence.name }}</span>{% endif %}
               {% if cov.untracked %}
               <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
               {% elif cov.total == 0 %}

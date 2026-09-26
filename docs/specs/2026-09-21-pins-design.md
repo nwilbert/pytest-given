@@ -64,8 +64,8 @@ The problems:
   - A name must be non-empty, free of leading and trailing whitespace, and unique within its story.
   - It is a lookup key only, never a report key, HTML id or hash parameter, so it needs no slug
     alphabet.
-  - Messages and the timeline quote names (`'cancel'`) and leave numbers bare, so a sentence named
-    `'3'` never reads as sentence 3.
+  - Messages quote names (`'cancel'`) and leave numbers bare, so a sentence named `'3'` never
+    reads as sentence 3.
 
 `activity_id=` is removed, and with it the 0 sentinel, the skip-taken-numbers rule in
 `_assign_sequence_numbers`, and `_check_unique_ids`, which can no longer fail. Its one job, keeping
@@ -192,8 +192,9 @@ the old field names, so a report saved before this change replays without its st
 
 HTML:
 
-- The timeline bubble keeps the number. A named sentence shows its name as a small muted tag
-  beside it, so an author can read the name off the timeline.
+- The timeline bubble keeps the number. A named sentence shows its name as an outlined
+  monospace tag beside its coverage chip, so an author can read the name off the timeline
+  without it competing with the sentence's prose.
 - A scenario that binds several stories is listed under each of them, with the `Covers:` chips for
   that story.
 - In the app data, `scenarios[].story_id` becomes `story_ids`, and `scenario_sentences` becomes

@@ -21,7 +21,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The documentation lives at <https://nwilbert.github.io/pytest-given/>; the README keeps the overview and quick start, and the bundled skills and the `--given-source-link` / `--source-link` help text point at the site.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.
-- The Stories timeline shows a named sentence's name beside its number.
+- The Stories timeline shows a named sentence's name beside its coverage.
 - A scenario can bind several stories (`@scenario(stories=[a, b])`), and the Stories tab lists it under each.
 
 ### Changed

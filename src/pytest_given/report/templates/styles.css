@@ -1102,7 +1102,6 @@ span.param-highlight {
 }
 .sentence-row:hover .sentence-num:not(.sentence-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
 .sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.sentence-name { align-self: flex-start; font-size: var(--font-size-sm); color: var(--text-muted); font-family: var(--font-mono); }
 .sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 /* Counts side by side, separated by space rather than a glyph. */
@@ -1128,6 +1127,18 @@ span.param-highlight {
   color: var(--text-muted);
   border: 1px dashed var(--border);
   cursor: help;
+}
+/* The sentence name: a code key, not a status. Outlined on the surface colour
+   beside the tinted coverage chip, so it keeps its shape on a selected row too;
+   one pixel less padding so the border keeps the two the same height. */
+.sentence-name {
+  padding: 1px 7px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
 }
 
 /* === Scenario badge strip === */
