@@ -182,7 +182,7 @@ def _graft_recorded_fixtures(
         collector.graft_recording(
             recording.root,
             override_narration=None if descriptor is None else descriptor.narration,
-            override_pins=() if descriptor is None else descriptor.pins,
+            override_pins=None if descriptor is None else descriptor.pins,
         )
         grafted.add(name)
         if scopes[key] == 'function':
@@ -220,7 +220,7 @@ def _graft_annotated_leaves(
     for name, descriptor in descriptors.items():
         if name in grafted or _step_fixturedef(item, name) is not None:
             continue
-        collector.graft_leaf_given(name, descriptor.narration, pins=descriptor.pins)
+        collector.graft_leaf_given(descriptor.narration, pins=descriptor.pins)
 
 
 def _step_fixturedef(item: pytest.Item, name: str) -> pytest.FixtureDef[object] | None:

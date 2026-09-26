@@ -17,11 +17,9 @@ from pytest_given.model import (
     NodeId,
     Pin,
     PytestGivenError,
-    Sentence,
     SentenceId,
     SourceLocation,
     Step,
-    Story,
     StoryId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -545,7 +543,7 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
         t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}',
         pins=adopt_pytest_given['graft'],
     ):
-        collector.graft_leaf_given('name', _n('the name {text}'))
+        collector.graft_leaf_given(_n('the name {text}'))
         recorded = collector.finish_scenario(status='passed')
     with then('the step is a given with no children'):
         leaf = recorded.steps[0]
@@ -597,7 +595,7 @@ def test_graft_leaf_given_without_scenario_is_refused() -> None:
         ),
         pytest.raises(AssertionError),
     ):
-        collector.graft_leaf_given('orphan', _n('orphan'))
+        collector.graft_leaf_given(_n('orphan'))
 
 
 def test_graft_recording_without_override_is_unchanged() -> None:
@@ -636,67 +634,62 @@ def test_fail_ignores_a_node_id_the_collector_never_recorded() -> None:
     assert collector.scenarios == []
 
 
-def _model_story(story_id: str) -> Story:
-    return Story(
-        id=StoryId(story_id),
-        title=story_id,
-        sentences=(Sentence(id=SentenceId(1), clauses=()),),
-    )
-
-
 def _pin(story_id: str) -> Pin:
     return Pin(story_id=StoryId(story_id), sentence_id=SentenceId(1))
 
 
-def test_push_step_refuses_a_pin_into_a_story_the_scenario_does_not_bind():
+def test_push_step_keeps_not_pinned_apart_from_pinned_to_nothing():
     collector = Collector()
-    collector.start_scenario('id', 'a', 'mod', [], stories=(_model_story('a'),))
-    with pytest.raises(PytestGivenError, match=r"story 'b'.*does not bind.*stories="):
-        collector.push_step('given', Narration(text='x'), pins=(_pin('b'),))
+    collector.start_scenario('id', 'a', 'mod', [])
+    collector.push_step('given', Narration(text='unpinned'))
+    collector.pop_step()
+    collector.push_step('given', Narration(text='opted out'), pins=())
+    collector.pop_step()
+    recorded = collector.finish_scenario(status='passed')
+    assert [step.pins for step in recorded.steps] == [None, ()]
 
 
-def test_push_step_refuses_a_pin_into_a_story_the_scenario_pins():
-    collector = Collector()
-    collector.start_scenario(
-        'id', 'a', 'mod', [], stories=(_model_story('a'),), pins=(_pin('a'),)
-    )
-    with pytest.raises(PytestGivenError, match='pins that story itself'):
-        collector.push_step('given', Narration(text='x'), pins=(_pin('a'),))
-
-
-def test_push_step_pin_outside_any_scenario_is_a_user_error():
+def test_a_pin_recorded_outside_any_scenario_is_kept():
+    """A wider-scoped fixture an unannotated test set up first records its
+    pins; they count in each scenario the recording is grafted into."""
     collector = Collector()
     recording = FixtureRecording(
         root=Step(phase='given', narration=Narration(text='wide'))
     )
     with collector.fixture_setup(recording, given('wide')):
-        with pytest.raises(PytestGivenError, match='needs a scenario'):
-            collector.push_step('given', Narration(text='x'), pins=(_pin('a'),))
+        collector.push_step('given', Narration(text='x'), pins=(_pin('a'),))
+        collector.pop_step()
+    assert recording.root.children[0].pins == (_pin('a'),)
 
 
 @pytest.mark.parametrize(
-    ('stories', 'pins'),
+    ('override', 'expected'),
     [
-        ((), ()),  # the recording's story is unbound here
-        ((_model_story('a'),), (_pin('a'),)),  # bound, but pinned by the scenario
+        (None, (_pin('root'),)),
+        ((), ()),
+        ((_pin('label'),), (_pin('label'),)),
     ],
+    ids=['none-keeps', 'empty-clears', 'list-replaces'],
 )
-def test_graft_refuses_a_recording_whose_pin_does_not_fit(stories, pins):
+def test_graft_override_pins_retell_only_the_root(override, expected):
     root = Step(
         phase='given',
-        narration=Narration(text='a module-scoped arrangement'),
-        fixture_name='wide',
+        narration=Narration(text='a room'),
+        pins=(_pin('root'),),
         children=[
-            Step(
-                phase='given',
-                narration=Narration(text='an inner step'),
-                pins=(_pin('a'),),
-            )
+            Step(phase='given', narration=Narration(text='inner'), pins=(_pin('a'),))
         ],
     )
     collector = Collector()
-    collector.start_scenario('id', 'later', 'mod', [], stories=stories, pins=pins)
-    with pytest.raises(PytestGivenError, match="story 'a'") as excinfo:
-        collector.graft_recording(root)
-    assert "fixture 'wide'" in str(excinfo.value)
-    assert "step 'an inner step'" in str(excinfo.value)
+    collector.start_scenario('id', 'a', 'mod', [])
+    collector.graft_recording(root, override_pins=override)
+    grafted = collector.finish_scenario(status='passed').steps[0]
+    assert grafted.pins == expected
+    assert grafted.children[0].pins == (_pin('a'),)
+
+
+def test_graft_leaf_given_records_its_pins():
+    collector = Collector()
+    collector.start_scenario('id', 'a', 'mod', [])
+    collector.graft_leaf_given(Narration(text='a room'), pins=(_pin('a'),))
+    assert collector.finish_scenario(status='passed').steps[0].pins == (_pin('a'),)

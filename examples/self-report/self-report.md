@@ -1,7 +1,7 @@
 # pytest-given — pytest-given Self-Report
 
 ## ✓ A test without `@scenario` stays out of the «report»
-`tests/integration/test_plugin.py:136::test_unannotated_test_not_in_report`
+`tests/integration/test_plugin.py:137::test_unannotated_test_not_in_report`
 
 - **given** a suite whose only test is undecorated
 - **when** the suite runs with --given-json
@@ -9,7 +9,7 @@
 - **then** the «report» holds no «scenario»
 
 ## ✓ A «step fixture» is «grafted» in as a given «step»
-`tests/integration/test_plugin.py:205::test_step_fixture_appears_as_given_step`
+`tests/integration/test_plugin.py:206::test_step_fixture_appears_as_given_step`
 
 - **given** a «scenario» consuming a «step fixture»
   - 📎 suite:
@@ -32,7 +32,7 @@
 - **then** the «step» from the fixture leads the recorded steps
 
 ## ✓ The «cases» of a «parametrized scenario» become one «scenario» with a «parameter table»
-`tests/integration/test_plugin.py:243::test_parametrized_test_as_table` · parametrization
+`tests/integration/test_plugin.py:244::test_parametrized_test_as_table` · parametrization
 
 - **given** a «parametrized scenario» over two «cases»
   - 📎 suite:
@@ -56,14 +56,14 @@
 - **then** the grouped steps carry a placeholder per matching name
 
 ## ✓ A refusal on a run with no sink does not claim a «report» was skipped
-`tests/integration/test_plugin.py:382::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
+`tests/integration/test_plugin.py:383::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
 
 - **given** a suite whose narration varies across parametrize cases
 - **when** the suite runs with no --given-* sink
 - **then** the refusal is reported without claiming a report was skipped
 
 ## ✓ A refused run discards the previous run's «report»
-`tests/integration/test_plugin.py:410::test_a_grouping_error_discards_the_previous_report` · validation
+`tests/integration/test_plugin.py:411::test_a_grouping_error_discards_the_previous_report` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -83,7 +83,7 @@
 - **then** the stale files are gone rather than left reading as current
 
 ## ✓ An unknown «source link» preset stops the run before it collects
-`tests/integration/test_plugin.py:478::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:479::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
   - 📎 suite:
@@ -100,14 +100,14 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ An unknown «source link» preset in an ini reports the ini name
-`tests/integration/test_plugin.py:510::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
+`tests/integration/test_plugin.py:511::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
 
 - **given** a suite configured through the ini rather than the flag
 - **when** the suite runs with an HTML sink
 - **then** the error names the ini setting, not a flag the user never typed
 
 ## ✓ A «report» that fails to render discards the previous one too
-`tests/integration/test_plugin.py:536::test_a_render_failure_leaves_no_half_replaced_report` · validation
+`tests/integration/test_plugin.py:537::test_a_render_failure_leaves_no_half_replaced_report` · validation
 
 - **given** a suite with one «scenario»
 - **given** a «report» pair on disk from a previous run
@@ -116,7 +116,7 @@
 - **then** neither the stale pair nor a half-written new one survives
 
 ## ✓ A «scenario» is matched against each of its «stories»
-`tests/integration/test_plugin.py:1837::test_scenario_matched_against_two_stories`
+`tests/integration/test_plugin.py:1842::test_scenario_matched_against_two_stories`
 
 - **given** a «scenario» binding two «stories» whose «sentence» its «narration» fits
   - 📎 suite:
@@ -139,31 +139,10 @@
 - **then** the test passes
 - **then** the «scenario» binds both «stories» and covers the «sentence» of each
 
-## ✓ A «story» named in both stories= and pins= is refused
-`tests/integration/test_plugin.py:1906::test_story_in_both_stories_and_pins_is_refused` · validation
+## ✓ A declared «story» no «scenario» covers appears in the report
+`tests/integration/test_plugin.py:1914::test_a_declared_story_no_scenario_covers_appears`
 
-- **given** a «scenario» naming one «story» in both stories= and pins=
-  - 📎 suite:
-    ```
-    from pytest_given import Glossary, scenario, sentence, story
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    s = story('Book', [sentence(guest, search, room)])
-    
-    @scenario('x', stories=s, pins=s[1])
-    def test_x():
-        pass
-    ```
-- **when** the suite runs
-- **then** the run fails, saying the «story» is named in both
-
-## ✓ A «step» «pin» into a pinned «story» is refused
-`tests/integration/test_plugin.py:1938::test_step_pin_into_a_pinned_story_is_refused` · validation
-
-- **given** a «step» pinning a «story» its «scenario» already pins
+- **given** a suite declaring a «story» that no «scenario» names or «pins»
   - 📎 suite:
     ```
     from pytest_given import Glossary, given, scenario, sentence, story
@@ -172,20 +151,47 @@
     guest = g.actor('Guest')
     search = g.activity('search')
     room = g.work_object('Room')
-    s = story('Book', [sentence(guest, search, room)])
+    story('Unread', [sentence(guest, search, room)])
     
-    @scenario('x', pins=s[1])
+    @scenario('x')
     def test_x():
-        with given('thing', pins=s[1]):
+        with given('something'):
             pass
     ```
-- **when** the suite runs
-- **then** the «scenario» fails, saying it pins that «story» itself
+- **when** the suite runs with --given-json
+- **then** the report lists the «story», its «sentence» covered by nothing
 
-## ✓ A «step» «pin» into an unbound «story» is refused
-`tests/integration/test_plugin.py:1975::test_step_pin_into_an_unbound_story_is_refused` · validation
+## ✓ A pinned «scenario» still counts its «step» «pins»
+`tests/integration/test_plugin.py:1952::test_a_pinned_scenario_still_counts_its_step_pins`
 
-- **given** a «step» pinning a «story» its «scenario» does not bind
+- **given** a «scenario» pinning one «sentence», whose «steps» pin a second and narrate a third
+  - 📎 suite:
+    ```
+    from pytest_given import Glossary, given, scenario, sentence, story
+    
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.activity('search')
+    room = g.work_object('Room')
+    s = story('Book', [
+        sentence(guest('Alice'), search, room),
+        sentence(guest('Bob'), search, room),
+        sentence(guest, search, room)])
+    
+    @scenario('x', stories=s, pins=s[1])
+    def test_x():
+        with given('a pinned step', pins=s[2]):
+            pass
+        with given(t'the {guest} does a {search} for a {room}'):
+            pass
+    ```
+- **when** the suite runs with --given-json
+- **then** the «scenario» covers both pinned «sentences» and not the one its narration would match
+
+## ✓ A «step» «pin» into a «story» outside stories= covers it
+`tests/integration/test_plugin.py:1999::test_a_step_pin_into_a_story_outside_stories_covers_it`
+
+- **given** a «step» pinning a «story» its «scenario» does not name
   - 📎 suite:
     ```
     from pytest_given import Glossary, given, scenario, sentence, story
@@ -202,13 +208,13 @@
         with given('thing', pins=b[1]):
             pass
     ```
-- **when** the suite runs
-- **then** the «scenario» fails, pointing at @scenario(stories=...)
+- **when** the suite runs with --given-json
+- **then** the «scenario» passes and covers the pinned «sentence», in the «story» it did not name
 
-## ✓ A «fixture recording» whose «pin» does not fit is refused at «graft»
-`tests/integration/test_plugin.py:2012::test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft` · validation
+## ✓ A wide «fixture recording» keeps its «pins» in every «scenario» it is grafted into
+`tests/integration/test_plugin.py:2041::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
 
-- **given** a module-scoped «step fixture» pinning a «story» that only the first «scenario» using it binds
+- **given** a module-scoped «step fixture» pinning a «sentence», set up first by an unannotated test
   - 📎 suite:
     ```
     import pytest
@@ -228,21 +234,22 @@
             pass
         yield 1
     
+    def test_unannotated(wide):
+        assert wide == 1
+    
     @scenario('first', stories=a)
     def test_first(wide):
-        with given('something'):
-            pass
+        pass
     
     @scenario('second', stories=b)
     def test_second(wide):
-        with given('something'):
-            pass
+        pass
     ```
-- **when** the suite runs
-- **then** the first «scenario» passes and the second errors at «graft», naming the «step fixture» and the offending step
+- **when** the suite runs with --given-json
+- **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
 ## ✓ An Annotated label carrying a «pin» pins its «step»
-`tests/integration/test_plugin.py:2070::test_annotated_label_carrying_a_pin_pins_its_step`
+`tests/integration/test_plugin.py:2103::test_annotated_label_carrying_a_pin_pins_its_step`
 
 - **given** a «scenario» whose Annotated given(...) label on a plain fixture carries a «pin»
   - 📎 suite:
@@ -268,8 +275,21 @@
 - **when** the suite runs
 - **then** the label's «step» carries the «pin»
 
+## ✓ An Annotated label retells the «pins» of the fixture label it replaces · 3 cases
+`tests/integration/test_plugin.py:2143::test_annotated_label_pins_retell_the_fixture_root`
+
+- **given** a label with pins={label_pins} over a fixture pinning a[1]
+- **when** the suite runs
+- **then** the grafted root carries the expected «pins», and the inner «step» keeps its own
+
+| label_pins | root_pins | |
+|---|---|---|
+| None | [{'story_id': 'book', 'sentence_id': 1}] | ✓ |
+| [] | [] | ✓ |
+| [a[2]] | [{'story_id': 'book', 'sentence_id': 2}] | ✓ |
+
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2683::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2649::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -292,14 +312,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2696::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2662::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2717::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2683::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -307,7 +327,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2737::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2703::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -315,7 +335,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2770::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2736::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -335,7 +355,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2802::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2768::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -344,7 +364,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:2905::test_given_theme_cli_flag_sets_the_report_default` · configuration
+`tests/integration/test_plugin.py:2871::test_given_theme_cli_flag_sets_the_report_default` · configuration
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -352,7 +372,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:2954::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:2920::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -360,7 +380,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:3071::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3037::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -495,98 +515,98 @@
 - **then** the report that was already written is still there
 
 ## ✓ A «scenario» records under its «node ID»
-`tests/unit/capture/test_collector.py:43::test_start_and_finish_scenario`
+`tests/unit/capture/test_collector.py:41::test_start_and_finish_scenario`
 
 - **given** a fresh «Collector»
 - **when** a «Scenario» starts under its «Node ID» and finishes
 - **then** it carries its «Node ID», name, status and «Tag»
 
 ## ✓ A «scenario» is timed from past its «step fixture» setup
-`tests/unit/capture/test_collector.py:59::test_duration_excludes_fixture_setup`
+`tests/unit/capture/test_collector.py:57::test_duration_excludes_fixture_setup`
 
 - **given** a «Collector» whose clock reads 100.3s once setup is done
 - **when** the clock is started past setup and the body runs 0.2s
 - **then** the recorded duration is the body alone, not the setup before it
 
 ## ✓ «Steps» record with their «phases»
-`tests/unit/capture/test_collector.py:81::test_collect_steps`
+`tests/unit/capture/test_collector.py:79::test_collect_steps`
 
 - **given** an «Active scenario» in a fresh «Collector»
 - **when** a given and a when «Step» are pushed
 - **then** each «Step» carries its «Phase»
 
 ## ✓ «Steps» pushed during fixture setup record into the «fixture recording»
-`tests/unit/capture/test_collector.py:224::test_push_step_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:222::test_push_step_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** a «Step» is pushed inside the fixture body
 - **then** it is recorded as a child of the recording root
 
 ## ✓ An «attachment» lands on the «step» being recorded
-`tests/unit/capture/test_collector.py:248::test_attach_during_fixture_setup_records_into_recording`
+`tests/unit/capture/test_collector.py:246::test_attach_during_fixture_setup_records_into_recording`
 
 - **given** a «Fixture recording» under setup
 - **when** an «Attachment» is attached inside the fixture body
 - **then** the «Attachment» lands on the recording root
 
 ## ✓ Fixture-body «steps» do not leak into the «active scenario»
-`tests/unit/capture/test_collector.py:270::test_push_step_routing_isolates_recording_from_scenario`
+`tests/unit/capture/test_collector.py:268::test_push_step_routing_isolates_recording_from_scenario`
 
 - **given** an «Active scenario» with a «Fixture recording»
 - **when** a «Step» is pushed inside the fixture body
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ An «attachment» outside every «step» is refused
-`tests/unit/capture/test_collector.py:326::test_attach_outside_any_step_raises`
+`tests/unit/capture/test_collector.py:324::test_attach_outside_any_step_raises`
 
 - **given** an «Active scenario» with no «Step» open
 - **when** an «attachment» is made from the test body
 - **then** it is refused rather than dropped
 
 ## ✓ A «fixture recording» is deep-copied when «grafted»
-`tests/unit/capture/test_collector.py:343::test_graft_recording_deep_copies_into_scenario`
+`tests/unit/capture/test_collector.py:341::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «Fixture recording» with a nested child «Step»
 - **when** a «Graft» copies it into the «Active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ A «step fixture» failing in teardown fails its finished «scenario»
-`tests/unit/capture/test_collector.py:485::test_fail_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:483::test_fail_marks_a_finished_scenario_failed`
 
 - **given** a «Scenario» that already finished as passed
 - **when** a fixture raises past its yield, after the scenario finished
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:502::test_fail_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:500::test_fail_keeps_an_existing_error`
 
 - **given** a «Scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A «Collector» reports which «node ids» it recorded
-`tests/unit/capture/test_collector.py:518::test_records_reports_only_recorded_node_ids`
+`tests/unit/capture/test_collector.py:516::test_records_reports_only_recorded_node_ids`
 
 - **given** a «Collector» that recorded one «scenario»
 - **when** the recorded and an unrecorded node id are both asked about
 - **then** only the recorded node id is claimed
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:536::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:534::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «Active scenario» is being recorded
 - **when** a leaf «Graft» appends a childless «Step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:557::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:555::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «Fixture recording» whose root has a label and a child
 - **when** a «Graft» supplies an override «Narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py:587::test_graft_leaf_given_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py:585::test_graft_leaf_given_without_scenario_is_refused`
 
 - **given** a collector with no «Active scenario»
 - **when** a leaf «Graft» runs
@@ -1285,13 +1305,13 @@
 - **then** the span unwraps once and its contents stay literal
 
 ## ✓ A «step» pairs its «narration» with a «phase»
-`tests/unit/capture/test_step_descriptor.py:62::test_context_manager_basic`
+`tests/unit/capture/test_step_descriptor.py:54::test_context_manager_basic`
 
 - **when** a given «Step» descriptor is created
 - **then** it carries the given «Phase» and its «Narration»
 
 ## ✓ A «step» opened outside a «scenario» warns rather than raising
-`tests/unit/capture/test_step_descriptor.py:162::test_context_manager_unannotated_test_warns_instead_of_raises`
+`tests/unit/capture/test_step_descriptor.py:154::test_context_manager_unannotated_test_warns_instead_of_raises`
 
 - **given** a «collector» recording inside an undecorated test
 - **when** a given «step» is opened against it
@@ -1299,28 +1319,28 @@
 - **then** it names the missing `@scenario`, so a suite can filter it
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:295::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:287::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «Step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:322::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:314::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:350::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:342::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ A cross-phase «step» cannot open inside a «when_then» body · 2 cases
-`tests/unit/capture/test_step_descriptor.py:392::test_when_then_rejects_cross_phase_nested_step` · validation
+`tests/unit/capture/test_step_descriptor.py:384::test_when_then_rejects_cross_phase_nested_step` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a given or then opens inside the «when_then» body
@@ -1333,14 +1353,14 @@
 | then | ✓ |
 
 ## ✓ A nested when becomes a child of the «when_then» action
-`tests/unit/capture/test_step_descriptor.py:424::test_when_then_allows_nested_when_as_child_sub_step`
+`tests/unit/capture/test_step_descriptor.py:416::test_when_then_allows_nested_when_as_child_sub_step`
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a when opens inside the «when_then» body
 - **then** the sub-action is a child of the action and the then still follows
 
 ## ✓ `@scenario` marks the test function without wrapping it
-`tests/unit/capture/test_step_descriptor.py:471::test_scenario_marks_the_function_without_wrapping_it`
+`tests/unit/capture/test_step_descriptor.py:463::test_scenario_marks_the_function_without_wrapping_it`
 
 - **given** a test function taking one fixture
 - **when** the function is decorated
@@ -1348,7 +1368,7 @@
 - **then** it carries the «scenario» marker, and a plain one does not
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:541::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:533::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «Attachment» label of kind {label_kind}
 - **when** it is attached
@@ -1361,7 +1381,7 @@
 | not-a-string | ✓ |
 
 ## ✓ A `Template` «narration» is refused in a test body · 3 cases
-`tests/unit/capture/test_step_descriptor.py:583::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
+`tests/unit/capture/test_step_descriptor.py:575::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
 
 - **given** an «Active scenario» in a local «Collector»
 - **when** a {phase_name} «step» opens on a `Template`
@@ -1374,7 +1394,7 @@
 | then | ✓ |
 
 ## ✓ A bare number or name is refused where a «pin» goes · 3 cases
-`tests/unit/capture/test_step_descriptor.py:974::test_pins_refuse_a_bare_number_or_name` · validation
+`tests/unit/capture/test_step_descriptor.py:967::test_pins_refuse_a_bare_number_or_name` · validation
 
 - **given** a sentence number or name written without its «Story»
 - **when** a «Step» is declared with it
@@ -1387,7 +1407,7 @@
 | [1, 2] | ✓ |
 
 ## ✓ An «actor» handle in a «clause» becomes a «term ref»
-`tests/unit/capture/test_story.py:65::test_clause_dispatches_actor_to_clause_term_ref`
+`tests/unit/capture/test_story.py:61::test_clause_dispatches_actor_to_clause_term_ref`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1396,7 +1416,7 @@
 - **then** the «Actor» slot becomes a «Term ref»
 
 ## ✓ An inflected «activity» keeps its «term» identity but shows the «inflection»
-`tests/unit/capture/test_story.py:109::test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_display`
+`tests/unit/capture/test_story.py:105::test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_display`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1406,7 +1426,7 @@
 - **then** the «Term ref» shows the inflection over the same «Activity»
 
 ## ✓ A bare string in a «clause» becomes a connective word
-`tests/unit/capture/test_story.py:130::test_clause_dispatches_bare_string_to_clause_word`
+`tests/unit/capture/test_story.py:126::test_clause_dispatches_bare_string_to_clause_word`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1415,7 +1435,7 @@
 - **then** the bare word becomes a «Clause part» word, not a «Term ref»
 
 ## ✓ A «clause» needs at least an «actor», an «activity» and a node
-`tests/unit/capture/test_story.py:145::test_clause_rejects_fewer_than_three_parts` · validation
+`tests/unit/capture/test_story.py:141::test_clause_rejects_fewer_than_three_parts` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1423,7 +1443,7 @@
 - **then** a PytestGivenError rejects it as too short, counting the parts
 
 ## ✓ Position 0 of a «clause» must be an «actor»
-`tests/unit/capture/test_story.py:163::test_clause_rejects_work_object_in_position_0` · validation
+`tests/unit/capture/test_story.py:159::test_clause_rejects_work_object_in_position_0` · validation
 
 - **given** a search activity
 - **given** a Room work object
@@ -1431,7 +1451,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ An «activity» cannot open a «clause»
-`tests/unit/capture/test_story.py:178::test_clause_rejects_activity_in_position_0` · validation
+`tests/unit/capture/test_story.py:174::test_clause_rejects_activity_in_position_0` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1440,7 +1460,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ A bare string may stand in for the «actor» «slot»
-`tests/unit/capture/test_story.py:193::test_clause_allows_bare_string_in_position_0`
+`tests/unit/capture/test_story.py:189::test_clause_allows_bare_string_in_position_0`
 
 - **given** a search activity
 - **given** a Room work object
@@ -1448,7 +1468,7 @@
 - **then** it is accepted as a «Clause part» word
 
 ## ✓ Position 1 of a «clause» must be an «activity»
-`tests/unit/capture/test_story.py:203::test_clause_rejects_actor_in_position_1` · validation
+`tests/unit/capture/test_story.py:199::test_clause_rejects_actor_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1456,7 +1476,7 @@
 - **then** a PytestGivenError says position 1 is the verb «slot»
 
 ## ✓ A «work object» cannot fill the verb «slot»
-`tests/unit/capture/test_story.py:218::test_clause_rejects_work_object_in_position_1` · validation
+`tests/unit/capture/test_story.py:214::test_clause_rejects_work_object_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1464,7 +1484,7 @@
 - **then** a PytestGivenError says position 1 is the verb «slot»
 
 ## ✓ Position 2 of a «clause» must be a noun
-`tests/unit/capture/test_story.py:233::test_clause_rejects_activity_in_position_2` · validation
+`tests/unit/capture/test_story.py:229::test_clause_rejects_activity_in_position_2` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1472,7 +1492,7 @@
 - **then** a PytestGivenError says position 2 is the noun slot
 
 ## ✓ A bare verb may sit between two real entity nodes
-`tests/unit/capture/test_story.py:248::test_clause_allows_bare_verb_between_term_nodes`
+`tests/unit/capture/test_story.py:244::test_clause_allows_bare_verb_between_term_nodes`
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1480,28 +1500,28 @@
 - **then** the entities are term refs and the verb stays a bare word
 
 ## ✓ A «clause» may be fully bare words
-`tests/unit/capture/test_story.py:263::test_clause_allows_fully_bare_words`
+`tests/unit/capture/test_story.py:259::test_clause_allows_fully_bare_words`
 
 - **given** three plain words with no glossary handles
 - **when** a «Clause» is built from them
 - **then** every part is a «Clause part» word
 
 ## ✓ Node/edge alternation allows a trailing connective node
-`tests/unit/capture/test_story.py:282::test_clause_allows_node_edge_alternation_with_connective`
+`tests/unit/capture/test_story.py:278::test_clause_allows_node_edge_alternation_with_connective`
 
 - **given** an «Actor», an «Activity», a «Work Object» and a second actor
 - **when** they form a five-part «Clause» joined by a connective
 - **then** even positions are term-ref nodes and the connective stays a word
 
 ## ✓ A «clause» may not end on a dangling edge
-`tests/unit/capture/test_story.py:308::test_clause_rejects_dangling_edge` · validation
+`tests/unit/capture/test_story.py:304::test_clause_rejects_dangling_edge` · validation
 
 - **given** an «Actor», «Activity» and «Work Object» plus a connective
 - **when** a clause ending on a connective edge is built
 - **then** a PytestGivenError names the trailing arrow with no target
 
 ## ✓ A single-clause «sentence» synthesizes one «clause»
-`tests/unit/capture/test_story.py:336::test_sentence_single_clause_synthesizes_one_clause`
+`tests/unit/capture/test_story.py:332::test_sentence_single_clause_synthesizes_one_clause`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1510,7 +1530,7 @@
 - **then** it wraps a single «Clause»
 
 ## ✓ A «sentence» may hold several «clauses»
-`tests/unit/capture/test_story.py:352::test_sentence_accepts_multiple_clauses`
+`tests/unit/capture/test_story.py:348::test_sentence_accepts_multiple_clauses`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1520,7 +1540,7 @@
 - **then** the sentence carries both clauses
 
 ## ✓ Mixing loose parts and prebuilt «clauses» is rejected
-`tests/unit/capture/test_story.py:369::test_sentence_mixing_parts_and_clauses_raises` · validation
+`tests/unit/capture/test_story.py:365::test_sentence_mixing_parts_and_clauses_raises` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1530,7 +1550,7 @@
 - **then** a PytestGivenError rejects the mix
 
 ## ✓ A «story» auto-numbers its «sentences» from one
-`tests/unit/capture/test_story.py:389::test_story_auto_numbers_sentences_from_one`
+`tests/unit/capture/test_story.py:385::test_story_auto_numbers_sentences_from_one`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1539,14 +1559,14 @@
 - **then** the sentences are numbered 1 and 2
 
 ## ✓ A «story» derives its id from its title
-`tests/unit/capture/test_story.py:407::test_story_derives_id_from_title`
+`tests/unit/capture/test_story.py:403::test_story_derives_id_from_title`
 
 - **given** a human-readable story title
 - **when** a «Story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A «story» may span only one «glossary»
-`tests/unit/capture/test_story.py:419::test_story_rejects_two_glossaries` · validation
+`tests/unit/capture/test_story.py:415::test_story_rejects_two_glossaries` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1556,7 +1576,7 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ A «sentence» «handle» is looked up by name or by number
-`tests/unit/capture/test_story.py:465::test_story_hands_out_a_sentence_by_name_and_by_number`
+`tests/unit/capture/test_story.py:461::test_story_hands_out_a_sentence_by_name_and_by_number`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1565,8 +1585,18 @@
 - **when** the «Sentence» is looked up by its name and by its number
 - **then** both «handles» name sentence 2 of that «Story»
 
+## ✓ Iterating a «story» yields its «sentence» handles
+`tests/unit/capture/test_story.py:481::test_iterating_a_story_yields_its_sentence_handles`
+
+- **given** a Guest actor
+- **given** a search activity
+- **given** a Room work object
+- **given** a «Story» of two «sentences»
+- **when** the «Story» is iterated
+- **then** it yields each «sentence» handle in order
+
 ## ✓ Looking up a «sentence» the «story» lacks lists the ones it has
-`tests/unit/capture/test_story.py:486::test_story_lookup_miss_lists_the_sentences`
+`tests/unit/capture/test_story.py:518::test_story_lookup_miss_lists_the_sentences`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1576,7 +1606,7 @@
 - **then** a PytestGivenError lists the story's sentences
 
 ## ✓ Two «sentences» of one «story» cannot share a name
-`tests/unit/capture/test_story.py:546::test_story_rejects_duplicate_sentence_names`
+`tests/unit/capture/test_story.py:578::test_story_rejects_duplicate_sentence_names`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1586,7 +1616,7 @@
 - **then** a PytestGivenError names the duplicate and both numbers
 
 ## ✓ An empty or padded «sentence» name is refused · 3 cases
-`tests/unit/capture/test_story.py:563::test_sentence_rejects_an_empty_or_padded_name`
+`tests/unit/capture/test_story.py:595::test_sentence_rejects_an_empty_or_padded_name`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1602,28 +1632,28 @@
 | 'cancel ' | ✓ |
 
 ## ✓ Two «stories» with the same id collide
-`tests/unit/capture/test_story.py:581::test_story_id_collision_raises_with_both_sites` · validation
+`tests/unit/capture/test_story.py:613::test_story_id_collision_raises_with_both_sites` · validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «clause» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:664::test_clause_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:696::test_clause_allows_second_verb_edge`
 
 - **given** an «Actor», two «Activity» and two «Work Object» handles
 - **when** they form a five-node «Clause» (actor verb object verb object)
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A declared «work object» in a verb «slot» is rejected at construction
-`tests/unit/capture/test_story.py:712::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+`tests/unit/capture/test_story.py:744::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «File glossary» declaring Room a work object
 - **when** Room is placed in the verb «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
 ## ✓ A «slot» error names the «term», not its repr
-`tests/unit/capture/test_story.py:738::test_slot_error_message_stays_compact` · diagnostics
+`tests/unit/capture/test_story.py:770::test_slot_error_message_stays_compact` · diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1633,14 +1663,14 @@
 - **then** the message is short and free of dataclass reprs
 
 ## ✓ A kindless «term» stays valid in any «slot»
-`tests/unit/capture/test_story.py:759::test_kindless_term_is_accepted_in_either_slot` · validation
+`tests/unit/capture/test_story.py:791::test_kindless_term_is_accepted_in_either_slot` · validation
 
 - **given** a «Kindless» «Term» declared with g(...)
 - **when** it is placed in a node «slot» and a verb slot
 - **then** both clauses construct, leaving the kind to inference
 
 ## ✓ A non-handle «clause part» names its type
-`tests/unit/capture/test_story.py:774::test_non_handle_part_names_its_type` · validation, diagnostics
+`tests/unit/capture/test_story.py:806::test_non_handle_part_names_its_type` · validation, diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1847,21 +1877,21 @@
 - **then** dead-term flags none of its terms
 
 ## ✓ A «sentence» is referenced by its «terms», whatever their surface form
-`tests/unit/report/test_coverage.py:41::test_a_refs_collects_term_ids_whatever_the_display`
+`tests/unit/report/test_coverage.py:54::test_a_refs_collects_term_ids_whatever_the_display`
 
 - **given** a «Sentence» written with an «Instance» and an «Inflection»
 - **when** «Coverage» collects the «Sentence» references
 - **then** they are the «Term» ids alone; words contribute nothing
 
 ## ✓ A multi-clause «sentence» unions references across its «clauses»
-`tests/unit/report/test_coverage.py:66::test_a_refs_unions_across_multi_clause_sentence`
+`tests/unit/report/test_coverage.py:79::test_a_refs_unions_across_multi_clause_sentence`
 
 - **given** a «Sentence» with two «clauses»
 - **when** «Coverage» collects the «Sentence» references
 - **then** the «terms» of both clauses are present
 
 ## ✓ A «sentence» whose «clauses» start at different «actors» builds and is covered
-`tests/unit/report/test_coverage.py:94::test_sentence_with_clauses_from_different_actors_is_covered`
+`tests/unit/report/test_coverage.py:107::test_sentence_with_clauses_from_different_actors_is_covered`
 
 - **given** a «Sentence» of two «clauses»: a guest signs the register, and a clerk signs the register
 - **given** a «Step» naming both actors, the activity and the register
@@ -1869,14 +1899,14 @@
 - **then** the «Sentence» is covered
 
 ## ✓ A «step» is referenced by its «terms», whatever their surface form
-`tests/unit/report/test_coverage.py:140::test_s_for_step_collects_term_ids_whatever_the_display`
+`tests/unit/report/test_coverage.py:163::test_s_for_step_collects_term_ids_whatever_the_display`
 
 - **given** a «Step» naming an «Instance» and an «Inflection»
 - **when** «Coverage» collects the «Step» references
 - **then** they are the «Term» ids alone
 
 ## ✓ An «instance» and its bare «term» cover each other
-`tests/unit/report/test_coverage.py:166::test_compute_coverage_matches_instance_and_bare_term_both_ways`
+`tests/unit/report/test_coverage.py:189::test_compute_coverage_matches_instance_and_bare_term_both_ways`
 
 - **given** a «Sentence» naming a bare «Actor»
 - **given** the same «Sentence» naming an «Instance» of that actor
@@ -1886,7 +1916,7 @@
 - **then** the bare «Step» covers the «Instance» «Sentence»
 
 ## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:226::test_compute_coverage_lost_when_sentence_gains_a_term`
+`tests/unit/report/test_coverage.py:249::test_compute_coverage_lost_when_sentence_gains_a_term`
 
 - **given** a «Step» naming two «term refs»
 - **given** the same «Sentence» with that middle slot a bare word, then an «Activity» ref
@@ -1895,29 +1925,44 @@
 - **then** the widened «Sentence» is no longer covered
 
 ## ✓ A «scenario» «pin» covers exactly its «sentences»
-`tests/unit/report/test_coverage.py:276::test_compute_coverage_scenario_pin_replaces_matching`
+`tests/unit/report/test_coverage.py:299::test_compute_coverage_scenario_pin_replaces_matching`
 
 - **given** a «Story» with a matching and an under-anchored «Sentence»
 - **given** a «Scenario» whose «Step» matches sentence 1 but which pins sentence 2
 - **when** «Coverage» is computed against the «Story»
 - **then** only the pinned «Sentence» is covered, matching never ran
 
+## ✓ A «step» is narration-matched only where neither it nor its «scenario» «pins» · 4 cases
+`tests/unit/report/test_coverage.py:383::test_narration_matching_runs_only_where_nothing_pins`
+
+- **given** a scenario with pins={scenario_pins}
+- **given** a step matching sentence 1, with pins={step_pins}
+- **when** «Coverage» is computed against the «Story»
+- **then** the «scenario» covers what the «step» contributes
+
+| scenario_pins | step_pins | covered | |
+|---|---|---|---|
+| None | None | {1} | ✓ |
+| None | [2] | {2} | ✓ |
+| [] | None | set() | ✓ |
+| [] | [2] | {2} | ✓ |
+
 ## ✓ A «sentence» with two distinct «terms» is «coverage»-eligible
-`tests/unit/report/test_coverage.py:385::test_is_coverage_eligible_true_for_two_distinct_terms`
+`tests/unit/report/test_coverage.py:459::test_is_coverage_eligible_true_for_two_distinct_terms`
 
 - **given** a «Sentence» anchored by two distinct «Term» refs
 - **when** its «Coverage» eligibility is checked
 - **then** it is eligible for «Coverage» tracking
 
 ## ✓ An under-anchored «sentence» is not «coverage»-eligible
-`tests/unit/report/test_coverage.py:407::test_is_coverage_eligible_false_for_one_distinct_term`
+`tests/unit/report/test_coverage.py:481::test_is_coverage_eligible_false_for_one_distinct_term`
 
 - **given** a «Sentence» that mentions only one distinct «Term»
 - **when** its «Coverage» eligibility is checked
 - **then** it is ineligible — «Coverage» needs at least two anchors
 
 ## ✓ An under-anchored «sentence» is never covered by narration matching
-`tests/unit/report/test_coverage.py:437::test_compute_coverage_excludes_under_anchored_sentence`
+`tests/unit/report/test_coverage.py:511::test_compute_coverage_excludes_under_anchored_sentence`
 
 - **given** a «Story» whose «Sentence» is all bare words
 - **given** a «Scenario» narrating one «Term ref»
@@ -1925,7 +1970,7 @@
 - **then** «Coverage» excludes the under-anchored «Sentence»
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:461::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:535::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «Story» with one canonical «Sentence»
 - **given** the covering «term refs» in a nested child «Step»
@@ -1933,7 +1978,7 @@
 - **then** the nested «Step» still counts and the «Sentence» is covered
 
 ## ✓ An explicit «step» binding covers an eligible «sentence»
-`tests/unit/report/test_coverage.py:498::test_compute_coverage_explicit_step_binding_covers_eligible_sentence`
+`tests/unit/report/test_coverage.py:572::test_compute_coverage_explicit_step_binding_covers_eligible_sentence`
 
 - **given** a «Story» with a coverage-eligible «Sentence»
 - **given** a «Step» «bound» to it explicitly by id
@@ -1941,7 +1986,7 @@
 - **then** «Coverage» counts it directly, without narration matching
 
 ## ✓ An explicit binding covers an under-anchored «sentence»
-`tests/unit/report/test_coverage.py:527::test_compute_coverage_explicit_binding_covers_under_anchored_sentence`
+`tests/unit/report/test_coverage.py:601::test_compute_coverage_explicit_binding_covers_under_anchored_sentence`
 
 - **given** a «Story» whose «Sentence» is under-anchored
 - **given** a «Step» «bound» to it explicitly by id
@@ -1999,7 +2044,7 @@
               },
               "children": [],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             }
           ],
@@ -2010,7 +2055,7 @@
           "story_ids": [
             "book"
           ],
-          "pins": []
+          "pins": null
         }
       ],
       "glossary": {
@@ -2353,14 +2398,14 @@
 - **then** the error points at the env var and the raw-template escape hatch
 
 ## ✓ An under-anchored «sentence» is flagged ineligible in rollups
-`tests/unit/report/test_story_view.py:168::test_build_story_rollups_flags_under_anchored_sentence_ineligible`
+`tests/unit/report/test_story_view.py:208::test_build_story_rollups_flags_under_anchored_sentence_ineligible`
 
 - **given** a «Story» with an anchored and an under-anchored «Sentence»
 - **when** the story rollups are built
 - **then** only the anchored «Sentence» is «Coverage»-eligible
 
 ## ✓ A pinned under-anchored «sentence» stops reading as untracked
-`tests/unit/report/test_story_view.py:212::test_build_story_rollups_pinned_under_anchored_sentence_is_tracked`
+`tests/unit/report/test_story_view.py:252::test_build_story_rollups_pinned_under_anchored_sentence_is_tracked`
 
 - **given** a «Story» whose only «Sentence» is under-anchored
 - **given** a «Scenario» whose «step» pins it by id
@@ -2368,7 +2413,7 @@
 - **then** it stays narration-ineligible but is no longer untracked
 
 ## ✓ A «scenario» bound to two «stories» is matched against each
-`tests/unit/report/test_story_view.py:314::test_build_story_rollups_lists_a_scenario_under_each_bound_story`
+`tests/unit/report/test_story_view.py:354::test_build_story_rollups_lists_a_scenario_under_each_bound_story`
 
 - **given** two «stories» each with a guest-search-room «Sentence»
 - **given** a «Scenario» bound to both whose «Step» names those terms
@@ -2376,7 +2421,7 @@
 - **then** the «Scenario» is listed under, and covers, both «stories»
 
 ## ✓ A «Sentence» is labeled by the prose of its «clauses»
-`tests/unit/report/test_story_view.py:365::test_build_sentence_labels_joins_parts_into_prose`
+`tests/unit/report/test_story_view.py:405::test_build_sentence_labels_joins_parts_into_prose`
 
 - **given** a «Story» with a two-«clause» «sentence»
 - **when** the «sentence» labels are built

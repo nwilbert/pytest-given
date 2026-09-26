@@ -13,7 +13,7 @@ attachment — each discriminated on read by the keys its variants do not share.
 """
 
 import dataclasses
-from typing import Any, cast
+from typing import Any, TypedDict, cast
 
 from .errors import PytestGivenError
 from .schema import (
@@ -213,13 +213,21 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
     )
 
 
-def _pins_from_list(items: list[dict[str, Any]] | None) -> tuple[Pin, ...]:
+class _PinDict(TypedDict):
+    story_id: str
+    sentence_id: int
+
+
+def _pins_from_list(items: list[_PinDict] | None) -> tuple[Pin, ...] | None:
+    """`null` is "not pinned", distinct from `[]`, which pins nothing."""
+    if items is None:
+        return None
     return tuple(
         Pin(
             story_id=StoryId(item['story_id']),
             sentence_id=SentenceId(item['sentence_id']),
         )
-        for item in items or ()
+        for item in items
     )
 
 

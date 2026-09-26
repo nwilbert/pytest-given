@@ -99,11 +99,20 @@ Each step's term references are matched against the story's sentences to compute
 
 A sentence can be named — the story's second row above takes `name='select'` — and a story hands out **sentence handles** by name or number: `book_a_group_trip['select']`, `book_a_group_trip[2]`. Numbers are positions, so inserting a row renumbers the rows after it; a name stays put. A handle is what **pins** take:
 
-- `given(text, pins=book_a_group_trip['select'])` pins a step. The step covers exactly the named sentences in that story instead of being narration-matched there. The story has to be one the scenario binds — with `stories=` or a pin of its own — or the pin raises, naming `stories=` as the fix.
-- `@scenario(..., pins=book_a_group_trip['select'])` pins the whole scenario. It covers exactly those sentences of that story, with no narration matching against it, and binds the story without `stories=`. A step pin into a story the scenario pins raises.
-- `@scenario(..., stories=[book_a_group_trip, check_in])` matches narration against several stories at once — `check_in` here stands for another story defined the same way. The scenario is listed under each, with its chips for that story.
+- `given(text, pins=book_a_group_trip['select'])` pins a step. The step covers exactly the named sentences, in whatever story, and is not narration-matched at all. `pins=[]` opts a step out of matching without pinning anything.
+- `@scenario(..., pins=book_a_group_trip['select'])` pins the whole scenario. It covers those sentences plus its steps' pins, and none of its steps is narration-matched; `pins=[]` keeps only the steps' pins.
+- `@scenario(..., stories=[book_a_group_trip, check_in])` matches narration against several stories at once — `check_in` here stands for another story defined the same way. The scenario is listed under each, with its chips for that story, and under any other story a pin reaches.
 
-Each rule applies per story: a pin into one story says nothing about another. A scenario pin is an assertion no narration backs: it covers its sentences even when the test fails early or is skipped (the chip shows the scenario's status), so keep one only where the body really exercises the sentence. A pin also reaches under-anchored sentences, which narration matching skips.
+So narration matching runs only where nothing pins, and `pins=None` (the default) leaves the level above in charge:
+
+| scenario `pins=` | step `pins=` | the step contributes |
+|---|---|---|
+| `None` | `None` | its narration matches, in the `stories=` stories |
+| `None` | a list | exactly its pins |
+| a list, `[]` included | `None` | nothing |
+| a list, `[]` included | a list | exactly its pins |
+
+Every story the suite declares appears in the Stories tab, covered or not. A scenario pin is an assertion no narration backs: it covers its sentences even when the test fails early or is skipped (the chip shows the scenario's status), so keep one only where the body really exercises the sentence. A pin also reaches under-anchored sentences, which narration matching skips.
 
 The [domain-storytelling](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and [file-backed glossary](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) design specs carry the full surface; the [examples](../examples.md) show it end to end.
 

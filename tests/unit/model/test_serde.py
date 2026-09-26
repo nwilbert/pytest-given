@@ -670,22 +670,21 @@ def test_scenario_story_ids_and_pins_round_trip():
     assert rt.scenarios[0].pins == pins
 
 
-def test_a_report_saved_before_pins_replays_without_story_bindings():
+def test_not_pinned_and_pinned_to_nothing_round_trip_apart():
+    """`null` is "not pinned" and `[]` opts out of narration matching, so the
+    two must survive a report replayed through `pytest-given report`."""
+    steps = [
+        Step(phase='given', narration=Narration(text='unpinned')),
+        Step(phase='given', narration=Narration(text='opted out'), pins=()),
+    ]
     scn = Scenario(
-        id=NodeId('n'),
-        narration=Narration(text='x'),
-        module='m',
-        story_ids=(StoryId('book'),),
-        pins=(Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),),
+        id=NodeId('n'), narration=Narration(text='x'), module='m', steps=steps, pins=()
     )
     data = report_to_dict(ReportData(metadata=_meta(), scenarios=[scn]))
-    scenario_dict = data['scenarios'][0]
-    del scenario_dict['story_ids'], scenario_dict['pins']
-    scenario_dict['story_id'] = 'book'
-    scenario_dict['activity_ids'] = [1]
-    replayed = report_from_dict(data)
-    assert replayed.scenarios[0].story_ids == ()
-    assert replayed.scenarios[0].pins == ()
+    assert [step['pins'] for step in data['scenarios'][0]['steps']] == [None, []]
+    replayed = report_from_dict(data).scenarios[0]
+    assert replayed.pins == ()
+    assert [step.pins for step in replayed.steps] == [None, ()]
 
 
 def test_sentence_name_round_trips_and_defaults_to_none():

@@ -1,6 +1,5 @@
 """Unit tests for resolving the suite's single glossary."""
 
-from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -13,7 +12,6 @@ from pytest_given.capture import (
     sentence,
     story,
 )
-from pytest_given.capture.story import restore_story_registry
 from pytest_given.model import PytestGivenError
 
 
@@ -30,14 +28,7 @@ class _FakeConftest:
             setattr(self, name, value)
 
 
-@pytest.fixture
-def _clean_story_registry() -> Iterator[None]:
-    restore_story_registry({})
-    yield
-    restore_story_registry({})
-
-
-@pytest.mark.usefixtures('_clean_story_registry')
+@pytest.mark.usefixtures('isolated_story_registry')
 def test_two_stories_reaching_different_glossaries_raise() -> None:
     """Read straight off the story tree, so two stories cannot smuggle in two
     glossaries between them."""
@@ -59,7 +50,7 @@ def test_two_stories_reaching_different_glossaries_raise() -> None:
         resolve_glossary([first, second], [])
 
 
-@pytest.mark.usefixtures('_clean_story_registry')
+@pytest.mark.usefixtures('isolated_story_registry')
 def test_a_storys_glossary_wins_over_the_conftest_scan() -> None:
     g = Glossary()
     told = story(
@@ -120,7 +111,7 @@ def test_no_stories_and_no_conftest_glossary_resolves_to_none() -> None:
     assert resolve_glossary([], []) is None
 
 
-@pytest.mark.usefixtures('_clean_story_registry')
+@pytest.mark.usefixtures('isolated_story_registry')
 def test_a_story_referencing_no_glossary_falls_back_to_the_conftest_scan() -> None:
     bare = story('Wordless Story', [sentence(clause('a guest', 'books', 'a room'))])
     g = Glossary()

@@ -58,7 +58,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         module=module,
         tags=marker.tags,
         source=source,
-        stories=marker.stories,
+        story_ids=marker.story_ids,
         pins=marker.pins,
     )
     session_state(item.config).published_for = node_id

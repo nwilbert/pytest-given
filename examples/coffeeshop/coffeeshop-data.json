@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-26T11:27:53.911195+00:00",
+    "timestamp": "2026-09-26T16:24:27.768216+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "fa619a41c62bc6b1b578b241c600be4a4bc87e1b",
+    "commit_sha": "28054bc48abdbd3796cfb508c771970faad36aca",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -40,7 +40,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -57,7 +57,7 @@
               "content_type": "json"
             }
           ],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -69,7 +69,7 @@
         "line": 32
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_text_attachment",
@@ -90,7 +90,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -107,7 +107,7 @@
               "content_type": "text"
             }
           ],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -118,7 +118,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -129,7 +129,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -141,7 +141,7 @@
         "line": 44
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_generator_fixture",
@@ -162,7 +162,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "db"
         },
         {
@@ -173,7 +173,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -184,7 +184,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -196,7 +196,7 @@
         "line": 55
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
@@ -219,7 +219,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -240,7 +240,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -261,7 +261,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -312,7 +312,7 @@
         "line": 64
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]",
@@ -333,7 +333,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -357,7 +357,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -368,7 +368,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -379,7 +379,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -415,7 +415,7 @@
         "line": 76
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight",
@@ -436,7 +436,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -447,7 +447,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -468,7 +468,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -492,7 +492,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -504,7 +504,7 @@
         "line": 88
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
@@ -538,7 +538,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -562,7 +562,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -586,7 +586,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -622,7 +622,7 @@
         "line": 99
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_serve[200]",
@@ -659,7 +659,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -683,7 +683,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -707,7 +707,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -719,7 +719,7 @@
         "line": 109
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_serve[400]",
@@ -756,7 +756,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -767,7 +767,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -791,7 +791,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -815,7 +815,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -827,7 +827,7 @@
         "line": 109
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]",
@@ -863,7 +863,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -890,7 +890,7 @@
               "column_id": "attachment:0"
             }
           ],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -914,7 +914,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -938,7 +938,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -996,7 +996,7 @@
         "line": 127
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation",
@@ -1021,7 +1021,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -1049,7 +1049,7 @@
               },
               "children": [],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             },
             {
@@ -1064,12 +1064,12 @@
               },
               "children": [],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1080,7 +1080,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1104,12 +1104,12 @@
                   "content_type": "json"
                 }
               ],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -1121,7 +1121,7 @@
         "line": 174
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_complex_order",
@@ -1147,7 +1147,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -1158,7 +1158,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1176,7 +1176,7 @@
               },
               "children": [],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             },
             {
@@ -1194,7 +1194,7 @@
                   },
                   "children": [],
                   "attachments": [],
-                  "pins": [],
+                  "pins": null,
                   "fixture_name": null
                 },
                 {
@@ -1205,17 +1205,17 @@
                   },
                   "children": [],
                   "attachments": [],
-                  "pins": [],
+                  "pins": null,
                   "fixture_name": null
                 }
               ],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1233,7 +1233,7 @@
               },
               "children": [],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             },
             {
@@ -1257,17 +1257,17 @@
                       "content_type": "json"
                     }
                   ],
-                  "pins": [],
+                  "pins": null,
                   "fixture_name": null
                 }
               ],
               "attachments": [],
-              "pins": [],
+              "pins": null,
               "fixture_name": null
             }
           ],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1284,7 +1284,7 @@
               "content_type": "json"
             }
           ],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -1296,7 +1296,7 @@
         "line": 190
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected",
@@ -1321,7 +1321,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -1332,7 +1332,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1343,7 +1343,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1354,7 +1354,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -1366,7 +1366,7 @@
         "line": 227
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase",
@@ -1393,7 +1393,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -1404,7 +1404,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1415,7 +1415,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1426,7 +1426,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1437,7 +1437,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -1449,7 +1449,7 @@
         "line": 244
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_failing",
@@ -1460,7 +1460,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 76,
+      "duration_ms": 77,
       "steps": [
         {
           "phase": "given",
@@ -1470,7 +1470,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "machine"
         },
         {
@@ -1481,7 +1481,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -1589,7 +1589,7 @@
         "line": 260
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_skipped",
@@ -1610,7 +1610,7 @@
         "line": 266
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]",
@@ -1655,7 +1655,7 @@
         "line": 273
       },
       "story_ids": [],
-      "pins": []
+      "pins": null
     }
   ],
   "glossary": null,

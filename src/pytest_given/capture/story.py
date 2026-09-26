@@ -1,9 +1,8 @@
 """Story / Sentence / Clause constructors, the glossaries they carry, and the
 sentence handles a story hands out."""
 
-from collections.abc import Iterable, Sequence
-from dataclasses import dataclass, field
-from typing import NamedTuple
+from collections.abc import Iterable, Iterator, Sequence
+from dataclasses import dataclass
 
 from ..model import (
     Clause,
@@ -85,9 +84,13 @@ class Story(BaseStory, _GlossaryCarrier):
             raise PytestGivenError(
                 f'story {self.title!r} has no sentence {key!r}; {detail}'
             )
-        return SentenceHandle(
-            pin=Pin(story_id=self.id, sentence_id=found.id), story=self
-        )
+        return SentenceHandle(pin=Pin(story_id=self.id, sentence_id=found.id))
+
+    def __iter__(self) -> Iterator[SentenceHandle]:
+        """The story's sentence handles in order. Without it, iteration would
+        fall back to `__getitem__(0)`, which no sentence answers to."""
+        for one in self.sentences:
+            yield SentenceHandle(pin=Pin(story_id=self.id, sentence_id=one.id))
 
 
 def _find_sentence(sentences: tuple[Sentence, ...], key: int | str) -> Sentence | None:
@@ -104,33 +107,29 @@ def _find_sentence(sentences: tuple[Sentence, ...], key: int | str) -> Sentence 
 
 @dataclass(frozen=True)
 class SentenceHandle:
-    """A sentence as its story hands it out. Carries the live story so
-    `@scenario` can register a story it reaches only through a pin."""
+    """A sentence as its story hands it out, for `pins=` to take."""
 
     pin: Pin
-    story: Story = field(repr=False, compare=False)
 
 
 # What `pins=` accepts, on a step and on `@scenario` alike.
 type Pins = SentenceHandle | Sequence[SentenceHandle]
 
 
-def sentence_handles(pins: Pins | None) -> tuple[SentenceHandle, ...]:
-    """`pins=` as the handles it names. A bare number or name is refused: it
-    would need a story to resolve against, which a pin carries itself."""
+def pins_of(pins: Pins | None) -> tuple[Pin, ...] | None:
+    """`pins=` as the pins it names, or None when it was not given: `[]` pins
+    nothing, but still opts out of narration matching. A bare number or name
+    is refused: it would need a story to resolve against, which a pin carries
+    itself."""
     if pins is None:
-        return ()
+        return None
     handles = one_or_sequence(pins, SentenceHandle)
     if handles is not None:
         # A sentence pinned twice is one pin; order of first mention stays.
-        return tuple(dict.fromkeys(handles))
-    # Checked item by item, so `pins=[the_story]` earns the hint too.
-    items = (
-        pins if isinstance(pins, Sequence) and not isinstance(pins, str) else (pins,)
-    )
+        return tuple(dict.fromkeys(handle.pin for handle in handles))
     whole_story = (
         ' To narration-match a whole story, bind it with stories= instead.'
-        if any(isinstance(item, BaseStory) for item in items)
+        if any(isinstance(item, BaseStory) for item in _items(pins, SentenceHandle))
         else ''
     )
     raise PytestGivenError(
@@ -143,15 +142,10 @@ def sentence_handles(pins: Pins | None) -> tuple[SentenceHandle, ...]:
 def one_or_sequence[T](value: object, kind: type[T]) -> tuple[T, ...] | None:
     """`value` as a tuple of `kind`, whether it is one on its own or a
     sequence of them; None when it is neither, for the caller to word the
-    error. A str is never the sequence: `''` would pass as an empty one."""
-    items = (value,) if isinstance(value, kind) else value
-    if (
-        isinstance(items, Sequence)
-        and not isinstance(items, str)
-        and all(isinstance(item, kind) for item in items)
-    ):
-        return tuple(items)
-    return None
+    error."""
+    items = _items(value, kind)
+    typed = tuple(item for item in items if isinstance(item, kind))
+    return typed if len(typed) == len(items) else None
 
 
 def argument_text(value: object) -> str:
@@ -162,6 +156,15 @@ def argument_text(value: object) -> str:
         return f'the story {value.title!r}'
     text = repr(value)
     return text if len(text) <= 60 else f'a {type(value).__name__}'
+
+
+def _items(value: object, kind: type) -> tuple[object, ...]:
+    """What an argument taking one `kind` or a sequence of them passes: the
+    value itself unless it is a sequence other than a str, whose items a
+    one-or-many argument means instead."""
+    if isinstance(value, kind | str) or not isinstance(value, Sequence):
+        return (value,)
+    return tuple(value)
 
 
 def carried_glossaries(node: object) -> frozenset[Glossary]:
@@ -249,51 +252,42 @@ def union_glossaries(carried: Iterable[frozenset[Glossary]]) -> frozenset[Glossa
     return frozenset[Glossary]().union(*carried)
 
 
-class StoryDeclaration(NamedTuple):
-    """Where a story id was claimed, and under which title."""
-
-    title: str
-    site: str
-
-
-# Which story ids this process has seen declared. Process-global, so
+# Every story this process has declared, in declaration order: the report's
+# stories, and what catches a story declared twice. Process-global, so
 # `process_state` — its only sanctioned caller — swaps it around a nested
 # in-process run.
-_STORY_REGISTRY: dict[StoryId, StoryDeclaration] = {}
+_STORY_REGISTRY: dict[StoryId, Story] = {}
 
 
-def snapshot_story_registry() -> dict[StoryId, StoryDeclaration]:
+def registered_stories() -> list[BaseStory]:
+    return list[BaseStory](_STORY_REGISTRY.values())
+
+
+def snapshot_story_registry() -> dict[StoryId, Story]:
     return dict(_STORY_REGISTRY)
 
 
-def restore_story_registry(snapshot: dict[StoryId, StoryDeclaration]) -> None:
+def restore_story_registry(snapshot: dict[StoryId, Story]) -> None:
     """Reinstate a snapshot; `{}` clears the registry for a fresh session."""
     _STORY_REGISTRY.clear()
     _STORY_REGISTRY.update(snapshot)
 
 
-def story_label(story_id: StoryId) -> str:
-    """A story as an error names it: by the title `story()` declared it
-    under, falling back to its id for one no `story()` call in this run
-    claimed (a hand-built model story)."""
-    declaration = _STORY_REGISTRY.get(story_id)
-    return repr(declaration.title if declaration is not None else story_id)
+def _register_story(built: Story) -> None:
+    """Claim `built`'s id, or refuse a second claim on it.
 
-
-def _register_story(sid: StoryId, title: str, source: SourceLocation | None) -> None:
-    """Claim `sid`, or refuse a second claim on it.
-
-    Takes the source `story()` already captured rather than walking the same
-    frame again: a raw `co_filename` would put an absolute, unfolded path in
-    the message.
+    Reads the site off the source `story()` already captured rather than
+    walking the same frame again: a raw `co_filename` would put an absolute,
+    unfolded path in the message.
     """
-    site = _site_text(source)
-    if sid in _STORY_REGISTRY:
+    claimed = _STORY_REGISTRY.get(built.id)
+    if claimed is not None:
         raise PytestGivenError(
-            f'story {title!r} (id {sid!r}) already declared at '
-            f'{_STORY_REGISTRY[sid].site}; declaring it again at {site}.'
+            f'story {built.title!r} (id {built.id!r}) already declared at '
+            f'{_site_text(claimed.source)}; declaring it again at '
+            f'{_site_text(built.source)}.'
         )
-    _STORY_REGISTRY[sid] = StoryDeclaration(title=title, site=site)
+    _STORY_REGISTRY[built.id] = built
 
 
 def _site_text(source: SourceLocation | None) -> str:
@@ -304,21 +298,26 @@ def _site_text(source: SourceLocation | None) -> str:
 
 
 def story(title: str, sentences: Sequence[UnnumberedSentence] = ()) -> Story:
-    """Construct a Story: numbers its sentences by position, and enforces
-    unique sentence names and v1's single-glossary invariant."""
-    sid = StoryId(id_derive(title))
-    source = capture_caller_source()
-    _register_story(sid, title, source)
+    """Construct and register a Story: numbers its sentences by position, and
+    enforces unique sentence names and v1's single-glossary invariant. A story
+    that fails a check is not registered, so a corrected one may take its id."""
+    unnumbered = tuple(sentences)
     numbered = tuple(
         Sentence(id=SentenceId(position), clauses=one.clauses, name=one.name)
-        for position, one in enumerate(sentences, start=1)
+        for position, one in enumerate(unnumbered, start=1)
     )
     _check_unique_names(title, numbered)
-    glossaries = union_glossaries(carried_glossaries(one) for one in sentences)
+    glossaries = union_glossaries(carried_glossaries(one) for one in unnumbered)
     _check_single_glossary(title, glossaries)
-    return Story(
-        id=sid, title=title, sentences=numbered, source=source, _glossaries=glossaries
+    built = Story(
+        id=StoryId(id_derive(title)),
+        title=title,
+        sentences=numbered,
+        source=capture_caller_source(),
+        _glossaries=glossaries,
     )
+    _register_story(built)
+    return built
 
 
 def _check_unique_names(title: str, sentences: tuple[Sentence, ...]) -> None:

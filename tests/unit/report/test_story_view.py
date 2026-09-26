@@ -165,6 +165,46 @@ def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
     assert maps[NodeId('t')] == {}
 
 
+def _one_sentence_story(story_id: str) -> Story:
+    return Story(
+        id=StoryId(story_id),
+        title=story_id,
+        sentences=(Sentence(id=SentenceId(1), clauses=()),),
+    )
+
+
+def test_a_scenario_is_listed_under_its_stories_and_the_stories_it_covers() -> None:
+    """Listed under `stories=` even where nothing matched, under a story only
+    a step pin reaches, and not under one a stale pin names."""
+    pinned_step = Step(
+        phase='when',
+        narration=Narration(text='x'),
+        pins=(
+            Pin(story_id=StoryId('pinned'), sentence_id=SentenceId(1)),
+            Pin(story_id=StoryId('stale'), sentence_id=SentenceId(1)),
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t'),
+        narration=Narration(text='s'),
+        module='m',
+        steps=[pinned_step],
+        story_ids=(StoryId('named'),),
+    )
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[scn],
+        stories=[_one_sentence_story('named'), _one_sentence_story('pinned')],
+    )
+    maps = build_coverage_map(rd)
+    assert maps[NodeId('t')] == {
+        StoryId('named'): set(),
+        StoryId('pinned'): {SentenceId(1)},
+    }
+    rollups = build_story_rollups(rd, maps)
+    assert [one.id for one in rollups[StoryId('pinned')].scenarios] == [NodeId('t')]
+
+
 @scenario(
     t'An under-anchored {pg["Sentence"].low} is flagged ineligible in rollups',
 )

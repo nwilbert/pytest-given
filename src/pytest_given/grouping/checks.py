@@ -317,7 +317,7 @@ class StepSignature(NamedTuple):
 
     path: StepPath
     phase: Phase
-    pins: tuple[Pin, ...]
+    pins: tuple[Pin, ...] | None
 
 
 class PartKey(NamedTuple):

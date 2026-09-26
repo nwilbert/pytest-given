@@ -335,7 +335,7 @@ class Step:
     narration: Narration
     children: list[Step] = field(default_factory=list)
     attachments: list[StepAttachment] = field(default_factory=list)
-    pins: tuple[Pin, ...] = ()
+    pins: tuple[Pin, ...] | None = None
     fixture_name: str | None = None
     # Anchor of the step's body for the narration lint; captured only when
     # lint is enabled, and never serialized so report artifacts stay
@@ -412,7 +412,7 @@ class Scenario:
     skip_reason: str | None = None
     source: SourceLocation | None = None
     story_ids: tuple[StoryId, ...] = ()
-    pins: tuple[Pin, ...] = ()
+    pins: tuple[Pin, ...] | None = None
 
 
 @dataclass(frozen=True)

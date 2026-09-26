@@ -1,4 +1,17 @@
-from pytest_given import Glossary, clause, given, scenario, sentence, then, when
+from typing import Annotated
+
+import pytest
+
+from pytest_given import (
+    Glossary,
+    Template,
+    clause,
+    given,
+    scenario,
+    sentence,
+    then,
+    when,
+)
 from pytest_given.model import (
     Clause,
     ClauseTermRef,
@@ -125,11 +138,21 @@ def test_sentence_with_clauses_from_different_actors_is_covered():
         assert coverage == {built.id}
 
 
-def _step(phase, *term_refs, pins=()):
+def _step(phase, *term_refs, pins=None, pins_story='s'):
     return Step(
         phase=phase,
         narration=Narration(text='x', parts=(NarrationLiteral(value='x'), *term_refs)),
-        pins=tuple(Pin(story_id=StoryId('s'), sentence_id=SentenceId(i)) for i in pins),
+        pins=_pins(pins, pins_story),
+    )
+
+
+def _pins(sentence_ids, story_id):
+    """Pins into `story_id`; None stays None, which is "not pinned"."""
+    if sentence_ids is None:
+        return None
+    return tuple(
+        Pin(story_id=StoryId(story_id), sentence_id=SentenceId(sentence_id))
+        for sentence_id in sentence_ids
     )
 
 
@@ -152,14 +175,14 @@ def test_s_for_step_collects_term_ids_whatever_the_display():
         assert refs == {TermId('guest'), TermId('search')}
 
 
-def _scenario_with_steps(*steps, pins=()):
+def _scenario_with_steps(*steps, pins=None, pins_story='s', stories=('s',)):
     return Scenario(
         id=NodeId('test'),
         narration=Narration(text='scn'),
         module='m',
         steps=list(steps),
-        story_ids=(StoryId('s'),),
-        pins=tuple(Pin(story_id=StoryId('s'), sentence_id=SentenceId(i)) for i in pins),
+        story_ids=tuple(StoryId(story_id) for story_id in stories),
+        pins=_pins(pins, pins_story),
     )
 
 
@@ -341,11 +364,9 @@ def test_compute_coverage_drops_pins_naming_no_sentence_of_the_story():
     )
 
 
-def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
-    """A pinned step contributes exactly its pins, even where its narration
-    fits another sentence; the scenario's other steps are still matched."""
-    matched = _guest_search_room_story().sentences[0]
-    pinned = Sentence(
+def _search_and_book_story():
+    """Sentence 1 is what `_matching_step` narrates; sentence 2 only a pin reaches."""
+    booked = Sentence(
         id=SentenceId(2),
         clauses=(
             _clause(
@@ -355,9 +376,47 @@ def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
             ),
         ),
     )
-    index = build_story_index(
-        Story(id=StoryId('s'), title='S', sentences=(matched, pinned))
-    )
+    searched = _guest_search_room_story().sentences[0]
+    return Story(id=StoryId('s'), title='S', sentences=(searched, booked))
+
+
+@scenario(
+    t'A {pg["Step"].low} is narration-matched only where neither it nor its '
+    t'{pg["Scenario"].low} {pg["Pin"]("pins")}',
+)
+@pytest.mark.parametrize(
+    ('scenario_pins', 'step_pins', 'covered'),
+    [
+        (None, None, {1}),
+        (None, [2], {2}),
+        ([], None, set()),
+        ([], [2], {2}),
+    ],
+    ids=['nothing-pinned', 'step-pinned', 'scenario-pinned', 'both-pinned'],
+)
+def test_narration_matching_runs_only_where_nothing_pins(
+    scenario_pins: Annotated[
+        list[int] | None, given(Template('a scenario with pins={scenario_pins}'))
+    ],
+    step_pins: Annotated[
+        list[int] | None,
+        given(Template('a step matching sentence 1, with pins={step_pins}')),
+    ],
+    covered: set[int],
+):
+    with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
+        coverage = compute_coverage(
+            _scenario_with_steps(_matching_step(pins=step_pins), pins=scenario_pins),
+            build_story_index(_search_and_book_story()),
+        )
+    with then(t'the {pg["Scenario"].low} covers what the {pg["Step"].low} contributes'):
+        assert coverage == {SentenceId(sentence_id) for sentence_id in covered}
+
+
+def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
+    """A pinned step contributes exactly its pins, even where its narration
+    fits another sentence; the scenario's other steps are still matched."""
+    index = build_story_index(_search_and_book_story())
     pinned_step = _matching_step(pins=[2])
     assert compute_coverage(_scenario_with_steps(pinned_step), index) == {SentenceId(2)}
     assert compute_coverage(
@@ -365,21 +424,36 @@ def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
     ) == {SentenceId(1), SentenceId(2)}
 
 
-def test_compute_coverage_matches_a_step_pinned_into_another_story():
-    step = _matching_step()
-    step.pins = (Pin(story_id=StoryId('t'), sentence_id=SentenceId(1)),)
+def test_a_step_pinned_into_another_story_is_not_matched_in_this_one():
+    step = _matching_step(pins=[1], pins_story='t')
     coverage = compute_coverage(
         _scenario_with_steps(step), build_story_index(_guest_search_room_story())
     )
-    assert coverage == {SentenceId(1)}
+    assert coverage == set()
 
 
-def test_compute_coverage_ignores_a_scenario_pin_into_another_story():
-    scenario_ = _scenario_with_steps(_matching_step())
-    scenario_.pins = (Pin(story_id=StoryId('t'), sentence_id=SentenceId(9)),)
-    assert compute_coverage(
-        scenario_, build_story_index(_guest_search_room_story())
-    ) == {SentenceId(1)}
+def test_a_scenario_pinned_into_another_story_matches_no_step_in_this_one():
+    scenario_ = _scenario_with_steps(_matching_step(), pins=[9], pins_story='t')
+    assert (
+        compute_coverage(scenario_, build_story_index(_guest_search_room_story()))
+        == set()
+    )
+
+
+def test_a_scenario_pin_and_its_step_pins_add_up():
+    scenario_ = _scenario_with_steps(_matching_step(pins=[2]), pins=[1])
+    assert compute_coverage(scenario_, build_story_index(_search_and_book_story())) == {
+        SentenceId(1),
+        SentenceId(2),
+    }
+
+
+def test_a_scenario_naming_no_story_is_not_matched():
+    scenario_ = _scenario_with_steps(_matching_step(), stories=())
+    assert (
+        compute_coverage(scenario_, build_story_index(_guest_search_room_story()))
+        == set()
+    )
 
 
 @scenario(

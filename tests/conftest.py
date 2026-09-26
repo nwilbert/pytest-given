@@ -3,6 +3,7 @@
 import pytest
 
 from pytest_given.capture.source import current_rootdir, restore_rootdir
+from pytest_given.capture.story import restore_story_registry, snapshot_story_registry
 from tests.ubiquitous_language import pg  # noqa: F401
 
 
@@ -19,3 +20,16 @@ def _preserve_session_rootdir():
     previous = current_rootdir()
     yield
     restore_rootdir(previous)
+
+
+@pytest.fixture
+def isolated_story_registry():
+    """An empty story registry for the test, and the session's back after.
+
+    The registry is the report's story list, so a test that clears it rather
+    than restoring it takes the self-report's own stories with it.
+    """
+    previous = snapshot_story_registry()
+    restore_story_registry({})
+    yield
+    restore_story_registry(previous)

@@ -14,9 +14,10 @@ from ..model import (
     Pin,
     PytestGivenError,
     Story,
+    StoryId,
 )
 from .steps import StepDescriptor
-from .story import Pins, argument_text, one_or_sequence, sentence_handles
+from .story import Pins, argument_text, one_or_sequence, pins_of
 from .template import (
     ResolvedName,
     StepText,
@@ -33,13 +34,13 @@ class ScenarioDecorator:
         name: ResolvedName,
         tags: list[str],
         *,
-        stories: tuple[Story, ...] = (),
-        pins: tuple[Pin, ...] = (),
+        story_ids: tuple[StoryId, ...] = (),
+        pins: tuple[Pin, ...] | None = None,
         group_parametrized: bool = True,
     ) -> None:
         self.name: ResolvedName = name
         self.tags = tags
-        self.stories = stories
+        self.story_ids = story_ids
         self.pins = pins
         self.group_parametrized = group_parametrized
 
@@ -86,31 +87,22 @@ def scenario(
         )
     else:
         resolved_name = name
-    matched = _matched_stories(stories)
-    handles = sentence_handles(pins)
-    pinned = {handle.story.id: handle.story for handle in handles}
-    for story in matched:
-        if story.id in pinned:
-            raise PytestGivenError(
-                f'@scenario names story {story.title!r} in both stories= and '
-                f'pins=: stories= matches narration against it, pins= replaces '
-                f'that matching. Keep one.'
-            )
     return ScenarioDecorator(
         resolved_name,
         tags or [],
-        stories=matched + tuple(pinned.values()),
-        pins=tuple(handle.pin for handle in handles),
+        story_ids=_story_ids(stories),
+        pins=pins_of(pins),
         group_parametrized=group_parametrized,
     )
 
 
-def _matched_stories(stories: Story | Sequence[Story] | None) -> tuple[Story, ...]:
+def _story_ids(stories: Story | Sequence[Story] | None) -> tuple[StoryId, ...]:
+    """The stories `stories=` narration-matches against, each once, in order."""
     if stories is None:
         return ()
     items = one_or_sequence(stories, Story)
     if items is not None:
-        return tuple({story.id: story for story in items}.values())
+        return tuple(dict.fromkeys(story.id for story in items))
     raise PytestGivenError(
         f'@scenario(stories=...) takes a Story or a sequence of them; '
         f'got {argument_text(stories)}'

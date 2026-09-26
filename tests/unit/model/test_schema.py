@@ -423,10 +423,10 @@ def test_report_data_accepts_glossary_and_stories() -> None:
     assert rd.glossary is g
 
 
-def test_scenario_defaults_story_ids_and_pins_empty() -> None:
+def test_scenario_defaults_to_no_stories_and_not_pinned() -> None:
     scenario_ = Scenario(id=NodeId('n'), narration=Narration(text='t'), module='m')
     assert scenario_.story_ids == ()
-    assert scenario_.pins == ()
+    assert scenario_.pins is None
 
 
 def test_scenario_accepts_story_ids_and_pins() -> None:
@@ -445,9 +445,9 @@ def test_scenario_accepts_story_ids_and_pins() -> None:
     assert scenario_.pins == pins
 
 
-def test_step_defaults_pins_empty() -> None:
+def test_step_defaults_to_not_pinned() -> None:
     step = Step(phase='given', narration=Narration(text='t'))
-    assert step.pins == ()
+    assert step.pins is None
 
 
 def test_step_accepts_pins() -> None:

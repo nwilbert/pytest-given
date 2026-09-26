@@ -22,11 +22,7 @@ from pathlib import Path
 from ..model import StoryId
 from .collector import Collector, get_active_collector, set_active_collector
 from .source import current_rootdir, restore_rootdir, set_rootdir
-from .story import (
-    StoryDeclaration,
-    restore_story_registry,
-    snapshot_story_registry,
-)
+from .story import Story, restore_story_registry, snapshot_story_registry
 
 
 @dataclass(frozen=True)
@@ -34,7 +30,7 @@ class CaptureState:
     """Everything `capture` holds process-wide, as one value."""
 
     rootdir: Path | None
-    stories: dict[StoryId, StoryDeclaration]
+    stories: dict[StoryId, Story]
     collector: Collector | None
 
 

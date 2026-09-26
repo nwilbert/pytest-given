@@ -25,7 +25,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames`. **Always `null` on a parametrized scenario**, even a failed one: its errors are per case in `parameters.cases[].error`, same shape |
 | `source` | `{relpath, line}` — the test function's definition site |
-| `story_ids` / `pins` | Stories the scenario binds (`@scenario(stories=...)`, plus stories reached through a pin), and its scenario pins as `[{story_id, sentence_id}]` |
+| `story_ids` / `pins` | The stories `@scenario(stories=...)` narration-matches against, and the scenario pins as `[{story_id, sentence_id}]` — `null` when not pinned, `[]` when opted out of matching. A step's `pins` reads the same way |
 
 In a grouped scenario `id`, `module`, `tags` and `source` come from the first
 *collected* case, while `steps` are templatized from the first case that
@@ -84,8 +84,9 @@ jq -r '.scenarios[] | select([.. | .term_id? // empty] | index("waitlist"))
 jq -r '.scenarios[] | select(.tags | index("validation")) | .narration.text' report.json
 jq -r '.scenarios[] | select(.tags | any(startswith("ticket/"))) | .narration.text' report.json
 
-# Scenarios implementing a story
-jq -r '.scenarios[] | select(.story_ids | index("lend-and-return-a-book")) | .narration.text' report.json
+# Scenarios covering a story (node ids) — `story_ids` misses one that only pins it
+jq -r '[.coverage[] | select(.story_id == "lend-and-return-a-book") | .scenario_ids[]]
+       | unique[]' report.json
 
 # Uncovered sentences (tracked ones no scenario covers), as story#sentence
 jq -r '.coverage[] | select(.tracked and .scenario_ids == [])

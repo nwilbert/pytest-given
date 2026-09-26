@@ -17,6 +17,7 @@ from pytest_given.capture.story import (
     UnnumberedSentence,
     carried_glossaries,
     clause,
+    registered_stories,
     restore_story_registry,
     sentence,
     story,
@@ -31,12 +32,7 @@ from pytest_given.model import (
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
-
-@pytest.fixture(autouse=True)
-def _reset_story_registry():
-    restore_story_registry({})
-    yield
-    restore_story_registry({})
+pytestmark = pytest.mark.usefixtures('isolated_story_registry')
 
 
 @pytest.fixture
@@ -480,7 +476,43 @@ def test_story_hands_out_a_sentence_by_name_and_by_number(guest, search, room):
     with then(t'both {pg["Handle"]("handles")} name sentence 2 of that {pg["Story"]}'):
         expected = Pin(story_id=built.id, sentence_id=SentenceId(2))
         assert by_name.pin == by_number.pin == expected
-        assert by_name.story is built
+
+
+@scenario(t'Iterating a {pg["Story"].low} yields its {pg["Sentence"].low} handles')
+def test_iterating_a_story_yields_its_sentence_handles(guest, search, room):
+    with given(t'a {pg["Story"]} of two {pg["Sentence"]("sentences")}'):
+        built = story(
+            'Iterated',
+            [sentence(guest, search, room), sentence(guest('Alice'), search, room)],
+        )
+    with when(t'the {pg["Story"]} is iterated'):
+        handles = list(built)
+    with then(t'it yields each {pg["Sentence"].low} handle in order'):
+        assert handles == [built[1], built[2]]
+
+
+def test_story_reads_a_one_shot_iterable_of_sentences_once(guest, search, room):
+    built = story('Generated', (sentence(guest, search, room) for _ in range(2)))
+    assert [one.id for one in built.sentences] == [1, 2]
+    assert carried_glossaries(built) == frozenset({guest.glossary})
+
+
+def test_a_story_that_fails_its_checks_leaves_its_id_free(guest, search, room):
+    with pytest.raises(PytestGivenError, match='names two sentences'):
+        story(
+            'Retried',
+            [
+                sentence(guest, search, room, name='x'),
+                sentence(guest, search, room, name='x'),
+            ],
+        )
+    assert story('Retried', [sentence(guest, search, room)]).title == 'Retried'
+
+
+def test_the_registry_lists_declared_stories_in_order(guest, search, room):
+    first = story('First', [sentence(guest, search, room)])
+    second = story('Second')
+    assert registered_stories() == [first, second]
 
 
 @scenario(

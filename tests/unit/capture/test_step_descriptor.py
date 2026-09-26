@@ -31,9 +31,6 @@ from pytest_given.capture.steps import (
     when_then,
 )
 from pytest_given.capture.story import (
-    restore_story_registry,
-)
-from pytest_given.capture.story import (
     sentence as sentence_fn,
 )
 from pytest_given.capture.story import (
@@ -51,12 +48,7 @@ from pytest_given.model import (
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
-
-@pytest.fixture(autouse=True)
-def _reset_story_registry():
-    restore_story_registry({})
-    yield
-    restore_story_registry({})
+pytestmark = pytest.mark.usefixtures('isolated_story_registry')
 
 
 @scenario(
@@ -968,7 +960,8 @@ def test_step_descriptor_records_the_pins_of_its_handles():
         the_story[1].pin,
         the_story[2].pin,
     )
-    assert then('a result').pins == ()
+    assert then('a result').pins is None
+    assert then('an opt-out', pins=[]).pins == ()
 
 
 @scenario(
@@ -994,20 +987,23 @@ def test_scenario_refuses_a_bare_pin_too():
         scenario('x', pins=2)  # type: ignore[arg-type]
 
 
-def test_scenario_binds_its_stories_then_its_pinned_stories():
+def test_scenario_matches_only_its_stories_and_keeps_its_pins_apart():
+    """Pinning a story does not add it to `stories=`, and naming a story in
+    both is merely redundant."""
     matched = _two_sentence_story('Matched')
     pinned = _two_sentence_story('Pinned')
     deco = scenario('x', stories=matched, pins=[pinned['cancel'], pinned[1]])
-    assert [one.id for one in deco.stories] == [matched.id, pinned.id]
+    assert deco.story_ids == (matched.id,)
     assert deco.pins == (pinned[2].pin, pinned[1].pin)
+    assert scenario('y', stories=matched, pins=matched[1]).story_ids == (matched.id,)
 
 
 def test_scenario_takes_a_sequence_of_stories():
     first, second = _two_sentence_story('First'), _two_sentence_story('Second')
-    assert [one.id for one in scenario('x', stories=[first, second]).stories] == [
+    assert scenario('x', stories=[first, second, first]).story_ids == (
         first.id,
         second.id,
-    ]
+    )
 
 
 def test_scenario_rejects_a_non_story():
@@ -1054,33 +1050,36 @@ def test_a_sentence_pinned_twice_is_recorded_once():
     )
 
 
-def test_a_decorated_helper_records_and_checks_its_pins():
+def test_a_decorated_helper_records_its_pins_into_any_story():
     bound = _two_sentence_story('Helper Bound')
-    unbound = _two_sentence_story('Helper Unbound')
+    elsewhere = _two_sentence_story('Helper Elsewhere')
 
     @when('the helper runs', pins=bound['cancel'])
     def pinned_helper() -> None: ...
 
-    @when('the stray helper runs', pins=unbound[1])
-    def stray_helper() -> None: ...
+    @when('the other helper runs', pins=elsewhere[1])
+    def other_helper() -> None: ...
 
     collector = Collector()
-    collector.start_scenario('id', 'name', 'mod', [], stories=(bound,))
+    collector.start_scenario('id', 'name', 'mod', [], story_ids=(bound.id,))
     set_active_collector(collector)
     try:
         pinned_helper()
-        with pytest.raises(PytestGivenError, match=r"'Helper Unbound'.*does not bind"):
-            stray_helper()
+        other_helper()
     finally:
         set_active_collector(None)
     recorded = collector.finish_scenario(status='passed')
-    assert recorded.steps[0].pins == (bound[2].pin,)
+    assert [step.pins for step in recorded.steps] == [
+        (bound[2].pin,),
+        (elsewhere[1].pin,),
+    ]
 
 
 def test_scenario_defaults_to_no_stories_and_no_pins():
     deco = scenario('x')
-    assert deco.stories == ()
-    assert deco.pins == ()
+    assert deco.story_ids == ()
+    assert deco.pins is None
+    assert scenario('y', pins=[]).pins == ()
 
 
 # --- Gated step-source capture (narration-lint anchors) ---

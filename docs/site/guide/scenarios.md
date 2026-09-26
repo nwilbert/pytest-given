@@ -14,7 +14,7 @@ Required for a test to appear in the report. `stories=` (one story or several) a
 
 `given(text, *, pins=None)`, `when(text, *, pins=None)`, `then(text, *, pins=None)`
 
-Dual-purpose: use as a **context manager** inside a test body, or as a **decorator** on a fixture or helper function. `pins=` binds the step to a story sentence regardless of its narration — see [Domain Storytelling](domain-storytelling.md).
+Dual-purpose: use as a **context manager** inside a test body, or as a **decorator** on a fixture or helper function. `pins=` binds the step to story sentences instead of narration matching, and `pins=[]` opts it out of matching — see [Domain Storytelling](domain-storytelling.md).
 
 As context managers:
 
@@ -60,7 +60,7 @@ def test_rejects_underpayment(
         buy_coffee(machine, cents)
 ```
 
-A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. `when`/`then` are rejected here — the action and its outcome belong in the test body. A label's `pins=` works as on any step; on a decorated fixture it replaces the pins of the fixture's own label, not those of steps inside its body.
+A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. `when`/`then` are rejected here — the action and its outcome belong in the test body. A label's `pins=` works as on any step; on a decorated fixture it replaces the pins of the fixture's own label, not those of steps inside its body, and `pins=[]` clears them.
 
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 

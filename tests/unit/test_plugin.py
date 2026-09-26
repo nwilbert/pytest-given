@@ -23,9 +23,6 @@ from pytest_given.capture.scenario import (
 from pytest_given.capture.source import file_source
 from pytest_given.capture.steps import StepDescriptor
 from pytest_given.capture.story import (
-    restore_story_registry,
-)
-from pytest_given.capture.story import (
     story as story_fn,
 )
 from pytest_given.lint import LintConfig
@@ -350,7 +347,7 @@ def _drain_cleanups(config: Any) -> None:
         config.cleanups.pop()()
 
 
-@pytest.mark.usefixtures('_reset_story_registry_plugin')
+@pytest.mark.usefixtures('isolated_story_registry')
 def test_nested_session_restores_the_outer_story_registry(tmp_path: Any) -> None:
     """The story registry is displaced at `load_initial_conftests` time (before
     conftests import), so each session starts clean, but a nested in-process
@@ -431,13 +428,6 @@ def test_extract_skip_reason_returns_none_for_unrecognized_shapes() -> None:
 
 
 # --- Task 7.2 / 7.4 unit coverage ---
-
-
-@pytest.fixture
-def _reset_story_registry_plugin() -> Any:
-    restore_story_registry({})
-    yield
-    restore_story_registry({})
 
 
 def test_extract_given_descriptor_from_parametrize_param() -> None:

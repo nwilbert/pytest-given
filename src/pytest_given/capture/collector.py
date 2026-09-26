@@ -27,10 +27,9 @@ from ..model import (
     Step,
     Story,
     StoryId,
-    iter_steps,
 )
 from .source import PACKAGE_ROOT
-from .story import story_label
+from .story import registered_stories
 from .template import Template, narration_from
 
 if TYPE_CHECKING:
@@ -157,7 +156,6 @@ class Collector:
         self._state: RecordingState = 'idle'
         self._active_recording: FixtureRecording | None = None
         self._active_fixture_descriptor: StepDescriptor | None = None
-        self._discovered_stories: dict[StoryId, Story] = {}
 
     @property
     def state(self) -> RecordingState:
@@ -196,8 +194,8 @@ class Collector:
 
     @property
     def stories(self) -> list[Story]:
-        """Every story a scenario declared this session, in discovery order."""
-        return list(self._discovered_stories.values())
+        """Every story declared this session, in declaration order."""
+        return registered_stories()
 
     @property
     def active_fixture_descriptor(self) -> StepDescriptor | None:
@@ -216,8 +214,8 @@ class Collector:
         tags: list[str],
         source: SourceLocation | None = None,
         *,
-        stories: tuple[Story, ...] = (),
-        pins: tuple[Pin, ...] = (),
+        story_ids: tuple[StoryId, ...] = (),
+        pins: tuple[Pin, ...] | None = None,
     ) -> None:
         self._current_scenario = Scenario(
             id=scenario_id,
@@ -225,16 +223,12 @@ class Collector:
             module=module,
             tags=tags,
             source=source,
-            story_ids=tuple(story.id for story in stories),
+            story_ids=story_ids,
             pins=pins,
         )
         self._step_stack = []
         self._started_at = None
         self._state = 'test'
-        # Stories reach the report only through a scenario, so every one it
-        # binds, matched or pinned, is registered here.
-        for story in stories:
-            self._discovered_stories[story.id] = story
 
     def begin_timing(self) -> None:
         """Start the active scenario's clock.
@@ -328,14 +322,14 @@ class Collector:
         root: Step,
         *,
         override_narration: Narration | None = None,
-        override_pins: tuple[Pin, ...] = (),
+        override_pins: tuple[Pin, ...] | None = None,
     ) -> None:
         """Deep-copy a fixture's recorded root into the active scenario's steps.
 
         An Annotated label on the fixture parameter retells the grafted root:
         *override_narration* replaces its narration, and *override_pins*, when
-        non-empty, its pins. The recorded children and attachments are
-        preserved.
+        given (`()` included), its pins. The recorded children and attachments
+        are preserved.
         """
         # Grafting runs from the setup hook of an annotated item, which opened
         # the scenario before fixtures ran; nothing closes it until logreport.
@@ -343,37 +337,19 @@ class Collector:
         grafted = copy.deepcopy(root)
         if override_narration is not None:
             grafted.narration = override_narration
-        if override_pins:
+        if override_pins is not None:
             grafted.pins = override_pins
-        # A wider-scoped fixture recorded once, against the first scenario that
-        # used it; a later one may not fit its pins. The traceback ends in
-        # this module rather than the failing test's body, so the message has
-        # to name where the pin came from itself.
-        for step in iter_steps([grafted]):
-            if step.pins:
-                self._check_pins_fit(
-                    step.pins,
-                    context=(
-                        f'recorded by fixture {grafted.fixture_name!r}, '
-                        f'step {step.narration.text!r}'
-                    ),
-                )
         self._current_scenario.steps.append(grafted)
 
     def graft_leaf_given(
-        self, parameter: str, narration: Narration, *, pins: tuple[Pin, ...] = ()
+        self, narration: Narration, *, pins: tuple[Pin, ...] | None = None
     ) -> None:
         """Append a childless `given` step to the active scenario.
 
-        Used for the Annotated label on `parameter` when it names a parametrize
-        value or an undecorated / built-in fixture — an arrangement with no
-        recorded body.
+        Used for Annotated labels on parametrize values and undecorated /
+        built-in fixtures — arrangements with no recorded body.
         """
         assert self._current_scenario is not None
-        if pins:
-            self._check_pins_fit(
-                pins, context=f'Annotated label on parameter {parameter!r}'
-            )
         self._current_scenario.steps.append(
             Step(phase='given', narration=narration, pins=pins)
         )
@@ -383,7 +359,7 @@ class Collector:
         phase: Phase,
         narration: Narration,
         *,
-        pins: tuple[Pin, ...] = (),
+        pins: tuple[Pin, ...] | None = None,
         source: SourceLocation | None = None,
     ) -> Step:
         if not self.recording:
@@ -394,8 +370,6 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
-        if pins:
-            self._check_pins_fit(pins)
         step = Step(phase=phase, narration=narration, pins=pins, source=source)
         if stack:
             stack[-1].children.append(step)
@@ -410,44 +384,6 @@ class Collector:
             self._current_scenario.steps.append(step)
         stack.append(step)
         return step
-
-    def _check_pins_fit(
-        self, pins: tuple[Pin, ...], *, context: str | None = None
-    ) -> None:
-        """Refuse a step pin the active scenario cannot take: one into a story
-        it does not bind, or into one it pins, whose coverage is exactly the
-        scenario's pins. `context`, when given, names where the pin was
-        recorded.
-        """
-        scenario = self._current_scenario
-        if scenario is None:
-            # A `@given` fixture scoped wider than `function` records even
-            # when no scenario is active — an unannotated test pulled it in.
-            raise PytestGivenError(
-                'a step pin needs a scenario to land in, but this step was '
-                'recorded outside one — an unannotated test pulled in a '
-                'fixture that records it.'
-            )
-        suffix = f' ({context})' if context else ''
-        pinned = {pin.story_id for pin in scenario.pins}
-        for pin in pins:
-            if pin.story_id not in scenario.story_ids:
-                problem = (
-                    f'which scenario {scenario.id!r} does not bind; add the '
-                    f'story to @scenario(stories=...).'
-                )
-            elif pin.story_id in pinned:
-                problem = (
-                    f'but scenario {scenario.id!r} pins that story itself, so '
-                    f'its coverage there is exactly the scenario pins; drop the '
-                    f'step pin, or bind the story with stories= instead.'
-                )
-            else:
-                continue
-            raise PytestGivenError(
-                f'a step pins sentence {pin.sentence_id} of story '
-                f'{story_label(pin.story_id)}{suffix}, {problem}'
-            )
 
     def pop_step(self) -> Step | None:
         stack = self._target_stack()

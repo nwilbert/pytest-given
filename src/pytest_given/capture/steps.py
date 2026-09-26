@@ -27,7 +27,7 @@ from ..model import (
 )
 from .collector import Collector, get_active_collector, recording_collector
 from .source import capture_caller_source, code_source
-from .story import Pins, sentence_handles
+from .story import Pins, pins_of
 from .template import (
     StepText,
     Template,
@@ -39,21 +39,17 @@ from .template import (
 
 def given(text: StepText, *, pins: Pins | None = None) -> StepDescriptor:
     """Create a Given step (context manager or decorator)."""
-    return StepDescriptor('given', text, pins=_pins_of(pins))
+    return StepDescriptor('given', text, pins=pins_of(pins))
 
 
 def when(text: StepText, *, pins: Pins | None = None) -> StepDescriptor:
     """Create a When step (context manager or decorator)."""
-    return StepDescriptor('when', text, pins=_pins_of(pins))
+    return StepDescriptor('when', text, pins=pins_of(pins))
 
 
 def then(text: StepText, *, pins: Pins | None = None) -> StepDescriptor:
     """Create a Then step (context manager or decorator)."""
-    return StepDescriptor('then', text, pins=_pins_of(pins))
-
-
-def _pins_of(pins: Pins | None) -> tuple[Pin, ...]:
-    return tuple(handle.pin for handle in sentence_handles(pins))
+    return StepDescriptor('then', text, pins=pins_of(pins))
 
 
 def when_then(
@@ -118,7 +114,7 @@ class StepDescriptor:
         phase: Phase,
         text: StepText,
         *,
-        pins: tuple[Pin, ...] = (),
+        pins: tuple[Pin, ...] | None = None,
     ) -> None:
         self.phase = phase
         self._source: StepText = text

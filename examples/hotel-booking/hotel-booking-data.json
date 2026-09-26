@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-26T12:59:12.971305+00:00",
+    "timestamp": "2026-09-26T16:24:28.196334+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "ca77ae0b8ed857e014f9cf2c67295123f9935afa",
+    "commit_sha": "28054bc48abdbd3796cfb508c771970faad36aca",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -36,7 +36,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "carol"
         },
         {
@@ -59,7 +59,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -142,7 +142,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -156,7 +156,7 @@
       "story_ids": [
         "book-a-group-trip"
       ],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_complete_booking",
@@ -186,7 +186,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "carol"
         },
         {
@@ -206,7 +206,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "alice"
         },
         {
@@ -226,7 +226,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "bob"
         },
         {
@@ -297,7 +297,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -330,7 +330,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -366,7 +366,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -410,7 +410,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -443,7 +443,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -454,7 +454,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -468,7 +468,7 @@
       "story_ids": [
         "book-a-group-trip"
       ],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
@@ -498,7 +498,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "carol"
         },
         {
@@ -518,7 +518,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "alice"
         },
         {
@@ -538,7 +538,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "bob"
         },
         {
@@ -579,7 +579,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -621,7 +621,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -666,7 +666,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -710,7 +710,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -783,7 +783,7 @@
       "story_ids": [
         "book-a-group-trip"
       ],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking",
@@ -813,7 +813,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "alice"
         },
         {
@@ -841,7 +841,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -874,7 +874,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -918,7 +918,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -954,7 +954,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -968,7 +968,7 @@
       "story_ids": [
         "cancel-a-booking"
       ],
-      "pins": []
+      "pins": null
     },
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel",
@@ -998,7 +998,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": "alice"
         },
         {
@@ -1026,7 +1026,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1051,7 +1051,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1062,7 +1062,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1095,7 +1095,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1106,7 +1106,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1117,7 +1117,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         },
         {
@@ -1128,7 +1128,7 @@
           },
           "children": [],
           "attachments": [],
-          "pins": [],
+          "pins": null,
           "fixture_name": null
         }
       ],
@@ -1143,7 +1143,7 @@
         "cancel-a-booking",
         "book-a-group-trip"
       ],
-      "pins": []
+      "pins": null
     }
   ],
   "glossary": {

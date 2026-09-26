@@ -28,13 +28,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - **Breaking.** `sentence(..., activity_id=N)` is removed: sentences are numbered by position, so name the sentence (`name=`) and pin it by name.
 - **Breaking.** Pins take sentence handles under `pins=`: `given(..., activity=3)` becomes `given(..., pins=the_story[3])`, and `@scenario(activities=[2, 3])` becomes `pins=[the_story[2], the_story[3]]`, or `the_story['name']` for a named sentence.
-- **Breaking.** `@scenario(story=)` is now `stories=` and takes one story or several; a scenario pin binds its story without it.
-- **Breaking.** `@scenario(pins=)` covers exactly the pinned sentences, with no narration matching against their story; a step pin into such a story raises.
-- **Breaking.** In the JSON report, `scenarios[].story_id` is now `story_ids`, and `activity_ids` on scenarios and steps is now `pins` (`[{story_id, sentence_id}]`); a report saved before this change replays without its story bindings, so regenerate saved reports.
+- **Breaking.** `@scenario(story=)` is now `stories=` and takes one story or several.
+- **Breaking.** `@scenario(pins=)` covers exactly the pinned sentences plus its steps' pins, with no narration matching in any story; `pins=[]` on a step or scenario opts out of narration matching without pinning anything.
+- **Breaking.** In the JSON report, `scenarios[].story_id` is now `story_ids`, and `activity_ids` on scenarios and steps is now `pins` (`[{story_id, sentence_id}]`, `null` when not given); regenerate saved reports.
 - **Breaking.** `activity()` is now `sentence()`, `path()` is now `clause()`, and `Glossary.verb()` is now `Glossary.activity()`: rename the calls and imports.
 - **Breaking.** A file glossary's kind column says `activity` where it said `verb`.
 - **Breaking.** In the JSON report, `stories[].activities[]` is now `stories[].sentences[]` with `clauses` in place of `paths`, the term kind `"verb"` is now `"activity"`, and `coverage[].activity_id` is now `sentence_id`. Regenerate saved reports: `pytest-given report` rejects a `verb` kind.
 - **Breaking.** The report's `#activity-filter=` link parameter is now `#sentence-filter=`.
+- The report lists every story the run declares, not only those a scenario binds, so a story no scenario covers shows with no coverage.
 - The HTML report says *Sentence* where it said *Activity*, and the Glossary view groups activity terms under *Activities* instead of *Verbs*.
 - The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.
 - The documentation site is set in Source Sans 3 and Source Code Pro.
@@ -55,11 +56,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A refused scenario on a run with no `--given-*` sink no longer reports itself under a "report not written" heading.
 - An unknown `--given-source-link` preset is reported under the flag the user typed rather than under the `given_source_link` ini name.
 - A report whose rendering fails unexpectedly still discards the previous run's report rather than leaving it on disk reading as current.
-- A step pin recorded from a `@given` fixture scoped wider than `function`, pulled in by a test without `@scenario`, now raises a `PytestGivenError` naming the cause instead of a bare `AssertionError`.
+- A step pin recorded from a `@given` fixture scoped wider than `function`, first set up by a test without `@scenario`, is recorded and counts in every scenario the fixture reaches, instead of failing with a bare `AssertionError`.
 - The `#scenario=` deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.
 - `pytest-given report` reports a non-UTF-8 input file as an error rather than crashing with a traceback.
 - A `dead-term` finding states the criterion the rule actually applies: a term ref in a `@scenario` name keeps a term alive, which the old message did not mention.
-- An `Annotated` `given(...)` label carrying a pin records it instead of silently dropping it, replacing the pins of the fixture step it relabels, and a pin on a step fixture's own `@given(...)` label is now recorded instead of dropped.
+- An `Annotated` `given(...)` label carrying a pin records it instead of silently dropping it, replacing the pins of the fixture step it relabels (`pins=[]` clears them), and a pin on a step fixture's own `@given(...)` label is now recorded instead of dropped.
 - The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from `parameters.cases[].error`, where they live, and starts from a committed or CI-published report when one exists instead of always rerunning the suite.
 
 ## [0.2.0] - 2026-09-04

@@ -60,7 +60,7 @@ class SentenceCoverage:
 
 @dataclass
 class StoryRollup:
-    """Per-story precomputed view data: scenarios bound to the story plus a
+    """Per-story precomputed view data: scenarios listed under the story plus a
     per-sentence coverage breakdown. The Stories view consumes both."""
 
     scenarios: list[Scenario] = field(default_factory=list)
@@ -70,10 +70,11 @@ class StoryRollup:
 def build_story_rollups(
     report: ReportData, coverage_maps: CoverageMap
 ) -> dict[StoryId, StoryRollup]:
-    """Per-story view-data: bound scenarios + per-sentence coverage rollup."""
+    """Per-story view-data: the scenarios listed under the story, the ones
+    `coverage_maps` keys it for, + per-sentence coverage rollup."""
     scenarios_by_story: dict[StoryId, list[Scenario]] = {}
     for scn in report.scenarios:
-        for story_id in scn.story_ids:
+        for story_id in coverage_maps[scn.id]:
             scenarios_by_story.setdefault(story_id, []).append(scn)
 
     rollups: dict[StoryId, StoryRollup] = {}
