@@ -252,7 +252,7 @@ def glossary() -> Glossary:
     g = Glossary()
     g.actor('Guest', definition='')
     g.work_object('Room', definition='')
-    g.verb('search', definition='')
+    g.activity('search', definition='')
     return g
 
 
@@ -306,31 +306,31 @@ def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) ->
 
 
 @scenario(
-    t'A bare {pg["Verb"].low} handle keeps its canonical display',
+    t'A bare {pg["Activity"].low} handle keeps its canonical display',
 )
-def test_tstring_with_verb_emits_term_ref_with_canonical_display(
+def test_tstring_with_activity_emits_term_ref_with_canonical_display(
     glossary: Glossary,
 ) -> None:
-    with given(t'a {pg["Verb"]} handle used without an {pg["Inflection"]}'):
-        search = glossary.verb('search')
+    with given(t'an {pg["Activity"]} handle used without an {pg["Inflection"]}'):
+        search = glossary.activity('search')
     with when('it is interpolated into a t-string step'):
         parts = parse_tstring(t'they {search}')
-    with then(t'the {pg["Term ref"]} shows the canonical verb'):
+    with then(t'the {pg["Term ref"]} shows the canonical activity'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert term_refs[0].display == 'search'
 
 
 @scenario(
-    t'An inflected {pg["Verb"].low} in a t-string shows the {pg["Inflection"].low}',
+    t'An inflected {pg["Activity"].low} in a t-string shows the {pg["Inflection"].low}',
 )
-def test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display(
+def test_tstring_with_inflected_activity_emits_term_ref_with_inflected_display(
     glossary: Glossary,
 ) -> None:
-    with given(t'a {pg["Verb"]} handle called with an {pg["Inflection"]}'):
-        search = glossary.verb('search')
+    with given(t'an {pg["Activity"]} handle called with an {pg["Inflection"]}'):
+        search = glossary.activity('search')
     with when('it is interpolated into a t-string step'):
         parts = parse_tstring(t'they {search("searches for")} a room')
-    with then(t'the {pg["Term ref"]} shows the inflection but keeps the verb id'):
+    with then(t'the {pg["Term ref"]} shows the inflection but keeps the activity id'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert term_refs[0].display == 'searches for'
         assert term_refs[0].term_id == 'search'

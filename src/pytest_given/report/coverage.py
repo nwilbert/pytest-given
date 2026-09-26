@@ -1,15 +1,15 @@
-"""Scenario ↔ story-activity coverage matching."""
+"""Scenario ↔ story-sentence coverage matching."""
 
 from dataclasses import dataclass
 
 from ..model import (
-    Activity,
-    ActivityId,
-    ActivityTermRef,
+    ClauseTermRef,
     NarrationTermRef,
     NodeId,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     Step,
     Story,
     StoryId,
@@ -17,32 +17,32 @@ from ..model import (
     iter_steps,
 )
 
-# Which activities a scenario covers.
-type CoverageMap = dict[NodeId, set[ActivityId]]
+# Which sentences a scenario covers.
+type CoverageMap = dict[NodeId, set[SentenceId]]
 
 
 @dataclass(frozen=True)
 class StoryIndex:
-    """A story's activities reduced to what matching needs, built once.
+    """A story's sentences reduced to what matching needs, built once.
 
     Depends only on the story, so it is shared across every scenario bound to
     that story instead of rebuilt per scenario — which computes `a_refs` once
-    per activity rather than once per activity per scenario.
+    per sentence rather than once per sentence per scenario.
 
-    Eligibility is *not* recorded, even though `refs_by_activity` is keyed by
-    exactly the eligible activities: the index is built lazily, only for a
+    Eligibility is *not* recorded, even though `refs_by_sentence` is keyed by
+    exactly the eligible sentences: the index is built lazily, only for a
     story some scenario is bound to, so absence here does not distinguish
     "ineligible" from "no scenario named this story". `build_story_rollups`
     asks `is_coverage_eligible` again for that reason.
     """
 
-    refs_by_activity: dict[ActivityId, set[TermId]]
-    activities_by_term: dict[TermId, set[ActivityId]]
-    ids: set[ActivityId]
+    refs_by_sentence: dict[SentenceId, set[TermId]]
+    sentences_by_term: dict[TermId, set[SentenceId]]
+    ids: set[SentenceId]
 
 
 def build_coverage_map(report: ReportData) -> CoverageMap:
-    """Which activities each scenario covers, keyed by node id — empty for one
+    """Which sentences each scenario covers, keyed by node id — empty for one
     bound to no story.
 
     Each story is indexed once and reused across the scenarios bound to it.
@@ -68,73 +68,73 @@ def build_coverage_map(report: ReportData) -> CoverageMap:
 def build_story_index(story: Story) -> StoryIndex:
     """Index *story* for matching.
 
-    Under-anchored activities (fewer than 2 distinct term refs) are excluded
+    Under-anchored sentences (fewer than 2 distinct term refs) are excluded
     from *narration* matching — the ``A_refs ⊆ S`` rule would let one term, or
     none, be covered by almost any step. An explicit ``activity=`` pin says
     what the narration cannot, so it reaches them too.
     """
-    refs_by_activity = {
-        activity.id: a_refs(activity)
-        for activity in story.activities
-        if is_coverage_eligible(activity)
+    refs_by_sentence = {
+        sentence.id: a_refs(sentence)
+        for sentence in story.sentences
+        if is_coverage_eligible(sentence)
     }
-    activities_by_term: dict[TermId, set[ActivityId]] = {}
-    for aid, refs in refs_by_activity.items():
+    sentences_by_term: dict[TermId, set[SentenceId]] = {}
+    for aid, refs in refs_by_sentence.items():
         for term_id in refs:
-            activities_by_term.setdefault(term_id, set()).add(aid)
+            sentences_by_term.setdefault(term_id, set()).add(aid)
     return StoryIndex(
-        refs_by_activity=refs_by_activity,
-        activities_by_term=activities_by_term,
-        ids={a.id for a in story.activities},
+        refs_by_sentence=refs_by_sentence,
+        sentences_by_term=sentences_by_term,
+        ids={a.id for a in story.sentences},
     )
 
 
-def a_refs(activity: Activity) -> set[TermId]:
-    """The term ids the A_refs ⊆ S rule matches an activity on, across all
+def a_refs(sentence: Sentence) -> set[TermId]:
+    """The term ids the A_refs ⊆ S rule matches a sentence on, across all
     its paths. Words contribute nothing; an instance or inflection counts as
     its term, so `guest('Alice')` and `guest` are the same ref."""
     return {
         part.term_id
-        for activity_path in activity.paths
-        for part in activity_path.parts
-        if isinstance(part, ActivityTermRef)
+        for clause in sentence.clauses
+        for part in clause.parts
+        if isinstance(part, ClauseTermRef)
     }
 
 
-def is_coverage_eligible(activity: Activity) -> bool:
-    """An activity participates in *narration* matching only if it carries at
-    least two distinct glossary term refs. Under-anchored activities (0 or 1
+def is_coverage_eligible(sentence: Sentence) -> bool:
+    """A sentence participates in *narration* matching only if it carries at
+    least two distinct glossary term refs. Under-anchored sentences (0 or 1
     distinct term) are excluded from it, and render 'not coverage-tracked'
     unless an `activity=` pin covers them anyway."""
-    return len(a_refs(activity)) >= 2
+    return len(a_refs(sentence)) >= 2
 
 
-def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[ActivityId]:
-    """The activities this scenario covers.
+def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[SentenceId]:
+    """The sentences this scenario covers.
 
     A non-empty `scenario.activity_ids` bounds which can appear at all.
     """
     # Intersected with the story's own ids, never taken verbatim: `scope` is
-    # the only guard the pin path below has, and an id naming no activity in
+    # the only guard the pin path below has, and an id naming no sentence in
     # this story would render a `Covers:` chip pointing at a timeline row that
     # does not exist. Collection rules that out for a live run, but a saved
     # report replayed through `pytest-given report` is deserialized unvalidated.
     scope = (
         set(scenario.activity_ids) & index.ids if scenario.activity_ids else index.ids
     )
-    covered: set[ActivityId] = set()
+    covered: set[SentenceId] = set()
     for step in iter_steps(scenario.steps):
         if step.activity_ids:
             covered |= {aid for aid in step.activity_ids if aid in scope}
             continue
         s_cache = s_for_step(step)
-        candidates: set[ActivityId] = set()
+        candidates: set[SentenceId] = set()
         for term_id in s_cache:
-            candidates |= index.activities_by_term.get(term_id, set())
+            candidates |= index.sentences_by_term.get(term_id, set())
         covered |= {
             aid
             for aid in candidates
-            if aid in scope and index.refs_by_activity[aid].issubset(s_cache)
+            if aid in scope and index.refs_by_sentence[aid].issubset(s_cache)
         }
     return covered
 

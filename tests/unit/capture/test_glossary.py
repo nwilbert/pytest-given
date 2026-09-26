@@ -90,9 +90,9 @@ def test_work_object_carries_term_and_glossary_back_ref():
     assert w.glossary is g
 
 
-def test_verb_carries_term_and_glossary_back_ref():
+def test_activity_carries_term_and_glossary_back_ref():
     g = Glossary()
-    t = _term('verb')
+    t = _term('activity')
     v = TermHandle(_term=t, _glossary=g)
     assert v.term is t
     assert v.glossary is g
@@ -125,23 +125,23 @@ def test_work_object_call_returns_instance_with_distinct_display():
 
 
 @scenario(
-    t'Calling a {pg["Verb"].low} records an {pg["Inflection"].low} '
+    t'Calling an {pg["Activity"].low} records an {pg["Inflection"].low} '
     t'of the same {pg["Term"].low}',
 )
-def test_verb_call_returns_inflection_sharing_term_identity():
-    with given(t'a {pg["Verb"]} handle for confirm'):
+def test_activity_call_returns_inflection_sharing_term_identity():
+    with given(t'an {pg["Activity"]} handle for confirm'):
         g = Glossary()
-        t = GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='confirm')
+        t = GlossaryTerm(id=TermId('confirm'), kind='activity', canonical='confirm')
         v = TermHandle(_term=t, _glossary=g)
-    with when(t'the {pg["Verb"]} is called with a surface form'):
+    with when(t'the {pg["Activity"]} is called with a surface form'):
         infl = v('confirms')
-    with then(t'an {pg["Inflection"]} sharing the verb identity is returned'):
+    with then(t'an {pg["Inflection"]} sharing the activity identity is returned'):
         assert isinstance(infl, TermInstance)
         assert infl.handle is v
         assert infl.display == 'confirms'
 
 
-# --- Task 2.4: Glossary.actor/work_object/verb registration methods ---
+# --- Task 2.4: Glossary.actor/work_object/activity registration methods ---
 
 
 @scenario(
@@ -169,11 +169,11 @@ def test_glossary_work_object_registers_and_returns_handle():
     assert g.get(TermId('room')).kind == 'object'
 
 
-def test_glossary_verb_registers_and_returns_handle():
+def test_glossary_activity_registers_and_returns_handle():
     g = Glossary()
-    v = g.verb('confirm')
-    assert v.declared_kind == 'verb'
-    assert g.get(TermId('confirm')).kind == 'verb'
+    v = g.activity('confirm')
+    assert v.declared_kind == 'activity'
+    assert g.get(TermId('confirm')).kind == 'activity'
 
 
 @scenario(
@@ -218,12 +218,12 @@ def test_glossary_cross_kind_collision_raises():
         g.actor('Foo')
     with (
         when_then(
-            t'the same name is registered as a {pg["Verb"]}',
+            t'the same name is registered as an {pg["Activity"]}',
             'a PytestGivenError reports the conflict with the prior registration',
         ),
         pytest.raises(PytestGivenError, match='conflicts with prior registration'),
     ):
-        g.verb('foo')
+        g.activity('foo')
 
 
 def test_glossary_actor_empty_name_raises():
@@ -261,11 +261,11 @@ def test_glossary_work_object_captures_source():
         source_mod.restore_rootdir(None)
 
 
-def test_glossary_verb_captures_source():
+def test_glossary_activity_captures_source():
     source_mod.set_rootdir(Path(__file__).resolve().parents[3])
     try:
         g = Glossary()
-        v = g.verb('confirm')
+        v = g.activity('confirm')
         assert v.term.source is not None
         assert v.term.source.relpath.endswith('test_glossary.py')
     finally:
@@ -317,7 +317,7 @@ def test_blank_definition_normalizes_to_none():
 
 def test_real_definition_is_kept():
     g = Glossary()
-    verb = g.verb('book', 'Reserve a room.')
+    verb = g.activity('book', 'Reserve a room.')
     assert verb.term.definition == 'Reserve a room.'
 
 
@@ -407,10 +407,10 @@ def test_work_object_low_yields_lowercased_instance():
     assert low.display == 'room'
 
 
-def test_verb_low_yields_lowercased_inflection():
+def test_activity_low_yields_lowercased_inflection():
     g = Glossary()
     v = TermHandle(
-        _term=GlossaryTerm(id=TermId('confirm'), kind='verb', canonical='Confirm'),
+        _term=GlossaryTerm(id=TermId('confirm'), kind='activity', canonical='Confirm'),
         _glossary=g,
     )
     low = v.low

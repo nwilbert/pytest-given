@@ -17,18 +17,23 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A `/` in a tag nests it in the HTML report's Tags sidebar (`ticket/ABC-123` under a `ticket` heading), and selecting the heading filters to every tag beneath it, as a package does for its modules.
 - The bundled skills ship under `pytest_given/.agents/skills/` in the wheel, so downstream projects can also install them with [library-skills](https://library-skills.io) (`uvx library-skills install --claude`) alongside the skills of their other dependencies. `pytest-given skills install` keeps working as before.
-- The JSON report carries a top-level `coverage` key — one record per story activity with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
+- The JSON report carries a top-level `coverage` key — one record per story sentence with `tracked` and the ids of the scenarios covering it — so story coverage can be read from a terminal instead of recomputed from the steps.
 - The documentation lives at <https://nwilbert.github.io/pytest-given/>; the README keeps the overview and quick start, and the bundled skills and the `--given-source-link` / `--source-link` help text point at the site.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.
 
 ### Changed
 
+- **Breaking.** `activity()` is now `sentence()`, `path()` is now `clause()`, and `Glossary.verb()` is now `Glossary.activity()`: rename the calls and imports.
+- **Breaking.** A file glossary's kind column says `activity` where it said `verb`.
+- **Breaking.** In the JSON report, `stories[].activities[]` is now `stories[].sentences[]` with `clauses` in place of `paths`, the term kind `"verb"` is now `"activity"`, and `coverage[].activity_id` is now `sentence_id`. Regenerate saved reports: `pytest-given report` rejects a `verb` kind.
+- **Breaking.** The report's `#activity-filter=` link parameter is now `#sentence-filter=`.
+- The HTML report says *Sentence* where it said *Activity*, and the Glossary view groups activity terms under *Activities* instead of *Verbs*.
 - The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.
 - The documentation site is set in Source Sans 3 and Source Code Pro.
 - The HTML report inlines its stylesheet and script without their source comments, which takes about 29 KB off every report; line numbers are preserved, so a browser stack trace still maps onto `app.js`.
-- Story coverage matches on glossary terms alone: an instance in an activity (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — activities that differed only by instance are no longer told apart by narration, only by an `activity=` pin.
-- The authoring skill's and README's glossary snippets keep generic verbs (*searches for*, *adds*) as bare activity strings instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.
+- Story coverage matches on glossary terms alone: an instance in a sentence (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — sentences that differed only by instance are no longer told apart by narration, only by an `activity=` pin.
+- The authoring skill's and README's glossary snippets keep generic verbs (*searches for*, *adds*) as bare strings in sentences instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.
 
 ### Fixed
 
@@ -52,7 +57,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
   scenario's narration with its test's source — and audits the rules the
   release notes announce. Both skills now flag alternation `match=` pins and a
   `when` that narrates arrangement while its body acts.
-- The authoring skill's `stories.md` spells out the directional instance rule of coverage matching (and its consequence: write activities with bare handles), that two activities with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's `coverage` key instead of reimplementing the rule.
+- The authoring skill's `stories.md` spells out the directional instance rule of coverage matching (and its consequence: write sentences with bare handles), that two sentences with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's `coverage` key instead of reimplementing the rule.
 
 ## [0.2.0] - 2026-09-04
 

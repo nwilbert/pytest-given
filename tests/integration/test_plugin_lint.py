@@ -416,7 +416,7 @@ def test_dead_term_opt_in_flags_unreferenced_term(pytester):
     result.stdout.fnmatch_lines(
         [
             "*WARN*dead-term*guest*term 'Guest' is referenced by no scenario name, "
-            'no step and no story activity*'
+            'no step and no story sentence*'
         ]
     )
 

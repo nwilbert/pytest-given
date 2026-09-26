@@ -5,7 +5,7 @@ Everything is a top-level export of `pytest_given`:
 ```python
 from pytest_given import (
     FileGlossary, Glossary, PytestGivenError, PytestGivenWarning, Template,
-    activity, attach, given, path, scenario, story, then, when, when_then,
+    attach, clause, given, scenario, sentence, story, then, when, when_then,
 )
 ```
 
@@ -13,7 +13,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 
 ## Core
 
-- **`@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term refs in the title). `story=` binds the scenario to a `story(...)` for coverage; `activities=` requires `story=` and narrows the scenario to those activity ids, so it can cover no others — an `int` or a sequence of them, never a string (`activities='13'` raises `TypeError` rather than becoming the ids 1 and 3). The decorated function is returned unwrapped, so it keeps its own signature.
+- **`@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term refs in the title). `story=` binds the scenario to a `story(...)` for coverage; `activities=` requires `story=` and narrows the scenario to those sentence ids, so it can cover no others — an `int` or a sequence of them, never a string (`activities='13'` raises `TypeError` rather than becoming the ids 1 and 3). The decorated function is returned unwrapped, so it keeps its own signature.
 - **`given(text)` / `when(text)` / `then(text)`** — dual-purpose:
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest within a phase (a `when` inside a `when`); crossing phases raises `PytestGivenError` — including a decorated helper of another phase called inside an open step.
   - **Fixture decorator** — `@given` only, with `@pytest.fixture` **outermost** (`@pytest.fixture` above `@given('…')`); the other order is rejected at decoration time, `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work, at any scope; recording steps after `yield` is not allowed.
@@ -47,17 +47,17 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Glossary
 
-- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.verb('book', …)`. Where to define `g`, and how `conftest.py` must bind it for the plugin to find it: [glossaries.md](glossaries.md).
+- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.activity('book', …)`. Where to define `g`, and how `conftest.py` must bind it for the plugin to find it: [glossaries.md](glossaries.md).
 - **File-backed**: `g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')` — needs at least one GFM pipe table; first column = term, second = description by default (`term_column=` / `description_column=` / `kind_column=` override, 0-based index or header name, case-insensitive).
 - **Handles in t-strings** render as kind-colored words with definition tooltips: `t'a {guest} {book("books")} a {room}'`. Three surface forms on every handle: **bare** `g['Room']`, **`.low`** `g['Room'].low`, and a **callable** override `g['borrow']('borrows')`. Which to pick: [glossaries.md](glossaries.md).
-- **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). On a code-defined glossary, `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied); on a `FileGlossary` the vocabulary is closed — `g('foo')` only looks up, and new terms are added as rows in the file. Both forms return handles usable in t-strings and activities.
-- An undeclared kind is inferred from story activity-slot positions (position 0 → actor, odd → verb, even ≥ 2 → work object); a term used only in steps stays kindless. A *declared* kind is instead checked against its slot when `activity(...)` is built, so a mismatch raises there. Collision rules: [glossaries.md](glossaries.md).
+- **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). On a code-defined glossary, `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied); on a `FileGlossary` the vocabulary is closed — `g('foo')` only looks up, and new terms are added as rows in the file. Both forms return handles usable in t-strings and sentences.
+- An undeclared kind is inferred from clause slot positions (position 0 → actor, odd → activity, even ≥ 2 → work object); a term used only in steps stays kindless. A *declared* kind is instead checked against its slot when `sentence(...)` is built, so a mismatch raises there. Collision rules: [glossaries.md](glossaries.md).
 - **One glossary per suite** — two distinct `Glossary` instances reaching the report raise `PytestGivenError`. Discovery (story tree first, then a `conftest.py` scan): [glossaries.md](glossaries.md).
 
 ## Stories
 
-- `story('Name', [activity(...), ...])` — a flow of `activity(actor, verb, work_object, ...)` rows, read left-to-right; parts may be bare strings, but an activity needs **two distinct glossary terms** to be matched by narration; under-anchored activities render as "not coverage-tracked" unless a step pins them. `path(...)` branches alternate sequences off a shared prefix. Activity ids are the rows' 1-based list positions unless a row fixes its own with `activity(..., activity_id=N)` (`activity_id=0` is the unset sentinel and raises); since `activity=` pins name those numbers, inserting a row renumbers the pins after it — see [stories.md](stories.md).
-- Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**, and `given(text, activity=3)` (a 1-based activity number or a sequence) pins a step to an activity regardless of its narration. The matching rule and what it costs you when authoring: [stories.md](stories.md).
+- `story('Name', [sentence(...), ...])` — a flow of `sentence(actor, activity, work_object, ...)` rows, read left-to-right; parts may be bare strings, but a sentence needs **two distinct glossary terms** to be matched by narration; under-anchored sentences render as "not coverage-tracked" unless a step pins them. A sentence with several arrow chains under one number takes one `clause(...)` per chain: `sentence(clause(...), clause(...))`. Sentence ids are the rows' 1-based list positions unless a row fixes its own with `sentence(..., activity_id=N)` (`activity_id=0` is the unset sentinel and raises); since `activity=` pins name those numbers, inserting a row renumbers the pins after it — see [stories.md](stories.md).
+- Bind a scenario with `@scenario(..., story=the_story)` — the only way a story reaches the report. Coverage matches **per step**, and `given(text, activity=3)` (a 1-based sentence number or a sequence) pins a step to a sentence regardless of its narration. The matching rule and what it costs you when authoring: [stories.md](stories.md).
 
 ## Verifying
 

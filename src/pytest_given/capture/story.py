@@ -1,17 +1,17 @@
-"""Story / Activity / Path constructors, and the glossary pin they carry."""
+"""Story / Sentence / Clause constructors, and the glossary pin they carry."""
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, replace
 
 from ..model import (
-    Activity,
-    ActivityId,
-    ActivityPart,
-    ActivityPath,
-    ActivityTermRef,
-    ActivityWord,
+    Clause,
+    ClausePart,
+    ClauseTermRef,
+    ClauseWord,
     Glossary,
     PytestGivenError,
+    Sentence,
+    SentenceId,
     SourceLocation,
     Story,
     StoryId,
@@ -23,7 +23,7 @@ from .source import capture_caller_source
 
 # What every slot accepts structurally: a glossary reference of some sort, or a
 # bare connective. Which *kind* fits a given position is `_check_position`'s.
-type _PathArg = TermRef | str
+type _ClauseArg = TermRef | str
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -45,12 +45,12 @@ class _Pinned:
 
 
 @dataclass(frozen=True, kw_only=True)
-class _PinnedPath(ActivityPath, _Pinned):
+class _PinnedClause(Clause, _Pinned):
     pass
 
 
 @dataclass(frozen=True, kw_only=True)
-class _PinnedActivity(Activity, _Pinned):
+class _PinnedSentence(Sentence, _Pinned):
     pass
 
 
@@ -62,78 +62,79 @@ class _PinnedStory(Story, _Pinned):
 def pinned_glossaries(node: object) -> frozenset[Glossary]:
     """The glossaries pinned on a story-tree node.
 
-    Empty for a node that did not come from `path()` / `activity()` /
+    Empty for a node that did not come from `clause()` / `sentence()` /
     `story()` — a deserialized report's, most of all, which carries its
     glossary as a serialized field instead.
     """
     return node._glossaries if isinstance(node, _Pinned) else frozenset()
 
 
-def path(*parts: _PathArg) -> ActivityPath:
-    """Build an ActivityPath as a node/edge alternation, so it maps directly
+def clause(*parts: _ClauseArg) -> Clause:
+    """Build a Clause as a node/edge alternation, so it maps directly
     onto a Domain Storytelling graph. Even positions (0, 2, ...) are entity
-    nodes (actor / work object); odd positions (1, 3, ...) are edges — a verb
-    handle or a bare-string connective. Position 0 is an actor, position 1 a
-    verb — but any position also accepts a bare string (an ActivityWord that
-    carries no role). The path has odd length >= 3 and ends on a node."""
+    nodes (actor / work object); odd positions (1, 3, ...) are edges — an
+    activity handle or a bare-string connective. Position 0 is an actor,
+    position 1 an activity — but any position also accepts a bare string (a
+    ClauseWord that carries no role). The clause has odd length >= 3 and ends
+    on a node."""
     if len(parts) < 3 or len(parts) % 2 == 0:
         raise PytestGivenError(
-            f'activity path must alternate node / edge / node … with an odd '
+            f'clause must alternate node / edge / node … with an odd '
             f'length >= 3 (it must start and end on an entity node); got '
             f'{len(parts)} part(s): {parts!r}. A trailing arrow with no target '
-            f'is not allowed — split multi-arrow activities into separate '
-            f'path(...) calls.'
+            f'is not allowed — split multi-arrow sentences into separate '
+            f'clause(...) calls.'
         )
     for position, part in enumerate(parts):
         if isinstance(part, str):
             continue  # a bare word carries no role; valid at any position
         _check_position(part, position, slot_for(position), parts)
     schema_parts = tuple(_to_part(part) for part in parts)
-    # Pin the live Glossary objects the path references; the enclosing activity
+    # Pin the live Glossary objects the clause references; the enclosing sentence
     # and story union them upwards, which is what enforces the v1 "one glossary
     # per story" invariant at construction time.
     glossaries = frozenset(
         owner for part in parts if (owner := _glossary_of(part)) is not None
     )
-    return _PinnedPath(parts=schema_parts, _glossaries=glossaries)
+    return _PinnedClause(parts=schema_parts, _glossaries=glossaries)
 
 
 def _glossary_of(value: object) -> Glossary | None:
     return value.glossary if isinstance(value, TermRef) else None
 
 
-def activity(
-    *parts_or_paths: _PathArg | ActivityPath,
+def sentence(
+    *parts_or_clauses: _ClauseArg | Clause,
     activity_id: int | None = None,
-) -> Activity:
-    """Build an Activity from either positional parts (single path) or
-    positional ActivityPath instances (multi-path). Mixing raises.
+) -> Sentence:
+    """Build a Sentence from either positional parts (single clause) or
+    positional Clause instances (multi-clause). Mixing raises.
 
     `activity_id=` overrides the default sequence number (0). `story(...)`
-    reassigns sequence numbers when activities are passed without explicit ids.
+    reassigns sequence numbers when sentences are passed without explicit ids.
     """
-    has_paths = any(isinstance(p, ActivityPath) for p in parts_or_paths)
-    has_parts = any(not isinstance(p, ActivityPath) for p in parts_or_paths)
-    if has_paths and has_parts:
+    has_clauses = any(isinstance(p, Clause) for p in parts_or_clauses)
+    has_parts = any(not isinstance(p, Clause) for p in parts_or_clauses)
+    if has_clauses and has_parts:
         raise PytestGivenError(
-            'activity(...) cannot mix ActivityPath instances with bare parts; '
-            'either pass parts (for a single path) or paths (for multi-path), '
+            'sentence(...) cannot mix Clause instances with bare parts; '
+            'either pass parts (for a single clause) or clauses (for multi-clause), '
             'not both.'
         )
-    if has_paths:
-        paths = tuple(p for p in parts_or_paths if isinstance(p, ActivityPath))
+    if has_clauses:
+        clauses = tuple(p for p in parts_or_clauses if isinstance(p, Clause))
     else:
-        paths = (path(*parts_or_paths),)  # type: ignore[arg-type]
-    glossaries = union_glossaries(pinned_glossaries(p) for p in paths)
+        clauses = (clause(*parts_or_clauses),)  # type: ignore[arg-type]
+    glossaries = union_glossaries(pinned_glossaries(p) for p in clauses)
     if activity_id == 0:
         raise PytestGivenError(
-            'activity(activity_id=0) is reserved as the unset sentinel; '
+            'sentence(activity_id=0) is reserved as the unset sentinel; '
             'use activity_id=1.. or omit to take the auto-assigned sequence '
             'number.'
         )
-    return _PinnedActivity(
-        id=ActivityId(activity_id if activity_id is not None else 0),
-        paths=paths,
+    return _PinnedSentence(
+        id=SentenceId(activity_id if activity_id is not None else 0),
+        clauses=clauses,
         _glossaries=glossaries,
     )
 
@@ -182,51 +183,51 @@ def _site_text(source: SourceLocation | None) -> str:
     return f'{source.relpath}:{source.line}'
 
 
-def story(title: str, activities: Sequence[Activity] = ()) -> Story:
+def story(title: str, sentences: Sequence[Sentence] = ()) -> Story:
     """Construct a Story. Reassigns auto-numbered ids, validates uniqueness,
     and enforces v1's single-glossary invariant."""
     sid = StoryId(id_derive(title))
     source = capture_caller_source()
     _register_story(sid, title, source)
-    numbered = _assign_sequence_numbers(tuple(activities))
+    numbered = _assign_sequence_numbers(tuple(sentences))
     _check_unique_ids(numbered)
     glossaries = union_glossaries(pinned_glossaries(a) for a in numbered)
     _check_single_glossary(title, glossaries)
     return _PinnedStory(
         id=sid,
         title=title,
-        activities=numbered,
+        sentences=numbered,
         source=source,
         _glossaries=glossaries,
     )
 
 
 def _assign_sequence_numbers(
-    activities: tuple[Activity, ...],
-) -> tuple[Activity, ...]:
-    """Activities passed with id=0 (the unset sentinel) get sequential ids
-    skipping any explicit ids already taken; activities with an explicit id
+    sentences: tuple[Sentence, ...],
+) -> tuple[Sentence, ...]:
+    """Sentences passed with id=0 (the unset sentinel) get sequential ids
+    skipping any explicit ids already taken; sentences with an explicit id
     keep theirs."""
-    taken: set[ActivityId] = {a.id for a in activities if a.id != 0}
-    out: list[Activity] = []
+    taken: set[SentenceId] = {a.id for a in sentences if a.id != 0}
+    out: list[Sentence] = []
     next_seq = 1
-    for a in activities:
+    for a in sentences:
         if a.id != 0:
             out.append(a)
             continue
-        while ActivityId(next_seq) in taken:
+        while SentenceId(next_seq) in taken:
             next_seq += 1
-        out.append(replace(a, id=ActivityId(next_seq)))
+        out.append(replace(a, id=SentenceId(next_seq)))
         next_seq += 1
     return tuple(out)
 
 
-def _check_unique_ids(activities: tuple[Activity, ...]) -> None:
-    seen: set[ActivityId] = set()
-    for a in activities:
+def _check_unique_ids(sentences: tuple[Sentence, ...]) -> None:
+    seen: set[SentenceId] = set()
+    for a in sentences:
         if a.id in seen:
             raise PytestGivenError(
-                f'duplicate activity id {a.id} in story; activity ids must be unique.'
+                f'duplicate sentence id {a.id} in story; sentence ids must be unique.'
             )
         seen.add(a.id)
 
@@ -239,7 +240,11 @@ def _check_single_glossary(title: str, glossaries: frozenset[Glossary]) -> None:
         )
 
 
-_KIND_LABEL = {'actor': 'an actor', 'object': 'a work object', 'verb': 'a verb'}
+_KIND_LABEL = {
+    'actor': 'an actor',
+    'object': 'a work object',
+    'activity': 'an activity',
+}
 
 # The slot itself, phrased for the message ('must be …').
 _ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
@@ -249,8 +254,8 @@ def _term_name(value: object) -> str:
     return value.term.canonical if isinstance(value, TermRef) else type(value).__name__
 
 
-def _render_path(parts: tuple[object, ...]) -> str:
-    """The offending path as names, so the message keeps its context without
+def _render_clause(parts: tuple[object, ...]) -> str:
+    """The offending clause as names, so the message keeps its context without
     dumping handle reprs (each of which embeds the whole Glossary)."""
     return ' → '.join(
         part if isinstance(part, str) else _term_name(part) for part in parts
@@ -279,8 +284,8 @@ def _check_position(
     else:
         problem = f'got {type(value).__name__}'
     raise PytestGivenError(
-        f'activity path position {pos} must be {_ROLE_LABEL[role]}: {problem}. '
-        f'{_suggestion_for(role)} Path: {_render_path(full_parts)}.'
+        f'clause position {pos} must be {_ROLE_LABEL[role]}: {problem}. '
+        f'{_suggestion_for(role)} Clause: {_render_clause(full_parts)}.'
     )
 
 
@@ -288,20 +293,20 @@ def _suggestion_for(role: Slot) -> str:
     if role == 'actor':
         return (
             'Position 0 is the actor node — pass an actor handle '
-            '(g.actor("…") / g("…")) or a bare string, not a work object or verb.'
+            '(g.actor("…") / g("…")) or a bare string, not a work object or activity.'
         )
     if role == 'verb':
         return (
-            'An edge takes a verb handle (g.verb("…") / g("…")) or a bare '
+            'An edge takes an activity handle (g.activity("…") / g("…")) or a bare '
             'connective string, not an actor or work object.'
         )
     return (
         'A node takes an actor or work-object handle (g.work_object("…") / '
-        'g("…")) or a bare string, not a verb.'
+        'g("…")) or a bare string, not an activity.'
     )
 
 
-def _to_part(value: _PathArg) -> ActivityPart:
+def _to_part(value: _ClauseArg) -> ClausePart:
     if isinstance(value, TermRef):
-        return ActivityTermRef(term_id=value.id, display=value.display)
-    return ActivityWord(text=value)
+        return ClauseTermRef(term_id=value.id, display=value.display)
+    return ClauseWord(text=value)

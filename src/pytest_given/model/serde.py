@@ -19,16 +19,14 @@ from .errors import PytestGivenError
 from .schema import (
     CONTENT_TYPES,
     PHASES,
-    Activity,
-    ActivityId,
-    ActivityPart,
-    ActivityPath,
-    ActivityTermRef,
-    ActivityWord,
     Attachment,
     AttachmentLabel,
     AttachmentRef,
     CellValue,
+    Clause,
+    ClausePart,
+    ClauseTermRef,
+    ClauseWord,
     ColumnId,
     ColumnKind,
     ErrorInfo,
@@ -47,6 +45,8 @@ from .schema import (
     ParameterTable,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     SourceLocation,
     Status,
     Step,
@@ -142,31 +142,31 @@ def _story_from_dict(d: dict[str, Any]) -> Story:
     return Story(
         id=StoryId(d['id']),
         title=d['title'],
-        activities=tuple(_activity_from_dict(a) for a in d.get('activities', [])),
+        sentences=tuple(_sentence_from_dict(a) for a in d.get('sentences', [])),
         source=_source_from_dict(d.get('source')),
     )
 
 
-def _activity_from_dict(d: dict[str, Any]) -> Activity:
-    return Activity(
-        id=ActivityId(d['id']),
-        paths=tuple(_activity_path_from_dict(p) for p in d.get('paths', [])),
+def _sentence_from_dict(d: dict[str, Any]) -> Sentence:
+    return Sentence(
+        id=SentenceId(d['id']),
+        clauses=tuple(_clause_from_dict(p) for p in d.get('clauses', [])),
     )
 
 
-def _activity_path_from_dict(d: dict[str, Any]) -> ActivityPath:
-    return ActivityPath(
-        parts=tuple(_activity_part_from_dict(p) for p in d.get('parts', [])),
+def _clause_from_dict(d: dict[str, Any]) -> Clause:
+    return Clause(
+        parts=tuple(_clause_part_from_dict(p) for p in d.get('parts', [])),
     )
 
 
-def _activity_part_from_dict(d: dict[str, Any]) -> ActivityPart:
+def _clause_part_from_dict(d: dict[str, Any]) -> ClausePart:
     if 'term_id' in d:
-        return ActivityTermRef(term_id=TermId(d['term_id']), display=d['display'])
+        return ClauseTermRef(term_id=TermId(d['term_id']), display=d['display'])
     if 'text' in d:
-        return ActivityWord(text=d['text'])
+        return ClauseWord(text=d['text'])
     raise PytestGivenError(
-        f'unknown ActivityPart shape (keys: {sorted(d)!r}). Expected one of '
+        f'unknown ClausePart shape (keys: {sorted(d)!r}). Expected one of '
         '"term_id", "text".'
     )
 
@@ -186,7 +186,7 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         skip_reason=d.get('skip_reason'),
         source=_source_from_dict(d.get('source')),
         story_id=StoryId(d['story_id']) if d.get('story_id') else None,
-        activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
+        activity_ids=tuple(SentenceId(i) for i in d.get('activity_ids') or ()),
     )
 
 
@@ -203,7 +203,7 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         narration=_narration_from_dict(d['narration']),
         children=[_step_from_dict(c) for c in d.get('children', [])],
         attachments=[_step_attachment_from_dict(a) for a in d.get('attachments', [])],
-        activity_ids=tuple(ActivityId(i) for i in d.get('activity_ids') or ()),
+        activity_ids=tuple(SentenceId(i) for i in d.get('activity_ids') or ()),
         fixture_name=d.get('fixture_name'),
     )
 
@@ -286,7 +286,7 @@ def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
 # alias needs the alias object at runtime, and one list per alphabet is
 # cheaper to read than the indirection.
 _STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped')
-_TERM_KINDS: tuple[TermKind, ...] = ('actor', 'object', 'verb')
+_TERM_KINDS: tuple[TermKind, ...] = ('actor', 'object', 'activity')
 _COLUMN_KINDS: tuple[ColumnKind, ...] = ('param', 'derived', 'attachment')
 
 

@@ -3,11 +3,9 @@ the tab visibility the report shell derives."""
 
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPath,
-    ActivityTermRef,
-    ActivityWord,
+    Clause,
+    ClauseTermRef,
+    ClauseWord,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -16,6 +14,8 @@ from pytest_given.model import (
     NodeId,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     Step,
     Story,
     StoryId,
@@ -24,25 +24,25 @@ from pytest_given.model import (
 from pytest_given.report.coverage import build_coverage_map
 from pytest_given.report.html_renderer import TabVisibility, tab_visibility
 from pytest_given.report.story_view import (
-    build_activity_labels,
+    build_sentence_labels,
     build_story_rollups,
 )
 from tests.ubiquitous_language import pg
 
 
-def _ent(tid: str, display: str) -> ActivityTermRef:
-    return ActivityTermRef(term_id=TermId(tid), display=display)
+def _ent(tid: str, display: str) -> ClauseTermRef:
+    return ClauseTermRef(term_id=TermId(tid), display=display)
 
 
-def _verb_part(tid: str) -> ActivityTermRef:
-    return ActivityTermRef(term_id=TermId(tid), display=tid)
+def _activity_part(tid: str) -> ClauseTermRef:
+    return ClauseTermRef(term_id=TermId(tid), display=tid)
 
 
 def _g() -> Glossary:
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
     return g
 
 
@@ -57,19 +57,19 @@ def test_tab_visibility_only_scenarios_visible_with_empty_report() -> None:
 
 
 def test_tab_visibility_stories_visible_when_stories_non_empty() -> None:
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
+    a = Sentence(
+        id=SentenceId(1),
+        clauses=(
+            Clause(
                 parts=(
                     _ent('guest', 'Guest'),
-                    _verb_part('search'),
+                    _activity_part('search'),
                     _ent('room', 'Room'),
                 )
             ),
         ),
     )
-    s = Story(id=StoryId('s'), title='S', activities=(a,))
+    s = Story(id=StoryId('s'), title='S', sentences=(a,))
     rd = ReportData(metadata=_meta(), stories=[s])
     assert tab_visibility(rd).stories is True
 
@@ -86,19 +86,19 @@ def test_tab_visibility_glossary_hidden_when_glossary_is_empty() -> None:
 
 def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
     g = _g()
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
+    a = Sentence(
+        id=SentenceId(1),
+        clauses=(
+            Clause(
                 parts=(
                     _ent('guest', 'Guest'),
-                    _verb_part('search'),
+                    _activity_part('search'),
                     _ent('room', 'Room'),
                 )
             ),
         ),
     )
-    story = Story(id=StoryId('book'), title='Book', activities=(a,))
+    story = Story(id=StoryId('book'), title='Book', sentences=(a,))
     step = Step(
         phase='when',
         narration=Narration(
@@ -119,7 +119,7 @@ def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     maps = build_coverage_map(rd)
-    assert ActivityId(1) in maps[NodeId('test::x')]
+    assert SentenceId(1) in maps[NodeId('test::x')]
 
 
 def test_build_coverage_maps_empty_for_scenario_without_story() -> None:
@@ -163,70 +163,70 @@ def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
 
 
 @scenario(
-    t'An under-anchored {pg["Activity"].low} is flagged ineligible in rollups',
+    t'An under-anchored {pg["Sentence"].low} is flagged ineligible in rollups',
 )
-def test_build_story_rollups_flags_under_anchored_activity_ineligible() -> None:
+def test_build_story_rollups_flags_under_anchored_sentence_ineligible() -> None:
     with given(
-        t'a {pg["Story"]} with an anchored and an under-anchored {pg["Activity"]}'
+        t'a {pg["Story"]} with an anchored and an under-anchored {pg["Sentence"]}'
     ):
         g = _g()
-        eligible = Activity(
-            id=ActivityId(1),
-            paths=(
-                ActivityPath(
+        eligible = Sentence(
+            id=SentenceId(1),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        _verb_part('search'),
+                        _activity_part('search'),
                         _ent('room', 'Room'),
                     )
                 ),
             ),
         )
-        under_anchored = Activity(
-            id=ActivityId(2),
-            paths=(
-                ActivityPath(
+        under_anchored = Sentence(
+            id=SentenceId(2),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        ActivityWord(text='browses'),
-                        ActivityWord(text='listings'),
+                        ClauseWord(text='browses'),
+                        ClauseWord(text='listings'),
                     )
                 ),
             ),
         )
         story = Story(
-            id=StoryId('book'), title='Book', activities=(eligible, under_anchored)
+            id=StoryId('book'), title='Book', sentences=(eligible, under_anchored)
         )
         rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
     with when('the story rollups are built'):
         rollups = build_story_rollups(rd, build_coverage_map(rd))
-    with then(t'only the anchored {pg["Activity"]} is {pg["Coverage"]}-eligible'):
-        per_activity = rollups[StoryId('book')].per_activity
-        assert per_activity[ActivityId(1)].eligible is True
-        assert per_activity[ActivityId(2)].eligible is False
+    with then(t'only the anchored {pg["Sentence"]} is {pg["Coverage"]}-eligible'):
+        per_sentence = rollups[StoryId('book')].per_sentence
+        assert per_sentence[SentenceId(1)].eligible is True
+        assert per_sentence[SentenceId(2)].eligible is False
 
 
 @scenario(
-    t'A pinned under-anchored {pg["Activity"].low} stops reading as untracked',
+    t'A pinned under-anchored {pg["Sentence"].low} stops reading as untracked',
 )
-def test_build_story_rollups_pinned_under_anchored_activity_is_tracked() -> None:
+def test_build_story_rollups_pinned_under_anchored_sentence_is_tracked() -> None:
     """`untracked` is what the timeline renders as '—'. An under-anchored
-    activity earns it only while nothing pins it."""
-    with given(t'a {pg["Story"]} whose only {pg["Activity"]} is under-anchored'):
+    sentence earns it only while nothing pins it."""
+    with given(t'a {pg["Story"]} whose only {pg["Sentence"]} is under-anchored'):
         g = _g()
-        under_anchored = Activity(
-            id=ActivityId(1),
-            paths=(
-                ActivityPath(
+        under_anchored = Sentence(
+            id=SentenceId(1),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        ActivityWord(text='browses'),
-                        ActivityWord(text='listings'),
+                        ClauseWord(text='browses'),
+                        ClauseWord(text='listings'),
                     )
                 ),
             ),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(under_anchored,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(under_anchored,))
     with given(t'a {pg["Scenario"]} whose {pg["Step"].low} pins it by id'):
         pinned = Scenario(
             id=NodeId('test::a'),
@@ -238,7 +238,7 @@ def test_build_story_rollups_pinned_under_anchored_activity_is_tracked() -> None
                 Step(
                     phase='when',
                     narration=Narration(text='the listing page is opened'),
-                    activity_ids=[ActivityId(1)],
+                    activity_ids=[SentenceId(1)],
                 )
             ],
         )
@@ -248,7 +248,7 @@ def test_build_story_rollups_pinned_under_anchored_activity_is_tracked() -> None
     with when('the story rollups are built'):
         rollups = build_story_rollups(rd, build_coverage_map(rd))
     with then(t'it stays narration-ineligible but is no longer untracked'):
-        cov = rollups[StoryId('book')].per_activity[ActivityId(1)]
+        cov = rollups[StoryId('book')].per_sentence[SentenceId(1)]
         assert cov.eligible is False
         assert cov.total == 1
         assert cov.untracked is False
@@ -256,7 +256,7 @@ def test_build_story_rollups_pinned_under_anchored_activity_is_tracked() -> None
 
 def _covering_scn(node_id: str, status: str) -> Scenario:
     """A scenario whose single step references guest/search/room, so it covers
-    the guest-search-room activity used across the rollup-count tests."""
+    the guest-search-room sentence used across the rollup-count tests."""
     step = Step(
         phase='when',
         narration=Narration(
@@ -280,19 +280,19 @@ def _covering_scn(node_id: str, status: str) -> Scenario:
 
 def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
     g = _g()
-    activity = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
+    sentence = Sentence(
+        id=SentenceId(1),
+        clauses=(
+            Clause(
                 parts=(
                     _ent('guest', 'Guest'),
-                    _verb_part('search'),
+                    _activity_part('search'),
                     _ent('room', 'Room'),
                 )
             ),
         ),
     )
-    story = Story(id=StoryId('book'), title='Book', activities=(activity,))
+    story = Story(id=StoryId('book'), title='Book', sentences=(sentence,))
     scns = [
         _covering_scn('test::a', 'passed'),
         _covering_scn('test::b', 'passed'),
@@ -301,7 +301,7 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
     ]
     rd = ReportData(metadata=_meta(), scenarios=scns, stories=[story], glossary=g)
     rollups = build_story_rollups(rd, build_coverage_map(rd))
-    cov = rollups[StoryId('book')].per_activity[ActivityId(1)]
+    cov = rollups[StoryId('book')].per_sentence[SentenceId(1)]
     assert cov.total == 4
     assert cov.passed == 2
     assert cov.failed == 1
@@ -309,56 +309,56 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
 
 
 @scenario(
-    t'An {pg["Activity"]} is labeled by the prose of its {pg["Path"]("paths")}',
+    t'A {pg["Sentence"]} is labeled by the prose of its {pg["Clause"]("clauses")}',
 )
-def test_build_activity_labels_joins_parts_into_prose() -> None:
-    with given(t'a {pg["Story"]} with a two-{pg["Path"].low} {pg["Activity"].low}'):
-        activity = Activity(
-            id=ActivityId(3),
-            paths=(
-                ActivityPath(
+def test_build_sentence_labels_joins_parts_into_prose() -> None:
+    with given(t'a {pg["Story"]} with a two-{pg["Clause"].low} {pg["Sentence"].low}'):
+        sentence = Sentence(
+            id=SentenceId(3),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Carol'),
-                        _verb_part('search'),
-                        ActivityWord(text='for'),
+                        _activity_part('search'),
+                        ClauseWord(text='for'),
                         _ent('room', 'Room'),
                     )
                 ),
-                ActivityPath(parts=(_ent('guest', 'Bob'), _verb_part('search'))),
+                Clause(parts=(_ent('guest', 'Bob'), _activity_part('search'))),
             ),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(activity,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(sentence,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=_g())
-    with when(t'the {pg["Activity"].low} labels are built'):
-        labels = build_activity_labels(rd)
+    with when(t'the {pg["Sentence"].low} labels are built'):
+        labels = build_sentence_labels(rd)
     with then(
         t'the label reads as prose under a story-scoped key, '
-        t'with the {pg["Path"].low} texts joined'
+        t'with the {pg["Clause"].low} texts joined'
     ):
         assert labels == {'book:3': 'Carol search for Room · Bob search'}
 
 
-def test_build_activity_labels_keys_same_numbered_activities_per_story() -> None:
-    """Activity ids are per-story ints: two stories both have an activity 1, so
+def test_build_sentence_labels_keys_same_numbered_sentences_per_story() -> None:
+    """Sentence ids are per-story ints: two stories both have a sentence 1, so
     the key has to carry the story id to keep them apart."""
-    parts = (_ent('guest', 'Guest'), _verb_part('search'))
+    parts = (_ent('guest', 'Guest'), _activity_part('search'))
     first = Story(
         id=StoryId('book'),
         title='Book',
-        activities=(Activity(id=ActivityId(1), paths=(ActivityPath(parts=parts),)),),
+        sentences=(Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),)),),
     )
     second = Story(
         id=StoryId('cancel'),
         title='Cancel',
-        activities=(
-            Activity(
-                id=ActivityId(1),
-                paths=(
-                    ActivityPath(parts=(_ent('guest', 'Guest'), _verb_part('cancel'))),
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(
+                    Clause(parts=(_ent('guest', 'Guest'), _activity_part('cancel'))),
                 ),
             ),
         ),
     )
     rd = ReportData(metadata=_meta(), stories=[first, second], glossary=_g())
-    labels = build_activity_labels(rd)
+    labels = build_sentence_labels(rd)
     assert labels == {'book:1': 'Guest search', 'cancel:1': 'Guest cancel'}

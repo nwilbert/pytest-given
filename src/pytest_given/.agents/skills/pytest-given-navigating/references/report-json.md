@@ -7,7 +7,7 @@ metadata      project, title, timestamp, pytest_version, plugin_version, commit_
 scenarios[]   one entry per @scenario (parametrized cases grouped into one)
 glossary      {terms: [...]} — every declared term, referenced or not; null on a suite with no glossary
 stories[]     one entry per story(...)
-coverage[]    one entry per story activity — which scenarios cover it
+coverage[]    one entry per story sentence — which scenarios cover it
 ```
 
 ## Scenario
@@ -50,15 +50,15 @@ Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`La
 
 ## Glossary term
 
-`{id, kind, canonical, definition, source}` — `kind` is `actor` / `verb` / `object`, or `null` for kindless terms.
+`{id, kind, canonical, definition, source}` — `kind` is `actor` / `activity` / `object`, or `null` for kindless terms.
 
 ## Story
 
-`{id, title, activities: [{id, paths: [{parts: [...]}]}], source}` — activity ids are what `activity_ids` on scenarios and steps point at. An activity part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
+`{id, title, sentences: [{id, clauses: [{parts: [...]}]}], source}` — sentence ids are what `activity_ids` on scenarios and steps point at. A clause part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
 
 ## Coverage
 
-`{story_id, activity_id, tracked, scenario_ids: [...]}` — the same per-activity coverage the Stories tab renders, one record per activity of every story, in story then activity order. `scenario_ids` are the node ids of the scenarios covering the activity; `tracked: false` marks an activity the report can say nothing about (fewer than two glossary terms and no `activity=` pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the rule is per step, gated by the two-term eligibility, with pins replacing narration — reimplementing it gets the answer wrong.
+`{story_id, sentence_id, tracked, scenario_ids: [...]}` — the same per-sentence coverage the Stories tab renders, one record per sentence of every story, in story then sentence order. `scenario_ids` are the node ids of the scenarios covering the sentence; `tracked: false` marks a sentence the report can say nothing about (fewer than two glossary terms and no `activity=` pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the rule is per step, gated by the two-term eligibility, with pins replacing narration — reimplementing it gets the answer wrong.
 
 ## Recipes
 
@@ -87,12 +87,12 @@ jq -r '.scenarios[] | select(.tags | any(startswith("ticket/"))) | .narration.te
 # Scenarios implementing a story
 jq -r '.scenarios[] | select(.story_id == "lend-and-return-a-book") | .narration.text' report.json
 
-# Uncovered activities (tracked ones no scenario covers), as story#activity
+# Uncovered sentences (tracked ones no scenario covers), as story#sentence
 jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
-       | .story_id + "#" + (.activity_id|tostring)' report.json
+       | .story_id + "#" + (.sentence_id|tostring)' report.json
 
-# Which scenarios cover one activity
-jq -r '.coverage[] | select(.story_id == "lend-and-return-a-book" and .activity_id == 3)
+# Which scenarios cover one sentence
+jq -r '.coverage[] | select(.story_id == "lend-and-return-a-book" and .sentence_id == 3)
        | .scenario_ids[]' report.json
 
 # Every term with its definition

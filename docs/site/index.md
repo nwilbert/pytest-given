@@ -30,7 +30,7 @@ Live examples:
 
 - **[Coffeeshop report](examples/coffeeshop.html){ target=_blank }**: tour of the core features, including `Annotated` `given` labels.
 - **[Hotel-booking report](examples/hotel-booking.html){ target=_blank }**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
-- **[File-glossary report](examples/file-glossary-booking.html){ target=_blank }**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
+- **[File-glossary report](examples/file-glossary-booking.html){ target=_blank }**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story sentences.
 - **[Self-report](examples/self-report.html){ target=_blank }**: pytest-given run against its own test suite (dogfooding).
 
 ## Why pytest-given?

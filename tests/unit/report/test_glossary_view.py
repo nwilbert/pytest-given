@@ -2,10 +2,8 @@
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPath,
-    ActivityTermRef,
+    Clause,
+    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -15,6 +13,8 @@ from pytest_given.model import (
     NodeId,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     Step,
     Story,
     StoryId,
@@ -25,19 +25,19 @@ from pytest_given.report.glossary_view import build_term_crossrefs
 from tests.ubiquitous_language import pg
 
 
-def _ent(tid: str, display: str) -> ActivityTermRef:
-    return ActivityTermRef(term_id=TermId(tid), display=display)
+def _ent(tid: str, display: str) -> ClauseTermRef:
+    return ClauseTermRef(term_id=TermId(tid), display=display)
 
 
-def _verb_part(tid: str) -> ActivityTermRef:
-    return ActivityTermRef(term_id=TermId(tid), display=tid)
+def _activity_part(tid: str) -> ClauseTermRef:
+    return ClauseTermRef(term_id=TermId(tid), display=tid)
 
 
 def _g() -> Glossary:
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
     return g
 
 
@@ -52,7 +52,7 @@ def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
 
 @scenario(
     t'The {pg["Glossary"].low} view aggregates {pg["Instance"]("instances")} '
-    t'and {pg["Verb"].low} forms',
+    t'and {pg["Activity"].low} forms',
 )
 def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
     with given(
@@ -60,21 +60,19 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
         t'entity {pg["Instance"]}s and an {pg["Inflection"]}'
     ):
         g = _g()
-        a = Activity(
-            id=ActivityId(1),
-            paths=(
-                ActivityPath(
+        a = Sentence(
+            id=SentenceId(1),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Alice'),
-                        ActivityTermRef(
-                            term_id=TermId('search'), display='searches for'
-                        ),
+                        ClauseTermRef(term_id=TermId('search'), display='searches for'),
                         _ent('room', 'Deluxe Suite'),
                     )
                 ),
             ),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         step = Step(
             phase='when',
             narration=Narration(
@@ -100,7 +98,9 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
     with then(t'the entity terms collect their {pg["Instance"]}s'):
         assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
         assert 'Deluxe Suite' in [i.display for i in aggs[TermId('room')].instances]
-    with then(t'the verb collects its {pg["Inflection"]} but not its canonical form'):
+    with then(
+        t'the activity collects its {pg["Inflection"]} but not its canonical form'
+    ):
         forms = list(aggs[TermId('search')].forms)
         assert 'searches for' in forms
         assert 'search' not in forms
@@ -151,31 +151,31 @@ def test_build_glossary_aggregations_walks_nested_steps() -> None:
 
 
 @scenario(
-    t'{pg["Term"]("Terms")} referenced by an {pg["Activity"].low} record '
+    t'{pg["Term"]("Terms")} referenced by a {pg["Sentence"].low} record '
     t'the {pg["Story"].low}',
 )
-def test_build_glossary_aggregations_records_story_refs_via_activities() -> None:
+def test_build_glossary_aggregations_records_story_refs_via_sentences() -> None:
     with given(
-        t'a {pg["Story"]} whose {pg["Activity"]} references an actor and a verb'
+        t'a {pg["Story"]} whose {pg["Sentence"]} references an actor and an activity'
     ):
         g = _g()
-        a = Activity(
-            id=ActivityId(1),
-            paths=(
-                ActivityPath(
+        a = Sentence(
+            id=SentenceId(1),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        _verb_part('search'),
+                        _activity_part('search'),
                         _ent('room', 'Room'),
                     )
                 ),
             ),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'the actor and the verb each list that {pg["Story"]}'):
+    with then(t'the actor and the activity each list that {pg["Story"]}'):
         assert aggs[TermId('guest')].stories == [StoryId('book')]
         assert aggs[TermId('search')].stories == [StoryId('book')]
 
@@ -185,21 +185,21 @@ def test_build_glossary_aggregations_records_story_refs_via_activities() -> None
 )
 def test_repeated_references_within_one_story_are_recorded_once() -> None:
     with given(
-        t'a {pg["Story"]} whose two {pg["Activity"]("activities")} repeat the '
+        t'a {pg["Story"]} whose two {pg["Sentence"]("sentences")} repeat the '
         t'same {pg["Term"]} and the same {pg["Inflection"]}'
     ):
         g = _g()
         parts = (
             _ent('guest', 'Guest'),
-            ActivityTermRef(term_id=TermId('search'), display='searches for'),
+            ClauseTermRef(term_id=TermId('search'), display='searches for'),
             _ent('room', 'Room'),
         )
         story = Story(
             id=StoryId('book'),
             title='Book',
-            activities=(
-                Activity(id=ActivityId(1), paths=(ActivityPath(parts=parts),)),
-                Activity(id=ActivityId(2), paths=(ActivityPath(parts=parts),)),
+            sentences=(
+                Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),)),
+                Sentence(id=SentenceId(2), clauses=(Clause(parts=parts),)),
             ),
         )
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
@@ -210,9 +210,11 @@ def test_repeated_references_within_one_story_are_recorded_once() -> None:
         assert list(aggs[TermId('search')].forms) == ['searches for']
 
 
-def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() -> None:
-    """A verb NarrationTermRef in a scenario step is skipped for instance
-    collection (verbs have no instances, only forms from activity paths)."""
+def test_build_glossary_aggregations_activity_in_step_not_collected_as_instance() -> (
+    None
+):
+    """An activity NarrationTermRef in a scenario step is skipped for instance
+    collection (activities have no instances, only forms from clauses)."""
     g = _g()
     step = Step(
         phase='when',
@@ -229,7 +231,7 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     aggs = build_term_crossrefs(rd).aggregations
-    # Verb terms from scenario steps are not added to aggs as instances.
+    # Activity terms from scenario steps are not added to aggs as instances.
     assert TermId('search') not in aggs
 
 
@@ -238,25 +240,23 @@ def test_build_glossary_aggregations_verb_in_step_not_collected_as_instance() ->
 )
 def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
     with given(
-        t'a {pg["Story"]} activity referencing entities by canonical name, '
+        t'a {pg["Story"]} sentence referencing entities by canonical name, '
         t'and a {pg["Step"]} referencing one in lowercase'
     ):
         g = _g()
-        a = Activity(
-            id=ActivityId(1),
-            paths=(
-                ActivityPath(
+        a = Sentence(
+            id=SentenceId(1),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        ActivityTermRef(
-                            term_id=TermId('search'), display='searches for'
-                        ),
+                        ClauseTermRef(term_id=TermId('search'), display='searches for'),
                         _ent('room', 'Room'),
                     )
                 ),
             ),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         step = Step(
             phase='when',
             narration=Narration(
@@ -300,20 +300,20 @@ def test_build_glossary_aggregations_skips_non_term_ref_narration_parts() -> Non
     assert aggs == {}
 
 
-def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> None:
-    """An ActivityTermRef whose term_id isn't in the glossary is silently skipped."""
+def test_build_glossary_aggregations_skips_unknown_term_ref_in_sentence() -> None:
+    """An ClauseTermRef whose term_id isn't in the glossary is silently skipped."""
     g = _g()
-    a = Activity(
-        id=ActivityId(1),
-        paths=(
-            ActivityPath(
+    a = Sentence(
+        id=SentenceId(1),
+        clauses=(
+            Clause(
                 parts=(
-                    ActivityTermRef(term_id=TermId('unknown-term'), display='Unknown'),
+                    ClauseTermRef(term_id=TermId('unknown-term'), display='Unknown'),
                 )
             ),
         ),
     )
-    story = Story(id=StoryId('s'), title='S', activities=(a,))
+    story = Story(id=StoryId('s'), title='S', sentences=(a,))
     rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     aggs = build_term_crossrefs(rd).aggregations
     assert TermId('unknown-term') not in aggs
@@ -324,16 +324,16 @@ def test_build_glossary_aggregations_skips_unknown_term_ref_in_activity() -> Non
 )
 def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> None:
     with given(
-        t'a {pg["Kindless"]} {pg["Term"]} referenced by a {pg["Story"]} activity'
+        t'a {pg["Kindless"]} {pg["Term"]} referenced by a {pg["Story"]} sentence'
     ):
         g = _g()
         g.register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
-        kindless_part = ActivityTermRef(term_id=TermId('widget'), display='My Widget')
-        a = Activity(
-            id=ActivityId(1),
-            paths=(ActivityPath(parts=(kindless_part,)),),
+        kindless_part = ClauseTermRef(term_id=TermId('widget'), display='My Widget')
+        a = Sentence(
+            id=SentenceId(1),
+            clauses=(Clause(parts=(kindless_part,)),),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
@@ -349,7 +349,7 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
         assert widget_agg.instances == [], (
             'kindless term must not produce an entity instance'
         )
-        assert widget_agg.forms == [], 'kindless term must not produce a verb form'
+        assert widget_agg.forms == [], 'kindless term must not produce an activity form'
 
 
 @scenario(
@@ -384,19 +384,19 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
             steps=[fixture_step, body_step],
             story_id=StoryId('book'),
         )
-        a = Activity(
-            id=ActivityId(1),
-            paths=(
-                ActivityPath(
+        a = Sentence(
+            id=SentenceId(1),
+            clauses=(
+                Clause(
                     parts=(
                         _ent('guest', 'Guest'),
-                        _verb_part('search'),
+                        _activity_part('search'),
                         _ent('room', 'Room'),
                     )
                 ),
             ),
         )
-        story = Story(id=StoryId('book'), title='Book', activities=(a,))
+        story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations

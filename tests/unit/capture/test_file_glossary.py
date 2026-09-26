@@ -3,8 +3,8 @@ import pytest
 from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.file_glossary import FileGlossary
 from pytest_given.capture.glossary import TermHandle
-from pytest_given.capture.story import activity
-from pytest_given.model import ActivityTermRef, Glossary, PytestGivenError, TermId
+from pytest_given.capture.story import sentence
+from pytest_given.model import ClauseTermRef, Glossary, PytestGivenError, TermId
 from tests.ubiquitous_language import pg
 
 GLOSSARY_MD = """# Glossary
@@ -86,19 +86,19 @@ def test_unknown_name_raises_with_suggestion(glossary_file):
 
 
 @scenario(
-    t'Handles are usable inline in an {pg["Activity"].low}',
+    t'Handles are usable inline in a {pg["Sentence"].low}',
 )
-def test_usable_inline_in_activity(glossary_file):
+def test_usable_inline_in_sentence(glossary_file):
     with given(t'a {pg["File glossary"]} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
-    with when(t'its handles build an {pg["Activity"]}'):
-        built = activity(glossary['Guest'], glossary['search'], glossary['Room'])
+    with when(t'its handles build a {pg["Sentence"]}'):
+        built = sentence(glossary['Guest'], glossary['search'], glossary['Room'])
     with then(t'each slot becomes a {pg["Term ref"]}'):
-        parts = built.paths[0].parts
-        assert parts[0] == ActivityTermRef(term_id='guest', display='Guest')
-        assert parts[1] == ActivityTermRef(term_id='search', display='search')
-        assert parts[2] == ActivityTermRef(term_id='room', display='Room')
+        parts = built.clauses[0].parts
+        assert parts[0] == ClauseTermRef(term_id='guest', display='Guest')
+        assert parts[1] == ClauseTermRef(term_id='search', display='search')
+        assert parts[2] == ClauseTermRef(term_id='room', display='Room')
 
 
 @scenario(
@@ -109,13 +109,13 @@ def test_call_overrides_display(glossary_file):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with when(t'a handle is called to name an {pg["Instance"]}'):
-        built = activity(
+        built = sentence(
             glossary['Guest']('Carol'),
             glossary['search']('searches for'),
             glossary['Room'],
         )
     with then(t'the {pg["Term ref"]} carries the overridden display'):
-        assert built.paths[0].parts[0] == ActivityTermRef(
+        assert built.clauses[0].parts[0] == ClauseTermRef(
             term_id='guest', display='Carol'
         )
 
@@ -128,6 +128,7 @@ def test_explicit_kind_column(tmp_path):
         doc = (
             '| Term | Meaning | Kind |\n|---|---|---|\n'
             '| Guest | x | Actor |\n| Room | y | Work Object |\n'
+            '| book | z | Activity |\n'
         )
         attach('Glossary file', doc)
         path = tmp_path / 'g.md'
@@ -137,6 +138,7 @@ def test_explicit_kind_column(tmp_path):
     with then(t'kinds come straight from the file, not {pg["Kindless"]} inference'):
         assert glossary['Guest'].term.kind == 'actor'
         assert glossary['Room'].term.kind == 'object'
+        assert glossary['book'].term.kind == 'activity'
 
 
 @scenario(

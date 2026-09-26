@@ -16,7 +16,6 @@ from collections.abc import Set as AbstractSet
 from typing import NamedTuple
 
 from ..model import (
-    ActivityId,
     AttachmentLabel,
     Narration,
     NarrationLiteral,
@@ -29,6 +28,7 @@ from ..model import (
     PytestGivenError,
     RawParamValue,
     Scenario,
+    SentenceId,
     Step,
     StepPath,
     case_suffix,
@@ -79,8 +79,8 @@ def check_same_template(group: Group) -> None:
         if step_structure(case_signature) != step_structure(signature):
             raise _divergence_error(case, 'a different step structure', group)
         if case_signature != signature:
-            # Only the activities differ, which `a different step structure`
-            # would misdescribe — and the fix is to pick one activity, not to
+            # Only the sentences differ, which `a different step structure`
+            # would misdescribe — and the fix is to pick one sentence, not to
             # give up on grouping.
             raise _varying_activity_error(case, group)
         for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
@@ -122,9 +122,9 @@ def _varying_activity_error(case: Scenario, group: Group) -> PytestGivenError:
     return _grouping_error(
         group,
         f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} claims '
-        f'different step activities than case {case_suffix(group.baseline.id)} '
+        f'different step sentences than case {case_suffix(group.baseline.id)} '
         f'— the grouped tree keeps one set, and story coverage is credited '
-        f'from exactly that field. Give the step one activity, or use '
+        f'from exactly that field. Give the step one sentence, or use '
         f'@scenario(..., group_parametrized=False) to emit one scenario per '
         f'case.',
     )
@@ -313,11 +313,11 @@ def _test_name(scenario: Scenario) -> str:
 
 class StepSignature(NamedTuple):
     """What a grouped tree requires every case's step to share: where it sits,
-    its phase, and the activities it claims."""
+    its phase, and the sentences it claims."""
 
     path: StepPath
     phase: Phase
-    activity_ids: tuple[ActivityId, ...]
+    activity_ids: tuple[SentenceId, ...]
 
 
 class PartKey(NamedTuple):
@@ -332,7 +332,7 @@ class PartKey(NamedTuple):
 
 def step_shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
     """A case's tree reduced to what a grouped tree must share: where each step
-    sits, its phase, and the activities it claims.
+    sits, its phase, and the sentences it claims.
 
     Paths carry the nesting, so this needs no recursion — a `walk_steps`
     mapping is already DFS pre-order.
@@ -349,7 +349,7 @@ def step_shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
 
 
 def step_structure(signature: list[StepSignature]) -> list[tuple[StepPath, Phase]]:
-    """The signature without its activities — where the steps sit and what
+    """The signature without its sentences — where the steps sit and what
     phase each is."""
     return [(step.path, step.phase) for step in signature]
 

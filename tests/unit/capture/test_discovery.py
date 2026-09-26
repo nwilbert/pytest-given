@@ -8,9 +8,9 @@ import pytest
 from pytest_given import Glossary
 from pytest_given.capture import (
     FileGlossary,
-    activity,
-    path,
+    clause,
     resolve_glossary,
+    sentence,
     story,
 )
 from pytest_given.capture.story import restore_story_registry
@@ -45,11 +45,15 @@ def test_two_stories_reaching_different_glossaries_raise() -> None:
     g2 = Glossary()
     first = story(
         'Coverage Story A',
-        [activity(g1.actor('Guest One'), g1.verb('search'), g1.work_object('Room'))],
+        [
+            sentence(
+                g1.actor('Guest One'), g1.activity('search'), g1.work_object('Room')
+            )
+        ],
     )
     second = story(
         'Coverage Story B',
-        [activity(g2.actor('Guest Two'), g2.verb('book'), g2.work_object('Suite'))],
+        [sentence(g2.actor('Guest Two'), g2.activity('book'), g2.work_object('Suite'))],
     )
     with pytest.raises(PytestGivenError, match='distinct Glossary'):
         resolve_glossary([first, second], [])
@@ -60,7 +64,7 @@ def test_a_storys_glossary_wins_over_the_conftest_scan() -> None:
     g = Glossary()
     told = story(
         'Coverage Story',
-        [activity(g.actor('Guest'), g.verb('search'), g.work_object('Room'))],
+        [sentence(g.actor('Guest'), g.activity('search'), g.work_object('Room'))],
     )
     other = Glossary()
     assert resolve_glossary([told], [_FakeConftest('/x/conftest.py', g=other)]) is g
@@ -118,7 +122,7 @@ def test_no_stories_and_no_conftest_glossary_resolves_to_none() -> None:
 
 @pytest.mark.usefixtures('_clean_story_registry')
 def test_a_story_referencing_no_glossary_falls_back_to_the_conftest_scan() -> None:
-    bare = story('Wordless Story', [activity(path('a guest', 'books', 'a room'))])
+    bare = story('Wordless Story', [sentence(clause('a guest', 'books', 'a room'))])
     g = Glossary()
     g.actor('Guest')
     assert resolve_glossary([bare], [_FakeConftest('/x/conftest.py', g=g)]) is g

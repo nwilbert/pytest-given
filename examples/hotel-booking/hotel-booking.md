@@ -1,7 +1,7 @@
 # pytest-given — Hotel Booking Example
 
 ## ✓ Carol picks a suite for the group
-`examples/hotel-booking/test_hotel_booking.py:154::test_pick_suite`
+`examples/hotel-booking/test_hotel_booking.py:162::test_pick_suite`
 
 - **given** our organizer «Carol»
 - **given** the «Deluxe Suite» is listed as available
@@ -10,7 +10,7 @@
 - **then** the «Deluxe Suite» is held for the group
 
 ## ✓ Carol completes the booking for both guests
-`examples/hotel-booking/test_hotel_booking.py:169::test_complete_booking`
+`examples/hotel-booking/test_hotel_booking.py:177::test_complete_booking`
 
 - **given** our organizer «Carol»
 - **given** our guest «Alice»
@@ -20,9 +20,10 @@
 - **when** «Carol» submits the «Payment» for the «Booking»
 - **then** the «Booking System» «confirms» the «Booking»
 - **then** the «Booking System» sends the «Confirmation» to «Alice» and «Bob»
+- **then** «Alice» and «Bob» can check in to the «Deluxe Suite»
 
 ## ✗ Payment is declined — the booking is not finalized · 4 cases
-`examples/hotel-booking/test_hotel_booking.py:202::test_payment_declined`
+`examples/hotel-booking/test_hotel_booking.py:216::test_payment_declined`
 
 - **given** our organizer «Carol»
 - **given** our guest «Alice»
@@ -41,10 +42,10 @@
 
 - **gift card, partial balance** — failed:
   > assert 'gift card' in {'bank transfer', 'credit card', 'debit card'}
-  > test_hotel_booking.py:234 in test_payment_declined
+  > test_hotel_booking.py:248 in test_payment_declined
 
 ## ✓ Alice cancels her booking and is refunded
-`examples/hotel-booking/test_hotel_booking.py:244::test_cancel_booking`
+`examples/hotel-booking/test_hotel_booking.py:258::test_cancel_booking`
 
 - **given** our guest «Alice»
 - **given** «Alice» has a confirmed «Booking» she paid for

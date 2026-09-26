@@ -14,7 +14,6 @@ from pytest_given.grouping import (
 )
 from pytest_given.grouping.context import build_group
 from pytest_given.model import (
-    ActivityId,
     Attachment,
     AttachmentRef,
     Narration,
@@ -28,6 +27,7 @@ from pytest_given.model import (
     ParamSpec,
     PytestGivenError,
     Scenario,
+    SentenceId,
     SourceLocation,
     Step,
     StepPath,
@@ -2765,7 +2765,7 @@ def _sig_step(phase: str, text: str, children: list[Step] | None = None) -> Step
     )
 
 
-def _shape_of(steps: list[Step]) -> list[tuple[StepPath, str, tuple[ActivityId, ...]]]:
+def _shape_of(steps: list[Step]) -> list[tuple[StepPath, str, tuple[SentenceId, ...]]]:
     """`checks.step_shape` over a freshly walked tree, the way `build_group` feeds
     it."""
     return checks.step_shape(walk_steps(steps))
@@ -2792,11 +2792,11 @@ def test_shape_separates_different_shapes() -> None:
     assert _shape_of(_sig_tree()) != _shape_of([_sig_step('given', 'a')])
 
 
-def test_shape_separates_steps_claiming_different_activities() -> None:
+def test_shape_separates_steps_claiming_different_sentences() -> None:
     """`activity=` is a per-call argument, so one case's step can claim an
-    activity another's does not — and the grouped tree keeps only one set."""
+    sentence another's does not — and the grouped tree keeps only one set."""
     claimed = [_sig_step('given', 'a')]
-    claimed[0] = dataclasses.replace(claimed[0], activity_ids=(ActivityId(2),))
+    claimed[0] = dataclasses.replace(claimed[0], activity_ids=(SentenceId(2),))
     assert _shape_of(_sig_tree()[:1]) != _shape_of(claimed)
 
 
@@ -2804,7 +2804,7 @@ def test_shape_of_an_empty_tree_is_empty() -> None:
     assert _shape_of([]) == []
 
 
-def test_cases_claiming_different_activities_say_so() -> None:
+def test_cases_claiming_different_sentences_say_so() -> None:
     """`activity=` is a per-call argument, so two cases can genuinely claim
     different ids at one path. The grouped tree keeps one set — but that is not
     'a different step structure', and the fix is smaller than declining the
@@ -2819,7 +2819,7 @@ def test_cases_claiming_different_activities_say_so() -> None:
                 Step(
                     phase='given',
                     narration=Narration(text='a machine'),
-                    activity_ids=(ActivityId(ids),),
+                    activity_ids=(SentenceId(ids),),
                 )
             ],
         )
@@ -2829,7 +2829,7 @@ def test_cases_claiming_different_activities_say_so() -> None:
         nid1: ParamSpec(names=['n'], values=[1]),
         nid2: ParamSpec(names=['n'], values=[2]),
     }
-    with pytest.raises(PytestGivenError, match='different step activities'):
+    with pytest.raises(PytestGivenError, match='different step sentences'):
         group_parametrized(scenarios, param_info)
 
 

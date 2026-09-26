@@ -13,7 +13,7 @@ Each rule has a fixed default severity; there is no master level. A `warn` findi
 | `action-in-then` | `warn` | A scenario where no `when` performs an action and a `then` folds the action into its assertion. |
 | `unused-interpolation` | `warn` | A `with`-anchored step whose narration interpolates `{name}` — a t-string value or a parameter-table placeholder — that the step body never uses. |
 | `tag-shadows-term` | `warn` | A scenario tag whose slug duplicates a glossary term — one concept named through two mechanisms. |
-| `dead-term` | `off` | A glossary term referenced by no scenario or step narration and no story activity. Opt in on suites whose glossary is meant to be fully exercised. |
+| `dead-term` | `off` | A glossary term referenced by no scenario or step narration and no story sentence. Opt in on suites whose glossary is meant to be fully exercised. |
 
 Override severities per rule with `given_lint_rules`, and exempt individual subjects with `given_lint_ignore` — bare node-id globs, or scoped to one rule with a `rule-id:` prefix:
 

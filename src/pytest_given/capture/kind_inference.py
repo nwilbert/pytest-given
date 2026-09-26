@@ -1,8 +1,8 @@
 """Post-collection inference of file-glossary term kinds from story usage.
 
-A term referenced by an activity path gets a kind from the slot positions it
-appears in across all stories: 0 → actor, odd → verb, even ≥ 2 → noun
-(actor or work object). Undeclared kinds are inferred; declared kinds are
+A term referenced by a clause gets a kind from the slot positions it
+appears in across all stories: 0 → actor, odd → verb (an activity), even ≥ 2
+→ noun (actor or work object). Undeclared kinds are inferred; declared kinds are
 verified against observed positions. Conflicts raise."""
 
 from collections import defaultdict
@@ -10,7 +10,7 @@ from dataclasses import replace
 from typing import Literal
 
 from ..model import (
-    ActivityTermRef,
+    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     PytestGivenError,
@@ -26,7 +26,7 @@ type Slot = Literal['actor', 'verb', 'noun']
 # and is valid anywhere.
 ROLE_ACCEPTS: dict[Slot, tuple[TermKind, ...]] = {
     'actor': ('actor',),
-    'verb': ('verb',),
+    'verb': ('activity',),
     'noun': ('actor', 'object'),
 }
 
@@ -36,8 +36,8 @@ _SLOT_ORDER: tuple[Slot, ...] = ('verb', 'actor', 'noun')
 
 
 def slot_for(position: int) -> Slot:
-    """Which slot an activity-path position is: 0 is the actor node, odd
-    positions are edges (verbs), even positions from 2 on are further nodes."""
+    """Which slot a clause position is: 0 is the actor node, odd
+    positions are edges (activities), even positions from 2 on are further nodes."""
     if position == 0:
         return 'actor'
     if position % 2 == 1:
@@ -56,10 +56,10 @@ def infer_glossary_kinds(glossary: Glossary, stories: list[Story]) -> Glossary:
         lambda: defaultdict(set)
     )
     for story in stories:
-        for activity in story.activities:
-            for activity_path in activity.paths:
-                for position, part in enumerate(activity_path.parts):
-                    if isinstance(part, ActivityTermRef):
+        for sentence in story.sentences:
+            for clause in sentence.clauses:
+                for position, part in enumerate(clause.parts):
+                    if isinstance(part, ClauseTermRef):
                         slot = slot_for(position)
                         sightings_by_term[part.term_id][slot].add(story.title)
     inferred_terms = [
@@ -85,7 +85,7 @@ def _infer_one(
             f'a verb slot and an actor/noun slot. Add a kind column to disambiguate.'
         )
     if 'verb' in slots:
-        return 'verb'
+        return 'activity'
     if 'actor' in slots:
         return 'actor'
     if 'noun' in slots:

@@ -31,7 +31,7 @@ Read the guide for the artifact you are about to touch — not all of them:
 |---|---|
 | Glossary tab is empty | `references/glossaries.md` |
 | Stories tab is empty | `references/stories.md` |
-| An activity never turns covered | `references/stories.md` |
+| A sentence never turns covered | `references/stories.md` |
 | A file-scoped lint run fails where the whole suite passes | `references/scenarios.md` |
 
 ## Adoption levels

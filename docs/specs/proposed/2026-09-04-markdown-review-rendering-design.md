@@ -8,7 +8,7 @@ reviewing skill ships to work around it:
 1. **`--given-md-source`** (opt-in) inlines each scenario's test body under its steps, so the
    narration and the code it claims to describe sit side by side.
 2. **A Stories section** (default on) renders story coverage from the production rollups, so the
-   report says which activities are covered without opening the HTML.
+   report says which sentences are covered without opening the HTML.
 
 Both are reachable post-hoc through `pytest-given report`, so a reviewer re-renders an existing
 JSON report instead of re-running the suite.
@@ -61,9 +61,9 @@ body, N cases in the parameter table.
 
 ### Part 2 — Stories section
 
-`build_coverage_map(report)` → `build_story_rollups(report, maps)` → `build_activity_labels(report)`
-are already the HTML template's inputs; the Markdown section reads the same three. Each activity
-renders as its label prose plus one marker derived from `ActivityCoverage`: covered (`total > 0`),
+`build_coverage_map(report)` → `build_story_rollups(report, maps)` → `build_sentence_labels(report)`
+are already the HTML template's inputs; the Markdown section reads the same three. Each sentence
+renders as its label prose plus one marker derived from `SentenceCoverage`: covered (`total > 0`),
 uncovered, or not tracked (`untracked`). A report with no stories renders no section, so existing
 suites see no change.
 
@@ -100,10 +100,10 @@ wrapper proves awkward in a diff — see Open Questions.
 
 ## Adopt pytest-given
 
-| # | Activity | Coverage |
+| # | Sentence | Coverage |
 |---|---|---|
 | 1 | Domain Expert tells Story to the Developer | — not tracked |
-| 2 | Developer captures Story as Activity | ✓ 3 scenarios |
+| 2 | Developer captures Story as Sentence | ✓ 3 scenarios |
 | 3 | Developer builds Glossary with the Domain Expert | ✗ uncovered |
 ```
 
@@ -150,7 +150,7 @@ error.
   its own decision, and its value is to a human clicking through, not to this workflow.
 - **Step-fixture bodies.** `Step.source` is recorded only under `--given-lint` (deliberately: the
   AST surface costs nothing when the lint is off), so inlining covers scenarios only.
-- **A coverage gate.** `pytest-given coverage` exiting non-zero on an uncovered eligible activity is
+- **A coverage gate.** `pytest-given coverage` exiting non-zero on an uncovered eligible sentence is
   a different feature — a threshold, not a rendering.
 - **`--changed-since`.** Selecting only scenarios whose bodies moved stays a CLI idea.
 

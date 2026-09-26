@@ -11,7 +11,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, NoReturn
 
 from ..model import (
-    ActivityId,
     Attachment,
     AttachmentLabel,
     ContentType,
@@ -22,6 +21,7 @@ from ..model import (
     PytestGivenError,
     PytestGivenWarning,
     Scenario,
+    SentenceId,
     SourceLocation,
     Status,
     Step,
@@ -215,7 +215,7 @@ class Collector:
         source: SourceLocation | None = None,
         *,
         story: Story | None = None,
-        activity_ids: tuple[ActivityId, ...] = (),
+        activity_ids: tuple[SentenceId, ...] = (),
     ) -> None:
         self._current_scenario = Scenario(
             id=scenario_id,
@@ -353,7 +353,7 @@ class Collector:
         phase: Phase,
         narration: Narration,
         *,
-        activity_ids: tuple[ActivityId, ...] = (),
+        activity_ids: tuple[SentenceId, ...] = (),
         source: SourceLocation | None = None,
     ) -> Step:
         if not self.recording:
@@ -386,7 +386,7 @@ class Collector:
     def _check_step_activity_scope(
         self,
         phase: Phase,
-        activity_ids: tuple[ActivityId, ...],
+        activity_ids: tuple[SentenceId, ...],
     ) -> None:
         if self._current_scenario is None:
             # A `@given` fixture scoped wider than `function` records even
@@ -406,7 +406,7 @@ class Collector:
                 f'(phase={phase!r}, ids={list(activity_ids)}).'
             )
         scope = self._current_scenario.activity_ids
-        valid = scope or tuple(a.id for a in story.activities)
+        valid = scope or tuple(a.id for a in story.sentences)
         valid_set = set(valid)
         for aid in activity_ids:
             if aid in valid_set:

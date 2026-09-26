@@ -74,7 +74,7 @@
 
   --term-actor-ink: #8a4310;    --term-actor-wash: #fde5d3;    --term-actor-edge: #f0b48a;
   --term-object-ink: #0f6e64;   --term-object-wash: #d5f2ee;   --term-object-edge: #7fd5c9;
-  --term-verb-ink: #5f2d9a;     --term-verb-wash: #ece0f7;     --term-verb-edge: #c6aef0;
+  --term-activity-ink: #5f2d9a; --term-activity-wash: #ece0f7; --term-activity-edge: #c6aef0;
   --term-kindless-ink: #545962; --term-kindless-wash: #e9ecf0; --term-kindless-edge: #c9ccd3;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
@@ -115,7 +115,7 @@
 
   --term-actor-ink: #f5b47a;    --term-actor-wash: #47302b;    --term-actor-edge: #7a4a2e;
   --term-object-ink: #7fded0;   --term-object-wash: #21383f;   --term-object-edge: #2a6b62;
-  --term-verb-ink: #cbb5f7;     --term-verb-wash: #372e4d;     --term-verb-edge: #5b4886;
+  --term-activity-ink: #cbb5f7; --term-activity-wash: #372e4d; --term-activity-edge: #5b4886;
   --term-kindless-ink: #b8b2c2; --term-kindless-wash: #312c38; --term-kindless-edge: #4a4455;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
@@ -530,14 +530,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 .scenario-list,
 .entry-list,
-.activity-timeline {
+.sentence-timeline {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .scenario,
-.activity-row,
+.sentence-row,
 .entry {
   border-top: 1px solid var(--border);
   margin-top: -1px;
@@ -978,7 +978,7 @@ span.param-highlight {
 
 .term-ref-actor,
 .term-ref-object,
-.term-ref-verb,
+.term-ref-activity,
 .term-ref-unknown {
   padding: 1px 3px;
   border-radius: 3px;
@@ -991,7 +991,7 @@ span.param-highlight {
 }
 .term-ref-actor { background: var(--term-actor-wash); color: var(--term-actor-ink); }
 .term-ref-object { background: var(--term-object-wash); color: var(--term-object-ink); }
-.term-ref-verb { background: var(--term-verb-wash); color: var(--term-verb-ink); }
+.term-ref-activity { background: var(--term-activity-wash); color: var(--term-activity-ink); }
 
 
 
@@ -1004,7 +1004,7 @@ span.param-highlight {
 
 
 .term-ref--link:hover { text-decoration: underline; }
-.activity-word {
+.clause-word {
   color: var(--text-secondary);
 }
 
@@ -1108,16 +1108,16 @@ span.param-highlight {
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
 
-.activity-timeline { margin-bottom: var(--space-xl); }
-.activity-row {
+.sentence-timeline { margin-bottom: var(--space-xl); }
+.sentence-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.activity-row:hover:not(.activity-row-highlight) { background: var(--bg-page); }
-.activity-num {
+.sentence-row:hover:not(.sentence-row-highlight) { background: var(--bg-page); }
+.sentence-num {
   min-width: 24px;
   padding: 0;
   height: 24px;
@@ -1132,15 +1132,15 @@ span.param-highlight {
   font-weight: 600;
   flex-shrink: 0;
 }
-.activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
-.activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+.sentence-row:hover .sentence-num:not(.sentence-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
+.sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 
 .meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
 
 
-.activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
+.sentence-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
 
 .cov-chip {
   display: inline-flex;
@@ -1219,7 +1219,7 @@ span.param-highlight {
 }
 .kind-swatch-actor { background: var(--term-actor-edge); }
 .kind-swatch-object { background: var(--term-object-edge); }
-.kind-swatch-verb { background: var(--term-verb-edge); }
+.kind-swatch-activity { background: var(--term-activity-edge); }
 .kind-swatch-kindless { background: var(--term-kindless-edge); }
 
 
@@ -1246,7 +1246,7 @@ span.param-highlight {
 
 .term-actor { color: var(--term-actor-ink); }
 .term-obj { color: var(--term-object-ink); }
-.term-verb { color: var(--term-verb-ink); }
+.term-activity { color: var(--term-activity-ink); }
 .term-kindless { color: var(--term-kindless-ink); }
 
 
@@ -1259,7 +1259,7 @@ span.param-highlight {
 }
 .term-pill.term-actor { background: var(--term-actor-wash); border: 1px solid var(--term-actor-edge); }
 .term-pill.term-obj { background: var(--term-object-wash); border: 1px solid var(--term-object-edge); }
-.term-pill.term-verb { background: var(--term-verb-wash); border: 1px solid var(--term-verb-edge); }
+.term-pill.term-activity { background: var(--term-activity-wash); border: 1px solid var(--term-activity-edge); }
 .term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
 
 
@@ -1351,14 +1351,14 @@ span.param-highlight {
 
 
 
-.activity-jump {
+.sentence-jump {
   display: none;
   font: inherit;
   font-size: var(--font-size-sm);
   white-space: nowrap;
 }
-.activity-row-highlight .activity-jump { display: inline-block; }
-.activity-jump:focus-visible {
+.sentence-row-highlight .sentence-jump { display: inline-block; }
+.sentence-jump:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -1366,10 +1366,10 @@ span.param-highlight {
 
 
 
-.activity-row-highlight { background: var(--color-accent-tint); }
+.sentence-row-highlight { background: var(--color-accent-tint); }
 .scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-surface); }
-.activity-num-highlight,
-.activity-num-highlight:hover,
+.sentence-num-highlight,
+.sentence-num-highlight:hover,
 .use-chip-highlight,
 .use-chip-highlight:hover {
   background: var(--color-accent);
@@ -1511,9 +1511,9 @@ span.param-highlight {
           Term: <span x-text="termLabel(termId)"></span>
           <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
         </span>
-      </template><span class="filter-chip" x-show="activityFilter" x-cloak>
-        <span class="filter-chip-text" x-text="activityLabel(activityFilter)" :title="activityLabel(activityFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearActivityFilter()" aria-label="Clear activity filter">×</button>
+      </template><span class="filter-chip" x-show="sentenceFilter" x-cloak>
+        <span class="filter-chip-text" x-text="sentenceLabel(sentenceFilter)" :title="sentenceLabel(sentenceFilter)"></span>
+        <button type="button" class="filter-chip-x" @click="clearSentenceFilter()" aria-label="Clear sentence filter">×</button>
       </span>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
         <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
@@ -1573,7 +1573,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L22">examples/coffeeshop/test_coffeeshop.py:22</a></div>
       
     </div>
     </div>
@@ -1627,7 +1627,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L34">examples/coffeeshop/test_coffeeshop.py:34</a></div>
       
     </div>
     </div>
@@ -1668,7 +1668,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L45">examples/coffeeshop/test_coffeeshop.py:45</a></div>
       
     </div>
     </div>
@@ -1792,7 +1792,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L54">examples/coffeeshop/test_coffeeshop.py:54</a></div>
       
     </div>
     </div>
@@ -1879,7 +1879,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L66">examples/coffeeshop/test_coffeeshop.py:66</a></div>
       
     </div>
     </div>
@@ -1922,7 +1922,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L78">examples/coffeeshop/test_coffeeshop.py:78</a></div>
       
     </div>
     </div>
@@ -2007,7 +2007,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L89">examples/coffeeshop/test_coffeeshop.py:89</a></div>
       
     </div>
     </div>
@@ -2048,7 +2048,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2091,7 +2091,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L98">examples/coffeeshop/test_coffeeshop.py:98</a></div>
       
     </div>
     </div>
@@ -2262,7 +2262,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L115">examples/coffeeshop/test_coffeeshop.py:115</a></div>
       
     </div>
     </div>
@@ -2339,7 +2339,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L162">examples/coffeeshop/test_coffeeshop.py:162</a></div>
       
     </div>
     </div>
@@ -2447,7 +2447,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L178">examples/coffeeshop/test_coffeeshop.py:178</a></div>
       
     </div>
     </div>
@@ -2496,7 +2496,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L215">examples/coffeeshop/test_coffeeshop.py:215</a></div>
       
     </div>
     </div>
@@ -2553,7 +2553,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L232">examples/coffeeshop/test_coffeeshop.py:232</a></div>
       
     </div>
     </div>
@@ -2574,7 +2574,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">81ms</span>
+        <span class="scenario-duration">77ms</span>
       </span>
     </div>
 
@@ -2646,7 +2646,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L248">examples/coffeeshop/test_coffeeshop.py:248</a></div>
       
     </div>
     </div>
@@ -2686,7 +2686,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L254">examples/coffeeshop/test_coffeeshop.py:254</a></div>
       
     </div>
     </div>
@@ -2770,7 +2770,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/87366f4b5994c0b19484b0374fbfdb744733138e/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/05960078bba4716e6f740da8a8ee57f58dffdd3d/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2799,7 +2799,7 @@ Total:        $2.00</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-20T12:56:58.668391+00:00\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario name)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"story_id\":null,\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_activities\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":[],\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":[],\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":[],\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":[],\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":[],\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":[],\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":[],\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":[],\"examples/coffeeshop/test_coffeeshop.py::test_failing\":[],\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":[],\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":[]},\"activity_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-09-26T10:27:38.129116+00:00\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario name)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"story_id\":null,\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"story_id\":null,\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"story_id\":null,\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":[],\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":[],\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":[],\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":[],\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":[],\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":[],\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":[],\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":[],\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":[],\"examples/coffeeshop/test_coffeeshop.py::test_failing\":[],\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":[],\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":[]},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -2841,7 +2841,7 @@ function deserializeStory(params) {
 
 
 
-  const fromFilter = (params.get('activity-filter') || '').split(':')[0];
+  const fromFilter = (params.get('sentence-filter') || '').split(':')[0];
   if (ids.includes(fromFilter)) return fromFilter;
   return ids[0] || null;
 }
@@ -2909,8 +2909,8 @@ function reportApp() {
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
 
 
-  const scenarioActivities = data.scenario_activities || {};
-  const activityLabels = data.activity_labels || {};
+  const scenarioSentences = data.scenario_sentences || {};
+  const sentenceLabels = data.sentence_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
 
@@ -2995,7 +2995,7 @@ function reportApp() {
     themeChoice: theme.choice,
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
-    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
+    glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
     expandedTerms: {},
     showPassed: true,
@@ -3012,23 +3012,23 @@ function reportApp() {
 
 
 
-    activityFilter: null,
+    sentenceFilter: null,
     _suppressHashWrite: false,
-    highlightedActivities: {},
+    highlightedSentences: {},
 
 
     _toggle(map, key) {
       if (map[key]) delete map[key];
       else map[key] = true;
     },
-    get anyActivitiesHighlighted() {
-      return Object.keys(this.highlightedActivities).length > 0;
+    get anySentencesHighlighted() {
+      return Object.keys(this.highlightedSentences).length > 0;
     },
-    toggleActivityHighlight(id) {
-      this._toggle(this.highlightedActivities, id);
+    toggleSentenceHighlight(id) {
+      this._toggle(this.highlightedSentences, id);
     },
-    clearActivityHighlights() {
-      this.highlightedActivities = {};
+    clearSentenceHighlights() {
+      this.highlightedSentences = {};
     },
 
 
@@ -3036,13 +3036,13 @@ function reportApp() {
     selectStory(id) {
       if (this.selectedStory === id) return;
       this.selectedStory = id;
-      this.highlightedActivities = {};
+      this.highlightedSentences = {};
     },
 
 
-    activitySelectionMatches(coveredIds) {
-      if (!this.anyActivitiesHighlighted) return true;
-      return coveredIds.some(id => this.highlightedActivities[id]);
+    sentenceSelectionMatches(coveredIds) {
+      if (!this.anySentencesHighlighted) return true;
+      return coveredIds.some(id => this.highlightedSentences[id]);
     },
 
 
@@ -3074,7 +3074,7 @@ function reportApp() {
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
-      return ['actor', 'object', 'verb', 'kindless'].some(k => counts[k] > 0);
+      return ['actor', 'object', 'activity', 'kindless'].some(k => counts[k] > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -3107,7 +3107,7 @@ function reportApp() {
 
       if (parts.length) return parts.join('\u2003');
       const chipped = this.termFilters.length || this.tagFilters.length
-        || this.moduleFilter || this.activityFilter;
+        || this.moduleFilter || this.sentenceFilter;
       return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
@@ -3129,7 +3129,7 @@ function reportApp() {
     _visible() {
       const state = [
         this.showPassed, this.showFailed, this.showSkipped,
-        this.moduleFilter, this.activityFilter, this.search,
+        this.moduleFilter, this.sentenceFilter, this.search,
         this.tagFilters, this.termFilters,
       ];
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
@@ -3249,10 +3249,10 @@ function reportApp() {
           }
         }
       }
-      if (this.activityFilter) {
-        const [storyId, activityId] = this.activityFilter.split(':');
+      if (this.sentenceFilter) {
+        const [storyId, sentenceId] = this.sentenceFilter.split(':');
         if (s.story_id !== storyId) return false;
-        if (!(scenarioActivities[s.id] || []).includes(Number(activityId))) {
+        if (!(scenarioSentences[s.id] || []).includes(Number(sentenceId))) {
           return false;
         }
       }
@@ -3350,7 +3350,7 @@ function reportApp() {
       this.tagFilters = [];
       this.termFilters = [];
       this.moduleFilter = null;
-      this.activityFilter = null;
+      this.sentenceFilter = null;
       this.search = '';
       this.showPassed = true;
       this.showFailed = true;
@@ -3375,25 +3375,25 @@ function reportApp() {
 
       if (hasGlossary) this.view = 'terms';
     },
-    filterScenariosByActivity(key) {
+    filterScenariosBySentence(key) {
 
       this.resetFilters();
-      this.activityFilter = key;
+      this.sentenceFilter = key;
 
 
-      this.highlightedActivities = { [key.split(':')[1]]: true };
+      this.highlightedSentences = { [key.split(':')[1]]: true };
       this.mainView = 'scenarios';
     },
-    clearActivityFilter() {
-      this.activityFilter = null;
+    clearSentenceFilter() {
+      this.sentenceFilter = null;
     },
-    activityLabel(key) {
+    sentenceLabel(key) {
       if (!key) return '';
 
 
       const number = key.split(':')[1];
-      const text = lookup(activityLabels, key, '');
-      return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
+      const text = lookup(sentenceLabels, key, '');
+      return text ? `Sentence ${number}: ${text}` : `Sentence ${number}`;
     },
     removeTermFilter(id) {
       this.termFilters = this.termFilters.filter(t => t !== id);
@@ -3532,7 +3532,7 @@ function reportApp() {
 
 
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'activityFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -3550,18 +3550,18 @@ function reportApp() {
         this.goToTerm(pill.dataset.termId);
       }, true);
       document.addEventListener('click', (event) => {
-        const chip = event.target.closest('[data-activity-id]');
+        const chip = event.target.closest('[data-sentence-id]');
         if (!chip) return;
 
 
-        if (event.target.closest('[data-activity-jump]')) return;
-        this.toggleActivityHighlight(chip.dataset.activityId);
+        if (event.target.closest('[data-sentence-jump]')) return;
+        this.toggleSentenceHighlight(chip.dataset.sentenceId);
       });
 
       document.addEventListener('click', (event) => {
-        const jump = event.target.closest('[data-activity-jump]');
+        const jump = event.target.closest('[data-sentence-jump]');
         if (!jump) return;
-        this.filterScenariosByActivity(jump.dataset.activityJump);
+        this.filterScenariosBySentence(jump.dataset.sentenceJump);
       });
 
       document.addEventListener('click', (event) => {
@@ -3662,8 +3662,8 @@ function reportApp() {
       } else {
         this.termFilters = [];
       }
-      if (params.has('activity-filter')) this.activityFilter = params.get('activity-filter');
-      else this.activityFilter = null;
+      if (params.has('sentence-filter')) this.sentenceFilter = params.get('sentence-filter');
+      else this.sentenceFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -3681,8 +3681,8 @@ function reportApp() {
 
 
 
-      this.highlightedActivities = this.activityFilter
-        ? { [this.activityFilter.split(':')[1]]: true }
+      this.highlightedSentences = this.sentenceFilter
+        ? { [this.sentenceFilter.split(':')[1]]: true }
         : {};
 
 
@@ -3713,7 +3713,7 @@ function reportApp() {
       if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
-      if (this.activityFilter) params.set('activity-filter', this.activityFilter);
+      if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
 
       const shown = [];
       if (this.showPassed) shown.push('passed');

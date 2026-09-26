@@ -207,11 +207,11 @@
           <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
         </span>
       </template>
-      {#- The activity label is a whole sentence, so it truncates and carries
+      {#- The sentence label is its whole prose, so it truncates and carries
           the full prose in a title rather than pushing the chips off the row. -#}
-      <span class="filter-chip" x-show="activityFilter" x-cloak>
-        <span class="filter-chip-text" x-text="activityLabel(activityFilter)" :title="activityLabel(activityFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearActivityFilter()" aria-label="Clear activity filter">×</button>
+      <span class="filter-chip" x-show="sentenceFilter" x-cloak>
+        <span class="filter-chip-text" x-text="sentenceLabel(sentenceFilter)" :title="sentenceLabel(sentenceFilter)"></span>
+        <button type="button" class="filter-chip-x" @click="clearSentenceFilter()" aria-label="Clear sentence filter">×</button>
       </span>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
         <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
@@ -383,7 +383,7 @@
               :aria-pressed="selectedStory === $el.dataset.storyId"
               @click="selectStory($el.dataset.storyId)">
         <div class="story-sidebar-title">{{ story.title }}</div>
-        <div class="story-sidebar-meta meta-list"><span>{{ story.activities | length }} activities</span><span>{{ scns | length | plural('scenario') }}</span></div>
+        <div class="story-sidebar-meta meta-list"><span>{{ story.sentences | length | plural('sentence') }}</span><span>{{ scns | length | plural('scenario') }}</span></div>
       </button>
       {% endfor %}
     </div>
@@ -397,29 +397,29 @@
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
-            <div class="header-context meta-list"><span>{{ story.activities | length }} activities</span><span>{{ total_scns | plural('scenario') }}</span></div>
-            <button class="collapse-all-btn" x-show="anyActivitiesHighlighted" x-cloak
-                    @click="clearActivityHighlights()">Deselect</button>
+            <div class="header-context meta-list"><span>{{ story.sentences | length | plural('sentence') }}</span><span>{{ total_scns | plural('scenario') }}</span></div>
+            <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
+                    @click="clearSentenceHighlights()">Deselect</button>
           </div>
         </div>
-        <div class="activity-timeline">
-          {% for activity in story.activities %}
-          {% set cov = rollup.per_activity[activity.id] %}
-          <div class="activity-row" id="activity-{{ story.id }}-{{ activity.id }}"
-               data-activity-id="{{ activity.id }}"
-               :class="{ 'activity-row-highlight': highlightedActivities[$el.dataset.activityId] }">
-            <button type="button" class="btn-reset activity-num" data-activity-id="{{ activity.id }}"
-                    :class="{ 'activity-num-highlight': highlightedActivities[$el.dataset.activityId] }"
-                    :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                    aria-label="Select activity {{ activity.id }}">{{ activity.id }}</button>
-            <div class="activity-body">
-              {% for path in activity.paths %}
-              <div class="activity-path">
-                {% for part in path.parts %}{{ part | activity_part }}{% endfor %}
+        <div class="sentence-timeline">
+          {% for sentence in story.sentences %}
+          {% set cov = rollup.per_sentence[sentence.id] %}
+          <div class="sentence-row" id="sentence-{{ story.id }}-{{ sentence.id }}"
+               data-sentence-id="{{ sentence.id }}"
+               :class="{ 'sentence-row-highlight': highlightedSentences[$el.dataset.sentenceId] }">
+            <button type="button" class="btn-reset sentence-num" data-sentence-id="{{ sentence.id }}"
+                    :class="{ 'sentence-num-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                    :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                    aria-label="Select sentence {{ sentence.id }}">{{ sentence.id }}</button>
+            <div class="sentence-body">
+              {% for clause in sentence.clauses %}
+              <div class="sentence-clause">
+                {% for part in clause.parts %}{{ part | clause_part }}{% endfor %}
               </div>
               {% endfor %}
             </div>
-            <div class="activity-cov">
+            <div class="sentence-cov">
               {% if cov.untracked %}
               <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
               {% elif cov.total == 0 %}
@@ -428,13 +428,13 @@
               {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
               <span class="cov-chip {{ cov_class }}"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span>{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span>{{ cov.skipped }} skipped</span>{% endif %}</span>
               {% endif %}
-              {#- Revealed by CSS once the row is selected (see .activity-jump),
+              {#- Revealed by CSS once the row is selected (see .sentence-jump),
                   so the row keeps one meaning per click: the row selects, this
                   leaves for the Scenarios view. Only where there is something
-                  to show — an uncovered activity would land on an empty list. -#}
+                  to show — an uncovered sentence would land on an empty list. -#}
               {% if cov.total %}
-              <button type="button" class="use-chip activity-jump"
-                      data-activity-jump="{{ activity_key(story.id, activity.id) }}">Open in Scenarios <span aria-hidden="true">→</span></button>
+              <button type="button" class="use-chip sentence-jump"
+                      data-sentence-jump="{{ sentence_key(story.id, sentence.id) }}">Open in Scenarios <span aria-hidden="true">→</span></button>
               {% endif %}
             </div>
           </div>
@@ -448,7 +448,7 @@
                {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
                   the `"` its own string literals need. #}
                data-covers='{{ scn_covers.get(scn.id, []) | tojson }}'
-               x-show="activitySelectionMatches(JSON.parse($el.dataset.covers))">
+               x-show="sentenceSelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
                 <button type="button" class="btn-reset scenario-name scenario-name--goto"
@@ -461,11 +461,11 @@
             {% if scn_covers.get(scn.id) %}
             <div class="scn-act-strip">
               <span class="scn-act-label">Covers:</span>
-              {% for act_id in scn_covers.get(scn.id, []) %}
-              <button type="button" class="btn-reset use-chip" data-activity-id="{{ act_id }}"
-                      :class="{ 'use-chip-highlight': highlightedActivities[$el.dataset.activityId] }"
-                      :aria-pressed="!!highlightedActivities[$el.dataset.activityId]"
-                      aria-label="Select activity {{ act_id }}">{{ act_id }}</button>
+              {% for sentence_id in scn_covers.get(scn.id, []) %}
+              <button type="button" class="btn-reset use-chip" data-sentence-id="{{ sentence_id }}"
+                      :class="{ 'use-chip-highlight': highlightedSentences[$el.dataset.sentenceId] }"
+                      :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
+                      aria-label="Select sentence {{ sentence_id }}">{{ sentence_id }}</button>
               {% endfor %}
             </div>
             {% endif %}

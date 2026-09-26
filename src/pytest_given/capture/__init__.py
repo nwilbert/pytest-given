@@ -1,7 +1,7 @@
 """Recording a run: the authoring surface, and the machinery behind it.
 
 Two audiences share this namespace. The authoring surface — `given` / `when` /
-`then` / `when_then` / `attach`, `@scenario`, `story` / `activity` / `path`,
+`then` / `when_then` / `attach`, `@scenario`, `story` / `sentence` / `clause`,
 `Glossary` / `FileGlossary` / `Template` — is re-exported from the package
 root and is what a test author writes. Everything else is the seam `plugin/`
 drives it through, public only because a sibling subpackage may import solely
@@ -41,8 +41,8 @@ from .steps import (
     when_then,
 )
 from .story import (
-    activity,
-    path,
+    clause,
+    sentence,
     story,
 )
 from .template import (
@@ -60,23 +60,23 @@ __all__ = [
     'ScenarioDecorator',
     'StepDescriptor',
     'Template',
-    'activity',
     'annotated_given_descriptors',
     'attach',
     'begin_capture_session',
     'capture_snapshot',
+    'clause',
     'get_active_collector',
     'given',
     'infer_glossary_kinds',
     'is_internal_path',
     'item_source',
     'parse_short_repr',
-    'path',
     'resolve_glossary',
     'resolved_placeholder_part',
     'restore_capture_state',
     'scenario',
     'scenario_marker',
+    'sentence',
     'set_active_collector',
     'step_descriptor',
     'story',

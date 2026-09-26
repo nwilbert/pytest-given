@@ -15,7 +15,7 @@ Inspired by [JGiven](https://jgiven.org/) (Java).
 Live examples:
 - **[Coffeeshop report](https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html)**: tour of the core features, including `Annotated` `given` labels.
 - **[Hotel-booking report](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html)**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
-- **[File-glossary report](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html)**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story activities.
+- **[File-glossary report](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html)**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story sentences.
 - **[Self-report](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html)**: pytest-given run against its own test suite (dogfooding).
 
 ## Quick start
@@ -85,7 +85,7 @@ Increasingly those tests aren't hand-written at all: a human describes a scenari
 - **[Step context managers](https://nwilbert.github.io/pytest-given/dev/guide/scenarios/)**: `with given(...)`, `when(...)`, `then(...)` blocks in plain pytest tests, nesting within a phase.
 - **[Narrated fixtures](https://nwilbert.github.io/pytest-given/dev/guide/scenarios/)**: `@given` on a fixture, or `Annotated[..., given(...)]` on a parameter, records setup as a step.
 - **[Parametrized scenarios](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/)**: one narrated tree plus a parameter table per case, or one scenario per case on request.
-- **[Domain Storytelling](https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/)**: a glossary of ubiquitous-language terms, Domain Stories as activity sequences, and per-activity coverage in the report.
+- **[Domain Storytelling](https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/)**: a glossary of ubiquitous-language terms, Domain Stories as sequences of sentences, and per-sentence coverage in the report.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
 - **[Agent skills](https://nwilbert.github.io/pytest-given/dev/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.
 

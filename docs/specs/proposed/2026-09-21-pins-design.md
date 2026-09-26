@@ -27,7 +27,7 @@ def test_pay():
   A scenario can bind to several stories, and the rule applies to each separately.
 
 This spec is written against the vocabulary of the
-[sentences and clauses spec](2026-09-26-sentences-and-clauses-design.md), which lands first. That
+[sentences and clauses spec](../2026-09-26-sentences-and-clauses-design.md), which lands first. That
 spec leaves the pin arguments under their old names for this one to replace.
 
 ## Background

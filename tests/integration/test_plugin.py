@@ -1560,13 +1560,13 @@ def test_story_source_captured_in_json(pytester, tmp_path):
     """story() records the source location of its construction site."""
     pytester.makepyfile(
         test_story_src="""
-        from pytest_given import Glossary, activity, scenario, story, when
+        from pytest_given import Glossary, scenario, sentence, story, when
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Booking', [activity(guest, search, room)])
+        s = story('Booking', [sentence(guest, search, room)])
 
         @scenario('A', story=s, activities=[1])
         def test_a():
@@ -1590,13 +1590,13 @@ def test_glossary_term_source_captured_in_json(pytester, tmp_path):
     """Glossary terms record the source location of first registration."""
     pytester.makepyfile(
         test_glossary_src="""
-        from pytest_given import Glossary, activity, scenario, story, when
+        from pytest_given import Glossary, scenario, sentence, story, when
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Booking', [activity(guest, search, room)])
+        s = story('Booking', [sentence(guest, search, room)])
 
         @scenario('A', story=s, activities=[1])
         def test_a():
@@ -1624,12 +1624,12 @@ def test_glossary_term_source_captured_when_declared_in_conftest(pytester, tmp_p
     imported before `pytest_configure`."""
     pytester.makeconftest(
         """
-        from pytest_given import Glossary, activity, story
+        from pytest_given import Glossary, sentence, story
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('ConftestStory', [activity(guest, search, room)])
+        s = story('ConftestStory', [sentence(guest, search, room)])
         """
     )
     pytester.makepyfile(
@@ -1780,16 +1780,16 @@ def test_given_source_link_unknown_preset_raises(pytester, tmp_path):
 
 def test_step_activity_kwarg_propagates_to_report(pytester):
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, given, scenario, story, when
+        from pytest_given import Glossary, given, scenario, sentence, story, when
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
         s = story('Activity Propagation', [
-            activity(guest, search, room),
-            activity(guest('Alice'), search, room),
-            activity(guest, search, room('Suite'))])
+            sentence(guest, search, room),
+            sentence(guest('Alice'), search, room),
+            sentence(guest, search, room('Suite'))])
 
         @scenario('a scenario', story=s, activities=[1, 2, 3])
         def test_x():
@@ -1811,13 +1811,13 @@ def test_step_activity_kwarg_propagates_to_report(pytester):
 
 def test_scenario_story_id_appears_in_report(pytester):
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, given, scenario, story
+        from pytest_given import Glossary, given, scenario, sentence, story
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Book', [activity(guest, search, room)])
+        s = story('Book', [sentence(guest, search, room)])
 
         @scenario('x', story=s, activities=[1])
         def test_x():
@@ -1836,13 +1836,13 @@ def test_scenario_story_id_appears_in_report(pytester):
 
 def test_scenario_activity_id_not_in_story_raises_at_import(pytester):
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, scenario, story
+        from pytest_given import Glossary, scenario, sentence, story
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Book', [activity(guest, search, room)])
+        s = story('Book', [sentence(guest, search, room)])
 
         @scenario('x', story=s, activities=[99])
         def test_x():
@@ -1853,21 +1853,21 @@ def test_scenario_activity_id_not_in_story_raises_at_import(pytester):
     # Both arguments are the decorator's own, so this is rejected where it is
     # written: the traceback points at the `@scenario(...)` line rather than
     # naming a node id from a collection hook.
-    result.stdout.fnmatch_lines(['*activity id 99 not in story*'])
+    result.stdout.fnmatch_lines(['*sentence id 99 not in story*'])
     assert 'INTERNALERROR' not in result.stdout.str()
 
 
 def test_step_activity_outside_scenario_scope_raises(pytester):
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, given, scenario, story
+        from pytest_given import Glossary, given, scenario, sentence, story
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
         s = story('Book', [
-            activity(guest, search, room),
-            activity(guest('Alice'), search, room)])
+            sentence(guest, search, room),
+            sentence(guest('Alice'), search, room)])
 
         @scenario('x', story=s, activities=[1])
         def test_x():
@@ -1881,13 +1881,13 @@ def test_step_activity_outside_scenario_scope_raises(pytester):
 
 def test_decorator_form_helper_step_with_activity_validates_scope(pytester):
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, given, scenario, story
+        from pytest_given import Glossary, given, scenario, sentence, story
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Book', [activity(guest, search, room)])
+        s = story('Book', [sentence(guest, search, room)])
 
         @given('a setup', activity=99)
         def helper():
@@ -1922,10 +1922,10 @@ def test_step_activity_in_wide_fixture_without_scenario_reports_the_cause(pytest
     an authoring mistake and must name itself, not surface as an assert."""
     pytester.makepyfile("""
         import pytest
-        from pytest_given import Glossary, activity, given, scenario, story
+        from pytest_given import Glossary, given, scenario, sentence, story
 
         g = Glossary()
-        s = story('Wide', [activity(g.actor('Guest'), g.verb('search'),
+        s = story('Wide', [sentence(g.actor('Guest'), g.activity('search'),
                                     g.work_object('Room'), activity_id=1)])
 
         @pytest.fixture(scope='module')
@@ -1954,13 +1954,13 @@ def test_step_activity_in_wide_fixture_without_scenario_reports_the_cause(pytest
 
 def test_session_finish_populates_report_stories_and_glossary(pytester):
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, scenario, story
+        from pytest_given import Glossary, scenario, sentence, story
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Book', [activity(guest, search, room)])
+        s = story('Book', [sentence(guest, search, room)])
 
         @scenario('x', story=s)
         def test_x():
@@ -1992,13 +1992,13 @@ def test_report_json_excludes_underscore_fields(pytester):
     """`_by_id` on Glossary and `_glossaries` on the story tree must not
     appear in the JSON output."""
     pytester.makepyfile("""
-        from pytest_given import Glossary, activity, scenario, story
+        from pytest_given import Glossary, scenario, sentence, story
 
         g = Glossary()
         guest = g.actor('Guest')
-        search = g.verb('search')
+        search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Book JSON Filter', [activity(guest, search, room)])
+        s = story('Book JSON Filter', [sentence(guest, search, room)])
 
         @scenario('x', story=s)
         def test_x():
@@ -2018,7 +2018,7 @@ def test_glossary_only_in_conftest_is_discovered(pytester):
         from pytest_given import Glossary
         g = Glossary()
         g.actor('Guest')
-        g.verb('search')
+        g.activity('search')
     """)
     pytester.makepyfile("""
         from pytest_given import scenario

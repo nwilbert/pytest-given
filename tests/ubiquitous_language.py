@@ -13,15 +13,15 @@ Glossary fixtures/locals the unit tests build for their own domain-under-test.
 arc, from Domain Expert elicitation through Agent-authored scenarios and the
 Collector/Renderer machinery to stakeholder review. Backend scenarios bind to
 it via ``@scenario(story=adopt_pytest_given)`` plus an ``activity=N`` pin on
-the one step that genuinely demonstrates activity N. Verbs are bare words —
+the one step that genuinely demonstrates sentence N. Activities are bare words —
 story prose, not glossary vocabulary (see the design spec) — except *Graft*
-and *Group*, existing terms whose meaning is the verb. The ``_t`` suffix
-("term handle") dodges shadowing the ``story``/``activity`` constructors.
+and *Group*, existing terms whose meaning is the activity. The ``_t`` suffix
+("term handle") dodges shadowing the ``story``/``sentence`` constructors.
 """
 
 from pathlib import Path
 
-from pytest_given import FileGlossary, activity, story
+from pytest_given import FileGlossary, sentence, story
 
 _GLOSSARY_PATH = Path(__file__).resolve().parent.parent / 'GLOSSARY.md'
 
@@ -33,7 +33,7 @@ agent = pg['Agent']
 collector_t = pg['Collector']
 renderer_t = pg['Renderer']
 story_t = pg['Story']
-activity_t = pg['Activity']
+sentence_t = pg['Sentence']
 glossary_t = pg['Glossary']
 scenario_t = pg['Scenario']
 tag_t = pg['Tag']
@@ -54,21 +54,21 @@ adopt_pytest_given = story(
     'Adopt pytest-given',
     [
         # 1 — honest gap: nothing implements elicitation.
-        activity(domain_expert, 'tells', story_t, 'to the', developer),
+        sentence(domain_expert, 'tells', story_t, 'to the', developer),
         # 2
-        activity(developer, 'captures', story_t, 'as', activity_t),
+        sentence(developer, 'captures', story_t, 'as', sentence_t),
         # 3
-        activity(developer, 'builds', glossary_t, 'with the', domain_expert),
+        sentence(developer, 'builds', glossary_t, 'with the', domain_expert),
         # 4
-        activity(agent, 'writes', scenario_t, 'with', tag_t, 'against the', glossary_t),
+        sentence(agent, 'writes', scenario_t, 'with', tag_t, 'against the', glossary_t),
         # 5
-        activity(agent, 'narrates', step_t, 'with a', phase_t),
+        sentence(agent, 'narrates', step_t, 'with a', phase_t),
         # 6
-        activity(agent, 'attaches', attachment_t, 'to a', step_t),
+        sentence(agent, 'attaches', attachment_t, 'to a', step_t),
         # 7
-        activity(collector_t, 'records', step_t, 'on the', step_stack_t),
+        sentence(collector_t, 'records', step_t, 'on the', step_stack_t),
         # 8
-        activity(
+        sentence(
             collector_t,
             pg['Graft']('grafts'),
             fixture_recording_t,
@@ -76,7 +76,7 @@ adopt_pytest_given = story(
             step_fixture_t,
         ),
         # 9
-        activity(
+        sentence(
             collector_t,
             pg['Group']('groups'),
             parametrized_scenario_t,
@@ -84,10 +84,10 @@ adopt_pytest_given = story(
             parameter_table_t,
         ),
         # 10
-        activity(renderer_t, 'renders', report_t, 'with', parameter_coloring_t),
+        sentence(renderer_t, 'renders', report_t, 'with', parameter_coloring_t),
         # 11
-        activity(narration_lint_t, 'flags', scenario_t, 'against a', lint_rule_t),
-        # 12 — honest gap: review is a human activity.
-        activity(domain_expert, 'reviews', scenario_t, 'in the', report_t),
+        sentence(narration_lint_t, 'flags', scenario_t, 'against a', lint_rule_t),
+        # 12 — honest gap: a human does the review.
+        sentence(domain_expert, 'reviews', scenario_t, 'in the', report_t),
     ],
 )

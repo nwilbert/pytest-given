@@ -36,10 +36,10 @@ function deserializeStory(params) {
   const s = params.get('story');
   const ids = window.__REPORT_DATA__.story_ids || [];
   if (s && ids.includes(s)) return s;
-  // An activity filter names the story it came from. A pasted `#activity-filter=`
+  // A sentence filter names the story it came from. A pasted `#sentence-filter=`
   // link carries no `story=` (the Scenarios view doesn't write one), so read it
   // from the filter — otherwise the Stories tab opens on an unrelated story.
-  const fromFilter = (params.get('activity-filter') || '').split(':')[0];
+  const fromFilter = (params.get('sentence-filter') || '').split(':')[0];
   if (ids.includes(fromFilter)) return fromFilter;
   return ids[0] || null;
 }
@@ -105,10 +105,10 @@ function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = data.story_ids || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
-  // Scenario -> covered activity ids, and activity key -> its prose. The story
+  // Scenario -> covered sentence ids, and sentence key -> its prose. The story
   // markup paints that prose as pills, unreadable as a filter label.
-  const scenarioActivities = data.scenario_activities || {};
-  const activityLabels = data.activity_labels || {};
+  const scenarioSentences = data.scenario_sentences || {};
+  const sentenceLabels = data.sentence_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
@@ -193,7 +193,7 @@ function reportApp() {
     themeChoice: theme.choice,
     selectedStory: storyIds[0] || null,
     glossarySearch: '',
-    glossaryKindFilter: { actor: true, object: true, verb: true, kindless: true },
+    glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
     expandedTerms: {},
     showPassed: true,
@@ -207,40 +207,40 @@ function reportApp() {
     tagFilters: [],
     termFilters: [],
     moduleFilter: null,
-    // '<story id>:<activity id>', set by the jump from a story activity.
+    // '<story id>:<sentence id>', set by the jump from a story sentence.
     // Single-select: every jump replaces the last, so a second one could
     // never be selected.
-    activityFilter: null,
+    sentenceFilter: null,
     _suppressHashWrite: false,
-    highlightedActivities: {},
+    highlightedSentences: {},
     // Presence sets: `delete` rather than `= false` keeps the matching
     // "is anything open?" getters a plain key count.
     _toggle(map, key) {
       if (map[key]) delete map[key];
       else map[key] = true;
     },
-    get anyActivitiesHighlighted() {
-      return Object.keys(this.highlightedActivities).length > 0;
+    get anySentencesHighlighted() {
+      return Object.keys(this.highlightedSentences).length > 0;
     },
-    toggleActivityHighlight(id) {
-      this._toggle(this.highlightedActivities, id);
+    toggleSentenceHighlight(id) {
+      this._toggle(this.highlightedSentences, id);
     },
-    clearActivityHighlights() {
-      this.highlightedActivities = {};
+    clearSentenceHighlights() {
+      this.highlightedSentences = {};
     },
-    // Activity ids are per-story ints, so a highlight cannot travel. Cleared
+    // Sentence ids are per-story ints, so a highlight cannot travel. Cleared
     // here rather than in a `selectedStory` watcher, which would fire after
     // `_readHash` had set story and highlights together and undo the second.
     selectStory(id) {
       if (this.selectedStory === id) return;
       this.selectedStory = id;
-      this.highlightedActivities = {};
+      this.highlightedSentences = {};
     },
-    // Story-view scenario cards filter on the selected activities: a card stays
-    // visible when nothing is selected, or when it covers ANY selected activity.
-    activitySelectionMatches(coveredIds) {
-      if (!this.anyActivitiesHighlighted) return true;
-      return coveredIds.some(id => this.highlightedActivities[id]);
+    // Story-view scenario cards filter on the selected sentences: a card stays
+    // visible when nothing is selected, or when it covers ANY selected sentence.
+    sentenceSelectionMatches(coveredIds) {
+      if (!this.anySentencesHighlighted) return true;
+      return coveredIds.some(id => this.highlightedSentences[id]);
     },
     // Terms of one kind surviving the search and definition filters. The
     // headings and their counts are Jinja-rendered report totals, so without
@@ -272,7 +272,7 @@ function reportApp() {
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
-      return ['actor', 'object', 'verb', 'kindless'].some(k => counts[k] > 0);
+      return ['actor', 'object', 'activity', 'kindless'].some(k => counts[k] > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -305,7 +305,7 @@ function reportApp() {
       // An em space: this lands in one x-text, so the gap has to be a character.
       if (parts.length) return parts.join('\u2003');
       const chipped = this.termFilters.length || this.tagFilters.length
-        || this.moduleFilter || this.activityFilter;
+        || this.moduleFilter || this.sentenceFilter;
       return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
@@ -327,7 +327,7 @@ function reportApp() {
     _visible() {
       const state = [
         this.showPassed, this.showFailed, this.showSkipped,
-        this.moduleFilter, this.activityFilter, this.search,
+        this.moduleFilter, this.sentenceFilter, this.search,
         this.tagFilters, this.termFilters,
       ];
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
@@ -447,10 +447,10 @@ function reportApp() {
           }
         }
       }
-      if (this.activityFilter) {
-        const [storyId, activityId] = this.activityFilter.split(':');
+      if (this.sentenceFilter) {
+        const [storyId, sentenceId] = this.sentenceFilter.split(':');
         if (s.story_id !== storyId) return false;
-        if (!(scenarioActivities[s.id] || []).includes(Number(activityId))) {
+        if (!(scenarioSentences[s.id] || []).includes(Number(sentenceId))) {
           return false;
         }
       }
@@ -537,7 +537,7 @@ function reportApp() {
       this.$nextTick(() => this.scrollToAndExpand(nodeId));
     },
     goToScenarioFresh(nodeId) {
-      // Jumping in from a story activity: clear whatever was filtering the
+      // Jumping in from a story sentence: clear whatever was filtering the
       // Scenarios view first, or the scenario you asked for can land behind a
       // filter that hides it. Kept out of goToScenario, which also serves
       // `#scenario=` deep links where the hash's own filters must win.
@@ -548,7 +548,7 @@ function reportApp() {
       this.tagFilters = [];
       this.termFilters = [];
       this.moduleFilter = null;
-      this.activityFilter = null;
+      this.sentenceFilter = null;
       this.search = '';
       this.showPassed = true;
       this.showFailed = true;
@@ -573,25 +573,25 @@ function reportApp() {
       // Reveal the active term rather than landing on an unrelated axis.
       if (hasGlossary) this.view = 'terms';
     },
-    filterScenariosByActivity(key) {
+    filterScenariosBySentence(key) {
       // Navigation, not refinement, as for a term.
       this.resetFilters();
-      this.activityFilter = key;
-      // Keep the timeline lit on the activity you left from, so the Stories
+      this.sentenceFilter = key;
+      // Keep the timeline lit on the sentence you left from, so the Stories
       // tab is a way back rather than a fresh start.
-      this.highlightedActivities = { [key.split(':')[1]]: true };
+      this.highlightedSentences = { [key.split(':')[1]]: true };
       this.mainView = 'scenarios';
     },
-    clearActivityFilter() {
-      this.activityFilter = null;
+    clearSentenceFilter() {
+      this.sentenceFilter = null;
     },
-    activityLabel(key) {
+    sentenceLabel(key) {
       if (!key) return '';
       // The timeline number means nothing in the Scenarios view, so the chip
       // leads with the prose and keeps the number as the pointer back.
       const number = key.split(':')[1];
-      const text = lookup(activityLabels, key, '');
-      return text ? `Activity ${number}: ${text}` : `Activity ${number}`;
+      const text = lookup(sentenceLabels, key, '');
+      return text ? `Sentence ${number}: ${text}` : `Sentence ${number}`;
     },
     removeTermFilter(id) {
       this.termFilters = this.termFilters.filter(t => t !== id);
@@ -730,7 +730,7 @@ function reportApp() {
       // spam); discrete navigations and filters push a back-able one. All
       // writes are suppressed while state is being applied FROM the hash.
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'activityFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
@@ -748,18 +748,18 @@ function reportApp() {
         this.goToTerm(pill.dataset.termId);
       }, true);
       document.addEventListener('click', (event) => {
-        const chip = event.target.closest('[data-activity-id]');
+        const chip = event.target.closest('[data-sentence-id]');
         if (!chip) return;
         // The row's own jump control has a different destination; selecting
         // the row as well would fight it.
-        if (event.target.closest('[data-activity-jump]')) return;
-        this.toggleActivityHighlight(chip.dataset.activityId);
+        if (event.target.closest('[data-sentence-jump]')) return;
+        this.toggleSentenceHighlight(chip.dataset.sentenceId);
       });
-      // The jump control filters the Scenarios view down to that activity.
+      // The jump control filters the Scenarios view down to that sentence.
       document.addEventListener('click', (event) => {
-        const jump = event.target.closest('[data-activity-jump]');
+        const jump = event.target.closest('[data-sentence-jump]');
         if (!jump) return;
-        this.filterScenariosByActivity(jump.dataset.activityJump);
+        this.filterScenariosBySentence(jump.dataset.sentenceJump);
       });
       // Story-view scenario card titles jump to the scenario in the Scenarios view.
       document.addEventListener('click', (event) => {
@@ -860,8 +860,8 @@ function reportApp() {
       } else {
         this.termFilters = [];
       }
-      if (params.has('activity-filter')) this.activityFilter = params.get('activity-filter');
-      else this.activityFilter = null;
+      if (params.has('sentence-filter')) this.sentenceFilter = params.get('sentence-filter');
+      else this.sentenceFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
         this.showPassed = shown.has('passed');
@@ -876,11 +876,11 @@ function reportApp() {
       else this.search = '';
       this.mainView = deserializeView(params);
       this.selectedStory = deserializeStory(params);
-      // Derived, so a pasted `#activity-filter=` link lands the way the in-app
-      // jump does — lit on the activity it names — and back/forward never
+      // Derived, so a pasted `#sentence-filter=` link lands the way the in-app
+      // jump does — lit on the sentence it names — and back/forward never
       // keeps a highlight from the state it left.
-      this.highlightedActivities = this.activityFilter
-        ? { [this.activityFilter.split(':')[1]]: true }
+      this.highlightedSentences = this.sentenceFilter
+        ? { [this.sentenceFilter.split(':')[1]]: true }
         : {};
       // The axis is ephemeral, but a link arriving with a filter should reveal
       // it. Only ever set, never reset — stepping back to an unfiltered state
@@ -911,7 +911,7 @@ function reportApp() {
       if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
-      if (this.activityFilter) params.set('activity-filter', this.activityFilter);
+      if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
 
       const shown = [];
       if (this.showPassed) shown.push('passed');

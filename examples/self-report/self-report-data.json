@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-20T12:57:14.782494+00:00",
+    "timestamp": "2026-09-26T10:11:41.765211+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "87366f4b5994c0b19484b0374fbfdb744733138e",
+    "commit_sha": "05960078bba4716e6f740da8a8ee57f58dffdd3d",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -26,7 +26,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -134,7 +134,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -272,7 +272,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -443,7 +443,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -509,7 +509,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -716,7 +716,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -785,7 +785,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -907,7 +907,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1000,7 +1000,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -1076,7 +1076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 72,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -1157,7 +1157,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -1247,7 +1247,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -1331,7 +1331,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -1439,7 +1439,7 @@
         "configuration"
       ],
       "status": "passed",
-      "duration_ms": 149,
+      "duration_ms": 152,
       "steps": [
         {
           "phase": "given",
@@ -1537,7 +1537,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1629,7 +1629,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1699,7 +1699,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1800,7 +1800,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -1899,7 +1899,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -2021,7 +2021,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2125,7 +2125,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -2202,7 +2202,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -3772,7 +3772,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -3978,7 +3978,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -4055,24 +4055,24 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_file_glossary.py::test_usable_inline_in_activity",
+      "id": "tests/unit/capture/test_file_glossary.py::test_usable_inline_in_sentence",
       "narration": {
-        "text": "Handles are usable inline in an activity",
+        "text": "Handles are usable inline in a sentence",
         "parts": [
           {
-            "value": "Handles are usable inline in an "
+            "value": "Handles are usable inline in a "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           }
         ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -4106,15 +4106,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "its handles build an Activity",
+            "text": "its handles build a Sentence",
             "parts": [
               {
-                "value": "its handles build an "
+                "value": "its handles build a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -4163,7 +4163,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -4269,7 +4269,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -4285,7 +4285,7 @@
           "attachments": [
             {
               "label": "Glossary file",
-              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Actor |\n| Room | y | Work Object |\n",
+              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | Actor |\n| Room | y | Work Object |\n| book | z | Activity |\n",
               "content_type": "text"
             }
           ],
@@ -4417,7 +4417,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 142
+        "line": 144
       },
       "story_id": null,
       "activity_ids": []
@@ -4443,7 +4443,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -4518,7 +4518,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 161
+        "line": 163
       },
       "story_id": null,
       "activity_ids": []
@@ -4594,7 +4594,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 176
+        "line": 178
       },
       "story_id": null,
       "activity_ids": []
@@ -4675,7 +4675,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 196
+        "line": 198
       },
       "story_id": null,
       "activity_ids": []
@@ -4775,7 +4775,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 221
+        "line": 223
       },
       "story_id": null,
       "activity_ids": []
@@ -4862,7 +4862,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 241
+        "line": 243
       },
       "story_id": null,
       "activity_ids": []
@@ -4965,7 +4965,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 265
+        "line": 267
       },
       "story_id": null,
       "activity_ids": []
@@ -5065,7 +5065,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 280
+        "line": 282
       },
       "story_id": null,
       "activity_ids": []
@@ -5179,7 +5179,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 303
+        "line": 305
       },
       "story_id": null,
       "activity_ids": []
@@ -5204,7 +5204,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -5286,7 +5286,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 317
+        "line": 319
       },
       "story_id": null,
       "activity_ids": []
@@ -5692,17 +5692,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_glossary.py::test_verb_call_returns_inflection_sharing_term_identity",
+      "id": "tests/unit/capture/test_glossary.py::test_activity_call_returns_inflection_sharing_term_identity",
       "narration": {
-        "text": "Calling a verb records an inflection of the same term",
+        "text": "Calling an activity records an inflection of the same term",
         "parts": [
           {
-            "value": "Calling a "
+            "value": "Calling an "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " records an "
@@ -5730,15 +5730,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Verb handle for confirm",
+            "text": "an Activity handle for confirm",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " handle for confirm"
@@ -5753,15 +5753,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the Verb is called with a surface form",
+            "text": "the Activity is called with a surface form",
             "parts": [
               {
                 "value": "the "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " is called with a surface form"
@@ -5776,7 +5776,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "an Inflection sharing the verb identity is returned",
+            "text": "an Inflection sharing the activity identity is returned",
             "parts": [
               {
                 "value": "an "
@@ -5787,7 +5787,7 @@
                 "expression": "pg[\"Inflection\"]"
               },
               {
-                "value": " sharing the verb identity is returned"
+                "value": " sharing the activity identity is returned"
               }
             ]
           },
@@ -6107,15 +6107,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the same name is registered as a Verb",
+            "text": "the same name is registered as an Activity",
             "parts": [
               {
-                "value": "the same name is registered as a "
+                "value": "the same name is registered as an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               }
             ]
           },
@@ -6509,9 +6509,9 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_inference.py::test_infers_actor_verb_object_by_position",
+      "id": "tests/unit/capture/test_kind_inference.py::test_infers_actor_activity_object_by_position",
       "narration": {
-        "text": "Term kinds are inferred from activity-slot positions",
+        "text": "Term kinds are inferred from clause-slot positions",
         "parts": [
           {
             "term_id": "term",
@@ -6519,7 +6519,7 @@
             "expression": "pg[\"Term\"]"
           },
           {
-            "value": " kinds are inferred from activity-slot positions"
+            "value": " kinds are inferred from clause-slot positions"
           }
         ]
       },
@@ -6587,7 +6587,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "they are inferred as Actor, Verb, Work Object by slot",
+            "text": "they are inferred as Actor, Activity, Work Object by slot",
             "parts": [
               {
                 "value": "they are inferred as "
@@ -6601,9 +6601,9 @@
                 "value": ", "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": ", "
@@ -6630,6 +6630,176 @@
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
         "line": 46
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/capture/test_kind_inference.py::test_infers_kinds_from_a_second_clause",
+      "narration": {
+        "text": "A term named only in the second clause of a sentence gets its kind inferred",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " named only in the second "
+          },
+          {
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
+          },
+          {
+            "value": " of a "
+          },
+          {
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
+          },
+          {
+            "value": " gets its kind inferred"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_kind_inference",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a glossary of Kindless Term entries",
+            "parts": [
+              {
+                "value": "a glossary of "
+              },
+              {
+                "term_id": "kindless",
+                "display": "Kindless",
+                "expression": "pg[\"Kindless\"]"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " entries"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Sentence whose second Clause starts at another actor",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
+              },
+              {
+                "value": " whose second "
+              },
+              {
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
+              },
+              {
+                "value": " starts at another "
+              },
+              {
+                "term_id": "actor",
+                "display": "actor",
+                "expression": "pg[\"Actor\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Kind inference runs over its Story",
+            "parts": [
+              {
+                "term_id": "kind-inference",
+                "display": "Kind inference",
+                "expression": "pg[\"Kind inference\"]"
+              },
+              {
+                "value": " runs over its "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the first Term of the second clause is an Actor",
+            "parts": [
+              {
+                "value": "the first "
+              },
+              {
+                "term_id": "term",
+                "display": "Term",
+                "expression": "pg[\"Term\"]"
+              },
+              {
+                "value": " of the second clause is an "
+              },
+              {
+                "term_id": "actor",
+                "display": "Actor",
+                "expression": "pg[\"Actor\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_kind_inference.py",
+        "line": 65
       },
       "story_id": null,
       "activity_ids": []
@@ -6802,7 +6972,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 64
+        "line": 101
       },
       "story_id": null,
       "activity_ids": []
@@ -6925,13 +7095,13 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 87
+        "line": 124
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_inference.py::test_verb_and_noun_conflict_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_activity_and_noun_conflict_raises",
       "narration": {
         "text": "A term in both a verb and a noun slot is a conflict",
         "parts": [
@@ -6944,15 +7114,7 @@
             "expression": "pg[\"Term\"].low"
           },
           {
-            "value": " in both a "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " and a noun "
+            "value": " in both a verb and a noun "
           },
           {
             "term_id": "slot",
@@ -7031,7 +7193,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 99
+        "line": 136
       },
       "story_id": null,
       "activity_ids": []
@@ -7124,23 +7286,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 121
+        "line": 157
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_inference.py::test_declared_verb_in_actor_slot_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_activity_in_actor_slot_raises",
       "narration": {
-        "text": "A declared verb in an actor slot is rejected",
+        "text": "A declared activity in an actor slot is rejected",
         "parts": [
           {
             "value": "A declared "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " in an "
@@ -7174,7 +7336,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Term declared as a Verb",
+            "text": "a Term declared as an Activity",
             "parts": [
               {
                 "value": "a "
@@ -7185,12 +7347,12 @@
                 "expression": "pg[\"Term\"]"
               },
               {
-                "value": " declared as a "
+                "value": " declared as an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               }
             ]
           },
@@ -7239,15 +7401,15 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 143
+        "line": 179
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_inference.py::test_verb_and_actor_conflict_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_activity_and_actor_conflict_raises",
       "narration": {
-        "text": "A term used as both verb and actor is a conflict",
+        "text": "A term used as both activity and actor is a conflict",
         "parts": [
           {
             "value": "A "
@@ -7261,9 +7423,9 @@
             "value": " used as both "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " and "
@@ -7345,7 +7507,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 160
+        "line": 197
       },
       "story_id": null,
       "activity_ids": []
@@ -7460,7 +7622,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 186
+        "line": 223
       },
       "story_id": null,
       "activity_ids": []
@@ -7479,15 +7641,7 @@
             "expression": "pg[\"Actor\"].low"
           },
           {
-            "value": " in a "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " "
+            "value": " in a verb "
           },
           {
             "term_id": "slot",
@@ -7562,7 +7716,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 204
+        "line": 241
       },
       "story_id": null,
       "activity_ids": []
@@ -7649,7 +7803,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 223
+        "line": 260
       },
       "story_id": null,
       "activity_ids": []
@@ -7744,23 +7898,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 243
+        "line": 280
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_kind_inference.py::test_declared_verb_in_noun_slot_raises",
+      "id": "tests/unit/capture/test_kind_inference.py::test_declared_activity_in_noun_slot_raises",
       "narration": {
-        "text": "A declared verb in a noun slot is rejected",
+        "text": "A declared activity in a noun slot is rejected",
         "parts": [
           {
             "value": "A declared "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " in a noun "
@@ -7785,7 +7939,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Term declared as a Verb",
+            "text": "a Term declared as an Activity",
             "parts": [
               {
                 "value": "a "
@@ -7796,12 +7950,12 @@
                 "expression": "pg[\"Term\"]"
               },
               {
-                "value": " declared as a "
+                "value": " declared as an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               }
             ]
           },
@@ -7838,7 +7992,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 266
+        "line": 303
       },
       "story_id": null,
       "activity_ids": []
@@ -7871,7 +8025,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "the five positions of a short activity path",
+            "text": "the five positions of a short clause",
             "parts": []
           },
           "children": [],
@@ -7931,7 +8085,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 285
+        "line": 322
       },
       "story_id": null,
       "activity_ids": []
@@ -10193,15 +10347,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a string where a sequence of activity ids goes",
+            "text": "a string where a sequence of sentence ids goes",
             "parts": [
               {
                 "value": "a string where a sequence of "
               },
               {
-                "term_id": "activity",
-                "display": "activity",
-                "expression": "pg[\"Activity\"](\"activity\")"
+                "term_id": "sentence",
+                "display": "sentence",
+                "expression": "pg[\"Sentence\"](\"sentence\")"
               },
               {
                 "value": " ids goes"
@@ -10259,9 +10413,9 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_dispatches_actor_to_activity_term_ref",
+      "id": "tests/unit/capture/test_story.py::test_clause_dispatches_actor_to_clause_term_ref",
       "narration": {
-        "text": "An actor handle in a path becomes a term ref",
+        "text": "An actor handle in a clause becomes a term ref",
         "parts": [
           {
             "value": "An "
@@ -10275,9 +10429,9 @@
             "value": " handle in a "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " becomes a "
@@ -10308,7 +10462,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -10330,15 +10484,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Path is built from three glossary handles",
+            "text": "a Clause is built from three glossary handles",
             "parts": [
               {
                 "value": "a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " is built from three glossary handles"
@@ -10390,17 +10544,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_dispatches_inflected_verb_to_activity_term_ref_with_inflected_display",
+      "id": "tests/unit/capture/test_story.py::test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_display",
       "narration": {
-        "text": "An inflected verb keeps its term identity but shows the inflection",
+        "text": "An inflected activity keeps its term identity but shows the inflection",
         "parts": [
           {
             "value": "An inflected "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " keeps its "
@@ -10439,7 +10593,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -10461,15 +10615,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Verb handle called with an Inflection",
+            "text": "an Activity handle called with an Inflection",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " handle called with an "
@@ -10489,15 +10643,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "it takes the verb slot of a Path",
+            "text": "it takes the verb slot of a Clause",
             "parts": [
               {
                 "value": "it takes the verb slot of a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -10509,7 +10663,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Term ref shows the inflection over the same Verb",
+            "text": "the Term ref shows the inflection over the same Activity",
             "parts": [
               {
                 "value": "the "
@@ -10523,9 +10677,9 @@
                 "value": " shows the inflection over the same "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               }
             ]
           },
@@ -10540,23 +10694,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 106
+        "line": 107
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_dispatches_bare_string_to_activity_word",
+      "id": "tests/unit/capture/test_story.py::test_clause_dispatches_bare_string_to_clause_word",
       "narration": {
-        "text": "A bare string in a path becomes a connective word",
+        "text": "A bare string in a clause becomes a connective word",
         "parts": [
           {
             "value": "A bare string in a "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " becomes a connective word"
@@ -10582,7 +10736,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -10604,15 +10758,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Path is built with a bare word between term nodes",
+            "text": "a Clause is built with a bare word between term nodes",
             "parts": [
               {
                 "value": "a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " is built with a bare word between term nodes"
@@ -10627,15 +10781,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the bare word becomes an Activity Part word, not a Term ref",
+            "text": "the bare word becomes a Clause part word, not a Term ref",
             "parts": [
               {
-                "value": "the bare word becomes an "
+                "value": "the bare word becomes a "
               },
               {
-                "term_id": "activity-part",
-                "display": "Activity Part",
-                "expression": "pg[\"Activity Part\"]"
+                "term_id": "clause-part",
+                "display": "Clause part",
+                "expression": "pg[\"Clause part\"]"
               },
               {
                 "value": " word, not a "
@@ -10658,23 +10812,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 123
+        "line": 126
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_path_with_fewer_than_three_parts",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_fewer_than_three_parts",
       "narration": {
-        "text": "A path needs at least an actor, a verb and a node",
+        "text": "A clause needs at least an actor, an activity and a node",
         "parts": [
           {
             "value": "A "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " needs at least an "
@@ -10685,12 +10839,12 @@
             "expression": "pg[\"Actor\"].low"
           },
           {
-            "value": ", a "
+            "value": ", an "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " and a node"
@@ -10718,7 +10872,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -10729,15 +10883,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Path of only two parts is built",
+            "text": "a Clause of only two parts is built",
             "parts": [
               {
                 "value": "a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " of only two parts is built"
@@ -10766,23 +10920,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 138
+        "line": 141
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_work_object_in_position_0",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_work_object_in_position_0",
       "narration": {
-        "text": "Position 0 of a path must be an actor",
+        "text": "Position 0 of a clause must be an actor",
         "parts": [
           {
             "value": "Position 0 of a "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " must be an "
@@ -10804,7 +10958,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -10826,15 +10980,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Path is built with a Work Object in position 0",
+            "text": "a Clause is built with a Work Object in position 0",
             "parts": [
               {
                 "value": "a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " is built with a "
@@ -10883,31 +11037,31 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 156
+        "line": 159
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_verb_in_position_0",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_activity_in_position_0",
       "narration": {
-        "text": "A verb cannot open a path",
+        "text": "An activity cannot open a clause",
         "parts": [
           {
-            "value": "A "
+            "value": "An "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " cannot open a "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           }
         ]
       },
@@ -10932,7 +11086,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -10954,23 +11108,23 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Verb is placed in position 0 of a Path",
+            "text": "an Activity is placed in position 0 of a Clause",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " is placed in position 0 of a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -11008,13 +11162,13 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 171
+        "line": 174
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_allows_bare_string_in_position_0",
+      "id": "tests/unit/capture/test_story.py::test_clause_allows_bare_string_in_position_0",
       "narration": {
         "text": "A bare string may stand in for the actor slot",
         "parts": [
@@ -11044,7 +11198,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -11066,15 +11220,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a bare string takes position 0 of a Path",
+            "text": "a bare string takes position 0 of a Clause",
             "parts": [
               {
                 "value": "a bare string takes position 0 of a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -11086,15 +11240,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "it is accepted as an Activity Part word",
+            "text": "it is accepted as a Clause part word",
             "parts": [
               {
-                "value": "it is accepted as an "
+                "value": "it is accepted as a "
               },
               {
-                "term_id": "activity-part",
-                "display": "Activity Part",
-                "expression": "pg[\"Activity Part\"]"
+                "term_id": "clause-part",
+                "display": "Clause part",
+                "expression": "pg[\"Clause part\"]"
               },
               {
                 "value": " word"
@@ -11112,31 +11266,31 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 186
+        "line": 189
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_actor_in_position_1",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_actor_in_position_1",
       "narration": {
-        "text": "Position 1 of a path must be a verb",
+        "text": "Position 1 of a clause must be an activity",
         "parts": [
           {
             "value": "Position 1 of a "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
-            "value": " must be a "
+            "value": " must be an "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           }
         ]
       },
@@ -11172,7 +11326,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "an Actor is placed in position 1 of a Path",
+            "text": "an Actor is placed in position 1 of a Clause",
             "parts": [
               {
                 "value": "an "
@@ -11186,9 +11340,9 @@
                 "value": " is placed in position 1 of a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -11200,18 +11354,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError says position 1 is the Verb slot",
+            "text": "a PytestGivenError says position 1 is the verb slot",
             "parts": [
               {
-                "value": "a PytestGivenError says position 1 is the "
+                "value": "a PytestGivenError says position 1 is the verb "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
-              },
-              {
-                "value": " slot"
+                "term_id": "slot",
+                "display": "slot",
+                "expression": "pg[\"Slot\"].low"
               }
             ]
           },
@@ -11226,13 +11377,13 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 196
+        "line": 199
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_work_object_in_position_1",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_work_object_in_position_1",
       "narration": {
         "text": "A work object cannot fill the verb slot",
         "parts": [
@@ -11245,15 +11396,7 @@
             "expression": "pg[\"Work Object\"].low"
           },
           {
-            "value": " cannot fill the "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " "
+            "value": " cannot fill the verb "
           },
           {
             "term_id": "slot",
@@ -11294,7 +11437,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Work Object is placed in position 1 of a Path",
+            "text": "a Work Object is placed in position 1 of a Clause",
             "parts": [
               {
                 "value": "a "
@@ -11308,9 +11451,9 @@
                 "value": " is placed in position 1 of a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -11322,18 +11465,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError says position 1 is the Verb slot",
+            "text": "a PytestGivenError says position 1 is the verb slot",
             "parts": [
               {
-                "value": "a PytestGivenError says position 1 is the "
+                "value": "a PytestGivenError says position 1 is the verb "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
-              },
-              {
-                "value": " slot"
+                "term_id": "slot",
+                "display": "slot",
+                "expression": "pg[\"Slot\"].low"
               }
             ]
           },
@@ -11348,23 +11488,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 211
+        "line": 214
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_verb_in_position_2",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_activity_in_position_2",
       "narration": {
-        "text": "Position 2 of a path must be a noun",
+        "text": "Position 2 of a clause must be a noun",
         "parts": [
           {
             "value": "Position 2 of a "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " must be a noun"
@@ -11392,7 +11532,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -11403,23 +11543,23 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Verb is placed in position 2 of a Path",
+            "text": "an Activity is placed in position 2 of a Clause",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " is placed in position 2 of a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -11445,26 +11585,18 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 226
+        "line": 229
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_allows_bare_verb_between_term_nodes",
+      "id": "tests/unit/capture/test_story.py::test_clause_allows_bare_verb_between_term_nodes",
       "narration": {
         "text": "A bare verb may sit between two real entity nodes",
         "parts": [
           {
-            "value": "A bare "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " may sit between two real entity nodes"
+            "value": "A bare verb may sit between two real entity nodes"
           }
         ]
       },
@@ -11540,23 +11672,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 241
+        "line": 244
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_allows_fully_bare_path",
+      "id": "tests/unit/capture/test_story.py::test_clause_allows_fully_bare_path",
       "narration": {
-        "text": "A path may be fully bare words",
+        "text": "A clause may be fully bare words",
         "parts": [
           {
             "value": "A "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " may be fully bare words"
@@ -11582,15 +11714,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Path is built from them",
+            "text": "a Clause is built from them",
             "parts": [
               {
                 "value": "a "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " is built from them"
@@ -11605,15 +11737,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "every part is an Activity Part word",
+            "text": "every part is a Clause part word",
             "parts": [
               {
-                "value": "every part is an "
+                "value": "every part is a "
               },
               {
-                "term_id": "activity-part",
-                "display": "Activity Part",
-                "expression": "pg[\"Activity Part\"]"
+                "term_id": "clause-part",
+                "display": "Clause part",
+                "expression": "pg[\"Clause part\"]"
               },
               {
                 "value": " word"
@@ -11631,13 +11763,13 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 256
+        "line": 259
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_allows_node_edge_alternation_with_connective",
+      "id": "tests/unit/capture/test_story.py::test_clause_allows_node_edge_alternation_with_connective",
       "narration": {
         "text": "Node/edge alternation allows a trailing connective node",
         "parts": []
@@ -11650,7 +11782,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Actor, a Verb, a Work Object and a second actor",
+            "text": "an Actor, an Activity, a Work Object and a second actor",
             "parts": [
               {
                 "value": "an "
@@ -11661,12 +11793,12 @@
                 "expression": "pg[\"Actor\"]"
               },
               {
-                "value": ", a "
+                "value": ", an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": ", a "
@@ -11689,15 +11821,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "they form a five-part Path joined by a connective",
+            "text": "they form a five-part Clause joined by a connective",
             "parts": [
               {
                 "value": "they form a five-part "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " joined by a connective"
@@ -11726,23 +11858,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 275
+        "line": 278
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_rejects_dangling_edge",
+      "id": "tests/unit/capture/test_story.py::test_clause_rejects_dangling_edge",
       "narration": {
-        "text": "A path may not end on a dangling edge",
+        "text": "A clause may not end on a dangling edge",
         "parts": [
           {
             "value": "A "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " may not end on a dangling edge"
@@ -11759,7 +11891,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Actor, Verb and Work Object plus a connective",
+            "text": "an Actor, Activity and Work Object plus a connective",
             "parts": [
               {
                 "value": "an "
@@ -11773,9 +11905,9 @@
                 "value": ", "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " and "
@@ -11798,7 +11930,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a path ending on a connective edge is built",
+            "text": "a clause ending on a connective edge is built",
             "parts": []
           },
           "children": [],
@@ -11823,31 +11955,31 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 300
+        "line": 304
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_activity_single_path_synthesizes_one_path",
+      "id": "tests/unit/capture/test_story.py::test_sentence_single_clause_synthesizes_one_clause",
       "narration": {
-        "text": "A single-path activity synthesizes one path",
+        "text": "A single-clause sentence synthesizes one clause",
         "parts": [
           {
-            "value": "A single-path "
+            "value": "A single-clause "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " synthesizes one "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           }
         ]
       },
@@ -11870,7 +12002,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -11892,15 +12024,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "an Activity is built from handles directly",
+            "text": "a Sentence is built from handles directly",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is built from handles directly"
@@ -11917,15 +12049,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "it wraps a single Path",
+            "text": "it wraps a single Clause",
             "parts": [
               {
                 "value": "it wraps a single "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -11940,31 +12072,31 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 328
+        "line": 332
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_activity_multi_path_accepts_multiple_paths",
+      "id": "tests/unit/capture/test_story.py::test_sentence_accepts_multiple_clauses",
       "narration": {
-        "text": "An activity may branch into multiple paths",
+        "text": "A sentence may hold several clauses",
         "parts": [
           {
-            "value": "An "
+            "value": "A "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
-            "value": " may branch into multiple "
+            "value": " may hold several "
           },
           {
-            "term_id": "path",
-            "display": "paths",
-            "expression": "pg[\"Path\"](\"paths\")"
+            "term_id": "clause",
+            "display": "clauses",
+            "expression": "pg[\"Clause\"](\"clauses\")"
           }
         ]
       },
@@ -11987,7 +12119,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12009,18 +12141,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "two alternate Path branches",
+            "text": "two clauses",
             "parts": [
               {
-                "value": "two alternate "
+                "value": "two "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
-              },
-              {
-                "value": " branches"
+                "term_id": "clause",
+                "display": "clauses",
+                "expression": "pg[\"Clause\"](\"clauses\")"
               }
             ]
           },
@@ -12032,15 +12161,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "they are combined into one Activity",
+            "text": "they are combined into one Sentence",
             "parts": [
               {
                 "value": "they are combined into one "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -12054,7 +12183,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the activity carries both paths",
+            "text": "the sentence carries both clauses",
             "parts": []
           },
           "children": [],
@@ -12068,23 +12197,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 341
+        "line": 345
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_activity_mixing_parts_and_paths_raises",
+      "id": "tests/unit/capture/test_story.py::test_sentence_mixing_parts_and_clauses_raises",
       "narration": {
-        "text": "Mixing loose parts and prebuilt paths is rejected",
+        "text": "Mixing loose parts and prebuilt clauses is rejected",
         "parts": [
           {
             "value": "Mixing loose parts and prebuilt "
           },
           {
-            "term_id": "path",
-            "display": "paths",
-            "expression": "pg[\"Path\"](\"paths\")"
+            "term_id": "clause",
+            "display": "clauses",
+            "expression": "pg[\"Clause\"](\"clauses\")"
           },
           {
             "value": " is rejected"
@@ -12112,7 +12241,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12134,15 +12263,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a prebuilt Path",
+            "text": "a prebuilt Clause",
             "parts": [
               {
                 "value": "a prebuilt "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               }
             ]
           },
@@ -12154,15 +12283,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "it is combined with loose handles in one Activity",
+            "text": "it is combined with loose handles in one Sentence",
             "parts": [
               {
                 "value": "it is combined with loose handles in one "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -12188,20 +12317,20 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 355
+        "line": 359
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_activity_explicit_id_zero_raises",
+      "id": "tests/unit/capture/test_story.py::test_sentence_explicit_id_zero_raises",
       "narration": {
-        "text": "Activity id 0 is reserved",
+        "text": "Sentence id 0 is reserved",
         "parts": [
           {
-            "term_id": "activity",
-            "display": "Activity",
-            "expression": "pg[\"Activity\"]"
+            "term_id": "sentence",
+            "display": "Sentence",
+            "expression": "pg[\"Sentence\"]"
           },
           {
             "value": " id 0 is reserved"
@@ -12229,7 +12358,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12251,15 +12380,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "an Activity is built with explicit activity_id=0",
+            "text": "a Sentence is built with explicit activity_id=0",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is built with explicit activity_id=0"
@@ -12288,15 +12417,15 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 372
+        "line": 376
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_story_auto_numbers_activities_from_one",
+      "id": "tests/unit/capture/test_story.py::test_story_auto_numbers_sentences_from_one",
       "narration": {
-        "text": "A story auto-numbers its activities from one",
+        "text": "A story auto-numbers its sentences from one",
         "parts": [
           {
             "value": "A "
@@ -12310,9 +12439,9 @@
             "value": " auto-numbers its "
           },
           {
-            "term_id": "activity",
-            "display": "activities",
-            "expression": "pg[\"Activity\"](\"activities\")"
+            "term_id": "sentence",
+            "display": "sentences",
+            "expression": "pg[\"Sentence\"](\"sentences\")"
           },
           {
             "value": " from one"
@@ -12338,7 +12467,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12360,7 +12489,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a Story is built from two Activity rows",
+            "text": "a Story is built from two Sentence rows",
             "parts": [
               {
                 "value": "a "
@@ -12374,9 +12503,9 @@
                 "value": " is built from two "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " rows"
@@ -12393,7 +12522,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the activities are numbered 1 and 2",
+            "text": "the sentences are numbered 1 and 2",
             "parts": []
           },
           "children": [],
@@ -12407,7 +12536,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 390
+        "line": 394
       },
       "story_id": "adopt-pytest-given",
       "activity_ids": []
@@ -12437,7 +12566,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12459,15 +12588,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a mix of explicit and auto Activity ids",
+            "text": "a mix of explicit and auto Sentence ids",
             "parts": [
               {
                 "value": "a mix of explicit and auto "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " ids"
@@ -12516,7 +12645,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 405
+        "line": 409
       },
       "story_id": null,
       "activity_ids": []
@@ -12524,15 +12653,15 @@
     {
       "id": "tests/unit/capture/test_story.py::test_story_rejects_duplicate_activity_ids",
       "narration": {
-        "text": "Duplicate activity ids in a story are rejected",
+        "text": "Duplicate sentence ids in a story are rejected",
         "parts": [
           {
             "value": "Duplicate "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " ids in a "
@@ -12568,7 +12697,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12590,15 +12719,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "two Activity rows sharing an explicit id",
+            "text": "two Sentence rows sharing an explicit id",
             "parts": [
               {
                 "value": "two "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " rows sharing an explicit id"
@@ -12633,7 +12762,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError reports the duplicate activity id",
+            "text": "a PytestGivenError reports the duplicate sentence id",
             "parts": []
           },
           "children": [],
@@ -12647,7 +12776,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 422
+        "line": 426
       },
       "story_id": null,
       "activity_ids": []
@@ -12726,7 +12855,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 442
+        "line": 446
       },
       "story_id": null,
       "activity_ids": []
@@ -12775,7 +12904,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -12797,7 +12926,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "two activities that reach two different glossaries",
+            "text": "two sentences that reach two different glossaries",
             "parts": []
           },
           "children": [],
@@ -12845,7 +12974,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 454
+        "line": 458
       },
       "story_id": null,
       "activity_ids": []
@@ -12926,23 +13055,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 500
+        "line": 504
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_story.py::test_path_allows_second_verb_edge",
+      "id": "tests/unit/capture/test_story.py::test_clause_allows_second_verb_edge",
       "narration": {
-        "text": "A path may chain a second verb-object pair",
+        "text": "A clause may chain a second verb-object pair",
         "parts": [
           {
             "value": "A "
           },
           {
-            "term_id": "path",
-            "display": "path",
-            "expression": "pg[\"Path\"].low"
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
           },
           {
             "value": " may chain a second verb-object pair"
@@ -12957,7 +13086,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Actor, two Verb and two Work Object handles",
+            "text": "an Actor, two Activity and two Work Object handles",
             "parts": [
               {
                 "value": "an "
@@ -12971,9 +13100,9 @@
                 "value": ", two "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " and two "
@@ -12996,15 +13125,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "they form a five-node Path (actor verb object verb object)",
+            "text": "they form a five-node Clause (actor verb object verb object)",
             "parts": [
               {
                 "value": "they form a five-node "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
+                "term_id": "clause",
+                "display": "Clause",
+                "expression": "pg[\"Clause\"]"
               },
               {
                 "value": " (actor verb object verb object)"
@@ -13045,7 +13174,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 583
+        "line": 587
       },
       "story_id": null,
       "activity_ids": []
@@ -13064,15 +13193,7 @@
             "expression": "pg[\"Work Object\"].low"
           },
           {
-            "value": " in a "
-          },
-          {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
-          },
-          {
-            "value": " "
+            "value": " in a verb "
           },
           {
             "term_id": "slot",
@@ -13120,15 +13241,7 @@
             "text": "Room is placed in the verb slot",
             "parts": [
               {
-                "value": "Room is placed in the "
-              },
-              {
-                "term_id": "verb",
-                "display": "verb",
-                "expression": "pg[\"Verb\"].low"
-              },
-              {
-                "value": " "
+                "value": "Room is placed in the verb "
               },
               {
                 "term_id": "slot",
@@ -13159,7 +13272,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 675
+        "line": 679
       },
       "story_id": null,
       "activity_ids": []
@@ -13222,7 +13335,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a search verb",
+            "text": "a search activity",
             "parts": []
           },
           "children": [],
@@ -13244,15 +13357,7 @@
                 "expression": "pg[\"Work Object\"].low"
               },
               {
-                "value": " is placed in the "
-              },
-              {
-                "term_id": "verb",
-                "display": "verb",
-                "expression": "pg[\"Verb\"].low"
-              },
-              {
-                "value": " slot"
+                "value": " is placed in the verb slot"
               }
             ]
           },
@@ -13289,7 +13394,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 701
+        "line": 705
       },
       "story_id": null,
       "activity_ids": []
@@ -13381,7 +13486,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "both paths construct, leaving the kind to inference",
+            "text": "both clauses construct, leaving the kind to inference",
             "parts": []
           },
           "children": [],
@@ -13395,7 +13500,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 722
+        "line": 726
       },
       "story_id": null,
       "activity_ids": []
@@ -13403,15 +13508,15 @@
     {
       "id": "tests/unit/capture/test_story.py::test_non_handle_part_names_its_type",
       "narration": {
-        "text": "A non-handle activity part names its type",
+        "text": "A non-handle clause part names its type",
         "parts": [
           {
             "value": "A non-handle "
           },
           {
-            "term_id": "activity-part",
-            "display": "activity part",
-            "expression": "pg[\"Activity Part\"].low"
+            "term_id": "clause-part",
+            "display": "clause part",
+            "expression": "pg[\"Clause part\"].low"
           },
           {
             "value": " names its type"
@@ -13451,15 +13556,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "an int is passed where a verb handle belongs",
+            "text": "an int is passed where an activity handle belongs",
             "parts": [
               {
-                "value": "an int is passed where a "
+                "value": "an int is passed where an "
               },
               {
-                "term_id": "verb",
-                "display": "verb",
-                "expression": "pg[\"Verb\"].low"
+                "term_id": "activity",
+                "display": "activity",
+                "expression": "pg[\"Activity\"].low"
               },
               {
                 "value": " handle belongs"
@@ -13474,7 +13579,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError names the offending type and the path",
+            "text": "a PytestGivenError names the offending type and the clause",
             "parts": []
           },
           "children": [],
@@ -13488,7 +13593,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_story.py",
-        "line": 737
+        "line": 741
       },
       "story_id": null,
       "activity_ids": []
@@ -14110,17 +14215,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_template.py::test_tstring_with_verb_emits_term_ref_with_canonical_display",
+      "id": "tests/unit/capture/test_template.py::test_tstring_with_activity_emits_term_ref_with_canonical_display",
       "narration": {
-        "text": "A bare verb handle keeps its canonical display",
+        "text": "A bare activity handle keeps its canonical display",
         "parts": [
           {
             "value": "A bare "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " handle keeps its canonical display"
@@ -14135,15 +14240,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Verb handle used without an Inflection",
+            "text": "an Activity handle used without an Inflection",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " handle used without an "
@@ -14174,7 +14279,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Term ref shows the canonical verb",
+            "text": "the Term ref shows the canonical activity",
             "parts": [
               {
                 "value": "the "
@@ -14185,7 +14290,7 @@
                 "expression": "pg[\"Term ref\"]"
               },
               {
-                "value": " shows the canonical verb"
+                "value": " shows the canonical activity"
               }
             ]
           },
@@ -14206,17 +14311,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/capture/test_template.py::test_tstring_with_inflected_verb_emits_term_ref_with_inflected_display",
+      "id": "tests/unit/capture/test_template.py::test_tstring_with_inflected_activity_emits_term_ref_with_inflected_display",
       "narration": {
-        "text": "An inflected verb in a t-string shows the inflection",
+        "text": "An inflected activity in a t-string shows the inflection",
         "parts": [
           {
             "value": "An inflected "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " in a t-string shows the "
@@ -14236,15 +14341,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Verb handle called with an Inflection",
+            "text": "an Activity handle called with an Inflection",
             "parts": [
               {
-                "value": "a "
+                "value": "an "
               },
               {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
+                "term_id": "activity",
+                "display": "Activity",
+                "expression": "pg[\"Activity\"]"
               },
               {
                 "value": " handle called with an "
@@ -14275,7 +14380,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Term ref shows the inflection but keeps the verb id",
+            "text": "the Term ref shows the inflection but keeps the activity id",
             "parts": [
               {
                 "value": "the "
@@ -14286,7 +14391,7 @@
                 "expression": "pg[\"Term ref\"]"
               },
               {
-                "value": " shows the inflection but keeps the verb id"
+                "value": " shows the inflection but keeps the activity id"
               }
             ]
           },
@@ -15631,17 +15736,150 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display",
+      "id": "tests/unit/lint/test_runtime_rules.py::test_dead_term_passes_term_referenced_only_by_a_second_clause",
       "narration": {
-        "text": "An activity is referenced by its terms, whatever their surface form",
+        "text": "Narration lint counts a term named only in the second clause of a sentence as referenced",
         "parts": [
           {
-            "value": "An "
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "value": " counts a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].low"
+          },
+          {
+            "value": " named only in the second "
+          },
+          {
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].low"
+          },
+          {
+            "value": " of a "
+          },
+          {
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
+          },
+          {
+            "value": " as referenced"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_runtime_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a story whose one sentence names the term only in its second clause",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "story",
+                "display": "story",
+                "expression": "pg[\"Story\"].low"
+              },
+              {
+                "value": " whose one "
+              },
+              {
+                "term_id": "sentence",
+                "display": "sentence",
+                "expression": "pg[\"Sentence\"].low"
+              },
+              {
+                "value": " names the "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].low"
+              },
+              {
+                "value": " only in its second "
+              },
+              {
+                "term_id": "clause",
+                "display": "clause",
+                "expression": "pg[\"Clause\"].low"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the runtime rules run over that story",
+            "parts": [
+              {
+                "value": "the runtime "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " run over that story"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "dead-term flags none of its terms",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_runtime_rules.py",
+        "line": 291
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display",
+      "narration": {
+        "text": "A sentence is referenced by its terms, whatever their surface form",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " is referenced by its "
@@ -15664,15 +15902,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Activity written with an Instance and an Inflection",
+            "text": "a Sentence written with an Instance and an Inflection",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " written with an "
@@ -15700,7 +15938,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "Coverage collects the Activity references",
+            "text": "Coverage collects the Sentence references",
             "parts": [
               {
                 "term_id": "coverage",
@@ -15711,9 +15949,9 @@
                 "value": " collects the "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " references"
@@ -15760,25 +15998,25 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_path_activity",
+      "id": "tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_clause_sentence",
       "narration": {
-        "text": "A branching activity unions references across its paths",
+        "text": "A multi-clause sentence unions references across its clauses",
         "parts": [
           {
-            "value": "A branching "
+            "value": "A multi-clause "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " unions references across its "
           },
           {
-            "term_id": "path",
-            "display": "paths",
-            "expression": "pg[\"Path\"](\"paths\")"
+            "term_id": "clause",
+            "display": "clauses",
+            "expression": "pg[\"Clause\"](\"clauses\")"
           }
         ]
       },
@@ -15790,26 +16028,23 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Activity that branches into two Path alternatives",
+            "text": "a Sentence with two clauses",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
-                "value": " that branches into two "
+                "value": " with two "
               },
               {
-                "term_id": "path",
-                "display": "Path",
-                "expression": "pg[\"Path\"]"
-              },
-              {
-                "value": " alternatives"
+                "term_id": "clause",
+                "display": "clauses",
+                "expression": "pg[\"Clause\"](\"clauses\")"
               }
             ]
           },
@@ -15821,7 +16056,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "Coverage collects the Activity references",
+            "text": "Coverage collects the Sentence references",
             "parts": [
               {
                 "term_id": "coverage",
@@ -15832,9 +16067,9 @@
                 "value": " collects the "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " references"
@@ -15849,7 +16084,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the terms of both branches are present",
+            "text": "the terms of both clauses are present",
             "parts": [
               {
                 "value": "the "
@@ -15860,7 +16095,7 @@
                 "expression": "pg[\"Term\"](\"terms\")"
               },
               {
-                "value": " of both branches are present"
+                "value": " of both clauses are present"
               }
             ]
           },
@@ -15875,7 +16110,159 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 66
+        "line": 65
+      },
+      "story_id": null,
+      "activity_ids": []
+    },
+    {
+      "id": "tests/unit/report/test_coverage.py::test_sentence_with_clauses_from_different_actors_is_covered",
+      "narration": {
+        "text": "A sentence whose clauses start at different actors builds and is covered",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
+          },
+          {
+            "value": " whose "
+          },
+          {
+            "term_id": "clause",
+            "display": "clauses",
+            "expression": "pg[\"Clause\"](\"clauses\")"
+          },
+          {
+            "value": " start at different "
+          },
+          {
+            "term_id": "actor",
+            "display": "actors",
+            "expression": "pg[\"Actor\"](\"actors\")"
+          },
+          {
+            "value": " builds and is covered"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_coverage",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Sentence of two clauses: a guest signs the register, and a clerk signs the register",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
+              },
+              {
+                "value": " of two "
+              },
+              {
+                "term_id": "clause",
+                "display": "clauses",
+                "expression": "pg[\"Clause\"](\"clauses\")"
+              },
+              {
+                "value": ": a guest signs the register, and a clerk signs the register"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Step naming both actors, the activity and the register",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "step",
+                "display": "Step",
+                "expression": "pg[\"Step\"]"
+              },
+              {
+                "value": " naming both actors, the activity and the register"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Coverage is computed against the Story",
+            "parts": [
+              {
+                "term_id": "coverage",
+                "display": "Coverage",
+                "expression": "pg[\"Coverage\"]"
+              },
+              {
+                "value": " is computed against the "
+              },
+              {
+                "term_id": "story",
+                "display": "Story",
+                "expression": "pg[\"Story\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Sentence is covered",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
+              },
+              {
+                "value": " is covered"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "activity_ids": [],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_coverage.py",
+        "line": 93
       },
       "story_id": null,
       "activity_ids": []
@@ -16004,7 +16391,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 112
+        "line": 144
       },
       "story_id": null,
       "activity_ids": []
@@ -16043,15 +16430,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Activity naming a bare Actor",
+            "text": "a Sentence naming a bare Actor",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " naming a bare "
@@ -16071,15 +16458,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "the same Activity naming an Instance of that actor",
+            "text": "the same Sentence naming an Instance of that actor",
             "parts": [
               {
                 "value": "the same "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " naming an "
@@ -16153,7 +16540,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Instance Step covers the bare Activity",
+            "text": "the Instance Step covers the bare Sentence",
             "parts": [
               {
                 "value": "the "
@@ -16175,9 +16562,9 @@
                 "value": " covers the bare "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -16189,7 +16576,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the bare Step covers the Instance Activity",
+            "text": "the bare Step covers the Instance Sentence",
             "parts": [
               {
                 "value": "the bare "
@@ -16211,9 +16598,9 @@
                 "value": " "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -16228,23 +16615,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 138
+        "line": 170
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_activity_gains_a_term",
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_sentence_gains_a_term",
       "narration": {
-        "text": "Promoting a bare word to a verb ref drops coverage from a step that matched",
+        "text": "Promoting a bare word to an activity ref drops coverage from a step that matched",
         "parts": [
           {
-            "value": "Promoting a bare word to a "
+            "value": "Promoting a bare word to an "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " ref drops "
@@ -16303,23 +16690,23 @@
         {
           "phase": "given",
           "narration": {
-            "text": "the same Activity with that middle slot a bare word, then a Verb ref",
+            "text": "the same Sentence with that middle slot a bare word, then an Activity ref",
             "parts": [
               {
                 "value": "the same "
               },
               {
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
+              },
+              {
+                "value": " with that middle slot a bare word, then an "
+              },
+              {
                 "term_id": "activity",
                 "display": "Activity",
                 "expression": "pg[\"Activity\"]"
-              },
-              {
-                "value": " with that middle slot a bare word, then a "
-              },
-              {
-                "term_id": "verb",
-                "display": "Verb",
-                "expression": "pg[\"Verb\"]"
               },
               {
                 "value": " ref"
@@ -16359,15 +16746,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the two-ref Activity is covered",
+            "text": "the two-ref Sentence is covered",
             "parts": [
               {
                 "value": "the two-ref "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is covered"
@@ -16382,15 +16769,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the widened Activity is no longer covered",
+            "text": "the widened Sentence is no longer covered",
             "parts": [
               {
                 "value": "the widened "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is no longer covered"
@@ -16408,7 +16795,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 198
+        "line": 230
       },
       "story_id": null,
       "activity_ids": []
@@ -16416,7 +16803,7 @@
     {
       "id": "tests/unit/report/test_coverage.py::test_compute_coverage_scenario_constrained_to_activity_ids",
       "narration": {
-        "text": "A scenario activity binding constrains coverage",
+        "text": "A scenario sentence binding constrains coverage",
         "parts": [
           {
             "value": "A "
@@ -16430,9 +16817,9 @@
             "value": " "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " binding constrains "
@@ -16452,7 +16839,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with two matching activities",
+            "text": "a Story with two matching sentences",
             "parts": [
               {
                 "value": "a "
@@ -16463,7 +16850,7 @@
                 "expression": "pg[\"Story\"]"
               },
               {
-                "value": " with two matching activities"
+                "value": " with two matching sentences"
               }
             ]
           },
@@ -16475,7 +16862,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Scenario bound only to activity 1",
+            "text": "a Scenario bound only to sentence 1",
             "parts": [
               {
                 "value": "a "
@@ -16489,12 +16876,12 @@
                 "value": " "
               },
               {
-                "term_id": "scenario-activity-binding",
+                "term_id": "scenario-sentence-binding",
                 "display": "bound",
-                "expression": "pg[\"Scenario\u2194activity binding\"](\"bound\")"
+                "expression": "pg[\"Scenario\u2194sentence binding\"](\"bound\")"
               },
               {
-                "value": " only to activity 1"
+                "value": " only to sentence 1"
               }
             ]
           },
@@ -16531,7 +16918,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "Coverage considers only the bound Activity",
+            "text": "Coverage considers only the bound Sentence",
             "parts": [
               {
                 "term_id": "coverage",
@@ -16542,9 +16929,9 @@
                 "value": " considers only the bound "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -16559,7 +16946,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 250
+        "line": 280
       },
       "story_id": null,
       "activity_ids": []
@@ -16567,15 +16954,15 @@
     {
       "id": "tests/unit/report/test_coverage.py::test_is_coverage_eligible_true_for_two_distinct_terms",
       "narration": {
-        "text": "An activity with two distinct terms is coverage-eligible",
+        "text": "A sentence with two distinct terms is coverage-eligible",
         "parts": [
           {
-            "value": "An "
+            "value": "A "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " with two distinct "
@@ -16606,15 +16993,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Activity anchored by two distinct Term refs",
+            "text": "a Sentence anchored by two distinct Term refs",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " anchored by two distinct "
@@ -16686,7 +17073,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 297
+        "line": 327
       },
       "story_id": null,
       "activity_ids": []
@@ -16694,15 +17081,15 @@
     {
       "id": "tests/unit/report/test_coverage.py::test_is_coverage_eligible_false_for_one_distinct_term",
       "narration": {
-        "text": "An under-anchored activity is not coverage-eligible",
+        "text": "An under-anchored sentence is not coverage-eligible",
         "parts": [
           {
             "value": "An under-anchored "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " is not "
@@ -16725,15 +17112,15 @@
         {
           "phase": "given",
           "narration": {
-            "text": "an Activity that mentions only one distinct Term",
+            "text": "a Sentence that mentions only one distinct Term",
             "parts": [
               {
-                "value": "an "
+                "value": "a "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " that mentions only one distinct "
@@ -16802,23 +17189,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 319
+        "line": 349
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_excludes_under_anchored_activity",
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_excludes_under_anchored_sentence",
       "narration": {
-        "text": "An under-anchored activity is never covered by narration matching",
+        "text": "An under-anchored sentence is never covered by narration matching",
         "parts": [
           {
             "value": "An under-anchored "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " is never covered by narration matching"
@@ -16833,7 +17220,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story whose Activity is all bare words",
+            "text": "a Story whose Sentence is all bare words",
             "parts": [
               {
                 "value": "a "
@@ -16847,9 +17234,9 @@
                 "value": " whose "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is all bare words"
@@ -16917,7 +17304,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "Coverage excludes the under-anchored Activity",
+            "text": "Coverage excludes the under-anchored Sentence",
             "parts": [
               {
                 "term_id": "coverage",
@@ -16928,9 +17315,9 @@
                 "value": " excludes the under-anchored "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -16945,7 +17332,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 349
+        "line": 379
       },
       "story_id": null,
       "activity_ids": []
@@ -16981,7 +17368,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with one canonical Activity",
+            "text": "a Story with one canonical Sentence",
             "parts": [
               {
                 "value": "a "
@@ -16995,9 +17382,9 @@
                 "value": " with one canonical "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -17062,7 +17449,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the nested Step still counts and the Activity is covered",
+            "text": "the nested Step still counts and the Sentence is covered",
             "parts": [
               {
                 "value": "the nested "
@@ -17076,9 +17463,9 @@
                 "value": " still counts and the "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is covered"
@@ -17096,15 +17483,15 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 374
+        "line": 404
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_step_binding_covers_eligible_activity",
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_step_binding_covers_eligible_sentence",
       "narration": {
-        "text": "An explicit step binding covers an eligible activity",
+        "text": "An explicit step binding covers an eligible sentence",
         "parts": [
           {
             "value": "An explicit "
@@ -17118,9 +17505,9 @@
             "value": " binding covers an eligible "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           }
         ]
       },
@@ -17132,7 +17519,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with a coverage-eligible Activity",
+            "text": "a Story with a coverage-eligible Sentence",
             "parts": [
               {
                 "value": "a "
@@ -17146,9 +17533,9 @@
                 "value": " with a coverage-eligible "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -17174,9 +17561,9 @@
                 "value": " "
               },
               {
-                "term_id": "scenario-activity-binding",
+                "term_id": "scenario-sentence-binding",
                 "display": "bound",
-                "expression": "pg[\"Scenario\u2194activity binding\"](\"bound\")"
+                "expression": "pg[\"Scenario\u2194sentence binding\"](\"bound\")"
               },
               {
                 "value": " to it explicitly by id"
@@ -17239,23 +17626,23 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 411
+        "line": 441
       },
       "story_id": null,
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_binding_covers_under_anchored_activity",
+      "id": "tests/unit/report/test_coverage.py::test_compute_coverage_explicit_binding_covers_under_anchored_sentence",
       "narration": {
-        "text": "An explicit binding covers an under-anchored activity",
+        "text": "An explicit binding covers an under-anchored sentence",
         "parts": [
           {
             "value": "An explicit binding covers an under-anchored "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           }
         ]
       },
@@ -17267,7 +17654,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story whose Activity is under-anchored",
+            "text": "a Story whose Sentence is under-anchored",
             "parts": [
               {
                 "value": "a "
@@ -17281,9 +17668,9 @@
                 "value": " whose "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is under-anchored"
@@ -17312,9 +17699,9 @@
                 "value": " "
               },
               {
-                "term_id": "scenario-activity-binding",
+                "term_id": "scenario-sentence-binding",
                 "display": "bound",
-                "expression": "pg[\"Scenario\u2194activity binding\"](\"bound\")"
+                "expression": "pg[\"Scenario\u2194sentence binding\"](\"bound\")"
               },
               {
                 "value": " to it explicitly by id"
@@ -17377,7 +17764,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_coverage.py",
-        "line": 440
+        "line": 470
       },
       "story_id": null,
       "activity_ids": []
@@ -17385,7 +17772,7 @@
     {
       "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_collects_instances_and_forms",
       "narration": {
-        "text": "The glossary view aggregates instances and verb forms",
+        "text": "The glossary view aggregates instances and activity forms",
         "parts": [
           {
             "value": "The "
@@ -17407,9 +17794,9 @@
             "value": " and "
           },
           {
-            "term_id": "verb",
-            "display": "verb",
-            "expression": "pg[\"Verb\"].low"
+            "term_id": "activity",
+            "display": "activity",
+            "expression": "pg[\"Activity\"].low"
           },
           {
             "value": " forms"
@@ -17472,7 +17859,7 @@
           "attachments": [
             {
               "label": "Report data",
-              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"verb\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"activities\": [\n        {\n          \"id\": 1,\n          \"paths\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
+              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"activity_ids\": [],\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"source\": null,\n      \"story_id\": \"book\",\n      \"activity_ids\": []\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"activity\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"sentences\": [\n        {\n          \"id\": 1,\n          \"clauses\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
               "content_type": "json"
             }
           ],
@@ -17528,10 +17915,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the verb collects its Inflection but not its canonical form",
+            "text": "the activity collects its Inflection but not its canonical form",
             "parts": [
               {
-                "value": "the verb collects its "
+                "value": "the activity collects its "
               },
               {
                 "term_id": "inflection",
@@ -17560,9 +17947,9 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_records_story_refs_via_activities",
+      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_records_story_refs_via_sentences",
       "narration": {
-        "text": "Terms referenced by an activity record the story",
+        "text": "Terms referenced by a sentence record the story",
         "parts": [
           {
             "term_id": "term",
@@ -17570,12 +17957,12 @@
             "expression": "pg[\"Term\"](\"Terms\")"
           },
           {
-            "value": " referenced by an "
+            "value": " referenced by a "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " record the "
@@ -17595,7 +17982,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story whose Activity references an actor and a verb",
+            "text": "a Story whose Sentence references an actor and an activity",
             "parts": [
               {
                 "value": "a "
@@ -17609,12 +17996,12 @@
                 "value": " whose "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
-                "value": " references an actor and a verb"
+                "value": " references an actor and an activity"
               }
             ]
           },
@@ -17649,10 +18036,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the actor and the verb each list that Story",
+            "text": "the actor and the activity each list that Story",
             "parts": [
               {
-                "value": "the actor and the verb each list that "
+                "value": "the actor and the activity each list that "
               },
               {
                 "term_id": "story",
@@ -17711,7 +18098,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story whose two activities repeat the same Term and the same Inflection",
+            "text": "a Story whose two sentences repeat the same Term and the same Inflection",
             "parts": [
               {
                 "value": "a "
@@ -17725,9 +18112,9 @@
                 "value": " whose two "
               },
               {
-                "term_id": "activity",
-                "display": "activities",
-                "expression": "pg[\"Activity\"](\"activities\")"
+                "term_id": "sentence",
+                "display": "sentences",
+                "expression": "pg[\"Sentence\"](\"sentences\")"
               },
               {
                 "value": " repeat the same "
@@ -17843,7 +18230,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story activity referencing entities by canonical name, and a Step referencing one in lowercase",
+            "text": "a Story sentence referencing entities by canonical name, and a Step referencing one in lowercase",
             "parts": [
               {
                 "value": "a "
@@ -17854,7 +18241,7 @@
                 "expression": "pg[\"Story\"]"
               },
               {
-                "value": " activity referencing entities by canonical name, and a "
+                "value": " sentence referencing entities by canonical name, and a "
               },
               {
                 "term_id": "step",
@@ -17920,7 +18307,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 236
+        "line": 238
       },
       "story_id": null,
       "activity_ids": []
@@ -17967,7 +18354,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Kindless Term referenced by a Story activity",
+            "text": "a Kindless Term referenced by a Story sentence",
             "parts": [
               {
                 "value": "a "
@@ -17994,7 +18381,7 @@
                 "expression": "pg[\"Story\"]"
               },
               {
-                "value": " activity"
+                "value": " sentence"
               }
             ]
           },
@@ -18340,7 +18727,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 145,
+      "duration_ms": 139,
       "steps": [
         {
           "phase": "given",
@@ -19270,17 +19657,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_sinks.py::test_json_sink_carries_per_activity_coverage",
+      "id": "tests/unit/report/test_sinks.py::test_json_sink_carries_per_sentence_coverage",
       "narration": {
-        "text": "The JSON report carries each activity's coverage",
+        "text": "The JSON report carries each sentence's coverage",
         "parts": [
           {
             "value": "The JSON report carries each "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg['Activity'].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg['Sentence'].low"
           },
           {
             "value": "'s "
@@ -19295,12 +19682,12 @@
       "module": "tests.unit.report.test_sinks",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with a covered, an uncovered, an untracked Activity",
+            "text": "a Story with a covered, an uncovered, an untracked Sentence",
             "parts": [
               {
                 "value": "a "
@@ -19314,9 +19701,9 @@
                 "value": " with a covered, an uncovered, an untracked "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -19339,15 +19726,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a top-level `coverage` lists every activity once",
+            "text": "a top-level `coverage` lists every sentence once",
             "parts": [
               {
                 "value": "a top-level `coverage` lists every "
               },
               {
-                "term_id": "activity",
-                "display": "activity",
-                "expression": "pg[\"Activity\"].low"
+                "term_id": "sentence",
+                "display": "sentence",
+                "expression": "pg[\"Sentence\"].low"
               },
               {
                 "value": " once"
@@ -19996,17 +20383,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_flags_under_anchored_activity_ineligible",
+      "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_flags_under_anchored_sentence_ineligible",
       "narration": {
-        "text": "An under-anchored activity is flagged ineligible in rollups",
+        "text": "An under-anchored sentence is flagged ineligible in rollups",
         "parts": [
           {
             "value": "An under-anchored "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " is flagged ineligible in rollups"
@@ -20021,7 +20408,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with an anchored and an under-anchored Activity",
+            "text": "a Story with an anchored and an under-anchored Sentence",
             "parts": [
               {
                 "value": "a "
@@ -20035,9 +20422,9 @@
                 "value": " with an anchored and an under-anchored "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               }
             ]
           },
@@ -20060,15 +20447,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "only the anchored Activity is Coverage-eligible",
+            "text": "only the anchored Sentence is Coverage-eligible",
             "parts": [
               {
                 "value": "only the anchored "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is "
@@ -20100,17 +20487,17 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_pinned_under_anchored_activity_is_tracked",
+      "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_pinned_under_anchored_sentence_is_tracked",
       "narration": {
-        "text": "A pinned under-anchored activity stops reading as untracked",
+        "text": "A pinned under-anchored sentence stops reading as untracked",
         "parts": [
           {
             "value": "A pinned under-anchored "
           },
           {
-            "term_id": "activity",
-            "display": "activity",
-            "expression": "pg[\"Activity\"].low"
+            "term_id": "sentence",
+            "display": "sentence",
+            "expression": "pg[\"Sentence\"].low"
           },
           {
             "value": " stops reading as untracked"
@@ -20125,7 +20512,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story whose only Activity is under-anchored",
+            "text": "a Story whose only Sentence is under-anchored",
             "parts": [
               {
                 "value": "a "
@@ -20139,9 +20526,9 @@
                 "value": " whose only "
               },
               {
-                "term_id": "activity",
-                "display": "Activity",
-                "expression": "pg[\"Activity\"]"
+                "term_id": "sentence",
+                "display": "Sentence",
+                "expression": "pg[\"Sentence\"]"
               },
               {
                 "value": " is under-anchored"
@@ -20222,25 +20609,25 @@
       "activity_ids": []
     },
     {
-      "id": "tests/unit/report/test_story_view.py::test_build_activity_labels_joins_parts_into_prose",
+      "id": "tests/unit/report/test_story_view.py::test_build_sentence_labels_joins_parts_into_prose",
       "narration": {
-        "text": "An Activity is labeled by the prose of its paths",
+        "text": "A Sentence is labeled by the prose of its clauses",
         "parts": [
           {
-            "value": "An "
+            "value": "A "
           },
           {
-            "term_id": "activity",
-            "display": "Activity",
-            "expression": "pg[\"Activity\"]"
+            "term_id": "sentence",
+            "display": "Sentence",
+            "expression": "pg[\"Sentence\"]"
           },
           {
             "value": " is labeled by the prose of its "
           },
           {
-            "term_id": "path",
-            "display": "paths",
-            "expression": "pg[\"Path\"](\"paths\")"
+            "term_id": "clause",
+            "display": "clauses",
+            "expression": "pg[\"Clause\"](\"clauses\")"
           }
         ]
       },
@@ -20252,7 +20639,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a Story with a two-path activity",
+            "text": "a Story with a two-clause sentence",
             "parts": [
               {
                 "value": "a "
@@ -20266,17 +20653,17 @@
                 "value": " with a two-"
               },
               {
-                "term_id": "path",
-                "display": "path",
-                "expression": "pg[\"Path\"].low"
+                "term_id": "clause",
+                "display": "clause",
+                "expression": "pg[\"Clause\"].low"
               },
               {
                 "value": " "
               },
               {
-                "term_id": "activity",
-                "display": "activity",
-                "expression": "pg[\"Activity\"].low"
+                "term_id": "sentence",
+                "display": "sentence",
+                "expression": "pg[\"Sentence\"].low"
               }
             ]
           },
@@ -20288,15 +20675,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the activity labels are built",
+            "text": "the sentence labels are built",
             "parts": [
               {
                 "value": "the "
               },
               {
-                "term_id": "activity",
-                "display": "activity",
-                "expression": "pg[\"Activity\"].low"
+                "term_id": "sentence",
+                "display": "sentence",
+                "expression": "pg[\"Sentence\"].low"
               },
               {
                 "value": " labels are built"
@@ -20311,15 +20698,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the label reads as prose under a story-scoped key, with the path texts joined",
+            "text": "the label reads as prose under a story-scoped key, with the clause texts joined",
             "parts": [
               {
                 "value": "the label reads as prose under a story-scoped key, with the "
               },
               {
-                "term_id": "path",
-                "display": "path",
-                "expression": "pg[\"Path\"].low"
+                "term_id": "clause",
+                "display": "clause",
+                "expression": "pg[\"Clause\"].low"
               },
               {
                 "value": " texts joined"
@@ -20718,7 +21105,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -22586,7 +22973,7 @@
       },
       {
         "id": "group",
-        "kind": "verb",
+        "kind": "activity",
         "canonical": "Group",
         "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share both the same name and the same *Node ID* without its parametrize tail \u2014 one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
         "source": {
@@ -22636,7 +23023,7 @@
       },
       {
         "id": "graft",
-        "kind": "verb",
+        "kind": "activity",
         "canonical": "Graft",
         "definition": "Attaching a fixture recording into the active scenario's step tree at the moment its host test starts.",
         "source": {
@@ -22788,20 +23175,20 @@
         "id": "glossary",
         "kind": "object",
         "canonical": "Glossary",
-        "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.verb(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
+        "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.activity(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 75
+          "line": 77
         }
       },
       {
         "id": "file-glossary",
         "kind": null,
         "canonical": "File glossary",
-        "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from activity *slot* positions when no explicit `kind_column` is configured.",
+        "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from clause *slot* positions when no explicit `kind_column` is configured.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 76
+          "line": 78
         }
       },
       {
@@ -22811,27 +23198,27 @@
         "definition": "A term handed over before its kind is settled \u2014 what `g('foo')` and `g['foo']` on a code glossary return, and every *file glossary* lookup. The handle is the same `TermHandle` the typed registrations (`g.actor(...)` and friends) hand back; `declared_kind is None` is what marks the deferral. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 77
+          "line": 79
         }
       },
       {
         "id": "term",
         "kind": null,
         "canonical": "Term",
-        "definition": "A registered glossary entry: an Actor, Work Object, Verb, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str",
+        "definition": "A registered glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 78
+          "line": 80
         }
       },
       {
         "id": "handle",
         "kind": null,
         "canonical": "Handle",
-        "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and activities interpolate, in one of three surface forms: **bare** (`room` \u2014 the canonical display), **`.low`** (`room.low` \u2014 lowercased), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on a *Verb*). Each form renders as a *term ref*.",
+        "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of three surface forms: **bare** (`room` \u2014 the canonical display), **`.low`** (`room.low` \u2014 lowercased), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). Each form renders as a *term ref*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 79
+          "line": 81
         }
       },
       {
@@ -22841,7 +23228,7 @@
         "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind color: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 80
+          "line": 82
         }
       },
       {
@@ -22851,27 +23238,27 @@
         "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind color: a wash in narration, a pill in the Glossary view.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 81
+          "line": 83
         }
       },
       {
-        "id": "verb",
+        "id": "activity",
         "kind": null,
-        "canonical": "Verb",
-        "definition": "A glossary term for an action (e.g., *book*, *confirm*). Verbs accept inflections \u2014 calling `book('books')` records *books* as a surface form of the canonical *book*.",
+        "canonical": "Activity",
+        "definition": "A glossary term for what an actor does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept inflections: calling `book('books')` records *books* as a surface form of the canonical *book*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 82
+          "line": 84
         }
       },
       {
         "id": "term-ref",
         "kind": null,
         "canonical": "Term ref",
-        "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ActivityTermRef` inside activity prose.",
+        "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ClauseTermRef` inside a clause.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 83
+          "line": 85
         }
       },
       {
@@ -22881,107 +23268,107 @@
         "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 84
+          "line": 86
         }
       },
       {
         "id": "inflection",
         "kind": null,
         "canonical": "Inflection",
-        "definition": "A surface form of a Verb other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under \"Also used as:\" in the Glossary.",
-        "source": {
-          "relpath": "GLOSSARY.md",
-          "line": 85
-        }
-      },
-      {
-        "id": "story",
-        "kind": "object",
-        "canonical": "Story",
-        "definition": "A named flow modeled as a sequence of activities. Constructed by `story('Title', [activity(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
-        "source": {
-          "relpath": "GLOSSARY.md",
-          "line": 86
-        }
-      },
-      {
-        "id": "activity",
-        "kind": "object",
-        "canonical": "Activity",
-        "definition": "One row in a story \u2014 typically `actor + verb + work_object` plus optional connective words. Constructed by `activity(...)`.",
+        "definition": "A surface form of an Activity term other than its canonical name (e.g., *searches for* as an inflection of *search*). Reported under \"Also used as:\" in the Glossary.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 87
         }
       },
       {
-        "id": "activity-part",
-        "kind": null,
-        "canonical": "Activity Part",
-        "definition": "The two-variant union making up an activity's prose (`ActivityPart` = `ActivityTermRef` or `ActivityWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare path word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
+        "id": "story",
+        "kind": "object",
+        "canonical": "Story",
+        "definition": "A named flow modeled as a sequence of sentences. Constructed by `story('Title', [sentence(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 88
         }
       },
       {
-        "id": "path",
-        "kind": null,
-        "canonical": "Path",
-        "definition": "A branching segment inside a story \u2014 `path(...)` lets alternate activity sequences share a prefix.",
+        "id": "sentence",
+        "kind": "object",
+        "canonical": "Sentence",
+        "definition": "One numbered row in a story, what Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. Constructed by `sentence(...)`. Usually one clause, built implicitly; several when the sentence has several arrows under one number.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 89
         }
       },
       {
-        "id": "slot",
+        "id": "clause-part",
         "kind": null,
-        "canonical": "Slot",
-        "definition": "A position role in an activity path, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both path validation and *kind inference*.",
+        "canonical": "Clause part",
+        "definition": "The two-variant union making up a clause's prose (`ClausePart` = `ClauseTermRef` or `ClauseWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare clause word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 90
         }
       },
       {
-        "id": "scenario-activity-binding",
+        "id": "clause",
         "kind": null,
-        "canonical": "Scenario\u2194activity binding",
-        "definition": "The link between a scenario (or step) and one or more story activities. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`.",
+        "canonical": "Clause",
+        "definition": "One linear walk through a sentence's arrows, a node/edge alternation starting actor \u2192 verb \u2192 noun, constructed by `clause(...)`. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 91
         }
       },
       {
-        "id": "coverage",
+        "id": "slot",
         "kind": null,
-        "canonical": "Coverage",
-        "definition": "The \"did this scenario touch that activity\" relation. Computed by the *A_refs \u2286 S* rule: an activity is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A step can also cover an activity explicitly via the `activity=` pin, regardless of its narration or its term count.",
+        "canonical": "Slot",
+        "definition": "A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both clause validation and *kind inference*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 92
         }
       },
       {
-        "id": "kind-inference",
+        "id": "scenario-sentence-binding",
         "kind": null,
-        "canonical": "Kind inference",
-        "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story activities; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any activity stays *kindless*.",
+        "canonical": "Scenario\u2194sentence binding",
+        "definition": "The link between a scenario (or step) and one or more story sentences. Carried by `@scenario(story=, activities=)` and the `activity=` kwarg on `given`/`when`/`then`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 93
         }
       },
       {
-        "id": "kindless",
+        "id": "coverage",
         "kind": null,
-        "canonical": "Kindless",
-        "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in an activity). Shown in the report's *Uncategorized* bucket.",
+        "canonical": "Coverage",
+        "definition": "The \"did this scenario touch that sentence\" relation. Computed by the *A_refs \u2286 S* rule: a sentence is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A step can also cover a sentence explicitly via the `activity=` pin, regardless of its narration or its term count.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 94
+        }
+      },
+      {
+        "id": "kind-inference",
+        "kind": null,
+        "canonical": "Kind inference",
+        "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story sentences; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any sentence stays *kindless*.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 95
+        }
+      },
+      {
+        "id": "kindless",
+        "kind": null,
+        "canonical": "Kindless",
+        "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence). Shown in the report's *Uncategorized* bucket.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 96
         }
       },
       {
@@ -22991,7 +23378,7 @@
         "definition": "A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 95
+          "line": 97
         }
       },
       {
@@ -23001,7 +23388,7 @@
         "definition": "Person who writes the application code and \u2014 together with the *Agent* \u2014 the scenarios; curates the glossary with the *Domain Expert*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 103
+          "line": 105
         }
       },
       {
@@ -23011,7 +23398,7 @@
         "definition": "Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 104
+          "line": 106
         }
       },
       {
@@ -23021,7 +23408,7 @@
         "definition": "AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 105
+          "line": 107
         }
       }
     ]
@@ -23030,10 +23417,10 @@
     {
       "id": "adopt-pytest-given",
       "title": "Adopt pytest-given",
-      "activities": [
+      "sentences": [
         {
           "id": 1,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23060,7 +23447,7 @@
         },
         {
           "id": 2,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23078,8 +23465,8 @@
                   "text": "as"
                 },
                 {
-                  "term_id": "activity",
-                  "display": "Activity"
+                  "term_id": "sentence",
+                  "display": "Sentence"
                 }
               ]
             }
@@ -23087,7 +23474,7 @@
         },
         {
           "id": 3,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23114,7 +23501,7 @@
         },
         {
           "id": 4,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23148,7 +23535,7 @@
         },
         {
           "id": 5,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23175,7 +23562,7 @@
         },
         {
           "id": 6,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23202,7 +23589,7 @@
         },
         {
           "id": 7,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23229,7 +23616,7 @@
         },
         {
           "id": 8,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23257,7 +23644,7 @@
         },
         {
           "id": 9,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23285,7 +23672,7 @@
         },
         {
           "id": 10,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23312,7 +23699,7 @@
         },
         {
           "id": 11,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23339,7 +23726,7 @@
         },
         {
           "id": 12,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -23374,23 +23761,23 @@
   "coverage": [
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 1,
+      "sentence_id": 1,
       "tracked": true,
       "scenario_ids": []
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 2,
+      "sentence_id": 2,
       "tracked": true,
       "scenario_ids": [
-        "tests/unit/capture/test_story.py::test_activity_single_path_synthesizes_one_path",
-        "tests/unit/capture/test_story.py::test_activity_multi_path_accepts_multiple_paths",
-        "tests/unit/capture/test_story.py::test_story_auto_numbers_activities_from_one"
+        "tests/unit/capture/test_story.py::test_sentence_single_clause_synthesizes_one_clause",
+        "tests/unit/capture/test_story.py::test_sentence_accepts_multiple_clauses",
+        "tests/unit/capture/test_story.py::test_story_auto_numbers_sentences_from_one"
       ]
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 3,
+      "sentence_id": 3,
       "tracked": true,
       "scenario_ids": [
         "tests/unit/capture/test_glossary.py::test_glossary_actor_registers_and_returns_handle",
@@ -23400,7 +23787,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 4,
+      "sentence_id": 4,
       "tracked": true,
       "scenario_ids": [
         "tests/unit/capture/test_template.py::test_tstring_with_file_term_handle_emits_term_ref"
@@ -23408,7 +23795,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 5,
+      "sentence_id": 5,
       "tracked": true,
       "scenario_ids": [
         "tests/unit/capture/test_step_descriptor.py::test_context_manager_basic",
@@ -23418,7 +23805,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 6,
+      "sentence_id": 6,
       "tracked": true,
       "scenario_ids": [
         "tests/unit/capture/test_collector.py::test_attach_during_fixture_setup_records_into_recording"
@@ -23426,7 +23813,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 7,
+      "sentence_id": 7,
       "tracked": true,
       "scenario_ids": [
         "tests/unit/capture/test_collector.py::test_collect_steps",
@@ -23436,7 +23823,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 8,
+      "sentence_id": 8,
       "tracked": true,
       "scenario_ids": [
         "tests/integration/test_plugin.py::test_step_fixture_appears_as_given_step",
@@ -23447,7 +23834,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 9,
+      "sentence_id": 9,
       "tracked": true,
       "scenario_ids": [
         "tests/integration/test_plugin.py::test_parametrized_test_as_table",
@@ -23458,7 +23845,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 10,
+      "sentence_id": 10,
       "tracked": true,
       "scenario_ids": [
         "tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration"
@@ -23466,7 +23853,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 11,
+      "sentence_id": 11,
       "tracked": true,
       "scenario_ids": [
         "tests/integration/test_plugin_lint.py::test_enabled_error_finding_fails_the_run",
@@ -23484,7 +23871,7 @@
     },
     {
       "story_id": "adopt-pytest-given",
-      "activity_id": 12,
+      "sentence_id": 12,
       "tracked": true,
       "scenario_ids": []
     }

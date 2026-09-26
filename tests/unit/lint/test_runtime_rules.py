@@ -7,16 +7,16 @@ from pytest_given.lint import DEFAULTS
 from pytest_given.lint.base import RuleId
 from pytest_given.lint.runtime_rules import run_runtime_rules
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPath,
-    ActivityTermRef,
+    Clause,
+    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     Narration,
     NarrationTermRef,
     NodeId,
     Scenario,
+    Sentence,
+    SentenceId,
     SourceLocation,
     Step,
     Story,
@@ -235,7 +235,7 @@ def test_dead_term_flags_unreferenced_term() -> None:
         assert finding.subject == 'ghost-term'
         assert finding.message == (
             "term 'Ghost term' is referenced by no scenario name, "
-            'no step and no story activity'
+            'no step and no story sentence'
         )
     with then(t'its {pg["Severity"].low} is off — the rule is opt-in'):
         # Catalog default; `apply_config` drops it unless the suite opts in.
@@ -270,13 +270,13 @@ def test_dead_term_passes_term_referenced_by_a_story() -> None:
     story = Story(
         id=StoryId('s'),
         title='S',
-        activities=(
-            Activity(
-                id=ActivityId(1),
-                paths=(
-                    ActivityPath(
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(
+                    Clause(
                         parts=(
-                            ActivityTermRef(
+                            ClauseTermRef(
                                 term_id=id_derive('Ghost term'), display='Ghost term'
                             ),
                         )
@@ -286,6 +286,39 @@ def test_dead_term_passes_term_referenced_by_a_story() -> None:
         ),
     )
     assert _dead_term_findings(_glossary('Ghost term'), stories=[story]) == []
+
+
+@scenario(
+    t'{pg["Narration lint"]} counts a {pg["Term"].low} named only in the '
+    t'second {pg["Clause"].low} of a {pg["Sentence"].low} as referenced',
+)
+def test_dead_term_passes_term_referenced_only_by_a_second_clause() -> None:
+    def ref(name):
+        return ClauseTermRef(term_id=id_derive(name), display=name)
+
+    with given(
+        t'a {pg["Story"].low} whose one {pg["Sentence"].low} names the '
+        t'{pg["Term"].low} only in its second {pg["Clause"].low}'
+    ):
+        story = Story(
+            id=StoryId('s'),
+            title='S',
+            sentences=(
+                Sentence(
+                    id=SentenceId(1),
+                    clauses=(
+                        Clause(parts=(ref('Guest'), ref('sign'), ref('Register'))),
+                        Clause(parts=(ref('Clerk'), ref('sign'), ref('Register'))),
+                    ),
+                ),
+            ),
+        )
+    with when(t'the runtime {pg["Lint rule"]("rules")} run over that story'):
+        findings = _dead_term_findings(
+            _glossary('Guest', 'Clerk', 'sign', 'Register'), stories=[story]
+        )
+    with then('dead-term flags none of its terms'):
+        assert findings == []
 
 
 def test_dead_term_needs_a_glossary() -> None:

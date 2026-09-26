@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-20T10:25:55.836655+00:00",
+    "timestamp": "2026-09-26T10:27:38.940623+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "f521848c4a3cceed7782b6a312fdd272a8a05ddf",
+    "commit_sha": "05960078bba4716e6f740da8a8ee57f58dffdd3d",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -281,7 +281,7 @@
       },
       {
         "id": "book",
-        "kind": "verb",
+        "kind": "activity",
         "canonical": "book",
         "definition": "Reserve a room for a given stay.",
         "source": {
@@ -335,10 +335,10 @@
     {
       "id": "book-a-room",
       "title": "Book a Room",
-      "activities": [
+      "sentences": [
         {
           "id": 1,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -357,7 +357,7 @@
         },
         {
           "id": 2,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -378,7 +378,7 @@
         },
         {
           "id": 3,
-          "paths": [
+          "clauses": [
             {
               "parts": [
                 {
@@ -406,13 +406,13 @@
   "coverage": [
     {
       "story_id": "book-a-room",
-      "activity_id": 1,
+      "sentence_id": 1,
       "tracked": false,
       "scenario_ids": []
     },
     {
       "story_id": "book-a-room",
-      "activity_id": 2,
+      "sentence_id": 2,
       "tracked": true,
       "scenario_ids": [
         "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room",
@@ -421,7 +421,7 @@
     },
     {
       "story_id": "book-a-room",
-      "activity_id": 3,
+      "sentence_id": 3,
       "tracked": true,
       "scenario_ids": [
         "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room"

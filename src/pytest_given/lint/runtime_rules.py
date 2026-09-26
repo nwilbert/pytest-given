@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from ..model import (
     PHASES,
-    ActivityTermRef,
+    ClauseTermRef,
     Glossary,
     NarrationTermRef,
     NodeId,
@@ -30,7 +30,7 @@ def run_runtime_rules(
     evaluation per logical scenario.
 
     A rule that is off is not evaluated at all. `dead-term` ships off and
-    walks every narration part of every scenario plus every activity path of
+    walks every narration part of every scenario plus every clause of
     every story, so computing its findings only to discard them was the bulk
     of the lint's cost on a default run.
     """
@@ -148,10 +148,10 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
                 if isinstance(part, NarrationTermRef):
                     referenced.add(part.term_id)
     for story in stories:
-        for activity in story.activities:
-            for path in activity.paths:
-                for ref in path.parts:
-                    if isinstance(ref, ActivityTermRef):
+        for sentence in story.sentences:
+            for clause in sentence.clauses:
+                for ref in clause.parts:
+                    if isinstance(ref, ClauseTermRef):
                         referenced.add(ref.term_id)
     return [
         RawFinding(
@@ -160,7 +160,7 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
             location=term.source,
             message=(
                 f'term {term.canonical!r} is referenced by no scenario name, '
-                f'no step and no story activity'
+                f'no step and no story sentence'
             ),
         )
         for term in glossary.terms
@@ -169,7 +169,7 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
 
 
 # Keyed by rule id so `run_runtime_rules` can skip a disabled rule without
-# evaluating it — `dead-term` walks every narration part and every activity
+# evaluating it — `dead-term` walks every narration part and every sentence
 # path, which was the bulk of the lint's cost on a default run.
 _RUNTIME_RULES: dict[RuleId, Callable[[_Context], list[RawFinding]]] = {
     MISSING_PHASE: _missing_phase_findings,

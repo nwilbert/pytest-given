@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Literal, NamedTuple, NewType
 
 from ..model import (
-    ActivityTermRef,
+    ClauseTermRef,
     Glossary,
     GlossaryTerm,
     Narration,
@@ -36,7 +36,7 @@ class TermOccurrence:
 
 
 TermForm = NewType('TermForm', str)
-"""One verb surface form collected from story activity parts.
+"""One activity surface form collected from story clause parts.
 
 The inflection as story prose spells it (`books` for `book`), never the term's
 own canonical name — `record_form` drops that one. A distinct type, so it
@@ -128,11 +128,11 @@ class KindTally:
 _KIND_GROUPS: tuple[_KindRow, ...] = (
     _KindRow('Actors', 'actor', 'term-actor', 'actor'),
     _KindRow('Work Objects', 'object', 'term-obj', 'work object'),
-    _KindRow('Verbs', 'verb', 'term-verb', 'verb'),
+    _KindRow('Activities', 'activity', 'term-activity', 'activity'),
     _KindRow('Uncategorized', 'kindless', 'term-kindless', 'uncategorized'),
 )
 
-# Only an entity has instances worth listing; a verb's surface forms are its
+# Only an entity has instances worth listing; an activity's surface forms are its
 # own section.
 _INSTANCE_KINDS: frozenset[KindKey] = frozenset({'actor', 'object'})
 
@@ -164,7 +164,7 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
         undefined_count=sum(1 for term in terms if term.definition is None),
         all_uncategorized=bool(
             counts['kindless']
-            and not (counts['actor'] or counts['object'] or counts['verb'])
+            and not (counts['actor'] or counts['object'] or counts['activity'])
         ),
     )
 
@@ -203,7 +203,7 @@ def _term_entry(
         aggregation=aggregation,
         scenario_ids=scenario_ids,
         show_instances=show_instances,
-        show_forms=kind_key == 'verb' and bool(aggregation.forms),
+        show_forms=kind_key == 'activity' and bool(aggregation.forms),
         summary=tuple(
             part
             for part in (
@@ -240,8 +240,8 @@ class TermCrossRefs:
 def build_term_crossrefs(report: ReportData) -> TermCrossRefs:
     """Per-term aggregations and the term-to-scenarios index.
 
-    Scenario narrations contribute entity instances; story activity prose
-    contributes story refs, more instances, and verb surface forms. Scenario
+    Scenario narrations contribute entity instances; story sentence prose
+    contributes story refs, more instances, and activity surface forms. Scenario
     render order is preserved and each scenario appears at most once per term.
     """
     glossary = report.glossary
@@ -284,14 +284,14 @@ def _scenario_narrations(scenario: Scenario) -> Iterator[tuple[Narration, str | 
         yield step.narration, step.fixture_name
 
 
-def _story_term_refs(story: Story) -> Iterator[ActivityTermRef]:
-    """Every glossary reference in a story's activity prose."""
+def _story_term_refs(story: Story) -> Iterator[ClauseTermRef]:
+    """Every glossary reference in a story's sentence prose."""
     return (
         part
-        for activity in story.activities
-        for path in activity.paths
-        for part in path.parts
-        if isinstance(part, ActivityTermRef)
+        for sentence in story.sentences
+        for clause in sentence.clauses
+        for part in clause.parts
+        if isinstance(part, ClauseTermRef)
     )
 
 
@@ -329,7 +329,7 @@ class _GlossaryIndex:
         A reference whose display is the term's canonical name — in any case,
         so ``guest.low`` too — is the concept itself, not an instance; only
         specific displays (``Alice`` for ``Guest``) reach the Instances list.
-        Verbs and kindless terms have no instances and are ignored here.
+        Activities and kindless terms have no instances and are ignored here.
         """
         term = self._glossary.get(term_id)
         if term is None or term.kind not in ('actor', 'object'):
@@ -343,13 +343,13 @@ class _GlossaryIndex:
             )
 
     def record_form(self, term_id: TermId, display: str) -> None:
-        """Note one surface form of a verb term.
+        """Note one surface form of an activity term.
 
         The canonical form is the term's own name — in any case — and is not a
-        *form* of it, so only inflections are listed. Non-verbs are ignored.
+        *form* of it, so only inflections are listed. Non-activities are ignored.
         """
         term = self._glossary.get(term_id)
-        if term is None or term.kind != 'verb':
+        if term is None or term.kind != 'activity':
             return
         if (term_id, display) in self._forms:
             return

@@ -16,10 +16,10 @@ import jinja2
 from markupsafe import Markup, escape
 
 from ..model import (
-    ActivityPart,
-    ActivityTermRef,
-    ActivityWord,
     AttachmentRef,
+    ClausePart,
+    ClauseTermRef,
+    ClauseWord,
     Glossary,
     GlossaryTerm,
     Narration,
@@ -43,10 +43,10 @@ from .palette import STATUS_GLYPH, param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
 from .story_view import (
-    activity_key,
-    build_activity_labels,
-    build_scenario_activity_index,
+    build_scenario_sentence_index,
+    build_sentence_labels,
     build_story_rollups,
+    sentence_key,
 )
 from .text import plural
 from .theme import DEFAULT_THEME, Theme
@@ -121,10 +121,10 @@ def _build_env(
         loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
         autoescape=True,
     )
-    # The activity key's format lives in `story_view`; the template emits it
+    # The sentence key's format lives in `story_view`; the template emits it
     # for the jump button and `app.js` looks the label up by it, so both sides
     # go through the one constructor.
-    env.globals['activity_key'] = activity_key
+    env.globals['sentence_key'] = sentence_key
     # The step-tree macro branches on this: an AttachmentRef has no content to
     # expand, only a column to point at.
     env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
@@ -137,7 +137,7 @@ def _build_env(
         param_color_map,
         glossary=report.glossary,
     )
-    env.filters['activity_part'] = _make_activity_part_filter(report.glossary)
+    env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
     env.filters['inline_md'] = _inline_md
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
@@ -173,8 +173,8 @@ def _render_context(
     state is seeded from."""
     glossary_view = build_glossary_view(report)
     coverage = build_coverage_map(report)
-    scn_covers = build_scenario_activity_index(coverage)
-    activity_labels = build_activity_labels(report)
+    scn_covers = build_scenario_sentence_index(coverage)
+    sentence_labels = build_sentence_labels(report)
     scenario_slugs = build_scenario_slug_index(report)
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
@@ -205,8 +205,8 @@ def _render_context(
                 'story_ids': [story.id for story in report.stories],
                 'term_ids': term_ids,
                 'term_scenarios': glossary_view.term_scenarios,
-                'scenario_activities': scn_covers,
-                'activity_labels': activity_labels,
+                'scenario_sentences': scn_covers,
+                'sentence_labels': sentence_labels,
                 'scenario_slugs': {
                     slug: node_id for node_id, slug in scenario_slugs.items()
                 },
@@ -239,7 +239,7 @@ def _script_json_parse(value: object) -> Markup:
 
     The tokenizer-steering sequences are neutralized on the way out —
     `json.dumps` escapes neither inside a string literal, and this blob carries
-    user-controlled node ids and activity prose.
+    user-controlled node ids and sentence prose.
     """
     payload = json.dumps(json.dumps(value, separators=(',', ':')))
     return Markup('JSON.parse(' + _neutralize_script_data(payload) + ')')
@@ -440,7 +440,7 @@ def _render_narration_part(
 _TERM_KIND_CLASSES: dict[TermKind, str] = {
     'actor': 'term-ref-actor',
     'object': 'term-ref-object',
-    'verb': 'term-ref-verb',
+    'activity': 'term-ref-activity',
 }
 
 
@@ -451,12 +451,12 @@ def _term_kind_class(kind: TermKind | None) -> str:
 
 
 def _unknown_term_span(display: str) -> str:
-    """A term the glossary does not hold, as an activity part.
+    """A term the glossary does not hold, as a sentence part.
 
     No `data-term-id`, so the deep-link handler cannot navigate to a `#term=`
-    that does not exist, and no tooltip marker. Activity parts only:
+    that does not exist, and no tooltip marker. Sentence parts only:
     `_render_term_ref` answers the same case for a *narration* with bare text,
-    because narration prose wraps nothing, while every part of an activity
+    because narration prose wraps nothing, while every part of a sentence
     timeline is a span and a bare text node would break its layout.
     """
     return f'<span class="term-ref-unknown">{escape(display)}</span>'
@@ -483,22 +483,22 @@ def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
     return _term_ref_span(term, part.term_id, part.display)
 
 
-def _make_activity_part_filter(
+def _make_clause_part_filter(
     glossary: Glossary | None,
-) -> Callable[[ActivityPart], Markup]:
-    """Jinja filter: renders a single `ActivityPart` to HTML.
+) -> Callable[[ClausePart], Markup]:
+    """Jinja filter: renders a single `ClausePart` to HTML.
 
-    Usage: `{{ part | activity_part }}`
+    Usage: `{{ part | clause_part }}`
     """
 
-    def _render(part: ActivityPart) -> Markup:
+    def _render(part: ClausePart) -> Markup:
         match part:
-            case ActivityTermRef(term_id=tid, display=display):
+            case ClauseTermRef(term_id=tid, display=display):
                 term = glossary.get(tid) if glossary else None
                 if term is None:
                     return Markup(_unknown_term_span(display))
                 return Markup(_term_ref_span(term, tid, display))
-            case ActivityWord(text=text):
-                return Markup(f'<span class="activity-word">{escape(text)}</span>')
+            case ClauseWord(text=text):
+                return Markup(f'<span class="clause-word">{escape(text)}</span>')
 
     return _render

@@ -5,14 +5,12 @@ import pytest
 from pytest_given.capture import FixtureRecording
 from pytest_given.capture.collector import RecordingState
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPart,
-    ActivityPath,
-    ActivityTermRef,
-    ActivityWord,
     Attachment,
     AttachmentRef,
+    Clause,
+    ClausePart,
+    ClauseTermRef,
+    ClauseWord,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -28,6 +26,8 @@ from pytest_given.model import (
     ParameterTable,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     SourceLocation,
     Step,
     Story,
@@ -207,13 +207,13 @@ def test_scenario_source_defaults_to_none() -> None:
 
 
 def test_story_source_defaults_to_none() -> None:
-    s = Story(id=StoryId('checkout'), title='Checkout', activities=())
+    s = Story(id=StoryId('checkout'), title='Checkout', sentences=())
     assert s.source is None
 
 
 def test_story_carries_source_location() -> None:
     src = SourceLocation(relpath='tests/conftest.py', line=12)
-    s = Story(id=StoryId('checkout'), title='Checkout', activities=(), source=src)
+    s = Story(id=StoryId('checkout'), title='Checkout', sentences=(), source=src)
     assert s.source == src
 
 
@@ -248,85 +248,85 @@ def test_glossary_term_is_frozen_and_kw_only() -> None:
     assert term.canonical == 'Guest'
     assert term.definition == 'Person booking accommodation.'
     with pytest.raises(dataclasses.FrozenInstanceError):
-        term.kind = 'verb'  # type: ignore[misc]
+        term.kind = 'activity'  # type: ignore[misc]
 
 
 def test_glossary_term_definition_defaults_none() -> None:
-    term = GlossaryTerm(id=TermId('x'), kind='verb', canonical='x')
+    term = GlossaryTerm(id=TermId('x'), kind='activity', canonical='x')
     assert term.definition is None
 
 
-# --- Task 1.2: Activity-part variants + ActivityPart union ---
+# --- Task 1.2: Sentence-part variants + ClausePart union ---
 
 
-def test_activity_term_ref_carries_term_id_and_display() -> None:
-    part = ActivityTermRef(term_id=TermId('guest'), display='Alice')
+def test_clause_term_ref_carries_term_id_and_display() -> None:
+    part = ClauseTermRef(term_id=TermId('guest'), display='Alice')
     assert part.term_id == 'guest'
     assert part.display == 'Alice'
 
 
-def test_activity_word_carries_text() -> None:
-    part = ActivityWord(text='for')
+def test_clause_word_carries_text() -> None:
+    part = ClauseWord(text='for')
     assert part.text == 'for'
 
 
-def test_activity_parts_are_frozen() -> None:
-    part = ActivityWord(text='for')
+def test_clause_parts_are_frozen() -> None:
+    part = ClauseWord(text='for')
     with pytest.raises(dataclasses.FrozenInstanceError):
         part.text = 'and'  # type: ignore[misc]
 
 
-def test_activity_part_union_accepts_all_variants() -> None:
-    parts: list[ActivityPart] = [
-        ActivityTermRef(term_id=TermId('g'), display='Guest'),
-        ActivityTermRef(term_id=TermId('s'), display='searches'),
-        ActivityWord(text='for'),
+def test_clause_part_union_accepts_all_variants() -> None:
+    parts: list[ClausePart] = [
+        ClauseTermRef(term_id=TermId('g'), display='Guest'),
+        ClauseTermRef(term_id=TermId('s'), display='searches'),
+        ClauseWord(text='for'),
     ]
     assert [type(p).__name__ for p in parts] == [
-        'ActivityTermRef',
-        'ActivityTermRef',
-        'ActivityWord',
+        'ClauseTermRef',
+        'ClauseTermRef',
+        'ClauseWord',
     ]
 
 
-# --- Task 1.3: ActivityPath, Activity, Story with _by_id index ---
+# --- Task 1.3: Clause, Sentence, Story with _by_id index ---
 
 
-def test_activity_path_is_frozen_with_parts_tuple() -> None:
-    path = ActivityPath(
+def test_clause_is_frozen_with_parts_tuple() -> None:
+    path = Clause(
         parts=(
-            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
-            ActivityTermRef(term_id=TermId('search'), display='searches for'),
-            ActivityTermRef(term_id=TermId('room'), display='Room'),
+            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
+            ClauseTermRef(term_id=TermId('search'), display='searches for'),
+            ClauseTermRef(term_id=TermId('room'), display='Room'),
         )
     )
     assert len(path.parts) == 3
 
 
-def test_activity_holds_id_and_paths() -> None:
-    p = ActivityPath(
+def test_sentence_holds_id_and_clauses() -> None:
+    p = Clause(
         parts=(
-            ActivityTermRef(term_id=TermId('g'), display='G'),
-            ActivityTermRef(term_id=TermId('s'), display='s'),
-            ActivityTermRef(term_id=TermId('o'), display='O'),
+            ClauseTermRef(term_id=TermId('g'), display='G'),
+            ClauseTermRef(term_id=TermId('s'), display='s'),
+            ClauseTermRef(term_id=TermId('o'), display='O'),
         )
     )
-    act = Activity(id=ActivityId(1), paths=(p,))
+    act = Sentence(id=SentenceId(1), clauses=(p,))
     assert act.id == 1
-    assert act.paths == (p,)
+    assert act.clauses == (p,)
 
 
 def test_story_glossary_pin_excluded_from_repr_and_equality() -> None:
-    p = ActivityPath(
+    p = Clause(
         parts=(
-            ActivityTermRef(term_id=TermId('g'), display='G'),
-            ActivityTermRef(term_id=TermId('s'), display='s'),
-            ActivityTermRef(term_id=TermId('o'), display='O'),
+            ClauseTermRef(term_id=TermId('g'), display='G'),
+            ClauseTermRef(term_id=TermId('s'), display='s'),
+            ClauseTermRef(term_id=TermId('o'), display='O'),
         )
     )
-    a = Activity(id=ActivityId(1), paths=(p,))
-    s1 = Story(id=StoryId('x'), title='X', activities=(a,))
-    s2 = Story(id=StoryId('x'), title='X', activities=(a,))
+    a = Sentence(id=SentenceId(1), clauses=(p,))
+    s1 = Story(id=StoryId('x'), title='X', sentences=(a,))
+    s2 = Story(id=StoryId('x'), title='X', sentences=(a,))
     assert s1 == s2
     assert '_glossaries' not in repr(s1)
 
@@ -359,7 +359,7 @@ def test_glossary_register_rejects_id_collision() -> None:
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
     with pytest.raises(AssertionError, match='already registered'):
-        g.register(GlossaryTerm(id=TermId('x'), kind='verb', canonical='X'))
+        g.register(GlossaryTerm(id=TermId('x'), kind='activity', canonical='X'))
 
 
 def test_glossary_index_excluded_from_repr() -> None:
@@ -434,7 +434,7 @@ def test_scenario_accepts_story_id_and_activity_ids() -> None:
         narration=Narration(text='t'),
         module='m',
         story_id=StoryId('book'),
-        activity_ids=(ActivityId(1), ActivityId(2)),
+        activity_ids=(SentenceId(1), SentenceId(2)),
     )
     assert s.story_id == 'book'
     assert s.activity_ids == (1, 2)
@@ -449,7 +449,7 @@ def test_step_accepts_activity_ids() -> None:
     step = Step(
         phase='given',
         narration=Narration(text='t'),
-        activity_ids=(ActivityId(3),),
+        activity_ids=(SentenceId(3),),
     )
     assert step.activity_ids == (3,)
 

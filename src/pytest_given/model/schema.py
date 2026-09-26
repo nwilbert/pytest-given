@@ -83,7 +83,7 @@ def case_suffix(node_id: str) -> str:
 
 
 TermId = NewType('TermId', str)
-ActivityId = NewType('ActivityId', int)
+SentenceId = NewType('SentenceId', int)
 StoryId = NewType('StoryId', str)
 
 
@@ -116,7 +116,7 @@ class Narration:
 
 # What a glossary term is: who acts, what is acted on, or the action itself.
 # None while a term's kind is still deferred to `infer_glossary_kinds`.
-type TermKind = Literal['actor', 'object', 'verb']
+type TermKind = Literal['actor', 'object', 'activity']
 
 
 @dataclass(frozen=True)
@@ -142,8 +142,8 @@ class GlossaryTerm:
 
 
 @dataclass(frozen=True, kw_only=True)
-class ActivityTermRef:
-    """Reference to a glossary term in an activity path. Kind resolved via
+class ClauseTermRef:
+    """Reference to a glossary term in a clause. Kind resolved via
     glossary[term_id].kind — mirrors NarrationTermRef. Used for both
     code-defined handles and file-glossary handles (whose kind may be
     inferred post-collection)."""
@@ -153,31 +153,31 @@ class ActivityTermRef:
 
 
 @dataclass(frozen=True, kw_only=True)
-class ActivityWord:
+class ClauseWord:
     """Bare-string connective (preposition, article, etc.). Carries no kind."""
 
     text: str
 
 
-type ActivityPart = ActivityTermRef | ActivityWord
+type ClausePart = ClauseTermRef | ClauseWord
 
 
 @dataclass(frozen=True, kw_only=True)
-class ActivityPath:
-    parts: tuple[ActivityPart, ...]
+class Clause:
+    parts: tuple[ClausePart, ...]
 
 
 @dataclass(frozen=True, kw_only=True)
-class Activity:
-    id: ActivityId
-    paths: tuple[ActivityPath, ...]
+class Sentence:
+    id: SentenceId
+    clauses: tuple[Clause, ...]
 
 
 @dataclass(frozen=True, kw_only=True)
 class Story:
     id: StoryId
     title: str
-    activities: tuple[Activity, ...]
+    sentences: tuple[Sentence, ...]
     source: SourceLocation | None = None
 
 
@@ -323,7 +323,7 @@ class Step:
     narration: Narration
     children: list[Step] = field(default_factory=list)
     attachments: list[StepAttachment] = field(default_factory=list)
-    activity_ids: tuple[ActivityId, ...] = ()
+    activity_ids: tuple[SentenceId, ...] = ()
     fixture_name: str | None = None
     # Anchor of the step's body for the narration lint; captured only when
     # lint is enabled, and never serialized so report artifacts stay
@@ -400,7 +400,7 @@ class Scenario:
     skip_reason: str | None = None
     source: SourceLocation | None = None
     story_id: StoryId | None = None
-    activity_ids: tuple[ActivityId, ...] = ()
+    activity_ids: tuple[SentenceId, ...] = ()
 
 
 @dataclass(frozen=True)

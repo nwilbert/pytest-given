@@ -18,10 +18,10 @@ from typing import (
 )
 
 from ..model import (
-    ActivityId,
     Narration,
     Phase,
     PytestGivenError,
+    SentenceId,
     SourceLocation,
     narration_of,
 )
@@ -125,12 +125,12 @@ class StepDescriptor:
         phase: Phase,
         text: StepText,
         *,
-        activity_ids: tuple[ActivityId, ...] = (),
+        activity_ids: tuple[SentenceId, ...] = (),
     ) -> None:
         self.phase = phase
         self._source: StepText = text
         self.narration: Narration = narration_from(text)
-        self.activity_ids: tuple[ActivityId, ...] = activity_ids
+        self.activity_ids: tuple[SentenceId, ...] = activity_ids
 
     @property
     def is_deferred_template(self) -> bool:
@@ -405,8 +405,8 @@ class WhenThen:
 def normalize_activity(
     activity: int | Sequence[int] | None,
     kwarg: str = 'activity',
-) -> tuple[ActivityId, ...]:
-    """Normalize an ``activity=`` / ``activities=`` kwarg to ActivityId values.
+) -> tuple[SentenceId, ...]:
+    """Normalize an ``activity=`` / ``activities=`` kwarg to SentenceId values.
 
     `kwarg` names the argument the author actually wrote, so the step form and
     the scenario form each report their own.
@@ -418,15 +418,15 @@ def normalize_activity(
     # `isinstance`. Without the guards `activities='13'` would yield ids 1
     # and 3 rather than the TypeError it deserves.
     if isinstance(activity, int) and not isinstance(activity, bool):
-        return (ActivityId(activity),)
+        return (SentenceId(activity),)
     if isinstance(activity, Sequence) and not isinstance(activity, str):
-        result: list[ActivityId] = []
+        result: list[SentenceId] = []
         for item in activity:
             if not isinstance(item, int) or isinstance(item, bool):
                 raise TypeError(
                     f'{kwarg} sequence must contain int values, got {type(item)!r}'
                 )
-            result.append(ActivityId(item))
+            result.append(SentenceId(item))
         return tuple(result)
     raise TypeError(
         f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'

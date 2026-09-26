@@ -42,7 +42,7 @@
      the sidebar swatch. */
   --term-actor-ink: #8a4310;    --term-actor-wash: #fde5d3;    --term-actor-edge: #f0b48a;
   --term-object-ink: #0f6e64;   --term-object-wash: #d5f2ee;   --term-object-edge: #7fd5c9;
-  --term-verb-ink: #5f2d9a;     --term-verb-wash: #ece0f7;     --term-verb-edge: #c6aef0;
+  --term-activity-ink: #5f2d9a; --term-activity-wash: #ece0f7; --term-activity-edge: #c6aef0;
   --term-kindless-ink: #545962; --term-kindless-wash: #e9ecf0; --term-kindless-edge: #c9ccd3;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
@@ -83,7 +83,7 @@
 
   --term-actor-ink: #f5b47a;    --term-actor-wash: #47302b;    --term-actor-edge: #7a4a2e;
   --term-object-ink: #7fded0;   --term-object-wash: #21383f;   --term-object-edge: #2a6b62;
-  --term-verb-ink: #cbb5f7;     --term-verb-wash: #372e4d;     --term-verb-edge: #5b4886;
+  --term-activity-ink: #cbb5f7; --term-activity-wash: #372e4d; --term-activity-edge: #5b4886;
   --term-kindless-ink: #b8b2c2; --term-kindless-wash: #312c38; --term-kindless-edge: #4a4455;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
@@ -498,14 +498,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    under the surface's border, whichever row that is after filtering. */
 .scenario-list,
 .entry-list,
-.activity-timeline {
+.sentence-timeline {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .scenario,
-.activity-row,
+.sentence-row,
 .entry {
   border-top: 1px solid var(--border);
   margin-top: -1px;
@@ -915,7 +915,7 @@ span.param-highlight {
   padding-block: 0;
 }
 
-/* === Term refs in narration (actor / object / verb / no kind) ===
+/* === Term refs in narration (actor / object / activity / no kind) ===
    A light wash behind the word, with the kind in the ink. The two channels
    carry different things: the wash says "this word is a glossary term", the
    ink says which kind, and only the first has to survive every context the
@@ -946,7 +946,7 @@ span.param-highlight {
    reading as two marks, and would collide with the line above. */
 .term-ref-actor,
 .term-ref-object,
-.term-ref-verb,
+.term-ref-activity,
 .term-ref-unknown {
   padding: 1px 3px;
   border-radius: 3px;
@@ -959,7 +959,7 @@ span.param-highlight {
 }
 .term-ref-actor { background: var(--term-actor-wash); color: var(--term-actor-ink); }
 .term-ref-object { background: var(--term-object-wash); color: var(--term-object-ink); }
-.term-ref-verb { background: var(--term-verb-wash); color: var(--term-verb-ink); }
+.term-ref-activity { background: var(--term-activity-wash); color: var(--term-activity-ink); }
 /* The kindless ink is a grey that differs from the body ink in hue, not only
    lightness: a lighter body ink reads as body text lightened — receding, the
    opposite of marked. */
@@ -972,7 +972,7 @@ span.param-highlight {
 /* Colored text underlining on hover is the plain link idiom, which is what
    lets the resting state spend nothing on a click affordance. */
 .term-ref--link:hover { text-decoration: underline; }
-.activity-word {
+.clause-word {
   color: var(--text-secondary);
 }
 /* Custom hover tooltip for term refs, replacing the native title: the
@@ -1075,17 +1075,17 @@ span.param-highlight {
 .story-sidebar-title { font-weight: 600; font-size: var(--font-size-md); }
 .story-sidebar-meta { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
 
-/* === Activity timeline === */
-.activity-timeline { margin-bottom: var(--space-xl); }
-.activity-row {
+/* === Sentence timeline === */
+.sentence-timeline { margin-bottom: var(--space-xl); }
+.sentence-row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.activity-row:hover:not(.activity-row-highlight) { background: var(--bg-page); }
-.activity-num {
+.sentence-row:hover:not(.sentence-row-highlight) { background: var(--bg-page); }
+.sentence-num {
   min-width: 24px;
   padding: 0;
   height: 24px;
@@ -1100,15 +1100,15 @@ span.param-highlight {
   font-weight: 600;
   flex-shrink: 0;
 }
-.activity-row:hover .activity-num:not(.activity-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
-.activity-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.activity-path { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
+.sentence-row:hover .sentence-num:not(.sentence-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
+.sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 /* Counts side by side, separated by space rather than a glyph. */
 .meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
 
 /* === Coverage chip === */
-.activity-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
+.sentence-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
 /* A flex row so its counts, when there are several, sit a space apart. */
 .cov-chip {
   display: inline-flex;
@@ -1142,7 +1142,7 @@ span.param-highlight {
   cursor: pointer;
 }
 .use-chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
-/* Non-interactive chips (term instances, verb forms): no link affordance. */
+/* Non-interactive chips (term instances, activity forms): no link affordance. */
 .use-chip--static { cursor: default; }
 .use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
 .scn-act-strip {
@@ -1154,7 +1154,7 @@ span.param-highlight {
   flex-wrap: wrap;
 }
 .scn-act-label { color: var(--text-muted); font-weight: 600; }
-/* Activity-id bubbles are single numbers: keep them round, not elongated pills. */
+/* Sentence-id bubbles are single numbers: keep them round, not elongated pills. */
 .scn-act-strip .use-chip {
   min-width: 22px;
   height: 22px;
@@ -1165,7 +1165,7 @@ span.param-highlight {
   justify-content: center;
 }
 .scn-act-strip-section { margin-top: var(--space-xl); }
-/* Section label separating the scenario list from the activity timeline above. */
+/* Section label separating the scenario list from the sentence timeline above. */
 .story-section-heading { margin-bottom: var(--space-sm); }
 
 /* Kind filter rows in sidebar */
@@ -1187,7 +1187,7 @@ span.param-highlight {
 }
 .kind-swatch-actor { background: var(--term-actor-edge); }
 .kind-swatch-object { background: var(--term-object-edge); }
-.kind-swatch-verb { background: var(--term-verb-edge); }
+.kind-swatch-activity { background: var(--term-activity-edge); }
 .kind-swatch-kindless { background: var(--term-kindless-edge); }
 
 /* === Kind section headers === */
@@ -1214,7 +1214,7 @@ span.param-highlight {
    The kindless border stays dashed — the catalog's own mark for "not a kind". */
 .term-actor { color: var(--term-actor-ink); }
 .term-obj { color: var(--term-object-ink); }
-.term-verb { color: var(--term-verb-ink); }
+.term-activity { color: var(--term-activity-ink); }
 .term-kindless { color: var(--term-kindless-ink); }
 
 /* === Term pills === */
@@ -1227,7 +1227,7 @@ span.param-highlight {
 }
 .term-pill.term-actor { background: var(--term-actor-wash); border: 1px solid var(--term-actor-edge); }
 .term-pill.term-obj { background: var(--term-object-wash); border: 1px solid var(--term-object-edge); }
-.term-pill.term-verb { background: var(--term-verb-wash); border: 1px solid var(--term-verb-edge); }
+.term-pill.term-activity { background: var(--term-activity-wash); border: 1px solid var(--term-activity-edge); }
 .term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
 
 /* === Glossary entry layout === */
@@ -1315,29 +1315,29 @@ span.param-highlight {
 }
 .filter-chip-x:hover { opacity: 1; }
 
-/* Selecting an activity row reveals its way out — a selected row is this
+/* Selecting a sentence row reveals its way out — a selected row is this
    timeline's expanded state, the way the glossary hides the equivalent action
    behind expanding an entry. Hidden rather than dimmed, so it is not a tab
    stop while it is out of reach. */
-.activity-jump {
+.sentence-jump {
   display: none;
   font: inherit;
   font-size: var(--font-size-sm);
   white-space: nowrap;
 }
-.activity-row-highlight .activity-jump { display: inline-block; }
-.activity-jump:focus-visible {
+.sentence-row-highlight .sentence-jump { display: inline-block; }
+.sentence-jump:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/* === Activity highlighting (multi-select) === */
-/* A selected activity's timeline row takes the accent tint, like a selected
+/* === Sentence highlighting (multi-select) === */
+/* A selected sentence's timeline row takes the accent tint, like a selected
    sidebar row; its bubble and the matching scenario bubbles go solid accent. */
-.activity-row-highlight { background: var(--color-accent-tint); }
+.sentence-row-highlight { background: var(--color-accent-tint); }
 .scn-act-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-surface); }
-.activity-num-highlight,
-.activity-num-highlight:hover,
+.sentence-num-highlight,
+.sentence-num-highlight:hover,
 .use-chip-highlight,
 .use-chip-highlight:hover {
   background: var(--color-accent);

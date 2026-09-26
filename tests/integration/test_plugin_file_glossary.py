@@ -16,10 +16,10 @@ g = FileGlossary('GLOSSARY.md')
 """
 
 TEST_FILE = """
-from pytest_given import scenario, when, story, activity
+from pytest_given import scenario, when, story, sentence
 from conftest import g
 
-book = story('Book a room', [activity(g['Guest'], g['search'], g['Room'])])
+book = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])
 
 
 @scenario('Guest searches', story=book)
@@ -39,4 +39,4 @@ def test_file_glossary_kinds_resolved_in_report(pytester):
 
     data = json.loads(json_path.read_text(encoding='utf-8'))
     kinds = {term['id']: term['kind'] for term in data['glossary']['terms']}
-    assert kinds == {'guest': 'actor', 'search': 'verb', 'room': 'object'}
+    assert kinds == {'guest': 'actor', 'search': 'activity', 'room': 'object'}

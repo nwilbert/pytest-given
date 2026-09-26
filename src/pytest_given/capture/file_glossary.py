@@ -23,7 +23,7 @@ _KIND_ALIASES: dict[str, TermKind] = {
     'object': 'object',
     'work object': 'object',
     'work_object': 'object',
-    'verb': 'verb',
+    'activity': 'activity',
 }
 
 
@@ -88,7 +88,7 @@ class FileGlossary(LookupGlossary):
         if mapped is None:
             raise PytestGivenError(
                 f'{self._path}:{line}: unrecognized kind {raw!r}; expected one of '
-                f"'actor', 'object'/'work object', 'verb'."
+                f"'actor', 'object'/'work object', 'activity'."
             )
         return mapped
 

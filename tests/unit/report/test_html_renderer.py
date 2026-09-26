@@ -5,11 +5,9 @@ from pathlib import Path
 
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPath,
-    ActivityTermRef,
-    ActivityWord,
+    Clause,
+    ClauseTermRef,
+    ClauseWord,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -21,6 +19,8 @@ from pytest_given.model import (
     ParameterTable,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     Step,
     Story,
     StoryId,
@@ -35,7 +35,7 @@ from pytest_given.report.html_renderer import (
     _app_data,
     _build_param_color_map,
     _inline_md,
-    _make_activity_part_filter,
+    _make_clause_part_filter,
     _make_narration_filter,
     _neutralize_script_data,
     _strip_comments,
@@ -1376,7 +1376,7 @@ def _glossary() -> Glossary:
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
     return g
 
 
@@ -1400,14 +1400,14 @@ def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
     assert 'term-ref-object' in str(f(n))
 
 
-def test_narration_filter_renders_verb_term_ref_with_verb_class() -> None:
+def test_narration_filter_renders_activity_term_ref_with_activity_class() -> None:
     g = _glossary()
     f = _make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='search',
         parts=(NarrationTermRef(term_id=TermId('search'), display='searches'),),
     )
-    assert 'term-ref-verb' in str(f(n))
+    assert 'term-ref-activity' in str(f(n))
 
 
 def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
@@ -1474,46 +1474,46 @@ def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
 
 
 # ---------------------------------------------------------------------------
-# activity_part filter
+# clause_part filter
 # ---------------------------------------------------------------------------
 
 
-def test_activity_part_filter_actor_term_ref():
+def test_clause_part_filter_actor_term_ref():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    f = _make_activity_part_filter(g)
-    out = str(f(ActivityTermRef(term_id=TermId('guest'), display='Alice')))
+    f = _make_clause_part_filter(g)
+    out = str(f(ClauseTermRef(term_id=TermId('guest'), display='Alice')))
     assert 'term-ref-actor' in out
     assert 'Alice' in out
 
 
-def test_activity_part_filter_object_term_ref():
+def test_clause_part_filter_object_term_ref():
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
-    f = _make_activity_part_filter(g)
-    out = str(f(ActivityTermRef(term_id=TermId('room'), display='Room')))
+    f = _make_clause_part_filter(g)
+    out = str(f(ClauseTermRef(term_id=TermId('room'), display='Room')))
     assert 'term-ref-object' in out
 
 
-def test_activity_part_filter_unknown_term_ref_falls_back():
-    f = _make_activity_part_filter(Glossary())  # empty glossary
-    out = str(f(ActivityTermRef(term_id=TermId('missing'), display='X')))
+def test_clause_part_filter_unknown_term_ref_falls_back():
+    f = _make_clause_part_filter(Glossary())  # empty glossary
+    out = str(f(ClauseTermRef(term_id=TermId('missing'), display='X')))
     assert 'term-ref-unknown' in out
 
 
-def test_activity_part_filter_verb_term_ref_renders_verb_class():
+def test_clause_part_filter_activity_term_ref_renders_activity_class():
     g = Glossary()
-    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
-    f = _make_activity_part_filter(g)
-    out = str(f(ActivityTermRef(term_id=TermId('search'), display='searches')))
-    assert 'term-ref-verb' in out
+    g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
+    f = _make_clause_part_filter(g)
+    out = str(f(ClauseTermRef(term_id=TermId('search'), display='searches')))
+    assert 'term-ref-activity' in out
     assert 'searches' in out
 
 
-def test_activity_part_filter_word_renders_activity_word_class():
-    f = _make_activity_part_filter(None)
-    out = str(f(ActivityWord(text='for')))
-    assert 'activity-word' in out
+def test_clause_part_filter_word_renders_clause_word_class():
+    f = _make_clause_part_filter(None)
+    out = str(f(ClauseWord(text='for')))
+    assert 'clause-word' in out
     assert 'for' in out
 
 
@@ -1545,7 +1545,7 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
                         },
                         {
                             'id': 'search',
-                            'kind': 'verb',
+                            'kind': 'activity',
                             'canonical': 'search',
                             'definition': '',
                         },
@@ -1561,10 +1561,10 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
                     {
                         'id': 'book-a-room',
                         'title': 'Book a Room',
-                        'activities': [
+                        'sentences': [
                             {
                                 'id': 1,
-                                'paths': [
+                                'clauses': [
                                     {
                                         'parts': [
                                             {
@@ -1711,22 +1711,20 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     `_glossaries` stash that previously didn't round-trip."""
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
-    g.register(GlossaryTerm(id=TermId('search'), kind='verb', canonical='search'))
+    g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))
     g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
     story = Story(
         id=StoryId('book-a-room'),
         title='Book a Room',
-        activities=(
-            Activity(
-                id=ActivityId(1),
-                paths=(
-                    ActivityPath(
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(
+                    Clause(
                         parts=(
-                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
-                            ActivityTermRef(
-                                term_id=TermId('search'), display='searches'
-                            ),
-                            ActivityTermRef(term_id=TermId('room'), display='Room'),
+                            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
+                            ClauseTermRef(term_id=TermId('search'), display='searches'),
+                            ClauseTermRef(term_id=TermId('room'), display='Room'),
                         )
                     ),
                 ),
@@ -1771,7 +1769,7 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'term-ref-actor' in content
-    assert 'term-ref-verb' in content
+    assert 'term-ref-activity' in content
 
 
 def test_render_glossary_all_uncategorized_hides_kind_ui(tmp_path: Path) -> None:
@@ -1848,7 +1846,7 @@ def test_render_glossary_all_uncategorized_header_omits_kind_breakdown(
     tmp_path: Path,
 ) -> None:
     """With every term uncategorized, the header context collapses to just the
-    term count — the '0 actors · 0 work objects · 0 verbs · N uncategorized'
+    term count — the '0 actors · 0 work objects · 0 activities · N uncategorized'
     breakdown is noise and is dropped."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
@@ -2033,10 +2031,10 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                 {
                     'id': f'story{_BREAKOUT}',
                     'title': 'a story',
-                    'activities': [
+                    'sentences': [
                         {
                             'id': f'act{_BREAKOUT}',
-                            'paths': [{'parts': [{'text': 'does a thing'}]}],
+                            'clauses': [{'parts': [{'text': 'does a thing'}]}],
                         }
                     ],
                 }
@@ -2174,11 +2172,11 @@ def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
     assert '<div class="topbar-title">Coffee Shop Example</div>' in content
 
 
-def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
-    """The Scenarios view filters by activity in the browser, so the page has to
-    carry both directions as data: which activities each scenario covers, and
-    what each activity says. Neither is derivable from the story markup, which
-    only paints the activity's prose as pills inside the Stories view."""
+def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
+    """The Scenarios view filters by sentence in the browser, so the page has to
+    carry both directions as data: which sentences each scenario covers, and
+    what each sentence says. Neither is derivable from the story markup, which
+    only paints the sentence's prose as pills inside the Stories view."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -2192,7 +2190,7 @@ def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
                 'glossary': {
                     'terms': [
                         {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
-                        {'id': 'search', 'kind': 'verb', 'canonical': 'search'},
+                        {'id': 'search', 'kind': 'activity', 'canonical': 'search'},
                         {'id': 'room', 'kind': 'object', 'canonical': 'Room'},
                     ],
                 },
@@ -2200,10 +2198,10 @@ def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
                     {
                         'id': 'book-a-room',
                         'title': 'Book a Room',
-                        'activities': [
+                        'sentences': [
                             {
                                 'id': 1,
-                                'paths': [
+                                'clauses': [
                                     {
                                         'parts': [
                                             {'term_id': 'guest', 'display': 'Carol'},
@@ -2259,8 +2257,8 @@ def test_render_embeds_activity_filter_data(tmp_path: Path) -> None:
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     app_data = _embedded_app_data(content)
-    assert app_data['scenario_activities'] == {'test.py::test_x': [1]}
-    assert app_data['activity_labels'] == {'book-a-room:1': 'Carol searches for Room'}
+    assert app_data['scenario_sentences'] == {'test.py::test_x': [1]}
+    assert app_data['sentence_labels'] == {'book-a-room:1': 'Carol searches for Room'}
 
 
 def test_render_emits_the_configured_theme_as_the_document_default() -> None:

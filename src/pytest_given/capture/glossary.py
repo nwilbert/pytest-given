@@ -74,9 +74,9 @@ class Glossary(LookupGlossary):
         """Register a work object — a thing acted on."""
         return self._declare('object', name, definition)
 
-    def verb(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register a verb — an action."""
-        return self._declare('verb', name, definition)
+    def activity(self, name: str, definition: str | None = None) -> TermHandle:
+        """Register an activity — what an actor does."""
+        return self._declare('activity', name, definition)
 
     def __call__(self, name: str, definition: str | None = None) -> TermHandle:
         """Declare-or-get a term whose kind inference will settle later."""
@@ -143,7 +143,7 @@ class TermHandle(TermRef):
 
         Whether that reads as a distinct entity or as a mere inflection is the
         *term's* business, decided from `declared_kind` where it matters — an
-        actor's `Alice` is its own identity, a verb's `books` is the same verb
+        actor's `Alice` is its own identity, an activity's `books` is the same term
         in another form.
         """
         return TermInstance(handle=self, surface=display)
@@ -214,7 +214,7 @@ def _register_kind(
     """Idempotent registration. Returns the canonical term (existing or new).
 
     `source` is the call site of the user-facing method (`g.actor` /
-    `g.work_object` / `g.verb`), captured there and threaded through.
+    `g.work_object` / `g.activity`), captured there and threaded through.
     First-registration wins: re-registration with matching (kind, canonical,
     definition) returns the existing term unchanged, preserving its original
     `source`.

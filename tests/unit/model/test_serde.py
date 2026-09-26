@@ -1,13 +1,11 @@
 import pytest
 
 from pytest_given.model import (
-    Activity,
-    ActivityId,
-    ActivityPath,
-    ActivityTermRef,
-    ActivityWord,
     Attachment,
     AttachmentRef,
+    Clause,
+    ClauseTermRef,
+    ClauseWord,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -24,6 +22,8 @@ from pytest_given.model import (
     PytestGivenError,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     SourceLocation,
     Step,
     Story,
@@ -34,7 +34,7 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.model.serde import (
-    _activity_part_from_dict,
+    _clause_part_from_dict,
     _narration_part_from_dict,
     _param_table_from_dict,
 )
@@ -62,18 +62,16 @@ def _dummy_metadata() -> Metadata:
     )
 
 
-def test_activity_term_ref_round_trips():
+def test_clause_term_ref_round_trips():
     story = Story(
         id=StoryId('s'),
         title='S',
-        activities=(
-            Activity(
-                id=ActivityId(1),
-                paths=(
-                    ActivityPath(
-                        parts=(
-                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
-                        )
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(
+                    Clause(
+                        parts=(ClauseTermRef(term_id=TermId('guest'), display='Guest'),)
                     ),
                 ),
             ),
@@ -83,8 +81,8 @@ def test_activity_term_ref_round_trips():
         metadata=_dummy_metadata(), scenarios=[], stories=[story], glossary=None
     )
     round_tripped = report_from_dict(report_to_dict(report))
-    part = round_tripped.stories[0].activities[0].paths[0].parts[0]
-    assert part == ActivityTermRef(term_id=TermId('guest'), display='Guest')
+    part = round_tripped.stories[0].sentences[0].clauses[0].parts[0]
+    assert part == ClauseTermRef(term_id=TermId('guest'), display='Guest')
 
 
 def test_glossary_term_kind_can_be_none():
@@ -602,18 +600,18 @@ def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> N
         report_from_dict(payload)
 
 
-def test_activity_part_variants_round_trip():
+def test_clause_part_variants_round_trip():
     parts = (
-        ActivityTermRef(term_id=TermId('guest'), display='Guest'),
-        ActivityTermRef(term_id=TermId('search'), display='searches'),
-        ActivityWord(text='for'),
+        ClauseTermRef(term_id=TermId('guest'), display='Guest'),
+        ClauseTermRef(term_id=TermId('search'), display='searches'),
+        ClauseWord(text='for'),
     )
-    path = ActivityPath(parts=parts)
-    activity = Activity(id=ActivityId(1), paths=(path,))
-    story = Story(id=StoryId('s'), title='S', activities=(activity,))
+    path = Clause(parts=parts)
+    sentence = Sentence(id=SentenceId(1), clauses=(path,))
+    story = Story(id=StoryId('s'), title='S', sentences=(sentence,))
     report = ReportData(metadata=_meta(), stories=[story])
     rt = _round_trip(report)
-    rt_parts = rt.stories[0].activities[0].paths[0].parts
+    rt_parts = rt.stories[0].sentences[0].clauses[0].parts
     assert rt_parts == parts
 
 
@@ -659,7 +657,7 @@ def test_scenario_story_id_and_activity_ids_round_trip():
         narration=Narration(text='x'),
         module='m',
         story_id=StoryId('book'),
-        activity_ids=(ActivityId(1), ActivityId(2)),
+        activity_ids=(SentenceId(1), SentenceId(2)),
     )
     report = ReportData(metadata=_meta(), scenarios=[scn])
     rt = _round_trip(report)
@@ -676,7 +674,7 @@ def test_step_activity_ids_round_trip():
             Step(
                 phase='given',
                 narration=Narration(text='s'),
-                activity_ids=(ActivityId(7),),
+                activity_ids=(SentenceId(7),),
             )
         ],
     )
@@ -685,9 +683,9 @@ def test_step_activity_ids_round_trip():
     assert rt.scenarios[0].steps[0].activity_ids == (7,)
 
 
-def test_activity_part_unknown_shape_raises():
-    with pytest.raises(PytestGivenError, match='unknown ActivityPart shape'):
-        _activity_part_from_dict({'unknown_key': 'x'})
+def test_clause_part_unknown_shape_raises():
+    with pytest.raises(PytestGivenError, match='unknown ClausePart shape'):
+        _clause_part_from_dict({'unknown_key': 'x'})
 
 
 def test_narration_part_unknown_shape_raises():
@@ -700,10 +698,10 @@ def test_story_source_roundtrips() -> None:
     story = Story(
         id=StoryId('checkout'),
         title='Checkout',
-        activities=(
-            Activity(
-                id=ActivityId(1),
-                paths=(ActivityPath(parts=(ActivityWord(text='x'),)),),
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(Clause(parts=(ClauseWord(text='x'),)),),
             ),
         ),
         source=SourceLocation(relpath='conftest.py', line=4),
@@ -859,15 +857,15 @@ def _every_field_populated() -> ReportData:
         id=StoryId('booking'),
         title='Booking',
         source=SourceLocation(relpath='s.py', line=1),
-        activities=(
-            Activity(
-                id=ActivityId(1),
-                paths=(
-                    ActivityPath(
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(
+                    Clause(
                         parts=(
-                            ActivityTermRef(term_id=TermId('guest'), display='Guest'),
-                            ActivityWord(text='books'),
-                            ActivityTermRef(term_id=TermId('room'), display='Room'),
+                            ClauseTermRef(term_id=TermId('guest'), display='Guest'),
+                            ClauseWord(text='books'),
+                            ClauseTermRef(term_id=TermId('room'), display='Room'),
                         )
                     ),
                 ),
@@ -901,7 +899,7 @@ def _every_field_populated() -> ReportData:
             ),
         ],
         fixture_name='shop',
-        activity_ids=(ActivityId(1),),
+        activity_ids=(SentenceId(1),),
         source=SourceLocation(relpath='t.py', line=9),
         children=[Step(phase='then', narration=Narration(text='it holds'))],
     )
@@ -949,7 +947,7 @@ def _every_field_populated() -> ReportData:
         skip_reason=None,
         source=SourceLocation(relpath='t.py', line=5),
         story_id=StoryId('booking'),
-        activity_ids=(ActivityId(1),),
+        activity_ids=(SentenceId(1),),
     )
     return ReportData(
         metadata=Metadata(

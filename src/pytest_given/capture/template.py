@@ -49,7 +49,7 @@ def reject_baked_values(
             f'{{{part.expression}}} (rendered as {part.rendered!r}); '
             f't-strings on a decorator evaluate once at {when}, so the value '
             f'is baked in. Use a glossary handle '
-            f'(g.actor/g.work_object/g.verb) for a term reference; '
+            f'(g.actor/g.work_object/g.activity) for a term reference; '
             f"pytest_given.Template('...{{{part.expression}}}...') for a "
             f'value bound per call; or {remedy}.'
         )

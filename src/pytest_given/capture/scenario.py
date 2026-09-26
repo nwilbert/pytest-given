@@ -11,8 +11,8 @@ from string import templatelib
 from typing import cast, get_type_hints
 
 from ..model import (
-    ActivityId,
     PytestGivenError,
+    SentenceId,
     Story,
 )
 from .steps import StepDescriptor, normalize_activity
@@ -33,7 +33,7 @@ class ScenarioDecorator:
         tags: list[str],
         *,
         story: Story | None = None,
-        activity_ids: tuple[ActivityId, ...] = (),
+        activity_ids: tuple[SentenceId, ...] = (),
         group_parametrized: bool = True,
     ) -> None:
         self.name: ResolvedName = name
@@ -102,9 +102,9 @@ def scenario(
 
 
 def _validate_story_binding(
-    story: Story | None, activity_ids: tuple[ActivityId, ...]
+    story: Story | None, activity_ids: tuple[SentenceId, ...]
 ) -> None:
-    """Reject activity ids that no story can resolve.
+    """Reject sentence ids that no story can resolve.
 
     Both arguments are `@scenario`'s own, fully known here, so this does not
     wait for collection the way the parametrize-dependent checks must — and
@@ -114,15 +114,15 @@ def _validate_story_binding(
     if story is None:
         if activity_ids:
             raise PytestGivenError(
-                '@scenario(activities=...) requires story=; activity ids are '
+                '@scenario(activities=...) requires story=; sentence ids are '
                 'meaningless without a story to look them up in.'
             )
         return
-    valid_ids = {activity.id for activity in story.activities}
+    valid_ids = {sentence.id for sentence in story.sentences}
     for activity_id in activity_ids:
         if activity_id not in valid_ids:
             raise PytestGivenError(
-                f'@scenario(activities=...): activity id {activity_id} not in '
+                f'@scenario(activities=...): sentence id {activity_id} not in '
                 f'story {story.title!r} (valid: {sorted(valid_ids)}).'
             )
 

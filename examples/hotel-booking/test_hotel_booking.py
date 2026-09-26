@@ -1,59 +1,61 @@
 """Group hotel booking — showcases DDD glossary, Domain Story, and coverage.
 
 An Organizer (Carol) reserves rooms for her colleagues Alice and Bob ahead of a
-conference. The Story covers seven activities exercising every part of the
+conference. The Story covers eight sentences exercising every part of the
 domain-storytelling grammar: canonical entities, actor/work-object instances,
-two work objects joined by a preposition, two actors in the same path,
-multi-path activities for parallel branches, and an activity whose vocabulary
-is undefined but classified by kind inference.
+two work objects joined by a preposition, two actors in the same clause,
+multi-clause sentences for parallel branches — one of them with clauses that
+start at different actors — and a sentence whose vocabulary is undefined but
+classified by kind inference.
 
 The glossary holds only vocabulary with a meaning specific to the domain. The
 verbs that are plain sentence prose — *searches for*, *selects*, *adds*,
-*submits*, *sends* — stay bare strings in the activities; only the verbs a
-hotel would define (confirm, decline, cancel, refund) are terms.
+*submits*, *sends*, *checks in to* — stay bare strings in the sentences; only
+the activities a hotel would define (confirm, decline, cancel, refund) are
+terms.
 
 Three scenarios implement the Story at varying detail, each in full
 Given/When/Then form:
 
-* `test_pick_suite` — happy path, covers activities 1-2. Both activities
+* `test_pick_suite` — happy path, covers sentences 1-2. Both sentences
   narrate the same two terms (Organizer, Room) — their verbs are bare — so
-  narration alone cannot tell them apart; the steps pin their activity number
+  narration alone cannot tell them apart; the steps pin their sentence number
   with `activity=`.
-* `test_complete_booking` — happy path through the rest, covers 2-6.
-  Activity 2 is intentionally shared with `test_pick_suite` so the Stories tab
-  shows two badges on that row (its `given` pins activity 2 for the same
+* `test_complete_booking` — happy path through the rest, covers 2-6 and 8.
+  Sentence 2 is intentionally shared with `test_pick_suite` so the Stories tab
+  shows two badges on that row (its `given` pins sentence 2 for the same
   reason as above).
-* `test_payment_declined` — parametrized error branch using a `decline` verb
-  that lives in the glossary but isn't part of any story activity. Cases pair
+* `test_payment_declined` — parametrized error branch using a `decline` activity
+  that lives in the glossary but isn't part of any story sentence. Cases pair
   a payment method with its decline reason (credit card / insufficient funds,
   debit card / expired card, bank transfer / fraud check), all funneling
   through the same decline path. Covers 3 and 4, overlapping with
   `test_complete_booking` to show how a scenario can probe a different aspect
-  (the failure path) of the same activities.
+  (the failure path) of the same sentences.
 
-Activity 7 uses `redeems` and `loyalty points`, both introduced with no kind
+Sentence 7 uses `redeems` and `loyalty points`, both introduced with no kind
 and no definition. The post-collection kind-inference pass classifies them
-from their slot positions — `redeems` as a verb, `loyalty points` as a work
-object — but both remain without a definition, so each renders with a kind
+from their slot positions — `redeems` as an activity, `loyalty points` as a
+work object — but both remain without a definition, so each renders with a kind
 pill and an Undefined badge. No scenario currently references those terms,
-so activity 7 is an uncovered gap in the Stories view, signalling that the
+so sentence 7 is an uncovered gap in the Stories view, signalling that the
 vocabulary still needs to be exercised by a test.
 
 A second, shorter Story — `Cancel a Booking` — shares the same glossary to
 exercise the multi-story parts of the report (Stories tab, story filter) and to
 show vocabulary reused across stories (Guest, Booking, Payment, Confirmation,
 Booking System). Its single scenario `test_cancel_booking` covers all three of
-its activities.
+its sentences.
 """
 
 import pytest
 
 from pytest_given import (
     Glossary,
-    activity,
+    clause,
     given,
-    path,
     scenario,
+    sentence,
     story,
     then,
     when,
@@ -71,15 +73,15 @@ booking = g.work_object('Booking', 'A reservation for one or more rooms.')
 payment = g.work_object('Payment', 'Money transferred for a booking.')
 confirmation = g.work_object('Confirmation', 'Notification of a successful booking.')
 
-confirm = g.verb(
+confirm = g.activity(
     'confirm', 'Guarantee a paid booking so its rooms are held for arrival.'
 )
-# `decline` is in the ubiquitous language but no Story activity uses it yet —
+# `decline` is in the ubiquitous language but no Story sentence uses it yet —
 # it surfaces in the Glossary tab and powers the error-path scenario.
-decline = g.verb('decline', 'Refuse a payment, leaving its booking pending.')
+decline = g.activity('decline', 'Refuse a payment, leaving its booking pending.')
 # Vocabulary for the second Story.
-cancel = g.verb('cancel', 'Withdraw a booking before arrival.')
-refund = g.verb('refund', 'Return the payment for a cancelled booking.')
+cancel = g.activity('cancel', 'Withdraw a booking before arrival.')
+refund = g.activity('refund', 'Return the payment for a cancelled booking.')
 
 
 book_a_group_trip = story(
@@ -87,30 +89,36 @@ book_a_group_trip = story(
     [
         # 1. Actor instance + canonical work object (the room category, before
         #    any specific room is chosen).
-        activity(organizer('Carol'), 'searches for', room),
+        sentence(organizer('Carol'), 'searches for', room),
         # 2. Actor instance + work-object instance.
-        activity(organizer('Carol'), 'selects', room('Deluxe Suite')),
-        # 3. Multi-path: two parallel branches, each a two-actor sentence
+        sentence(organizer('Carol'), 'selects', room('Deluxe Suite')),
+        # 3. Multi-clause: two parallel branches, each a two-actor clause
         #    joined by a preposition.
-        activity(
-            path(organizer('Carol'), 'adds', guest('Alice'), 'to', booking),
-            path(organizer('Carol'), 'adds', guest('Bob'), 'to', booking),
+        sentence(
+            clause(organizer('Carol'), 'adds', guest('Alice'), 'to', booking),
+            clause(organizer('Carol'), 'adds', guest('Bob'), 'to', booking),
         ),
         # 4. Two work objects connected by a preposition.
-        activity(organizer('Carol'), 'submits', payment, 'for', booking),
+        sentence(organizer('Carol'), 'submits', payment, 'for', booking),
         # 5. System confirms the booking.
-        activity(booking_system, confirm('confirms'), booking),
-        # 6. Multi-path send — one confirmation per guest, in parallel.
-        activity(
-            path(booking_system, 'sends', confirmation, 'to', guest('Alice')),
-            path(booking_system, 'sends', confirmation, 'to', guest('Bob')),
+        sentence(booking_system, confirm('confirms'), booking),
+        # 6. Multi-clause send — one confirmation per guest, in parallel.
+        sentence(
+            clause(booking_system, 'sends', confirmation, 'to', guest('Alice')),
+            clause(booking_system, 'sends', confirmation, 'to', guest('Bob')),
         ),
         # 7. Vocabulary the team hasn't classified yet — kindless until kind
         #    inference runs, and undefined until someone writes a definition.
-        activity(
+        sentence(
             organizer('Carol'),
             g('redeems'),
             g('loyalty points'),
+        ),
+        # 8. Clauses that start at different actors: each guest checks in on
+        #    their own, under one sentence number.
+        sentence(
+            clause(guest('Alice'), 'checks in to', room('Deluxe Suite')),
+            clause(guest('Bob'), 'checks in to', room('Deluxe Suite')),
         ),
     ],
 )
@@ -123,12 +131,12 @@ cancel_a_booking = story(
     'Cancel a Booking',
     [
         # Guest instance withdraws a booking made on their behalf.
-        activity(guest('Alice'), cancel('cancels'), booking),
+        sentence(guest('Alice'), cancel('cancels'), booking),
         # Two work objects joined by a preposition — the refund settles the
         # payment for that booking.
-        activity(booking_system, refund('refunds'), payment, 'for', booking),
+        sentence(booking_system, refund('refunds'), payment, 'for', booking),
         # Reuses the confirmation vocabulary from the first story.
-        activity(booking_system, 'sends', confirmation, 'to', guest('Alice')),
+        sentence(booking_system, 'sends', confirmation, 'to', guest('Alice')),
     ],
 )
 
@@ -194,6 +202,12 @@ def test_complete_booking(carol, alice, bob):
     ):
         booking_state['notified'] = list(booking_state['guests'])
         assert set(booking_state['notified']) == {'Alice', 'Bob'}
+    with then(
+        t'{guest("Alice")} and {guest("Bob")} can check in to the '
+        t'{room("Deluxe Suite")}'
+    ):
+        assert booking_state['confirmed']
+        assert booking_state['room'] == 'Deluxe Suite'
 
 
 SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
