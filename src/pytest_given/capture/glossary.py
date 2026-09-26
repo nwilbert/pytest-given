@@ -93,7 +93,7 @@ def normalize_definition(definition: str | None) -> str | None:
     return stripped or None
 
 
-class TermRef(ABC):
+class TermHandleBase(ABC):
     """Something that names a glossary term and knows how it should read.
 
     Two shapes implement it — a bare `TermHandle` reading as its canonical
@@ -126,7 +126,7 @@ class TermRef(ABC):
 
 
 @dataclass(frozen=True)
-class TermHandle(TermRef):
+class TermHandle(TermHandleBase):
     """A `GlossaryTerm` plus a back-ref to its owning `Glossary`.
 
     One type for every kind and every accessor: the registration methods differ
@@ -174,7 +174,7 @@ class TermHandle(TermRef):
 
 
 @dataclass(frozen=True)
-class TermInstance(TermRef):
+class TermInstance(TermHandleBase):
     """A term wearing one surface form: the handle it came from, plus display."""
 
     handle: TermHandle

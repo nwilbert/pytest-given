@@ -18,7 +18,7 @@ from ..model import (
     placeholder_value,
     render_interpolation,
 )
-from .glossary import TermRef
+from .glossary import TermHandleBase
 
 _FORMATTER = Formatter()
 
@@ -165,7 +165,7 @@ def try_term_ref(
     meaningful target on a term ref, so a non-empty value is rejected at
     parse time rather than silently dropped.
     """
-    if not isinstance(value, TermRef):
+    if not isinstance(value, TermHandleBase):
         return None
     display = value.display
     if format_spec or conversion:

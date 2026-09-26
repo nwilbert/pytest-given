@@ -21,13 +21,13 @@ from ..model import (
     id_derive,
 )
 from ..model import Story as BaseStory
-from .glossary import TermRef
+from .glossary import TermHandleBase
 from .kind_inference import ROLE_ACCEPTS, Slot, slot_for
 from .source import capture_caller_source
 
 # What every slot accepts structurally: a glossary reference of some sort, or a
 # bare connective. Which *kind* fits a given position is `_check_position`'s.
-type _ClauseArg = TermRef | str
+type _ClauseArg = TermHandleBase | str
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -211,7 +211,7 @@ def clause(*parts: _ClauseArg) -> Clause:
 
 
 def _glossary_of(value: object) -> Glossary | None:
-    return value.glossary if isinstance(value, TermRef) else None
+    return value.glossary if isinstance(value, TermHandleBase) else None
 
 
 def sentence(
@@ -355,7 +355,11 @@ _ROLE_LABEL = {'actor': 'an actor', 'verb': 'a verb', 'noun': 'a noun'}
 
 
 def _term_name(value: object) -> str:
-    return value.term.canonical if isinstance(value, TermRef) else type(value).__name__
+    return (
+        value.term.canonical
+        if isinstance(value, TermHandleBase)
+        else type(value).__name__
+    )
 
 
 def _render_clause(parts: tuple[object, ...]) -> str:
@@ -378,12 +382,12 @@ def _check_position(
     construction; only a genuinely undeclared one is deferred to
     `infer_glossary_kinds`.
     """
-    declared = value.declared_kind if isinstance(value, TermRef) else None
+    declared = value.declared_kind if isinstance(value, TermHandleBase) else None
     if declared is not None:
         if declared in ROLE_ACCEPTS[role]:
             return
         problem = f'{_term_name(value)!r} is declared {_KIND_LABEL[declared]}'
-    elif isinstance(value, TermRef):
+    elif isinstance(value, TermHandleBase):
         return
     else:
         problem = f'got {type(value).__name__}'
@@ -411,6 +415,6 @@ def _suggestion_for(role: Slot) -> str:
 
 
 def _to_part(value: _ClauseArg) -> ClausePart:
-    if isinstance(value, TermRef):
+    if isinstance(value, TermHandleBase):
         return ClauseTermRef(term_id=value.id, display=value.display)
     return ClauseWord(text=value)
