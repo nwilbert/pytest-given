@@ -121,12 +121,13 @@ def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
 def _varying_pins_error(case: Scenario, group: Group) -> PytestGivenError:
     return _grouping_error(
         group,
-        f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} claims '
-        f'different step sentences than case {case_suffix(group.baseline.id)} '
-        f'— the grouped tree keeps one set, and story coverage is credited '
-        f'from exactly that field. Give the step one sentence, or use '
-        f'@scenario(..., group_parametrized=False) to emit one scenario per '
-        f'case.',
+        f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} gives a '
+        f'step different pins= than case {case_suffix(group.baseline.id)} (a '
+        f'different sentence, or pins=[], which turns narration matching off, '
+        f'against no pins=) — the grouped tree keeps one step, and story '
+        f'coverage is credited from its pins. Pass the step the same pins= in '
+        f'every case, or use @scenario(..., group_parametrized=False) to emit '
+        f'one scenario per case.',
     )
 
 

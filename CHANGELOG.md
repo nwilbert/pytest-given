@@ -35,7 +35,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** A file glossary's kind column says `activity` where it said `verb`.
 - **Breaking.** In the JSON report, `stories[].activities[]` is now `stories[].sentences[]` with `clauses` in place of `paths`, the term kind `"verb"` is now `"activity"`, and `coverage[].activity_id` is now `sentence_id`. Regenerate saved reports: `pytest-given report` rejects a `verb` kind.
 - **Breaking.** The report's `#activity-filter=` link parameter is now `#sentence-filter=`.
-- The report lists every story the run declares, not only those a scenario binds, so a story no scenario covers shows with no coverage.
+- The report lists every story the run declares, not only those a scenario binds, so a story no scenario covers shows with no coverage. A story whose `story()` call ran before the session started (a module still imported from an earlier `pytest.main()` in the same process) is left out with a warning.
 - The HTML report says *Sentence* where it said *Activity*, and the Glossary view groups activity terms under *Activities* instead of *Verbs*.
 - The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.
 - The documentation site is set in Source Sans 3 and Source Code Pro.

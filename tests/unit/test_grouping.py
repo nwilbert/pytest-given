@@ -2813,11 +2813,22 @@ def test_shape_of_an_empty_tree_is_empty() -> None:
     assert _shape_of([]) == []
 
 
-def test_cases_claiming_different_sentences_say_so() -> None:
-    """`pins=` is a per-call argument, so two cases can genuinely claim
-    different pins at one path. The grouped tree keeps one set — but that is not
-    'a different step structure', and the fix is smaller than declining the
-    grouping."""
+@pytest.mark.parametrize(
+    ('first', 'second'),
+    [
+        (
+            (Pin(story_id=StoryId('s'), sentence_id=SentenceId(1)),),
+            (Pin(story_id=StoryId('s'), sentence_id=SentenceId(2)),),
+        ),
+        (None, ()),
+    ],
+    ids=['different-sentences', 'unpinned-against-opted-out'],
+)
+def test_cases_giving_a_step_different_pins_say_so(first, second) -> None:
+    """`pins=` is a per-call argument, so two cases can genuinely give one
+    step different pins, `pins=[]` against none included. The grouped tree
+    keeps one step — but that is not 'a different step structure', and the fix
+    is smaller than declining the grouping."""
     nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
     scenarios = [
         Scenario(
@@ -2825,20 +2836,16 @@ def test_cases_claiming_different_sentences_say_so() -> None:
             narration=Narration(text='x'),
             module='m',
             steps=[
-                Step(
-                    phase='given',
-                    narration=Narration(text='a machine'),
-                    pins=(Pin(story_id=StoryId('s'), sentence_id=SentenceId(ids)),),
-                )
+                Step(phase='given', narration=Narration(text='a machine'), pins=pins)
             ],
         )
-        for nid, ids in ((nid1, 1), (nid2, 2))
+        for nid, pins in ((nid1, first), (nid2, second))
     ]
     param_info = {
         nid1: ParamSpec(names=['n'], values=[1]),
         nid2: ParamSpec(names=['n'], values=[2]),
     }
-    with pytest.raises(PytestGivenError, match='different step sentences'):
+    with pytest.raises(PytestGivenError, match='different pins='):
         group_parametrized(scenarios, param_info)
 
 

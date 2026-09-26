@@ -552,6 +552,14 @@ def test_story_lookup_refuses_a_number_that_is_no_sentence_number(
         _ = built[key]
 
 
+def test_story_lookup_miss_is_a_lookup_error(guest, search, room):
+    """A live run's report renders this capture story, and Jinja's attribute
+    fallback probes it with `story[name]`, catching only `LookupError`."""
+    built = story('Probed', [sentence(guest, search, room)])
+    with pytest.raises(LookupError):
+        _ = built['description']
+
+
 def test_story_lookup_reads_a_numeric_string_as_a_name(guest, search, room):
     built = story(
         'Numeric Name',

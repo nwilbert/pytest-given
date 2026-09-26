@@ -4,6 +4,7 @@ On the way in, rootdir and the capture globals; on the way out, the grouped
 report, the sinks, the lint, and the terminal summary.
 """
 
+import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from importlib.metadata import version
@@ -27,9 +28,11 @@ from ..model import (
     Glossary,
     Metadata,
     PytestGivenError,
+    PytestGivenWarning,
     ReportData,
     Scenario,
     Story,
+    iter_steps,
     report_to_dict,
 )
 from ..report import detect_commit_sha, emit_sinks, sink_failure
@@ -168,6 +171,7 @@ def _build_report(session: pytest.Session) -> _SessionReport:
         collector.scenarios, session_state(config).param_info
     )
     stories = registered_stories()
+    _warn_of_undeclared_stories(scenarios, stories)
     # Registered plugins include class instances; only modules can declare a
     # conftest glossary, so the filter is the caller's and `resolve_glossary`
     # keeps a precise signature.
@@ -201,6 +205,44 @@ def _build_report(session: pytest.Session) -> _SessionReport:
         stories=stories,
         report_dict=report_dict,
     )
+
+
+def _warn_of_undeclared_stories(
+    scenarios: list[Scenario], stories: list[Story]
+) -> None:
+    """The report's stories are those whose `story()` call ran this session;
+    one that ran before it started — in a module still imported from an
+    earlier `pytest.main()` in the same process — is not among them, and
+    neither is the coverage the scenarios naming it earn."""
+    declared = {story.id for story in stories}
+    named = (
+        story_id
+        for scenario in scenarios
+        for story_id in (
+            *scenario.story_ids,
+            *(pin.story_id for pin in scenario.pins or ()),
+            *(
+                pin.story_id
+                for step in iter_steps(scenario.steps)
+                for pin in step.pins or ()
+            ),
+        )
+    )
+    undeclared = dict.fromkeys(
+        story_id for story_id in named if story_id not in declared
+    )
+    if undeclared:
+        warnings.warn(
+            PytestGivenWarning(
+                f'scenarios name stories this run never declared: '
+                f'{", ".join(map(repr, undeclared))}. The report leaves them and '
+                f'their coverage out: their story() calls ran before the session '
+                f'started, as a module still imported from an earlier '
+                f'pytest.main() in this process does not run them again. Run '
+                f'pytest in a fresh process.'
+            ),
+            stacklevel=1,
+        )
 
 
 def _run_lint(session: pytest.Session, built: _SessionReport) -> None:

@@ -457,3 +457,10 @@ def test_subscript_unknown_name_raises_with_hint():
         pytest.raises(PytestGivenError, match='Did you mean: redeems'),
     ):
         g['redeem']
+
+
+def test_subscript_miss_is_a_lookup_error():
+    """Jinja's attribute fallback probes a live run's glossary with
+    `glossary[name]`, catching only `LookupError`."""
+    with pytest.raises(LookupError):
+        Glossary()['description']

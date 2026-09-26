@@ -289,7 +289,7 @@
 | [a[2]] | [{'story_id': 'book', 'sentence_id': 2}] | ✓ |
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2649::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2689::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -312,14 +312,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2662::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2702::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2683::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2723::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -327,7 +327,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2703::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2743::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -335,7 +335,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2736::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2776::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -355,7 +355,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2768::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2808::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -364,7 +364,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:2871::test_given_theme_cli_flag_sets_the_report_default` · configuration
+`tests/integration/test_plugin.py:2911::test_given_theme_cli_flag_sets_the_report_default` · configuration
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -372,7 +372,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:2920::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:2960::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -380,7 +380,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:3037::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3077::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -1606,7 +1606,7 @@
 - **then** a PytestGivenError lists the story's sentences
 
 ## ✓ Two «sentences» of one «story» cannot share a name
-`tests/unit/capture/test_story.py:578::test_story_rejects_duplicate_sentence_names`
+`tests/unit/capture/test_story.py:586::test_story_rejects_duplicate_sentence_names`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1616,7 +1616,7 @@
 - **then** a PytestGivenError names the duplicate and both numbers
 
 ## ✓ An empty or padded «sentence» name is refused · 3 cases
-`tests/unit/capture/test_story.py:595::test_sentence_rejects_an_empty_or_padded_name`
+`tests/unit/capture/test_story.py:603::test_sentence_rejects_an_empty_or_padded_name`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1632,28 +1632,28 @@
 | 'cancel ' | ✓ |
 
 ## ✓ Two «stories» with the same id collide
-`tests/unit/capture/test_story.py:613::test_story_id_collision_raises_with_both_sites` · validation
+`tests/unit/capture/test_story.py:621::test_story_id_collision_raises_with_both_sites` · validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «clause» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:696::test_clause_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:704::test_clause_allows_second_verb_edge`
 
 - **given** an «Actor», two «Activity» and two «Work Object» handles
 - **when** they form a five-node «Clause» (actor verb object verb object)
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A declared «work object» in a verb «slot» is rejected at construction
-`tests/unit/capture/test_story.py:744::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+`tests/unit/capture/test_story.py:752::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «File glossary» declaring Room a work object
 - **when** Room is placed in the verb «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
 ## ✓ A «slot» error names the «term», not its repr
-`tests/unit/capture/test_story.py:770::test_slot_error_message_stays_compact` · diagnostics
+`tests/unit/capture/test_story.py:778::test_slot_error_message_stays_compact` · diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1663,14 +1663,14 @@
 - **then** the message is short and free of dataclass reprs
 
 ## ✓ A kindless «term» stays valid in any «slot»
-`tests/unit/capture/test_story.py:791::test_kindless_term_is_accepted_in_either_slot` · validation
+`tests/unit/capture/test_story.py:799::test_kindless_term_is_accepted_in_either_slot` · validation
 
 - **given** a «Kindless» «Term» declared with g(...)
 - **when** it is placed in a node «slot» and a verb slot
 - **then** both clauses construct, leaving the kind to inference
 
 ## ✓ A non-handle «clause part» names its type
-`tests/unit/capture/test_story.py:806::test_non_handle_part_names_its_type` · validation, diagnostics
+`tests/unit/capture/test_story.py:814::test_non_handle_part_names_its_type` · validation, diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object

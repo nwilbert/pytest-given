@@ -2263,6 +2263,46 @@ def test_session_finish_populates_report_stories_and_glossary(pytester):
     assert {t['id'] for t in data['glossary']['terms']} == {'guest', 'search', 'room'}
 
 
+@pytest.mark.usefixtures('isolated_story_registry')
+def test_session_finish_warns_of_a_story_declared_before_the_session(pytester):
+    """A module imported before the session starts — a `-p` plugin here, a
+    cached test module on a repeated `pytest.main()` — declared its story into
+    a registry the session then cleared, so the report cannot carry it. The
+    plugin declares into this outer session's registry too, hence the
+    isolation."""
+    pytester.makepyfile(
+        early_stories="""
+            from pytest_given import Glossary, sentence, story
+
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            flow = story('Early', [sentence(guest, search, room)])
+        """,
+        test_early="""
+            from early_stories import flow
+            from pytest_given import scenario
+
+            @scenario('pinned', pins=flow[1])
+            def test_pinned():
+                pass
+
+            @scenario('matched', stories=flow)
+            def test_matched():
+                pass
+        """,
+    )
+    pytester.syspathinsert()
+    result = pytester.runpytest('-p', 'early_stories', '--given-json=report.json')
+    result.assert_outcomes(passed=2)
+    result.stdout.fnmatch_lines(
+        ["*scenarios name stories this run never declared: 'early'*"]
+    )
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    assert data['stories'] == []
+
+
 def test_session_finish_with_no_stories_leaves_glossary_none(pytester):
     pytester.makepyfile("""
         from pytest_given import scenario

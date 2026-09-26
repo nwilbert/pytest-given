@@ -23,6 +23,15 @@ class PytestGivenError(RuntimeError):
     """
 
 
+class PytestGivenLookupError(PytestGivenError, LookupError):
+    """A subscript naming nothing: a story's sentence or a glossary's term.
+
+    A `LookupError` too, because generic `obj[name]` probes catch only that
+    family: Jinja's attribute fallback, reaching a live run's capture story or
+    glossary, would otherwise crash the render instead of reading a miss.
+    """
+
+
 def placeholder_mismatch(
     name: str, param_names: Sequence[str], *, where: str = ''
 ) -> PytestGivenError:

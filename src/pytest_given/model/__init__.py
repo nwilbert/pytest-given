@@ -6,7 +6,12 @@ Imports nothing else in the package — `capture`, `lint`, `report` and
 one of them.
 """
 
-from .errors import PytestGivenError, PytestGivenWarning, placeholder_mismatch
+from .errors import (
+    PytestGivenError,
+    PytestGivenLookupError,
+    PytestGivenWarning,
+    placeholder_mismatch,
+)
 from .narration import (
     narration_of,
     narration_text,
@@ -117,6 +122,7 @@ __all__ = [
     'Phase',
     'Pin',
     'PytestGivenError',
+    'PytestGivenLookupError',
     'PytestGivenWarning',
     'RawParamValue',
     'ReportData',

@@ -11,6 +11,7 @@ from ..model import (
 from ..model import (
     GlossaryTerm,
     PytestGivenError,
+    PytestGivenLookupError,
     SourceLocation,
     TermId,
     TermKind,
@@ -34,7 +35,7 @@ class LookupGlossary(BaseGlossary):
 
     def __getitem__(self, name: str) -> TermHandle:
         """Name-based, case-insensitive get-only lookup. Raises
-        `PytestGivenError` with a did-you-mean hint on an unknown name."""
+        `PytestGivenLookupError` with a did-you-mean hint on an unknown name."""
         term_id = TermId(id_derive(name))
         if term_id in self._handles:
             return self._handles[term_id]
@@ -44,7 +45,7 @@ class LookupGlossary(BaseGlossary):
                 name, [candidate.canonical for candidate in self.terms], n=3
             )
             hint = f' Did you mean: {", ".join(close)}?' if close else ''
-            raise PytestGivenError(f'no glossary term named {name!r}.{hint}')
+            raise PytestGivenLookupError(f'no glossary term named {name!r}.{hint}')
         handle = TermHandle(_term=term, _glossary=self)
         self._handles[term_id] = handle
         return handle

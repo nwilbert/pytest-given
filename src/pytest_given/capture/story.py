@@ -12,6 +12,7 @@ from ..model import (
     Glossary,
     Pin,
     PytestGivenError,
+    PytestGivenLookupError,
     Sentence,
     SentenceId,
     SentenceName,
@@ -34,9 +35,8 @@ class _GlossaryCarrier:
     """The live `Glossary` objects a story-tree node's subtree references.
 
     `clause()` / `sentence()` / `story()` carry them at construction so
-    `discovery.resolve_glossary` can pick the suite's glossary off the story
-    tree it was handed, rather than off a session-global that a nested run
-    could clear.
+    `discovery.resolve_glossary` can pick the suite's glossary off the
+    stories it is handed.
 
     A capture-side mixin rather than a field on the schema: the report model
     neither carries this nor serializes it, and `model/` is the leaf — it may
@@ -81,7 +81,7 @@ class Story(BaseStory, _GlossaryCarrier):
                 detail = f'its sentences are {listing}.'
             else:
                 detail = 'it has no sentences.'
-            raise PytestGivenError(
+            raise PytestGivenLookupError(
                 f'story {self.title!r} has no sentence {key!r}; {detail}'
             )
         return self._handle(found)
@@ -257,8 +257,7 @@ def union_glossaries(carried: Iterable[frozenset[Glossary]]) -> frozenset[Glossa
 
 # Every story this process has declared, in declaration order: the report's
 # stories, and what catches a story declared twice. Process-global, so
-# `process_state` — its only sanctioned caller — swaps it around a nested
-# in-process run.
+# `process_state` swaps it around a nested in-process run.
 _STORY_REGISTRY: dict[StoryId, Story] = {}
 
 
