@@ -100,6 +100,9 @@ HTML:
 - CSS: `term-verb`, `term-ref-verb`, `kind-swatch-verb` and the `--term-verb-*` tokens become
   `activity`.
 - App data: `scenario_activities` → `scenario_sentences`, `activity_labels` → `sentence_labels`.
+- The story counts in the sidebar and header (`7 activities`) become `7 sentences`, through the
+  `plural` filter the scenario count beside them uses. This fixes today's `1 activities`.
+- The aria-label `Select activity N` becomes `Select sentence N`.
 
 Verified by Playwright only.
 
@@ -170,8 +173,11 @@ vocabulary of their time.
 - `hotel-booking` and `file-glossary-booking` move to the new names.
 - `hotel-booking` gains a sentence whose clauses start at different actors, the quick-start
   figure's sentence 5. No test or example has that shape today.
-- Tests follow mechanically, including scenario titles that name the old terms. One new scenario:
-  a sentence whose clauses start at different actors builds and is covered.
+- Tests follow mechanically, including scenario titles that name the old terms.
+- New scenarios, since every kind-inference and lint fixture has one clause per sentence today:
+  - a sentence whose clauses start at different actors builds and is covered;
+  - a term that appears only in a sentence's second clause gets its kind inferred;
+  - such a term is not flagged by `dead-term`.
 - Regenerate the example and self-report outputs.
 
 ### Changelog
