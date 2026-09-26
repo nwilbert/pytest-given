@@ -170,8 +170,8 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
             raise PytestGivenError(
                 f'Annotated given(..., pins=...) on parameter {name!r} is not '
                 f'supported: the label only renames the fixture step, so the pin '
-                f'would be dropped. Pin a step inside the fixture body, or in the '
-                f'test body.'
+                f"would be dropped. Pin the fixture's own @given(..., pins=...), "
+                f'a step inside the fixture body, or one in the test body.'
             )
         out[name] = desc
     return out

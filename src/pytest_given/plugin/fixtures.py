@@ -72,6 +72,7 @@ def pytest_fixture_setup(
         root=Step(
             phase=desc.phase,
             narration=desc.narration,
+            pins=desc.pins,
             fixture_name=fixturedef.argname,
         )
     )

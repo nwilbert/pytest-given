@@ -2095,6 +2095,67 @@ def test_annotated_label_carrying_a_pin_is_refused(pytester):
         result.stdout.fnmatch_lines(['*Annotated given(..., pins=...)*not supported*'])
 
 
+def test_fixture_label_pin_reaches_the_grafted_step_and_coverage(pytester):
+    pytester.makepyfile("""
+        import pytest
+        from pytest_given import Glossary, given, scenario, sentence, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [
+            sentence(guest, search, room),
+            sentence(guest('Alice'), search, room)])
+
+        @pytest.fixture
+        @given('a fixture label', pins=a[2])
+        def arranged():
+            return 1
+
+        @scenario('x', stories=a)
+        def test_x(arranged):
+            pass
+    """)
+    result = pytester.runpytest('--given-json=report.json')
+    result.assert_outcomes(passed=1)
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    scenario_record = data['scenarios'][0]
+    assert scenario_record['steps'][0]['pins'] == [
+        {'story_id': 'book', 'sentence_id': 2}
+    ]
+    covering = {
+        record['sentence_id']: record['scenario_ids'] for record in data['coverage']
+    }
+    assert covering[2] == [scenario_record['id']]
+
+
+def test_fixture_label_pin_into_an_unbound_story_is_refused(pytester):
+    pytester.makepyfile("""
+        import pytest
+        from pytest_given import Glossary, given, scenario, sentence, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [sentence(guest, search, room)])
+        b = story('Stay', [sentence(guest, search, room)])
+
+        @pytest.fixture
+        @given('a fixture label', pins=a[1])
+        def arranged():
+            return 1
+
+        @scenario('x', stories=b)
+        def test_x(arranged):
+            pass
+    """)
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    result.stdout.fnmatch_lines(["*story 'book', which scenario*does not bind*"])
+
+
 def test_step_pin_in_wide_fixture_without_scenario_reports_the_cause(pytester):
     """A wider-than-function `@given` fixture records even for an unannotated
     test, so a pin in its body has no scenario to land in. That is an
