@@ -69,7 +69,7 @@ from pytest_given import sentence, story
 
 book_a_group_trip = story('Book a Group Trip', [
     sentence(organizer('Carol'), 'searches for', room),
-    sentence(organizer('Carol'), 'selects', room('Deluxe Suite')),
+    sentence(organizer('Carol'), 'selects', room('Deluxe Suite'), name='select'),
 ])
 ```
 
@@ -97,11 +97,11 @@ def test_select_suite(carol):
 
 Each step's term references are matched against the story's sentences to compute coverage. The Stories tab shows the timeline with a coverage chip per sentence and the scenarios that touch it; selecting a sentence offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. The JSON report carries the same per-sentence result under a top-level `coverage` key.
 
-A sentence can be named — `sentence(guest, cancel('cancels'), booking, name='cancel')` — and a story hands out **sentence handles** by name or number: `book_a_group_trip['cancel']`, `book_a_group_trip[3]`. Numbers are positions, so inserting a row renumbers the rows after it; a name stays put. A handle is what **pins** take:
+A sentence can be named — the story's second row above takes `name='select'` — and a story hands out **sentence handles** by name or number: `book_a_group_trip['select']`, `book_a_group_trip[2]`. Numbers are positions, so inserting a row renumbers the rows after it; a name stays put. A handle is what **pins** take:
 
-- `given(text, pins=book_a_group_trip['cancel'])` pins a step. The step covers exactly the named sentences in that story instead of being narration-matched there.
-- `@scenario(..., pins=book_a_group_trip['cancel'])` pins the whole scenario. It covers exactly those sentences of that story, with no narration matching against it, and binds the story without `stories=`. A step pin into a story the scenario pins raises.
-- `@scenario(..., stories=[book_a_group_trip, cancel_a_booking])` matches narration against several stories. The scenario is listed under each, with its chips for that story.
+- `given(text, pins=book_a_group_trip['select'])` pins a step. The step covers exactly the named sentences in that story instead of being narration-matched there. The story has to be one the scenario binds — with `stories=` or a pin of its own — or the pin raises, naming `stories=` as the fix.
+- `@scenario(..., pins=book_a_group_trip['select'])` pins the whole scenario. It covers exactly those sentences of that story, with no narration matching against it, and binds the story without `stories=`. A step pin into a story the scenario pins raises.
+- `@scenario(..., stories=[book_a_group_trip, check_in])` matches narration against several stories at once — `check_in` here stands for another story defined the same way. The scenario is listed under each, with its chips for that story.
 
 Each rule applies per story: a pin into one story says nothing about another. A scenario pin is an assertion no narration backs: it covers its sentences even when the test fails early or is skipped (the chip shows the scenario's status), so keep one only where the body really exercises the sentence. A pin also reaches under-anchored sentences, which narration matching skips.
 

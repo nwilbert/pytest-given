@@ -10,7 +10,7 @@ from pytest_given import clause, sentence, story
 book_a_group_trip = story('Book a Group Trip', [
     sentence(organizer('Carol'), 'searches for', room),
     sentence(organizer('Carol'), 'submits', payment, 'for', booking),
-    sentence(booking_system, confirm('confirms'), booking),
+    sentence(booking_system, confirm('confirms'), booking, name='confirm'),
 ])
 ```
 
@@ -60,9 +60,9 @@ jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
 
 `coverage[]` holds `{story_id, sentence_id, tracked, scenario_ids}` per sentence, computed by the same code as the Stories tab; `tracked: false` is the "not coverage-tracked" chip. The full shape is in the navigating skill's `references/report-json.md`.
 
-A step can also **pin** a sentence explicitly — `given(text, pins=book_a_group_trip['cancel'])`, taking a sentence handle (or a list of them). A pin *replaces* narration matching for that step in that story rather than adding to it: the step covers exactly the sentences it names there and no others, however well its text fits them. A pin is also the only thing that reaches an under-anchored sentence: the two-term rule gates narration matching, not pins. Use a pin when the sentence is phrased above the vocabulary the step narrates (e.g. a process-level sentence implemented by a technical test), and keep it on the one step that genuinely demonstrates the sentence. `@scenario(pins=...)` pins the whole scenario: it covers exactly those sentences of that story, and a step pin into that story raises.
+A step can also **pin** a sentence explicitly — `given(text, pins=book_a_group_trip['confirm'])`, taking a sentence handle (or a list of them). A pin *replaces* narration matching for that step in that story rather than adding to it: the step covers exactly the sentences it names there and no others, however well its text fits them. A pin is also the only thing that reaches an under-anchored sentence: the two-term rule gates narration matching, not pins. Use a pin when the sentence is phrased above the vocabulary the step narrates (e.g. a process-level sentence implemented by a technical test), and keep it on the one step that genuinely demonstrates the sentence. The story pinned into has to be one the scenario binds — with `stories=` or a pin of its own — or the pin raises, naming `stories=` as the fix. `@scenario(pins=...)` pins the whole scenario: it covers exactly those sentences of that story, and a step pin into that story raises.
 
-**Pin by name, not by number.** Sentence numbers are positions, so inserting a row renumbers every row after it, and `the_story[5]` silently lands on a different sentence. Name a sentence you pin (`sentence(..., name='cancel')`) and pin `the_story['cancel']`.
+**Pin by name, not by number.** Sentence numbers are positions, so inserting a row renumbers every row after it, and `the_story[5]` silently lands on a different sentence. Name a sentence you pin (`sentence(..., name='confirm')`) and pin `the_story['confirm']`.
 
 An uncovered sentence is a signal, not an error — it marks vocabulary and behavior no test exercises yet.
 
