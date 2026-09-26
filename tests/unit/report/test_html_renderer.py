@@ -1526,7 +1526,7 @@ def test_clause_part_filter_word_renders_clause_word_class():
 
 def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
     """render_html executes the stories-coverage rollup (lines 85, 90-107)
-    when at least one scenario has a story_id and the report has a story."""
+    when at least one scenario binds a story and the report has that story."""
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -2265,8 +2265,9 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
     content = html_path.read_text(encoding='utf-8')
     app_data = _embedded_app_data(content)
     assert app_data['scenario_sentences'] == {'test.py::test_x': {'book-a-room': [1]}}
-    assert app_data['sentence_labels'] == {'book-a-room:1': 'Carol searches for Room'}
-    assert app_data['story_titles'] == {'book-a-room': 'Book a Room'}
+    assert app_data['sentence_labels'] == {
+        'book-a-room:1': 'Sentence 1: Carol searches for Room'
+    }
 
 
 def test_render_emits_the_configured_theme_as_the_document_default() -> None:

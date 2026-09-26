@@ -105,11 +105,10 @@ function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = data.story_ids || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
-  // Scenario -> story -> covered sentence ids, and sentence key -> its prose. The story
-  // markup paints that prose as pills, unreadable as a filter label.
+  // Scenario -> story -> covered sentence ids, and sentence key -> its label.
+  // The story markup paints the prose as pills, unreadable as a filter label.
   const scenarioSentences = data.scenario_sentences || {};
   const sentenceLabels = data.sentence_labels || {};
-  const storyTitles = data.story_titles || {};
   const hasGlossary = glossaryTerms.length > 0;
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
@@ -450,7 +449,6 @@ function reportApp() {
       }
       if (this.sentenceFilter) {
         const [storyId, sentenceId] = this.sentenceFilter.split(':');
-        if (!s.story_ids.includes(storyId)) return false;
         const covered = (scenarioSentences[s.id] || {})[storyId] || [];
         if (!covered.includes(Number(sentenceId))) return false;
       }
@@ -587,14 +585,8 @@ function reportApp() {
     },
     sentenceLabel(key) {
       if (!key) return '';
-      // The timeline number means nothing in the Scenarios view, so the chip
-      // leads with the prose and keeps the number as the pointer back. With
-      // several stories a number is ambiguous, so it names its story too.
-      const [storyId, number] = key.split(':');
-      const storyTitle = storyIds.length > 1 ? lookup(storyTitles, storyId, '') : '';
-      const pointer = storyTitle ? `${storyTitle}, sentence ${number}` : `Sentence ${number}`;
-      const text = lookup(sentenceLabels, key, '');
-      return text ? `${pointer}: ${text}` : pointer;
+      // A key from a stale link names no sentence here; its number still points.
+      return lookup(sentenceLabels, key, `Sentence ${key.split(':')[1]}`);
     },
     removeTermFilter(id) {
       this.termFilters = this.termFilters.filter(t => t !== id);

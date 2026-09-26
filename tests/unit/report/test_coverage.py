@@ -281,16 +281,7 @@ def test_compute_coverage_scenario_pin_replaces_matching():
     with given(
         t'a {pg["Story"]} with a matching and an under-anchored {pg["Sentence"]}'
     ):
-        matching = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                _clause(
-                    _entity('guest', 'Guest'),
-                    _term_part('search'),
-                    _entity('room', 'Room'),
-                ),
-            ),
-        )
+        matching = _guest_search_room_story().sentences[0]
         under_anchored = Sentence(
             id=SentenceId(2),
             clauses=(
@@ -306,15 +297,7 @@ def test_compute_coverage_scenario_pin_replaces_matching():
         t'a {pg["Scenario"]} whose {pg["Step"]} matches sentence 1 but which pins '
         t'sentence 2'
     ):
-        scenario_ = _scenario_with_steps(
-            _step(
-                'when',
-                _term_ref('guest', 'Guest'),
-                _term_ref('search', 'search'),
-                _term_ref('room', 'Room'),
-            ),
-            pins=[2],
-        )
+        scenario_ = _scenario_with_steps(_matching_step(), pins=[2])
     with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(scenario_, build_story_index(story))
     with then(t'only the pinned {pg["Sentence"]} is covered, matching never ran'):

@@ -120,17 +120,17 @@ def sentence_handles(pins: Pins | None) -> tuple[SentenceHandle, ...]:
     would need a story to resolve against, which a pin carries itself."""
     if pins is None:
         return ()
-    items = (pins,) if isinstance(pins, SentenceHandle) else pins
-    if (
-        isinstance(items, Sequence)
-        and not isinstance(items, str)
-        and all(isinstance(item, SentenceHandle) for item in items)
-    ):
+    handles = one_or_sequence(pins, SentenceHandle)
+    if handles is not None:
         # A sentence pinned twice is one pin; order of first mention stays.
-        return tuple(dict.fromkeys(items))
+        return tuple(dict.fromkeys(handles))
+    # Checked item by item, so `pins=[the_story]` earns the hint too.
+    items = (
+        pins if isinstance(pins, Sequence) and not isinstance(pins, str) else (pins,)
+    )
     whole_story = (
         ' To narration-match a whole story, bind it with stories= instead.'
-        if isinstance(pins, BaseStory)
+        if any(isinstance(item, BaseStory) for item in items)
         else ''
     )
     raise PytestGivenError(
@@ -138,6 +138,20 @@ def sentence_handles(pins: Pins | None) -> tuple[SentenceHandle, ...]:
         f"sentence up on its story: pins=the_story['name'] or "
         f'pins=the_story[3].{whole_story}'
     )
+
+
+def one_or_sequence[T](value: object, kind: type[T]) -> tuple[T, ...] | None:
+    """`value` as a tuple of `kind`, whether it is one on its own or a
+    sequence of them; None when it is neither, for the caller to word the
+    error. A str is never the sequence: `''` would pass as an empty one."""
+    items = (value,) if isinstance(value, kind) else value
+    if (
+        isinstance(items, Sequence)
+        and not isinstance(items, str)
+        and all(isinstance(item, kind) for item in items)
+    ):
+        return tuple(items)
+    return None
 
 
 def argument_text(value: object) -> str:
@@ -258,11 +272,12 @@ def restore_story_registry(snapshot: dict[StoryId, StoryDeclaration]) -> None:
     _STORY_REGISTRY.update(snapshot)
 
 
-def declared_title(story_id: StoryId) -> str | None:
-    """The title `story()` declared `story_id` under, or None for an id no
-    `story()` call in this run claimed (a hand-built model story)."""
+def story_label(story_id: StoryId) -> str:
+    """A story as an error names it: by the title `story()` declared it
+    under, falling back to its id for one no `story()` call in this run
+    claimed (a hand-built model story)."""
     declaration = _STORY_REGISTRY.get(story_id)
-    return declaration.title if declaration is not None else None
+    return repr(declaration.title if declaration is not None else story_id)
 
 
 def _register_story(sid: StoryId, title: str, source: SourceLocation | None) -> None:

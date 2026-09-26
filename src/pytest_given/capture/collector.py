@@ -30,7 +30,7 @@ from ..model import (
     iter_steps,
 )
 from .source import PACKAGE_ROOT
-from .story import declared_title
+from .story import story_label
 from .template import Template, narration_from
 
 if TYPE_CHECKING:
@@ -403,41 +403,38 @@ class Collector:
     ) -> None:
         """Refuse a step pin the active scenario cannot take: one into a story
         it does not bind, or into one it pins, whose coverage is exactly the
-        scenario's pins.
-
-        `context` names where the pin was recorded (a fixture and its step)
-        when the caller is the graft path, whose traceback ends here rather
-        than at the failing test's own body; `push_step`'s call leaves it
-        unset, since its traceback already points at user code.
+        scenario's pins. `context`, when given, names where the pin was
+        recorded.
         """
         scenario = self._current_scenario
-        suffix = f' ({context})' if context else ''
         if scenario is None:
             # A `@given` fixture scoped wider than `function` records even
             # when no scenario is active — an unannotated test pulled it in.
             raise PytestGivenError(
-                f'a step pin needs a scenario to land in, but this step was '
-                f'recorded outside one{suffix} — an unannotated test pulled in '
-                f'a fixture that records it.'
+                'a step pin needs a scenario to land in, but this step was '
+                'recorded outside one — an unannotated test pulled in a '
+                'fixture that records it.'
             )
+        suffix = f' ({context})' if context else ''
         pinned = {pin.story_id for pin in scenario.pins}
         for pin in pins:
             if pin.story_id not in scenario.story_ids:
-                raise PytestGivenError(
-                    f'a step pins sentence {pin.sentence_id} of story '
-                    f'{_story_label(pin.story_id)}{suffix}, which scenario '
-                    f'{scenario.id!r} does not bind; add the story to '
-                    f'@scenario(stories=...).'
+                problem = (
+                    f'which scenario {scenario.id!r} does not bind; add the '
+                    f'story to @scenario(stories=...).'
                 )
-            if pin.story_id in pinned:
-                raise PytestGivenError(
-                    f'a step pins sentence {pin.sentence_id} of story '
-                    f'{_story_label(pin.story_id)}{suffix}, but scenario '
-                    f'{scenario.id!r} '
-                    f'pins that story itself, so its coverage there is exactly '
-                    f'the scenario pins; drop the step pin, or bind the story '
-                    f'with stories= instead.'
+            elif pin.story_id in pinned:
+                problem = (
+                    f'but scenario {scenario.id!r} pins that story itself, so '
+                    f'its coverage there is exactly the scenario pins; drop the '
+                    f'step pin, or bind the story with stories= instead.'
                 )
+            else:
+                continue
+            raise PytestGivenError(
+                f'a step pins sentence {pin.sentence_id} of story '
+                f'{story_label(pin.story_id)}{suffix}, {problem}'
+            )
 
     def pop_step(self) -> Step | None:
         stack = self._target_stack()
@@ -529,10 +526,3 @@ class Collector:
         if self._current_scenario is not None and self._current_scenario.id == node_id:
             return self._current_scenario
         return self._scenarios_by_id.get(node_id)
-
-
-def _story_label(story_id: StoryId) -> str:
-    """A story as an error names it: by the title the author wrote, falling
-    back to its id for a story no `story()` call declared."""
-    title = declared_title(story_id)
-    return repr(title if title is not None else story_id)

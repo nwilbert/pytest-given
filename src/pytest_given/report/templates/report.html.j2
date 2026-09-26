@@ -447,7 +447,7 @@
           <div class="story-section-heading">Scenarios</div>
           <div class="scenario-list">
           {% for scn in story_scns %}
-          {% set covers = scn_covers[scn.id].get(story.id, []) %}
+          {% set covers = scn_covers[scn.id][story.id] %}
           <div class="scenario {{ scn.status }}"
                {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
                   the `"` its own string literals need. #}

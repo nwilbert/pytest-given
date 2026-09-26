@@ -85,7 +85,7 @@ def build_story_rollups(
             passed = 0
             skipped = 0
             for scn in scenarios:
-                if sentence.id not in coverage_maps[scn.id].get(story.id, set()):
+                if sentence.id not in coverage_maps[scn.id][story.id]:
                     continue
                 covered_by.append(scn.id)
                 if scn.status == 'passed':
@@ -138,16 +138,23 @@ def build_scenario_sentence_index(
 
 
 def build_sentence_labels(report: ReportData) -> dict[SentenceKey, str]:
-    """For each sentence, its prose as plain text, keyed by `SentenceKey`.
+    """For each sentence, its label as plain text, keyed by `SentenceKey`.
 
     Lets the report name a sentence outside the story timeline — in the
     Scenarios view's sentence filter chip — where the numbered bubble that
-    identifies it in the timeline carries no meaning on its own.
+    identifies it in the timeline carries no meaning on its own. So the label
+    carries the prose, with the number as the pointer back; with several
+    stories a number is ambiguous, so it names its story too.
     """
+    several = len(report.stories) > 1
     return {
-        sentence_key(story.id, sentence.id): ' · '.join(
-            _clause_text(clause) for clause in sentence.clauses
+        sentence_key(story.id, sentence.id): (
+            f'{story.title}, sentence {sentence.id}'
+            if several
+            else f'Sentence {sentence.id}'
         )
+        + ': '
+        + ' · '.join(_clause_text(clause) for clause in sentence.clauses)
         for story in report.stories
         for sentence in story.sentences
     }

@@ -203,7 +203,6 @@ def _render_context(
             _app_data(report)
             | {
                 'story_ids': [story.id for story in report.stories],
-                'story_titles': {story.id: story.title for story in report.stories},
                 'term_ids': term_ids,
                 'term_scenarios': glossary_view.term_scenarios,
                 'scenario_sentences': scn_covers,
@@ -282,7 +281,6 @@ def _app_data(report: ReportData) -> dict[str, object]:
                 'module': scenario.module,
                 'tags': scenario.tags,
                 'status': scenario.status,
-                'story_ids': list(scenario.story_ids),
                 'narration': {'text': scenario.narration.text},
             }
             for scenario in report.scenarios

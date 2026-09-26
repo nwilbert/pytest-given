@@ -386,15 +386,16 @@ def test_build_sentence_labels_joins_parts_into_prose() -> None:
     with when(t'the {pg["Sentence"].low} labels are built'):
         labels = build_sentence_labels(rd)
     with then(
-        t'the label reads as prose under a story-scoped key, '
-        t'with the {pg["Clause"].low} texts joined'
+        t'the label gives the number, then reads as prose under a story-scoped '
+        t'key, with the {pg["Clause"].low} texts joined'
     ):
-        assert labels == {'book:3': 'Carol search for Room · Bob search'}
+        assert labels == {'book:3': 'Sentence 3: Carol search for Room · Bob search'}
 
 
 def test_build_sentence_labels_keys_same_numbered_sentences_per_story() -> None:
     """Sentence ids are per-story ints: two stories both have a sentence 1, so
-    the key has to carry the story id to keep them apart."""
+    the key has to carry the story id to keep them apart, and the label the
+    story title."""
     parts = (_ent('guest', 'Guest'), _activity_part('search'))
     first = Story(
         id=StoryId('book'),
@@ -415,4 +416,7 @@ def test_build_sentence_labels_keys_same_numbered_sentences_per_story() -> None:
     )
     rd = ReportData(metadata=_meta(), stories=[first, second], glossary=_g())
     labels = build_sentence_labels(rd)
-    assert labels == {'book:1': 'Guest search', 'cancel:1': 'Guest cancel'}
+    assert labels == {
+        'book:1': 'Book, sentence 1: Guest search',
+        'cancel:1': 'Cancel, sentence 1: Guest cancel',
+    }

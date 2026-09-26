@@ -1026,6 +1026,12 @@ def test_pins_given_a_whole_story_point_at_stories_briefly():
     assert len(message) < 300
 
 
+def test_pins_given_a_list_holding_a_story_point_at_stories_too():
+    the_story = _two_sentence_story('Listed Story')
+    with pytest.raises(PytestGivenError, match='stories='):
+        given('x', pins=[the_story])  # type: ignore[list-item]
+
+
 def test_stories_given_a_non_story_stay_brief():
     glossary = Glossary()
     glossary.actor('Guest')

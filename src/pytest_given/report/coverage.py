@@ -30,11 +30,9 @@ class StoryIndex:
     that story instead of rebuilt per scenario — which computes `a_refs` once
     per sentence rather than once per sentence per scenario.
 
-    Eligibility is *not* recorded, even though `refs_by_sentence` is keyed by
-    exactly the eligible sentences: the index is built lazily, only for a
-    story some scenario is bound to, so absence here does not distinguish
-    "ineligible" from "no scenario named this story". `build_story_rollups`
-    asks `is_coverage_eligible` again for that reason.
+    `refs_by_sentence` is keyed by exactly the eligible sentences, but the
+    index never leaves `build_coverage_map`, so `build_story_rollups` asks
+    `is_coverage_eligible` again rather than reading eligibility off it.
     """
 
     story_id: StoryId
@@ -53,20 +51,15 @@ def build_coverage_map(report: ReportData) -> CoverageMap:
     presentation, and it is the only reason `StoryIndex` would have to be part
     of another module's vocabulary.
     """
-    stories = {story.id: story for story in report.stories}
-    indexes: dict[StoryId, StoryIndex] = {}
-    result: CoverageMap = {}
-    for scenario in report.scenarios:
-        per_story: dict[StoryId, set[SentenceId]] = {}
-        for story_id in scenario.story_ids:
-            story = stories.get(story_id)
-            if story is None:
-                continue
-            if story_id not in indexes:
-                indexes[story_id] = build_story_index(story)
-            per_story[story_id] = compute_coverage(scenario, indexes[story_id])
-        result[scenario.id] = per_story
-    return result
+    indexes = {story.id: build_story_index(story) for story in report.stories}
+    return {
+        scenario.id: {
+            story_id: compute_coverage(scenario, indexes[story_id])
+            for story_id in scenario.story_ids
+            if story_id in indexes
+        }
+        for scenario in report.scenarios
+    }
 
 
 def build_story_index(story: Story) -> StoryIndex:

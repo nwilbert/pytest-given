@@ -16,7 +16,7 @@ from ..model import (
     Story,
 )
 from .steps import StepDescriptor
-from .story import Pins, argument_text, sentence_handles
+from .story import Pins, argument_text, one_or_sequence, sentence_handles
 from .template import (
     ResolvedName,
     StepText,
@@ -108,12 +108,8 @@ def scenario(
 def _matched_stories(stories: Story | Sequence[Story] | None) -> tuple[Story, ...]:
     if stories is None:
         return ()
-    items = (stories,) if isinstance(stories, Story) else stories
-    if (
-        isinstance(items, Sequence)
-        and not isinstance(items, str)
-        and all(isinstance(item, Story) for item in items)
-    ):
+    items = one_or_sequence(stories, Story)
+    if items is not None:
         return tuple({story.id: story for story in items}.values())
     raise PytestGivenError(
         f'@scenario(stories=...) takes a Story or a sequence of them; '
