@@ -74,24 +74,24 @@ def build_story_index(story: Story) -> StoryIndex:
     what the narration cannot, so it reaches them too.
     """
     refs_by_sentence = {
-        sentence.id: a_refs(sentence)
+        sentence.id: refs
         for sentence in story.sentences
-        if is_coverage_eligible(sentence)
+        if _is_anchored(refs := a_refs(sentence))
     }
     sentences_by_term: dict[TermId, set[SentenceId]] = {}
-    for aid, refs in refs_by_sentence.items():
+    for sentence_id, refs in refs_by_sentence.items():
         for term_id in refs:
-            sentences_by_term.setdefault(term_id, set()).add(aid)
+            sentences_by_term.setdefault(term_id, set()).add(sentence_id)
     return StoryIndex(
         refs_by_sentence=refs_by_sentence,
         sentences_by_term=sentences_by_term,
-        ids={a.id for a in story.sentences},
+        ids={sentence.id for sentence in story.sentences},
     )
 
 
 def a_refs(sentence: Sentence) -> set[TermId]:
     """The term ids the A_refs ⊆ S rule matches a sentence on, across all
-    its paths. Words contribute nothing; an instance or inflection counts as
+    its clauses. Words contribute nothing; an instance or inflection counts as
     its term, so `guest('Alice')` and `guest` are the same ref."""
     return {
         part.term_id
@@ -106,7 +106,11 @@ def is_coverage_eligible(sentence: Sentence) -> bool:
     least two distinct glossary term refs. Under-anchored sentences (0 or 1
     distinct term) are excluded from it, and render 'not coverage-tracked'
     unless an `activity=` pin covers them anyway."""
-    return len(a_refs(sentence)) >= 2
+    return _is_anchored(a_refs(sentence))
+
+
+def _is_anchored(refs: set[TermId]) -> bool:
+    return len(refs) >= 2
 
 
 def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[SentenceId]:
@@ -125,16 +129,19 @@ def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[SentenceId]:
     covered: set[SentenceId] = set()
     for step in iter_steps(scenario.steps):
         if step.activity_ids:
-            covered |= {aid for aid in step.activity_ids if aid in scope}
+            covered |= {
+                sentence_id for sentence_id in step.activity_ids if sentence_id in scope
+            }
             continue
         s_cache = s_for_step(step)
         candidates: set[SentenceId] = set()
         for term_id in s_cache:
             candidates |= index.sentences_by_term.get(term_id, set())
         covered |= {
-            aid
-            for aid in candidates
-            if aid in scope and index.refs_by_sentence[aid].issubset(s_cache)
+            sentence_id
+            for sentence_id in candidates
+            if sentence_id in scope
+            and index.refs_by_sentence[sentence_id].issubset(s_cache)
         }
     return covered
 

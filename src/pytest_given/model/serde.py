@@ -142,7 +142,9 @@ def _story_from_dict(d: dict[str, Any]) -> Story:
     return Story(
         id=StoryId(d['id']),
         title=d['title'],
-        sentences=tuple(_sentence_from_dict(a) for a in d.get('sentences', [])),
+        sentences=tuple(
+            _sentence_from_dict(sentence) for sentence in d.get('sentences', [])
+        ),
         source=_source_from_dict(d.get('source')),
     )
 

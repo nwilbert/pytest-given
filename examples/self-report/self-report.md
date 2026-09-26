@@ -1247,7 +1247,7 @@
 - **then** the «Term ref» shows the inflection over the same «Activity»
 
 ## ✓ A bare string in a «clause» becomes a connective word
-`tests/unit/capture/test_story.py:126::test_clause_dispatches_bare_string_to_clause_word`
+`tests/unit/capture/test_story.py:128::test_clause_dispatches_bare_string_to_clause_word`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1256,7 +1256,7 @@
 - **then** the bare word becomes a «Clause part» word, not a «Term ref»
 
 ## ✓ A «clause» needs at least an «actor», an «activity» and a node
-`tests/unit/capture/test_story.py:141::test_clause_rejects_fewer_than_three_parts` · validation
+`tests/unit/capture/test_story.py:143::test_clause_rejects_fewer_than_three_parts` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1264,7 +1264,7 @@
 - **then** a PytestGivenError rejects it as too short, counting the parts
 
 ## ✓ Position 0 of a «clause» must be an «actor»
-`tests/unit/capture/test_story.py:159::test_clause_rejects_work_object_in_position_0` · validation
+`tests/unit/capture/test_story.py:161::test_clause_rejects_work_object_in_position_0` · validation
 
 - **given** a search activity
 - **given** a Room work object
@@ -1272,7 +1272,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ An «activity» cannot open a «clause»
-`tests/unit/capture/test_story.py:174::test_clause_rejects_activity_in_position_0` · validation
+`tests/unit/capture/test_story.py:176::test_clause_rejects_activity_in_position_0` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1281,7 +1281,7 @@
 - **then** a PytestGivenError says position 0 is the «Actor» slot
 
 ## ✓ A bare string may stand in for the «actor» «slot»
-`tests/unit/capture/test_story.py:189::test_clause_allows_bare_string_in_position_0`
+`tests/unit/capture/test_story.py:191::test_clause_allows_bare_string_in_position_0`
 
 - **given** a search activity
 - **given** a Room work object
@@ -1289,7 +1289,7 @@
 - **then** it is accepted as a «Clause part» word
 
 ## ✓ Position 1 of a «clause» must be an «activity»
-`tests/unit/capture/test_story.py:199::test_clause_rejects_actor_in_position_1` · validation
+`tests/unit/capture/test_story.py:201::test_clause_rejects_actor_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1297,7 +1297,7 @@
 - **then** a PytestGivenError says position 1 is the verb «slot»
 
 ## ✓ A «work object» cannot fill the verb «slot»
-`tests/unit/capture/test_story.py:214::test_clause_rejects_work_object_in_position_1` · validation
+`tests/unit/capture/test_story.py:216::test_clause_rejects_work_object_in_position_1` · validation
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1305,7 +1305,7 @@
 - **then** a PytestGivenError says position 1 is the verb «slot»
 
 ## ✓ Position 2 of a «clause» must be a noun
-`tests/unit/capture/test_story.py:229::test_clause_rejects_activity_in_position_2` · validation
+`tests/unit/capture/test_story.py:231::test_clause_rejects_activity_in_position_2` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1313,7 +1313,7 @@
 - **then** a PytestGivenError says position 2 is the noun slot
 
 ## ✓ A bare verb may sit between two real entity nodes
-`tests/unit/capture/test_story.py:244::test_clause_allows_bare_verb_between_term_nodes`
+`tests/unit/capture/test_story.py:246::test_clause_allows_bare_verb_between_term_nodes`
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1321,28 +1321,28 @@
 - **then** the entities are term refs and the verb stays a bare word
 
 ## ✓ A «clause» may be fully bare words
-`tests/unit/capture/test_story.py:259::test_clause_allows_fully_bare_path`
+`tests/unit/capture/test_story.py:261::test_clause_allows_fully_bare_words`
 
 - **given** three plain words with no glossary handles
 - **when** a «Clause» is built from them
 - **then** every part is a «Clause part» word
 
 ## ✓ Node/edge alternation allows a trailing connective node
-`tests/unit/capture/test_story.py:278::test_clause_allows_node_edge_alternation_with_connective`
+`tests/unit/capture/test_story.py:280::test_clause_allows_node_edge_alternation_with_connective`
 
 - **given** an «Actor», an «Activity», a «Work Object» and a second actor
 - **when** they form a five-part «Clause» joined by a connective
 - **then** even positions are term-ref nodes and the connective stays a word
 
 ## ✓ A «clause» may not end on a dangling edge
-`tests/unit/capture/test_story.py:304::test_clause_rejects_dangling_edge` · validation
+`tests/unit/capture/test_story.py:306::test_clause_rejects_dangling_edge` · validation
 
 - **given** an «Actor», «Activity» and «Work Object» plus a connective
 - **when** a clause ending on a connective edge is built
 - **then** a PytestGivenError names the trailing arrow with no target
 
 ## ✓ A single-clause «sentence» synthesizes one «clause»
-`tests/unit/capture/test_story.py:332::test_sentence_single_clause_synthesizes_one_clause`
+`tests/unit/capture/test_story.py:334::test_sentence_single_clause_synthesizes_one_clause`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1351,7 +1351,7 @@
 - **then** it wraps a single «Clause»
 
 ## ✓ A «sentence» may hold several «clauses»
-`tests/unit/capture/test_story.py:345::test_sentence_accepts_multiple_clauses`
+`tests/unit/capture/test_story.py:347::test_sentence_accepts_multiple_clauses`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1361,7 +1361,7 @@
 - **then** the sentence carries both clauses
 
 ## ✓ Mixing loose parts and prebuilt «clauses» is rejected
-`tests/unit/capture/test_story.py:359::test_sentence_mixing_parts_and_clauses_raises` · validation
+`tests/unit/capture/test_story.py:361::test_sentence_mixing_parts_and_clauses_raises` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1371,7 +1371,7 @@
 - **then** a PytestGivenError rejects the mix
 
 ## ✓ «Sentence» id 0 is reserved
-`tests/unit/capture/test_story.py:376::test_sentence_explicit_id_zero_raises` · validation
+`tests/unit/capture/test_story.py:378::test_sentence_explicit_id_zero_raises` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1380,7 +1380,7 @@
 - **then** a PytestGivenError says activity_id=0 is reserved
 
 ## ✓ A «story» auto-numbers its «sentences» from one
-`tests/unit/capture/test_story.py:394::test_story_auto_numbers_sentences_from_one`
+`tests/unit/capture/test_story.py:396::test_story_auto_numbers_sentences_from_one`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1389,7 +1389,7 @@
 - **then** the sentences are numbered 1 and 2
 
 ## ✓ Auto-numbering skips ids already taken explicitly
-`tests/unit/capture/test_story.py:409::test_story_auto_numbering_skips_taken_explicit_ids`
+`tests/unit/capture/test_story.py:411::test_story_auto_numbering_skips_taken_explicit_ids`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1399,7 +1399,7 @@
 - **then** auto picks skip the ids already used explicitly
 
 ## ✓ Duplicate «sentence» ids in a «story» are rejected
-`tests/unit/capture/test_story.py:426::test_story_rejects_duplicate_activity_ids` · validation
+`tests/unit/capture/test_story.py:428::test_story_rejects_duplicate_activity_ids` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1409,14 +1409,14 @@
 - **then** a PytestGivenError reports the duplicate sentence id
 
 ## ✓ A «story» derives its id from its title
-`tests/unit/capture/test_story.py:446::test_story_derives_id_from_title`
+`tests/unit/capture/test_story.py:448::test_story_derives_id_from_title`
 
 - **given** a human-readable story title
 - **when** a «Story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A «story» may span only one «glossary»
-`tests/unit/capture/test_story.py:458::test_story_rejects_two_glossaries` · validation
+`tests/unit/capture/test_story.py:460::test_story_rejects_two_glossaries` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1426,28 +1426,28 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ Two «stories» with the same id collide
-`tests/unit/capture/test_story.py:504::test_story_id_collision_raises_with_both_sites` · validation
+`tests/unit/capture/test_story.py:506::test_story_id_collision_raises_with_both_sites` · validation
 
 - **given** a «Story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «clause» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:587::test_clause_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:589::test_clause_allows_second_verb_edge`
 
 - **given** an «Actor», two «Activity» and two «Work Object» handles
 - **when** they form a five-node «Clause» (actor verb object verb object)
 - **then** every slot is a «Term ref», with no bare words
 
 ## ✓ A declared «work object» in a verb «slot» is rejected at construction
-`tests/unit/capture/test_story.py:679::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+`tests/unit/capture/test_story.py:681::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «File glossary» declaring Room a work object
 - **when** Room is placed in the verb «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
 ## ✓ A «slot» error names the «term», not its repr
-`tests/unit/capture/test_story.py:705::test_slot_error_message_stays_compact` · diagnostics
+`tests/unit/capture/test_story.py:707::test_slot_error_message_stays_compact` · diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1457,14 +1457,14 @@
 - **then** the message is short and free of dataclass reprs
 
 ## ✓ A kindless «term» stays valid in any «slot»
-`tests/unit/capture/test_story.py:726::test_kindless_term_is_accepted_in_either_slot` · validation
+`tests/unit/capture/test_story.py:728::test_kindless_term_is_accepted_in_either_slot` · validation
 
 - **given** a «Kindless» «Term» declared with g(...)
 - **when** it is placed in a node «slot» and a verb slot
 - **then** both clauses construct, leaving the kind to inference
 
 ## ✓ A non-handle «clause part» names its type
-`tests/unit/capture/test_story.py:741::test_non_handle_part_names_its_type` · validation, diagnostics
+`tests/unit/capture/test_story.py:743::test_non_handle_part_names_its_type` · validation, diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object

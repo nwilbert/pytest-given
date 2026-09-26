@@ -406,18 +406,18 @@ class Collector:
                 f'(phase={phase!r}, ids={list(activity_ids)}).'
             )
         scope = self._current_scenario.activity_ids
-        valid = scope or tuple(a.id for a in story.sentences)
+        valid = scope or tuple(sentence.id for sentence in story.sentences)
         valid_set = set(valid)
-        for aid in activity_ids:
-            if aid in valid_set:
+        for sentence_id in activity_ids:
+            if sentence_id in valid_set:
                 continue
             if scope:
                 raise PytestGivenError(
-                    f'step activity={aid} outside scenario scope '
+                    f'step activity={sentence_id} outside scenario scope '
                     f'(scenario activities={sorted(scope)}).'
                 )
             raise PytestGivenError(
-                f'step activity={aid} not in story {story.title!r} '
+                f'step activity={sentence_id} not in story {story.title!r} '
                 f'(valid: {sorted(valid_set)}).'
             )
 

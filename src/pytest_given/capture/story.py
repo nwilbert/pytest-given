@@ -191,7 +191,7 @@ def story(title: str, sentences: Sequence[Sentence] = ()) -> Story:
     _register_story(sid, title, source)
     numbered = _assign_sequence_numbers(tuple(sentences))
     _check_unique_ids(numbered)
-    glossaries = union_glossaries(pinned_glossaries(a) for a in numbered)
+    glossaries = union_glossaries(pinned_glossaries(sentence) for sentence in numbered)
     _check_single_glossary(title, glossaries)
     return _PinnedStory(
         id=sid,
@@ -208,28 +208,29 @@ def _assign_sequence_numbers(
     """Sentences passed with id=0 (the unset sentinel) get sequential ids
     skipping any explicit ids already taken; sentences with an explicit id
     keep theirs."""
-    taken: set[SentenceId] = {a.id for a in sentences if a.id != 0}
+    taken: set[SentenceId] = {sentence.id for sentence in sentences if sentence.id != 0}
     out: list[Sentence] = []
     next_seq = 1
-    for a in sentences:
-        if a.id != 0:
-            out.append(a)
+    for sentence in sentences:
+        if sentence.id != 0:
+            out.append(sentence)
             continue
         while SentenceId(next_seq) in taken:
             next_seq += 1
-        out.append(replace(a, id=SentenceId(next_seq)))
+        out.append(replace(sentence, id=SentenceId(next_seq)))
         next_seq += 1
     return tuple(out)
 
 
 def _check_unique_ids(sentences: tuple[Sentence, ...]) -> None:
     seen: set[SentenceId] = set()
-    for a in sentences:
-        if a.id in seen:
+    for sentence in sentences:
+        if sentence.id in seen:
             raise PytestGivenError(
-                f'duplicate sentence id {a.id} in story; sentence ids must be unique.'
+                f'duplicate sentence id {sentence.id} in story; '
+                f'sentence ids must be unique.'
             )
-        seen.add(a.id)
+        seen.add(sentence.id)
 
 
 def _check_single_glossary(title: str, glossaries: frozenset[Glossary]) -> None:

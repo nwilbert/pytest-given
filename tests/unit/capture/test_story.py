@@ -66,10 +66,10 @@ def search(g):
 )
 def test_clause_dispatches_actor_to_clause_term_ref(guest, search, room):
     with when(t'a {pg["Clause"]} is built from three glossary handles'):
-        p = clause(guest, search, room)
+        built = clause(guest, search, room)
     with then(t'the {pg["Actor"]} slot becomes a {pg["Term ref"]}'):
-        assert isinstance(p, Clause)
-        assert p.parts[0] == ClauseTermRef(term_id=guest.id, display='Guest')
+        assert isinstance(built, Clause)
+        assert built.parts[0] == ClauseTermRef(term_id=guest.id, display='Guest')
 
 
 def test_clause_dispatches_actor_instance_to_clause_term_ref_with_instance_display(
@@ -77,13 +77,13 @@ def test_clause_dispatches_actor_instance_to_clause_term_ref_with_instance_displ
     search,
     room,
 ):
-    p = clause(guest('Alice'), search, room)
-    assert p.parts[0] == ClauseTermRef(term_id=guest.id, display='Alice')
+    built = clause(guest('Alice'), search, room)
+    assert built.parts[0] == ClauseTermRef(term_id=guest.id, display='Alice')
 
 
 def test_clause_dispatches_work_object_to_clause_term_ref(guest, search, room):
-    p = clause(guest, search, room)
-    assert p.parts[2] == ClauseTermRef(term_id=room.id, display='Room')
+    built = clause(guest, search, room)
+    assert built.parts[2] == ClauseTermRef(term_id=room.id, display='Room')
 
 
 def test_clause_dispatches_work_object_instance_to_clause_term_ref_with_display(
@@ -91,8 +91,8 @@ def test_clause_dispatches_work_object_instance_to_clause_term_ref_with_display(
     search,
     room,
 ):
-    p = clause(guest, search, room('Deluxe Suite'))
-    assert p.parts[2] == ClauseTermRef(term_id=room.id, display='Deluxe Suite')
+    built = clause(guest, search, room('Deluxe Suite'))
+    assert built.parts[2] == ClauseTermRef(term_id=room.id, display='Deluxe Suite')
 
 
 def test_clause_dispatches_activity_to_clause_term_ref_with_canonical_display(
@@ -100,8 +100,8 @@ def test_clause_dispatches_activity_to_clause_term_ref_with_canonical_display(
     search,
     room,
 ):
-    p = clause(guest, search, room)
-    assert p.parts[1] == ClauseTermRef(term_id=search.id, display='search')
+    built = clause(guest, search, room)
+    assert built.parts[1] == ClauseTermRef(term_id=search.id, display='search')
 
 
 @scenario(
@@ -116,11 +116,13 @@ def test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_
     with given(t'an {pg["Activity"]} handle called with an {pg["Inflection"]}'):
         inflected = search('searches for')
     with when(t'it takes the verb slot of a {pg["Clause"]}'):
-        p = clause(guest, inflected, room)
+        built = clause(guest, inflected, room)
     with then(
         t'the {pg["Term ref"]} shows the inflection over the same {pg["Activity"]}'
     ):
-        assert p.parts[1] == ClauseTermRef(term_id=search.id, display='searches for')
+        assert built.parts[1] == ClauseTermRef(
+            term_id=search.id, display='searches for'
+        )
 
 
 @scenario(
@@ -128,11 +130,11 @@ def test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_
 )
 def test_clause_dispatches_bare_string_to_clause_word(guest, search, room):
     with when(t'a {pg["Clause"]} is built with a bare word between term nodes'):
-        p = clause(guest, search, room, 'for', guest('Alice'))
+        built = clause(guest, search, room, 'for', guest('Alice'))
     with then(
         t'the bare word becomes a {pg["Clause part"]} word, not a {pg["Term ref"]}'
     ):
-        assert p.parts[3] == ClauseWord(text='for')
+        assert built.parts[3] == ClauseWord(text='for')
 
 
 # --- Task 4.2: grammar validation ---
@@ -191,9 +193,9 @@ def test_clause_rejects_activity_in_position_0(guest, search, room):
 )
 def test_clause_allows_bare_string_in_position_0(search, room):
     with when(t'a bare string takes position 0 of a {pg["Clause"]}'):
-        p = clause('Guest', search, room)
+        built = clause('Guest', search, room)
     with then(t'it is accepted as a {pg["Clause part"]} word'):
-        assert p.parts[0] == ClauseWord(text='Guest')
+        assert built.parts[0] == ClauseWord(text='Guest')
 
 
 @scenario(
@@ -246,26 +248,26 @@ def test_clause_rejects_activity_in_position_2(guest, search):
 )
 def test_clause_allows_bare_verb_between_term_nodes(guest, room):
     with when(t'a bare verb sits between an {pg["Actor"]} and a {pg["Work Object"]}'):
-        p = clause(guest, 'receives', room)
+        built = clause(guest, 'receives', room)
     with then('the entities are term refs and the verb stays a bare word'):
-        assert [type(part) for part in p.parts] == [
+        assert [type(part) for part in built.parts] == [
             ClauseTermRef,
             ClauseWord,
             ClauseTermRef,
         ]
-        assert p.parts[1] == ClauseWord(text='receives')
+        assert built.parts[1] == ClauseWord(text='receives')
 
 
 @scenario(
     t'A {pg["Clause"].low} may be fully bare words',
 )
-def test_clause_allows_fully_bare_path():
+def test_clause_allows_fully_bare_words():
     with given('three plain words with no glossary handles'):
         words = ('Guest', 'receives', 'Confirmation')
     with when(t'a {pg["Clause"]} is built from them'):
-        p = clause(*words)
+        built = clause(*words)
     with then(t'every part is a {pg["Clause part"]} word'):
-        assert [type(part) for part in p.parts] == [
+        assert [type(part) for part in built.parts] == [
             ClauseWord,
             ClauseWord,
             ClauseWord,
@@ -348,12 +350,12 @@ def test_sentence_single_clause_synthesizes_one_clause(guest, search, room):
 )
 def test_sentence_accepts_multiple_clauses(guest, search, room):
     with given(t'two {pg["Clause"]("clauses")}'):
-        p1 = clause(guest, search, room)
-        p2 = clause(guest('Bob'), search, room)
+        first = clause(guest, search, room)
+        second = clause(guest('Bob'), search, room)
     with when(t'they are combined into one {pg["Sentence"]}', activity=2):
-        a = sentence(p1, p2)
+        a = sentence(first, second)
     with then('the sentence carries both clauses'):
-        assert a.clauses == (p1, p2)
+        assert a.clauses == (first, second)
 
 
 @scenario(
@@ -362,7 +364,7 @@ def test_sentence_accepts_multiple_clauses(guest, search, room):
 )
 def test_sentence_mixing_parts_and_clauses_raises(guest, search, room):
     with given(t'a prebuilt {pg["Clause"]}'):
-        p = clause(guest, search, room)
+        built = clause(guest, search, room)
     with (
         when_then(
             t'it is combined with loose handles in one {pg["Sentence"]}',
@@ -370,7 +372,7 @@ def test_sentence_mixing_parts_and_clauses_raises(guest, search, room):
         ),
         pytest.raises(PytestGivenError, match='mix'),
     ):
-        sentence(p, guest, search, room)
+        sentence(built, guest, search, room)
 
 
 @scenario(
@@ -541,15 +543,15 @@ def test_clause_records_single_glossary(guest, search, room):
     """The live Glossary the clause references is pinned so the single-glossary
     invariant can be enforced at story construction and the plugin can resolve
     the report glossary from the story tree."""
-    p = clause(guest, search, room)
-    assert pinned_glossaries(p) == frozenset({guest.glossary})
+    built = clause(guest, search, room)
+    assert pinned_glossaries(built) == frozenset({guest.glossary})
 
 
 def test_sentence_unions_glossaries_across_clauses(g, guest, search, room):
     # Two clauses, same glossary — the pin must dedup by identity, not double-count.
-    p1 = clause(guest, search, room)
-    p2 = clause(guest('Alice'), search, room)
-    a = sentence(p1, p2)
+    first = clause(guest, search, room)
+    second = clause(guest('Alice'), search, room)
+    a = sentence(first, second)
     assert pinned_glossaries(a) == frozenset({g})
 
 
@@ -564,24 +566,24 @@ def test_story_stashes_its_glossary(guest, search, room):
 
 
 def test_clause_allows_bare_string_in_position_1(guest, room):
-    p = clause(guest, 'searches', room)
-    assert p.parts[1] == ClauseWord(text='searches')
+    built = clause(guest, 'searches', room)
+    assert built.parts[1] == ClauseWord(text='searches')
 
 
 def test_clause_allows_bare_string_in_position_2(guest, search):
-    p = clause(guest, search, 'the room')
-    assert p.parts[2] == ClauseWord(text='the room')
+    built = clause(guest, search, 'the room')
+    assert built.parts[2] == ClauseWord(text='the room')
 
 
 def test_clause_accepts_actor_in_position_2(guest, search):
-    p = clause(guest, search, guest('Bob'))
-    assert isinstance(p.parts[2], ClauseTermRef)
+    built = clause(guest, search, guest('Bob'))
+    assert isinstance(built.parts[2], ClauseTermRef)
 
 
 def test_clause_accepts_extended_alternation(guest, search, room):
     # actor verb node connective node — valid 5-part alternation ending on a node
-    p = clause(guest, search, room, 'into', room('Inbox'))
-    assert len(p.parts) == 5
+    built = clause(guest, search, room, 'into', room('Inbox'))
+    assert len(built.parts) == 5
 
 
 @scenario(
@@ -605,8 +607,8 @@ def test_clause_allows_second_verb_edge():
 
 def test_clause_allows_bare_string_at_later_even_position(guest, search, room):
     # actor verb node connective bare-node — even index 4 is a bare word
-    p = clause(guest, search, room, 'into', 'Inbox')
-    assert p.parts[4] == ClauseWord(text='Inbox')
+    built = clause(guest, search, room, 'into', 'Inbox')
+    assert built.parts[4] == ClauseWord(text='Inbox')
 
 
 def test_activity_id_defaults_to_zero_when_unspecified(guest, search, room):
@@ -619,12 +621,12 @@ def test_sentence_explicit_id_overrides_default(guest, search, room):
     assert a.id == 7
 
 
-def test_sentence_explicit_id_with_multipath(guest, search, room):
-    p1 = clause(guest, search, room)
-    p2 = clause(guest('Bob'), search, room)
-    a = sentence(p1, p2, activity_id=3)
+def test_sentence_explicit_id_with_multiple_clauses(guest, search, room):
+    first = clause(guest, search, room)
+    second = clause(guest('Bob'), search, room)
+    a = sentence(first, second, activity_id=3)
     assert a.id == 3
-    assert a.clauses == (p1, p2)
+    assert a.clauses == (first, second)
 
 
 def test_story_keeps_explicit_activity_ids(guest, search, room):
@@ -667,8 +669,8 @@ def test_top_level_imports():
     guest = g.actor('Guest')
     search = g.activity('search')
     room = g.work_object('Room')
-    p = clause(guest, search, room)
-    a = sentence(p)
+    built = clause(guest, search, room)
+    a = sentence(built)
     s = story('Smoke', [a])
     assert s.title == 'Smoke'
 

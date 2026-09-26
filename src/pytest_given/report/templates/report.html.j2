@@ -440,7 +440,7 @@
           </div>
           {% endfor %}
         </div>
-        <div class="scn-act-strip-section">
+        <div class="scn-sentence-strip-section">
           <div class="story-section-heading">Scenarios</div>
           <div class="scenario-list">
           {% for scn in story_scns %}
@@ -459,8 +459,8 @@
               </span>
             </div>
             {% if scn_covers.get(scn.id) %}
-            <div class="scn-act-strip">
-              <span class="scn-act-label">Covers:</span>
+            <div class="scn-sentence-strip">
+              <span class="scn-sentence-label">Covers:</span>
               {% for sentence_id in scn_covers.get(scn.id, []) %}
               <button type="button" class="btn-reset use-chip" data-sentence-id="{{ sentence_id }}"
                       :class="{ 'use-chip-highlight': highlightedSentences[$el.dataset.sentenceId] }"
