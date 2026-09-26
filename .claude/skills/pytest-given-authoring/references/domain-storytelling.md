@@ -12,7 +12,7 @@ Domain experts narrate a **concrete case** ("Carol books rooms for her team", no
 - **Work objects** — the things actors work *with* and pass around: documents, items, information (a booking, a payment, a confirmation).
 - **Activities** — what an actor does, drawn as an arrow labelled with a verb, connecting the actor to work objects.
 - **Sentences** — an actor, an activity and its work objects; numbered, forming the story's sequence. One sentence may have several arrows under one number (an actor handing a work object to two recipients, two actors working side by side).
-- **Granularity** — stories exist at levels: coarse-grained (a whole process, for overview) down to fine-grained (one step's detail). Pick one level per story; don't mix. Note that `@scenario(story=...)` binds to **one** story, so keeping a coarse and a fine story of the same flow makes every scenario choose which level it covers — the usual answer is one level per suite.
+- **Granularity** — stories exist at levels: coarse-grained (a whole process, for overview) down to fine-grained (one step's detail). Pick one level per story; don't mix. Note that `@scenario(stories=...)` binds to **one** story, so keeping a coarse and a fine story of the same flow makes every scenario choose which level it covers — the usual answer is one level per suite.
 - **As-is vs to-be** — a story records either how work happens today or how it should happen after the change. Label which.
 
 ## Mapping onto pytest-given
@@ -26,7 +26,7 @@ Domain experts narrate a **concrete case** ("Carol books rooms for her team", no
 | The emerging vocabulary | The glossary (see [glossaries.md](glossaries.md)) |
 | "Does the software do this?" | Scenario ↔ sentence coverage in the Stories tab |
 
-The step past the method: binding scenarios (`@scenario(..., story=...)`) turns a story from a picture of shared understanding into a **claim backed by executing tests** — each sentence's coverage chip says whether code demonstrably implements it.
+The step past the method: binding scenarios (`@scenario(..., stories=...)`) turns a story from a picture of shared understanding into a **claim backed by executing tests** — each sentence's coverage chip says whether code demonstrably implements it.
 
 ## Greenfield workflow
 

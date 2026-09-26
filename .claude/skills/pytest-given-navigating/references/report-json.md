@@ -25,7 +25,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames`. **Always `null` on a parametrized scenario**, even a failed one: its errors are per case in `parameters.cases[].error`, same shape |
 | `source` | `{relpath, line}` — the test function's definition site |
-| `story_id` / `activity_ids` | Story binding from `@scenario(..., story=...)` |
+| `story_ids` / `pins` | Stories the scenario binds (`@scenario(stories=...)`, plus stories reached through a pin), and its scenario pins as `[{story_id, sentence_id}]` |
 
 In a grouped scenario `id`, `module`, `tags` and `source` come from the first
 *collected* case, while `steps` are templatized from the first case that
@@ -35,7 +35,7 @@ for per-case status.
 
 ## Step
 
-`{phase, narration, children[], attachments[], activity_ids, fixture_name}` — `phase` is `given`/`when`/`then`; `children` nests sub-steps; `fixture_name` is set when the step came from a `@given`-decorated fixture. A step carries no status or error of its own: failure lives on the scenario, and per case in `parameters.cases[]`. An entry in `attachments[]` is either `{label, content, content_type}` or, when the payload varies across parametrize cases, `{label, content_type, column_id}` — a content-less pointer at the column that holds every case's payload.
+`{phase, narration, children[], attachments[], pins, fixture_name}` — `phase` is `given`/`when`/`then`; `children` nests sub-steps; `fixture_name` is set when the step came from a `@given`-decorated fixture. A step carries no status or error of its own: failure lives on the scenario, and per case in `parameters.cases[]`. An entry in `attachments[]` is either `{label, content, content_type}` or, when the payload varies across parametrize cases, `{label, content_type, column_id}` — a content-less pointer at the column that holds every case's payload.
 
 `narration.parts[]` is the structured step text; each part is one of:
 
@@ -54,11 +54,11 @@ Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`La
 
 ## Story
 
-`{id, title, sentences: [{id, clauses: [{parts: [...]}]}], source}` — sentence ids are what `activity_ids` on scenarios and steps point at. A clause part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
+`{id, title, sentences: [{id, name, clauses: [{parts: [...]}]}], source}` — sentence ids are what `pins[].sentence_id` on scenarios and steps point at; `name` is `null` for an unnamed sentence. A clause part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
 
 ## Coverage
 
-`{story_id, sentence_id, tracked, scenario_ids: [...]}` — the same per-sentence coverage the Stories tab renders, one record per sentence of every story, in story then sentence order. `scenario_ids` are the node ids of the scenarios covering the sentence; `tracked: false` marks a sentence the report can say nothing about (fewer than two glossary terms and no `activity=` pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the rule is per step, gated by the two-term eligibility, with pins replacing narration — reimplementing it gets the answer wrong.
+`{story_id, sentence_id, tracked, scenario_ids: [...]}` — the same per-sentence coverage the Stories tab renders, one record per sentence of every story, in story then sentence order. `scenario_ids` are the node ids of the scenarios covering the sentence; `tracked: false` marks a sentence the report can say nothing about (fewer than two glossary terms and no pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the rule is per step, gated by the two-term eligibility, with pins replacing narration — reimplementing it gets the answer wrong.
 
 ## Recipes
 
@@ -85,7 +85,7 @@ jq -r '.scenarios[] | select(.tags | index("validation")) | .narration.text' rep
 jq -r '.scenarios[] | select(.tags | any(startswith("ticket/"))) | .narration.text' report.json
 
 # Scenarios implementing a story
-jq -r '.scenarios[] | select(.story_id == "lend-and-return-a-book") | .narration.text' report.json
+jq -r '.scenarios[] | select(.story_ids | index("lend-and-return-a-book")) | .narration.text' report.json
 
 # Uncovered sentences (tracked ones no scenario covers), as story#sentence
 jq -r '.coverage[] | select(.tracked and .scenario_ids == [])

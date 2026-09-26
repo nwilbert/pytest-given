@@ -89,13 +89,21 @@ A clause alternates node / edge / node …, so it has an odd length ≥ 3 and en
 **3. Scenario ↔ sentence binding** — link a scenario (and individual steps) to the story it implements:
 
 ```python
-@scenario('Carol selects a suite', story=book_a_group_trip)
+@scenario('Carol selects a suite', stories=book_a_group_trip)
 def test_select_suite(carol):
     with when(t'{organizer("Carol")} selects the {room("Deluxe Suite")}'):
         ...
 ```
 
-Each step's term references are matched against the story's sentences to compute coverage. The Stories tab shows the timeline with a coverage chip per sentence and the scenarios that touch it; selecting a sentence offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. A step can also bind explicitly with `given(text, activity=...)`, naming a sentence by its 1-based position in the story; pass `sentence(..., activity_id=N)` to fix a row's number so inserting a row later doesn't renumber the pins after it. `@scenario(..., activities=[2, 3])` requires `story=` and narrows the scenario to those sentence ids, so it can cover no others. The JSON report carries the same per-sentence result under a top-level `coverage` key, so a terminal or an agent can read it without re-deriving the rule.
+Each step's term references are matched against the story's sentences to compute coverage. The Stories tab shows the timeline with a coverage chip per sentence and the scenarios that touch it; selecting a sentence offers *Open in Scenarios*, which filters the Scenarios view down to those scenarios. The JSON report carries the same per-sentence result under a top-level `coverage` key.
+
+A sentence can be named — `sentence(guest, cancel('cancels'), booking, name='cancel')` — and a story hands out **sentence handles** by name or number: `book_a_group_trip['cancel']`, `book_a_group_trip[3]`. Numbers are positions, so inserting a row renumbers the rows after it; a name stays put. A handle is what **pins** take:
+
+- `given(text, pins=book_a_group_trip['cancel'])` pins a step. The step covers exactly the named sentences in that story instead of being narration-matched there.
+- `@scenario(..., pins=book_a_group_trip['cancel'])` pins the whole scenario. It covers exactly those sentences of that story, with no narration matching against it, and binds the story without `stories=`. A step pin into a story the scenario pins raises.
+- `@scenario(..., stories=[book_a_group_trip, cancel_a_booking])` matches narration against several stories. The scenario is listed under each, with its chips for that story.
+
+Each rule applies per story: a pin into one story says nothing about another. A scenario pin is an assertion no narration backs: it covers its sentences even when the test fails early or is skipped (the chip shows the scenario's status), so keep one only where the body really exercises the sentence. A pin also reaches under-anchored sentences, which narration matching skips.
 
 The [domain-storytelling](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-07-domain-storytelling-design.md) and [file-backed glossary](https://github.com/nwilbert/pytest-given/blob/main/docs/specs/2026-06-18-file-backed-glossary-design.md) design specs carry the full surface; the [examples](../examples.md) show it end to end.
 

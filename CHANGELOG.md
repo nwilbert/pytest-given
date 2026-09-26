@@ -44,6 +44,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `attachment-labels` and varying-`str` grouping refusals name the parametrize case they found, and the latter now points at `group_parametrized=False` as a way out.
 - The reviewing skill ships `references/pairs.md`, a script pairing each scenario's narration with its test's source, and audits the rules the release notes announce; both skills flag alternation `match=` pins and a `when` that narrates arrangement while its body acts.
 - The authoring skill's `stories.md` spells out the directional instance rule of coverage matching (and its consequence: write sentences with bare handles), that two sentences with nested term sets always cover together, and how to verify coverage from the JSON report; the reviewing skill's coverage recipe reads the report's `coverage` key instead of reimplementing the rule.
+- The authoring, reviewing and navigating skills describe sentence handles, `pins=` and `stories=`, and the reviewing skill checks that each scenario-pinned sentence is exercised by the test body.
 
 ### Fixed
 

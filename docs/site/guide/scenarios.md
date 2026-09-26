@@ -4,9 +4,9 @@ Everything a narrated test uses: the decorator that puts it in the report, and t
 
 ## `@scenario`
 
-`@scenario(name, tags=None, *, story=None, activities=None, group_parametrized=True)`
+`@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)`
 
-Required for a test to appear in the report. `story=` / `activities=` bind it to a domain story (see [Domain Storytelling](domain-storytelling.md)) — `activities=` requires `story=` and takes an `int` or a sequence of them, never a string; `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
+Required for a test to appear in the report. `stories=` (one story or several) and `pins=` (one sentence handle or several) bind it to domain stories — see [Domain Storytelling](domain-storytelling.md); `group_parametrized=False` declines parametrize merging. The decorated function is returned unwrapped.
 
 `tags=` takes free-form strings. A `/` nests a tag in the report's Tags sidebar the way a `.` nests modules: `ticket/ABC-123` files under a `ticket` heading, and selecting the heading filters to every tag beneath it. Tags are report metadata, not pytest marks.
 
