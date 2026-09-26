@@ -54,19 +54,30 @@ adopt_pytest_given = story(
     'Adopt pytest-given',
     [
         # 1 — honest gap: nothing implements elicitation.
-        sentence(domain_expert, 'tells', story_t, 'to the', developer),
+        sentence(domain_expert, 'tells', story_t, 'to the', developer, name='tell'),
         # 2
-        sentence(developer, 'captures', story_t, 'as', sentence_t),
+        sentence(developer, 'captures', story_t, 'as', sentence_t, name='capture'),
         # 3
-        sentence(developer, 'builds', glossary_t, 'with the', domain_expert),
+        sentence(
+            developer, 'builds', glossary_t, 'with the', domain_expert, name='build'
+        ),
         # 4
-        sentence(agent, 'writes', scenario_t, 'with', tag_t, 'against the', glossary_t),
+        sentence(
+            agent,
+            'writes',
+            scenario_t,
+            'with',
+            tag_t,
+            'against the',
+            glossary_t,
+            name='write',
+        ),
         # 5
-        sentence(agent, 'narrates', step_t, 'with a', phase_t),
+        sentence(agent, 'narrates', step_t, 'with a', phase_t, name='narrate'),
         # 6
-        sentence(agent, 'attaches', attachment_t, 'to a', step_t),
+        sentence(agent, 'attaches', attachment_t, 'to a', step_t, name='attach'),
         # 7
-        sentence(collector_t, 'records', step_t, 'on the', step_stack_t),
+        sentence(collector_t, 'records', step_t, 'on the', step_stack_t, name='record'),
         # 8
         sentence(
             collector_t,
@@ -74,6 +85,7 @@ adopt_pytest_given = story(
             fixture_recording_t,
             'from a',
             step_fixture_t,
+            name='graft',
         ),
         # 9
         sentence(
@@ -82,12 +94,19 @@ adopt_pytest_given = story(
             parametrized_scenario_t,
             'into a',
             parameter_table_t,
+            name='group',
         ),
         # 10
-        sentence(renderer_t, 'renders', report_t, 'with', parameter_coloring_t),
+        sentence(
+            renderer_t, 'renders', report_t, 'with', parameter_coloring_t, name='render'
+        ),
         # 11
-        sentence(narration_lint_t, 'flags', scenario_t, 'against a', lint_rule_t),
+        sentence(
+            narration_lint_t, 'flags', scenario_t, 'against a', lint_rule_t, name='flag'
+        ),
         # 12 — honest gap: a human does the review.
-        sentence(domain_expert, 'reviews', scenario_t, 'in the', report_t),
+        sentence(
+            domain_expert, 'reviews', scenario_t, 'in the', report_t, name='review'
+        ),
     ],
 )

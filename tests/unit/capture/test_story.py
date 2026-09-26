@@ -14,8 +14,9 @@ from pytest_given import (
 )
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.story import (
+    UnnumberedSentence,
+    carried_glossaries,
     clause,
-    pinned_glossaries,
     restore_story_registry,
     sentence,
     story,
@@ -24,7 +25,8 @@ from pytest_given.model import (
     Clause,
     ClauseTermRef,
     ClauseWord,
-    Sentence,
+    Pin,
+    SentenceId,
     StoryId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -339,7 +341,7 @@ def test_sentence_single_clause_synthesizes_one_clause(guest, search, room):
     with when(t'a {pg["Sentence"]} is built from handles directly', activity=2):
         a = sentence(guest, search, room)
     with then(t'it wraps a single {pg["Clause"]}'):
-        assert isinstance(a, Sentence)
+        assert isinstance(a, UnnumberedSentence)
         assert len(a.clauses) == 1
         assert a.clauses[0].parts[0].display == 'Guest'
 
@@ -375,21 +377,6 @@ def test_sentence_mixing_parts_and_clauses_raises(guest, search, room):
         sentence(built, guest, search, room)
 
 
-@scenario(
-    t'{pg["Sentence"]} id 0 is reserved',
-    tags=['validation'],
-)
-def test_sentence_explicit_id_zero_raises(guest, search, room):
-    with (
-        when_then(
-            t'a {pg["Sentence"]} is built with explicit activity_id=0',
-            'a PytestGivenError says activity_id=0 is reserved',
-        ),
-        pytest.raises(PytestGivenError, match=r'activity_id=0.*reserved'),
-    ):
-        sentence(guest, search, room, activity_id=0)
-
-
 # --- Task 4.4: story() constructor ---
 
 
@@ -406,43 +393,6 @@ def test_story_auto_numbers_sentences_from_one(guest, search, room):
     with then('the sentences are numbered 1 and 2'):
         assert s.sentences[0].id == 1
         assert s.sentences[1].id == 2
-
-
-@scenario(
-    'Auto-numbering skips ids already taken explicitly',
-)
-def test_story_auto_numbering_skips_taken_explicit_ids(guest, search, room):
-    with given(t'a mix of explicit and auto {pg["Sentence"]} ids'):
-        sentences = [
-            sentence(guest, search, room, activity_id=1),
-            sentence(guest('Alice'), search, room),
-            sentence(guest('Bob'), search, room, activity_id=3),
-            sentence(guest('Cara'), search, room),
-        ]
-    with when(t'they are assembled into a {pg["Story"]}'):
-        s = story('Book a Room', sentences)
-    with then('auto picks skip the ids already used explicitly'):
-        assert [a.id for a in s.sentences] == [1, 2, 3, 4]
-
-
-@scenario(
-    t'Duplicate {pg["Sentence"].low} ids in a {pg["Story"].low} are rejected',
-    tags=['validation'],
-)
-def test_story_rejects_duplicate_activity_ids(guest, search, room):
-    with given(t'two {pg["Sentence"]} rows sharing an explicit id'):
-        rows = [
-            sentence(guest, search, room, activity_id=1),
-            sentence(guest('Alice'), search, room, activity_id=1),
-        ]
-    with (
-        when_then(
-            t'they are assembled into a {pg["Story"]}',
-            'a PytestGivenError reports the duplicate sentence id',
-        ),
-        pytest.raises(PytestGivenError, match='duplicate sentence id'),
-    ):
-        story('Book', rows)
 
 
 @scenario(
@@ -500,6 +450,122 @@ def test_story_captures_source_from_call_site(g):
         source_mod.restore_rootdir(None)
 
 
+# --- Task 1 (pins): sentence numbers, names and sentence handles ---
+
+
+@scenario(
+    t'A {pg["Sentence"].low} {pg["Handle"].low} is looked up by name or by number',
+)
+def test_story_hands_out_a_sentence_by_name_and_by_number(guest, search, room):
+    with given(t'a {pg["Story"]} whose second {pg["Sentence"]} is named'):
+        built = story(
+            'Lookup',
+            [
+                sentence(guest, search, room),
+                sentence(guest('Alice'), search, room, name='cancel'),
+            ],
+        )
+    with when(t'the {pg["Sentence"]} is looked up by its name and by its number'):
+        by_name = built['cancel']
+        by_number = built[2]
+    with then(t'both {pg["Handle"]("handles")} name sentence 2 of that {pg["Story"]}'):
+        expected = Pin(story_id=built.id, sentence_id=SentenceId(2))
+        assert by_name.pin == by_number.pin == expected
+        assert by_name.story is built
+
+
+@scenario(
+    t'Looking up a {pg["Sentence"].low} the {pg["Story"].low} lacks lists the '
+    t'ones it has',
+)
+def test_story_lookup_miss_lists_the_sentences(guest, search, room):
+    with given(t'a {pg["Story"]} with an unnamed and a named {pg["Sentence"]}'):
+        built = story(
+            'Lookup Miss',
+            [
+                sentence(guest, search, room),
+                sentence(guest('Alice'), search, room, name='search'),
+            ],
+        )
+    with (
+        when_then(
+            'an unknown name is looked up',
+            "a PytestGivenError lists the story's sentences",
+        ),
+        pytest.raises(
+            PytestGivenError,
+            match=r"story 'Lookup Miss' has no sentence 'serch'.*1, 2 'search'",
+        ),
+    ):
+        _ = built['serch']
+
+
+@pytest.mark.parametrize('key', [0, -1, 3, True])
+def test_story_lookup_refuses_a_number_that_is_no_sentence_number(
+    guest, search, room, key
+):
+    built = story(
+        'Bad Numbers', [sentence(guest, search, room), sentence(guest, search, room)]
+    )
+    with pytest.raises(PytestGivenError, match='has no sentence'):
+        _ = built[key]
+
+
+def test_story_lookup_reads_a_numeric_string_as_a_name(guest, search, room):
+    built = story(
+        'Numeric Name',
+        [
+            sentence(guest, search, room),
+            sentence(guest('Alice'), search, room, name='1'),
+        ],
+    )
+    assert built['1'].pin.sentence_id == 2
+    assert built[1].pin.sentence_id == 1
+    with pytest.raises(PytestGivenError, match=r"has no sentence '2'"):
+        _ = built['2']
+
+
+def test_story_numbers_sentences_by_position(guest, search, room):
+    built = story(
+        'Positions',
+        [sentence(guest, search, room, name='first'), sentence(guest, search, room)],
+    )
+    assert [one.id for one in built.sentences] == [1, 2]
+    assert [one.name for one in built.sentences] == ['first', None]
+
+
+@scenario(
+    t'Two {pg["Sentence"]("sentences")} of one {pg["Story"].low} cannot share a name',
+)
+def test_story_rejects_duplicate_sentence_names(guest, search, room):
+    with given(t'two {pg["Sentence"]("sentences")} both named "cancel"'):
+        first = sentence(guest, search, room, name='cancel')
+        second = sentence(guest('Alice'), search, room, name='cancel')
+    with (
+        when_then(
+            t'a {pg["Story"]} is built from them',
+            'a PytestGivenError names the duplicate and both numbers',
+        ),
+        pytest.raises(PytestGivenError, match=r"'cancel'.*sentences 1 and 2"),
+    ):
+        story('Duplicate Names', [first, second])
+
+
+@scenario(t'An empty or padded {pg["Sentence"].low} name is refused')
+@pytest.mark.parametrize('bad_name', ['', ' cancel', 'cancel '])
+def test_sentence_rejects_an_empty_or_padded_name(guest, search, room, bad_name):
+    with given(t'the {pg["Sentence"]} name {bad_name!r}'):
+        name = bad_name
+    with (
+        when_then(
+            t'a {pg["Sentence"]} is built with that name',
+            'a PytestGivenError says what a name must be',
+        ),
+        pytest.raises(PytestGivenError, match='sentence name'),
+    ):
+        sentence(guest, search, room, name=name)
+
+
 # --- Task 4.5: story-id duplicate detection ---
 
 
@@ -544,7 +610,7 @@ def test_clause_records_single_glossary(guest, search, room):
     invariant can be enforced at story construction and the plugin can resolve
     the report glossary from the story tree."""
     built = clause(guest, search, room)
-    assert pinned_glossaries(built) == frozenset({guest.glossary})
+    assert carried_glossaries(built) == frozenset({guest.glossary})
 
 
 def test_sentence_unions_glossaries_across_clauses(g, guest, search, room):
@@ -552,14 +618,14 @@ def test_sentence_unions_glossaries_across_clauses(g, guest, search, room):
     first = clause(guest, search, room)
     second = clause(guest('Alice'), search, room)
     a = sentence(first, second)
-    assert pinned_glossaries(a) == frozenset({g})
+    assert carried_glossaries(a) == frozenset({g})
 
 
 def test_story_stashes_its_glossary(guest, search, room):
     """story() carries the referenced Glossary on the Story tree so
     plugin._resolve_glossary can pick it without any session-global."""
     s = story('Book', [sentence(guest, search, room)])
-    assert pinned_glossaries(s) == frozenset({guest.glossary})
+    assert carried_glossaries(s) == frozenset({guest.glossary})
 
 
 # --- Additional grammar/constructor cases (kept as plain unit checks) ---
@@ -609,50 +675,6 @@ def test_clause_allows_bare_string_at_later_even_position(guest, search, room):
     # actor verb node connective bare-node — even index 4 is a bare word
     built = clause(guest, search, room, 'into', 'Inbox')
     assert built.parts[4] == ClauseWord(text='Inbox')
-
-
-def test_activity_id_defaults_to_zero_when_unspecified(guest, search, room):
-    a = sentence(guest, search, room)
-    assert a.id == 0
-
-
-def test_sentence_explicit_id_overrides_default(guest, search, room):
-    a = sentence(guest, search, room, activity_id=7)
-    assert a.id == 7
-
-
-def test_sentence_explicit_id_with_multiple_clauses(guest, search, room):
-    first = clause(guest, search, room)
-    second = clause(guest('Bob'), search, room)
-    a = sentence(first, second, activity_id=3)
-    assert a.id == 3
-    assert a.clauses == (first, second)
-
-
-def test_story_keeps_explicit_activity_ids(guest, search, room):
-    s = story(
-        'Book a Room',
-        [
-            sentence(guest, search, room, activity_id=10),
-            sentence(guest('Alice'), search, room),
-        ],
-    )
-    assert s.sentences[0].id == 10
-    assert s.sentences[1].id == 1
-
-
-def test_story_auto_numbering_skips_taken_ids_even_when_earlier_auto(
-    guest, search, room
-):
-    """Explicit activity_id=1 anywhere takes precedence over the auto counter."""
-    s = story(
-        'Book a Room',
-        [
-            sentence(guest('Alice'), search, room),
-            sentence(guest, search, room, activity_id=1),
-        ],
-    )
-    assert [a.id for a in s.sentences] == [2, 1]
 
 
 # --- Task 4.6: top-level re-exports ---

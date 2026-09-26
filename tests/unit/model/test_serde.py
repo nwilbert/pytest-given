@@ -24,6 +24,7 @@ from pytest_given.model import (
     Scenario,
     Sentence,
     SentenceId,
+    SentenceName,
     SourceLocation,
     Step,
     Story,
@@ -663,6 +664,18 @@ def test_scenario_story_id_and_activity_ids_round_trip():
     rt = _round_trip(report)
     assert rt.scenarios[0].story_id == 'book'
     assert rt.scenarios[0].activity_ids == (1, 2)
+
+
+def test_sentence_name_round_trips_and_defaults_to_none():
+    named = Sentence(id=SentenceId(1), clauses=(), name=SentenceName('cancel'))
+    unnamed = Sentence(id=SentenceId(2), clauses=())
+    story = Story(id=StoryId('book'), title='Book', sentences=(named, unnamed))
+    report = ReportData(metadata=_meta(), stories=[story])
+    data = report_to_dict(report)
+    assert [one['name'] for one in data['stories'][0]['sentences']] == ['cancel', None]
+    del data['stories'][0]['sentences'][1]['name']
+    rt = report_from_dict(data)
+    assert [one.name for one in rt.stories[0].sentences] == ['cancel', None]
 
 
 def test_step_activity_ids_round_trip():

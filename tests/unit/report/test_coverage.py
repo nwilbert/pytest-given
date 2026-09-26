@@ -102,10 +102,11 @@ def test_sentence_with_clauses_from_different_actors_is_covered():
         g = Glossary()
         guest, clerk = g.actor('Guest'), g.actor('Clerk')
         sign, register = g.activity('sign'), g.work_object('Register')
-        built = sentence(
+        unnumbered = sentence(
             clause(guest, sign('signs'), register),
             clause(clerk, sign('signs'), register),
         )
+        built = Sentence(id=SentenceId(1), clauses=unnumbered.clauses)
         story = Story(id=StoryId('s'), title='S', sentences=(built,))
     with given(t'a {pg["Step"]} naming both actors, the activity and the register'):
         scenario_ = _scenario_with_steps(

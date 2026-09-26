@@ -84,6 +84,9 @@ def case_suffix(node_id: str) -> str:
 
 TermId = NewType('TermId', str)
 SentenceId = NewType('SentenceId', int)
+# What an author may call a sentence, so a pin survives a sentence inserted
+# before it. A lookup key only: never a report key or HTML id, so no slug rules.
+SentenceName = NewType('SentenceName', str)
 StoryId = NewType('StoryId', str)
 
 
@@ -171,6 +174,7 @@ class Clause:
 class Sentence:
     id: SentenceId
     clauses: tuple[Clause, ...]
+    name: SentenceName | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -179,6 +183,14 @@ class Story:
     title: str
     sentences: tuple[Sentence, ...]
     source: SourceLocation | None = None
+
+
+@dataclass(frozen=True, kw_only=True)
+class Pin:
+    """A sentence bound explicitly, instead of left to narration matching."""
+
+    story_id: StoryId
+    sentence_id: SentenceId
 
 
 @dataclass(eq=False)

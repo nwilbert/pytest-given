@@ -1926,7 +1926,7 @@ def test_step_activity_in_wide_fixture_without_scenario_reports_the_cause(pytest
 
         g = Glossary()
         s = story('Wide', [sentence(g.actor('Guest'), g.activity('search'),
-                                    g.work_object('Room'), activity_id=1)])
+                                    g.work_object('Room'))])
 
         @pytest.fixture(scope='module')
         @given('a module-scoped arrangement')

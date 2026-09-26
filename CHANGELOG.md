@@ -24,6 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+- **Breaking.** `sentence(..., activity_id=N)` is removed: sentences are numbered by position, so name the sentence (`name=`) and pin it by name.
 - **Breaking.** `activity()` is now `sentence()`, `path()` is now `clause()`, and `Glossary.verb()` is now `Glossary.activity()`: rename the calls and imports.
 - **Breaking.** A file glossary's kind column says `activity` where it said `verb`.
 - **Breaking.** In the JSON report, `stories[].activities[]` is now `stories[].sentences[]` with `clauses` in place of `paths`, the term kind `"verb"` is now `"activity"`, and `coverage[].activity_id` is now `sentence_id`. Regenerate saved reports: `pytest-given report` rejects a `verb` kind.

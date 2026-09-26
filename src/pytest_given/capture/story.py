@@ -1,7 +1,8 @@
-"""Story / Sentence / Clause constructors, and the glossary pin they carry."""
+"""Story / Sentence / Clause constructors, the glossaries they carry, and the
+sentence handles a story hands out."""
 
 from collections.abc import Iterable, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field
 
 from ..model import (
     Clause,
@@ -9,14 +10,16 @@ from ..model import (
     ClauseTermRef,
     ClauseWord,
     Glossary,
+    Pin,
     PytestGivenError,
     Sentence,
     SentenceId,
+    SentenceName,
     SourceLocation,
-    Story,
     StoryId,
     id_derive,
 )
+from ..model import Story as BaseStory
 from .glossary import TermRef
 from .kind_inference import ROLE_ACCEPTS, Slot, slot_for
 from .source import capture_caller_source
@@ -27,14 +30,15 @@ type _ClauseArg = TermRef | str
 
 
 @dataclass(frozen=True, kw_only=True)
-class _Pinned:
+class _GlossaryCarrier:
     """The live `Glossary` objects a story-tree node's subtree references.
 
-    `story()` pins them at construction so `discovery.resolve_glossary` can
-    pick the suite's glossary off the story tree it was handed, rather than off
-    a session-global that a nested run could clear.
+    `clause()` / `sentence()` / `story()` carry them at construction so
+    `discovery.resolve_glossary` can pick the suite's glossary off the story
+    tree it was handed, rather than off a session-global that a nested run
+    could clear.
 
-    A capture-side subclass rather than a field on the schema: the report model
+    A capture-side mixin rather than a field on the schema: the report model
     neither carries this nor serializes it, and `model/` is the leaf — it may
     not reach into `capture` for the `Glossary` these actually are. Underscored
     all the same, so the reflective serializer drops it if one of these ever
@@ -45,28 +49,72 @@ class _Pinned:
 
 
 @dataclass(frozen=True, kw_only=True)
-class _PinnedClause(Clause, _Pinned):
+class _CarrierClause(Clause, _GlossaryCarrier):
     pass
 
 
 @dataclass(frozen=True, kw_only=True)
-class _PinnedSentence(Sentence, _Pinned):
-    pass
+class UnnumberedSentence(_GlossaryCarrier):
+    """What `sentence()` builds: a sentence before `story()` gives it its
+    number. Not a model `Sentence` — it has no id until `story()` assigns
+    one by position."""
+
+    clauses: tuple[Clause, ...]
+    name: SentenceName | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
-class _PinnedStory(Story, _Pinned):
-    pass
+class Story(BaseStory, _GlossaryCarrier):
+    """The story `story()` returns: the model's storage plus sentence lookup,
+    as the capture `Glossary` adds term lookup to the model's."""
+
+    def __getitem__(self, key: int | str) -> SentenceHandle:
+        """`story['name']` or `story[3]`; a number is the 1-based sentence
+        number, never a list index, so 0, negatives and bools miss."""
+        found = _find_sentence(self.sentences, key)
+        if found is None:
+            listing = ', '.join(
+                f'{one.id} {one.name!r}' if one.name is not None else str(one.id)
+                for one in self.sentences
+            )
+            raise PytestGivenError(
+                f'story {self.title!r} has no sentence {key!r}; '
+                f'its sentences are {listing}.'
+            )
+        return SentenceHandle(
+            pin=Pin(story_id=self.id, sentence_id=found.id), story=self
+        )
 
 
-def pinned_glossaries(node: object) -> frozenset[Glossary]:
-    """The glossaries pinned on a story-tree node.
+def _find_sentence(sentences: tuple[Sentence, ...], key: int | str) -> Sentence | None:
+    if isinstance(key, str):
+        return next((one for one in sentences if one.name == key), None)
+    if (
+        isinstance(key, int)
+        and not isinstance(key, bool)
+        and 1 <= key <= len(sentences)
+    ):
+        return sentences[key - 1]
+    return None
+
+
+@dataclass(frozen=True)
+class SentenceHandle:
+    """A sentence as its story hands it out. Carries the live story so
+    `@scenario` can register a story it reaches only through a pin."""
+
+    pin: Pin
+    story: Story = field(repr=False, compare=False)
+
+
+def carried_glossaries(node: object) -> frozenset[Glossary]:
+    """The glossaries carried on a story-tree node.
 
     Empty for a node that did not come from `clause()` / `sentence()` /
     `story()` — a deserialized report's, most of all, which carries its
     glossary as a serialized field instead.
     """
-    return node._glossaries if isinstance(node, _Pinned) else frozenset()
+    return node._glossaries if isinstance(node, _GlossaryCarrier) else frozenset()
 
 
 def clause(*parts: _ClauseArg) -> Clause:
@@ -90,13 +138,13 @@ def clause(*parts: _ClauseArg) -> Clause:
             continue  # a bare word carries no role; valid at any position
         _check_position(part, position, slot_for(position), parts)
     schema_parts = tuple(_to_part(part) for part in parts)
-    # Pin the live Glossary objects the clause references; the enclosing sentence
-    # and story union them upwards, which is what enforces the v1 "one glossary
-    # per story" invariant at construction time.
+    # Carry the live Glossary objects the clause references; the enclosing
+    # sentence and story union them upwards, which is what enforces the v1
+    # "one glossary per story" invariant at construction time.
     glossaries = frozenset(
         owner for part in parts if (owner := _glossary_of(part)) is not None
     )
-    return _PinnedClause(parts=schema_parts, _glossaries=glossaries)
+    return _CarrierClause(parts=schema_parts, _glossaries=glossaries)
 
 
 def _glossary_of(value: object) -> Glossary | None:
@@ -105,13 +153,12 @@ def _glossary_of(value: object) -> Glossary | None:
 
 def sentence(
     *parts_or_clauses: _ClauseArg | Clause,
-    activity_id: int | None = None,
-) -> Sentence:
+    name: str | None = None,
+) -> UnnumberedSentence:
     """Build a Sentence from either positional parts (single clause) or
     positional Clause instances (multi-clause). Mixing raises.
 
-    `activity_id=` overrides the default sequence number (0). `story(...)`
-    reassigns sequence numbers when sentences are passed without explicit ids.
+    Its number is its position, which `story()` assigns.
     """
     has_clauses = any(isinstance(p, Clause) for p in parts_or_clauses)
     has_parts = any(not isinstance(p, Clause) for p in parts_or_clauses)
@@ -125,23 +172,22 @@ def sentence(
         clauses = tuple(p for p in parts_or_clauses if isinstance(p, Clause))
     else:
         clauses = (clause(*parts_or_clauses),)  # type: ignore[arg-type]
-    glossaries = union_glossaries(pinned_glossaries(p) for p in clauses)
-    if activity_id == 0:
+    glossaries = union_glossaries(carried_glossaries(one) for one in clauses)
+    if name is not None and (not name or name != name.strip()):
         raise PytestGivenError(
-            'sentence(activity_id=0) is reserved as the unset sentinel; '
-            'use activity_id=1.. or omit to take the auto-assigned sequence '
-            'number.'
+            f'a sentence name must be non-empty, with no leading or trailing '
+            f'whitespace; got {name!r}.'
         )
-    return _PinnedSentence(
-        id=SentenceId(activity_id if activity_id is not None else 0),
+    return UnnumberedSentence(
         clauses=clauses,
+        name=SentenceName(name) if name is not None else None,
         _glossaries=glossaries,
     )
 
 
-def union_glossaries(pins: Iterable[frozenset[Glossary]]) -> frozenset[Glossary]:
-    """The distinct glossaries a group of pins reaches."""
-    return frozenset[Glossary]().union(*pins)
+def union_glossaries(carried: Iterable[frozenset[Glossary]]) -> frozenset[Glossary]:
+    """The distinct glossaries a group of carriers reaches."""
+    return frozenset[Glossary]().union(*carried)
 
 
 # Which story ids this process has seen declared, and where. Process-global,
@@ -183,54 +229,36 @@ def _site_text(source: SourceLocation | None) -> str:
     return f'{source.relpath}:{source.line}'
 
 
-def story(title: str, sentences: Sequence[Sentence] = ()) -> Story:
-    """Construct a Story. Reassigns auto-numbered ids, validates uniqueness,
-    and enforces v1's single-glossary invariant."""
+def story(title: str, sentences: Sequence[UnnumberedSentence] = ()) -> Story:
+    """Construct a Story: numbers its sentences by position, and enforces
+    unique sentence names and v1's single-glossary invariant."""
     sid = StoryId(id_derive(title))
     source = capture_caller_source()
     _register_story(sid, title, source)
-    numbered = _assign_sequence_numbers(tuple(sentences))
-    _check_unique_ids(numbered)
-    glossaries = union_glossaries(pinned_glossaries(sentence) for sentence in numbered)
+    numbered = tuple(
+        Sentence(id=SentenceId(position), clauses=one.clauses, name=one.name)
+        for position, one in enumerate(sentences, start=1)
+    )
+    _check_unique_names(title, numbered)
+    glossaries = union_glossaries(one._glossaries for one in sentences)
     _check_single_glossary(title, glossaries)
-    return _PinnedStory(
-        id=sid,
-        title=title,
-        sentences=numbered,
-        source=source,
-        _glossaries=glossaries,
+    return Story(
+        id=sid, title=title, sentences=numbered, source=source, _glossaries=glossaries
     )
 
 
-def _assign_sequence_numbers(
-    sentences: tuple[Sentence, ...],
-) -> tuple[Sentence, ...]:
-    """Sentences passed with id=0 (the unset sentinel) get sequential ids
-    skipping any explicit ids already taken; sentences with an explicit id
-    keep theirs."""
-    taken: set[SentenceId] = {sentence.id for sentence in sentences if sentence.id != 0}
-    out: list[Sentence] = []
-    next_seq = 1
-    for sentence in sentences:
-        if sentence.id != 0:
-            out.append(sentence)
+def _check_unique_names(title: str, sentences: tuple[Sentence, ...]) -> None:
+    first_with: dict[SentenceName, SentenceId] = {}
+    for one in sentences:
+        if one.name is None:
             continue
-        while SentenceId(next_seq) in taken:
-            next_seq += 1
-        out.append(replace(sentence, id=SentenceId(next_seq)))
-        next_seq += 1
-    return tuple(out)
-
-
-def _check_unique_ids(sentences: tuple[Sentence, ...]) -> None:
-    seen: set[SentenceId] = set()
-    for sentence in sentences:
-        if sentence.id in seen:
+        if one.name in first_with:
             raise PytestGivenError(
-                f'duplicate sentence id {sentence.id} in story; '
-                f'sentence ids must be unique.'
+                f'story {title!r} names two sentences {one.name!r} (sentences '
+                f'{first_with[one.name]} and {one.id}); a sentence name must be '
+                f'unique within its story.'
             )
-        seen.add(sentence.id)
+        first_with[one.name] = one.id
 
 
 def _check_single_glossary(title: str, glossaries: frozenset[Glossary]) -> None:

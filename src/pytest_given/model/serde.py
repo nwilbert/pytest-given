@@ -47,6 +47,7 @@ from .schema import (
     Scenario,
     Sentence,
     SentenceId,
+    SentenceName,
     SourceLocation,
     Status,
     Step,
@@ -153,6 +154,7 @@ def _sentence_from_dict(d: dict[str, Any]) -> Sentence:
     return Sentence(
         id=SentenceId(d['id']),
         clauses=tuple(_clause_from_dict(p) for p in d.get('clauses', [])),
+        name=SentenceName(d['name']) if d.get('name') is not None else None,
     )
 
 
