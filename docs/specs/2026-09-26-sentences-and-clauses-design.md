@@ -22,7 +22,7 @@ book_a_room = story('Book a room', [
 ])
 ```
 
-This is a rename only; no behavior changes. The [pins spec](proposed/2026-09-21-pins-design.md)
+This is a rename only; no behavior changes. The [pins spec](2026-09-21-pins-design.md)
 builds on it, and both ship in one release so users migrate once.
 
 ## Background

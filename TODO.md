@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] Implement pins: named sentences, sentence handles, multi-story scenarios; same release as the rename ([spec](docs/specs/proposed/2026-09-21-pins-design.md))
 - [ ] Make the docs sections for https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/ more explicit. Check for other pages that are too dense / unstructured.
 
 ## Next

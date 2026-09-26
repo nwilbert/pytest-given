@@ -19,11 +19,11 @@ Given/When/Then form:
 
 * `test_pick_suite` — happy path, covers sentences 1-2. Both sentences
   narrate the same two terms (Organizer, Room) — their verbs are bare — so
-  narration alone cannot tell them apart; the steps pin their sentence number
-  with `pins=`.
+  narration alone cannot tell them apart; the steps pin them by name with
+  `pins=book_a_group_trip['search']` and `['select']`.
 * `test_complete_booking` — happy path through the rest, covers 2-6 and 8.
   Sentence 2 is intentionally shared with `test_pick_suite` so the Stories tab
-  shows two badges on that row (its `given` pins sentence 2 for the same
+  shows two badges on that row (its `given` pins `'select'` for the same
   reason as above).
 * `test_payment_declined` — parametrized error branch using a `decline` activity
   that lives in the glossary but isn't part of any story sentence. Cases pair
@@ -44,8 +44,11 @@ vocabulary still needs to be exercised by a test.
 A second, shorter Story — `Cancel a Booking` — shares the same glossary to
 exercise the multi-story parts of the report (Stories tab, story filter) and to
 show vocabulary reused across stories (Guest, Booking, Payment, Confirmation,
-Booking System). Its single scenario `test_cancel_booking` covers all three of
-its sentences.
+Booking System). `test_cancel_booking` covers all three of its sentences.
+`test_check_in_then_cancel` binds both stories with `stories=`: Alice checks in
+to the Deluxe Suite (sentence 8 of the first story), then cancels a later
+booking (the `'cancel'` sentence of the second), so the Stories tab lists it
+under each.
 """
 
 import pytest
@@ -89,9 +92,9 @@ book_a_group_trip = story(
     [
         # 1. Actor instance + canonical work object (the room category, before
         #    any specific room is chosen).
-        sentence(organizer('Carol'), 'searches for', room),
+        sentence(organizer('Carol'), 'searches for', room, name='search'),
         # 2. Actor instance + work-object instance.
-        sentence(organizer('Carol'), 'selects', room('Deluxe Suite')),
+        sentence(organizer('Carol'), 'selects', room('Deluxe Suite'), name='select'),
         # 3. Multi-clause: two parallel branches, each a two-actor clause
         #    joined by a preposition.
         sentence(
@@ -131,7 +134,7 @@ cancel_a_booking = story(
     'Cancel a Booking',
     [
         # Guest instance withdraws a booking made on their behalf.
-        sentence(guest('Alice'), cancel('cancels'), booking),
+        sentence(guest('Alice'), cancel('cancels'), booking, name='cancel'),
         # Two work objects joined by a preposition — the refund settles the
         # payment for that booking.
         sentence(booking_system, refund('refunds'), payment, 'for', booking),
@@ -166,11 +169,13 @@ def test_pick_suite(carol):
             'Deluxe Suite': {'available': True},
             'Standard': {'available': False},
         }
-    with when(t'{organizer("Carol")} searches for a {room}', pins=book_a_group_trip[1]):
+    with when(
+        t'{organizer("Carol")} searches for a {room}', pins=book_a_group_trip['search']
+    ):
         offered = [name for name, r in catalog.items() if r['available']]
     with when(
         t'{organizer("Carol")} selects the {room("Deluxe Suite")}',
-        pins=book_a_group_trip[2],
+        pins=book_a_group_trip['select'],
     ):
         carol['selection'] = offered[0]
     with then(t'the {room("Deluxe Suite")} is held for the group'):
@@ -181,7 +186,7 @@ def test_pick_suite(carol):
 def test_complete_booking(carol, alice, bob):
     with given(
         t'{organizer("Carol")} has selected the {room("Deluxe Suite")}',
-        pins=book_a_group_trip[2],
+        pins=book_a_group_trip['select'],
     ):
         booking_state = {
             'room': 'Deluxe Suite',
@@ -288,3 +293,41 @@ def test_cancel_booking(alice):
     with then(t'the {booking_system} sends a {confirmation} to {guest("Alice")}'):
         booking_state['notified'] = [alice['name']]
         assert booking_state['notified'] == ['Alice']
+
+
+def check_in(stay):
+    if stay['status'] != 'confirmed':
+        raise ValueError(f'cannot check in to a {stay["status"]} booking')
+    stay['status'] = 'checked in'
+
+
+def cancel_before_arrival(stay):
+    if stay['status'] == 'checked in':
+        raise ValueError('cannot cancel a booking after arrival')
+    stay['status'] = 'cancelled'
+
+
+@scenario(
+    'Alice checks in, then cancels a later booking',
+    stories=[cancel_a_booking, book_a_group_trip],
+)
+def test_check_in_then_cancel(alice):
+    with given(t'{guest("Alice")} has a confirmed {booking} now and one next month'):
+        current_stay = {
+            'guest': alice['name'],
+            'room': 'Deluxe Suite',
+            'status': 'confirmed',
+        }
+        later_stay = {
+            'guest': alice['name'],
+            'room': 'Deluxe Suite',
+            'status': 'confirmed',
+        }
+    with when(t'{guest("Alice")} checks in to the {room("Deluxe Suite")}'):
+        check_in(current_stay)
+    with when(t'{guest("Alice")} {cancel("cancels")} her later {booking}'):
+        cancel_before_arrival(later_stay)
+    with then('the later booking is cancelled'):
+        assert later_stay['status'] == 'cancelled'
+    with then('her current stay is still checked in'):
+        assert current_stay['status'] == 'checked in'
