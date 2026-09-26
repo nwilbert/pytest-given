@@ -406,14 +406,16 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 @scenario(
     t'A {pg["File glossary"]("FileGlossary")} handle works in a t-string '
     t'{pg["Step"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,
 ) -> None:
     with given(t'a {pg["Deferred term"]} from a {pg["File glossary"]}'):
         guest = file_glossary['Guest']
-    with when('it is interpolated into a t-string step', activity=4):
+    with when(
+        'it is interpolated into a t-string step', pins=adopt_pytest_given['write']
+    ):
         parts = parse_tstring(t'a {guest} arrives')
     with then(t'the step carries a single {pg["Term ref"]}'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]

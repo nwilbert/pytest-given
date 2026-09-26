@@ -22,7 +22,7 @@ from conftest import g
 book = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])
 
 
-@scenario('Guest searches', story=book)
+@scenario('Guest searches', stories=book)
 def test_guest_searches():
     with when(t'{g["Guest"]} {g["search"]("searches for")} a {g["Room"]}'):
         pass

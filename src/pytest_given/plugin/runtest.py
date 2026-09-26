@@ -58,8 +58,8 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
         module=module,
         tags=marker.tags,
         source=source,
-        story=marker.story,
-        activity_ids=marker.activity_ids,
+        stories=marker.stories,
+        pins=marker.pins,
     )
     session_state(item.config).published_for = node_id
     set_active_collector(collector)

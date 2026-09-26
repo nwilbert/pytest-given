@@ -22,11 +22,15 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.
 - The Stories timeline shows a named sentence's name beside its number.
+- A scenario can bind several stories (`@scenario(stories=[a, b])`), and the Stories tab lists it under each.
 
 ### Changed
 
 - **Breaking.** `sentence(..., activity_id=N)` is removed: sentences are numbered by position, so name the sentence (`name=`) and pin it by name.
-- **Breaking.** In the JSON report, `scenarios[].story_id` is now `story_ids`, and `activity_ids` on scenarios and steps is now `pins` (`[{story_id, sentence_id}]`); a report saved before this change replays without its story bindings.
+- **Breaking.** Pins take sentence handles under `pins=`: `given(..., activity=3)` becomes `given(..., pins=the_story[3])`, and `@scenario(activities=[2, 3])` becomes `pins=[the_story[2], the_story[3]]`, or `the_story['name']` for a named sentence.
+- **Breaking.** `@scenario(story=)` is now `stories=` and takes one story or several; a scenario pin binds its story without it.
+- **Breaking.** `@scenario(pins=)` covers exactly the pinned sentences, with no narration matching against their story; a step pin into such a story raises.
+- **Breaking.** In the JSON report, `scenarios[].story_id` is now `story_ids`, and `activity_ids` on scenarios and steps is now `pins` (`[{story_id, sentence_id}]`); a report saved before this change replays without its story bindings, so regenerate saved reports.
 - **Breaking.** `activity()` is now `sentence()`, `path()` is now `clause()`, and `Glossary.verb()` is now `Glossary.activity()`: rename the calls and imports.
 - **Breaking.** A file glossary's kind column says `activity` where it said `verb`.
 - **Breaking.** In the JSON report, `stories[].activities[]` is now `stories[].sentences[]` with `clauses` in place of `paths`, the term kind `"verb"` is now `"activity"`, and `coverage[].activity_id` is now `sentence_id`. Regenerate saved reports: `pytest-given report` rejects a `verb` kind.
@@ -35,7 +39,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The HTML report is restyled: set in Source Sans 3 and Source Code Pro (embedded), lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts are set in sentence case.
 - The documentation site is set in Source Sans 3 and Source Code Pro.
 - The HTML report inlines its stylesheet and script without their source comments, keeping line numbers so a browser stack trace still maps onto `app.js`.
-- Story coverage matches on glossary terms alone: an instance in a sentence (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — sentences that differed only by instance are no longer told apart by narration, only by an `activity=` pin.
+- Story coverage matches on glossary terms alone: an instance in a sentence (`guest('Alice')`) is now covered by a step naming the bare term, and vice versa — sentences that differed only by instance are no longer told apart by narration, only by a pin.
 - The authoring skill's and README's glossary snippets keep generic verbs (*searches for*, *adds*) as bare strings in sentences instead of glossary terms, and the hotel-booking example's glossary is trimmed to domain vocabulary accordingly.
 - The `attachment-labels` and varying-`str` grouping refusals name the parametrize case they found, and the latter now points at `group_parametrized=False` as a way out.
 - The reviewing skill ships `references/pairs.md`, a script pairing each scenario's narration with its test's source, and audits the rules the release notes announce; both skills flag alternation `match=` pins and a `when` that narrates arrangement while its body acts.
@@ -50,10 +54,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A refused scenario on a run with no `--given-*` sink no longer reports itself under a "report not written" heading.
 - An unknown `--given-source-link` preset is reported under the flag the user typed rather than under the `given_source_link` ini name.
 - A report whose rendering fails unexpectedly still discards the previous run's report rather than leaving it on disk reading as current.
-- A step `activity=` recorded from a `@given` fixture scoped wider than `function`, pulled in by a test without `@scenario`, now raises a `PytestGivenError` naming the cause instead of a bare `AssertionError`.
+- A step pin recorded from a `@given` fixture scoped wider than `function`, pulled in by a test without `@scenario`, now raises a `PytestGivenError` naming the cause instead of a bare `AssertionError`.
 - The `#scenario=` deep link works for two scenarios whose node ids differ only in a character the slug folds; the fallback slug no longer hands back characters that break the URL fragment.
 - `pytest-given report` reports a non-UTF-8 input file as an error rather than crashing with a traceback.
 - A `dead-term` finding states the criterion the rule actually applies: a term ref in a `@scenario` name keeps a term alive, which the old message did not mention.
+- An `Annotated` `given(...)` label carrying a pin raises instead of silently dropping the pin.
 - The navigating skill's failing-scenarios recipe reads a parametrized scenario's failures from `parameters.cases[].error`, where they live, and starts from a committed or CI-published report when one exists instead of always rerunning the suite.
 
 ## [0.2.0] - 2026-09-04

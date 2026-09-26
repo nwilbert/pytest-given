@@ -25,7 +25,6 @@ from pytest_given.capture.steps import (
     StepDescriptor,
     attach,
     given,
-    normalize_activity,
     step_descriptor,
     then,
     when,
@@ -47,7 +46,6 @@ from pytest_given.model import (
     NarrationValue,
     PytestGivenError,
     PytestGivenWarning,
-    SentenceId,
     SourceLocation,
     Step,
 )
@@ -63,10 +61,13 @@ def _reset_story_registry():
 
 @scenario(
     t'A {pg["Step"].low} pairs its {pg["Narration"].low} with a {pg["Phase"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_context_manager_basic() -> None:
-    with when(t'a given {pg["Step"]} descriptor is created', activity=5):
+    with when(
+        t'a given {pg["Step"]} descriptor is created',
+        pins=adopt_pytest_given['narrate'],
+    ):
         desc = StepDescriptor('given', 'a coffee machine')
     with then(t'it carries the given {pg["Phase"]} and its {pg["Narration"]}'):
         assert desc.phase == 'given'
@@ -293,14 +294,16 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
 
 @scenario(
     t'{pg["when_then"]} records the action and its outcome as siblings',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a {pg["when_then"]} block exits cleanly', activity=5):
+    with when(
+        t'a {pg["when_then"]} block exits cleanly', pins=adopt_pytest_given['narrate']
+    ):
         set_active_collector(collector)
         try:
             with when_then('the action runs', 'the outcome holds'):
@@ -420,14 +423,17 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
 
 @scenario(
     t'A nested when becomes a child of the {pg["when_then"]} action',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_when_then_allows_nested_when_as_child_sub_step() -> None:
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a when opens inside the {pg["when_then"]} body', activity=5):
+    with when(
+        t'a when opens inside the {pg["when_then"]} body',
+        pins=adopt_pytest_given['narrate'],
+    ):
         set_active_collector(collector)
         try:
             with when_then('the action runs', 'the outcome holds'):
@@ -941,196 +947,78 @@ def test_decorator_records_when_called_from_inside_fixture_body() -> None:
     assert [c.narration.text for c in root.children] == ['inserting money']
 
 
-def test_step_descriptor_accepts_activity_int():
-    step = given('a thing', activity=3)
-    assert step.activity_ids == (SentenceId(3),)
+def _two_sentence_story(title: str):
+    glossary = Glossary()
+    guest = glossary.actor('Guest')
+    search = glossary.activity('search')
+    room = glossary.work_object('Room')
+    return story_fn(
+        title,
+        [
+            sentence_fn(guest, search, room),
+            sentence_fn(guest('Alice'), search, room, name='cancel'),
+        ],
+    )
 
 
-def test_step_descriptor_accepts_activity_sequence():
-    step = when('an event', activity=[1, 2])
-    assert step.activity_ids == (SentenceId(1), SentenceId(2))
-
-
-def test_step_descriptor_activity_defaults_empty():
-    step = then('a result')
-    assert step.activity_ids == ()
-
-
-def test_step_descriptor_rejects_non_int_activity_id():
-    with pytest.raises(TypeError, match='activity'):
-        given('x', activity='one')  # type: ignore[arg-type]
-
-
-def test_step_descriptor_rejects_non_sequence_activity():
-    with pytest.raises(TypeError, match='activity'):
-        given('x', activity=1.5)  # type: ignore[arg-type]
+def test_step_descriptor_records_the_pins_of_its_handles():
+    the_story = _two_sentence_story('Step Pins')
+    assert given('a thing', pins=the_story['cancel']).pins == (the_story[2].pin,)
+    assert when('an event', pins=[the_story[1], the_story[2]]).pins == (
+        the_story[1].pin,
+        the_story[2].pin,
+    )
+    assert then('a result').pins == ()
 
 
 @scenario(
-    t'A string `activities=` argument is refused by `@scenario`',
+    t'A bare number or name is refused where a {pg["Pin"].low} goes',
     tags=['validation'],
 )
-def test_scenario_rejects_a_string_activities_argument():
-    """`activities='13'` is a Sequence of str, so a bare comprehension would
-    yield SentenceId('1'), SentenceId('3') and fail at collection with
-    "sentence id 1 not in story (valid: [1, 2])" — naming an id that visibly
-    is in the valid list. Rejected at the decorator instead."""
-    with given(t'a string where a sequence of {pg["Sentence"]("sentence")} ids goes'):
-        activities = '13'
+@pytest.mark.parametrize('bare', [3, 'cancel', [1, 2]])
+def test_pins_refuse_a_bare_number_or_name(bare):
+    with given(t'a sentence number or name written without its {pg["Story"]}'):
+        pins = bare
     with (
         when_then(
-            t'the {pg["Scenario"].low} is declared',
-            'a `TypeError` naming the argument is raised',
+            t'a {pg["Step"]} is declared with it',
+            'a PytestGivenError shows the handle form',
         ),
-        pytest.raises(TypeError, match='activities'),
+        pytest.raises(PytestGivenError, match=r"the_story\['name'\]"),
     ):
-        scenario('x', activities=activities)  # type: ignore[arg-type]
+        given('x', pins=pins)  # type: ignore[arg-type]
 
 
-def test_scenario_rejects_non_int_activities_members():
-    with pytest.raises(TypeError, match='activities'):
-        scenario('x', activities=[1, '2'])  # type: ignore[list-item]
+def test_scenario_refuses_a_bare_pin_too():
+    with pytest.raises(PytestGivenError, match=r"the_story\['name'\]"):
+        scenario('x', pins=2)  # type: ignore[arg-type]
 
 
-# --- Task 7.1: ScenarioDecorator story= / activities= ---
+def test_scenario_binds_its_stories_then_its_pinned_stories():
+    matched = _two_sentence_story('Matched')
+    pinned = _two_sentence_story('Pinned')
+    deco = scenario('x', stories=matched, pins=[pinned['cancel'], pinned[1]])
+    assert [one.id for one in deco.stories] == [matched.id, pinned.id]
+    assert deco.pins == (pinned[2].pin, pinned[1].pin)
 
 
-def test_scenario_decorator_accepts_story_kwarg():
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    s = story_fn('Book Scenario Decorator', [sentence_fn(guest, search, room)])
-    deco = scenario('test', story=s)
-    assert deco.story is s
+def test_scenario_takes_a_sequence_of_stories():
+    first, second = _two_sentence_story('First'), _two_sentence_story('Second')
+    assert [one.id for one in scenario('x', stories=[first, second]).stories] == [
+        first.id,
+        second.id,
+    ]
 
 
-def _sentences_story(title: str, count: int):
-    """A story with `count` fully-formed sentences, numbered from 1."""
-    g = Glossary()
-    guest, search, room = g.actor('Guest'), g.activity('search'), g.work_object('Room')
-    return story_fn(title, [sentence_fn(guest, search, room) for _ in range(count)])
+def test_scenario_rejects_a_non_story():
+    with pytest.raises(PytestGivenError, match='Story'):
+        scenario('x', stories='not-a-story')  # type: ignore[arg-type]
 
 
-def test_scenario_decorator_accepts_activities_kwarg():
-    s = _sentences_story('Three Sentences', 3)
-    deco = scenario('test activities', story=s, activities=[1, 2, 3])
-    assert deco.activity_ids == (SentenceId(1), SentenceId(2), SentenceId(3))
-
-
-def test_scenario_decorator_accepts_a_bare_int_activities_argument():
-    """`activities=` takes the same `int | Sequence[int]` as a step's
-    `activity=`, so a scenario narrowed to one activity needs no list."""
-    s = _sentences_story('Two Sentences', 2)
-    deco = scenario('test one activity', story=s, activities=2)
-    assert deco.activity_ids == (SentenceId(2),)
-
-
-def test_scenario_decorator_rejects_activities_without_a_story():
-    """Both arguments are the decorator's own, so this needs no collection."""
-    with pytest.raises(PytestGivenError, match='requires story='):
-        scenario('test', activities=[1])
-
-
-def test_scenario_decorator_rejects_an_activity_id_the_story_lacks():
-    s = _sentences_story('One Sentence', 1)
-    with pytest.raises(PytestGivenError, match='not in story'):
-        scenario('test', story=s, activities=[7])
-
-
-def test_scenario_decorator_defaults_story_none_and_activities_empty():
-    deco = scenario('test defaults')
-    assert deco.story is None
-    assert deco.activity_ids == ()
-
-
-def test_scenario_decorator_rejects_non_story_object():
-    with pytest.raises(PytestGivenError, match='Story instance'):
-        scenario('test', story='not-a-story')  # type: ignore[arg-type]
-
-
-def test_normalize_activity_rejects_str():
-    with pytest.raises(TypeError, match='int or a Sequence'):
-        normalize_activity('3')  # type: ignore[arg-type]
-
-
-def test_normalize_activity_rejects_bool():
-    with pytest.raises(TypeError, match='int or a Sequence'):
-        normalize_activity(True)  # type: ignore[arg-type]
-
-
-def test_normalize_activity_rejects_non_int_in_sequence():
-    with pytest.raises(TypeError, match='must contain int values'):
-        normalize_activity((1, 'x'))  # type: ignore[list-item]
-
-
-def test_push_step_rejects_activity_id_not_in_story_no_scope() -> None:
-    """Collector.push_step rejects activity_ids that aren't in the story at
-    all when the scenario has no narrower scope. Validation lives on the
-    collector so every push_step entry point gets it."""
-    collector = Collector()
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    s = story_fn('Step Scope No Restriction', [sentence_fn(guest, search, room)])
-    collector.start_scenario('id', 'a', 'mod', [], story=s, activity_ids=())
-    with pytest.raises(PytestGivenError, match='not in story'):
-        collector.push_step(
-            'given', Narration(text='a thing'), activity_ids=(SentenceId(99),)
-        )
-
-
-def test_push_step_rejects_activity_id_outside_scenario_scope() -> None:
-    """When the scenario narrows scope, ids outside that scope are rejected
-    by the collector regardless of story membership."""
-    collector = Collector()
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    s = story_fn(
-        'Scoped',
-        [
-            sentence_fn(guest, search, room),
-            sentence_fn(guest('Alice'), search, room),
-        ],
-    )
-    collector.start_scenario(
-        'id', 'a', 'mod', [], story=s, activity_ids=(SentenceId(1),)
-    )
-    with pytest.raises(PytestGivenError, match='outside scenario scope'):
-        collector.push_step(
-            'given', Narration(text='a thing'), activity_ids=(SentenceId(2),)
-        )
-
-
-def test_push_step_requires_story_when_activity_ids_given() -> None:
-    """Step activity_ids without a story on the scenario is a user error."""
-    collector = Collector()
-    collector.start_scenario('id', 'a', 'mod', [])
-    with pytest.raises(PytestGivenError, match='requires a story'):
-        collector.push_step(
-            'given', Narration(text='a thing'), activity_ids=(SentenceId(1),)
-        )
-
-
-def test_push_step_activity_without_scenario_is_a_user_error() -> None:
-    """A `@given` fixture scoped wider than `function` records even when no
-    scenario is active — an unannotated test pulled it in. `activity=` there
-    has no scenario to scope against, which is the same authoring mistake as a
-    scenario without a story, and earns the same error rather than an assert.
-    """
-    collector = Collector()
-    descriptor = given('a wide arrangement')
-    recording = FixtureRecording(
-        root=Step(phase='given', narration=Narration(text='a wide arrangement'))
-    )
-    with collector.fixture_setup(recording, descriptor):
-        with pytest.raises(PytestGivenError, match='requires a scenario'):
-            collector.push_step(
-                'given', Narration(text='a thing'), activity_ids=(SentenceId(1),)
-            )
+def test_scenario_defaults_to_no_stories_and_no_pins():
+    deco = scenario('x')
+    assert deco.stories == ()
+    assert deco.pins == ()
 
 
 # --- Gated step-source capture (narration-lint anchors) ---

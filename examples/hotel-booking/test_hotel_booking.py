@@ -20,7 +20,7 @@ Given/When/Then form:
 * `test_pick_suite` — happy path, covers sentences 1-2. Both sentences
   narrate the same two terms (Organizer, Room) — their verbs are bare — so
   narration alone cannot tell them apart; the steps pin their sentence number
-  with `activity=`.
+  with `pins=`.
 * `test_complete_booking` — happy path through the rest, covers 2-6 and 8.
   Sentence 2 is intentionally shared with `test_pick_suite` so the Stories tab
   shows two badges on that row (its `given` pins sentence 2 for the same
@@ -159,25 +159,29 @@ def bob():
     return {'name': 'Bob', 'email': 'bob@example.com'}
 
 
-@scenario('Carol picks a suite for the group', story=book_a_group_trip)
+@scenario('Carol picks a suite for the group', stories=book_a_group_trip)
 def test_pick_suite(carol):
     with given(t'the {room("Deluxe Suite")} is listed as available'):
         catalog = {
             'Deluxe Suite': {'available': True},
             'Standard': {'available': False},
         }
-    with when(t'{organizer("Carol")} searches for a {room}', activity=1):
+    with when(t'{organizer("Carol")} searches for a {room}', pins=book_a_group_trip[1]):
         offered = [name for name, r in catalog.items() if r['available']]
-    with when(t'{organizer("Carol")} selects the {room("Deluxe Suite")}', activity=2):
+    with when(
+        t'{organizer("Carol")} selects the {room("Deluxe Suite")}',
+        pins=book_a_group_trip[2],
+    ):
         carol['selection'] = offered[0]
     with then(t'the {room("Deluxe Suite")} is held for the group'):
         assert carol['selection'] == 'Deluxe Suite'
 
 
-@scenario('Carol completes the booking for both guests', story=book_a_group_trip)
+@scenario('Carol completes the booking for both guests', stories=book_a_group_trip)
 def test_complete_booking(carol, alice, bob):
     with given(
-        t'{organizer("Carol")} has selected the {room("Deluxe Suite")}', activity=2
+        t'{organizer("Carol")} has selected the {room("Deluxe Suite")}',
+        pins=book_a_group_trip[2],
     ):
         booking_state = {
             'room': 'Deluxe Suite',
@@ -217,7 +221,9 @@ def test_complete_booking(carol, alice, bob):
 SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
 
 
-@scenario('Payment is declined — the booking is not finalized', story=book_a_group_trip)
+@scenario(
+    'Payment is declined — the booking is not finalized', stories=book_a_group_trip
+)
 @pytest.mark.parametrize(
     ('payment_method', 'decline_reason'),
     [
@@ -262,7 +268,7 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
         assert not booking_state['confirmed']
 
 
-@scenario('Alice cancels her booking and is refunded', story=cancel_a_booking)
+@scenario('Alice cancels her booking and is refunded', stories=cancel_a_booking)
 def test_cancel_booking(alice):
     with given(t'{guest("Alice")} has a confirmed {booking} she paid for'):
         booking_state = {

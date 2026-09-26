@@ -205,7 +205,7 @@ def test_attach_outside_a_step_fails_the_test(pytester, tmp_path):
 @scenario(
     t'A {pg["Step fixture"].low} is {pg["Graft"]("grafted")} in as a given '
     t'{pg["Step"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_step_fixture_appears_as_given_step(pytester, tmp_path):
     with given(t'a {pg["Scenario"].low} consuming a {pg["Step fixture"].low}'):
@@ -226,7 +226,7 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
         json_path = tmp_path / 'report.json'
-    with when('the suite runs with --given-json', activity=8):
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then('the test passes'):
         result.assert_outcomes(passed=1)
@@ -244,7 +244,7 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
     t'The {pg["Case"]("cases")} of a {pg["Parametrized scenario"].low} become one '
     t'{pg["Scenario"].low} with a {pg["Parameter table"].low}',
     tags=['parametrization'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_parametrized_test_as_table(pytester, tmp_path):
     with given(t'a {pg["Parametrized scenario"].low} over two {pg["Case"]("cases")}'):
@@ -263,7 +263,7 @@ def test_parametrized_test_as_table(pytester, tmp_path):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
         json_path = tmp_path / 'report.json'
-    with when('the suite runs with --given-json', activity=9):
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['group']):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then('both cases pass'):
         result.assert_outcomes(passed=2)
@@ -1568,7 +1568,7 @@ def test_story_source_captured_in_json(pytester, tmp_path):
         room = g.work_object('Room')
         s = story('Booking', [sentence(guest, search, room)])
 
-        @scenario('A', story=s, activities=[1])
+        @scenario('A', pins=s[1])
         def test_a():
             with when("x"):
                 pass
@@ -1598,7 +1598,7 @@ def test_glossary_term_source_captured_in_json(pytester, tmp_path):
         room = g.work_object('Room')
         s = story('Booking', [sentence(guest, search, room)])
 
-        @scenario('A', story=s, activities=[1])
+        @scenario('A', pins=s[1])
         def test_a():
             with when("x"):
                 pass
@@ -1637,7 +1637,7 @@ def test_glossary_term_source_captured_when_declared_in_conftest(pytester, tmp_p
         from conftest import s
         from pytest_given import scenario, when
 
-        @scenario('A', story=s, activities=[1])
+        @scenario('A', pins=s[1])
         def test_a():
             with when("x"):
                 pass
@@ -1778,7 +1778,7 @@ def test_given_source_link_unknown_preset_raises(pytester, tmp_path):
     assert 'emacs' in (result.stderr.str() + result.stdout.str())
 
 
-def test_step_activity_kwarg_propagates_to_report(pytester):
+def test_step_pins_propagate_to_report(pytester):
     pytester.makepyfile("""
         from pytest_given import Glossary, given, scenario, sentence, story, when
 
@@ -1786,33 +1786,33 @@ def test_step_activity_kwarg_propagates_to_report(pytester):
         guest = g.actor('Guest')
         search = g.activity('search')
         room = g.work_object('Room')
-        s = story('Activity Propagation', [
+        s = story('Pin Propagation', [
             sentence(guest, search, room),
             sentence(guest('Alice'), search, room),
             sentence(guest, search, room('Suite'))])
 
-        @scenario('a scenario', story=s)
+        @scenario('a scenario', stories=s)
         def test_x():
-            with given('setup', activity=1):
+            with given('setup', pins=s[1]):
                 pass
-            with when('action', activity=[2, 3]):
+            with when('action', pins=[s[2], s[3]]):
                 pass
     """)
     result = pytester.runpytest('--given-json=report.json')
     result.assert_outcomes(passed=1)
     data = json.loads(pytester.path.joinpath('report.json').read_text())
     steps = data['scenarios'][0]['steps']
-    assert steps[0]['pins'] == [{'story_id': 'activity-propagation', 'sentence_id': 1}]
+    assert steps[0]['pins'] == [{'story_id': 'pin-propagation', 'sentence_id': 1}]
     assert steps[1]['pins'] == [
-        {'story_id': 'activity-propagation', 'sentence_id': 2},
-        {'story_id': 'activity-propagation', 'sentence_id': 3},
+        {'story_id': 'pin-propagation', 'sentence_id': 2},
+        {'story_id': 'pin-propagation', 'sentence_id': 3},
     ]
 
 
 # --- Story binding recorded on the scenario ---
 
 
-def test_scenario_story_id_appears_in_report(pytester):
+def test_scenario_story_ids_and_pins_appear_in_report(pytester):
     pytester.makepyfile("""
         from pytest_given import Glossary, given, scenario, sentence, story
 
@@ -1822,7 +1822,7 @@ def test_scenario_story_id_appears_in_report(pytester):
         room = g.work_object('Room')
         s = story('Book', [sentence(guest, search, room)])
 
-        @scenario('x', story=s, activities=[1])
+        @scenario('x', pins=s[1])
         def test_x():
             with given('setup'):
                 pass
@@ -1834,10 +1834,54 @@ def test_scenario_story_id_appears_in_report(pytester):
     assert scn['pins'] == [{'story_id': 'book', 'sentence_id': 1}]
 
 
-# --- Story binding validated at collection and at runtime ---
+@scenario(
+    t'A {pg["Scenario"].low} is matched against each of its {pg["Story"]("stories")}',
+    stories=adopt_pytest_given,
+)
+def test_scenario_matched_against_two_stories(pytester, tmp_path):
+    with given(
+        t'a {pg["Scenario"].low} binding two {pg["Story"]("stories")} whose '
+        t'{pg["Sentence"].low} its {pg["Narration"].low} fits'
+    ):
+        suite = """
+            from pytest_given import Glossary, scenario, sentence, story, when
+
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            a = story('Book', [sentence(guest, search, room)])
+            b = story('Stay', [sentence(guest, search, room)])
+
+            @scenario('both', stories=[a, b])
+            def test_both():
+                with when(t'the {guest} does a {search} for a {room}'):
+                    pass
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('the test passes'):
+        result.assert_outcomes(passed=1)
+    with then(
+        t'the {pg["Scenario"].low} binds both {pg["Story"]("stories")} and covers '
+        t'the {pg["Sentence"].low} of each'
+    ):
+        data = json.loads(json_path.read_text())
+        scenario_id = data['scenarios'][0]['id']
+        assert data['scenarios'][0]['story_ids'] == ['book', 'stay']
+        assert [
+            (record['story_id'], record['sentence_id'], record['scenario_ids'])
+            for record in data['coverage']
+        ] == [('book', 1, [scenario_id]), ('stay', 1, [scenario_id])]
 
 
-def test_scenario_activity_id_not_in_story_raises_at_import(pytester):
+# --- Story binding validated at import and at runtime ---
+
+
+def test_scenario_pin_missing_from_its_story_raises_at_import(pytester):
     pytester.makepyfile("""
         from pytest_given import Glossary, scenario, sentence, story
 
@@ -1847,82 +1891,214 @@ def test_scenario_activity_id_not_in_story_raises_at_import(pytester):
         room = g.work_object('Room')
         s = story('Book', [sentence(guest, search, room)])
 
-        @scenario('x', story=s, activities=[99])
+        @scenario('x', pins=s['cancel'])
         def test_x():
             pass
     """)
     result = pytester.runpytest('--collect-only')
     assert result.ret != 0
-    # Both arguments are the decorator's own, so this is rejected where it is
-    # written: the traceback points at the `@scenario(...)` line rather than
-    # naming a node id from a collection hook.
-    result.stdout.fnmatch_lines(['*sentence id 99 not in story*'])
+    # The handle is looked up where it is written, so the traceback points at
+    # the `@scenario(...)` line rather than naming a node id.
+    result.stdout.fnmatch_lines(["*story 'Book' has no sentence 'cancel'*"])
     assert 'INTERNALERROR' not in result.stdout.str()
 
 
-def test_step_activity_outside_scenario_scope_raises(pytester):
-    pytester.makepyfile("""
-        from pytest_given import Glossary, given, scenario, sentence, story
+@scenario(
+    t'A {pg["Story"].low} named in both stories= and pins= is refused',
+    tags=['validation'],
+    stories=adopt_pytest_given,
+)
+def test_story_in_both_stories_and_pins_is_refused(pytester):
+    with given(
+        t'a {pg["Scenario"].low} naming one {pg["Story"].low} in both stories= '
+        t'and pins='
+    ):
+        suite = """
+            from pytest_given import Glossary, scenario, sentence, story
 
-        g = Glossary()
-        guest = g.actor('Guest')
-        search = g.activity('search')
-        room = g.work_object('Room')
-        s = story('Book', [
-            sentence(guest, search, room),
-            sentence(guest('Alice'), search, room)])
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            s = story('Book', [sentence(guest, search, room)])
 
-        @scenario('x', story=s, activities=[1])
-        def test_x():
-            with given('thing', activity=2):
+            @scenario('x', stories=s, pins=s[1])
+            def test_x():
                 pass
-    """)
-    result = pytester.runpytest()
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*step activity*2*outside scenario scope*'])
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs', pins=adopt_pytest_given['record']):
+        result = pytester.runpytest()
+    with then(t'the run fails, saying the {pg["Story"].low} is named in both'):
+        assert result.ret != 0
+        result.stdout.fnmatch_lines(['*in both stories= and pins=*'])
 
 
-def test_decorator_form_helper_step_with_activity_validates_scope(pytester):
-    pytester.makepyfile("""
-        from pytest_given import Glossary, given, scenario, sentence, story
+@scenario(
+    t'A {pg["Step"].low} {pg["Pin"].low} into a pinned {pg["Story"].low} is refused',
+    tags=['validation'],
+    stories=adopt_pytest_given,
+)
+def test_step_pin_into_a_pinned_story_is_refused(pytester):
+    with given(
+        t'a {pg["Step"].low} pinning a {pg["Story"].low} its {pg["Scenario"].low} '
+        t'already pins'
+    ):
+        suite = """
+            from pytest_given import Glossary, given, scenario, sentence, story
 
-        g = Glossary()
-        guest = g.actor('Guest')
-        search = g.activity('search')
-        room = g.work_object('Room')
-        s = story('Book', [sentence(guest, search, room)])
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            s = story('Book', [sentence(guest, search, room)])
 
-        @given('a setup', activity=99)
-        def helper():
-            return None
+            @scenario('x', pins=s[1])
+            def test_x():
+                with given('thing', pins=s[1]):
+                    pass
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs', pins=adopt_pytest_given['record']):
+        result = pytester.runpytest()
+    with then(
+        t'the {pg["Scenario"].low} fails, saying it pins that {pg["Story"].low} itself'
+    ):
+        result.assert_outcomes(failed=1)
+        result.stdout.fnmatch_lines(['*pins that story itself*'])
 
-        @scenario('x', story=s)
-        def test_x():
-            helper()
-    """)
-    result = pytester.runpytest()
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*step activity=99 not in story*'])
+
+@scenario(
+    t'A {pg["Step"].low} {pg["Pin"].low} into an unbound {pg["Story"].low} is refused',
+    tags=['validation'],
+    stories=adopt_pytest_given,
+)
+def test_step_pin_into_an_unbound_story_is_refused(pytester):
+    with given(
+        t'a {pg["Step"].low} pinning a {pg["Story"].low} its {pg["Scenario"].low} '
+        t'does not bind'
+    ):
+        suite = """
+            from pytest_given import Glossary, given, scenario, sentence, story
+
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            a = story('Book', [sentence(guest, search, room)])
+            b = story('Stay', [sentence(guest, search, room)])
+
+            @scenario('x', stories=a)
+            def test_x():
+                with given('thing', pins=b[1]):
+                    pass
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs', pins=adopt_pytest_given['record']):
+        result = pytester.runpytest()
+    with then(t'the {pg["Scenario"].low} fails, pointing at @scenario(stories=...)'):
+        result.assert_outcomes(failed=1)
+        result.stdout.fnmatch_lines(
+            ["*story 'stay', which scenario*does not bind*stories=*"]
+        )
 
 
-def test_step_activity_without_scenario_story_raises(pytester):
-    pytester.makepyfile("""
-        from pytest_given import given, scenario
+@scenario(
+    t'A {pg["Fixture recording"].low} whose {pg["Pin"].low} does not fit is '
+    t'refused at {pg["Graft"].low}',
+    tags=['validation'],
+    stories=adopt_pytest_given,
+)
+def test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft(pytester):
+    with given(
+        t'a module-scoped {pg["Step fixture"].low} pinning a {pg["Story"].low} '
+        t'that only the first {pg["Scenario"].low} using it binds'
+    ):
+        suite = """
+            import pytest
+            from pytest_given import Glossary, given, scenario, sentence, story
 
-        @scenario('x')
-        def test_x():
-            with given('thing', activity=1):
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            a = story('Book', [sentence(guest, search, room)])
+            b = story('Stay', [sentence(guest, search, room)])
+
+            @pytest.fixture(scope='module')
+            @given('a module-scoped arrangement')
+            def wide():
+                with given('an inner step', pins=a[1]):
+                    pass
+                yield 1
+
+            @scenario('first', stories=a)
+            def test_first(wide):
+                with given('something'):
+                    pass
+
+            @scenario('second', stories=b)
+            def test_second(wide):
+                with given('something'):
+                    pass
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs', pins=adopt_pytest_given['graft']):
+        result = pytester.runpytest()
+    with then(
+        t'the first {pg["Scenario"].low} passes and the second errors at '
+        t'{pg["Graft"].low}'
+    ):
+        result.assert_outcomes(passed=1, errors=1)
+        result.stdout.fnmatch_lines(["*story 'book', which scenario*does not bind*"])
+
+
+@scenario(
+    t'An Annotated label carrying a {pg["Pin"].low} is refused',
+    tags=['validation'],
+    stories=adopt_pytest_given,
+)
+def test_annotated_label_carrying_a_pin_is_refused(pytester):
+    with given(
+        t'a {pg["Scenario"].low} whose Annotated given(...) label carries a '
+        t'{pg["Pin"].low}'
+    ):
+        suite = """
+            from typing import Annotated
+            import pytest
+            from pytest_given import Glossary, given, scenario, sentence, story
+
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            s = story('Book', [sentence(guest, search, room)])
+
+            @pytest.fixture
+            def room_number():
+                return 7
+
+            @scenario('x', stories=s)
+            def test_x(room_number: Annotated[int, given('a room', pins=s[1])]):
                 pass
-    """)
-    result = pytester.runpytest()
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*step activity= requires a story on the scenario*'])
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs', pins=adopt_pytest_given['record']):
+        result = pytester.runpytest()
+    with then(t'the run fails, saying the label cannot carry a {pg["Pin"].low}'):
+        assert result.ret != 0
+        result.stdout.fnmatch_lines(['*Annotated given(..., pins=...)*not supported*'])
 
 
-def test_step_activity_in_wide_fixture_without_scenario_reports_the_cause(pytester):
+def test_step_pin_in_wide_fixture_without_scenario_reports_the_cause(pytester):
     """A wider-than-function `@given` fixture records even for an unannotated
-    test, so `activity=` in its body has no scenario to scope against. That is
-    an authoring mistake and must name itself, not surface as an assert."""
+    test, so a pin in its body has no scenario to land in. That is an
+    authoring mistake and must name itself, not surface as an assert."""
     pytester.makepyfile("""
         import pytest
         from pytest_given import Glossary, given, scenario, sentence, story
@@ -1934,21 +2110,21 @@ def test_step_activity_in_wide_fixture_without_scenario_reports_the_cause(pytest
         @pytest.fixture(scope='module')
         @given('a module-scoped arrangement')
         def wide():
-            with given('an inner step', activity=1):
+            with given('an inner step', pins=s[1]):
                 pass
             yield 1
 
         def test_unannotated(wide):
             assert wide == 1
 
-        @scenario('later', story=s)
+        @scenario('later', stories=s)
         def test_annotated(wide):
             with given('something'):
                 pass
     """)
     result = pytester.runpytest()
     assert result.ret != 0
-    result.stdout.fnmatch_lines(['*step activity= requires a scenario*'])
+    result.stdout.fnmatch_lines(['*step pin needs a scenario*'])
     assert 'AssertionError' not in result.stdout.str()
 
 
@@ -1965,7 +2141,7 @@ def test_session_finish_populates_report_stories_and_glossary(pytester):
         room = g.work_object('Room')
         s = story('Book', [sentence(guest, search, room)])
 
-        @scenario('x', story=s)
+        @scenario('x', stories=s)
         def test_x():
             pass
     """)
@@ -2003,7 +2179,7 @@ def test_report_json_excludes_underscore_fields(pytester):
         room = g.work_object('Room')
         s = story('Book JSON Filter', [sentence(guest, search, room)])
 
-        @scenario('x', story=s)
+        @scenario('x', stories=s)
         def test_x():
             pass
     """)

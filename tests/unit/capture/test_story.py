@@ -335,10 +335,13 @@ def test_clause_rejects_dangling_edge():
 
 @scenario(
     t'A single-clause {pg["Sentence"].low} synthesizes one {pg["Clause"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_sentence_single_clause_synthesizes_one_clause(guest, search, room):
-    with when(t'a {pg["Sentence"]} is built from handles directly', activity=2):
+    with when(
+        t'a {pg["Sentence"]} is built from handles directly',
+        pins=adopt_pytest_given['capture'],
+    ):
         a = sentence(guest, search, room)
     with then(t'it wraps a single {pg["Clause"]}'):
         assert isinstance(a, UnnumberedSentence)
@@ -348,13 +351,16 @@ def test_sentence_single_clause_synthesizes_one_clause(guest, search, room):
 
 @scenario(
     t'A {pg["Sentence"].low} may hold several {pg["Clause"]("clauses")}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_sentence_accepts_multiple_clauses(guest, search, room):
     with given(t'two {pg["Clause"]("clauses")}'):
         first = clause(guest, search, room)
         second = clause(guest('Bob'), search, room)
-    with when(t'they are combined into one {pg["Sentence"]}', activity=2):
+    with when(
+        t'they are combined into one {pg["Sentence"]}',
+        pins=adopt_pytest_given['capture'],
+    ):
         a = sentence(first, second)
     with then('the sentence carries both clauses'):
         assert a.clauses == (first, second)
@@ -382,10 +388,13 @@ def test_sentence_mixing_parts_and_clauses_raises(guest, search, room):
 
 @scenario(
     t'A {pg["Story"].low} auto-numbers its {pg["Sentence"]("sentences")} from one',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_story_auto_numbers_sentences_from_one(guest, search, room):
-    with when(t'a {pg["Story"]} is built from two {pg["Sentence"]} rows', activity=2):
+    with when(
+        t'a {pg["Story"]} is built from two {pg["Sentence"]} rows',
+        pins=adopt_pytest_given['capture'],
+    ):
         s = story(
             'Book a Room',
             [sentence(guest, search, room), sentence(guest('Alice'), search, room)],

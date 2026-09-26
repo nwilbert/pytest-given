@@ -146,12 +146,15 @@ def test_activity_call_returns_inflection_sharing_term_identity():
 
 @scenario(
     t'Registering an {pg["Actor"].low} returns a typed handle',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_glossary_actor_registers_and_returns_handle():
     with given('an empty glossary'):
         g = Glossary()
-    with when(t'an {pg["Actor"]} is registered with a definition', activity=3):
+    with when(
+        t'an {pg["Actor"]} is registered with a definition',
+        pins=adopt_pytest_given['build'],
+    ):
         a = g.actor('Guest', definition='Person booking accommodation.')
     with then(t'a handle carrying the {pg["Actor"]} kind is returned'):
         assert isinstance(a, TermHandle)
@@ -178,13 +181,16 @@ def test_glossary_activity_registers_and_returns_handle():
 
 @scenario(
     t'Re-registering a {pg["Term"].low} with matching fields is idempotent',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_glossary_re_registration_with_matching_fields_is_idempotent():
     with given(t'an {pg["Actor"]} already registered with a definition'):
         g = Glossary()
         a1 = g.actor('Guest', definition='d')
-    with when('the same name and definition are registered again', activity=3):
+    with when(
+        'the same name and definition are registered again',
+        pins=adopt_pytest_given['build'],
+    ):
         a2 = g.actor('Guest', definition='d')
     with then(t'both handles share the one {pg["Term"]}'):
         assert a1.term is a2.term
@@ -327,12 +333,15 @@ def test_real_definition_is_kept():
 @scenario(
     t'Calling the {pg["Glossary"].low} declares a '
     t'{pg["Kindless"].low} {pg["Term"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_call_declares_kindless_term():
     with given('an empty glossary'):
         g = Glossary()
-    with when(t'a {pg["Term"]} is declared by call, without a kind', activity=3):
+    with when(
+        t'a {pg["Term"]} is declared by call, without a kind',
+        pins=adopt_pytest_given['build'],
+    ):
         handle = g('loyalty points')
     with then(t'the {pg["Term"]} is registered as {pg["Kindless"]}'):
         assert handle.term.kind is None

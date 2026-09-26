@@ -15,9 +15,14 @@ from pytest_given.model import (
     NarrationPart,
     NarrationValue,
     NodeId,
+    Pin,
     PytestGivenError,
+    Sentence,
+    SentenceId,
     SourceLocation,
     Step,
+    Story,
+    StoryId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -75,13 +80,15 @@ def test_duration_excludes_fixture_setup(monkeypatch: pytest.MonkeyPatch) -> Non
 
 @scenario(
     t'{pg["Step"]("Steps")} record with their {pg["Phase"]("phases")}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_collect_steps() -> None:
     collector = Collector()
     with given(t'an {pg["Active scenario"]} in a fresh {pg["Collector"]}'):
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a given and a when {pg["Step"]} are pushed', activity=7):
+    with when(
+        t'a given and a when {pg["Step"]} are pushed', pins=adopt_pytest_given['record']
+    ):
         collector.push_step('given', _n('a machine'))
         collector.pop_step()
         collector.push_step('when', _n('I press start'))
@@ -217,7 +224,7 @@ def test_enter_fixture_teardown_transitions_state() -> None:
 @scenario(
     t'{pg["Step"]("Steps")} pushed during fixture setup record into the '
     t'{pg["Fixture recording"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_push_step_during_fixture_setup_records_into_recording() -> None:
     collector = Collector()
@@ -226,7 +233,10 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
         recording = FixtureRecording(root=root)
         setup = ExitStack()
         setup.enter_context(collector.fixture_setup(recording, _descriptor()))
-    with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
+    with when(
+        t'a {pg["Step"]} is pushed inside the fixture body',
+        pins=adopt_pytest_given['record'],
+    ):
         collector.push_step('given', _n('with 3 items'))
         collector.pop_step()
         setup.close()
@@ -237,7 +247,7 @@ def test_push_step_during_fixture_setup_records_into_recording() -> None:
 
 @scenario(
     t'An {pg["Attachment"].low} lands on the {pg["Step"].low} being recorded',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_attach_during_fixture_setup_records_into_recording() -> None:
     collector = Collector()
@@ -246,7 +256,10 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
         recording = FixtureRecording(root=root)
         setup = ExitStack()
         setup.enter_context(collector.fixture_setup(recording, _descriptor()))
-    with when(t'an {pg["Attachment"]} is attached inside the fixture body', activity=6):
+    with when(
+        t'an {pg["Attachment"]} is attached inside the fixture body',
+        pins=adopt_pytest_given['attach'],
+    ):
         collector.attach('snapshot', 'data')
         setup.close()
     with then(t'the {pg["Attachment"]} lands on the recording root'):
@@ -257,7 +270,7 @@ def test_attach_during_fixture_setup_records_into_recording() -> None:
 @scenario(
     t'Fixture-body {pg["Step"]("steps")} do not leak into the '
     t'{pg["Active scenario"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_push_step_routing_isolates_recording_from_scenario() -> None:
     collector = Collector()
@@ -267,7 +280,10 @@ def test_push_step_routing_isolates_recording_from_scenario() -> None:
         recording = FixtureRecording(root=root)
         setup = ExitStack()
         setup.enter_context(collector.fixture_setup(recording, _descriptor()))
-    with when(t'a {pg["Step"]} is pushed inside the fixture body', activity=7):
+    with when(
+        t'a {pg["Step"]} is pushed inside the fixture body',
+        pins=adopt_pytest_given['record'],
+    ):
         collector.push_step('given', _n('fixture-internal'))
         collector.pop_step()
         setup.close()
@@ -326,7 +342,7 @@ def test_attach_outside_any_step_raises() -> None:
 
 @scenario(
     t'A {pg["Fixture recording"].low} is deep-copied when {pg["Graft"]("grafted")}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_graft_recording_deep_copies_into_scenario() -> None:
     collector = Collector()
@@ -336,7 +352,8 @@ def test_graft_recording_deep_copies_into_scenario() -> None:
         root.children.append(Step(phase='given', narration=_n('with 3 items')))
         recording = FixtureRecording(root=root)
     with when(
-        t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}', activity=8
+        t'a {pg["Graft"]} copies it into the {pg["Active scenario"]}',
+        pins=adopt_pytest_given['graft'],
     ):
         collector.graft_recording(recording.root)
         recorded = collector.finish_scenario(status='passed')
@@ -518,13 +535,16 @@ def test_records_reports_only_recorded_node_ids() -> None:
 
 @scenario(
     t'A leaf given is {pg["Graft"]("grafted")} as a childless given {pg["Step"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_graft_leaf_given_appends_childless_given_step() -> None:
     collector = Collector()
     with given(t'an {pg["Active scenario"]} is being recorded'):
         collector.start_scenario('id', 'name', 'mod', [])
-    with when(t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}', activity=8):
+    with when(
+        t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}',
+        pins=adopt_pytest_given['graft'],
+    ):
         collector.graft_leaf_given(_n('the name {text}'))
         recorded = collector.finish_scenario(status='passed')
     with then('the step is a given with no children'):
@@ -537,7 +557,7 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
 @scenario(
     t'{pg["Graft"]("Grafting")} with an override replaces the root label but '
     t'keeps children',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_graft_recording_override_replaces_root_narration_keeps_children() -> None:
     collector = Collector()
@@ -548,7 +568,10 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         )
         root.children.append(Step(phase='given', narration=_n('a recorded child')))
         recording = FixtureRecording(root=root)
-    with when(t'a {pg["Graft"]} supplies an override {pg["Narration"]}', activity=8):
+    with when(
+        t'a {pg["Graft"]} supplies an override {pg["Narration"]}',
+        pins=adopt_pytest_given['graft'],
+    ):
         collector.graft_recording(
             recording.root, override_narration=_n('a fancy machine')
         )
@@ -611,3 +634,62 @@ def test_fail_ignores_a_node_id_the_collector_never_recorded() -> None:
     collector = Collector()
     collector.fail(NodeId('test.py::never_seen'), _error('boom'))
     assert collector.scenarios == []
+
+
+def _model_story(story_id: str) -> Story:
+    return Story(
+        id=StoryId(story_id),
+        title=story_id,
+        sentences=(Sentence(id=SentenceId(1), clauses=()),),
+    )
+
+
+def _pin(story_id: str) -> Pin:
+    return Pin(story_id=StoryId(story_id), sentence_id=SentenceId(1))
+
+
+def test_push_step_refuses_a_pin_into_a_story_the_scenario_does_not_bind():
+    collector = Collector()
+    collector.start_scenario('id', 'a', 'mod', [], stories=(_model_story('a'),))
+    with pytest.raises(PytestGivenError, match=r"story 'b'.*does not bind.*stories="):
+        collector.push_step('given', Narration(text='x'), pins=(_pin('b'),))
+
+
+def test_push_step_refuses_a_pin_into_a_story_the_scenario_pins():
+    collector = Collector()
+    collector.start_scenario(
+        'id', 'a', 'mod', [], stories=(_model_story('a'),), pins=(_pin('a'),)
+    )
+    with pytest.raises(PytestGivenError, match='pins that story itself'):
+        collector.push_step('given', Narration(text='x'), pins=(_pin('a'),))
+
+
+def test_push_step_pin_outside_any_scenario_is_a_user_error():
+    collector = Collector()
+    recording = FixtureRecording(
+        root=Step(phase='given', narration=Narration(text='wide'))
+    )
+    with collector.fixture_setup(recording, given('wide')):
+        with pytest.raises(PytestGivenError, match='needs a scenario'):
+            collector.push_step('given', Narration(text='x'), pins=(_pin('a'),))
+
+
+@pytest.mark.parametrize(
+    ('stories', 'pins'),
+    [
+        ((), ()),  # the recording's story is unbound here
+        ((_model_story('a'),), (_pin('a'),)),  # bound, but pinned by the scenario
+    ],
+)
+def test_graft_refuses_a_recording_whose_pin_does_not_fit(stories, pins):
+    root = Step(
+        phase='given',
+        narration=Narration(text='wide'),
+        children=[
+            Step(phase='given', narration=Narration(text='inner'), pins=(_pin('a'),))
+        ],
+    )
+    collector = Collector()
+    collector.start_scenario('id', 'later', 'mod', [], stories=stories, pins=pins)
+    with pytest.raises(PytestGivenError, match="story 'a'"):
+        collector.graft_recording(root)

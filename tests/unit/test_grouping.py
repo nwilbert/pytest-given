@@ -118,7 +118,7 @@ def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:
     t'{pg["Group"]("Grouping")} collapses parametrize {pg["Case"]("cases")} into one '
     t'{pg["Scenario"].low}',
     tags=['parametrization'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_group_parametrized_any_failed_groups_as_failed() -> None:
     with given(t'three {pg["Case"]} records of one {pg["Parametrized scenario"]}'):
@@ -139,7 +139,10 @@ def test_group_parametrized_any_failed_groups_as_failed() -> None:
             nid2: ParamSpec(names=['n'], values=[2]),
             nid3: ParamSpec(names=['n'], values=[3]),
         }
-    with when(t'the {pg["Group"]("grouping")} pass collapses them', activity=9):
+    with when(
+        t'the {pg["Group"]("grouping")} pass collapses them',
+        pins=adopt_pytest_given['group'],
+    ):
         grouped = group_parametrized(scenarios, param_info)
     with then(t'one scenario remains and any failed {pg["Case"]} fails it'):
         assert len(grouped) == 1
@@ -150,7 +153,7 @@ def test_group_parametrized_any_failed_groups_as_failed() -> None:
     t'A {pg["Parametrized scenario"].low} keeps its place among the '
     t'{pg["Scenario"]("scenarios")} around it',
     tags=['parametrization'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_group_parametrized_keeps_source_order() -> None:
     with given(t'a plain {pg["Scenario"].low} between two parametrized ones'):
@@ -164,7 +167,9 @@ def test_group_parametrized_keeps_source_order() -> None:
             first: ParamSpec(names=['n'], values=[1]),
             last: ParamSpec(names=['n'], values=[1]),
         }
-    with when(t'the {pg["Group"]("grouping")} pass runs', activity=9):
+    with when(
+        t'the {pg["Group"]("grouping")} pass runs', pins=adopt_pytest_given['group']
+    ):
         grouped = group_parametrized(scenarios, param_info)
     with then(t'the {pg["Report"].low} lists them in the order the file declares'):
         assert [s.id for s in grouped] == [first, mid, last]
@@ -2392,7 +2397,7 @@ def test_extra_occurrences_count_from_the_baseline_not_the_first_case() -> None:
     t'A {pg["Parameter table"].low} cell reads the way the {pg["Step"].low} '
     t'that points at it read',
     tags=['parametrization'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_a_formatted_param_cell_holds_the_text_the_step_narrated() -> None:
     with given(t'two {pg["Case"]("cases")} narrating a parameter with a format spec'):
@@ -2549,7 +2554,7 @@ def _tstring_step(phase: str, literal: str, expression: str, rendered: str) -> S
     t'{pg["Case"]("Cases")} that narrate different {pg["Step"]("steps")} are '
     t'refused rather than {pg["Group"]("grouped")}',
     tags=['parametrization', 'validation'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_divergent_step_structure_refuses_the_merge() -> None:
     with given(t'two {pg["Case"]("cases")} whose {pg["Step"]("step")} trees differ'):
@@ -2810,7 +2815,7 @@ def test_shape_of_an_empty_tree_is_empty() -> None:
 
 def test_cases_claiming_different_sentences_say_so() -> None:
     """`pins=` is a per-call argument, so two cases can genuinely claim
-    different ids at one path. The grouped tree keeps one set — but that is not
+    different pins at one path. The grouped tree keeps one set — but that is not
     'a different step structure', and the fix is smaller than declining the
     grouping."""
     nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')

@@ -10,7 +10,7 @@ import functools
 import inspect
 import json
 import types
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping
 from string import templatelib
 from typing import (
     Self,
@@ -20,13 +20,14 @@ from typing import (
 from ..model import (
     Narration,
     Phase,
+    Pin,
     PytestGivenError,
-    SentenceId,
     SourceLocation,
     narration_of,
 )
 from .collector import Collector, get_active_collector, recording_collector
 from .source import capture_caller_source, code_source
+from .story import Pins, sentence_handles
 from .template import (
     StepText,
     Template,
@@ -36,31 +37,23 @@ from .template import (
 )
 
 
-def given(
-    text: StepText,
-    *,
-    activity: int | Sequence[int] | None = None,
-) -> StepDescriptor:
+def given(text: StepText, *, pins: Pins | None = None) -> StepDescriptor:
     """Create a Given step (context manager or decorator)."""
-    return StepDescriptor('given', text, activity_ids=normalize_activity(activity))
+    return StepDescriptor('given', text, pins=_pins_of(pins))
 
 
-def when(
-    text: StepText,
-    *,
-    activity: int | Sequence[int] | None = None,
-) -> StepDescriptor:
+def when(text: StepText, *, pins: Pins | None = None) -> StepDescriptor:
     """Create a When step (context manager or decorator)."""
-    return StepDescriptor('when', text, activity_ids=normalize_activity(activity))
+    return StepDescriptor('when', text, pins=_pins_of(pins))
 
 
-def then(
-    text: StepText,
-    *,
-    activity: int | Sequence[int] | None = None,
-) -> StepDescriptor:
+def then(text: StepText, *, pins: Pins | None = None) -> StepDescriptor:
     """Create a Then step (context manager or decorator)."""
-    return StepDescriptor('then', text, activity_ids=normalize_activity(activity))
+    return StepDescriptor('then', text, pins=_pins_of(pins))
+
+
+def _pins_of(pins: Pins | None) -> tuple[Pin, ...]:
+    return tuple(handle.pin for handle in sentence_handles(pins))
 
 
 def when_then(
@@ -125,12 +118,12 @@ class StepDescriptor:
         phase: Phase,
         text: StepText,
         *,
-        activity_ids: tuple[SentenceId, ...] = (),
+        pins: tuple[Pin, ...] = (),
     ) -> None:
         self.phase = phase
         self._source: StepText = text
         self.narration: Narration = narration_from(text)
-        self.activity_ids: tuple[SentenceId, ...] = activity_ids
+        self.pins = pins
 
     @property
     def is_deferred_template(self) -> bool:
@@ -168,9 +161,7 @@ class StepDescriptor:
         source: SourceLocation | None = pinned_source
         if source is None and collector.capture_step_source:
             source = capture_caller_source()
-        collector.push_step(
-            self.phase, self.narration, activity_ids=self.activity_ids, source=source
-        )
+        collector.push_step(self.phase, self.narration, pins=self.pins, source=source)
         return self
 
     def __exit__(
@@ -301,9 +292,7 @@ class StepDescriptor:
         # The helper's FunctionDef *is* the step body — anchor there, no frame
         # walk needed.
         source = code_source(func.__code__) if collector.capture_step_source else None
-        collector.push_step(
-            self.phase, narration, activity_ids=self.activity_ids, source=source
-        )
+        collector.push_step(self.phase, narration, pins=self.pins, source=source)
         return collector
 
     def _check_tstring_decorator_safety(self) -> None:
@@ -400,37 +389,6 @@ class WhenThen:
         if exc_type is None:
             self._then._open(self._source)
             self._then.__exit__(None, None, None)
-
-
-def normalize_activity(
-    activity: int | Sequence[int] | None,
-    kwarg: str = 'activity',
-) -> tuple[SentenceId, ...]:
-    """Normalize an ``activity=`` / ``activities=`` kwarg to SentenceId values.
-
-    `kwarg` names the argument the author actually wrote, so the step form and
-    the scenario form each report their own.
-    """
-    if activity is None:
-        return ()
-    # Each accepting branch excludes the type that would otherwise slip into
-    # it: a bool is an `int` and a str is a `Sequence[int]` to nobody but
-    # `isinstance`. Without the guards `activities='13'` would yield ids 1
-    # and 3 rather than the TypeError it deserves.
-    if isinstance(activity, int) and not isinstance(activity, bool):
-        return (SentenceId(activity),)
-    if isinstance(activity, Sequence) and not isinstance(activity, str):
-        result: list[SentenceId] = []
-        for item in activity:
-            if not isinstance(item, int) or isinstance(item, bool):
-                raise TypeError(
-                    f'{kwarg} sequence must contain int values, got {type(item)!r}'
-                )
-            result.append(SentenceId(item))
-        return tuple(result)
-    raise TypeError(
-        f'{kwarg} must be an int or a Sequence[int], got {type(activity)!r}'
-    )
 
 
 _TEMPLATE_PARAM_KINDS = frozenset(

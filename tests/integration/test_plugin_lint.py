@@ -117,12 +117,12 @@ def test_an_error_finding_shows_in_the_summary_line(pytester):
 
 @scenario(
     t'An error-{pg["Severity"].low} {pg["Finding"].low} fails the run',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_enabled_error_finding_fails_the_run(pytester):
     with given(t'a suite whose given {pg["Step"].low} has an empty body'):
         attach('suite', EMPTY_GIVEN)
-    with when('the suite runs with the lint enabled', activity=11):
+    with when('the suite runs with the lint enabled', pins=adopt_pytest_given['flag']):
         result = _run(pytester, EMPTY_GIVEN, '--given-lint')
     with then(t'the run exits failed, naming the {pg["Lint rule"].low} and the step'):
         # The test itself passed; the error is pytest-given's own, registered
@@ -149,13 +149,14 @@ def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
 
 @scenario(
     t'A {pg["Lint rule"].low} downgraded to warn reports without failing the run',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_warn_override_prints_but_does_not_fail(pytester):
     with given(t'a suite whose given {pg["Step"].low} has an empty body'):
         attach('suite', EMPTY_GIVEN)
     with when(
-        t'the suite runs with that {pg["Lint rule"].low} set to warn', activity=11
+        t'the suite runs with that {pg["Lint rule"].low} set to warn',
+        pins=adopt_pytest_given['flag'],
     ):
         result = _run(
             pytester,
@@ -226,7 +227,7 @@ def test_stale_ignore_entry_fails_the_run(pytester):
 
 @scenario(
     t'Either {pg["Narration lint"].low} flag overrides the ini for one run',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_the_flag_overrides_the_ini_in_both_directions(pytester):
     with given(t'a suite with one flawed {pg["Step"].low}'):
@@ -435,7 +436,7 @@ def test_removed_phase_check_ini_key_is_unknown(pytester):
 
 @scenario(
     t'An error {pg["Finding"].low} leaves a more specific exit code alone',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
     with given('a suite whose lint would fail, under a stale ignore entry'):
@@ -444,7 +445,10 @@ def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
             '[pytest]\ngiven_lint = true\ngiven_lint_ignore = ["never-matches-*"]\n'
         )
         pytester.makepyfile(test_sample=EMPTY_GIVEN)
-    with when('the suite runs deselected, so nothing is collected', activity=11):
+    with when(
+        'the suite runs deselected, so nothing is collected',
+        pins=adopt_pytest_given['flag'],
+    ):
         result = pytester.runpytest_inprocess('-k', 'no-such-test')
     with then('the run keeps NO_TESTS_COLLECTED rather than reporting a test failure'):
         # pytest binds exitstatus before sessionfinish, so overwriting it

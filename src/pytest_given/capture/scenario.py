@@ -11,11 +11,12 @@ from string import templatelib
 from typing import cast, get_type_hints
 
 from ..model import (
+    Pin,
     PytestGivenError,
-    SentenceId,
     Story,
 )
-from .steps import StepDescriptor, normalize_activity
+from .steps import StepDescriptor
+from .story import Pins, sentence_handles
 from .template import (
     ResolvedName,
     StepText,
@@ -32,14 +33,14 @@ class ScenarioDecorator:
         name: ResolvedName,
         tags: list[str],
         *,
-        story: Story | None = None,
-        activity_ids: tuple[SentenceId, ...] = (),
+        stories: tuple[Story, ...] = (),
+        pins: tuple[Pin, ...] = (),
         group_parametrized: bool = True,
     ) -> None:
         self.name: ResolvedName = name
         self.tags = tags
-        self.story = story
-        self.activity_ids = activity_ids
+        self.stories = stories
+        self.pins = pins
         self.group_parametrized = group_parametrized
 
     def __call__(self, func: Callable[..., object]) -> Callable[..., object]:
@@ -67,8 +68,8 @@ def scenario(
     name: StepText,
     tags: list[str] | None = None,
     *,
-    story: Story | None = None,
-    activities: int | Sequence[int] | None = None,
+    stories: Story | Sequence[Story] | None = None,
+    pins: Pins | None = None,
     group_parametrized: bool = True,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
@@ -85,46 +86,39 @@ def scenario(
         )
     else:
         resolved_name = name
-    if story is not None and not isinstance(story, Story):
-        raise PytestGivenError(
-            f'@scenario(story=...) must be a Story instance; '
-            f'got {type(story).__name__}: {story!r}'
-        )
-    activity_ids = normalize_activity(activities, 'activities')
-    _validate_story_binding(story, activity_ids)
+    matched = _matched_stories(stories)
+    handles = sentence_handles(pins)
+    pinned = {handle.story.id: handle.story for handle in handles}
+    for story in matched:
+        if story.id in pinned:
+            raise PytestGivenError(
+                f'@scenario names story {story.title!r} in both stories= and '
+                f'pins=: stories= matches narration against it, pins= replaces '
+                f'that matching. Keep one.'
+            )
     return ScenarioDecorator(
         resolved_name,
         tags or [],
-        story=story,
-        activity_ids=activity_ids,
+        stories=matched + tuple(pinned.values()),
+        pins=tuple(handle.pin for handle in handles),
         group_parametrized=group_parametrized,
     )
 
 
-def _validate_story_binding(
-    story: Story | None, activity_ids: tuple[SentenceId, ...]
-) -> None:
-    """Reject sentence ids that no story can resolve.
-
-    Both arguments are `@scenario`'s own, fully known here, so this does not
-    wait for collection the way the parametrize-dependent checks must — and
-    the traceback points at the decorator that got it wrong rather than
-    naming a node id.
-    """
-    if story is None:
-        if activity_ids:
-            raise PytestGivenError(
-                '@scenario(activities=...) requires story=; sentence ids are '
-                'meaningless without a story to look them up in.'
-            )
-        return
-    valid_ids = {sentence.id for sentence in story.sentences}
-    for activity_id in activity_ids:
-        if activity_id not in valid_ids:
-            raise PytestGivenError(
-                f'@scenario(activities=...): sentence id {activity_id} not in '
-                f'story {story.title!r} (valid: {sorted(valid_ids)}).'
-            )
+def _matched_stories(stories: Story | Sequence[Story] | None) -> tuple[Story, ...]:
+    if stories is None:
+        return ()
+    items = (stories,) if isinstance(stories, Story) else stories
+    if (
+        isinstance(items, Sequence)
+        and not isinstance(items, str)
+        and all(isinstance(item, Story) for item in items)
+    ):
+        return tuple({story.id: story for story in items}.values())
+    raise PytestGivenError(
+        f'@scenario(stories=...) takes a Story or a sequence of them; '
+        f'got {type(stories).__name__}: {stories!r}'
+    )
 
 
 def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
@@ -134,8 +128,8 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     Reads type hints off the unwrapped function (past the ``@scenario``
     wrapper). Best-effort: if the annotations cannot be resolved, returns an
     empty mapping rather than failing the test. Rejects the forbidden forms —
-    ``when(...)`` / ``then(...)``, a t-string label, or more than one
-    descriptor on a single parameter.
+    ``when(...)`` / ``then(...)``, a t-string label, a pin, or more than
+    one descriptor on a single parameter.
     """
     target = inspect.unwrap(cast('Callable[..., object]', func))
     try:
@@ -171,6 +165,13 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
                 f'where the parameter value is not in scope. Use '
                 f'given(Template("... {{{name}}} ...")) for a per-case '
                 f'placeholder, or a plain string label.'
+            )
+        if desc.pins:
+            raise PytestGivenError(
+                f'Annotated given(..., pins=...) on parameter {name!r} is not '
+                f'supported: the label only renames the fixture step, so the pin '
+                f'would be dropped. Pin a step inside the fixture body, or in the '
+                f'test body.'
             )
         out[name] = desc
     return out

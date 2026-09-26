@@ -100,7 +100,7 @@ def _rule_findings(findings, rule):
 
 @scenario(
     t'{pg["Narration lint"]} flags a {pg["Step"].low} whose body does nothing',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
     with given(t'a given {pg["Step"].low} whose body is only `pass`'):
@@ -115,7 +115,10 @@ def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
         attach('step body', src)
         with_line = _line(src, "with given('a value')")
         empty = _scenario([_step('given', 'a value', with_line)])
-    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+    with when(
+        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        pins=adopt_pytest_given['flag'],
+    ):
         findings = _ast_rules([empty], tmp_path)
     with then(t'an empty-step {pg["Finding"].low} points at the {pg["Step"].low} line'):
         [finding] = findings
@@ -261,7 +264,7 @@ def test_then_with_bare_assert_passes(tmp_path) -> None:
 
 @scenario(
     t'{pg["Narration lint"]} flags a then {pg["Step"].low} that checks nothing',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_then_without_check_fires(tmp_path) -> None:
     with given(t'a then {pg["Step"].low} whose body only calls'):
@@ -279,7 +282,10 @@ def test_then_without_check_fires(tmp_path) -> None:
         attach('step body', src)
         with_line = _line(src, 'with then')
         unchecked = _scenario([_step('then', 'it is one', with_line)])
-    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+    with when(
+        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        pins=adopt_pytest_given['flag'],
+    ):
         findings = _ast_rules([unchecked], tmp_path)
     with then(t'a then-without-check {pg["Finding"].low} reports the unchecked then'):
         [finding] = findings
@@ -425,7 +431,7 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
 
 @scenario(
     t'{pg["Narration lint"]} flags an assert outside a then {pg["Step"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 @pytest.mark.parametrize('phase', ['given', 'when'])
 def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) -> None:
@@ -442,7 +448,10 @@ def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) ->
         attach('step body', src)
         with_line = _line(src, 'with ')
         checking = _scenario([_step(phase, 'a stocked machine', with_line)])
-    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+    with when(
+        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        pins=adopt_pytest_given['flag'],
+    ):
         findings = _rule_findings(
             _ast_rules([checking], tmp_path), 'check-outside-then'
         )
@@ -561,7 +570,7 @@ def test_check_outside_then_fires_on_helper_body_assert(tmp_path) -> None:
 
 @scenario(
     t'{pg["Narration lint"]} flags a then {pg["Step"].low} that folds in the action',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
     with given(t'a {pg["Scenario"].low} with no when, acting inside its then'):
@@ -583,7 +592,10 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
                 _step('then', 'it brews', then_line),
             ]
         )
-    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+    with when(
+        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        pins=adopt_pytest_given['flag'],
+    ):
         findings = _rule_findings(_ast_rules([folded], tmp_path), 'action-in-then')
     with then(t'a warn {pg["Finding"].low} points at the then and says no when acts'):
         [finding] = findings
@@ -738,7 +750,7 @@ def _value_step(phase, text, line, expressions, children=()):
 @scenario(
     t'{pg["Narration lint"]} flags a {pg["Narration"].low} interpolating a name the '
     t'body never uses',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
     with given(t'a given {pg["Step"].low} whose body never loads the name'):
@@ -755,7 +767,10 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         attach('step body', src)
         with_line = _line(src, 'with given')
         unused = _scenario([_value_step('given', 'a 200 ml cup', with_line, ['size'])])
-    with when(t'the AST {pg["Lint rule"]("rules")} parse that source', activity=11):
+    with when(
+        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        pins=adopt_pytest_given['flag'],
+    ):
         findings = _rule_findings(
             _ast_rules([unused], tmp_path), 'unused-interpolation'
         )

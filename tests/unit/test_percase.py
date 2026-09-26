@@ -61,12 +61,14 @@ def _opted_out_group(
     t'{pg["Group"]("grouping")} and keep one {pg["Scenario"].low} per '
     t'{pg["Case"].low}',
     tags=['parametrization'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_opted_out_group_emits_one_scenario_per_case() -> None:
     with given(t'two {pg["Case"]("cases")} of a scenario that opted out'):
         scenarios, param_info = _opted_out_group('Brew coffee')
-    with when(t'the {pg["Group"]("grouping")} pass runs', activity=9):
+    with when(
+        t'the {pg["Group"]("grouping")} pass runs', pins=adopt_pytest_given['group']
+    ):
         result = group_parametrized(scenarios, param_info)
     with then(
         t'each {pg["Case"].low} stands alone, with no {pg["Parameter table"].low}'

@@ -49,7 +49,7 @@ book_a_room = story(
 )
 
 
-@scenario('Guest books an available room', story=book_a_room)
+@scenario('Guest books an available room', stories=book_a_room)
 def test_book_available_room():
     with given(t'the {g["Room"]} is available'):
         catalog = {'Standard': True, 'Suite': False}
@@ -64,7 +64,7 @@ def test_book_available_room():
         assert booked_room is not None
 
 
-@scenario('Guest cannot book an unavailable room', story=book_a_room)
+@scenario('Guest cannot book an unavailable room', stories=book_a_room)
 def test_book_unavailable_room():
     with given(t'no {g["Room"]} is available'):
         catalog = {'Suite': False}

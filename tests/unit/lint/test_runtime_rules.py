@@ -63,12 +63,14 @@ def _runtime(grouped=(), glossary=None, stories=()):
 @scenario(
     t'{pg["Narration lint"]} flags a passed {pg["Scenario"].low} that skips a '
     t'{pg["Phase"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
     with given(t'a passed {pg["Scenario"].low} narrating only given and then'):
         two_phase = _phases_scenario('test_x.py::test_a', ['given', 'then'])
-    with when(t'the runtime {pg["Lint rule"]("rules")} run', activity=11):
+    with when(
+        t'the runtime {pg["Lint rule"]("rules")} run', pins=adopt_pytest_given['flag']
+    ):
         findings = _runtime(grouped=[two_phase])
     with then(
         t'one missing-phase {pg["Finding"].low} names the absent when and the '
@@ -132,7 +134,7 @@ def _glossary(*names):
 @scenario(
     t'{pg["Narration lint"]} flags a {pg["Tag"].low} that duplicates a '
     t'{pg["Term"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
     with given(t'a {pg["Glossary"].low} defining one {pg["Term"].low}'):
@@ -146,7 +148,9 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
                 'test_x.py::test_b', ['given', 'when', 'then'], tags=['File Glossary']
             ),
         ]
-    with when(t'the runtime {pg["Lint rule"]("rules")} run', activity=11):
+    with when(
+        t'the runtime {pg["Lint rule"]("rules")} run', pins=adopt_pytest_given['flag']
+    ):
         findings = _rule_findings(
             _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
         )
@@ -220,14 +224,14 @@ def _dead_term_findings(glossary, grouped=(), stories=()):
 @scenario(
     t'{pg["Narration lint"]} flags a {pg["Term"].low} referenced by no '
     t'{pg["Scenario"].low} name, {pg["Step"].low} or {pg["Story"].low}',
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_dead_term_flags_unreferenced_term() -> None:
     with given(t'a {pg["Glossary"].low} holding one unreferenced {pg["Term"].low}'):
         glossary = _glossary('Ghost term')
     with when(
         t'the runtime {pg["Lint rule"]("rules")} run over no scenarios and no stories',
-        activity=11,
+        pins=adopt_pytest_given['flag'],
     ):
         findings = _dead_term_findings(glossary)
     with then(t'the {pg["Finding"].low} names the unreferenced {pg["Term"].low}'):

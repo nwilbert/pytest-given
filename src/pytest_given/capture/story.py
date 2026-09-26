@@ -107,6 +107,28 @@ class SentenceHandle:
     story: Story = field(repr=False, compare=False)
 
 
+# What `pins=` accepts, on a step and on `@scenario` alike.
+type Pins = SentenceHandle | Sequence[SentenceHandle]
+
+
+def sentence_handles(pins: Pins | None) -> tuple[SentenceHandle, ...]:
+    """`pins=` as the handles it names. A bare number or name is refused: it
+    would need a story to resolve against, which a pin carries itself."""
+    if pins is None:
+        return ()
+    items = (pins,) if isinstance(pins, SentenceHandle) else pins
+    if (
+        isinstance(items, Sequence)
+        and not isinstance(items, str)
+        and all(isinstance(item, SentenceHandle) for item in items)
+    ):
+        return tuple(items)
+    raise PytestGivenError(
+        f'pins= takes sentence handles, got {pins!r}. Look the sentence up on '
+        f"its story: pins=the_story['name'] or pins=the_story[3]."
+    )
+
+
 def carried_glossaries(node: object) -> frozenset[Glossary]:
     """The glossaries carried on a story-tree node.
 

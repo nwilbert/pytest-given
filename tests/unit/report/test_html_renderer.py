@@ -227,7 +227,7 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
 @scenario(
     t'{pg["Parameter coloring"]} marks placeholders and table headers',
     tags=['parametrization'],
-    story=adopt_pytest_given,
+    stories=adopt_pytest_given,
 )
 def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> None:
     with given(
@@ -298,7 +298,9 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
                 }
             )
         )
-    with when(t'the {pg["Renderer"]} renders the HTML page', activity=10):
+    with when(
+        t'the {pg["Renderer"]} renders the HTML page', pins=adopt_pytest_given['render']
+    ):
         html_path = tmp_path / 'report.html'
         render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
         content = html_path.read_text(encoding='utf-8')
