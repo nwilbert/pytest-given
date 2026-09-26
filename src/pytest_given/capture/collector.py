@@ -30,6 +30,7 @@ from ..model import (
     iter_steps,
 )
 from .source import PACKAGE_ROOT
+from .story import declared_title
 from .template import Template, narration_from
 
 if TYPE_CHECKING:
@@ -424,13 +425,15 @@ class Collector:
             if pin.story_id not in scenario.story_ids:
                 raise PytestGivenError(
                     f'a step pins sentence {pin.sentence_id} of story '
-                    f'{pin.story_id!r}{suffix}, which scenario {scenario.id!r} '
-                    f'does not bind; add the story to @scenario(stories=...).'
+                    f'{_story_label(pin.story_id)}{suffix}, which scenario '
+                    f'{scenario.id!r} does not bind; add the story to '
+                    f'@scenario(stories=...).'
                 )
             if pin.story_id in pinned:
                 raise PytestGivenError(
                     f'a step pins sentence {pin.sentence_id} of story '
-                    f'{pin.story_id!r}{suffix}, but scenario {scenario.id!r} '
+                    f'{_story_label(pin.story_id)}{suffix}, but scenario '
+                    f'{scenario.id!r} '
                     f'pins that story itself, so its coverage there is exactly '
                     f'the scenario pins; drop the step pin, or bind the story '
                     f'with stories= instead.'
@@ -526,3 +529,10 @@ class Collector:
         if self._current_scenario is not None and self._current_scenario.id == node_id:
             return self._current_scenario
         return self._scenarios_by_id.get(node_id)
+
+
+def _story_label(story_id: StoryId) -> str:
+    """A story as an error names it: by the title the author wrote, falling
+    back to its id for a story no `story()` call declared."""
+    title = declared_title(story_id)
+    return repr(title if title is not None else story_id)

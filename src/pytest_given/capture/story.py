@@ -3,6 +3,7 @@ sentence handles a story hands out."""
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
+from typing import NamedTuple
 
 from ..model import (
     Clause,
@@ -217,20 +218,34 @@ def union_glossaries(carried: Iterable[frozenset[Glossary]]) -> frozenset[Glossa
     return frozenset[Glossary]().union(*carried)
 
 
-# Which story ids this process has seen declared, and where. Process-global,
-# so `process_state` — its only sanctioned caller — swaps it around a nested
+class StoryDeclaration(NamedTuple):
+    """Where a story id was claimed, and under which title."""
+
+    title: str
+    site: str
+
+
+# Which story ids this process has seen declared. Process-global, so
+# `process_state` — its only sanctioned caller — swaps it around a nested
 # in-process run.
-_STORY_REGISTRY: dict[StoryId, str] = {}
+_STORY_REGISTRY: dict[StoryId, StoryDeclaration] = {}
 
 
-def snapshot_story_registry() -> dict[StoryId, str]:
+def snapshot_story_registry() -> dict[StoryId, StoryDeclaration]:
     return dict(_STORY_REGISTRY)
 
 
-def restore_story_registry(snapshot: dict[StoryId, str]) -> None:
+def restore_story_registry(snapshot: dict[StoryId, StoryDeclaration]) -> None:
     """Reinstate a snapshot; `{}` clears the registry for a fresh session."""
     _STORY_REGISTRY.clear()
     _STORY_REGISTRY.update(snapshot)
+
+
+def declared_title(story_id: StoryId) -> str | None:
+    """The title `story()` declared `story_id` under, or None for an id no
+    `story()` call in this run claimed (a hand-built model story)."""
+    declaration = _STORY_REGISTRY.get(story_id)
+    return declaration.title if declaration is not None else None
 
 
 def _register_story(sid: StoryId, title: str, source: SourceLocation | None) -> None:
@@ -244,9 +259,9 @@ def _register_story(sid: StoryId, title: str, source: SourceLocation | None) -> 
     if sid in _STORY_REGISTRY:
         raise PytestGivenError(
             f'story {title!r} (id {sid!r}) already declared at '
-            f'{_STORY_REGISTRY[sid]}; declaring it again at {site}.'
+            f'{_STORY_REGISTRY[sid].site}; declaring it again at {site}.'
         )
-    _STORY_REGISTRY[sid] = site
+    _STORY_REGISTRY[sid] = StoryDeclaration(title=title, site=site)
 
 
 def _site_text(source: SourceLocation | None) -> str:

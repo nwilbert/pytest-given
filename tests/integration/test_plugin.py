@@ -1968,6 +1968,8 @@ def test_step_pin_into_a_pinned_story_is_refused(pytester):
     ):
         result.assert_outcomes(failed=1)
         result.stdout.fnmatch_lines(['*pins that story itself*'])
+        # fnmatch ignores case on Windows; the title check needs a plain `in`.
+        assert "story 'Book', but scenario" in result.stdout.str()
 
 
 @scenario(
@@ -2002,8 +2004,9 @@ def test_step_pin_into_an_unbound_story_is_refused(pytester):
     with then(t'the {pg["Scenario"].low} fails, pointing at @scenario(stories=...)'):
         result.assert_outcomes(failed=1)
         result.stdout.fnmatch_lines(
-            ["*story 'stay', which scenario*does not bind*stories=*"]
+            ["*story 'Stay', which scenario*does not bind*stories=*"]
         )
+        assert "story 'Stay', which scenario" in result.stdout.str()
 
 
 @scenario(
@@ -2057,10 +2060,11 @@ def test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft(pytester):
         result.assert_outcomes(passed=1, errors=1)
         result.stdout.fnmatch_lines(
             [
-                "*story 'book'*fixture 'wide'*step 'an inner step'*"
+                "*story 'Book'*fixture 'wide'*step 'an inner step'*"
                 'which scenario*does not bind*'
             ]
         )
+        assert "story 'Book' (recorded by fixture 'wide'" in result.stdout.str()
 
 
 @scenario(
@@ -2161,10 +2165,11 @@ def test_fixture_label_pin_into_an_unbound_story_is_refused(pytester):
     result.assert_outcomes(errors=1)
     result.stdout.fnmatch_lines(
         [
-            "*story 'book'*fixture 'arranged'*step 'a fixture label'*"
+            "*story 'Book'*fixture 'arranged'*step 'a fixture label'*"
             'which scenario*does not bind*'
         ]
     )
+    assert "story 'Book' (recorded by fixture 'arranged'" in result.stdout.str()
 
 
 def test_step_pin_in_wide_fixture_without_scenario_reports_the_cause(pytester):
