@@ -2,7 +2,8 @@
 
 ## Now
 
-- [ ] Implement activity pins: named activities, activity handles, multi-story scenarios ([spec](docs/specs/proposed/2026-09-21-activity-pins-design.md))
+- [ ] Rename to Domain Storytelling vocabulary: sentence, activity, clause ([spec](docs/specs/proposed/2026-09-26-sentences-and-clauses-design.md))
+- [ ] Implement pins: named sentences, sentence handles, multi-story scenarios; same release as the rename ([spec](docs/specs/proposed/2026-09-21-pins-design.md))
 - [ ] Make the docs sections for https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/ more explicit. Check for other pages that are too dense / unstructured.
 
 ## Next

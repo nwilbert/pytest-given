@@ -1,103 +1,116 @@
-# Activity Pins — Design Spec
+# Pins — Design Spec
 
 ## Goal
 
-Make a pin say which activity it means in a way that survives the story being edited, and let a
+Make a pin say which sentence it means in a way that survives the story being edited, and let a
 scenario bind to more than one story:
 
 ```python
 book_a_room = story('Book a room', [
-    activity(guest, 'searches for', room),
-    activity(guest, 'cancels', booking, name='cancel'),
+    sentence(guest, 'searches for', room),
+    sentence(guest, 'cancels', booking, name='cancel'),
 ])
 
-@scenario('Carol cancels', activities=book_a_room['cancel'])
+@scenario('Carol cancels', pins=book_a_room['cancel'])
 def test_cancel(): ...
 
 @scenario('Carol pays and gets a receipt', stories=[book_a_room, checkout])
 def test_pay():
-    with when(t'{guest} pays for the {booking}', activities=checkout['pay']):
+    with when(t'{guest} pays for the {booking}', pins=checkout['pay']):
         ...
 ```
 
-- An activity may have a **name**, which stays stable when rows are inserted, unlike its number.
-- A pin is written with an **activity handle**, `the_story['name']` or `the_story[3]`, which
-  carries its story. Steps and scenarios both take it as `activities=`.
+- A sentence may have a **name**, which stays stable when rows are inserted, unlike its number.
+- A pin is written with a **sentence handle**, `the_story['name']` or `the_story[3]`, which
+  carries its story. Steps and scenarios both take it as `pins=`.
 - A scenario pin replaces narration matching for its story instead of capping what matching finds.
   A scenario can bind to several stories, and the rule applies to each separately.
 
+This spec is written against the vocabulary of the
+[sentences and clauses spec](2026-09-26-sentences-and-clauses-design.md), which lands first. That
+spec leaves the pin arguments under their old names for this one to replace.
+
 ## Background
 
-`ActivityId` is `NewType('ActivityId', int)`. `story()` numbers rows 1..N in list order, and
-`activity(..., activity_id=12)` sets an explicit number (0 is the unset sentinel). The number is
-both what the report displays (the timeline bubble, the `Activity 3: …` chip) and what everything
-refers to an activity by (`given(..., activity=3)`, `@scenario(activities=[2, 3])`,
-`coverage[].activity_id`, `steps[].activity_ids`).
+`SentenceId` is `NewType('SentenceId', int)`. `story()` numbers sentences 1..N in list order, and
+`sentence(..., activity_id=12)` sets an explicit number (0 is the unset sentinel). The number is
+both what the report displays (the timeline bubble, the `Sentence 3: …` chip) and what everything
+refers to a sentence by (`given(..., activity=3)`, `@scenario(activities=[2, 3])`,
+`coverage[].sentence_id`, `steps[].activity_ids`).
 
 The problems:
 
-- **Pins drift.** Numbers are positional, so inserting a row silently re-targets every pin after
-  it. The authoring skill documents this trap, with explicit numbering as the workaround.
+- **Pins drift.** Numbers are positional, so inserting a sentence silently re-targets every pin
+  after it. The authoring skill documents this trap, with explicit numbering as the workaround.
 - **Scenario `activities=` is hard to explain.** It is an intersection: narration matching still
   runs, and anything found outside the listed ids is dropped (`report/coverage.py`). It neither
   guarantees the listed ids are covered nor stops matching. The reviewing skill paraphrases it as
   "can cover no others", which is only half of it.
 - **Grafted pins re-target.** A scenario binds to at most one story (`Scenario.story_id`), and a
-  bare-int pin means "row N of the scenario's story". A wider-scoped `@given` fixture records once,
-  while the first scenario that uses it is active; `_check_step_activity_scope` checks its pins
-  against that scenario only. `graft_recording` then copies the steps into later scenarios
-  unchecked, where `activity=3` points at row 3 of whatever story they bind.
+  bare-int pin means "sentence N of the scenario's story". A wider-scoped `@given` fixture records
+  once, while the first scenario that uses it is active; `_check_step_activity_scope` checks its
+  pins against that scenario only. `graft_recording` then copies the steps into later scenarios
+  unchecked, where `activity=3` points at sentence 3 of whatever story they bind.
 
 ## Design
 
 ### Number and name
 
-- `id: ActivityId` stays an int but is always the row's 1-based position, assigned by `story()` and
-  never settable. So it is always contiguous, which is how a Domain Storytelling diagram numbers its
-  arrows.
-- `name: ActivityName | None` is new, set by `activity(*parts, name=None)`.
-  - `ActivityName` is a `NewType('ActivityName', str)` beside `ActivityId` in `model/schema.py`.
+- `id: SentenceId` stays an int but is always the sentence's 1-based position, assigned by
+  `story()` and never settable. So it is always contiguous, which is how a Domain Storytelling
+  diagram numbers its sentences.
+- `name: SentenceName | None` is new, set by `sentence(*parts, name=None)`.
+  - `SentenceName` is a `NewType('SentenceName', str)` beside `SentenceId` in `model/schema.py`.
   - A name must be non-empty, free of leading and trailing whitespace, and unique within its story.
   - It is a lookup key only, never a report key, HTML id or hash parameter, so it needs no slug
     alphabet.
-  - Messages and the timeline quote names (`'cancel'`) and leave numbers bare, so a row named `'3'`
-    never reads as row 3.
+  - Messages and the timeline quote names (`'cancel'`) and leave numbers bare, so a sentence named
+    `'3'` never reads as sentence 3.
 
 `activity_id=` is removed, and with it the 0 sentinel, the skip-taken-numbers rule in
 `_assign_sequence_numbers`, and `_check_unique_ids`, which can no longer fail. Its one job, keeping
-pins stable across an inserted row, is what a name does better.
+pins stable across an inserted sentence, is what a name does better.
 
 Why `name=`: a glossary term's name is also the string its author picks and lookups go through.
-`g['Guest']` finds a term by name, and `book_a_room['cancel']` finds an activity by name.
+`g['Guest']` finds a term by name, and `book_a_room['cancel']` finds a sentence by name.
 
-### Activity handles
+### Sentence handles
 
-A story hands out **activity handles** to its rows, the way a glossary hands out term handles:
+A story hands out **sentence handles** to its sentences, the way a glossary hands out term handles:
 
-- `book_a_room['cancel']` looks a row up by name, `book_a_room[3]` by number. Both return an
-  `ActivityHandle`.
+- `book_a_room['cancel']` looks a sentence up by name, `book_a_room[3]` by number. Both return a
+  `SentenceHandle`.
 - A miss raises `PytestGivenError` where the expression is evaluated: at import for `@scenario` and
   decorator-form steps, when the line runs for a `with` step. Either way the traceback points at
-  the line that wrote the pin. The message lists the story's rows (`1`, `2 'search'`, …).
-- A number is a row number, not a list index: `0`, a negative number and a `bool` raise.
+  the line that wrote the pin. The message lists the story's sentences (`1`, `2 'search'`, …).
+- A number is a sentence number, not a list index: `0`, a negative number and a `bool` raise.
 
 Recording converts a handle into what the report stores, as it does for terms:
 
 | author writes | recorded as | model type |
 |---|---|---|
 | term handle, in narration | term ref | `NarrationTermRef` |
-| activity handle, in `activities=` | pin | `ActivityPin` |
+| sentence handle, in `pins=` | pin | `Pin` |
 
-- `ActivityPin` is a frozen `{story_id, activity_id}` in `model/schema.py`.
-- `ActivityHandle` lives on the capture side. It holds its pin plus the live `Story`, so
+- `Pin` is a frozen `{story_id, sentence_id}` in `model/schema.py`.
+- `SentenceHandle` lives on the capture side. It holds its pin plus the live `Story`, so
   `@scenario` can register a story it reaches only through a pin, and `model/` stays the leaf.
 - `__getitem__` lives on the capture-side story subclass that `story()` already returns, and
   `story()`'s return annotation names that subclass so type checkers see the lookup.
 
-A step and `@scenario` both take `activities=`, as `ActivityHandle | Sequence[ActivityHandle]`: the
-plural keyword accepts one handle or several, as `stories=` and `tags=` do. Step `activity=` goes.
-Bare ints and strings are rejected with a message showing the handle form. Capture therefore never
-resolves a number or name against "the scenario's story".
+A step and `@scenario` both take `pins=`, as `SentenceHandle | Sequence[SentenceHandle]`: the
+plural keyword accepts one handle or several, as `stories=` and `tags=` do. Step `activity=` and
+scenario `activities=` go. Bare ints and strings are rejected with a message showing the handle
+form. Capture therefore never resolves a number or name against "the scenario's story".
+
+Why `pins=`:
+
+- The keyword, the glossary term, the model fields and the JSON field are one word.
+- It names the mechanism. Coverage is the result, and narration matching produces it too, so a
+  pin keyword should say how the scenario binds, not what the report shows.
+- It carries the override. Pinning a dependency version means choosing it instead of letting a
+  resolver pick; pinning a sentence means choosing it instead of letting narration matching find
+  it.
 
 "Pin" becomes a glossary term, so the internal glossary carrier in `capture/story.py` (`_Pinned`,
 `pinned_glossaries`) is renamed, e.g. to `_GlossaryCarrier` / `carried_glossaries`.
@@ -109,16 +122,16 @@ opposite ways:
 
 - `stories=` lists the stories the scenario is **narration-matched** against. Step pins may point
   only into these.
-- `activities=` lists the rows the scenario **pins**. Each pin binds its story, and no matching
-  runs against that story.
+- `pins=` lists the sentences the scenario **pins**. Each pin binds its story, and no matching runs
+  against that story.
 
 A story named by both raises at decoration time: the two arguments ask for opposite things. A
 scenario's stories are the `stories=` list followed by the pinned stories, in order of first
 appearance.
 
 `Scenario.story_id` becomes `story_ids: tuple[StoryId, ...]`. `Scenario.activity_ids` and
-`Step.activity_ids` become `pins: tuple[ActivityPin, ...]`. `start_scenario` registers every story
-the scenario binds, since stories still reach the report only through a scenario.
+`Step.activity_ids` become `pins: tuple[Pin, ...]`. `start_scenario` registers every story the
+scenario binds, since stories still reach the report only through a scenario.
 
 ### Pins and coverage
 
@@ -133,17 +146,17 @@ pin for the whole scenario. For each story S the scenario binds:
 | some | some | error |
 
 "The rest" includes steps pinned into another story, since a pin into T says nothing about S. As
-today, a pin reaches under-anchored activities.
+today, a pin reaches under-anchored sentences.
 
-A scenario pin is an assertion that no narration backs. It covers its activities even when the test
+A scenario pin is an assertion that no narration backs. It covers its sentences even when the test
 fails early or is skipped (the rollup shows the scenario's status beside the chip). The docs say
-so, and the reviewing skill checks that the body exercises each pinned activity.
+so, and the reviewing skill checks that the body exercises each pinned sentence.
 
 `compute_coverage` returns a scenario's pins into S early, without matching. Pins of both forms are
 intersected with the story's ids, the one part of today's `scope` intersection that survives: a
 report replayed through `pytest-given report` is deserialized unvalidated, and a stale pin must not
-put a `Covers:` chip on a row that no longer exists. `CoverageMap` becomes
-`dict[NodeId, dict[StoryId, set[ActivityId]]]`. `build_coverage_map` and `build_story_rollups`
+put a `Covers:` chip on a sentence that no longer exists. `CoverageMap` becomes
+`dict[NodeId, dict[StoryId, set[SentenceId]]]`. `build_coverage_map` and `build_story_rollups`
 iterate over every story a scenario binds.
 
 ### Where pins are checked
@@ -161,7 +174,7 @@ The error for a step pin into an unbound story names the story and suggests `sto
 
 `Annotated[..., given('label', activity=...)]` is accepted today, and the pin is silently dropped:
 `_graft_annotated_leaves` passes only the narration on. `annotated_given_descriptors` now rejects a
-descriptor that carries `activities=`.
+descriptor that carries `pins=`.
 
 Parametrize grouping compares pins where it compared ids (`StepSignature`); rule 6 is unchanged.
 
@@ -169,9 +182,9 @@ Parametrize grouping compares pins where it compared ids (`StepSignature`); rule
 
 JSON:
 
-- `stories[].activities[]` becomes `{id, name, paths}`, with `name: null` when unnamed.
+- `stories[].sentences[]` gains `name`, `null` when unnamed.
 - `scenarios[].story_id` becomes `story_ids`.
-- `activity_ids` on scenarios and steps becomes `pins: [{story_id, activity_id}]`.
+- `activity_ids` on scenarios and steps becomes `pins: [{story_id, sentence_id}]`.
 - `coverage[]` keeps its shape, since it was already story-qualified.
 
 Serde reads the new fields back, `name` with `.get` like its optional neighbours. It does not read
@@ -179,15 +192,15 @@ the old field names, so a report saved before this change replays without its st
 
 HTML:
 
-- The timeline bubble keeps the number. A named row shows its name as a small muted tag beside it,
-  so an author can read the name off the timeline.
+- The timeline bubble keeps the number. A named sentence shows its name as a small muted tag
+  beside it, so an author can read the name off the timeline.
 - A scenario that binds several stories is listed under each of them, with the `Covers:` chips for
   that story.
-- In the app data, `scenarios[].story_id` becomes `story_ids`, and `scenario_activities` becomes
+- In the app data, `scenarios[].story_id` becomes `story_ids`, and `scenario_sentences` becomes
   `{node_id: {story_id: [ids]}}`.
-- The template reads `scn_covers[scn.id][story.id]`. The `app.js` activity filter checks
+- The template reads `scn_covers[scn.id][story.id]`. The `app.js` sentence filter checks
   `s.story_ids.includes(storyId)` and reads the ids under that story.
-- `highlightedActivities`, the `story:id` activity key and the activity chip are unchanged, because
+- The sentence highlights, the `story:id` sentence key and the sentence chip are unchanged, because
   they already live inside one selected story.
 
 Verified by Playwright only.
@@ -196,35 +209,35 @@ Verified by Playwright only.
 
 Each break gets a `**Breaking.**` entry with its migration:
 
-- `activity(..., activity_id=N)` is removed: rows are numbered by position, so name the row
-  (`name=`) and pin it by name.
-- Pins take activity handles under `activities=` on steps too: `given(..., activity=3)` becomes
-  `given(..., activities=the_story[3])`, and `@scenario(activities=[2, 3])` becomes
-  `activities=[the_story[2], the_story[3]]`, or `the_story['name']` for a named row.
+- `sentence(..., activity_id=N)` is removed: sentences are numbered by position, so name the
+  sentence (`name=`) and pin it by name.
+- Pins take sentence handles under `pins=`: `given(..., activity=3)` becomes
+  `given(..., pins=the_story[3])`, and `@scenario(activities=[2, 3])` becomes
+  `pins=[the_story[2], the_story[3]]`, or `the_story['name']` for a named sentence.
 - `@scenario(story=)` is now `stories=` and takes one story or several; a scenario pin binds its
   story without it.
-- `@scenario(activities=)` covers exactly the pinned activities, with no narration matching
-  against their story; a step pin into such a story raises.
+- `@scenario(pins=)` covers exactly the pinned sentences, with no narration matching against their
+  story; a step pin into such a story raises.
 - In the JSON report, `scenarios[].story_id` is now `story_ids`, and `activity_ids` on scenarios
   and steps is now `pins`.
 
-Under **Added**: activity names shown on the timeline, and scenarios that bind several stories.
+Under **Added**: sentence names shown on the timeline, and scenarios that bind several stories.
 Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead of dropping it.
 
 ### Docs, skills and glossary
 
 - `GLOSSARY.md`:
-  - *Handle* covers both term handles (`g['Guest']`) and activity handles
+  - *Handle* covers both term handles (`g['Guest']`) and sentence handles
     (`book_a_room['cancel']`).
-  - A new **Pin** row: what an activity handle in `activities=` is recorded as, as a term handle is
+  - A new **Pin** row: what a sentence handle in `pins=` is recorded as, as a term handle is
     recorded as a term ref. A pin binds explicitly and replaces narration matching for its story.
-  - The *Activity* row gains number and name. *Scenario↔activity binding* becomes `stories=` plus
-    pins. *Coverage* refers to *Pin*.
+  - The *Sentence* row gains number and name. *Scenario↔activity binding* becomes
+    *Scenario↔sentence binding*: `stories=` plus pins. *Coverage* refers to *Pin*.
 - Site guide:
   - `domain-storytelling.md`: handles, names, multi-story binding, the pin table, and unbacked
     scenario pins.
   - `scenarios.md`: the signature. Its "never a string" remark goes.
-  - `parametrized.md`: rule 6's `activity=` becomes `activities=`.
+  - `parametrized.md`: rule 6's `activity=` becomes `pins=`.
 - Authoring skill:
   - `api.md`: the signatures, and the retired `activity_id=`.
   - `stories.md`: stories reach the report through `stories=` or a pin, the step pin example
@@ -243,14 +256,15 @@ Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead
 
 ### Self-report and examples
 
-- **Dogfood story.** `tests/ubiquitous_language.py` names every row of `adopt_pytest_given`, and its
-  ~30 `activity=N` pins become `activities=adopt_pytest_given['…']`, behind a short alias if needed.
-  This story has the most pins an inserted row would re-target, so it shows the fix best.
+- **Dogfood story.** `tests/ubiquitous_language.py` names every sentence of `adopt_pytest_given`,
+  and its ~30 `activity=N` pins become `pins=adopt_pytest_given['…']`, behind a short alias if
+  needed. This story has the most pins an inserted sentence would re-target, so it shows the fix
+  best.
 - **New scenarios, one per rule:**
   - a handle resolves a name and a number, and a miss raises at its line;
   - a duplicate, empty or padded name is rejected;
-  - a scenario pin covers exactly its activities, including an under-anchored one;
-  - a story in both `stories=` and `activities=` raises;
+  - a scenario pin covers exactly its sentences, including an under-anchored one;
+  - a story in both `stories=` and `pins=` raises;
   - a step pin into a pinned story raises;
   - a step pin into an unbound story raises;
   - a wider-scoped fixture's pin raises when grafted into a scenario it doesn't fit;
@@ -259,36 +273,37 @@ Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead
 - **Changed scenarios:**
   - the `activity_id=0` scenario in `test_story.py` goes;
   - "A string `activities=` argument is refused" (`test_step_descriptor.py`) becomes the refusal of
-    bare ints and strings;
+    bare ints and strings under `pins=`;
   - the scope tests in `test_plugin.py` (scenario `activities=` combined with step pins) become the
     new error cases.
-- **Examples.** `hotel-booking` and `file-glossary-booking` move to `stories=`. `hotel-booking` gains a named, pinned
-  activity and a scenario bound to two stories.
+- **Examples.** `hotel-booking` and `file-glossary-booking` move to `stories=`. `hotel-booking`
+  gains a named, pinned sentence and a scenario bound to two stories.
 
 ## Considered and rejected
 
 - **Bare `int` / `str` pins beside handles.** They need "the scenario's story" to resolve against,
   which a multi-story scenario lacks. They also keep resolution at capture, where the graft went
   wrong.
-- **Pinning by the `Activity` object.** `story()` rebuilds rows to number them, so a row bound to a
-  variable before `story()` is not the row in the story. It would also force every pinned row out
-  of the story's inline list.
+- **Pinning by the `Sentence` object.** `story()` rebuilds sentences to number them, so a sentence
+  bound to a variable before `story()` is not the sentence in the story. It would also force every
+  pinned sentence out of the story's inline list.
 - **Inferring a step pin's story into the scenario's binding.** A scenario's stories would then
   depend on which steps ran.
 - **"Claim" for the scenario form.** It only contrasted with the old cap. Now both forms do one
   thing at two scopes, so one term, *Pin*, covers them.
-- **"Activity ref" instead of "pin".**
+- **"Sentence ref" instead of "pin".**
   - The glossary row would stay, since it still has to say that the binding replaces matching.
-  - `ActivityRef` would sit next to `ActivityTermRef` with the opposite meaning.
-  - Matching is itself a step's term refs reaching an activity, so "ref" would blur the difference
+  - Matching is itself a step's term refs reaching a sentence, so "ref" would blur the difference
     between pinned and matched coverage.
-- **`pins=` as the keyword.** `activities=` names what is passed, so a newcomer needs no glossary to
-  read it.
+- **`sentences=` as the keyword.** Accurate, but it says only what is passed, not that it overrides
+  matching, and it reads less naturally on a scenario than the old `activities=`.
+- **`covers=` as the keyword.** It matches the report's `Covers:` chips, but it names the result,
+  which matching also produces, and invites the reading "these as well as whatever matching finds".
 
 ## Forward notes
 
-- **A lint rule for unbacked scenario pins**: a pinned activity whose terms no step mentions. It
+- **A lint rule for unbacked scenario pins**: a pinned sentence whose terms no step mentions. It
   would be the mechanical counterpart of the reviewing check. Only worth building if that check
   keeps finding such pins.
-- **Story diagrams** (unmerged branch) take the arrow number from `int(activity.id)`, which keeps
+- **Story diagrams** (unmerged branch) take the arrow number from `int(sentence.id)`, which keeps
   working.
