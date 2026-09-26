@@ -18,6 +18,7 @@ from ..model import (
     Narration,
     NodeId,
     Phase,
+    Pin,
     PytestGivenError,
     PytestGivenWarning,
     Scenario,
@@ -223,8 +224,13 @@ class Collector:
             module=module,
             tags=tags,
             source=source,
-            story_id=story.id if story is not None else None,
-            activity_ids=activity_ids,
+            story_ids=(story.id,) if story is not None else (),
+            pins=tuple(
+                Pin(story_id=story.id, sentence_id=sentence_id)
+                for sentence_id in activity_ids
+            )
+            if story is not None
+            else (),
         )
         self._step_stack = []
         self._started_at = None
@@ -364,11 +370,14 @@ class Collector:
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
                 ' — restructure your test or use a phase-neutral helper'
             )
+        pins: tuple[Pin, ...] = ()
         if activity_ids:
-            self._check_step_activity_scope(phase, activity_ids)
-        step = Step(
-            phase=phase, narration=narration, activity_ids=activity_ids, source=source
-        )
+            story_id = self._check_step_activity_scope(phase, activity_ids)
+            pins = tuple(
+                Pin(story_id=story_id, sentence_id=sentence_id)
+                for sentence_id in activity_ids
+            )
+        step = Step(phase=phase, narration=narration, pins=pins, source=source)
         if stack:
             stack[-1].children.append(step)
         else:
@@ -387,7 +396,7 @@ class Collector:
         self,
         phase: Phase,
         activity_ids: tuple[SentenceId, ...],
-    ) -> None:
+    ) -> StoryId:
         if self._current_scenario is None:
             # A `@given` fixture scoped wider than `function` records even
             # when no scenario is active, so this is reachable from an
@@ -398,14 +407,18 @@ class Collector:
                 f'pulled in a fixture that records it '
                 f'(phase={phase!r}, ids={list(activity_ids)}).'
             )
-        story_id = self._current_scenario.story_id
+        story_id = (
+            self._current_scenario.story_ids[0]
+            if self._current_scenario.story_ids
+            else None
+        )
         story = self._discovered_stories[story_id] if story_id is not None else None
         if story is None:
             raise PytestGivenError(
                 f'step activity= requires a story on the scenario '
                 f'(phase={phase!r}, ids={list(activity_ids)}).'
             )
-        scope = self._current_scenario.activity_ids
+        scope = tuple(pin.sentence_id for pin in self._current_scenario.pins)
         valid = scope or tuple(sentence.id for sentence in story.sentences)
         valid_set = set(valid)
         for sentence_id in activity_ids:
@@ -420,6 +433,7 @@ class Collector:
                 f'step activity={sentence_id} not in story {story.title!r} '
                 f'(valid: {sorted(valid_set)}).'
             )
+        return story.id
 
     def pop_step(self) -> Step | None:
         stack = self._target_stack()

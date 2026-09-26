@@ -7,6 +7,7 @@ from pytest_given.model import (
     NarrationLiteral,
     NarrationTermRef,
     NodeId,
+    Pin,
     Scenario,
     Sentence,
     SentenceId,
@@ -124,17 +125,11 @@ def test_sentence_with_clauses_from_different_actors_is_covered():
         assert coverage == {built.id}
 
 
-def _step(phase, *term_refs, activity_ids=()):
+def _step(phase, *term_refs, pins=()):
     return Step(
         phase=phase,
-        narration=Narration(
-            text='x',
-            parts=(
-                NarrationLiteral(value='x'),
-                *list(term_refs),
-            ),
-        ),
-        activity_ids=tuple(SentenceId(i) for i in activity_ids),
+        narration=Narration(text='x', parts=(NarrationLiteral(value='x'), *term_refs)),
+        pins=tuple(Pin(story_id=StoryId('s'), sentence_id=SentenceId(i)) for i in pins),
     )
 
 
@@ -157,14 +152,14 @@ def test_s_for_step_collects_term_ids_whatever_the_display():
         assert refs == {TermId('guest'), TermId('search')}
 
 
-def _scenario_with_steps(*steps, activity_ids=()):
+def _scenario_with_steps(*steps, pins=()):
     return Scenario(
         id=NodeId('test'),
         narration=Narration(text='scn'),
         module='m',
         steps=list(steps),
-        story_id=StoryId('story'),
-        activity_ids=tuple(SentenceId(i) for i in activity_ids),
+        story_ids=(StoryId('s'),),
+        pins=tuple(Pin(story_id=StoryId('s'), sentence_id=SentenceId(i)) for i in pins),
     )
 
 
@@ -279,12 +274,14 @@ def test_compute_coverage_lost_when_sentence_gains_a_term():
 
 
 @scenario(
-    t'A {pg["Scenario"].low} {pg["Sentence"].low} binding '
-    t'constrains {pg["Coverage"].low}',
+    t'A {pg["Scenario"].low} {pg["Pin"].low} covers exactly its '
+    t'{pg["Sentence"]("sentences")}',
 )
-def test_compute_coverage_scenario_constrained_to_activity_ids():
-    with given(t'a {pg["Story"]} with two matching sentences'):
-        a1 = Sentence(
+def test_compute_coverage_scenario_pin_replaces_matching():
+    with given(
+        t'a {pg["Story"]} with a matching and an under-anchored {pg["Sentence"]}'
+    ):
+        matching = Sentence(
             id=SentenceId(1),
             clauses=(
                 _clause(
@@ -294,35 +291,85 @@ def test_compute_coverage_scenario_constrained_to_activity_ids():
                 ),
             ),
         )
-        a2 = Sentence(
+        under_anchored = Sentence(
             id=SentenceId(2),
             clauses=(
                 _clause(
                     _entity('guest', 'Guest'),
-                    _term_part('search'),
-                    _entity('room', 'Room'),
+                    ClauseWord(text='browses'),
+                    ClauseWord(text='listings'),
                 ),
             ),
         )
-        story = Story(id=StoryId('s'), title='S', sentences=(a1, a2))
+        story = Story(id=StoryId('s'), title='S', sentences=(matching, under_anchored))
     with given(
-        t'a {pg["Scenario"]} {pg["Scenario↔sentence binding"]("bound")} '
-        t'only to sentence 1'
+        t'a {pg["Scenario"]} whose {pg["Step"]} matches sentence 1 but which pins '
+        t'sentence 2'
     ):
-        scenario = _scenario_with_steps(
+        scenario_ = _scenario_with_steps(
             _step(
                 'when',
                 _term_ref('guest', 'Guest'),
                 _term_ref('search', 'search'),
                 _term_ref('room', 'Room'),
             ),
-            activity_ids=[1],
+            pins=[2],
         )
     with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
-        coverage = compute_coverage(scenario, build_story_index(story))
-    with then(t'{pg["Coverage"]} considers only the bound {pg["Sentence"]}'):
-        assert SentenceId(1) in coverage
-        assert SentenceId(2) not in coverage
+        coverage = compute_coverage(scenario_, build_story_index(story))
+    with then(t'only the pinned {pg["Sentence"]} is covered, matching never ran'):
+        assert coverage == {SentenceId(2)}
+
+
+def _guest_search_room_story():
+    only = Sentence(
+        id=SentenceId(1),
+        clauses=(
+            _clause(
+                _entity('guest', 'Guest'), _term_part('search'), _entity('room', 'Room')
+            ),
+        ),
+    )
+    return Story(id=StoryId('s'), title='S', sentences=(only,))
+
+
+def _matching_step(**kwargs):
+    return _step(
+        'when',
+        _term_ref('guest', 'Guest'),
+        _term_ref('search', 'search'),
+        _term_ref('room', 'Room'),
+        **kwargs,
+    )
+
+
+def test_compute_coverage_drops_pins_naming_no_sentence_of_the_story():
+    """A replayed report is deserialized unvalidated; a stale pin must not
+    put a chip on a sentence that does not exist."""
+    index = build_story_index(_guest_search_room_story())
+    assert compute_coverage(_scenario_with_steps(pins=[1, 99]), index) == {
+        SentenceId(1)
+    }
+    assert (
+        compute_coverage(_scenario_with_steps(_step('when', pins=[99])), index) == set()
+    )
+
+
+def test_compute_coverage_matches_a_step_pinned_into_another_story():
+    step = _matching_step()
+    step.pins = (Pin(story_id=StoryId('t'), sentence_id=SentenceId(1)),)
+    coverage = compute_coverage(
+        _scenario_with_steps(step), build_story_index(_guest_search_room_story())
+    )
+    assert coverage == {SentenceId(1)}
+
+
+def test_compute_coverage_ignores_a_scenario_pin_into_another_story():
+    scenario_ = _scenario_with_steps(_matching_step())
+    scenario_.pins = (Pin(story_id=StoryId('t'), sentence_id=SentenceId(9)),)
+    assert compute_coverage(
+        scenario_, build_story_index(_guest_search_room_story())
+    ) == {SentenceId(1)}
 
 
 @scenario(
@@ -383,7 +430,7 @@ def test_is_coverage_eligible_false_for_all_bare_sentence():
 def test_compute_coverage_excludes_under_anchored_sentence():
     """A sentence with fewer than two distinct terms is excluded from
     narration matching (replaces the old 'empty refs matches every step'
-    behavior). An explicit `activity=` pin still reaches it — the sibling
+    behavior). A pin still reaches it — the sibling
     scenario below."""
     with given(t'a {pg["Story"]} whose {pg["Sentence"]} is all bare words'):
         a = Sentence(
@@ -443,7 +490,7 @@ def test_compute_coverage_nested_steps_are_walked():
     t'An explicit {pg["Step"].low} binding covers an eligible {pg["Sentence"].low}',
 )
 def test_compute_coverage_explicit_step_binding_covers_eligible_sentence():
-    """An explicit step activity_ids binding covers an eligible (>=2 distinct
+    """A step pin covers an eligible (>=2 distinct
     term) sentence directly, without narration matching."""
     with given(t'a {pg["Story"]} with a coverage-eligible {pg["Sentence"]}'):
         sentence = Sentence(
@@ -461,7 +508,7 @@ def test_compute_coverage_explicit_step_binding_covers_eligible_sentence():
         t'a {pg["Step"]} {pg["Scenario↔sentence binding"]("bound")} '
         t'to it explicitly by id'
     ):
-        scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
+        scenario = _scenario_with_steps(_step('when', pins=[1]))
     with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(scenario, build_story_index(story))
     with then(t'{pg["Coverage"]} counts it directly, without narration matching'):
@@ -490,7 +537,7 @@ def test_compute_coverage_explicit_binding_covers_under_anchored_sentence():
         t'a {pg["Step"]} {pg["Scenario↔sentence binding"]("bound")} '
         t'to it explicitly by id'
     ):
-        scenario = _scenario_with_steps(_step('when', activity_ids=[1]))
+        scenario = _scenario_with_steps(_step('when', pins=[1]))
     with when(t'{pg["Coverage"]} is computed against the {pg["Story"]}'):
         coverage = compute_coverage(scenario, build_story_index(story))
     with then(t'{pg["Coverage"]} counts it, despite the missing anchors'):

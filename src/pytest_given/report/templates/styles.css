@@ -1102,6 +1102,7 @@ span.param-highlight {
 }
 .sentence-row:hover .sentence-num:not(.sentence-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
 .sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sentence-name { align-self: flex-start; font-size: var(--font-size-sm); color: var(--text-muted); font-family: var(--font-mono); }
 .sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 /* Counts side by side, separated by space rather than a glyph. */

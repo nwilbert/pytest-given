@@ -413,6 +413,8 @@
                     :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
                     aria-label="Select sentence {{ sentence.id }}">{{ sentence.id }}</button>
             <div class="sentence-body">
+              {#- Quoted, so a sentence named '3' never reads as sentence 3. -#}
+              {% if sentence.name %}<span class="sentence-name">'{{ sentence.name }}'</span>{% endif %}
               {% for clause in sentence.clauses %}
               <div class="sentence-clause">
                 {% for part in clause.parts %}{{ part | clause_part }}{% endfor %}
@@ -444,10 +446,11 @@
           <div class="story-section-heading">Scenarios</div>
           <div class="scenario-list">
           {% for scn in story_scns %}
+          {% set covers = scn_covers[scn.id].get(story.id, []) %}
           <div class="scenario {{ scn.status }}"
                {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
                   the `"` its own string literals need. #}
-               data-covers='{{ scn_covers.get(scn.id, []) | tojson }}'
+               data-covers='{{ covers | tojson }}'
                x-show="sentenceSelectionMatches(JSON.parse($el.dataset.covers))">
             <div class="scenario-header scenario-header-empty">
               <div style="display:flex; align-items:center;">
@@ -458,10 +461,10 @@
                 {{ status_badge(scn.status) }}
               </span>
             </div>
-            {% if scn_covers.get(scn.id) %}
+            {% if covers %}
             <div class="scn-sentence-strip">
               <span class="scn-sentence-label">Covers:</span>
-              {% for sentence_id in scn_covers.get(scn.id, []) %}
+              {% for sentence_id in covers %}
               <button type="button" class="btn-reset use-chip" data-sentence-id="{{ sentence_id }}"
                       :class="{ 'use-chip-highlight': highlightedSentences[$el.dataset.sentenceId] }"
                       :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"

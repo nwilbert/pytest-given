@@ -25,12 +25,14 @@ from pytest_given.model import (
     NodeId,
     ParamInfo,
     ParamSpec,
+    Pin,
     PytestGivenError,
     Scenario,
     SentenceId,
     SourceLocation,
     Step,
     StepPath,
+    StoryId,
     TermId,
     narration_of,
     narration_text,
@@ -2793,10 +2795,12 @@ def test_shape_separates_different_shapes() -> None:
 
 
 def test_shape_separates_steps_claiming_different_sentences() -> None:
-    """`activity=` is a per-call argument, so one case's step can claim an
+    """`pins=` is a per-call argument, so one case's step can claim a
     sentence another's does not — and the grouped tree keeps only one set."""
     claimed = [_sig_step('given', 'a')]
-    claimed[0] = dataclasses.replace(claimed[0], activity_ids=(SentenceId(2),))
+    claimed[0] = dataclasses.replace(
+        claimed[0], pins=(Pin(story_id=StoryId('s'), sentence_id=SentenceId(2)),)
+    )
     assert _shape_of(_sig_tree()[:1]) != _shape_of(claimed)
 
 
@@ -2805,7 +2809,7 @@ def test_shape_of_an_empty_tree_is_empty() -> None:
 
 
 def test_cases_claiming_different_sentences_say_so() -> None:
-    """`activity=` is a per-call argument, so two cases can genuinely claim
+    """`pins=` is a per-call argument, so two cases can genuinely claim
     different ids at one path. The grouped tree keeps one set — but that is not
     'a different step structure', and the fix is smaller than declining the
     grouping."""
@@ -2819,7 +2823,7 @@ def test_cases_claiming_different_sentences_say_so() -> None:
                 Step(
                     phase='given',
                     narration=Narration(text='a machine'),
-                    activity_ids=(SentenceId(ids),),
+                    pins=(Pin(story_id=StoryId('s'), sentence_id=SentenceId(ids)),),
                 )
             ],
         )

@@ -21,10 +21,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The documentation lives at <https://nwilbert.github.io/pytest-given/>; the README keeps the overview and quick start, and the bundled skills and the `--given-source-link` / `--source-link` help text point at the site.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that is remembered per browser.
+- The Stories timeline shows a named sentence's name beside its number.
 
 ### Changed
 
 - **Breaking.** `sentence(..., activity_id=N)` is removed: sentences are numbered by position, so name the sentence (`name=`) and pin it by name.
+- **Breaking.** In the JSON report, `scenarios[].story_id` is now `story_ids`, and `activity_ids` on scenarios and steps is now `pins` (`[{story_id, sentence_id}]`); a report saved before this change replays without its story bindings.
 - **Breaking.** `activity()` is now `sentence()`, `path()` is now `clause()`, and `Glossary.verb()` is now `Glossary.activity()`: rename the calls and imports.
 - **Breaking.** A file glossary's kind column says `activity` where it said `verb`.
 - **Breaking.** In the JSON report, `stories[].activities[]` is now `stories[].sentences[]` with `clauses` in place of `paths`, the term kind `"verb"` is now `"activity"`, and `coverage[].activity_id` is now `sentence_id`. Regenerate saved reports: `pytest-given report` rejects a `verb` kind.

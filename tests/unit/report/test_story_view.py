@@ -1,6 +1,8 @@
 """Unit tests for the Stories-view rollups (`report/story_view.py`), plus
 the tab visibility the report shell derives."""
 
+import dataclasses
+
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
     Clause,
@@ -12,6 +14,7 @@ from pytest_given.model import (
     Narration,
     NarrationTermRef,
     NodeId,
+    Pin,
     ReportData,
     Scenario,
     Sentence,
@@ -115,11 +118,11 @@ def test_build_coverage_maps_produces_per_scenario_dicts() -> None:
         narration=Narration(text='scn'),
         module='m',
         steps=[step],
-        story_id=StoryId('book'),
+        story_ids=(StoryId('book'),),
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     maps = build_coverage_map(rd)
-    assert SentenceId(1) in maps[NodeId('test::x')]
+    assert SentenceId(1) in maps[NodeId('test::x')][StoryId('book')]
 
 
 def test_build_coverage_maps_empty_for_scenario_without_story() -> None:
@@ -132,7 +135,7 @@ def test_build_coverage_maps_empty_for_scenario_without_story() -> None:
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     maps = build_coverage_map(rd)
-    assert maps[NodeId('t')] == set()
+    assert maps[NodeId('t')] == {}
 
 
 def test_build_coverage_maps_empty_when_no_glossary() -> None:
@@ -144,22 +147,22 @@ def test_build_coverage_maps_empty_when_no_glossary() -> None:
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn])
     maps = build_coverage_map(rd)
-    assert maps == {NodeId('t'): set()}
+    assert maps == {NodeId('t'): {}}
 
 
 def test_build_coverage_maps_empty_for_scenario_with_unknown_story_id() -> None:
-    """Scenario has a story_id that doesn't match any story in the report."""
+    """Scenario has a story id that doesn't match any story in the report."""
     g = _g()
     scn = Scenario(
         id=NodeId('t'),
         narration=Narration(text='s'),
         module='m',
         steps=[],
-        story_id=StoryId('nonexistent'),
+        story_ids=(StoryId('nonexistent'),),
     )
     rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     maps = build_coverage_map(rd)
-    assert maps[NodeId('t')] == set()
+    assert maps[NodeId('t')] == {}
 
 
 @scenario(
@@ -233,12 +236,12 @@ def test_build_story_rollups_pinned_under_anchored_sentence_is_tracked() -> None
             narration=Narration(text='a'),
             module='m',
             status='passed',
-            story_id=StoryId('book'),
+            story_ids=(StoryId('book'),),
             steps=[
                 Step(
                     phase='when',
                     narration=Narration(text='the listing page is opened'),
-                    activity_ids=[SentenceId(1)],
+                    pins=(Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),),
                 )
             ],
         )
@@ -273,7 +276,7 @@ def _covering_scn(node_id: str, status: str) -> Scenario:
         narration=Narration(text='scn'),
         module='m',
         steps=[step],
-        story_id=StoryId('book'),
+        story_ids=(StoryId('book'),),
         status=status,
     )
 
@@ -306,6 +309,57 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
     assert cov.passed == 2
     assert cov.failed == 1
     assert cov.skipped == 1
+
+
+@scenario(
+    t'A {pg["Scenario"].low} bound to two {pg["Story"]("stories")} is matched '
+    t'against each',
+)
+def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
+    with given(
+        t'two {pg["Story"]("stories")} each with a guest-search-room {pg["Sentence"]}'
+    ):
+        glossary = _g()
+        clauses = (
+            Clause(
+                parts=(
+                    _ent('guest', 'Guest'),
+                    _activity_part('search'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        )
+        book = Story(
+            id=StoryId('book'),
+            title='Book',
+            sentences=(Sentence(id=SentenceId(1), clauses=clauses),),
+        )
+        stay = Story(
+            id=StoryId('stay'),
+            title='Stay',
+            sentences=(Sentence(id=SentenceId(1), clauses=clauses),),
+        )
+    with given(
+        t'a {pg["Scenario"]} bound to both whose {pg["Step"]} names those terms'
+    ):
+        both = dataclasses.replace(
+            _covering_scn('test::both', 'passed'),
+            story_ids=(StoryId('book'), StoryId('stay')),
+        )
+        report = ReportData(
+            metadata=_meta(), scenarios=[both], stories=[book, stay], glossary=glossary
+        )
+    with when('the story rollups are built'):
+        rollups = build_story_rollups(report, build_coverage_map(report))
+    with then(
+        t'the {pg["Scenario"]} is listed under, and covers, both '
+        t'{pg["Story"]("stories")}'
+    ):
+        for story_id in (StoryId('book'), StoryId('stay')):
+            assert rollups[story_id].scenarios == [both]
+            assert rollups[story_id].per_sentence[SentenceId(1)].scenario_ids == [
+                both.id
+            ]
 
 
 @scenario(

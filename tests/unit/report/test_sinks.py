@@ -164,7 +164,7 @@ def _story_report() -> ReportData:
                 module='tests.test_demo',
                 status='passed',
                 steps=[step],
-                story_id=StoryId('book'),
+                story_ids=(StoryId('book'),),
             )
         ],
         stories=[story],

@@ -105,7 +105,7 @@ function reportApp() {
   const data = window.__REPORT_DATA__;
   const storyIds = data.story_ids || [];
   const glossaryTerms = (data.glossary && data.glossary.terms) || [];
-  // Scenario -> covered sentence ids, and sentence key -> its prose. The story
+  // Scenario -> story -> covered sentence ids, and sentence key -> its prose. The story
   // markup paints that prose as pills, unreadable as a filter label.
   const scenarioSentences = data.scenario_sentences || {};
   const sentenceLabels = data.sentence_labels || {};
@@ -449,10 +449,9 @@ function reportApp() {
       }
       if (this.sentenceFilter) {
         const [storyId, sentenceId] = this.sentenceFilter.split(':');
-        if (s.story_id !== storyId) return false;
-        if (!(scenarioSentences[s.id] || []).includes(Number(sentenceId))) {
-          return false;
-        }
+        if (!s.story_ids.includes(storyId)) return false;
+        const covered = (scenarioSentences[s.id] || {})[storyId] || [];
+        if (!covered.includes(Number(sentenceId))) return false;
       }
       if (query && !searchHaystacks[index].includes(query)) return false;
       return true;

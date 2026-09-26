@@ -47,7 +47,7 @@ for relpath, group in sorted(by_file.items()):
         chunks.append(
             f'### {relpath}:{anchor} [{scenario["status"]}] '
             f'[tags: {", ".join(scenario["tags"]) or "-"}] '
-            f'[story: {scenario["story_id"] or "-"}]\n'
+            f'[stories: {", ".join(scenario["story_ids"]) or "-"}]\n'
             f'TITLE: {scenario["narration"]["text"]}\n{body}\n'
         )
     path = out / (relpath.replace('/', '__') + '.txt')

@@ -47,7 +47,7 @@ class SentenceCoverage:
     def untracked(self) -> bool:
         """Whether the report can say nothing about this sentence.
 
-        Ineligibility alone no longer settles it: an `activity=` pin covers an
+        Ineligibility alone no longer settles it: a pin covers an
         under-anchored sentence that narration matching cannot reach, and a
         covered sentence must never render as untracked.
         """
@@ -73,9 +73,8 @@ def build_story_rollups(
     """Per-story view-data: bound scenarios + per-sentence coverage rollup."""
     scenarios_by_story: dict[StoryId, list[Scenario]] = {}
     for scn in report.scenarios:
-        if scn.story_id is None:
-            continue
-        scenarios_by_story.setdefault(scn.story_id, []).append(scn)
+        for story_id in scn.story_ids:
+            scenarios_by_story.setdefault(story_id, []).append(scn)
 
     rollups: dict[StoryId, StoryRollup] = {}
     for story in report.stories:
@@ -86,7 +85,7 @@ def build_story_rollups(
             passed = 0
             skipped = 0
             for scn in scenarios:
-                if sentence.id not in coverage_maps[scn.id]:
+                if sentence.id not in coverage_maps[scn.id].get(story.id, set()):
                     continue
                 covered_by.append(scn.id)
                 if scn.status == 'passed':
@@ -131,8 +130,11 @@ def build_coverage_records(report: ReportData) -> list[CoverageRecord]:
 
 def build_scenario_sentence_index(
     coverage_maps: CoverageMap,
-) -> dict[NodeId, list[SentenceId]]:
-    return {scn_id: sorted(covered) for scn_id, covered in coverage_maps.items()}
+) -> dict[NodeId, dict[StoryId, list[SentenceId]]]:
+    return {
+        scn_id: {story_id: sorted(covered) for story_id, covered in per_story.items()}
+        for scn_id, per_story in coverage_maps.items()
+    }
 
 
 def build_sentence_labels(report: ReportData) -> dict[SentenceKey, str]:

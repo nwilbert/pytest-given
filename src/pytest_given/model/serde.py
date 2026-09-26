@@ -43,6 +43,7 @@ from .schema import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
+    Pin,
     ReportData,
     Scenario,
     Sentence,
@@ -189,8 +190,8 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         error=_error_from_dict(d.get('error')),
         skip_reason=d.get('skip_reason'),
         source=_source_from_dict(d.get('source')),
-        story_id=StoryId(d['story_id']) if d.get('story_id') else None,
-        activity_ids=tuple(SentenceId(i) for i in d.get('activity_ids') or ()),
+        story_ids=tuple(StoryId(story_id) for story_id in d.get('story_ids') or ()),
+        pins=_pins_from_list(d.get('pins')),
     )
 
 
@@ -207,8 +208,20 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         narration=_narration_from_dict(d['narration']),
         children=[_step_from_dict(c) for c in d.get('children', [])],
         attachments=[_step_attachment_from_dict(a) for a in d.get('attachments', [])],
-        activity_ids=tuple(SentenceId(i) for i in d.get('activity_ids') or ()),
+        pins=_pins_from_list(d.get('pins')),
         fixture_name=d.get('fixture_name'),
+    )
+
+
+def _pins_from_list(items: list[dict[str, Any]] | None) -> tuple[Pin, ...]:
+    """Old reports carry `story_id` / `activity_ids` instead; they are not read,
+    so such a report replays without its story bindings."""
+    return tuple(
+        Pin(
+            story_id=StoryId(item['story_id']),
+            sentence_id=SentenceId(item['sentence_id']),
+        )
+        for item in items or ()
     )
 
 

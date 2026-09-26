@@ -89,7 +89,7 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
             narration=Narration(text='s'),
             module='m',
             steps=[step],
-            story_id=StoryId('book'),
+            story_ids=(StoryId('book'),),
         )
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
         attach('Report data', report_to_dict(rd))
@@ -269,7 +269,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
             narration=Narration(text='s'),
             module='m',
             steps=[step],
-            story_id=StoryId('book'),
+            story_ids=(StoryId('book'),),
         )
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     with when(t'the {pg["Glossary"]} aggregations are built'):
@@ -382,7 +382,7 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
             narration=Narration(text='s'),
             module='m',
             steps=[fixture_step, body_step],
-            story_id=StoryId('book'),
+            story_ids=(StoryId('book'),),
         )
         a = Sentence(
             id=SentenceId(1),

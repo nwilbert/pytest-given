@@ -281,7 +281,7 @@ def _app_data(report: ReportData) -> dict[str, object]:
                 'module': scenario.module,
                 'tags': scenario.tags,
                 'status': scenario.status,
-                'story_id': scenario.story_id,
+                'story_ids': list(scenario.story_ids),
                 'narration': {'text': scenario.narration.text},
             }
             for scenario in report.scenarios

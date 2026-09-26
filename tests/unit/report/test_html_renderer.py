@@ -1630,7 +1630,7 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
                         ],
                         'parameters': None,
                         'error': None,
-                        'story_id': 'book-a-room',
+                        'story_ids': ['book-a-room'],
                     }
                 ],
             }
@@ -1748,7 +1748,7 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
                 ),
             )
         ],
-        story_id=story.id,
+        story_ids=(story.id,),
     )
     report = ReportData(
         metadata=Metadata(
@@ -2023,8 +2023,8 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                             }
                         ],
                     },
-                    'story_id': f'story{_BREAKOUT}',
-                    'activity_ids': [f'act{_BREAKOUT}'],
+                    'story_ids': [f'story{_BREAKOUT}'],
+                    'pins': [{'story_id': f'story{_BREAKOUT}', 'sentence_id': 1}],
                 }
             ],
             'stories': [
@@ -2225,7 +2225,7 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
                         'tags': [],
                         'status': 'passed',
                         'duration_ms': 0,
-                        'story_id': 'book-a-room',
+                        'story_ids': ['book-a-room'],
                         'steps': [
                             {
                                 'phase': 'when',
@@ -2257,7 +2257,7 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     app_data = _embedded_app_data(content)
-    assert app_data['scenario_sentences'] == {'test.py::test_x': [1]}
+    assert app_data['scenario_sentences'] == {'test.py::test_x': {'book-a-room': [1]}}
     assert app_data['sentence_labels'] == {'book-a-room:1': 'Carol searches for Room'}
 
 

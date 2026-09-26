@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-26T10:27:38.940623+00:00",
+    "timestamp": "2026-09-26T11:27:54.743602+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.2.0",
-    "commit_sha": "05960078bba4716e6f740da8a8ee57f58dffdd3d",
+    "commit_sha": "fa619a41c62bc6b1b578b241c600be4a4bc87e1b",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -39,7 +39,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         },
         {
@@ -72,7 +72,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         },
         {
@@ -100,7 +100,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         },
         {
@@ -128,7 +128,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         }
       ],
@@ -139,8 +139,10 @@
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 52
       },
-      "story_id": "book-a-room",
-      "activity_ids": []
+      "story_ids": [
+        "book-a-room"
+      ],
+      "pins": []
     },
     {
       "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room",
@@ -173,7 +175,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         },
         {
@@ -206,7 +208,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         },
         {
@@ -229,7 +231,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         },
         {
@@ -252,7 +254,7 @@
           },
           "children": [],
           "attachments": [],
-          "activity_ids": [],
+          "pins": [],
           "fixture_name": null
         }
       ],
@@ -263,8 +265,10 @@
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 67
       },
-      "story_id": "book-a-room",
-      "activity_ids": []
+      "story_ids": [
+        "book-a-room"
+      ],
+      "pins": []
     }
   ],
   "glossary": {
@@ -353,7 +357,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "name": null
         },
         {
           "id": 2,
@@ -374,7 +379,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "name": null
         },
         {
           "id": 3,
@@ -394,7 +400,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "name": null
         }
       ],
       "source": {

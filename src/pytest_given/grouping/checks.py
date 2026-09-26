@@ -25,10 +25,10 @@ from ..model import (
     NarrationValue,
     NodeId,
     Phase,
+    Pin,
     PytestGivenError,
     RawParamValue,
     Scenario,
-    SentenceId,
     Step,
     StepPath,
     case_suffix,
@@ -82,7 +82,7 @@ def check_same_template(group: Group) -> None:
             # Only the sentences differ, which `a different step structure`
             # would misdescribe — and the fix is to pick one sentence, not to
             # give up on grouping.
-            raise _varying_activity_error(case, group)
+            raise _varying_pins_error(case, group)
         for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
             # A comparable case has the baseline's exact structure, so every
             # baseline path exists in it — index, never `.get`.
@@ -118,7 +118,7 @@ def _varying_str_error(step: Step, group: Group) -> PytestGivenError:
     )
 
 
-def _varying_activity_error(case: Scenario, group: Group) -> PytestGivenError:
+def _varying_pins_error(case: Scenario, group: Group) -> PytestGivenError:
     return _grouping_error(
         group,
         f'case {case_suffix(case.id)} of {_test_name(group.anchor)!r} claims '
@@ -317,7 +317,7 @@ class StepSignature(NamedTuple):
 
     path: StepPath
     phase: Phase
-    activity_ids: tuple[SentenceId, ...]
+    pins: tuple[Pin, ...]
 
 
 class PartKey(NamedTuple):
@@ -337,15 +337,13 @@ def step_shape(indexed: Iterable[tuple[StepPath, Step]]) -> list[StepSignature]:
     Paths carry the nesting, so this needs no recursion — a `walk_steps`
     mapping is already DFS pre-order.
 
-    `activity_ids` is in here because `activity=` is a per-call argument, so
-    `given(t'…', activity=a if flag else b)` gives two cases genuinely
-    different ids at one path. The grouped tree keeps a single set, and
+    `pins` is in here because `pins=` is a per-call argument, so
+    `given(t'…', pins=a if flag else b)` gives two cases genuinely
+    different pins at one path. The grouped tree keeps a single set, and
     `report.coverage` reads exactly that field to credit story coverage — the
     same lie rule 4 refuses a varying term ref to prevent.
     """
-    return [
-        StepSignature(path, step.phase, step.activity_ids) for path, step in indexed
-    ]
+    return [StepSignature(path, step.phase, step.pins) for path, step in indexed]
 
 
 def step_structure(signature: list[StepSignature]) -> list[tuple[StepPath, Phase]]:

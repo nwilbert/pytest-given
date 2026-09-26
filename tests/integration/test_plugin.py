@@ -1791,7 +1791,7 @@ def test_step_activity_kwarg_propagates_to_report(pytester):
             sentence(guest('Alice'), search, room),
             sentence(guest, search, room('Suite'))])
 
-        @scenario('a scenario', story=s, activities=[1, 2, 3])
+        @scenario('a scenario', story=s)
         def test_x():
             with given('setup', activity=1):
                 pass
@@ -1802,8 +1802,11 @@ def test_step_activity_kwarg_propagates_to_report(pytester):
     result.assert_outcomes(passed=1)
     data = json.loads(pytester.path.joinpath('report.json').read_text())
     steps = data['scenarios'][0]['steps']
-    assert steps[0]['activity_ids'] == [1]
-    assert steps[1]['activity_ids'] == [2, 3]
+    assert steps[0]['pins'] == [{'story_id': 'activity-propagation', 'sentence_id': 1}]
+    assert steps[1]['pins'] == [
+        {'story_id': 'activity-propagation', 'sentence_id': 2},
+        {'story_id': 'activity-propagation', 'sentence_id': 3},
+    ]
 
 
 # --- Story binding recorded on the scenario ---
@@ -1821,14 +1824,14 @@ def test_scenario_story_id_appears_in_report(pytester):
 
         @scenario('x', story=s, activities=[1])
         def test_x():
-            with given('setup', activity=1):
+            with given('setup'):
                 pass
     """)
     pytester.runpytest('--given-json=report.json')
     data = json.loads(pytester.path.joinpath('report.json').read_text())
     scn = data['scenarios'][0]
-    assert scn['story_id'] == 'book'
-    assert scn['activity_ids'] == [1]
+    assert scn['story_ids'] == ['book']
+    assert scn['pins'] == [{'story_id': 'book', 'sentence_id': 1}]
 
 
 # --- Story binding validated at collection and at runtime ---

@@ -19,6 +19,7 @@ from pytest_given.model import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
+    Pin,
     PytestGivenError,
     ReportData,
     Scenario,
@@ -652,18 +653,40 @@ def test_report_data_with_no_glossary_or_stories_round_trips():
     assert rt.stories == []
 
 
-def test_scenario_story_id_and_activity_ids_round_trip():
+def test_scenario_story_ids_and_pins_round_trip():
+    pins = (
+        Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),
+        Pin(story_id=StoryId('book'), sentence_id=SentenceId(2)),
+    )
     scn = Scenario(
         id=NodeId('n'),
         narration=Narration(text='x'),
         module='m',
-        story_id=StoryId('book'),
-        activity_ids=(SentenceId(1), SentenceId(2)),
+        story_ids=(StoryId('book'),),
+        pins=pins,
     )
     report = ReportData(metadata=_meta(), scenarios=[scn])
     rt = _round_trip(report)
-    assert rt.scenarios[0].story_id == 'book'
-    assert rt.scenarios[0].activity_ids == (1, 2)
+    assert rt.scenarios[0].story_ids == (StoryId('book'),)
+    assert rt.scenarios[0].pins == pins
+
+
+def test_a_report_saved_before_pins_replays_without_story_bindings():
+    scn = Scenario(
+        id=NodeId('n'),
+        narration=Narration(text='x'),
+        module='m',
+        story_ids=(StoryId('book'),),
+        pins=(Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),),
+    )
+    data = report_to_dict(ReportData(metadata=_meta(), scenarios=[scn]))
+    scenario_dict = data['scenarios'][0]
+    del scenario_dict['story_ids'], scenario_dict['pins']
+    scenario_dict['story_id'] = 'book'
+    scenario_dict['activity_ids'] = [1]
+    replayed = report_from_dict(data)
+    assert replayed.scenarios[0].story_ids == ()
+    assert replayed.scenarios[0].pins == ()
 
 
 def test_sentence_name_round_trips_and_defaults_to_none():
@@ -678,7 +701,8 @@ def test_sentence_name_round_trips_and_defaults_to_none():
     assert [one.name for one in rt.stories[0].sentences] == ['cancel', None]
 
 
-def test_step_activity_ids_round_trip():
+def test_step_pins_round_trip():
+    pins = (Pin(story_id=StoryId('book'), sentence_id=SentenceId(7)),)
     scn = Scenario(
         id=NodeId('n'),
         narration=Narration(text='x'),
@@ -687,13 +711,13 @@ def test_step_activity_ids_round_trip():
             Step(
                 phase='given',
                 narration=Narration(text='s'),
-                activity_ids=(SentenceId(7),),
+                pins=pins,
             )
         ],
     )
     report = ReportData(metadata=_meta(), scenarios=[scn])
     rt = _round_trip(report)
-    assert rt.scenarios[0].steps[0].activity_ids == (7,)
+    assert rt.scenarios[0].steps[0].pins == pins
 
 
 def test_clause_part_unknown_shape_raises():
@@ -912,7 +936,7 @@ def _every_field_populated() -> ReportData:
             ),
         ],
         fixture_name='shop',
-        activity_ids=(SentenceId(1),),
+        pins=(Pin(story_id=StoryId('booking'), sentence_id=SentenceId(1)),),
         source=SourceLocation(relpath='t.py', line=9),
         children=[Step(phase='then', narration=Narration(text='it holds'))],
     )
@@ -959,8 +983,8 @@ def _every_field_populated() -> ReportData:
         error=ErrorInfo(message='boom', frames=[], error_tail=None),
         skip_reason=None,
         source=SourceLocation(relpath='t.py', line=5),
-        story_id=StoryId('booking'),
-        activity_ids=(SentenceId(1),),
+        story_ids=(StoryId('booking'),),
+        pins=(Pin(story_id=StoryId('booking'), sentence_id=SentenceId(1)),),
     )
     return ReportData(
         metadata=Metadata(

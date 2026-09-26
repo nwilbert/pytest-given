@@ -24,6 +24,7 @@ from pytest_given.model import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
+    Pin,
     ReportData,
     Scenario,
     Sentence,
@@ -422,36 +423,37 @@ def test_report_data_accepts_glossary_and_stories() -> None:
     assert rd.glossary is g
 
 
-def test_scenario_defaults_story_id_none_and_activity_ids_empty() -> None:
-    s = Scenario(id=NodeId('n'), narration=Narration(text='t'), module='m')
-    assert s.story_id is None
-    assert s.activity_ids == ()
+def test_scenario_defaults_story_ids_and_pins_empty() -> None:
+    scenario_ = Scenario(id=NodeId('n'), narration=Narration(text='t'), module='m')
+    assert scenario_.story_ids == ()
+    assert scenario_.pins == ()
 
 
-def test_scenario_accepts_story_id_and_activity_ids() -> None:
-    s = Scenario(
+def test_scenario_accepts_story_ids_and_pins() -> None:
+    pins = (
+        Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),
+        Pin(story_id=StoryId('book'), sentence_id=SentenceId(2)),
+    )
+    scenario_ = Scenario(
         id=NodeId('n'),
         narration=Narration(text='t'),
         module='m',
-        story_id=StoryId('book'),
-        activity_ids=(SentenceId(1), SentenceId(2)),
+        story_ids=(StoryId('book'),),
+        pins=pins,
     )
-    assert s.story_id == 'book'
-    assert s.activity_ids == (1, 2)
+    assert scenario_.story_ids == ('book',)
+    assert scenario_.pins == pins
 
 
-def test_step_defaults_activity_ids_empty() -> None:
+def test_step_defaults_pins_empty() -> None:
     step = Step(phase='given', narration=Narration(text='t'))
-    assert step.activity_ids == ()
+    assert step.pins == ()
 
 
-def test_step_accepts_activity_ids() -> None:
-    step = Step(
-        phase='given',
-        narration=Narration(text='t'),
-        activity_ids=(SentenceId(3),),
-    )
-    assert step.activity_ids == (3,)
+def test_step_accepts_pins() -> None:
+    pins = (Pin(story_id=StoryId('book'), sentence_id=SentenceId(3)),)
+    step = Step(phase='given', narration=Narration(text='t'), pins=pins)
+    assert step.pins == pins
 
 
 def test_parameter_table_carries_typed_columns() -> None:
