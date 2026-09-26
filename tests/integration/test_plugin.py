@@ -2051,10 +2051,16 @@ def test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft(pytester):
         result = pytester.runpytest()
     with then(
         t'the first {pg["Scenario"].low} passes and the second errors at '
-        t'{pg["Graft"].low}'
+        t'{pg["Graft"].low}, naming the {pg["Step fixture"].low} and the '
+        t'offending step'
     ):
         result.assert_outcomes(passed=1, errors=1)
-        result.stdout.fnmatch_lines(["*story 'book', which scenario*does not bind*"])
+        result.stdout.fnmatch_lines(
+            [
+                "*story 'book'*fixture 'wide'*step 'an inner step'*"
+                'which scenario*does not bind*'
+            ]
+        )
 
 
 @scenario(
@@ -2153,7 +2159,12 @@ def test_fixture_label_pin_into_an_unbound_story_is_refused(pytester):
     """)
     result = pytester.runpytest()
     result.assert_outcomes(errors=1)
-    result.stdout.fnmatch_lines(["*story 'book', which scenario*does not bind*"])
+    result.stdout.fnmatch_lines(
+        [
+            "*story 'book'*fixture 'arranged'*step 'a fixture label'*"
+            'which scenario*does not bind*'
+        ]
+    )
 
 
 def test_step_pin_in_wide_fixture_without_scenario_reports_the_cause(pytester):

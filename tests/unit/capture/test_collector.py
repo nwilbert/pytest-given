@@ -684,12 +684,19 @@ def test_push_step_pin_outside_any_scenario_is_a_user_error():
 def test_graft_refuses_a_recording_whose_pin_does_not_fit(stories, pins):
     root = Step(
         phase='given',
-        narration=Narration(text='wide'),
+        narration=Narration(text='a module-scoped arrangement'),
+        fixture_name='wide',
         children=[
-            Step(phase='given', narration=Narration(text='inner'), pins=(_pin('a'),))
+            Step(
+                phase='given',
+                narration=Narration(text='an inner step'),
+                pins=(_pin('a'),),
+            )
         ],
     )
     collector = Collector()
     collector.start_scenario('id', 'later', 'mod', [], stories=stories, pins=pins)
-    with pytest.raises(PytestGivenError, match="story 'a'"):
+    with pytest.raises(PytestGivenError, match="story 'a'") as excinfo:
         collector.graft_recording(root)
+    assert "fixture 'wide'" in str(excinfo.value)
+    assert "step 'an inner step'" in str(excinfo.value)

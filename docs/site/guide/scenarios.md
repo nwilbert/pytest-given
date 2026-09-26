@@ -12,9 +12,9 @@ Required for a test to appear in the report. `stories=` (one story or several) a
 
 ## `given` / `when` / `then`
 
-`given(text)`, `when(text)`, `then(text)`
+`given(text, *, pins=None)`, `when(text, *, pins=None)`, `then(text, *, pins=None)`
 
-Dual-purpose: use as a **context manager** inside a test body, or as a **decorator** on a fixture or helper function.
+Dual-purpose: use as a **context manager** inside a test body, or as a **decorator** on a fixture or helper function. `pins=` binds the step to a story sentence regardless of its narration — see [Domain Storytelling](domain-storytelling.md).
 
 As context managers:
 

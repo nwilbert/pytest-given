@@ -73,13 +73,16 @@ class Story(BaseStory, _GlossaryCarrier):
         number, never a list index, so 0, negatives and bools miss."""
         found = _find_sentence(self.sentences, key)
         if found is None:
-            listing = ', '.join(
-                f'{one.id} {one.name!r}' if one.name is not None else str(one.id)
-                for one in self.sentences
-            )
+            if self.sentences:
+                listing = ', '.join(
+                    f'{one.id} {one.name!r}' if one.name is not None else str(one.id)
+                    for one in self.sentences
+                )
+                detail = f'its sentences are {listing}.'
+            else:
+                detail = 'it has no sentences.'
             raise PytestGivenError(
-                f'story {self.title!r} has no sentence {key!r}; '
-                f'its sentences are {listing}.'
+                f'story {self.title!r} has no sentence {key!r}; {detail}'
             )
         return SentenceHandle(
             pin=Pin(story_id=self.id, sentence_id=found.id), story=self
@@ -177,8 +180,8 @@ def sentence(
     *parts_or_clauses: _ClauseArg | Clause,
     name: str | None = None,
 ) -> UnnumberedSentence:
-    """Build a Sentence from either positional parts (single clause) or
-    positional Clause instances (multi-clause). Mixing raises.
+    """Build an UnnumberedSentence from either positional parts (single
+    clause) or positional Clause instances (multi-clause). Mixing raises.
 
     Its number is its position, which `story()` assigns.
     """
@@ -195,10 +198,12 @@ def sentence(
     else:
         clauses = (clause(*parts_or_clauses),)  # type: ignore[arg-type]
     glossaries = union_glossaries(carried_glossaries(one) for one in clauses)
-    if name is not None and (not name or name != name.strip()):
+    if name is not None and (
+        not isinstance(name, str) or not name or name != name.strip()
+    ):
         raise PytestGivenError(
-            f'a sentence name must be non-empty, with no leading or trailing '
-            f'whitespace; got {name!r}.'
+            f'a sentence name must be a non-empty str, with no leading or '
+            f'trailing whitespace; got {name!r}.'
         )
     return UnnumberedSentence(
         clauses=clauses,

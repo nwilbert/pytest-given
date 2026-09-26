@@ -13,7 +13,7 @@ Glossary fixtures/locals the unit tests build for their own domain-under-test.
 arc, from Domain Expert elicitation through Agent-authored scenarios and the
 Collector/Renderer machinery to stakeholder review. Backend scenarios bind to
 it via ``@scenario(stories=adopt_pytest_given)`` plus a
-``pins=adopt_pytest_given['graft']`` pin on the one step that genuinely
+``pins=adopt_pytest_given['<name>']`` pin on the one step that genuinely
 demonstrates that sentence. Verbs are bare words —
 story prose, not glossary vocabulary (see the design spec) — except *Graft*
 and *Group*, existing terms whose meaning is the verb. The ``_t`` suffix

@@ -14,8 +14,9 @@ verbs that are plain sentence prose — *searches for*, *selects*, *adds*,
 the activities a hotel would define (confirm, decline, cancel, refund) are
 terms.
 
-Three scenarios implement the Story at varying detail, each in full
-Given/When/Then form:
+Four scenarios bind to the Story. Three implement it at varying detail, each
+in full Given/When/Then form; the fourth, `test_check_in_then_cancel`, binds a
+second story too and is described below:
 
 * `test_pick_suite` — happy path, covers sentences 1-2. Both sentences
   narrate the same two terms (Organizer, Room) — their verbs are bare — so

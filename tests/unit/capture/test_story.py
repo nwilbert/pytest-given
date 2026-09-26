@@ -789,6 +789,17 @@ def test_non_handle_part_names_its_type(guest, room):
         clause(guest, 42, room)
 
 
+def test_sentence_rejects_a_non_str_name(guest, search, room):
+    with pytest.raises(PytestGivenError, match='sentence name'):
+        sentence(guest, search, room, name=3)
+
+
+def test_story_lookup_on_empty_story_says_it_has_no_sentences():
+    built = story('Empty', [])
+    with pytest.raises(PytestGivenError, match='it has no sentences'):
+        _ = built[1]
+
+
 def test_misplaced_instances_name_their_canonical_term(g, tmp_path):
     # Plain, not narrated: one rule ("a misplaced part names its term") is
     # already covered above; these are its surface forms, and a scenario each

@@ -339,10 +339,18 @@ class Collector:
         assert self._current_scenario is not None
         grafted = copy.deepcopy(root)
         # A wider-scoped fixture recorded once, against the first scenario that
-        # used it; a later one may not fit its pins.
+        # used it; a later one may not fit its pins. The traceback ends in
+        # this module rather than the failing test's body, so the message has
+        # to name where the pin came from itself.
         for step in iter_steps([grafted]):
             if step.pins:
-                self._check_pins_fit(step.pins)
+                self._check_pins_fit(
+                    step.pins,
+                    context=(
+                        f'recorded by fixture {grafted.fixture_name!r}, '
+                        f'step {step.narration.text!r}'
+                    ),
+                )
         if override_narration is not None:
             grafted.narration = override_narration
         self._current_scenario.steps.append(grafted)
@@ -389,34 +397,43 @@ class Collector:
         stack.append(step)
         return step
 
-    def _check_pins_fit(self, pins: tuple[Pin, ...]) -> None:
+    def _check_pins_fit(
+        self, pins: tuple[Pin, ...], *, context: str | None = None
+    ) -> None:
         """Refuse a step pin the active scenario cannot take: one into a story
         it does not bind, or into one it pins, whose coverage is exactly the
-        scenario's pins."""
+        scenario's pins.
+
+        `context` names where the pin was recorded (a fixture and its step)
+        when the caller is the graft path, whose traceback ends here rather
+        than at the failing test's own body; `push_step`'s call leaves it
+        unset, since its traceback already points at user code.
+        """
         scenario = self._current_scenario
+        suffix = f' ({context})' if context else ''
         if scenario is None:
             # A `@given` fixture scoped wider than `function` records even
             # when no scenario is active — an unannotated test pulled it in.
             raise PytestGivenError(
-                'a step pin needs a scenario to land in, but this step was '
-                'recorded outside one — an unannotated test pulled in a fixture '
-                'that records it.'
+                f'a step pin needs a scenario to land in, but this step was '
+                f'recorded outside one{suffix} — an unannotated test pulled in '
+                f'a fixture that records it.'
             )
         pinned = {pin.story_id for pin in scenario.pins}
         for pin in pins:
             if pin.story_id not in scenario.story_ids:
                 raise PytestGivenError(
                     f'a step pins sentence {pin.sentence_id} of story '
-                    f'{pin.story_id!r}, which scenario {scenario.id!r} does not '
-                    f'bind; add the story to @scenario(stories=...).'
+                    f'{pin.story_id!r}{suffix}, which scenario {scenario.id!r} '
+                    f'does not bind; add the story to @scenario(stories=...).'
                 )
             if pin.story_id in pinned:
                 raise PytestGivenError(
                     f'a step pins sentence {pin.sentence_id} of story '
-                    f'{pin.story_id!r}, but scenario {scenario.id!r} pins that '
-                    f'story itself, so its coverage there is exactly the '
-                    f'scenario pins; drop the step pin, or bind the story with '
-                    f'stories= instead.'
+                    f'{pin.story_id!r}{suffix}, but scenario {scenario.id!r} '
+                    f'pins that story itself, so its coverage there is exactly '
+                    f'the scenario pins; drop the step pin, or bind the story '
+                    f'with stories= instead.'
                 )
 
     def pop_step(self) -> Step | None:
