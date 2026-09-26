@@ -173,8 +173,13 @@ a step enters a scenario:
 The error for a step pin into an unbound story names the story and suggests `stories=`.
 
 `Annotated[..., given('label', activity=...)]` is accepted today, and the pin is silently dropped:
-`_graft_annotated_leaves` passes only the narration on. `annotated_given_descriptors` now rejects a
-descriptor that carries `pins=`.
+`_graft_annotated_leaves` passes only the narration on. Both graft paths now pass the label's pins
+on too:
+
+- `graft_leaf_given` puts them on the leaf step and checks them, naming the parameter in its error.
+- `graft_recording` treats the label as retelling the fixture's root step. The label's pins, when it
+  has any, replace the root's pins the way its narration replaces the root's narration. Steps inside
+  the fixture body keep their own pins. The existing subtree check then covers the label's pins.
 
 Parametrize grouping compares pins where it compared ids (`StepSignature`); rule 6 is unchanged.
 
@@ -223,7 +228,7 @@ Each break gets a `**Breaking.**` entry with its migration:
   and steps is now `pins`.
 
 Under **Added**: sentence names shown on the timeline, and scenarios that bind several stories.
-Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead of dropping it.
+Under **Fixed**: an `Annotated` `given(...)` label carrying a pin records it instead of dropping it.
 
 ### Docs, skills and glossary
 
@@ -270,7 +275,7 @@ Under **Fixed**: an `Annotated` `given(...)` label carrying a pin raises instead
   - a step pin into an unbound story raises;
   - a wider-scoped fixture's pin raises when grafted into a scenario it doesn't fit;
   - a scenario matched against two stories;
-  - an Annotated label with a pin is rejected.
+  - an Annotated label's pin reaches its step.
 - **Changed scenarios:**
   - the `activity_id=0` scenario in `test_story.py` goes;
   - "A string `activities=` argument is refused" (`test_step_descriptor.py`) becomes the refusal of

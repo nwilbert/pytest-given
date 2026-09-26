@@ -328,17 +328,23 @@ class Collector:
         root: Step,
         *,
         override_narration: Narration | None = None,
+        override_pins: tuple[Pin, ...] = (),
     ) -> None:
         """Deep-copy a fixture's recorded root into the active scenario's steps.
 
-        When *override_narration* is given (an Annotated label on the fixture
-        parameter), it replaces the grafted root's narration; the recorded
-        children and attachments are preserved.
+        An Annotated label on the fixture parameter retells the grafted root:
+        *override_narration* replaces its narration, and *override_pins*, when
+        non-empty, its pins. The recorded children and attachments are
+        preserved.
         """
         # Grafting runs from the setup hook of an annotated item, which opened
         # the scenario before fixtures ran; nothing closes it until logreport.
         assert self._current_scenario is not None
         grafted = copy.deepcopy(root)
+        if override_narration is not None:
+            grafted.narration = override_narration
+        if override_pins:
+            grafted.pins = override_pins
         # A wider-scoped fixture recorded once, against the first scenario that
         # used it; a later one may not fit its pins. The traceback ends in
         # this module rather than the failing test's body, so the message has
@@ -352,18 +358,25 @@ class Collector:
                         f'step {step.narration.text!r}'
                     ),
                 )
-        if override_narration is not None:
-            grafted.narration = override_narration
         self._current_scenario.steps.append(grafted)
 
-    def graft_leaf_given(self, narration: Narration) -> None:
+    def graft_leaf_given(
+        self, parameter: str, narration: Narration, *, pins: tuple[Pin, ...] = ()
+    ) -> None:
         """Append a childless `given` step to the active scenario.
 
-        Used for Annotated labels on parametrize values and undecorated /
-        built-in fixtures — arrangements with no recorded body.
+        Used for the Annotated label on `parameter` when it names a parametrize
+        value or an undecorated / built-in fixture — an arrangement with no
+        recorded body.
         """
         assert self._current_scenario is not None
-        self._current_scenario.steps.append(Step(phase='given', narration=narration))
+        if pins:
+            self._check_pins_fit(
+                pins, context=f'Annotated label on parameter {parameter!r}'
+            )
+        self._current_scenario.steps.append(
+            Step(phase='given', narration=narration, pins=pins)
+        )
 
     def push_step(
         self,

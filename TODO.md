@@ -2,7 +2,10 @@
 
 ## Now
 
+- [ ] Rename `capture.glossary.TermRef` (the abstract base of `TermHandle` / `TermInstance`) to match the glossary: it is handle-side, while a *term ref* is the recorded occurrence (`NarrationTermRef`, `ClauseTermRef`) — e.g. `TermHandleBase`
 - [ ] Make the docs sections for https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/ more explicit. Check for other pages that are too dense / unstructured.
+- [ ] Review report readability with frontend design skill.
+- [ ] Add Domain Storytelling link in docs.
 
 ## Next
 
@@ -13,7 +16,6 @@
 - [ ] Glossary: Optionally hide kind? Group / filter by story?
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] How to handle work objects appearing multiple times in Domain Storytelling?
-- [ ] Rename `capture.glossary.TermRef` (the abstract base of `TermHandle` / `TermInstance`) to match the glossary: it is handle-side, while a *term ref* is the recorded occurrence (`NarrationTermRef`, `ClauseTermRef`) — e.g. `TermHandleBase`
 
 ## Later
 

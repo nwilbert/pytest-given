@@ -124,8 +124,8 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     Reads type hints off the unwrapped function (past the ``@scenario``
     wrapper). Best-effort: if the annotations cannot be resolved, returns an
     empty mapping rather than failing the test. Rejects the forbidden forms —
-    ``when(...)`` / ``then(...)``, a t-string label, a pin, or more than
-    one descriptor on a single parameter.
+    ``when(...)`` / ``then(...)``, a t-string label, or more than one
+    descriptor on a single parameter.
     """
     target = inspect.unwrap(cast('Callable[..., object]', func))
     try:
@@ -161,13 +161,6 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
                 f'where the parameter value is not in scope. Use '
                 f'given(Template("... {{{name}}} ...")) for a per-case '
                 f'placeholder, or a plain string label.'
-            )
-        if desc.pins:
-            raise PytestGivenError(
-                f'Annotated given(..., pins=...) on parameter {name!r} is not '
-                f'supported: the label only renames the fixture step, so the pin '
-                f"would be dropped. Pin the fixture's own @given(..., pins=...), "
-                f'a step inside the fixture body, or one in the test body.'
             )
         out[name] = desc
     return out

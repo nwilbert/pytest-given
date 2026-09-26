@@ -545,7 +545,7 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
         t'a leaf {pg["Graft"]} appends a childless {pg["Step"]}',
         pins=adopt_pytest_given['graft'],
     ):
-        collector.graft_leaf_given(_n('the name {text}'))
+        collector.graft_leaf_given('name', _n('the name {text}'))
         recorded = collector.finish_scenario(status='passed')
     with then('the step is a given with no children'):
         leaf = recorded.steps[0]
@@ -597,7 +597,7 @@ def test_graft_leaf_given_without_scenario_is_refused() -> None:
         ),
         pytest.raises(AssertionError),
     ):
-        collector.graft_leaf_given(_n('orphan'))
+        collector.graft_leaf_given('orphan', _n('orphan'))
 
 
 def test_graft_recording_without_override_is_unchanged() -> None:

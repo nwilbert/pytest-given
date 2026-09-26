@@ -2068,14 +2068,13 @@ def test_fixture_recording_whose_pin_does_not_fit_is_refused_at_graft(pytester):
 
 
 @scenario(
-    t'An Annotated label carrying a {pg["Pin"].low} is refused',
-    tags=['validation'],
+    t'An Annotated label carrying a {pg["Pin"].low} pins its {pg["Step"].low}',
     stories=adopt_pytest_given,
 )
-def test_annotated_label_carrying_a_pin_is_refused(pytester):
+def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
     with given(
-        t'a {pg["Scenario"].low} whose Annotated given(...) label carries a '
-        t'{pg["Pin"].low}'
+        t'a {pg["Scenario"].low} whose Annotated given(...) label on a plain '
+        t'fixture carries a {pg["Pin"].low}'
     ):
         suite = """
             from typing import Annotated
@@ -2099,10 +2098,78 @@ def test_annotated_label_carrying_a_pin_is_refused(pytester):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs', pins=adopt_pytest_given['record']):
-        result = pytester.runpytest()
-    with then(t'the run fails, saying the label cannot carry a {pg["Pin"].low}'):
-        assert result.ret != 0
-        result.stdout.fnmatch_lines(['*Annotated given(..., pins=...)*not supported*'])
+        result = pytester.runpytest('--given-json=report.json')
+    with then(t"the label's {pg['Step'].low} carries the {pg['Pin'].low}"):
+        result.assert_outcomes(passed=1)
+        data = json.loads(pytester.path.joinpath('report.json').read_text())
+        assert data['scenarios'][0]['steps'][0]['pins'] == [
+            {'story_id': 'book', 'sentence_id': 1}
+        ]
+
+
+def test_annotated_label_pins_replace_the_recorded_fixture_root_pins(pytester):
+    """The label retells the fixture's root step, narration and pins alike;
+    steps inside the fixture body keep their own pins."""
+    pytester.makepyfile("""
+        from typing import Annotated
+        import pytest
+        from pytest_given import Glossary, given, scenario, sentence, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [
+            sentence(guest, search, room),
+            sentence(guest('Alice'), search, room),
+            sentence(guest('Bob'), search, room)])
+
+        @pytest.fixture
+        @given('a fixture label', pins=a[1])
+        def arranged():
+            with given('an inner step', pins=a[3]):
+                pass
+            return 1
+
+        @scenario('x', stories=a)
+        def test_x(arranged: Annotated[int, given('a retold label', pins=a[2])]):
+            pass
+    """)
+    result = pytester.runpytest('--given-json=report.json')
+    result.assert_outcomes(passed=1)
+    data = json.loads(pytester.path.joinpath('report.json').read_text())
+    root = data['scenarios'][0]['steps'][0]
+    assert root['narration']['text'] == 'a retold label'
+    assert root['pins'] == [{'story_id': 'book', 'sentence_id': 2}]
+    assert root['children'][0]['pins'] == [{'story_id': 'book', 'sentence_id': 3}]
+
+
+def test_annotated_label_pin_into_an_unbound_story_names_the_parameter(pytester):
+    pytester.makepyfile("""
+        from typing import Annotated
+        import pytest
+        from pytest_given import Glossary, given, scenario, sentence, story
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [sentence(guest, search, room)])
+        b = story('Stay', [sentence(guest, search, room)])
+
+        @pytest.fixture
+        def room_number():
+            return 7
+
+        @scenario('x', stories=b)
+        def test_x(room_number: Annotated[int, given('a room', pins=a[1])]):
+            pass
+    """)
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    result.stdout.fnmatch_lines(
+        ["*story 'Book' (Annotated label on parameter 'room_number')*does not bind*"]
+    )
 
 
 def test_fixture_label_pin_reaches_the_grafted_step_and_coverage(pytester):

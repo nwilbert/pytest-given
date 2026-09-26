@@ -60,7 +60,7 @@ def test_rejects_underpayment(
         buy_coffee(machine, cents)
 ```
 
-A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. `when`/`then` are rejected here — the action and its outcome belong in the test body.
+A `Template` placeholder renders as `{col}` in the grouped view and as the concrete value per row. `when`/`then` are rejected here — the action and its outcome belong in the test body. A label's `pins=` works as on any step; on a decorated fixture it replaces the pins of the fixture's own label, not those of steps inside its body.
 
 As a helper-function decorator (any phase). The helper records its own step on each call; for dynamic narration, use `pytest_given.Template` and reference the helper's parameters:
 
