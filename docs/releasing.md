@@ -13,16 +13,6 @@ mistake shipped to PyPI is permanent.
 
 ### 1. Prepare the bump
 
-- [ ] **First release with the documentation site (0.3.0) only:** the release
-      publishes `/latest/` for the first time, so repoint every `/dev/` docs link
-      to `/latest/` in the same bump commit — `README.md`,
-      `SOURCE_LINK_HELP` in `src/pytest_given/report/source_link.py`, and
-      `references/scenarios.md` under
-      `src/pytest_given/.agents/skills/pytest-given-authoring/`
-      (`grep -rn "pytest-given/dev/"` finds them all, `AGENTS.md` included).
-      Expect the TestPyPI rehearsal's link check (step 2) to 404 on those
-      links — `/latest/` only exists once the `pypi` run has published it.
-      Then delete this item.
 - [ ] Bump `version` in `pyproject.toml`.
 - [ ] Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow
       extracts this exact section as the GitHub Release body, and fails the build

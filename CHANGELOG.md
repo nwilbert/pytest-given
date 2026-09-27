@@ -11,11 +11,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 <!-- --8<-- [start:site] -->
 
-## [Unreleased]
+## [0.3.0] - 2026-09-27
 
 ### Added
 
-- A documentation site at <https://nwilbert.github.io/pytest-given/> has a user guide, configuration and CLI reference, and the example reports. The CLI help and bundled skills link to it.
+- A documentation site at <https://nwilbert.github.io/pytest-given/> has a user guide, configuration and CLI reference, and the example reports. The bundled skills link to it, and the CLI help names the page on source-link templates.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that each browser remembers.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
 - Tags can be organized hierarchically: a `/` in a tag nests it in the HTML report's Tags sidebar (`ticket/ABC-123` goes under a `ticket` heading), and selecting the heading filters to every tag beneath it.
@@ -352,7 +352,8 @@ First public release.
 - Bundled authoring, navigating, and reviewing skills for AI agents, shipped in
   the wheel and version-matched to the plugin.
 
-[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0
 

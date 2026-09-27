@@ -36,8 +36,8 @@ _VALID_VARS = frozenset({'path', 'relpath', 'line', 'project', 'sha'})
 # so the two entry points advertise the same presets and the same docs page.
 SOURCE_LINK_HELP = (
     'Source-link template or preset (vscode, cursor, zed, pycharm, github, '
-    'none). Variables: '
-    'https://nwilbert.github.io/pytest-given/dev/configuration/source-links/'
+    'none). Variables: see "Source links & tracebacks" in the pytest-given '
+    'docs.'
 )
 
 

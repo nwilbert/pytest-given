@@ -2,7 +2,7 @@
 
 ## Project overview
 
-See [README.md](README.md) for the pitch and quick start, and the [documentation site](https://nwilbert.github.io/pytest-given/dev/) (sources under `docs/site/`) for the public API and CLI flags. The rest of this document is contributor-facing.
+See [README.md](README.md) for the pitch and quick start, and the [documentation site](https://nwilbert.github.io/pytest-given/latest/) (sources under `docs/site/`) for the public API and CLI flags. The rest of this document is contributor-facing.
 
 ## Setup
 

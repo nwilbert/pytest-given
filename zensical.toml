@@ -1,7 +1,7 @@
 [project]
 site_name = "pytest-given"
 site_description = "A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests."
-site_url = "https://nwilbert.github.io/pytest-given/"
+site_url = "https://nwilbert.github.io/pytest-given/latest/"
 repo_url = "https://github.com/nwilbert/pytest-given"
 edit_uri = "edit/main/docs/site/"
 docs_dir = "docs/site"
