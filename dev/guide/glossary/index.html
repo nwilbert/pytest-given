@@ -1030,8 +1030,12 @@
 
 
 <h1 id="glossary">Glossary<a class="headerlink" href="#glossary" title="Permanent link">&para;</a></h1>
-<p>A glossary lists the domain terms your tests use: the <strong>ubiquitous language</strong> of Domain-Driven Design. When step text mentions a glossary term, the report highlights the word and shows the term's definition on hover. The report also gets a <strong>Glossary</strong> tab that lists all terms.</p>
-<p>You can use a glossary on its own. <a href="../domain-storytelling/">Domain Storytelling</a> builds on it: its stories are made of glossary terms.</p>
+<p>A glossary defines the terms of your domain: the words your team uses for the things and actions it deals with. These words should mean the same everywhere: in conversations with stakeholders, in code, in tests, and in guidance for AI agents. pytest-given lets your tests refer to glossary terms, which links them to the glossary. The report highlights each such word and shows the term's definition on hover, and a <strong>Glossary</strong> tab lists all terms.</p>
+<p>Referring to glossary terms from your tests is optional: a glossary is useful on its own. It also pairs well with <a href="../domain-storytelling/">Domain Storytelling</a>: story sentences that use glossary terms can be matched against your tests, so the report shows which scenarios cover them.</p>
+<div class="admonition info">
+<p class="admonition-title">Ubiquitous Language</p>
+<p>Domain-Driven Design calls this shared vocabulary the <a href="https://martinfowler.com/bliki/UbiquitousLanguage.html">ubiquitous language</a>: one set of terms that domain experts and developers use everywhere. A glossary writes it down, and tests that refer to its terms stay in that language.</p>
+</div>
 <h2 id="declaring-terms">Declaring terms<a class="headerlink" href="#declaring-terms" title="Permanent link">&para;</a></h2>
 <p>Create a <code>Glossary</code> and declare each term with a definition:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">Glossary</span>
@@ -1041,9 +1045,9 @@
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">room</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="s1">&#39;Room&#39;</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;A bookable hotel room.&#39;</span><span class="p">)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">book</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="s1">&#39;book&#39;</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;Reserve a room for a stay.&#39;</span><span class="p">)</span>
 </code></pre></div>
-<p>Each call returns a <strong>handle</strong>. If the term already exists, <code>g(...)</code> returns it. To only look up a term, use <code>g['Guest']</code>, which raises an error if the term doesn't exist.</p>
-<p>Put handles into t-string step text, like <code>t'a {guest} {book("books")} a {room}'</code>. Each handle becomes a <strong>term ref</strong>: a highlighted word in the rendered step.</p>
+<p>Each call returns a <strong>handle</strong>. If the term already exists, <code>g(...)</code> returns its handle. To only look up a term, use <code>g['Guest']</code>, which raises an error if the term doesn't exist.</p>
 <h2 id="term-refs">Term refs<a class="headerlink" href="#term-refs" title="Permanent link">&para;</a></h2>
+<p>A <strong>term ref</strong> is a glossary term used in a step or a scenario title. To create one, put a handle into a <a href="../step-text/">t-string</a>, like <code>t'a {guest} {book("books")} a {room}'</code>. The report shows each term ref as a highlighted word with the term's definition on hover.</p>
 <p>A term ref has three forms. Use the simplest one that fits your sentence:</p>
 <ul>
 <li><strong><code>{guest}</code></strong> shows the term as declared: <em>Guest</em>.</li>
@@ -1052,7 +1056,7 @@
 </ul>
 <p>All three forms work on every handle, including handles you look up by name.</p>
 <h2 id="file-glossary">File glossary<a class="headerlink" href="#file-glossary" title="Permanent link">&para;</a></h2>
-<p>If your project already has a <code>GLOSSARY.md</code>, load it with <code>FileGlossary</code> instead of declaring terms in code:</p>
+<p>Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a <code>GLOSSARY.md</code>. Load the file with <code>FileGlossary</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileGlossary</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -1065,14 +1069,14 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="sa">t</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;Guest&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;book&quot;</span><span class="p">](</span><span class="s2">&quot;books&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> a </span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;Room&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="o">...</span>
 </code></pre></div>
-<p>A file glossary is a <strong>closed vocabulary</strong>: new terms can only be added as rows in the file. Both <code>g['foo']</code> and <code>g('foo')</code> just look up a term, and raise an error if it doesn't exist.</p>
+<p>A file glossary is a <strong>closed vocabulary</strong>: you add new terms only as rows in the file. Both <code>g['foo']</code> and <code>g('foo')</code> only look up a term, and raise an error if it doesn't exist.</p>
 <h2 id="kinds">Kinds<a class="headerlink" href="#kinds" title="Permanent link">&para;</a></h2>
-<p>A term can have a kind, which sets its color. The kinds come from <a href="../domain-storytelling/">Domain Storytelling</a>: <strong>actor</strong>, <strong>work object</strong>, and <strong>activity</strong>. To declare a kind, use <code>g.actor(...)</code>, <code>g.work_object(...)</code>, or <code>g.activity(...)</code> instead of <code>g(...)</code>:</p>
+<p>A term can have a kind, which sets its color in the report. The kinds come from <a href="../domain-storytelling/">Domain Storytelling</a>: <strong>actor</strong>, <strong>work object</strong>, and <strong>activity</strong>. To declare a kind, use <code>g.actor(...)</code>, <code>g.work_object(...)</code>, or <code>g.activity(...)</code> instead of <code>g(...)</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">guest</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">actor</span><span class="p">(</span><span class="s1">&#39;Guest&#39;</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;Person booking accommodation.&#39;</span><span class="p">)</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">room</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">work_object</span><span class="p">(</span><span class="s1">&#39;Room&#39;</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;A bookable hotel room.&#39;</span><span class="p">)</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">book</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="s1">&#39;book&#39;</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">&#39;Reserve a room for a stay.&#39;</span><span class="p">)</span>
 </code></pre></div>
-<p>In a file glossary, add a <code>kind_column</code>.</p>
+<p>In a file glossary, the kinds come from the column you pass as <code>kind_column</code>.</p>
 <p>If you don't declare a kind, pytest-given <a href="../domain-storytelling/#kind-inference">infers it</a> from the story sentences that use the term. A term that gets no kind either way is <strong>kindless</strong>. The report shows it in a neutral color and lists it under <strong>Uncategorized</strong> in the Glossary tab.</p>
 <h2 id="undefined-terms">Undefined terms<a class="headerlink" href="#undefined-terms" title="Permanent link">&para;</a></h2>
 <p>A term without a <code>definition=</code> is <strong>undefined</strong>. The Glossary tab marks it with an <em>Undefined</em> badge and can filter for these terms.</p>
@@ -1085,9 +1089,9 @@
 </ol>
 <p>So if you use a glossary without stories, import the glossary object itself into a <code>conftest.py</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># conftest.py</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.ubiquitous_language</span><span class="w"> </span><span class="kn">import</span> <span class="n">g</span>  <span class="c1"># noqa: F401 — plugin discovery</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.glossary</span><span class="w"> </span><span class="kn">import</span> <span class="n">g</span>  <span class="c1"># noqa: F401 — plugin discovery</span>
 </code></pre></div>
-<p><code>import tests.ubiquitous_language</code> does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.</p>
+<p><code>import tests.glossary</code> does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.</p>
 <p>A test suite can have only one glossary. If two different glossary objects reach the report, pytest-given raises <code>PytestGivenError</code>.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <p>The hotel-booking and file-glossary-booking <a href="../../examples/">examples</a> show a glossary in use.</p>

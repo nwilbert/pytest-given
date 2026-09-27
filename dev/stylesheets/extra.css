@@ -40,6 +40,9 @@
 /* Code keeps its previous absolute size (13.6px): it scales off the body, and
    the body step above would otherwise carry it up too. */
 .md-typeset code { font-size: 0.8em; }
+/* The theme sets admonitions to an absolute size below its own body size, so
+   they miss the step above and read too small; match the body instead. */
+.md-typeset .admonition { font-size: 0.85rem; }
 
 /* Aubergine brand colour: links, active nav, tab underline, hero. */
 :root > * {

@@ -670,10 +670,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#domain-stories" class="md-nav__link">
+  <a href="#writing-stories" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Domain stories
+        Writing stories
       </span>
     </span>
   </a>
@@ -681,10 +681,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scenariosentence-binding" class="md-nav__link">
+  <a href="#linking-scenarios-to-stories" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Scenario↔sentence binding
+        Linking scenarios to stories
       </span>
     </span>
   </a>
@@ -987,9 +987,13 @@
 
 <h1 id="domain-storytelling">Domain Storytelling<a class="headerlink" href="#domain-storytelling" title="Permanent link">&para;</a></h1>
 <p><a href="https://domainstorytelling.org/quick-start-guide">Domain Storytelling</a> describes how a domain works as short stories. With pytest-given you write these stories in code, and the report shows which scenarios cover each sentence of a story.</p>
-<p>Stories are made of <a href="../glossary/">glossary</a> terms. In Domain Storytelling, <strong>actors</strong> do <strong>activities</strong> with <strong>work objects</strong>. "Carol selects a room" has an actor (Carol), an activity (selects), and a work object (room). A story is a numbered list of such <strong>sentences</strong>. Domain Storytelling diagrams draw each activity as an arrow labelled with a verb.</p>
-<p>The HTML report shows stories in a <strong>Stories</strong> tab.</p>
-<h2 id="domain-stories">Domain stories<a class="headerlink" href="#domain-stories" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">About Domain Storytelling</p>
+<p><a href="https://domainstorytelling.org">Domain Storytelling</a> is a technique for building a shared understanding between domain experts and developers. Together they describe the domain as stories: who does what, with what, and in which order. These stories give your tests context. Your scenarios sit one level below them, and each one documents a specific piece of domain logic in much more detail.</p>
+</div>
+<p>In Domain Storytelling, <strong>actors</strong> do <strong>activities</strong> with <strong>work objects</strong>. "Carol selects a room" has an actor (Carol), an activity (selects), and a work object (room). A story is a numbered list of such <strong>sentences</strong>. In a Domain Storytelling diagram, each activity is an arrow labelled with a verb.</p>
+<p>When the parts of a sentence are <a href="../glossary/">glossary</a> terms, the report can match the sentence against your tests. The HTML report shows stories in a <strong>Stories</strong> tab.</p>
+<h2 id="writing-stories">Writing stories<a class="headerlink" href="#writing-stories" title="Permanent link">&para;</a></h2>
 <p>Create a story with <code>story(...)</code>, passing a name and a list of <code>sentence(...)</code> calls:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">story</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -1003,7 +1007,7 @@
 <p>A sentence reads left to right: actor, activity, work object. Connecting words like <code>'to'</code> can go in between.</p>
 <p>Each part can be a glossary handle or a plain string. Use plain strings for generic verbs like <em>searches for</em>. Only words with a specific meaning in your domain need a glossary entry.</p>
 <p>Handles from a <a href="../glossary/#file-glossary">file glossary</a> work the same way: <code>sentence(g['Guest'], g['book']('books'), g['Room'])</code>.</p>
-<p>A sentence needs at least two different glossary terms. With fewer, pytest-given can't match it against step text, and the report marks it as "not coverage-tracked". You can still cover such a sentence with a <a href="#pins">pin</a>.</p>
+<p>To be matched against your tests, a sentence needs at least two different glossary terms. The report marks a sentence with fewer as "not coverage-tracked". You can still cover it with a <a href="#pins">pin</a>.</p>
 <h3 id="clauses">Clauses<a class="headerlink" href="#clauses" title="Permanent link">&para;</a></h3>
 <p>Sometimes one sentence has more than one arrow: an actor hands a work object to two people, or two actors do something at the same time. Write one <code>clause(...)</code> per arrow chain:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">sentence</span><span class="p">(</span>
@@ -1011,7 +1015,7 @@
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">clause</span><span class="p">(</span><span class="n">organizer</span><span class="p">(</span><span class="s1">&#39;Carol&#39;</span><span class="p">),</span> <span class="s1">&#39;adds&#39;</span><span class="p">,</span> <span class="n">guest</span><span class="p">(</span><span class="s1">&#39;Bob&#39;</span><span class="p">),</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="n">trip</span><span class="p">),</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
 </code></pre></div>
-<p>The parts of a clause alternate: an actor or work object, then an activity or connecting word, then an actor or work object again, and so on. A clause starts with its actor and ends with an actor or work object, so it always has an odd number of parts, at least three.</p>
+<p>A clause starts with its actor. After that, its parts alternate: an activity or connecting word, then an actor or work object, and so on. A clause ends with an actor or work object, so it always has an odd number of parts, at least three.</p>
 <p>To cover a sentence with several clauses, one step must mention every glossary term from all of its clauses.</p>
 <h3 id="kind-inference">Kind inference<a class="headerlink" href="#kind-inference" title="Permanent link">&para;</a></h3>
 <p>If a term has no declared <a href="../glossary/#kinds">kind</a>, pytest-given infers it from the term's position in story sentences when the test session finishes:</p>
@@ -1020,19 +1024,19 @@
 <li>an activity position (2nd, 4th, …): <strong>activity</strong></li>
 <li>any other position (3rd, 5th, …): <strong>work object</strong></li>
 </ul>
-<p>If a term's kind is declared, pytest-given checks it against its position when the sentence is created. A term in the wrong position raises <code>PytestGivenError</code>, naming the term and its kind.</p>
-<p>If an undeclared term appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a <code>kind_column</code> to your file glossary) to fix it.</p>
-<h2 id="scenariosentence-binding">Scenario↔sentence binding<a class="headerlink" href="#scenariosentence-binding" title="Permanent link">&para;</a></h2>
-<p>Tell pytest-given which story a scenario implements with <code>stories=</code>:</p>
+<p>If a term's kind is declared, pytest-given checks the kind against the term's position when the sentence is created. A term in the wrong position raises <code>PytestGivenError</code>, naming the term and its kind.</p>
+<p>If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a <code>kind_column</code> to your file glossary) to fix it.</p>
+<h2 id="linking-scenarios-to-stories">Linking scenarios to stories<a class="headerlink" href="#linking-scenarios-to-stories" title="Permanent link">&para;</a></h2>
+<p>Tell pytest-given which story a scenario belongs to with <code>stories=</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">&#39;Carol selects a suite&#39;</span><span class="p">,</span> <span class="n">stories</span><span class="o">=</span><span class="n">book_a_group_trip</span><span class="p">)</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_select_suite</span><span class="p">(</span><span class="n">carol</span><span class="p">):</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="sa">t</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">organizer</span><span class="p">(</span><span class="s2">&quot;Carol&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> selects the </span><span class="si">{</span><span class="n">room</span><span class="p">(</span><span class="s2">&quot;Deluxe Suite&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="o">...</span>
 </code></pre></div>
-<p>pytest-given then works out which sentences of the story the scenario covers. By default it matches the step text against the sentences. With pins, you state the covered sentences yourself.</p>
+<p>For several stories, pass a list: <code>stories=[book_a_group_trip, check_in]</code>, where <code>check_in</code> is another story. The scenario then appears under each of them.</p>
+<p>pytest-given works out which sentences of these stories the scenario covers. By default, it matches the text of the scenario's steps against the sentences. With pins, you state the covered sentences yourself.</p>
 <h3 id="narration-matching">Narration matching<a class="headerlink" href="#narration-matching" title="Permanent link">&para;</a></h3>
 <p>A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: <code>{room}</code>, <code>{room.low}</code> and <code>room('Deluxe Suite')</code> all count as the term <em>Room</em>.</p>
-<p>To match against several stories, pass a list: <code>stories=[book_a_group_trip, check_in]</code>, where <code>check_in</code> is another story. The scenario then appears under each of these stories.</p>
 <h3 id="coverage-in-the-report">Coverage in the report<a class="headerlink" href="#coverage-in-the-report" title="Permanent link">&para;</a></h3>
 <p>The Stories tab shows each story as a timeline of its sentences. Each sentence has a coverage chip and lists the scenarios that cover it. Select a sentence and choose <em>Open in Scenarios</em> to see only those scenarios. Every story you declare appears in the tab, even if no scenario covers it.</p>
 <p>The JSON report contains the same data under the top-level <code>coverage</code> key.</p>
@@ -1041,7 +1045,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">book_a_group_trip</span><span class="p">[</span><span class="s1">&#39;select&#39;</span><span class="p">]</span>  <span class="c1"># by name, set with name=&#39;select&#39; above</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">book_a_group_trip</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>         <span class="c1"># by number</span>
 </code></pre></div>
-<p>Numbers are positions in the list, so they change when you insert a sentence before them. Names don't change.</p>
+<p>Numbers are positions in the list, so they change when you insert a sentence before them. Names stay the same.</p>
 <h3 id="pins">Pins<a class="headerlink" href="#pins" title="Permanent link">&para;</a></h3>
 <p>A <strong>pin</strong> states which sentences a step or scenario covers, instead of relying on narration matching. Pass sentence handles to <code>pins=</code>:</p>
 <ul>
