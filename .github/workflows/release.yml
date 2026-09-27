@@ -76,10 +76,12 @@ jobs:
             # be re-rehearsed. `.dev<run number>` is a real PEP 440 version —
             # local `+suffix` versions are rejected by both indexes — and sorts
             # before the release, so a rehearsal can never shadow the real thing.
-            # `--frozen` patches pyproject.toml without re-locking; the checkout
-            # is throwaway, so nothing is committed back.
+            # Re-locking keeps uv.lock's project version in step, which the
+            # `--locked` syncs in nox require; `--no-sync` skips building an
+            # environment here. The checkout is throwaway, so nothing is
+            # committed back.
             effective="${base}.dev${RUN_NUMBER}"
-            uv version --frozen "$effective"
+            uv version --no-sync "$effective"
           else
             effective="$base"
           fi
