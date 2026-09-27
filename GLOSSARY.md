@@ -33,7 +33,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Step fixture** | A pytest fixture whose function is wrapped with `@given(text)`. Only `@given` is allowed on fixtures; `@when` / `@then` are rejected. |
-| **Plain fixture** | A pytest fixture without a pytest-given decorator. Used by tests but produces no step in the report. |
+| **Plain fixture** | A pytest fixture without a pytest-given decorator. It produces no step in the report unless an `Annotated[..., given(...)]` label on the test's parameter narrates it. |
 | **Fixture recording** | A captured subtree of steps + attachments produced while a step fixture is being set up. Stored keyed by fixture-instance identity. A generator fixture's teardown records nothing — it refuses steps and attachments. |
 | **Graft** | Attaching a fixture recording into the active scenario's step tree at the moment its host test starts. |
 

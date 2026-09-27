@@ -121,7 +121,9 @@ def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:
     stories=adopt_pytest_given,
 )
 def test_group_parametrized_any_failed_groups_as_failed() -> None:
-    with given(t'three {pg["Case"]} records of one {pg["Parametrized scenario"]}'):
+    with given(
+        t'three {pg["Case"].low} records of one {pg["Parametrized scenario"].low}'
+    ):
         nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
         scenarios = [
             Scenario(
@@ -144,7 +146,7 @@ def test_group_parametrized_any_failed_groups_as_failed() -> None:
         pins=adopt_pytest_given['group'],
     ):
         grouped = group_parametrized(scenarios, param_info)
-    with then(t'one scenario remains and any failed {pg["Case"]} fails it'):
+    with then(t'one scenario remains and any failed {pg["Case"].low} fails it'):
         assert len(grouped) == 1
         assert grouped[0].status == 'failed'
 
@@ -175,27 +177,37 @@ def test_group_parametrized_keeps_source_order() -> None:
         assert [s.id for s in grouped] == [first, mid, last]
 
 
+@scenario(
+    t'Same-named {pg["Parametrized scenario"]("parametrized scenarios")} on '
+    t'different test functions stay apart',
+    tags=['parametrization'],
+)
 def test_group_parametrized_distinct_functions_same_name_do_not_group() -> None:
-    # Two different parametrized functions in one module that happen to share a
-    # scenario label must stay separate — grouping keys on the test function
-    # (node id without its parametrize tail), not on the rendered label.
-    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::y[1]')
-    scenarios = [
-        Scenario(id=nid1, narration=Narration(text='same label'), module='m'),
-        Scenario(id=nid2, narration=Narration(text='same label'), module='m'),
-    ]
-    param_info = {
-        nid1: ParamSpec(names=['n'], values=[1]),
-        nid2: ParamSpec(names=['k'], values=[1]),
-    }
-    grouped = group_parametrized(scenarios, param_info)
-    assert {s.id for s in grouped} == {nid1, nid2}
-    assert {
-        tuple(c.name for c in s.parameters.columns) for s in grouped if s.parameters
-    } == {
-        ('n',),
-        ('k',),
-    }
+    """Grouping keys on the test function (the node id without its
+    parametrize tail), not on the rendered label."""
+    with given(t'two test functions whose {pg["Case"]("cases")} share one name'):
+        nid1, nid2 = NodeId('t::x[1]'), NodeId('t::y[1]')
+        scenarios = [
+            Scenario(id=nid1, narration=Narration(text='same label'), module='m'),
+            Scenario(id=nid2, narration=Narration(text='same label'), module='m'),
+        ]
+        param_info = {
+            nid1: ParamSpec(names=['n'], values=[1]),
+            nid2: ParamSpec(names=['k'], values=[1]),
+        }
+    with when(t'the {pg["Group"]("grouping")} pass runs'):
+        grouped = group_parametrized(scenarios, param_info)
+    with then(
+        t'each function keeps its own {pg["Scenario"].low} and '
+        t'{pg["Parameter table"].low}'
+    ):
+        assert {s.id for s in grouped} == {nid1, nid2}
+        assert {
+            tuple(c.name for c in s.parameters.columns) for s in grouped if s.parameters
+        } == {
+            ('n',),
+            ('k',),
+        }
 
 
 def test_param_cell_unwraps_a_term_instance_to_its_display() -> None:
@@ -255,7 +267,7 @@ def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
     tags=['parametrization'],
 )
 def test_baseline_is_the_first_passed_case_not_the_first_case() -> None:
-    with given(t'a skipped first {pg["Case"]} and a second one that ran'):
+    with given(t'a skipped first {pg["Case"].low} and a second one that ran'):
         nid1, nid2 = NodeId('t.py::test_brew[200]'), NodeId('t.py::test_brew[350]')
         ran = Step(phase='when', narration=Narration(text='I brew'))
         scenarios = [
@@ -276,7 +288,7 @@ def test_baseline_is_the_first_passed_case_not_the_first_case() -> None:
         }
     with when(t'the {pg["Case"]("cases")} are {pg["Group"]("grouped")}'):
         grouped = group_parametrized(scenarios, param_info)
-    with then(t'the tree is the one the passed {pg["Case"]} recorded'):
+    with then(t'the tree is the one the passed {pg["Case"].low} recorded'):
         assert [s.narration.text for s in grouped[0].steps] == ['I brew']
 
 
@@ -505,7 +517,7 @@ def test_a_varying_str_narration_raises_rule_one() -> None:
         assert 'Use a t-string' in message
         assert message.endswith('(t.py:12)')
     with then(
-        t'it names the {pg["Case"]} whose values were baked in, and the '
+        t'it names the {pg["Case"].low} whose values were baked in, and the '
         t'per-case opt-out'
     ):
         assert 'case [200]' in message
@@ -622,7 +634,7 @@ def test_a_varying_bare_name_interpolation_becomes_a_derived_column() -> None:
             [200, '2.0'],
             [350, '3.5'],
         ]
-    with then(t'the {pg["Step"]} keeps a placeholder pointing at that column'):
+    with then(t'the {pg["Step"].low} keeps a placeholder pointing at that column'):
         part = grouped.steps[0].narration.parts[1]
         assert isinstance(part, NarrationPlaceholder)
         assert (part.name, part.column_id) == ('price', 'derived:0')
@@ -1576,7 +1588,9 @@ def _term_ref_step(
     tags=['parametrization', 'validation'],
 )
 def test_a_varying_term_ref_display_raises_rule_four() -> None:
-    with given(t'two {pg["Case"]("cases")} whose {pg["Term ref"]} reads differently'):
+    with given(
+        t'two {pg["Case"]("cases")} whose {pg["Term ref"].low} reads differently'
+    ):
         scenarios, info = _two_case_group(
             [_term_ref_step('customer', 'Alice')], [_term_ref_step('customer', 'Bob')]
         )
@@ -1588,7 +1602,7 @@ def test_a_varying_term_ref_display_raises_rule_four() -> None:
         pytest.raises(PytestGivenError) as excinfo,
     ):
         group_parametrized(scenarios, info)
-    with then(t'the error names the {pg["Term ref"]} and the split-it-out fix'):
+    with then(t'the error names the {pg["Term ref"].low} and the split-it-out fix'):
         message = str(excinfo.value)
         assert (
             "glossary term ref {pg['Customer'](name)} in 'test_brew' varies" in message
@@ -1639,7 +1653,7 @@ def test_a_param_bound_term_ref_that_varies_raises_rule_four() -> None:
     gives each case its own term ref and covers the same ground with neither.
     """
     with given(
-        t'two {pg["Case"]("cases")} whose {pg["Term ref"]} is the parameter itself'
+        t'two {pg["Case"]("cases")} whose {pg["Term ref"].low} is the parameter itself'
     ):
         scenarios, info = _two_case_group(
             [_term_ref_step('guest', 'Alice', expression='cup_size')],
@@ -1816,7 +1830,7 @@ def test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge()
             Attachment(label='brew log', content='log-for-vanilla'),
             Attachment(label='brew log', content='log-for-mocha'),
         ]
-    with then(t'the {pg["Step"]} keeps a content-less badge pointing at it'):
+    with then(t'the {pg["Step"].low} keeps a content-less badge pointing at it'):
         badge = grouped.steps[0].attachments[0]
         assert badge == AttachmentRef(
             label='brew log', content_type='text', column_id='attachment:0'
@@ -1853,7 +1867,7 @@ def test_a_varying_content_type_promotes_too() -> None:
     tags=['parametrization', 'validation'],
 )
 def test_a_label_present_in_one_case_only_raises_rule_five() -> None:
-    with given(t'an {pg["Attachment"]} label only one {pg["Case"]} attaches'):
+    with given(t'an {pg["Attachment"].low} label only one {pg["Case"].low} attaches'):
         scenarios, info = _two_case_group(
             [_att_step(Attachment(label='vanilla log', content='x'))],
             [_att_step()],
@@ -2405,7 +2419,10 @@ def test_a_formatted_param_cell_holds_the_text_the_step_narrated() -> None:
             [_param_value_step('200.00', spec='.2f')],
             [_param_value_step('350.00', spec='.2f')],
         )
-    with when(t'{pg["Group"]("grouping")} builds the {pg["Parameter table"].low}'):
+    with when(
+        t'{pg["Group"]("grouping")} builds the {pg["Parameter table"].low}',
+        pins=adopt_pytest_given['group'],
+    ):
         [grouped] = group_parametrized(scenarios, info)
     with then('each cell carries the formatted text, under one column'):
         assert grouped.parameters is not None
@@ -2554,7 +2571,6 @@ def _tstring_step(phase: str, literal: str, expression: str, rendered: str) -> S
     t'{pg["Case"]("Cases")} that narrate different {pg["Step"]("steps")} are '
     t'refused rather than {pg["Group"]("grouped")}',
     tags=['parametrization', 'validation'],
-    stories=adopt_pytest_given,
 )
 def test_divergent_step_structure_refuses_the_merge() -> None:
     with given(t'two {pg["Case"]("cases")} whose {pg["Step"]("step")} trees differ'):

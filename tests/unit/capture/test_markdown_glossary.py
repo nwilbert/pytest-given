@@ -25,11 +25,11 @@ def simple_doc():
     t'A pipe table parses into {pg["Term"].low} and definition rows',
 )
 def test_parses_default_columns(simple_doc):
-    with when(t'the parser reads it into rows for a {pg["File glossary"]}'):
+    with when(t'the parser reads it into rows for a {pg["File glossary"].low}'):
         rows = parse_glossary_tables(
             simple_doc, term_column=0, description_column=1, kind_column=None
         )
-    with then(t'each row carries a {pg["Term"]}, definition and source line'):
+    with then(t'each row carries a {pg["Term"].low}, definition and source line'):
         assert rows == [
             GlossaryRow(
                 term='Guest', definition='A person booking.', kind=None, line=5
@@ -52,7 +52,7 @@ def test_merges_multiple_tables():
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
         )
-    with then(t'every table contributes its {pg["Term"]} rows'):
+    with then(t'every table contributes its {pg["Term"].low} rows'):
         assert [row.term for row in rows] == ['Guest', 'Room', 'Search']
 
 
@@ -116,7 +116,7 @@ def test_no_table_raises():
         attach('Markdown document', text)
     with (
         when_then(
-            t'the parser reads it for a {pg["File glossary"]}',
+            t'the parser reads it for a {pg["File glossary"].low}',
             'a PytestGivenError reports that the file has no pipe table',
         ),
         pytest.raises(PytestGivenError, match=r'no .*table'),
@@ -189,7 +189,7 @@ def test_data_row_with_fewer_columns_raises():
     t'Bold {pg["Term"].low} cells render as clean {pg["Term"]("terms")}',
 )
 def test_strips_bold_from_term_cell():
-    with given(t'a {pg["Term"]} cell written with **bold** emphasis'):
+    with given(t'a {pg["Term"].low} cell written with **bold** emphasis'):
         text = '| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n'
         attach('Markdown document', text)
     with when('the parser reads the term cell'):
@@ -208,7 +208,7 @@ def test_strips_bold_from_term_cell():
     t'Italic and inline-code {pg["Term"].low} cells are unwrapped',
 )
 def test_strips_italic_and_inline_code_from_term_cell():
-    with given(t'{pg["Term"]} cells using *italic* and `code` emphasis'):
+    with given(t'{pg["Term"].low} cells using *italic* and `code` emphasis'):
         text = '| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n'
         attach('Markdown document', text)
     with when('the parser reads the term cells'):
@@ -223,7 +223,7 @@ def test_strips_italic_and_inline_code_from_term_cell():
     'Underscores inside an identifier survive',
 )
 def test_preserves_underscores_inside_term_identifier():
-    with given(t'a {pg["Term"]} literally named work_object'):
+    with given(t'a {pg["Term"].low} literally named work_object'):
         text = '| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n'
         attach('Markdown document', text)
     with when('the parser reads the term cell'):
@@ -293,7 +293,9 @@ def test_pipe_line_without_separator_is_skipped():
     t'A code-span {pg["Term"].low} cell keeps the markup inside it',
 )
 def test_code_span_term_cell_keeps_inner_markup():
-    with given(t'a {pg["Term"]} cell written as a code span around an asterisk pair'):
+    with given(
+        t'a {pg["Term"].low} cell written as a code span around an asterisk pair'
+    ):
         text = '| Term | Meaning |\n|---|---|\n| `a*b*c` | a literal. |\n'
         attach('Markdown document', text)
     with when('the parser reads the term cell'):

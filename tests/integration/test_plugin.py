@@ -545,7 +545,7 @@ def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
     with then('the run ends as a usage error, naming the flag the user typed'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR
         result.stderr.fnmatch_lines(['*Unknown --given-source-link preset*'])
-    with then('no test ran: the run stopped at configure, before collection'):
+    with then('no test ran'):
         assert 'passed' not in result.stdout.str()
 
 
@@ -794,6 +794,7 @@ def test_fixture_setup_failure_appears_in_report(pytester, tmp_path):
     assert 'fixture boom' in s['error']['message']
 
 
+@scenario(t'A fixture failing in teardown fails its finished {pg["Scenario"].low}')
 def test_fixture_teardown_failure_fails_the_scenario(pytester, tmp_path):
     """A scenario whose fixture errors *after* its yield must not stay green.
 
@@ -801,32 +802,39 @@ def test_fixture_teardown_failure_fails_the_scenario(pytester, tmp_path):
     active scenario, so without an explicit teardown path the error is dropped
     and the report shows `passed` for a run pytest counted as an error.
     """
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then
+    with given(t'a {pg["Scenario"].low} whose fixture raises after its yield'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, given, then
 
-        @pytest.fixture
-        def resource():
-            yield 1
-            raise RuntimeError("teardown boom")
+            @pytest.fixture
+            def resource():
+                yield 1
+                raise RuntimeError("teardown boom")
 
-        @scenario("Teardown-failed")
-        def test_a(resource):
-            with given("a resource"):
-                value = resource
-            with then("it is one"):
-                assert value == 1
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=1, errors=1)
-    data = json.loads(json_path.read_text())
-    s = data['scenarios'][0]
-    assert s['status'] == 'failed'
-    assert s['error'] is not None
-    assert 'teardown boom' in s['error']['message']
+            @scenario("Teardown-failed")
+            def test_a(resource):
+                with given("a resource"):
+                    value = resource
+                with then("it is one"):
+                    assert value == 1
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('pytest counts the test passed and its teardown an error'):
+        result.assert_outcomes(passed=1, errors=1)
+    with then(
+        t'the {pg["Report"].low} marks the {pg["Scenario"].low} failed with the '
+        t'teardown error'
+    ):
+        data = json.loads(json_path.read_text())
+        s = data['scenarios'][0]
+        assert s['status'] == 'failed'
+        assert s['error'] is not None
+        assert 'teardown boom' in s['error']['message']
 
 
 def test_unannotated_after_setup_failure_is_not_contaminated(pytester, tmp_path):
@@ -917,101 +925,70 @@ def test_with_given_inside_fixture_body_is_captured(pytester, tmp_path):
     assert steps[1]['narration']['text'] == 'items == 3'
 
 
-def test_given_in_fixture_teardown_raises(pytester, tmp_path):
-    """Calling `with given(...)` after the fixture's yield is a hard error."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then
-
-        @pytest.fixture
-        @given("a thing")
-        def thing():
-            yield 1
-            with given("teardown step"):  # illegal
-                pass
-
-        @scenario("Teardown raises")
-        def test_use(thing):
-            with then("v == 1"):
-                assert thing == 1
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}', '-v')
-    # The test body passes; the teardown failure should surface as an error.
-    # pytester reports teardown errors as ERROR, not as a failed test.
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*PytestGivenError*'])
+_LATE_TEARDOWN_CALLS = {
+    'step': 'with given("a late step"): pass',
+    'attachment': 'attach("late", "data")',
+}
 
 
-def test_attach_in_fixture_teardown_raises(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, given, then, attach
+@scenario(
+    t'A {pg["Step fixture"].low} refuses {pg["Step"]("steps")} and '
+    t'{pg["Attachment"]("attachments")} in its teardown',
+    tags=['validation'],
+)
+@pytest.mark.parametrize('late', list(_LATE_TEARDOWN_CALLS))
+def test_step_fixture_teardown_refuses_steps_and_attachments(pytester, late):
+    with given(t'a {pg["Step fixture"].low} that adds a {late} after its yield'):
+        suite = f"""
+            import pytest
+            from pytest_given import scenario, given, then, attach
 
-        @pytest.fixture
-        @given("a thing")
-        def thing():
-            yield 1
-            attach("late", "data")
+            @pytest.fixture
+            @given("a thing")
+            def thing():
+                yield 1
+                {_LATE_TEARDOWN_CALLS[late]}
 
-        @scenario("Attach teardown raises")
-        def test_use(thing):
-            with then("v == 1"):
-                assert thing == 1
-        """
-    )
-    result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*PytestGivenError*'])
-
-
-def test_when_on_fixture_raises(pytester):
-    """@when on a fixture is rejected: fixtures are setup, only @given fits."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, when, then
-
-        @pytest.fixture
-        @when("inserting money")
-        def coin():
-            return 2
-
-        @scenario("uses bad fixture")
-        def test_use(coin):
-            with then("coin is 2"):
-                assert coin == 2
-        """
-    )
-    result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*PytestGivenError*', '*@given*'])
+            @scenario("Teardown raises")
+            def test_use(thing):
+                with then("it is one"):
+                    assert thing == 1
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs'):
+        result = pytester.runpytest()
+    with then('the test passes but its teardown errors with a PytestGivenError'):
+        result.assert_outcomes(passed=1, errors=1)
+        result.stdout.fnmatch_lines(['*PytestGivenError*'])
 
 
-def test_then_on_fixture_raises(pytester):
-    """@then on a fixture is rejected for the same reason as @when."""
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, then
+@scenario('A fixture decorated with @when or @then is refused', tags=['validation'])
+@pytest.mark.parametrize('decorator', ['when', 'then'])
+def test_when_or_then_on_a_fixture_is_refused(pytester, decorator):
+    """Fixtures are setup, so only @given fits them."""
+    with given(t'a fixture decorated with @{decorator}'):
+        suite = f"""
+            import pytest
+            from pytest_given import scenario, then, {decorator}
 
-        @pytest.fixture
-        @then("a coffee is dispensed")
-        def coffee():
-            return 'espresso'
+            @pytest.fixture
+            @{decorator}("a coin is inserted")
+            def coin():
+                return 2
 
-        @scenario("uses bad fixture")
-        def test_use(coffee):
-            with then("coffee is espresso"):
-                assert coffee == 'espresso'
-        """
-    )
-    result = pytester.runpytest('-v')
-    assert result.ret != 0
-    result.stdout.fnmatch_lines(['*PytestGivenError*', '*@given*'])
+            @scenario("uses the fixture")
+            def test_use(coin):
+                with then("the coin is 2"):
+                    assert coin == 2
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+    with when('the suite runs'):
+        result = pytester.runpytest()
+    with then('the run fails with a PytestGivenError that points at @given'):
+        assert result.ret != 0
+        result.stdout.fnmatch_lines(['*PytestGivenError*', '*@given*'])
 
 
 def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
@@ -1912,8 +1889,8 @@ def test_scenario_matched_against_two_stories(pytester, tmp_path):
     with then('the test passes'):
         result.assert_outcomes(passed=1)
     with then(
-        t'the {pg["Scenario"].low} binds both {pg["Story"]("stories")} and covers '
-        t'the {pg["Sentence"].low} of each'
+        t'the {pg["Scenario"].low} {pg["Scenario↔sentence binding"]("binds")} both '
+        t'{pg["Story"]("stories")} and covers the {pg["Sentence"].low} of each'
     ):
         data = json.loads(json_path.read_text())
         scenario_id = data['scenarios'][0]['id']
@@ -2147,8 +2124,8 @@ def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_pa
 )
 def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
     with given(
-        t'a {pg["Scenario"].low} whose Annotated given(...) label on a plain '
-        t'fixture carries a {pg["Pin"].low}'
+        t'a {pg["Scenario"].low} whose Annotated given(...) label on a '
+        t'{pg["Plain fixture"].low} carries a {pg["Pin"].low}'
     ):
         suite = """
             from typing import Annotated
@@ -2680,7 +2657,7 @@ def test_annotated_template_label_without_parametrize_fails_scenario(
 ) -> None:
     with given('a Template label on a plain fixture parameter'):
         pytester.makepyfile(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE)
-        attach('suite', _TEMPLATE_LABEL_WITHOUT_PARAMETRIZE)
+        attach('suite', textwrap.dedent(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE).strip())
     with when(t'the suite runs with an HTML {pg["Report"].low}'):
         result = pytester.runpytest('--given-html=report.html')
     with then('the scenario errors, naming the parameter and the fix'):
@@ -2692,29 +2669,41 @@ def test_annotated_template_label_without_parametrize_fails_scenario(
         assert (pytester.path / 'report.html').is_file()
 
 
-def test_annotated_template_label_naming_no_column_fails_scenario(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        from typing import Annotated
-        import pytest
-        from pytest_given import scenario, given, when, Template
+_TEMPLATE_LABEL_NAMING_NO_COLUMN = """
+    from typing import Annotated
+    import pytest
+    from pytest_given import scenario, given, when, Template
 
-        @pytest.fixture
-        def room():
-            return 101
+    @pytest.fixture
+    def room():
+        return 101
 
-        @scenario('bad')
-        @pytest.mark.parametrize('x', [1])
-        def test_it(x, room: Annotated[int, given(Template('room {room}'))]):
-            with when('it is booked'):
-                pass
-        """
-    )
-    result = pytester.runpytest()
-    result.assert_outcomes(errors=1)
-    result.stdout.fnmatch_lines(
-        ["*'{room}' in the Annotated label on parameter 'room' does not match*"]
-    )
+    @scenario('bad')
+    @pytest.mark.parametrize('x', [1])
+    def test_it(x, room: Annotated[int, given(Template('room {room}'))]):
+        with when('it is booked'):
+            pass
+"""
+
+
+@scenario(
+    t'An Annotated Template label whose placeholder names no parametrize column '
+    t'fails its {pg["Scenario"].low}'
+)
+def test_annotated_template_label_naming_no_column_fails_scenario(pytester):
+    with given(
+        t'a {pg["Parametrized scenario"].low} whose Template label names a plain '
+        t'fixture, not a column'
+    ):
+        pytester.makepyfile(_TEMPLATE_LABEL_NAMING_NO_COLUMN)
+        attach('suite', textwrap.dedent(_TEMPLATE_LABEL_NAMING_NO_COLUMN).strip())
+    with when('the suite runs'):
+        result = pytester.runpytest()
+    with then('the scenario errors, naming the placeholder and its parameter'):
+        result.assert_outcomes(errors=1)
+        result.stdout.fnmatch_lines(
+            ["*'{room}' in the Annotated label on parameter 'room' does not match*"]
+        )
 
 
 def test_param_without_annotated_stays_table_only(pytester, tmp_path):
@@ -2798,7 +2787,7 @@ def test_no_output_flags_writes_nothing(pytester: pytest.Pytester) -> None:
         result = pytester.runpytest()
     with then('the run passes'):
         assert result.ret == 0
-    with then('nothing is written to disk'):
+    with then('no report directory appears in the default location'):
         assert not (pytester.path / 'given-report').exists()
 
 
@@ -2823,7 +2812,7 @@ def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
     assert 'pytest-given:md:start' not in result.stdout.str()
 
 
-@scenario(t'Each sink flag writes only its own {pg["Report"].low} file')
+@scenario(t'`--given-html` alone writes no JSON {pg["Report"].low}')
 def test_given_html_alone_writes_no_json(pytester: pytest.Pytester) -> None:
     with given(t'a suite with one {pg["Scenario"].low}'):
         pytester.makepyfile(_SUITE)
@@ -2832,7 +2821,7 @@ def test_given_html_alone_writes_no_json(pytester: pytest.Pytester) -> None:
         pytester.runpytest(f'--given-html={html_path}')
     with then('the HTML rendering is written'):
         assert html_path.exists()
-    with then('no JSON lands beside it'):
+    with then('no JSON lands in the default location'):
         assert not (pytester.path / 'given-report' / 'report-data.json').exists()
 
 
@@ -3012,8 +3001,7 @@ def test_given_title_cli_overrides_ini(pytester, tmp_path):
 
 
 @scenario(
-    t'`--given-theme` sets the {pg["Theme"].low} the HTML {pg["Report"].low} opens in',
-    tags=['configuration'],
+    t'`--given-theme` sets the {pg["Theme"].low} the HTML {pg["Report"].low} opens in'
 )
 def test_given_theme_cli_flag_sets_the_report_default(pytester, tmp_path):
     with given(t'a suite with one {pg["Scenario"].low}'):
@@ -3074,7 +3062,7 @@ def test_an_unknown_theme_fails_before_the_suite_runs(pytester):
     with then('the run ends as a usage error, naming the flag the user typed'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR
         result.stderr.fnmatch_lines(["*Unknown --given-theme value 'Dark'*"])
-    with then('no test ran: the run stopped at configure, before collection'):
+    with then('no test ran'):
         assert 'passed' not in result.stdout.str()
 
 

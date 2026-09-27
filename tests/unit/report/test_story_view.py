@@ -210,7 +210,8 @@ def test_a_scenario_is_listed_under_its_stories_and_the_stories_it_covers() -> N
 )
 def test_build_story_rollups_flags_under_anchored_sentence_ineligible() -> None:
     with given(
-        t'a {pg["Story"]} with an anchored and an under-anchored {pg["Sentence"]}'
+        t'a {pg["Story"].low} with an anchored and an under-anchored '
+        t'{pg["Sentence"].low}'
     ):
         g = _g()
         eligible = Sentence(
@@ -243,7 +244,9 @@ def test_build_story_rollups_flags_under_anchored_sentence_ineligible() -> None:
         rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
     with when('the story rollups are built'):
         rollups = build_story_rollups(rd, build_coverage_map(rd))
-    with then(t'only the anchored {pg["Sentence"]} is {pg["Coverage"]}-eligible'):
+    with then(
+        t'only the anchored {pg["Sentence"].low} is {pg["Coverage"].low}-eligible'
+    ):
         per_sentence = rollups[StoryId('book')].per_sentence
         assert per_sentence[SentenceId(1)].eligible is True
         assert per_sentence[SentenceId(2)].eligible is False
@@ -255,7 +258,9 @@ def test_build_story_rollups_flags_under_anchored_sentence_ineligible() -> None:
 def test_build_story_rollups_pinned_under_anchored_sentence_is_tracked() -> None:
     """`untracked` is what the timeline renders as '—'. An under-anchored
     sentence earns it only while nothing pins it."""
-    with given(t'a {pg["Story"]} whose only {pg["Sentence"]} is under-anchored'):
+    with given(
+        t'a {pg["Story"].low} whose only {pg["Sentence"].low} is under-anchored'
+    ):
         g = _g()
         under_anchored = Sentence(
             id=SentenceId(1),
@@ -270,7 +275,7 @@ def test_build_story_rollups_pinned_under_anchored_sentence_is_tracked() -> None
             ),
         )
         story = Story(id=StoryId('book'), title='Book', sentences=(under_anchored,))
-    with given(t'a {pg["Scenario"]} whose {pg["Step"].low} pins it by id'):
+    with given(t'a {pg["Scenario"].low} whose {pg["Step"].low} pins it by id'):
         pinned = Scenario(
             id=NodeId('test::a'),
             narration=Narration(text='a'),
@@ -357,7 +362,8 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
 )
 def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
     with given(
-        t'two {pg["Story"]("stories")} each with a guest-search-room {pg["Sentence"]}'
+        t'two {pg["Story"]("stories")} each with a guest-search-room '
+        t'{pg["Sentence"].low}'
     ):
         glossary = _g()
         clauses = (
@@ -380,7 +386,7 @@ def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
             sentences=(Sentence(id=SentenceId(1), clauses=clauses),),
         )
     with given(
-        t'a {pg["Scenario"]} bound to both whose {pg["Step"]} names those terms'
+        t'a {pg["Scenario"].low} bound to both whose {pg["Step"].low} names those terms'
     ):
         both = dataclasses.replace(
             _covering_scn('test::both', 'passed'),
@@ -392,7 +398,7 @@ def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
     with when('the story rollups are built'):
         rollups = build_story_rollups(report, build_coverage_map(report))
     with then(
-        t'the {pg["Scenario"]} is listed under, and covers, both '
+        t'the {pg["Scenario"].low} is listed under, and covers, both '
         t'{pg["Story"]("stories")}'
     ):
         for story_id in (StoryId('book'), StoryId('stay')):
@@ -403,10 +409,12 @@ def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
 
 
 @scenario(
-    t'A {pg["Sentence"]} is labeled by the prose of its {pg["Clause"]("clauses")}',
+    t'A {pg["Sentence"].low} is labeled by the prose of its {pg["Clause"]("clauses")}',
 )
 def test_build_sentence_labels_joins_parts_into_prose() -> None:
-    with given(t'a {pg["Story"]} with a two-{pg["Clause"].low} {pg["Sentence"].low}'):
+    with given(
+        t'a {pg["Story"].low} with a two-{pg["Clause"].low} {pg["Sentence"].low}'
+    ):
         sentence = Sentence(
             id=SentenceId(3),
             clauses=(

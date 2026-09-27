@@ -155,10 +155,11 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
             _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
         )
     with then(
-        t'a single warn {pg["Finding"].low} names the {pg["Tag"].low}, the '
-        t'{pg["Term"].low} it shadows, and both scenarios'
+        t'a single warn {pg["Finding"].low} names the {pg["Tag"].low} and the '
+        t'{pg["Term"].low} it shadows, counting the scenarios and naming one'
     ):
         [finding] = findings
+        assert DEFAULTS[finding.rule] == 'warn'
         assert finding.subject == 'file-glossary'
         assert finding.message == (
             "tag 'File Glossary' duplicates glossary term 'File glossary' "

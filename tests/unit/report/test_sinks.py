@@ -176,7 +176,8 @@ def _story_report() -> ReportData:
 )
 def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
     with given(
-        t'a {pg["Story"]} with a covered, an uncovered, an untracked {pg["Sentence"]}'
+        t'a {pg["Story"].low} with a covered, an uncovered, an untracked '
+        t'{pg["Sentence"].low}'
     ):
         report = _story_report()
     with when('the JSON sink is rendered'):

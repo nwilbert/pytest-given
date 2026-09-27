@@ -57,11 +57,11 @@ pytestmark = pytest.mark.usefixtures('isolated_story_registry')
 )
 def test_context_manager_basic() -> None:
     with when(
-        t'a given {pg["Step"]} descriptor is created',
+        t'a given {pg["Step"].low} descriptor is created',
         pins=adopt_pytest_given['narrate'],
     ):
         desc = StepDescriptor('given', 'a coffee machine')
-    with then(t'it carries the given {pg["Phase"]} and its {pg["Narration"]}'):
+    with then(t'it carries the given {pg["Phase"].low} and its {pg["Narration"].low}'):
         assert desc.phase == 'given'
         assert desc.narration.text == 'a coffee machine'
 
@@ -290,7 +290,7 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
 )
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
@@ -303,7 +303,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
             recorded = collector.finish_scenario(status='passed')
         finally:
             set_active_collector(session_collector)
-    with then(t'a when and a sibling then {pg["Step"]} are recorded'):
+    with then(t'a when and a sibling then {pg["Step"].low} are recorded'):
         assert [(s.phase, s.narration.text) for s in recorded.steps] == [
             ('when', 'the action runs'),
             ('then', 'the outcome holds'),
@@ -316,7 +316,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
 )
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
@@ -345,7 +345,7 @@ def test_when_then_pairs_with_inner_pytest_raises() -> None:
 )
 def test_when_then_omits_then_when_body_raises_uncaught() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(t'the {pg["when_then"]} body raises with nothing catching inside'):
@@ -389,7 +389,7 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
 def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
     phase_factory = {'given': given, 'then': then}[phase_name]
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
 
@@ -409,7 +409,7 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
         pytest.raises(PytestGivenError, match=r"Cannot nest .* inside 'when'"),
     ):
         open_cross_phase_step()
-    with then(t'the {pg["Step stack"]} is left balanced'):
+    with then(t'the {pg["Step stack"].low} is left balanced'):
         assert collector._step_stack == []
 
 
@@ -419,7 +419,7 @@ def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
 )
 def test_when_then_allows_nested_when_as_child_sub_step() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
@@ -536,12 +536,12 @@ _BAD_LABELS: dict[str, object] = {
     tags=['validation'],
 )
 def test_attach_rejects_a_non_str_label(label_kind: str) -> None:
-    with given(t'a non-str {pg["Attachment"]} label of kind {label_kind}'):
+    with given(t'a non-str {pg["Attachment"].low} label of kind {label_kind}'):
         candidate = cast(str, _BAD_LABELS[label_kind])
     with (
         when_then(
             t'it is attached',
-            t'a PytestGivenError says {pg["Attachment"]} labels are plain text',
+            t'a PytestGivenError says {pg["Attachment"].low} labels are plain text',
         ),
         pytest.raises(PytestGivenError, match='attachment labels are plain text'),
     ):
@@ -583,7 +583,7 @@ def test_phase_with_pytest_given_template_as_context_manager_raises(
     """`with given/when/then(Template(...))` is rejected — t-strings handle
     the body case."""
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"]} in a local {pg["Collector"]}'):
+    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         phase_factory = {'given': given, 'when': when, 'then': then}[phase_name]
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
@@ -970,11 +970,11 @@ def test_step_descriptor_records_the_pins_of_its_handles():
 )
 @pytest.mark.parametrize('bare', [3, 'cancel', [1, 2]])
 def test_pins_refuse_a_bare_number_or_name(bare):
-    with given(t'a sentence number or name written without its {pg["Story"]}'):
+    with given(t'a sentence number or name written without its {pg["Story"].low}'):
         pins = bare
     with (
         when_then(
-            t'a {pg["Step"]} is declared with it',
+            t'a {pg["Step"].low} is declared with it',
             'a PytestGivenError shows the handle form',
         ),
         pytest.raises(PytestGivenError, match=r"the_story\['name'\]"),

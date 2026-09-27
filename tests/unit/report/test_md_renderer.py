@@ -48,7 +48,9 @@ def test_header_names_the_project() -> None:
     t'{pg["Step"].low} bullets',
 )
 def test_passed_scenario_heading_and_steps() -> None:
-    with given(t'a {pg["Report"]} holding a passed {pg["Scenario"]} with three steps'):
+    with given(
+        t'a {pg["Report"].low} holding a passed {pg["Scenario"].low} with three steps'
+    ):
         scn = Scenario(
             id='tests/t.py::test_buy',
             narration=Narration(text='Buy coffee'),
@@ -62,9 +64,9 @@ def test_passed_scenario_heading_and_steps() -> None:
             ],
         )
         rd = _report(scn)
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(rd)
-    with then(t'the heading is checked and each {pg["Step"]} is a phase bullet'):
+    with then(t'the heading is checked and each {pg["Step"].low} is a phase bullet'):
         attach('Rendered Markdown', md)
         assert '## ✓ Buy coffee' in md
         assert '`tests/t.py::test_buy` · billing, happy-path' in md
@@ -146,7 +148,9 @@ def test_source_without_location_still_drops_parametrize_suffix() -> None:
     t'Nested {pg["Step"]("steps")} indent under their parent',
 )
 def test_nested_steps_indent() -> None:
-    with given(t'a {pg["Scenario"]} whose when {pg["Step"]} has a nested child'):
+    with given(
+        t'a {pg["Scenario"].low} whose when {pg["Step"].low} has a nested child'
+    ):
         scn = Scenario(
             id='tests/t.py::test_nest',
             narration=Narration(text='Nest'),
@@ -159,7 +163,7 @@ def test_nested_steps_indent() -> None:
                 )
             ],
         )
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(_report(scn))
     with then('the child bullet indents under its parent'):
         attach('Rendered Markdown', md)
@@ -173,7 +177,8 @@ def test_nested_steps_indent() -> None:
 )
 def test_narration_parts_resolve_terms_and_values() -> None:
     with given(
-        t'a {pg["Step"]} whose {pg["Narration"]} carries a {pg["Term ref"]}, '
+        t'a {pg["Step"].low} whose {pg["Narration"].low} carries a '
+        t'{pg["Term ref"].low}, '
         t'a value and a placeholder'
     ):
         scn = Scenario(
@@ -195,10 +200,10 @@ def test_narration_parts_resolve_terms_and_values() -> None:
                 )
             ],
         )
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(_report(scn))
     with then(
-        t'the {pg["Term ref"]} renders in guillemets, the value verbatim '
+        t'the {pg["Term ref"].low} renders in guillemets, the value verbatim '
         t'and the placeholder in braces'
     ):
         attach('Rendered Markdown', md)
@@ -244,8 +249,8 @@ def test_single_case_heading_says_one_case_not_one_cases() -> None:
 )
 def test_parametrized_scenario_renders_table() -> None:
     with given(
-        t'a {pg["Parametrized scenario"]} with a two-{pg["Case"]} '
-        t'{pg["Parameter table"]}'
+        t'a {pg["Parametrized scenario"].low} with a two-{pg["Case"].low} '
+        t'{pg["Parameter table"].low}'
     ):
         scn = Scenario(
             id='tests/t.py::test_price',
@@ -263,10 +268,11 @@ def test_parametrized_scenario_renders_table() -> None:
                 ],
             ),
         )
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(_report(scn))
     with then(
-        t'the heading counts the cases and the {pg["Parameter table"]} lists each row'
+        t'the heading counts the cases and the {pg["Parameter table"].low} lists each '
+        t'row'
     ):
         attach('Rendered Markdown', md)
         assert '## ✓ Pricing · 2 cases' in md
@@ -276,11 +282,11 @@ def test_parametrized_scenario_renders_table() -> None:
 
 
 @scenario(
-    t'A failing {pg["Step"].low} is marked with a minimal error digest',
+    t'A failed {pg["Scenario"].low} ends with a minimal error digest',
 )
 def test_failing_scenario_renders_a_minimal_error() -> None:
     with given(
-        t'a failed {pg["Scenario"]} carrying a two-line error and an internal frame'
+        t'a failed {pg["Scenario"].low} carrying a two-line error and an internal frame'
     ):
         scn = Scenario(
             id='tests/t.py::test_sold_out',
@@ -315,7 +321,7 @@ def test_failing_scenario_renders_a_minimal_error() -> None:
         )
         rd = _report(scn)
         attach('Error record', report_to_dict(rd)['scenarios'][0]['error'])
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(rd)
     with then('the heading is crossed and the error follows the steps'):
         attach('Rendered Markdown', md)
@@ -350,7 +356,7 @@ def test_single_line_attachment_renders_inline() -> None:
     t'A multi-line {pg["Attachment"].low} renders as a fenced block',
 )
 def test_multiline_attachment_renders_fenced_block() -> None:
-    with given(t'a {pg["Step"]} carrying a multi-line {pg["Attachment"]}'):
+    with given(t'a {pg["Step"].low} carrying a multi-line {pg["Attachment"].low}'):
         scn = Scenario(
             id='tests/t.py::test_multiline',
             narration=Narration(text='Multi'),
@@ -363,9 +369,11 @@ def test_multiline_attachment_renders_fenced_block() -> None:
                 )
             ],
         )
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(_report(scn))
-    with then(t'the {pg["Attachment"]} content sits in an indented fence, not inline'):
+    with then(
+        t'the {pg["Attachment"].low} content sits in an indented fence, not inline'
+    ):
         attach('Rendered Markdown', md)
         assert '  - 📎 Doc:' in md
         assert '\n    ```\n' in md
@@ -513,7 +521,7 @@ def test_param_table_renders_none_value_as_text_not_blank() -> None:
     'A skipped scenario shows its skip reason',
 )
 def test_skipped_scenario_shows_reason() -> None:
-    with given(t'a skipped {pg["Scenario"]} with a reason'):
+    with given(t'a skipped {pg["Scenario"].low} with a reason'):
         scn = Scenario(
             id='tests/t.py::test_skip',
             narration=Narration(text='Later'),
@@ -522,7 +530,7 @@ def test_skipped_scenario_shows_reason() -> None:
             skip_reason='needs fixture data',
             steps=[Step(phase='when', narration=Narration(text='act'))],
         )
-    with when(t'the Markdown {pg["Report"]} is rendered'):
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
         md = render_md(_report(scn))
     with then('the heading is marked skipped and the reason follows the node id'):
         attach('Rendered Markdown', md)

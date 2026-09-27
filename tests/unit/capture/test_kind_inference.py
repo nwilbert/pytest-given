@@ -47,15 +47,15 @@ def _kind(glossary, term_id):
     t'{pg["Term"]} kinds are inferred from clause-slot positions',
 )
 def test_infers_actor_activity_object_by_position():
-    with given(t'a glossary of three {pg["Kindless"]} {pg["Term"]} entries'):
+    with given(t'a glossary of three {pg["Kindless"].low} {pg["Term"].low} entries'):
         glossary = Glossary(terms=[_term('guest'), _term('search'), _term('room')])
-    with when(t'{pg["Kind inference"]} runs over a {pg["Story"]}'):
+    with when(t'{pg["Kind inference"].low} runs over a {pg["Story"].low}'):
         inferred = infer_glossary_kinds(
             glossary, [_story('S', ('guest', 'search', 'room'))]
         )
     with then(
-        t'they are inferred as {pg["Actor"]}, {pg["Activity"]}, '
-        t'{pg["Work Object"]} by slot'
+        t'they are inferred as {pg["Actor"].low}, {pg["Activity"].low}, '
+        t'{pg["Work Object"].low} by slot'
     ):
         assert _kind(inferred, 'guest') == 'actor'
         assert _kind(inferred, 'search') == 'activity'
@@ -67,7 +67,7 @@ def test_infers_actor_activity_object_by_position():
     t'{pg["Sentence"].low} gets its kind inferred',
 )
 def test_infers_kinds_from_a_second_clause():
-    with given(t'a glossary of {pg["Kindless"]} {pg["Term"]} entries'):
+    with given(t'a glossary of {pg["Kindless"].low} {pg["Term"].low} entries'):
         glossary = Glossary(
             terms=[_term('guest'), _term('clerk'), _term('sign'), _term('register')]
         )
@@ -81,7 +81,7 @@ def test_infers_kinds_from_a_second_clause():
         )
 
     with given(
-        t'a {pg["Sentence"]} whose second {pg["Clause"]} starts at another '
+        t'a {pg["Sentence"].low} whose second {pg["Clause"].low} starts at another '
         t'{pg["Actor"].low}'
     ):
         sentence = Sentence(
@@ -92,9 +92,11 @@ def test_infers_kinds_from_a_second_clause():
             ),
         )
         story = Story(id=StoryId('S'), title='S', sentences=(sentence,))
-    with when(t'{pg["Kind inference"]} runs over its {pg["Story"]}'):
+    with when(t'{pg["Kind inference"].low} runs over its {pg["Story"].low}'):
         inferred = infer_glossary_kinds(glossary, [story])
-    with then(t'the first {pg["Term"]} of the second clause is an {pg["Actor"]}'):
+    with then(
+        t'the first {pg["Term"].low} of the second clause is an {pg["Actor"].low}'
+    ):
         assert _kind(inferred, 'clerk') == 'actor'
 
 
@@ -103,21 +105,23 @@ def test_infers_kinds_from_a_second_clause():
     t'{pg["Slot"].low} elsewhere',
 )
 def test_actor_anywhere_beats_object():
-    with given(t'a {pg["Glossary"].low} of {pg["Kindless"]} {pg["Term"]} entries'):
+    with given(
+        t'a {pg["Glossary"].low} of {pg["Kindless"].low} {pg["Term"].low} entries'
+    ):
         glossary = Glossary(
             terms=[_term('host'), _term('greet'), _term('guest'), _term('wave')]
         )
     with given(
-        t'one {pg["Story"]} putting a {pg["Term"]} in a noun slot and another '
-        t'putting it in an {pg["Actor"]} slot'
+        t'one {pg["Story"].low} putting a {pg["Term"].low} in a noun slot and another '
+        t'putting it in an {pg["Actor"].low} slot'
     ):
         stories = [
             _story('S1', ('host', 'greet', 'guest')),
             _story('S2', ('guest', 'wave', 'host')),
         ]
-    with when(t'{pg["Kind inference"]} runs over both {pg["Story"]("stories")}'):
+    with when(t'{pg["Kind inference"].low} runs over both {pg["Story"]("stories")}'):
         inferred = infer_glossary_kinds(glossary, stories)
-    with then(t'its inferred kind is {pg["Actor"]}'):
+    with then(t'its inferred kind is {pg["Actor"].low}'):
         assert _kind(inferred, 'guest') == 'actor'
 
 
@@ -125,11 +129,11 @@ def test_actor_anywhere_beats_object():
     t'A {pg["Term"].low} used in no {pg["Story"].low} stays {pg["Kindless"].low}',
 )
 def test_never_used_stays_kindless():
-    with given(t'a {pg["Term"]} referenced by no {pg["Story"]}'):
+    with given(t'a {pg["Term"].low} referenced by no {pg["Story"].low}'):
         glossary = Glossary(terms=[_term('orphan')])
-    with when(t'{pg["Kind inference"]} runs with no stories'):
+    with when(t'{pg["Kind inference"].low} runs with no stories'):
         inferred = infer_glossary_kinds(glossary, [])
-    with then(t'the {pg["Term"]} remains {pg["Kindless"]}'):
+    with then(t'the {pg["Term"].low} remains {pg["Kindless"].low}'):
         assert _kind(inferred, 'orphan') is None
 
 
@@ -138,7 +142,9 @@ def test_never_used_stays_kindless():
     tags=['diagnostics', 'validation'],
 )
 def test_activity_and_noun_conflict_raises():
-    with given(t'a {pg["Kindless"]} {pg["Term"]} used in a verb slot and a noun slot'):
+    with given(
+        t'a {pg["Kindless"].low} {pg["Term"].low} used in a verb slot and a noun slot'
+    ):
         glossary = Glossary(terms=[_term('a'), _term('book'), _term('c'), _term('d')])
         stories = [
             _story('S1', ('a', 'book', 'c')),  # book = verb slot
@@ -146,7 +152,7 @@ def test_activity_and_noun_conflict_raises():
         ]
     with (
         when_then(
-            'kind resolution runs over both stories',
+            t'{pg["Kind inference"].low} runs over both {pg["Story"]("stories")}',
             'a PytestGivenError names the conflicting term',
         ),
         pytest.raises(PytestGivenError, match=r'(?i)book'),
@@ -158,7 +164,7 @@ def test_activity_and_noun_conflict_raises():
     t'A declared kind consistent with its {pg["Slot"].low} is kept',
 )
 def test_declared_kind_verified_and_kept():
-    with given(t'a glossary with explicitly declared {pg["Term"]} kinds'):
+    with given(t'a glossary with explicitly declared {pg["Term"].low} kinds'):
         glossary = Glossary(
             terms=[
                 _term('guest', 'actor'),
@@ -166,7 +172,7 @@ def test_declared_kind_verified_and_kept():
                 _term('room', 'object'),
             ]
         )
-    with when(t'{pg["Kind inference"]} runs over a matching {pg["Story"]}'):
+    with when(t'{pg["Kind inference"].low} runs over a matching {pg["Story"].low}'):
         inferred = infer_glossary_kinds(
             glossary, [_story('S', ('guest', 'search', 'room'))]
         )
@@ -182,11 +188,11 @@ def test_declared_kind_verified_and_kept():
     tags=['diagnostics', 'validation'],
 )
 def test_declared_activity_in_actor_slot_raises():
-    with given(t'a {pg["Term"]} declared as an {pg["Activity"]}'):
+    with given(t'a {pg["Term"].low} declared as an {pg["Activity"].low}'):
         glossary = Glossary(terms=[_term('search', 'activity'), _term('x'), _term('y')])
     with (
         when_then(
-            t'kind resolution places it in the {pg["Actor"]} slot',
+            t'{pg["Kind inference"].low} finds it in the {pg["Actor"].low} slot',
             'a PytestGivenError names the misplaced term',
         ),
         pytest.raises(PytestGivenError, match=r'(?i)search'),
@@ -201,7 +207,7 @@ def test_declared_activity_in_actor_slot_raises():
 )
 def test_activity_and_actor_conflict_raises():
     with given(
-        t'a {pg["Kindless"]} {pg["Term"]} used in a verb slot and an actor slot'
+        t'a {pg["Kindless"].low} {pg["Term"].low} used in a verb slot and an actor slot'
     ):
         glossary = Glossary(
             terms=[_term('a'), _term('examine'), _term('b'), _term('c')]
@@ -212,7 +218,7 @@ def test_activity_and_actor_conflict_raises():
         ]
     with (
         when_then(
-            'kind resolution runs over both stories',
+            t'{pg["Kind inference"].low} runs over both {pg["Story"]("stories")}',
             'a PytestGivenError names the conflicting term',
         ),
         pytest.raises(PytestGivenError, match=r'(?i)examine'),
@@ -226,11 +232,11 @@ def test_activity_and_actor_conflict_raises():
     tags=['diagnostics', 'validation'],
 )
 def test_declared_object_in_actor_slot_raises():
-    with given(t'a {pg["Term"]} declared as a {pg["Work Object"]}'):
+    with given(t'a {pg["Term"].low} declared as a {pg["Work Object"].low}'):
         glossary = Glossary(terms=[_term('room', 'object'), _term('x'), _term('y')])
     with (
         when_then(
-            t'kind resolution places it in the {pg["Actor"]} slot',
+            t'{pg["Kind inference"].low} finds it in the {pg["Actor"].low} slot',
             'a PytestGivenError names the misplaced term',
         ),
         pytest.raises(PytestGivenError, match=r'(?i)room'),
@@ -243,13 +249,13 @@ def test_declared_object_in_actor_slot_raises():
     tags=['validation'],
 )
 def test_declared_actor_in_verb_slot_raises():
-    with given(t'a {pg["Term"]} declared as an {pg["Actor"]}'):
+    with given(t'a {pg["Term"].low} declared as an {pg["Actor"].low}'):
         glossary = Glossary(
             terms=[_term('subject'), _term('guest', 'actor'), _term('y')]
         )
     with (
         when_then(
-            'kind resolution places it at position 1 (the verb slot)',
+            t'{pg["Kind inference"].low} finds it at position 1 (the verb slot)',
             'a PytestGivenError says an actor cannot fill the verb slot',
         ),
         pytest.raises(PytestGivenError, match=r'(?i)verb slot'),
@@ -262,15 +268,22 @@ def test_declared_actor_in_verb_slot_raises():
     tags=['diagnostics', 'validation'],
 )
 def test_conflict_where_names_only_offending_stories():
-    with given(t'an {pg["Actor"]} {pg["Term"]} that also appears in a verb slot'):
+    with given(
+        t'an {pg["Actor"].low} {pg["Term"].low} that also appears in a verb slot'
+    ):
         glossary = Glossary(terms=[_term('guest', 'actor'), _term('x'), _term('y')])
         stories = [
             _story('ActorStory', ('guest', 'x', 'y')),  # actor slot (ok)
             _story('VerbStory', ('x', 'guest', 'y')),  # verb slot (violation)
         ]
-    with when('kind resolution raises'):
-        with pytest.raises(PytestGivenError) as excinfo:
-            infer_glossary_kinds(glossary, stories)
+    with (
+        when_then(
+            t'{pg["Kind inference"].low} runs over both {pg["Story"]("stories")}',
+            'a PytestGivenError reports the conflict',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        infer_glossary_kinds(glossary, stories)
     with then('only the offending story is named in the message'):
         message = str(excinfo.value)
         assert 'VerbStory' in message
@@ -283,16 +296,23 @@ def test_conflict_where_names_only_offending_stories():
     tags=['diagnostics', 'validation'],
 )
 def test_inferred_conflict_where_excludes_unrelated_slot_stories():
-    with given(t'a {pg["Kindless"]} {pg["Term"]} used in verb, actor and noun slots'):
+    with given(
+        t'a {pg["Kindless"].low} {pg["Term"].low} used in verb, actor and noun slots'
+    ):
         glossary = Glossary(terms=[_term('run'), _term('x'), _term('y'), _term('z')])
         stories = [
             _story('VerbStory', ('x', 'run', 'y')),  # verb slot
             _story('ActorStory', ('run', 'x', 'y')),  # actor slot
             _story('NounStory', ('x', 'y', 'run')),  # noun slot only
         ]
-    with when('the verb-vs-actor conflict is raised'):
-        with pytest.raises(PytestGivenError) as excinfo:
-            infer_glossary_kinds(glossary, stories)
+    with (
+        when_then(
+            t'{pg["Kind inference"].low} runs over all three {pg["Story"]("stories")}',
+            'a PytestGivenError reports the verb-vs-actor conflict',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        infer_glossary_kinds(glossary, stories)
     with then('only the verb and actor stories are named, not the noun one'):
         message = str(excinfo.value)
         assert 'VerbStory' in message
@@ -305,13 +325,13 @@ def test_inferred_conflict_where_excludes_unrelated_slot_stories():
     tags=['validation'],
 )
 def test_declared_activity_in_noun_slot_raises():
-    with given(t'a {pg["Term"]} declared as an {pg["Activity"]}'):
+    with given(t'a {pg["Term"].low} declared as an {pg["Activity"].low}'):
         glossary = Glossary(
             terms=[_term('subject'), _term('action'), _term('search', 'activity')]
         )
     with (
         when_then(
-            'kind resolution places it at position ≥2 (a noun slot)',
+            t'{pg["Kind inference"].low} finds it at position ≥2 (a noun slot)',
             'a PytestGivenError says a verb cannot fill the noun slot',
         ),
         pytest.raises(PytestGivenError, match=r'(?i)noun slot'),
@@ -325,7 +345,9 @@ def test_declared_activity_in_noun_slot_raises():
 def test_slot_for_maps_odd_positions_to_verb():
     with given('the five positions of a short clause'):
         positions = range(5)
-    with when(t'the {pg["Slot"]} rule is applied to each position'):
+    with when(t'the {pg["Slot"].low} rule is applied to each position'):
         slots = [slot_for(i) for i in positions]
-    with then(t'position 0 is the actor {pg["Slot"]}, then verb and noun alternate'):
+    with then(
+        t'position 0 is the actor {pg["Slot"].low}, then verb and noun alternate'
+    ):
         assert slots == ['actor', 'verb', 'noun', 'verb', 'noun']

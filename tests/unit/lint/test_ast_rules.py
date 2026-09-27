@@ -457,6 +457,7 @@ def test_check_outside_then_fires_on_assert_in_given_or_when(tmp_path, phase) ->
         )
     with then(t'a warn {pg["Finding"].low} names the {phase} step holding the assert'):
         [finding] = findings
+        assert DEFAULTS[finding.rule] == 'warn'
         assert finding.message == (f"assert inside {phase} 'a stocked machine'")
 
 
@@ -599,6 +600,7 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
         findings = _rule_findings(_ast_rules([folded], tmp_path), 'action-in-then')
     with then(t'a warn {pg["Finding"].low} points at the then and says no when acts'):
         [finding] = findings
+        assert DEFAULTS[finding.rule] == 'warn'
         assert finding.subject == 'test_x.py::test_a'
         assert finding.location == SourceLocation(relpath='test_x.py', line=then_line)
         assert finding.message == (
@@ -776,6 +778,7 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         )
     with then(t'a warn {pg["Finding"].low} names the interpolation the body ignores'):
         [finding] = findings
+        assert DEFAULTS[finding.rule] == 'warn'
         assert finding.message == (
             "given 'a 200 ml cup' interpolates {size} but never uses it"
         )
@@ -919,7 +922,7 @@ def test_unused_interpolation_skips_term_refs(tmp_path) -> None:
         tmp_path,
         """\
         def test_a():
-            with given(t'a {pg["File glossary"]} on disk'):
+            with given(t'a {pg["File glossary"].low} on disk'):
                 y = 1
         """,
     )

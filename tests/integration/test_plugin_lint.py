@@ -237,7 +237,10 @@ def test_the_flag_overrides_the_ini_in_both_directions(pytester):
     with then('the lint does not run'):
         assert off.ret == 0
         assert 'narration lint' not in off.stdout.str()
-    with when('the suite runs with the lint disabled by ini but on by flag'):
+    with when(
+        'the suite runs with the lint disabled by ini but on by flag',
+        pins=adopt_pytest_given['flag'],
+    ):
         on = _run(pytester, EMPTY_GIVEN, '-o', 'given_lint=false', '--given-lint')
     with then('the lint runs and its error finding fails the run'):
         assert on.ret == pytest.ExitCode.TESTS_FAILED
@@ -434,10 +437,7 @@ def test_removed_phase_check_ini_key_is_unknown(pytester):
     assert 'Unknown config option: given_phase_check' in result.stdout.str()
 
 
-@scenario(
-    t'An error {pg["Finding"].low} leaves a more specific exit code alone',
-    stories=adopt_pytest_given,
-)
+@scenario(t'An error {pg["Finding"].low} leaves a more specific exit code alone')
 def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
     with given('a suite whose lint would fail, under a stale ignore entry'):
         attach('suite', EMPTY_GIVEN)
@@ -445,10 +445,7 @@ def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
             '[pytest]\ngiven_lint = true\ngiven_lint_ignore = ["never-matches-*"]\n'
         )
         pytester.makepyfile(test_sample=EMPTY_GIVEN)
-    with when(
-        'the suite runs deselected, so nothing is collected',
-        pins=adopt_pytest_given['flag'],
-    ):
+    with when('the suite runs deselected, so nothing is collected'):
         result = pytester.runpytest_inprocess('-k', 'no-such-test')
     with then('the run keeps NO_TESTS_COLLECTED rather than reporting a test failure'):
         # pytest binds exitstatus before sessionfinish, so overwriting it

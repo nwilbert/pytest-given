@@ -75,7 +75,7 @@ def test_resolve_template_raw_template_passes_through() -> None:
 
 @scenario(
     'An unknown preset name is refused, with the valid ones listed',
-    tags=['diagnostics'],
+    tags=['diagnostics', 'validation'],
 )
 def test_resolve_template_unknown_preset_raises() -> None:
     with given('a bareword that is neither a known preset nor a template'):

@@ -44,7 +44,7 @@ def test_id_derive_produces_expected_slug(
     text: Annotated[str, given(Template('the name {text}'))],
     expected,
 ):
-    with when(t'it is slugified into a {pg["Term"]} id'):
+    with when(t'it is slugified into a {pg["Term"].low} id'):
         derived = id_derive(text)
     with then(t'the id is the expected slug {expected!r}'):
         assert derived == expected
@@ -60,7 +60,7 @@ def test_id_derive_raises_on_empty_result(
 ):
     with (
         when_then(
-            t'it is slugified into a {pg["Term"]} id',
+            t'it is slugified into a {pg["Term"].low} id',
             'a PytestGivenError reports the derived id is empty',
         ),
         pytest.raises(PytestGivenError, match='derived id is empty'),
@@ -102,13 +102,13 @@ def test_activity_carries_term_and_glossary_back_ref():
     t'Calling an {pg["Actor"].low} names a distinct {pg["Instance"].low}',
 )
 def test_actor_call_returns_instance_with_distinct_display():
-    with given(t'an {pg["Actor"]} handle for Guest'):
+    with given(t'an {pg["Actor"].low} handle for Guest'):
         g = Glossary()
         t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
         a = TermHandle(_term=t, _glossary=g)
-    with when(t'the {pg["Actor"]} is called with a name'):
+    with when(t'the {pg["Actor"].low} is called with a name'):
         inst = a('Alice')
-    with then(t'an {pg["Instance"]} with a distinct display is returned'):
+    with then(t'an {pg["Instance"].low} with a distinct display is returned'):
         assert isinstance(inst, TermInstance)
         assert inst.handle is a
         assert inst.display == 'Alice'
@@ -129,13 +129,13 @@ def test_work_object_call_returns_instance_with_distinct_display():
     t'of the same {pg["Term"].low}',
 )
 def test_activity_call_returns_inflection_sharing_term_identity():
-    with given(t'an {pg["Activity"]} handle for confirm'):
+    with given(t'an {pg["Activity"].low} handle for confirm'):
         g = Glossary()
         t = GlossaryTerm(id=TermId('confirm'), kind='activity', canonical='confirm')
         v = TermHandle(_term=t, _glossary=g)
-    with when(t'the {pg["Activity"]} is called with a surface form'):
+    with when(t'the {pg["Activity"].low} is called with a surface form'):
         infl = v('confirms')
-    with then(t'an {pg["Inflection"]} sharing the activity identity is returned'):
+    with then(t'an {pg["Inflection"].low} sharing the activity identity is returned'):
         assert isinstance(infl, TermInstance)
         assert infl.handle is v
         assert infl.display == 'confirms'
@@ -152,11 +152,11 @@ def test_glossary_actor_registers_and_returns_handle():
     with given('an empty glossary'):
         g = Glossary()
     with when(
-        t'an {pg["Actor"]} is registered with a definition',
+        t'an {pg["Actor"].low} is registered with a definition',
         pins=adopt_pytest_given['build'],
     ):
         a = g.actor('Guest', definition='Person booking accommodation.')
-    with then(t'a handle carrying the {pg["Actor"]} kind is returned'):
+    with then(t'a handle carrying the {pg["Actor"].low} kind is returned'):
         assert isinstance(a, TermHandle)
         assert a.declared_kind == 'actor'
         assert a.id == 'guest'
@@ -184,7 +184,7 @@ def test_glossary_activity_registers_and_returns_handle():
     stories=adopt_pytest_given,
 )
 def test_glossary_re_registration_with_matching_fields_is_idempotent():
-    with given(t'an {pg["Actor"]} already registered with a definition'):
+    with given(t'an {pg["Actor"].low} already registered with a definition'):
         g = Glossary()
         a1 = g.actor('Guest', definition='d')
     with when(
@@ -192,7 +192,7 @@ def test_glossary_re_registration_with_matching_fields_is_idempotent():
         pins=adopt_pytest_given['build'],
     ):
         a2 = g.actor('Guest', definition='d')
-    with then(t'both handles share the one {pg["Term"]}'):
+    with then(t'both handles share the one {pg["Term"].low}'):
         assert a1.term is a2.term
 
 
@@ -201,7 +201,7 @@ def test_glossary_re_registration_with_matching_fields_is_idempotent():
     tags=['validation'],
 )
 def test_glossary_re_registration_with_mismatched_definition_raises():
-    with given(t'an {pg["Actor"]} already registered with one definition'):
+    with given(t'an {pg["Actor"].low} already registered with one definition'):
         g = Glossary()
         g.actor('Guest', definition='one')
     with (
@@ -219,12 +219,12 @@ def test_glossary_re_registration_with_mismatched_definition_raises():
     tags=['validation'],
 )
 def test_glossary_cross_kind_collision_raises():
-    with given(t'a name already registered as an {pg["Actor"]}'):
+    with given(t'a name already registered as an {pg["Actor"].low}'):
         g = Glossary()
         g.actor('Foo')
     with (
         when_then(
-            t'the same name is registered as an {pg["Activity"]}',
+            t'the same name is registered as an {pg["Activity"].low}',
             'a PytestGivenError reports the conflict with the prior registration',
         ),
         pytest.raises(PytestGivenError, match='conflicts with prior registration'),
@@ -246,9 +246,11 @@ def test_glossary_actor_captures_source():
     try:
         with given('a rootdir-aware glossary'):
             g = Glossary()
-        with when(t'an {pg["Actor"]} is registered'):
+        with when(t'an {pg["Actor"].low} is registered'):
             a = g.actor('Guest')
-        with then(t'the {pg["Term"]} records a {pg["Source link"]} to this file'):
+        with then(
+            t'the {pg["Term"].low} records a {pg["Source link"].low} to this file'
+        ):
             assert a.term.source is not None
             assert a.term.source.relpath.endswith('test_glossary.py')
             assert a.term.source.line > 0
@@ -339,11 +341,11 @@ def test_call_declares_kindless_term():
     with given('an empty glossary'):
         g = Glossary()
     with when(
-        t'a {pg["Term"]} is declared by call, without a kind',
+        t'a {pg["Term"].low} is declared by call, without a kind',
         pins=adopt_pytest_given['build'],
     ):
         handle = g('loyalty points')
-    with then(t'the {pg["Term"]} is registered as {pg["Kindless"]}'):
+    with then(t'the {pg["Term"].low} is registered as {pg["Kindless"].low}'):
         assert handle.term.kind is None
         assert handle.term.canonical == 'loyalty points'
 
@@ -432,12 +434,12 @@ def test_activity_low_yields_lowercased_inflection():
     t'Subscript looks up an already-declared {pg["Term"].low}',
 )
 def test_subscript_get_only_returns_handle():
-    with given(t'a glossary with one declared {pg["Term"]}'):
+    with given(t'a glossary with one declared {pg["Term"].low}'):
         g = Glossary()
         g('redeems')
     with when('the name is looked up by subscript'):
         handle = g['redeems']
-    with then(t'the returned {pg["Term"]} is the declared one'):
+    with then(t'the returned {pg["Term"].low} is the declared one'):
         assert handle.term.canonical == 'redeems'
 
 
@@ -446,7 +448,7 @@ def test_subscript_get_only_returns_handle():
     tags=['diagnostics', 'validation'],
 )
 def test_subscript_unknown_name_raises_with_hint():
-    with given(t'a glossary with one declared {pg["Term"]}'):
+    with given(t'a glossary with one declared {pg["Term"].low}'):
         g = Glossary()
         g('redeems')
     with (

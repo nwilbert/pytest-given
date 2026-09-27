@@ -69,8 +69,9 @@ def test_kind_summaries_use_irregular_plurals() -> None:
 )
 def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
     with given(
-        t'a {pg["Report"]} whose {pg["Story"]} and {pg["Scenario"]} reference '
-        t'entity {pg["Instance"]}s and an {pg["Inflection"]}'
+        t'a {pg["Report"].low} whose {pg["Story"].low} and {pg["Scenario"].low} '
+        t'reference '
+        t'entity {pg["Instance"].low}s and an {pg["Inflection"].low}'
     ):
         g = _g()
         a = Sentence(
@@ -106,13 +107,13 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
         )
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
         attach('Report data', report_to_dict(rd))
-    with when(t'the {pg["Glossary"]} aggregations are built'):
+    with when(t'the {pg["Glossary"].low} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'the entity terms collect their {pg["Instance"]}s'):
+    with then(t'the entity terms collect their {pg["Instance"].low}s'):
         assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
         assert 'Deluxe Suite' in [i.display for i in aggs[TermId('room')].instances]
     with then(
-        t'the activity collects its {pg["Inflection"]} but not its canonical form'
+        t'the activity collects its {pg["Inflection"].low} but not its canonical form'
     ):
         forms = list(aggs[TermId('search')].forms)
         assert 'searches for' in forms
@@ -169,7 +170,8 @@ def test_build_glossary_aggregations_walks_nested_steps() -> None:
 )
 def test_build_glossary_aggregations_records_story_refs_via_sentences() -> None:
     with given(
-        t'a {pg["Story"]} whose {pg["Sentence"]} references an actor and an activity'
+        t'a {pg["Story"].low} whose {pg["Sentence"].low} references an actor and an '
+        t'activity'
     ):
         g = _g()
         a = Sentence(
@@ -186,9 +188,9 @@ def test_build_glossary_aggregations_records_story_refs_via_sentences() -> None:
         )
         story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    with when(t'the {pg["Glossary"]} aggregations are built'):
+    with when(t'the {pg["Glossary"].low} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'the actor and the activity each list that {pg["Story"]}'):
+    with then(t'the actor and the activity each list that {pg["Story"].low}'):
         assert aggs[TermId('guest')].stories == [StoryId('book')]
         assert aggs[TermId('search')].stories == [StoryId('book')]
 
@@ -198,8 +200,8 @@ def test_build_glossary_aggregations_records_story_refs_via_sentences() -> None:
 )
 def test_repeated_references_within_one_story_are_recorded_once() -> None:
     with given(
-        t'a {pg["Story"]} whose two {pg["Sentence"]("sentences")} repeat the '
-        t'same {pg["Term"]} and the same {pg["Inflection"]}'
+        t'a {pg["Story"].low} whose two {pg["Sentence"]("sentences")} repeat the '
+        t'same {pg["Term"].low} and the same {pg["Inflection"].low}'
     ):
         g = _g()
         parts = (
@@ -216,9 +218,9 @@ def test_repeated_references_within_one_story_are_recorded_once() -> None:
             ),
         )
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    with when(t'the {pg["Glossary"]} aggregations are built'):
+    with when(t'the {pg["Glossary"].low} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'the {pg["Story"]} and the {pg["Inflection"]} appear once each'):
+    with then(t'the {pg["Story"].low} and the {pg["Inflection"].low} appear once each'):
         assert aggs[TermId('guest')].stories == [StoryId('book')]
         assert list(aggs[TermId('search')].forms) == ['searches for']
 
@@ -253,8 +255,8 @@ def test_build_glossary_aggregations_activity_in_step_not_collected_as_instance(
 )
 def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
     with given(
-        t'a {pg["Story"]} sentence referencing entities by canonical name, '
-        t'and a {pg["Step"]} referencing one in lowercase'
+        t'a {pg["Story"].low} sentence referencing entities by canonical name, '
+        t'and a {pg["Step"].low} referencing one in lowercase'
     ):
         g = _g()
         a = Sentence(
@@ -285,9 +287,9 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
             story_ids=(StoryId('book'),),
         )
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
-    with when(t'the {pg["Glossary"]} aggregations are built'):
+    with when(t'the {pg["Glossary"].low} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'neither entity term records an {pg["Instance"]}'):
+    with then(t'neither entity term records an {pg["Instance"].low}'):
         assert aggs[TermId('guest')].instances == []
         assert aggs[TermId('room')].instances == []
 
@@ -337,7 +339,8 @@ def test_build_glossary_aggregations_skips_unknown_term_ref_in_sentence() -> Non
 )
 def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> None:
     with given(
-        t'a {pg["Kindless"]} {pg["Term"]} referenced by a {pg["Story"]} sentence'
+        t'a {pg["Kindless"].low} {pg["Term"].low} referenced by a {pg["Story"].low} '
+        t'sentence'
     ):
         g = _g()
         g.register(GlossaryTerm(id=TermId('widget'), kind=None, canonical='Widget'))
@@ -348,11 +351,11 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
         )
         story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=g)
-    with when(t'the {pg["Glossary"]} aggregations are built'):
+    with when(t'the {pg["Glossary"].low} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
     with then(
-        t'the {pg["Term"]} lists the {pg["Story"]} but no {pg["Instance"]} '
-        t'and no {pg["Inflection"]}'
+        t'the {pg["Term"].low} lists the {pg["Story"].low} but no {pg["Instance"].low} '
+        t'and no {pg["Inflection"].low}'
     ):
         assert TermId('widget') in aggs, (
             'kindless term should still appear in aggregations'
@@ -371,8 +374,8 @@ def test_build_glossary_aggregations_kindless_term_records_only_story_ref() -> N
 )
 def test_glossary_aggregations_annotates_fixture_provenance() -> None:
     with given(
-        t'a {pg["Scenario"]} whose fixture-sourced {pg["Step"]} names '
-        t'an {pg["Instance"]}'
+        t'a {pg["Scenario"].low} whose fixture-sourced {pg["Step"].low} names '
+        t'an {pg["Instance"].low}'
     ):
         g = _g()
         fixture_step = Step(
@@ -411,9 +414,9 @@ def test_glossary_aggregations_annotates_fixture_provenance() -> None:
         )
         story = Story(id=StoryId('book'), title='Book', sentences=(a,))
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
-    with when(t'the {pg["Glossary"]} aggregations are built'):
+    with when(t'the {pg["Glossary"].low} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'the {pg["Instance"]} carries the fixture name'):
+    with then(t'the {pg["Instance"].low} carries the fixture name'):
         alice = next(i for i in aggs[TermId('guest')].instances if i.display == 'Alice')
         assert alice.fixture_name == 'alice'
 
@@ -460,7 +463,7 @@ def test_build_term_scenario_index_maps_terms_to_scenarios() -> None:
 )
 def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> None:
     with given(
-        t'a {pg["Scenario"]} referencing one {pg["Term"]} in two steps '
+        t'a {pg["Scenario"].low} referencing one {pg["Term"].low} in two steps '
         t'and another in its name'
     ):
         g = _g()
@@ -490,6 +493,6 @@ def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> N
         rd = ReportData(metadata=_meta(), scenarios=[scn], glossary=g)
     with when('the term-scenario index is built'):
         index = build_term_crossrefs(rd).term_scenarios
-    with then(t'each {pg["Term"]} maps to the scenario exactly once'):
+    with then(t'each {pg["Term"].low} maps to the scenario exactly once'):
         assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
         assert index[TermId('room')] == [NodeId('test::a')]  # narration counts
