@@ -1,5 +1,6 @@
 import json
 import textwrap
+from pathlib import Path
 from typing import Annotated
 
 import pytest
@@ -132,6 +133,46 @@ def test_given_all_frames_retains_internal_frames(pytester, tmp_path):
         f'expected internal frames to be retained, got {error["frames"]!r}'
     )
     assert any(f['func'] == 'test_fail' for f in error['frames'])
+
+
+_AUTHORING_MISTAKES = """
+    from pytest_given import Glossary, given, scenario, when
+
+    g = Glossary()
+    g.actor('Guest')
+
+    @scenario('nested across phases')
+    def test_nest():
+        with given('a machine'):
+            with when('it brews'):
+                pass
+
+    @scenario('a mistyped term')
+    def test_lookup():
+        with given('a guest'):
+            g['Gust']
+"""
+
+
+@scenario(
+    t'A {pg["Scenario"].low} failing on a pytest-given refusal points at the '
+    t'test, not at pytest-given'
+)
+def test_refusal_frame_points_at_the_test(
+    pytester: pytest.Pytester, tmp_path: Path
+) -> None:
+    with given('a suite that nests across phases and mistypes a term'):
+        pytester.makepyfile(_AUTHORING_MISTAKES)
+        attach('suite', _AUTHORING_MISTAKES)
+    with when('the suite runs with --given-json'):
+        json_path = tmp_path / 'report.json'
+        result = pytester.runpytest(f'--given-json={json_path}')
+        scenarios = json.loads(json_path.read_text())['scenarios']
+    with then('both scenarios fail'):
+        result.assert_outcomes(failed=2)
+    with then('each failure ends on its own test function'):
+        innermost = [scenario['error']['frames'][-1] for scenario in scenarios]
+        assert [frame['func'] for frame in innermost] == ['test_nest', 'test_lookup']
 
 
 @scenario(t'A test without `@scenario` stays out of the {pg["Report"].low}')

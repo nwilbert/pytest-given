@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from pytest_given.capture.source import restore_rootdir, set_rootdir
 from pytest_given.capture.traceback import parse_short_repr
 
@@ -132,6 +134,29 @@ def test_pytest_given_annotated_reader_frame_classified_internal() -> None:
         'src/pytest_given/capture/scenario.py:134: in annotated_given_descriptors\n'
         '    raise PytestGivenError(...)\n'
         'E   PytestGivenError: only given() is supported inside Annotated'
+    )
+    frames, _ = parse_short_repr(text)
+    assert frames[0].is_internal is True
+
+
+@pytest.mark.parametrize(
+    'module',
+    [
+        'capture/collector',
+        'capture/glossary',
+        'capture/file_glossary',
+        'capture/story',
+        'capture/template',
+        'model/text',
+    ],
+)
+def test_pytest_given_refusal_frame_classified_internal(module: str) -> None:
+    """Each module whose functions refuse an authoring mistake from inside a
+    test body, where the reader wants the line that made the mistake."""
+    text = (
+        f'src/pytest_given/{module}.py:42: in refuse\n'
+        '    raise PytestGivenError(...)\n'
+        'E   PytestGivenError: refused'
     )
     frames, _ = parse_short_repr(text)
     assert frames[0].is_internal is True

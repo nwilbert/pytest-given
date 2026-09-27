@@ -16,6 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - An `Annotated[..., given(Template(...))]` label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.
+- A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.
 
 ## [0.3.0] - 2026-09-27
 

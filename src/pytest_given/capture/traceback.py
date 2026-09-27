@@ -10,8 +10,9 @@ pytest's runner and pytest-given's own machinery are noise the reader almost
 never needs. The plugin applies it to pytest's traceback entries before
 `getrepr` runs, so the pre-filter and this post-parse pass agree.
 
-`_INTERNAL_SUFFIXES` names whole modules: a function that raises at test time
-belongs in one of them, or its frame reaches the reader.
+`_INTERNAL_SUFFIXES` names whole modules: every module whose functions a test
+body calls, and that can refuse the call, belongs there — otherwise a failure's
+innermost frame is our `raise` rather than the line that made the mistake.
 """
 
 import re
@@ -38,7 +39,16 @@ _INTERNAL_SUBSTRINGS = (
 # own frames back into every user traceback.
 _INTERNAL_SUFFIXES = tuple(
     f'/{module.replace(".", "/")}.py'
-    for module in ('pytest_given.capture.steps', 'pytest_given.capture.scenario')
+    for module in (
+        'pytest_given.capture.collector',
+        'pytest_given.capture.file_glossary',
+        'pytest_given.capture.glossary',
+        'pytest_given.capture.scenario',
+        'pytest_given.capture.steps',
+        'pytest_given.capture.story',
+        'pytest_given.capture.template',
+        'pytest_given.model.text',
+    )
 )
 
 _SITE_PACKAGES_MARKER = '/site-packages/'

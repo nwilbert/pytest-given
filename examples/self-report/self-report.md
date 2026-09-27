@@ -1,7 +1,34 @@
 # pytest-given — pytest-given Self-Report
 
+## ✓ A «scenario» failing on a pytest-given refusal points at the test, not at pytest-given
+`tests/integration/test_plugin.py:157::test_refusal_frame_points_at_the_test`
+
+- **given** a suite that nests across phases and mistypes a term
+  - 📎 suite:
+    ```
+    
+        from pytest_given import Glossary, given, scenario, when
+    
+        g = Glossary()
+        g.actor('Guest')
+    
+        @scenario('nested across phases')
+        def test_nest():
+            with given('a machine'):
+                with when('it brews'):
+                    pass
+    
+        @scenario('a mistyped term')
+        def test_lookup():
+            with given('a guest'):
+                g['Gust']
+    ```
+- **when** the suite runs with --given-json
+- **then** both scenarios fail
+- **then** each failure ends on its own test function
+
 ## ✓ A test without `@scenario` stays out of the «report»
-`tests/integration/test_plugin.py:137::test_unannotated_test_not_in_report`
+`tests/integration/test_plugin.py:178::test_unannotated_test_not_in_report`
 
 - **given** a suite whose only test is undecorated
 - **when** the suite runs with --given-json
@@ -9,7 +36,7 @@
 - **then** the «report» holds no «scenario»
 
 ## ✓ A «step fixture» is «grafted» in as a given «step»
-`tests/integration/test_plugin.py:206::test_step_fixture_appears_as_given_step`
+`tests/integration/test_plugin.py:247::test_step_fixture_appears_as_given_step`
 
 - **given** a «scenario» consuming a «step fixture»
   - 📎 suite:
@@ -32,7 +59,7 @@
 - **then** the «step» from the fixture leads the recorded steps
 
 ## ✓ The «cases» of a «parametrized scenario» become one «scenario» with a «parameter table»
-`tests/integration/test_plugin.py:244::test_parametrized_test_as_table` · parametrization
+`tests/integration/test_plugin.py:285::test_parametrized_test_as_table` · parametrization
 
 - **given** a «parametrized scenario» over two «cases»
   - 📎 suite:
@@ -56,14 +83,14 @@
 - **then** the grouped steps carry a placeholder per matching name
 
 ## ✓ A refusal on a run with no sink does not claim a «report» was skipped
-`tests/integration/test_plugin.py:383::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
+`tests/integration/test_plugin.py:424::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
 
 - **given** a suite whose narration varies across parametrize cases
 - **when** the suite runs with no --given-* sink
 - **then** the refusal is reported without claiming a report was skipped
 
 ## ✓ A refused run discards the previous run's «report»
-`tests/integration/test_plugin.py:411::test_a_grouping_error_discards_the_previous_report` · validation
+`tests/integration/test_plugin.py:452::test_a_grouping_error_discards_the_previous_report` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -83,7 +110,7 @@
 - **then** the stale files are gone rather than left reading as current
 
 ## ✓ An unknown «source link» preset stops the run before it collects
-`tests/integration/test_plugin.py:479::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:520::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
   - 📎 suite:
@@ -100,14 +127,14 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ An unknown «source link» preset in an ini reports the ini name
-`tests/integration/test_plugin.py:511::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
+`tests/integration/test_plugin.py:552::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
 
 - **given** a suite configured through the ini rather than the flag
 - **when** the suite runs with an HTML sink
 - **then** the error names the ini setting, not a flag the user never typed
 
 ## ✓ A «report» that fails to render discards the previous one too
-`tests/integration/test_plugin.py:537::test_a_render_failure_leaves_no_half_replaced_report` · validation
+`tests/integration/test_plugin.py:578::test_a_render_failure_leaves_no_half_replaced_report` · validation
 
 - **given** a suite with one «scenario»
 - **given** a «report» pair on disk from a previous run
@@ -116,7 +143,7 @@
 - **then** neither the stale pair nor a half-written new one survives
 
 ## ✓ A «scenario» is matched against each of its «stories»
-`tests/integration/test_plugin.py:1842::test_scenario_matched_against_two_stories`
+`tests/integration/test_plugin.py:1883::test_scenario_matched_against_two_stories`
 
 - **given** a «scenario» binding two «stories» whose «sentence» its «narration» fits
   - 📎 suite:
@@ -140,7 +167,7 @@
 - **then** the «scenario» binds both «stories» and covers the «sentence» of each
 
 ## ✓ A declared «story» no «scenario» covers appears in the report
-`tests/integration/test_plugin.py:1914::test_a_declared_story_no_scenario_covers_appears`
+`tests/integration/test_plugin.py:1955::test_a_declared_story_no_scenario_covers_appears`
 
 - **given** a suite declaring a «story» that no «scenario» names or «pins»
   - 📎 suite:
@@ -162,7 +189,7 @@
 - **then** the report lists the «story», its «sentence» covered by nothing
 
 ## ✓ A pinned «scenario» still counts its «step» «pins»
-`tests/integration/test_plugin.py:1952::test_a_pinned_scenario_still_counts_its_step_pins`
+`tests/integration/test_plugin.py:1993::test_a_pinned_scenario_still_counts_its_step_pins`
 
 - **given** a «scenario» pinning one «sentence», whose «steps» pin a second and narrate a third
   - 📎 suite:
@@ -189,7 +216,7 @@
 - **then** the «scenario» covers both pinned «sentences» and not the one its narration would match
 
 ## ✓ A «step» «pin» into a «story» outside stories= covers it
-`tests/integration/test_plugin.py:1999::test_a_step_pin_into_a_story_outside_stories_covers_it`
+`tests/integration/test_plugin.py:2040::test_a_step_pin_into_a_story_outside_stories_covers_it`
 
 - **given** a «step» pinning a «story» its «scenario» does not name
   - 📎 suite:
@@ -212,7 +239,7 @@
 - **then** the «scenario» passes and covers the pinned «sentence», in the «story» it did not name
 
 ## ✓ A wide «fixture recording» keeps its «pins» in every «scenario» it is grafted into
-`tests/integration/test_plugin.py:2041::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
+`tests/integration/test_plugin.py:2082::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
 
 - **given** a module-scoped «step fixture» pinning a «sentence», set up first by an unannotated test
   - 📎 suite:
@@ -249,7 +276,7 @@
 - **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
 ## ✓ An Annotated label carrying a «pin» pins its «step»
-`tests/integration/test_plugin.py:2103::test_annotated_label_carrying_a_pin_pins_its_step`
+`tests/integration/test_plugin.py:2144::test_annotated_label_carrying_a_pin_pins_its_step`
 
 - **given** a «scenario» whose Annotated given(...) label on a plain fixture carries a «pin»
   - 📎 suite:
@@ -276,7 +303,7 @@
 - **then** the label's «step» carries the «pin»
 
 ## ✓ An Annotated label retells the «pins» of the fixture label it replaces · 3 cases
-`tests/integration/test_plugin.py:2143::test_annotated_label_pins_retell_the_fixture_root`
+`tests/integration/test_plugin.py:2184::test_annotated_label_pins_retell_the_fixture_root`
 
 - **given** a label with pins={label_pins} over a fixture pinning a[1]
 - **when** the suite runs
@@ -289,7 +316,7 @@
 | [a[2]] | [{'story_id': 'book', 'sentence_id': 2}] | ✓ |
 
 ## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
-`tests/integration/test_plugin.py:2633::test_annotated_template_label_without_parametrize_fails_scenario`
+`tests/integration/test_plugin.py:2674::test_annotated_template_label_without_parametrize_fails_scenario`
 
 - **given** a Template label on a plain fixture parameter
   - 📎 suite:
@@ -313,7 +340,7 @@
 - **then** the HTML «report» is still written
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2751::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2792::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -336,14 +363,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2764::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2805::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2785::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2826::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -351,7 +378,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2805::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2846::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -359,7 +386,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2838::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2879::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -379,7 +406,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2870::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2911::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -388,7 +415,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:2973::test_given_theme_cli_flag_sets_the_report_default` · configuration
+`tests/integration/test_plugin.py:3014::test_given_theme_cli_flag_sets_the_report_default` · configuration
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -396,7 +423,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:3022::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:3063::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -404,7 +431,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:3139::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3180::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
