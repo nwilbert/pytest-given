@@ -149,12 +149,12 @@ def _pinned_ids(pins: tuple[Pin, ...], index: StoryIndex) -> set[SentenceId]:
 def _matched_ids(step: Step, index: StoryIndex) -> set[SentenceId]:
     """The indexed story's sentences a step's narration matches: those whose
     every term ref the step names."""
-    s_cache = s_for_step(step)
+    step_refs = s_for_step(step)
     candidates: set[SentenceId] = set()
-    for term_id in s_cache:
+    for term_id in step_refs:
         candidates |= index.sentences_by_term.get(term_id, set())
     return {
         sentence_id
         for sentence_id in candidates
-        if index.refs_by_sentence[sentence_id].issubset(s_cache)
+        if index.refs_by_sentence[sentence_id].issubset(step_refs)
     }

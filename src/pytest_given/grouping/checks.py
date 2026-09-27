@@ -360,10 +360,14 @@ def part_key(part: NarrationPart) -> PartKey:
     match part:
         case NarrationLiteral(value=value):
             return PartKey('literal', value)
-        case NarrationValue(expression=e, conversion=c, format_spec=f):
-            return PartKey('value', e, (c, f))
-        case NarrationPlaceholder(name=n, conversion=c, format_spec=f):
-            return PartKey('placeholder', n, (c, f))
+        case NarrationValue(
+            expression=expression, conversion=conversion, format_spec=format_spec
+        ):
+            return PartKey('value', expression, (conversion, format_spec))
+        case NarrationPlaceholder(
+            name=name, conversion=conversion, format_spec=format_spec
+        ):
+            return PartKey('placeholder', name, (conversion, format_spec))
         case NarrationTermRef(expression=expression):
             return PartKey('term', expression)
 

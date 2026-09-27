@@ -24,8 +24,7 @@ from ..model import (
     node_base,
     placeholder_token,
 )
-from .palette import STATUS_GLYPH
-from .text import plural
+from .text import STATUS_GLYPH, plural
 
 
 def render_md(report: ReportData) -> str:

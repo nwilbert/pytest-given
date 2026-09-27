@@ -8,6 +8,7 @@ from ..model import (
     PHASES,
     ClauseTermRef,
     Glossary,
+    GlossaryTerm,
     NarrationTermRef,
     NodeId,
     Scenario,
@@ -80,6 +81,7 @@ class _ShadowingTag:
     """
 
     tag: str
+    term: GlossaryTerm
     example: NodeId
     scenarios: int = 1
 
@@ -101,17 +103,16 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
             if derived is None:
                 continue
             slug = TermId(derived)
-            if glossary.get(slug) is None:
+            term = glossary.get(slug)
+            if term is None:
                 continue
             seen = shadowing.get(slug)
             if seen is None:
-                shadowing[slug] = _ShadowingTag(tag=tag, example=scenario.id)
+                shadowing[slug] = _ShadowingTag(tag=tag, term=term, example=scenario.id)
             else:
                 seen.scenarios += 1
     findings: list[RawFinding] = []
     for slug, shadow in shadowing.items():
-        term = glossary.get(slug)
-        assert term is not None
         noun = 'scenario' if shadow.scenarios == 1 else 'scenarios'
         findings.append(
             RawFinding(
@@ -120,7 +121,7 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
                 location=None,
                 message=(
                     f'tag {shadow.tag!r} duplicates glossary term '
-                    f'{term.canonical!r} ({shadow.scenarios} {noun}, '
+                    f'{shadow.term.canonical!r} ({shadow.scenarios} {noun}, '
                     f'e.g. {shadow.example})'
                 ),
             )

@@ -134,8 +134,7 @@ class Collector:
         # Whether steps record their body's source anchor (narration lint
         # only); off is the zero-cost default — no frame walking happens.
         self.capture_step_source = capture_step_source
-        self._scenarios: list[Scenario] = []
-        self._scenarios_by_id: dict[NodeId, Scenario] = {}
+        self._scenarios: dict[NodeId, Scenario] = {}
         self._current_scenario: Scenario | None = None
         self._step_stack: list[Step] = []
         # When the active scenario's clock was started, or None before it is.
@@ -172,7 +171,7 @@ class Collector:
 
     @property
     def scenarios(self) -> list[Scenario]:
-        return list(self._scenarios)
+        return list(self._scenarios.values())
 
     @property
     def active_fixture_descriptor(self) -> StepDescriptor | None:
@@ -234,8 +233,7 @@ class Collector:
         self._current_scenario.duration_ms = self._elapsed_ms()
         self._current_scenario.skip_reason = skip_reason
         scenario = self._current_scenario
-        self._scenarios.append(scenario)
-        self._scenarios_by_id[scenario.id] = scenario
+        self._scenarios[scenario.id] = scenario
         self._current_scenario = None
         self._step_stack = []
         self._started_at = None
@@ -426,7 +424,7 @@ class Collector:
         is deciding whether an error is worth the expensive traceback work, and
         that answer does not depend on which.
         """
-        return self.active_scenario_id == node_id or node_id in self._scenarios_by_id
+        return self.active_scenario_id == node_id or node_id in self._scenarios
 
     def fail(self, node_id: NodeId, error: ErrorInfo) -> None:
         """Mark `node_id`'s scenario failed, open or finished.
@@ -450,4 +448,4 @@ class Collector:
     def _scenario_for(self, node_id: NodeId) -> Scenario | None:
         if self._current_scenario is not None and self._current_scenario.id == node_id:
             return self._current_scenario
-        return self._scenarios_by_id.get(node_id)
+        return self._scenarios.get(node_id)

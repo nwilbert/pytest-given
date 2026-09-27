@@ -7,7 +7,7 @@ verified against observed positions. Conflicts raise."""
 
 from collections import defaultdict
 from dataclasses import replace
-from typing import Literal
+from typing import Literal, NoReturn
 
 from ..model import (
     ClauseTermRef,
@@ -99,7 +99,7 @@ def _verify_declared(term: GlossaryTerm, sightings: SlotSightings) -> None:
             _raise_declared(term, f'{slot} slot', _where(sightings, slot))
 
 
-def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> None:
+def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> NoReturn:
     raise PytestGivenError(
         f'term {term.canonical!r} is declared kind {term.kind!r} but appears in '
         f'a {slot}{where}, which is incompatible.'

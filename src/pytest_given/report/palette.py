@@ -23,11 +23,6 @@ import functools
 import math
 from typing import Literal
 
-from ..model import Status
-
-# How a status is painted, wherever it is painted.
-STATUS_GLYPH: dict[Status, str] = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
-
 # Where column 0 sits on the ring, as a fraction of the ring's circumference.
 # Swept against everything a column color has to stay clear of — the term-kind
 # inks, the three statuses and the accent. Nothing in the first four columns

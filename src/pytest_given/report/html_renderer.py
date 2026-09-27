@@ -39,7 +39,7 @@ from ..model import (
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
 from .inline_markdown import render_inline_markdown
-from .palette import STATUS_GLYPH, param_column_colors
+from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
 from .story_view import (
@@ -48,7 +48,7 @@ from .story_view import (
     build_story_rollups,
     sentence_key,
 )
-from .text import plural
+from .text import STATUS_GLYPH, plural
 from .theme import DEFAULT_THEME, Theme
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
@@ -486,11 +486,11 @@ def _make_clause_part_filter(
 
     def _render(part: ClausePart) -> Markup:
         match part:
-            case ClauseTermRef(term_id=tid, display=display):
-                term = glossary.get(tid) if glossary else None
+            case ClauseTermRef(term_id=term_id, display=display):
+                term = glossary.get(term_id) if glossary is not None else None
                 if term is None:
                     return Markup(_unknown_term_span(display))
-                return Markup(_term_ref_span(term, tid, display))
+                return Markup(_term_ref_span(term, term_id, display))
             case ClauseWord(text=text):
                 return Markup(f'<span class="clause-word">{escape(text)}</span>')
 

@@ -184,7 +184,8 @@ def build(session: nox.Session) -> None:
     assert len(wheels) == 1, f'expected exactly one wheel, got {wheels}'
     wheel = wheels[0].resolve()
 
-    names = zipfile.ZipFile(wheel).namelist()
+    with zipfile.ZipFile(wheel) as archive:
+        names = archive.namelist()
     missing = [
         required
         for required in _REQUIRED_WHEEL_PATHS

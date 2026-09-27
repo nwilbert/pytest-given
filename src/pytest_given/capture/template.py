@@ -3,7 +3,6 @@ that apply to a decorator-time t-string."""
 
 from collections.abc import Mapping, Sequence
 from string import Formatter, templatelib
-from typing import assert_never
 
 from ..model import (
     Narration,
@@ -186,16 +185,16 @@ def resolve_template_parts(
     """Each `Template` part resolved against the value bound to its name."""
     out: list[NarrationPart] = []
     for part in parts:
-        assert not isinstance(part, (NarrationValue, NarrationTermRef)), (
-            'pytest_given.Template yields only literals and placeholders'
-        )
         match part:
             case NarrationLiteral():
                 out.append(part)
             case NarrationPlaceholder(name=name):
                 out.append(resolved_placeholder_part(part, mapping[name]))
             case _:
-                assert_never(part)
+                raise AssertionError(
+                    f'pytest_given.Template yields only literals and '
+                    f'placeholders, not {part!r}'
+                )
     return tuple(out)
 
 

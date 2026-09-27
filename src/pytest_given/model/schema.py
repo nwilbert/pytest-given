@@ -121,6 +121,10 @@ class Narration:
 # None while a term's kind is still deferred to `infer_glossary_kinds`.
 type TermKind = Literal['actor', 'object', 'activity']
 
+# Each `Literal` alias's alphabet, for serde to validate against: a PEP 695
+# alias does not hand its members to `typing.get_args` directly.
+TERM_KINDS: tuple[TermKind, ...] = ('actor', 'object', 'activity')
+
 
 @dataclass(frozen=True)
 class SourceLocation:
@@ -241,6 +245,8 @@ PHASES: tuple[Phase, ...] = ('given', 'when', 'then')
 # `== 'passed'` reads false.
 type Status = Literal['passed', 'failed', 'skipped']
 
+STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped')
+
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
 # pass through; anything else (dates, objects) is coerced to its str() when the
 # cell is built, since parametrize values only feed display and the JSON sink
@@ -346,6 +352,8 @@ class Step:
 
 # Which kind of variance a parameter-table column records.
 type ColumnKind = Literal['param', 'derived', 'attachment']
+
+COLUMN_KINDS: tuple[ColumnKind, ...] = ('param', 'derived', 'attachment')
 
 
 @dataclass(frozen=True, kw_only=True)

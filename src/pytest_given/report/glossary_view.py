@@ -325,7 +325,7 @@ class _GlossaryIndex:
         Activities and kindless terms have no instances and are ignored here.
         """
         term = self._glossary.get(term_id)
-        if term is None or term.kind not in ('actor', 'object'):
+        if term is None or term.kind not in _INSTANCE_KINDS:
             return
         if (term_id, display) in self._instances:
             return

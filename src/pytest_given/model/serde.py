@@ -17,8 +17,11 @@ from typing import Any, TypedDict, cast
 
 from .errors import PytestGivenError
 from .schema import (
+    COLUMN_KINDS,
     CONTENT_TYPES,
     PHASES,
+    STATUSES,
+    TERM_KINDS,
     Attachment,
     AttachmentLabel,
     AttachmentRef,
@@ -28,7 +31,6 @@ from .schema import (
     ClauseTermRef,
     ClauseWord,
     ColumnId,
-    ColumnKind,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -50,7 +52,6 @@ from .schema import (
     SentenceId,
     SentenceName,
     SourceLocation,
-    Status,
     Step,
     StepAttachment,
     Story,
@@ -177,7 +178,7 @@ def _clause_part_from_dict(d: dict[str, Any]) -> ClausePart:
 
 
 def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
-    status = _literal(d.get('status', 'passed'), _STATUSES, 'scenario status')
+    status = _literal(d.get('status', 'passed'), STATUSES, 'scenario status')
     return Scenario(
         id=NodeId(d['id']),
         narration=_narration_from_dict(d['narration']),
@@ -294,27 +295,18 @@ def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
     )
 
 
-# The literal alphabets `_literal` checks against. Spelled out rather than
-# derived from the `Literal` aliases: `typing.get_args` on a PEP 695 `type`
-# alias needs the alias object at runtime, and one list per alphabet is
-# cheaper to read than the indirection.
-_STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped')
-_TERM_KINDS: tuple[TermKind, ...] = ('actor', 'object', 'activity')
-_COLUMN_KINDS: tuple[ColumnKind, ...] = ('param', 'derived', 'attachment')
-
-
 def _term_kind(value: object) -> TermKind | None:
     """A glossary term's kind, which is legitimately absent while deferred."""
-    return None if value is None else _literal(value, _TERM_KINDS, 'glossary term kind')
+    return None if value is None else _literal(value, TERM_KINDS, 'glossary term kind')
 
 
 def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
-    kind = _literal(d['kind'], _COLUMN_KINDS, 'parameter column kind')
+    kind = _literal(d['kind'], COLUMN_KINDS, 'parameter column kind')
     return ParameterColumn(id=ColumnId(d['id']), name=d['name'], kind=kind)
 
 
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
-    status = _literal(d.get('status', 'passed'), _STATUSES, 'parameter case status')
+    status = _literal(d.get('status', 'passed'), STATUSES, 'parameter case status')
     return ParameterCase(
         values=[_cell_from_json(v) for v in d['values']],
         status=status,
