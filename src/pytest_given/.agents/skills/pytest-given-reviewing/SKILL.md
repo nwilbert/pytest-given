@@ -10,12 +10,14 @@ Narration is **auditable, not verified**: nothing mechanical compares a step's t
 ## 1. Structural gate — run the lint first
 
 ```bash
-pytest <selection> --given-lint
+pytest --given-lint
 # plus the opt-in rule when the glossary is meant to be fully exercised:
-pytest <selection> --given-lint -o "given_lint_rules=dead-term=warn"
+pytest --given-lint -o "given_lint_rules=dead-term=warn"
 ```
 
-`warn` findings print in the summary; an `error` finding fails the run. The rule catalog and the honest-two-phase ignore convention live in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts". A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list, never silently waved through in review — stale entries fail the run, so the list cannot rot.
+Lint the whole suite, not the change's selection: a `given_lint_ignore` entry for a test the selection skips fails the run as `stale-ignore`. `-o` replaces the project's `given_lint_rules` list rather than extending it — if the project sets any, repeat them in the same value, one per line.
+
+`warn` findings print in the summary; an `error` finding fails the run. The rule catalog is in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts", and the honest-two-phase test an ignored `missing-phase` must pass under "Phase structure". A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list, never silently waved through in review — stale entries fail the run, so the list cannot rot.
 
 ## 2. Semantic audit — step text vs step body
 
@@ -23,7 +25,7 @@ pytest <selection> --given-lint -o "given_lint_rules=dead-term=warn"
 
 **No base report to diff against?** On an adoption branch the base has no scenarios, so the diff *is* the whole report — not a reason to skip the layer. Audit the full suite ordered by risk: scenarios whose bodies the branch touched first, then the rest file by file (fan out as below). `--given-md` is a plain pytest flag needing no project wiring, so run it yourself even when CI only configures the HTML/JSON sinks.
 
-For each scenario under review, read the step texts against their bodies and judge with one rubric — restated here rather than linked, because the fan-out below hands one file to one reviewer who has to carry it without loading a second skill. Its authoring-time counterpart is the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) ("Keeping it truthful", "Expected raises", "Vocabulary and tags") — change one, change both.
+For each scenario under review, read the step texts against their bodies and judge with the rubric below. It is complete on its own, so a fanned-out reviewer needs no second skill.
 
 Don't collect the bodies by hand: [references/pairs.md](references/pairs.md) dumps each scenario's narration beside the source of its test, one file per test file — also the fan-out unit below.
 
@@ -44,13 +46,9 @@ Layers 1 and 2 start from the narration and ask whether it is true; neither catc
 
 - **Unnarrated behavior branches.** Walk the behavior-bearing branches of the code under review — a scoping rule, a precedence decision, a fallback path — and check each has a scenario naming it. A branch covered only by an undecorated test is invisible in the report; one with no test at all rates higher, because an otherwise complete-looking spec now hides it.
 - **Glossary rows that assert behavior.** A definition making a claim ("X takes precedence over Y", "must be unique") is a spec sentence in its own right. When no scenario demonstrates that claim, the glossary is unbacked documentation — flag the pair and prefer pinning the behavior in a scenario over softening the definition.
-- **Rules the release notes announce.** Check that a scenario names each rule the CHANGELOG's unreleased entries state — the project promising a behavior in its own words, and what bounds a whole-suite review the way a diff bounds a change review. A rule narrated half (the fix named, the escape hatch not) counts.
-
-Rate an unnarrated branch below overstatement: silence understates, which misleads less than a false claim. A glossary row asserting untested behavior is not silence — it rates with layer 2.
+- **Rules the release notes announce.** If the project keeps a changelog, check that a scenario names each rule its unreleased entries state — the project promising a behavior in its own words, and what bounds a whole-suite review the way a diff bounds a change review. A rule narrated only in part (the fix named, the escape hatch not) is a finding too.
 
 ## 4. Glossary, tags, stories
-
-The first four mirror the authoring skill's [glossaries.md](../pytest-given-authoring/references/glossaries.md) ("Keeping the glossary honest"); the fifth mirrors [stories.md](../pytest-given-authoring/references/stories.md). Same reason as the layer-2 rubric — change one, change both.
 
 - A **dead term** (layer 1, opt-in rule) that describes unimplemented behavior is misleading domain documentation — flag it. Deleting the term is as often the answer as adding a reference; don't accept references manufactured to appease the rule. Check first whether an undecorated test already covers the row's behavior: then the fix is decorating it, not deleting the term. A term that is simply real vocabulary no scenario happens to narrate is **not** a finding — the glossary documents the domain, not the suite's coverage.
 - **Dilution** is the inverse finding: a row nothing would miss — a generic verb minted to fill a story slot (a bare word belongs there), a concept duplicated under a second name, a term added only to render as a term ref. A sharp, lean glossary outranks an impressive-looking one.
@@ -60,8 +58,14 @@ The first four mirror the authoring skill's [glossaries.md](../pytest-given-auth
 
 ## Findings are advisory review comments
 
-For each finding: file:line, what the narration claims, what the body actually does, why it matters. Rate truthfulness findings highest — a false spec misleads every future reader; language drift rates below that, because a drifted vocabulary erodes slowly rather than lying outright.
+For each finding: file:line, what the narration claims, what the body actually does, why it matters. Rate them in this order, highest first:
 
-**Report legibility is reviewable; taste is not.** The premise of the whole exercise is that the report is documentation, so how the document *reads* is in scope: inconsistent casing or phrasing of the same concept across step texts, a scenario name that doesn't parse as a sentence, two scenarios whose titles don't distinguish them. Rate these lowest and report them as one batched finding, not one per instance. Out of scope is what legibility doesn't reach — a wording you would simply have chosen differently.
+1. **False claims** — layer-2 overstatement, a glossary row asserting behavior no scenario demonstrates, a scenario pin its body never exercises. A false spec misleads every future reader.
+2. **Language drift** — a drifted vocabulary erodes slowly rather than lying outright.
+3. **Unnarrated behavior** — silence understates, which misleads less than a false claim.
+4. **Glossary, tag and story hygiene** (layer 4).
+5. **Report legibility** (below).
+
+**Report legibility is reviewable; taste is not.** The premise of the whole exercise is that the report is documentation, so how the document *reads* is in scope: inconsistent casing or phrasing of the same concept across step texts, a scenario name that doesn't parse as a sentence, two scenarios whose titles don't distinguish them. Report these as one batched finding, not one per instance. Out of scope is what legibility doesn't reach — a wording you would simply have chosen differently.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

@@ -5,7 +5,7 @@ description: Use when exploring or onboarding to a codebase whose tests use pyte
 
 # Navigating a codebase through its pytest-given artifacts
 
-The test suite narrates itself: rendered scenarios are a behavioral spec, the glossary is the domain map, stories are the interaction map. Read the narration instead of reverse-engineering test bodies, and answer every "which scenarios …?" question from the structured report instead of grepping — term references flow through glossary handles, so text search misses or double-counts them.
+The test suite narrates itself: rendered scenarios are a behavioral spec, the glossary is the domain map, stories are the interaction map. Read the narration instead of reverse-engineering test bodies, and answer every "which scenarios …?" question from the structured report instead of grepping — term refs flow through glossary handles, so text search misses or double-counts them.
 
 ## Orientation — first contact
 

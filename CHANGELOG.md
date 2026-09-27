@@ -54,6 +54,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - When rendering a report fails unexpectedly, the previous run's report is still discarded instead of staying on disk looking current.
 - `pytest-given report` reports a non-UTF-8 input file as an error instead of crashing with a traceback.
 - The navigating skill shows the failure messages of a parametrized scenario's cases, where it printed an empty message. It also starts from a committed or CI-published report when one exists, instead of always rerunning the suite.
+- The reviewing skill lints the whole suite, where a selection failed on the project's ignore entries as stale, keeps the project's own `given_lint_rules` when enabling `dead-term`, and ranks findings in one explicit order.
 
 ## [0.2.0] - 2026-09-04
 

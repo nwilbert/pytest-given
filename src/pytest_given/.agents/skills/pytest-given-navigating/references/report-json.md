@@ -41,7 +41,7 @@ for per-case status.
 
 - `{value: "literal text"}` — plain text
 - `{rendered, expression, format_spec, conversion}` — a t-string interpolation whose value is constant across cases; `rendered` is the text shown, `expression` the source it came from
-- `{term_id, display, expression}` — a glossary term reference
+- `{term_id, display, expression}` — a term ref
 - `{name, column_id, format_spec, conversion}` — a placeholder for the column `column_id` in a grouped parametrized scenario
 
 Match on the keys, not on position: a step's text is the concatenation of `value` / `rendered` / `display` / `{name}` across its parts.

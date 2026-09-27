@@ -59,6 +59,6 @@ for relpath, group in sorted(by_file.items()):
 
 - Each entry is the report's title over the test's source, decorators included, with real line numbers — cite `file:line` straight from the dump.
 - A parametrized scenario appears once, anchored where the report anchors it; its parameter table stays in the JSON.
-- Only decorated tests are in the report, so only they are in the dump — a suite passed to an inner run as a string literal never appears; read the literal.
+- Only decorated tests are in the report, so only they are in the dump.
 - One file per test file is the fan-out unit: hand a reviewer that file and the layer-2 rubric, nothing else.
 - `--given-json` is a plain pytest flag, so this needs no project wiring and no other sink.
