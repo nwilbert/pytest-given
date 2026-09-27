@@ -1,0 +1,160 @@
+<svg class="pg-diagram-svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="pg-diagram-title pg-diagram-desc">
+  <title id="pg-diagram-title">A loop between people, agents, and artifacts</title>
+  <desc id="pg-diagram-desc">Developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents.</desc>
+  <style>
+    /* Sizes are in the 1000-unit viewBox; colours are the --pg-diagram-* tokens
+       (defined by the page inline, by the generated README copy standalone). */
+    .pg-diagram-lines {
+      fill: none;
+      stroke: var(--pg-diagram-line);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .pg-diagram-arrowhead {
+      fill: var(--pg-diagram-line);
+    }
+    .pg-diagram-panel {
+      fill: var(--pg-diagram-panel);
+      stroke: var(--pg-diagram-panel-edge);
+      stroke-width: 1.5;
+      stroke-dasharray: 7 7; /* dashed: a grouping, not a thing */
+    }
+    .pg-diagram-panel-label {
+      fill: var(--pg-diagram-people-ink);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .pg-diagram-verbs text {
+      fill: var(--pg-diagram-line);
+      font-size: 16px;
+      font-weight: 500;
+      stroke: var(--pg-diagram-bg); /* halo: knocks a gap into the arrow beneath */
+      stroke-width: 12;
+      stroke-linejoin: round;
+      paint-order: stroke fill;
+    }
+    .pg-diagram-verbs .pg-diagram-verb-in-panel {
+      stroke: var(--pg-diagram-panel);
+    }
+    .pg-diagram-people > rect,
+    .pg-diagram-artifact > rect {
+      stroke-width: 2;
+    }
+    .pg-diagram-people > text {
+      font-size: 25px;
+      font-weight: 600;
+    }
+    .pg-diagram-people > rect {
+      fill: var(--pg-diagram-people-fill);
+      stroke: var(--pg-diagram-people-fill);
+    }
+    .pg-diagram-people > text {
+      fill: var(--pg-diagram-people-ink);
+    }
+    .pg-diagram-artifact > rect {
+      fill: var(--pg-diagram-artifact-fill);
+      stroke: var(--pg-diagram-artifact-fill);
+    }
+    .pg-diagram-artifact > text {
+      fill: var(--pg-diagram-artifact-ink);
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .pg-diagram-artifact .pg-diagram-artifact-single {
+      font-size: 23px;
+    }
+    .pg-diagram-icon {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .pg-diagram-people .pg-diagram-icon {
+      color: var(--pg-diagram-people-ink);
+    }
+    .pg-diagram-icon-dot {
+      fill: currentColor;
+      stroke: none;
+    }
+    .pg-diagram-icon-cutout {
+      fill: var(--pg-diagram-people-fill); /* the person sits in front of the screen */
+    }
+  </style>
+  <defs>
+    <marker id="pg-diagram-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="pg-diagram-arrowhead" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+  <!-- artifacts group panel -->
+  <rect class="pg-diagram-panel" x="305" y="280" width="440" height="400" rx="34"/>
+  <text class="pg-diagram-panel-label" x="337" y="318">Artifacts</text>
+  <!-- connectors -->
+  <g class="pg-diagram-lines" marker-end="url(#pg-diagram-arrow)">
+    <path d="M130,806 L130,137 Q130,121 146,121 L364,121"/>
+    <path d="M510,159 L510,277"/>
+    <path d="M430,439 L430,163"/>
+    <path d="M210,806 L210,496 Q210,480 226,480 L301,480"/>
+    <path d="M485,455 L500,455 Q515,455 515,440 L515,388 Q515,372 531,372 L575,372"/>
+    <path d="M485,509 L500,509 Q515,509 515,524 L515,579 Q515,595 531,595 L575,595"/>
+    <path d="M820,806 L820,611 Q820,595 804,595 L730,595"/>
+    <path d="M705,850 L274,850"/>
+  </g>
+  <!-- verbs: haloed text knocks a gap into the line beneath -->
+  <g class="pg-diagram-verbs" text-anchor="middle">
+    <text x="130" y="476">instruct</text>
+    <text x="548" y="228">write</text>
+    <text x="430" y="228">give context</text>
+    <text x="210" y="696">review</text>
+    <text class="pg-diagram-verb-in-panel" x="515" y="419">verify</text>
+    <text class="pg-diagram-verb-in-panel" x="515" y="558">generate</text>
+    <text x="820" y="696">validate</text>
+    <text x="494" y="856">give feedback</text>
+  </g>
+  <!-- AI Agents -->
+  <g class="pg-diagram-people">
+    <rect x="365" y="71" width="210" height="88" rx="26"/>
+    <g class="pg-diagram-icon" transform="translate(387 97) scale(1.5)">
+      <rect x="4.5" y="8" width="15" height="10.5" rx="3.2"/>
+      <line x1="12" y1="3.4" x2="12" y2="8"/>
+      <circle class="pg-diagram-icon-dot" cx="12" cy="2.6" r="1.3"/>
+      <circle class="pg-diagram-icon-dot" cx="9.3" cy="13" r="1.25"/>
+      <circle class="pg-diagram-icon-dot" cx="14.7" cy="13" r="1.25"/>
+      <line x1="2.6" y1="12" x2="2.6" y2="14.8"/>
+      <line x1="21.4" y1="12" x2="21.4" y2="14.8"/>
+    </g>
+    <text x="435" y="124">AI Agents</text>
+  </g>
+  <!-- Developers -->
+  <g class="pg-diagram-people">
+    <rect x="60" y="806" width="210" height="88" rx="26"/>
+    <g class="pg-diagram-icon" transform="translate(72 832) scale(1.5)">
+      <rect x="4" y="2.5" width="16" height="10" rx="2"/>
+      <path class="pg-diagram-icon-cutout" d="M5 22v-1c0-2.9 3.1-4.6 7-4.6s7 1.7 7 4.6v1z"/>
+      <circle class="pg-diagram-icon-cutout" cx="12" cy="13.4" r="2.9"/>
+    </g>
+    <text x="120" y="859">Developers</text>
+  </g>
+  <!-- Domain Experts -->
+  <g class="pg-diagram-people">
+    <rect x="705" y="806" width="280" height="88" rx="26"/>
+    <g class="pg-diagram-icon" transform="translate(725 832) scale(1.5)">
+      <circle cx="9" cy="8.6" r="3"/>
+      <path d="M3.4 19c0-3.1 2.5-5.4 5.6-5.4s5.6 2.3 5.6 5.4"/>
+      <path d="M16.2 6.1a3 3 0 0 1 0 5.7"/>
+      <path d="M17.4 14c2.4.5 4.2 2.4 4.2 5"/>
+    </g>
+    <text x="773" y="859">Domain Experts</text>
+  </g>
+  <!-- Artifacts -->
+  <g class="pg-diagram-artifact" text-anchor="middle">
+    <rect x="315" y="439" width="170" height="86" rx="22"/>
+    <text x="400" y="475">Annotated</text>
+    <text x="400" y="499">Tests</text>
+    <rect x="575" y="327" width="150" height="86" rx="22"/>
+    <text class="pg-diagram-artifact-single" x="650" y="379">Code</text>
+    <rect x="575" y="552" width="150" height="86" rx="22"/>
+    <text class="pg-diagram-artifact-single" x="650" y="604">Report</text>
+  </g>
+</svg>
