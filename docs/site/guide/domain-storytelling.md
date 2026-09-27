@@ -2,11 +2,15 @@
 
 [Domain Storytelling](https://domainstorytelling.org/quick-start-guide) describes how a domain works as short stories. With pytest-given you write these stories in code, and the report shows which scenarios cover each sentence of a story.
 
-Stories are made of [glossary](glossary.md) terms. In Domain Storytelling, **actors** do **activities** with **work objects**. "Carol selects a room" has an actor (Carol), an activity (selects), and a work object (room). A story is a numbered list of such **sentences**. Domain Storytelling diagrams draw each activity as an arrow labelled with a verb.
+!!! info "About Domain Storytelling"
 
-The HTML report shows stories in a **Stories** tab.
+    [Domain Storytelling](https://domainstorytelling.org) is a technique for building a shared understanding between domain experts and developers. Together they describe the domain as stories: who does what, with what, and in which order. These stories give your tests context. Your scenarios sit one level below them, and each one documents a specific piece of domain logic in much more detail.
 
-## Domain stories
+In Domain Storytelling, **actors** do **activities** with **work objects**. "Carol selects a room" has an actor (Carol), an activity (selects), and a work object (room). A story is a numbered list of such **sentences**. In a Domain Storytelling diagram, each activity is an arrow labelled with a verb.
+
+When the parts of a sentence are [glossary](glossary.md) terms, the report can match the sentence against your tests. The HTML report shows stories in a **Stories** tab.
+
+## Writing stories
 
 Create a story with `story(...)`, passing a name and a list of `sentence(...)` calls:
 
@@ -29,7 +33,7 @@ Each part can be a glossary handle or a plain string. Use plain strings for gene
 
 Handles from a [file glossary](glossary.md#file-glossary) work the same way: `sentence(g['Guest'], g['book']('books'), g['Room'])`.
 
-A sentence needs at least two different glossary terms. With fewer, pytest-given can't match it against step text, and the report marks it as "not coverage-tracked". You can still cover such a sentence with a [pin](#pins).
+To be matched against your tests, a sentence needs at least two different glossary terms. The report marks a sentence with fewer as "not coverage-tracked". You can still cover it with a [pin](#pins).
 
 ### Clauses
 
@@ -42,7 +46,7 @@ sentence(
 )
 ```
 
-The parts of a clause alternate: an actor or work object, then an activity or connecting word, then an actor or work object again, and so on. A clause starts with its actor and ends with an actor or work object, so it always has an odd number of parts, at least three.
+A clause starts with its actor. After that, its parts alternate: an activity or connecting word, then an actor or work object, and so on. A clause ends with an actor or work object, so it always has an odd number of parts, at least three.
 
 To cover a sentence with several clauses, one step must mention every glossary term from all of its clauses.
 
@@ -54,13 +58,13 @@ If a term has no declared [kind](glossary.md#kinds), pytest-given infers it from
 - an activity position (2nd, 4th, …): **activity**
 - any other position (3rd, 5th, …): **work object**
 
-If a term's kind is declared, pytest-given checks it against its position when the sentence is created. A term in the wrong position raises `PytestGivenError`, naming the term and its kind.
+If a term's kind is declared, pytest-given checks the kind against the term's position when the sentence is created. A term in the wrong position raises `PytestGivenError`, naming the term and its kind.
 
-If an undeclared term appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a `kind_column` to your file glossary) to fix it.
+If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a `kind_column` to your file glossary) to fix it.
 
-## Scenario↔sentence binding
+## Linking scenarios to stories
 
-Tell pytest-given which story a scenario implements with `stories=`:
+Tell pytest-given which story a scenario belongs to with `stories=`:
 
 ```python
 @scenario('Carol selects a suite', stories=book_a_group_trip)
@@ -69,13 +73,13 @@ def test_select_suite(carol):
         ...
 ```
 
-pytest-given then works out which sentences of the story the scenario covers. By default it matches the step text against the sentences. With pins, you state the covered sentences yourself.
+For several stories, pass a list: `stories=[book_a_group_trip, check_in]`, where `check_in` is another story. The scenario then appears under each of them.
+
+pytest-given works out which sentences of these stories the scenario covers. By default, it matches the text of the scenario's steps against the sentences. With pins, you state the covered sentences yourself.
 
 ### Narration matching
 
 A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: `{room}`, `{room.low}` and `room('Deluxe Suite')` all count as the term *Room*.
-
-To match against several stories, pass a list: `stories=[book_a_group_trip, check_in]`, where `check_in` is another story. The scenario then appears under each of these stories.
 
 ### Coverage in the report
 
@@ -92,7 +96,7 @@ book_a_group_trip['select']  # by name, set with name='select' above
 book_a_group_trip[2]         # by number
 ```
 
-Numbers are positions in the list, so they change when you insert a sentence before them. Names don't change.
+Numbers are positions in the list, so they change when you insert a sentence before them. Names stay the same.
 
 ### Pins
 

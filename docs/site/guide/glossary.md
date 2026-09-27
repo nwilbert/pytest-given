@@ -1,8 +1,12 @@
 # Glossary
 
-A glossary lists the domain terms your tests use: the **ubiquitous language** of Domain-Driven Design. When step text mentions a glossary term, the report highlights the word and shows the term's definition on hover. The report also gets a **Glossary** tab that lists all terms.
+A glossary defines the terms of your domain: the words your team uses for the things and actions it deals with. These words should mean the same everywhere: in conversations with stakeholders, in code, in tests, and in guidance for AI agents. pytest-given lets your tests refer to glossary terms, which links them to the glossary. The report highlights each such word and shows the term's definition on hover, and a **Glossary** tab lists all terms.
 
-You can use a glossary on its own. [Domain Storytelling](domain-storytelling.md) builds on it: its stories are made of glossary terms.
+Referring to glossary terms from your tests is optional: a glossary is useful on its own. It also pairs well with [Domain Storytelling](domain-storytelling.md): story sentences that use glossary terms can be matched against your tests, so the report shows which scenarios cover them.
+
+!!! info "Ubiquitous Language"
+
+    Domain-Driven Design calls this shared vocabulary the [ubiquitous language](https://martinfowler.com/bliki/UbiquitousLanguage.html): one set of terms that domain experts and developers use everywhere. A glossary writes it down, and tests that refer to its terms stay in that language.
 
 ## Declaring terms
 
@@ -17,11 +21,11 @@ room = g('Room', definition='A bookable hotel room.')
 book = g('book', definition='Reserve a room for a stay.')
 ```
 
-Each call returns a **handle**. If the term already exists, `g(...)` returns it. To only look up a term, use `g['Guest']`, which raises an error if the term doesn't exist.
-
-Put handles into t-string step text, like `t'a {guest} {book("books")} a {room}'`. Each handle becomes a **term ref**: a highlighted word in the rendered step.
+Each call returns a **handle**. If the term already exists, `g(...)` returns its handle. To only look up a term, use `g['Guest']`, which raises an error if the term doesn't exist.
 
 ## Term refs
+
+A **term ref** is a glossary term used in a step or a scenario title. To create one, put a handle into a [t-string](step-text.md), like `t'a {guest} {book("books")} a {room}'`. The report shows each term ref as a highlighted word with the term's definition on hover.
 
 A term ref has three forms. Use the simplest one that fits your sentence:
 
@@ -33,7 +37,7 @@ All three forms work on every handle, including handles you look up by name.
 
 ## File glossary
 
-If your project already has a `GLOSSARY.md`, load it with `FileGlossary` instead of declaring terms in code:
+Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a `GLOSSARY.md`. Load the file with `FileGlossary`:
 
 ```python
 from pathlib import Path
@@ -55,11 +59,11 @@ with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
     ...
 ```
 
-A file glossary is a **closed vocabulary**: new terms can only be added as rows in the file. Both `g['foo']` and `g('foo')` just look up a term, and raise an error if it doesn't exist.
+A file glossary is a **closed vocabulary**: you add new terms only as rows in the file. Both `g['foo']` and `g('foo')` only look up a term, and raise an error if it doesn't exist.
 
 ## Kinds
 
-A term can have a kind, which sets its color. The kinds come from [Domain Storytelling](domain-storytelling.md): **actor**, **work object**, and **activity**. To declare a kind, use `g.actor(...)`, `g.work_object(...)`, or `g.activity(...)` instead of `g(...)`:
+A term can have a kind, which sets its color in the report. The kinds come from [Domain Storytelling](domain-storytelling.md): **actor**, **work object**, and **activity**. To declare a kind, use `g.actor(...)`, `g.work_object(...)`, or `g.activity(...)` instead of `g(...)`:
 
 ```python
 guest = g.actor('Guest', definition='Person booking accommodation.')
@@ -67,7 +71,7 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 book = g.activity('book', definition='Reserve a room for a stay.')
 ```
 
-In a file glossary, add a `kind_column`.
+In a file glossary, the kinds come from the column you pass as `kind_column`.
 
 If you don't declare a kind, pytest-given [infers it](domain-storytelling.md#kind-inference) from the story sentences that use the term. A term that gets no kind either way is **kindless**. The report shows it in a neutral color and lists it under **Uncategorized** in the Glossary tab.
 
@@ -88,10 +92,10 @@ So if you use a glossary without stories, import the glossary object itself into
 
 ```python
 # conftest.py
-from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
+from tests.glossary import g  # noqa: F401 — plugin discovery
 ```
 
-`import tests.ubiquitous_language` does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.
+`import tests.glossary` does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.
 
 A test suite can have only one glossary. If two different glossary objects reach the report, pytest-given raises `PytestGivenError`.
 

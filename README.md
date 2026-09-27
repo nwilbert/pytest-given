@@ -3,7 +3,7 @@
 A pytest plugin that turns Given/When/Then annotated tests into interactive HTML reports.
 
 **Given** your pytest tests,<br>
-**when** you narrate them with `given` / `when` / `then` (no Gherkin, no separate DSL),<br>
+**when** you narrate them with `given` / `when` / `then`,<br>
 **then** documentation and behavior fuse into one report.
 
 **What people and agents read is what the code does.**
@@ -13,10 +13,10 @@ Inspired by [JGiven](https://jgiven.org/) (Java).
 **Documentation: <https://nwilbert.github.io/pytest-given/dev/>**
 
 Live examples:
-- **[Coffeeshop report](https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html)**: tour of the core features, including `Annotated` `given` labels.
-- **[Hotel-booking report](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html)**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
-- **[File-glossary report](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html)**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story sentences.
-- **[Self-report](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html)**: pytest-given run against its own test suite (dogfooding).
+- **[Coffeeshop](https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html)**: a tour of the core features.
+- **[Hotel booking](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html)**: a glossary and domain stories, with story coverage.
+- **[File glossary](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html)**: the same, with the glossary kept in a Markdown file.
+- **[Self-report](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html)**: pytest-given's own test suite.
 
 ## Quick start
 
@@ -66,26 +66,32 @@ This produces `given-report/report.html` — one file you can open directly in a
 
 ## Why pytest-given?
 
-Classical BDD tools (Cucumber, behave, pytest-bdd) center on a natural-language DSL like Gherkin, designed so stakeholders can author tests themselves and engineers maintain the glue that binds each step to a Python function.
+Classical BDD tools (Cucumber, behave, pytest-bdd) center on Gherkin, a natural-language DSL: stakeholders write the tests, and engineers maintain the glue code behind each step.
 
-pytest-given is for the opposite case: **engineers or their agents write normal tests, and the plugin turns them into readable documentation**. Stakeholders, domain experts, and engineers on adjacent teams can open the HTML report and follow it without touching the test suite; for the engineers writing the tests, the same narrative gives a domain-focused view of behavior that's easier to scan than raw test code — browsable by tag, glossary term, or module, with text search and status filters.
+pytest-given works the other way round: **engineers or their agents write normal tests, and pytest-given turns them into readable documentation.** Stakeholders and domain experts can follow the HTML report without ever opening the test suite. Engineers get a view of the system's behavior that is easier to scan than test code, browsable by tag, glossary term, or module. The approach is the one [JGiven](https://jgiven.org/) pioneered for Java, brought to pytest.
 
-- Plain Python — no Gherkin, no `.feature` files, no parser.
-- Tests stay first-class pytest tests; the report is a by-product.
-- Self-contained HTML: open it locally or attach it to CI artifacts; no server, no external assets.
+- Plain Python: no Gherkin, no `.feature` files, no parser.
+- Tests stay first-class pytest tests, and the report is a by-product.
+- Self-contained HTML: open it locally or attach it to a CI run, with no server and no external assets.
 
-Increasingly those tests aren't hand-written at all: a human describes a scenario in prose and an AI agent generates the test alongside the code it exercises, so the narrated report — not the raw test code — becomes the artifact humans review. The diagram below sketches that loop between people, agents, and artifacts; [Working with AI agents](https://nwilbert.github.io/pytest-given/dev/ai-agents/) covers how to drive it.
+### Written by agents, reviewed by people
+
+More and more tests aren't written by hand. A person describes a scenario, an AI agent writes the test along with the code, and people review the narrated report instead of the test code. The diagram shows this loop, and [Working with AI agents](https://nwilbert.github.io/pytest-given/dev/ai-agents/) explains how to set it up.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/pytest-given-diagram.svg" alt="A loop between people, agents, and artifacts: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents." width="640">
 </p>
+
+### Glossary and Domain Storytelling
+
+pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary](https://nwilbert.github.io/pytest-given/dev/guide/glossary/) defines the terms your team uses, and the report highlights them wherever a test mentions them. [Domain Storytelling](https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/) adds the big picture: stories of how the domain works, with the report showing which scenarios cover each sentence of a story.
 
 ## Features
 
 - **[Step context managers](https://nwilbert.github.io/pytest-given/dev/guide/scenarios/)**: `with given(...)`, `when(...)`, `then(...)` blocks in plain pytest tests, nesting within a phase.
 - **[Narrated fixtures](https://nwilbert.github.io/pytest-given/dev/guide/scenarios/)**: `@given` on a fixture, or `Annotated[..., given(...)]` on a parameter, records setup as a step.
 - **[Parametrized scenarios](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/)**: one narrated tree plus a parameter table per case, or one scenario per case on request.
-- **[Glossary](https://nwilbert.github.io/pytest-given/dev/guide/glossary/)**: ubiquitous-language terms, declared in code or loaded from a `GLOSSARY.md`, rendered as highlighted term refs in the narration.
+- **[Glossary](https://nwilbert.github.io/pytest-given/dev/guide/glossary/)**: your domain's terms, declared in code or loaded from a `GLOSSARY.md`, rendered as highlighted term refs in the narration.
 - **[Domain Storytelling](https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/)**: Domain Stories as sequences of sentences, and per-sentence coverage in the report.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
 - **[Agent skills](https://nwilbert.github.io/pytest-given/dev/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.

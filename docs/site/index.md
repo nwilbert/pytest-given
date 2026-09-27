@@ -13,7 +13,7 @@ title: Home
 
 <p class="pg-hero-gwt">
 <span><b>Given</b> your pytest tests,</span>
-<span><b>when</b> you narrate them with <code>given</code> / <code>when</code> / <code>then</code> (no Gherkin, no separate DSL),</span>
+<span><b>when</b> you narrate them with <code>given</code> / <code>when</code> / <code>then</code>,</span>
 <span><b>then</b> documentation and behavior fuse into one report.</span>
 </p>
 
@@ -26,34 +26,38 @@ title: Home
 
 </div>
 
-Live examples:
-
-- **[Coffeeshop report](examples/coffeeshop.html){ target=_blank }**: tour of the core features, including `Annotated` `given` labels.
-- **[Hotel-booking report](examples/hotel-booking.html){ target=_blank }**: Domain Storytelling: ubiquitous-language glossary, Domain Stories, and coverage.
-- **[File-glossary report](examples/file-glossary-booking.html){ target=_blank }**: Domain Storytelling with a Markdown `FileGlossary` and kinds inferred from story sentences.
-- **[Self-report](examples/self-report.html){ target=_blank }**: pytest-given run against its own test suite (dogfooding).
-
 ## Why pytest-given?
 
-Classical BDD tools (Cucumber, behave, pytest-bdd) center on a natural-language DSL like Gherkin, designed so stakeholders can author tests themselves and engineers maintain the glue that binds each step to a Python function.
+Classical BDD tools (Cucumber, behave, pytest-bdd) center on Gherkin, a natural-language DSL: stakeholders write the tests, and engineers maintain the glue code behind each step.
 
-pytest-given is for the opposite case: **engineers or their agents write normal tests, and the plugin turns them into readable documentation**. Stakeholders, domain experts, and engineers on adjacent teams can open the HTML report and follow it without touching the test suite; for the engineers writing the tests, the same narrative gives a domain-focused view of behavior that's easier to scan than raw test code — browsable by tag, glossary term, or module, with text search and status filters. The approach is the one [JGiven](https://jgiven.org/) pioneered for Java, brought to pytest.
+pytest-given works the other way round: **engineers or their agents write normal tests, and pytest-given turns them into readable documentation.** Stakeholders and domain experts can follow the HTML report without ever opening the test suite. Engineers get a view of the system's behavior that is easier to scan than test code, browsable by tag, glossary term, or module. The approach is the one [JGiven](https://jgiven.org/) pioneered for Java, brought to pytest.
 
-- Plain Python — no Gherkin, no `.feature` files, no parser.
-- Tests stay first-class pytest tests; the report is a by-product.
-- Self-contained HTML: open it locally or attach it to CI artifacts; no server, no external assets.
+- Plain Python: no Gherkin, no `.feature` files, no parser.
+- Tests stay first-class pytest tests, and the report is a by-product.
+- Self-contained HTML: open it locally or attach it to a CI run, with no server and no external assets.
 
-Increasingly those tests aren't hand-written at all: a human describes a scenario in prose and an AI agent generates the test alongside the code it exercises, so the narrated report — not the raw test code — becomes the artifact humans review. The diagram below sketches that loop between people, agents, and artifacts; [Working with AI agents](ai-agents.md) covers how to drive it.
+### Written by agents, reviewed by people
+
+More and more tests aren't written by hand. A person describes a scenario, an AI agent writes the test along with the code, and people review the narrated report instead of the test code. The diagram shows this loop, and [Working with AI agents](ai-agents.md) explains how to set it up.
 
 <figure class="pg-diagram">
   --8<-- "docs/site/assets/pytest-given-diagram.svg"
   <figcaption><a href="assets/pytest-given-diagram-full.svg">Open at full size</a></figcaption>
 </figure>
 
-## Development
+### Glossary and Domain Storytelling
 
-See [AGENTS.md](https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md) for setup, quality gates, and conventions.
+pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary](guide/glossary.md) defines the terms your team uses, and the report highlights them wherever a test mentions them. [Domain Storytelling](guide/domain-storytelling.md) adds the big picture: stories of how the domain works, with the report showing which scenarios cover each sentence of a story.
 
-## License
+## Example reports
 
-[MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md). The bundled Alpine.js runtime is also MIT; its notice is in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).
+- **[Coffeeshop](examples/coffeeshop.html){ target=_blank }**: a tour of the core features.
+- **[Hotel booking](examples/hotel-booking.html){ target=_blank }**: a glossary and domain stories, with story coverage.
+- **[File glossary](examples/file-glossary-booking.html){ target=_blank }**: the same, with the glossary kept in a Markdown file.
+- **[Self-report](examples/self-report.html){ target=_blank }**: pytest-given's own test suite.
+
+The [Examples](examples.md) page links the test code behind each report.
+
+## Development and license
+
+See [AGENTS.md](https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md) for setup, quality gates, and conventions. pytest-given is [MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md) licensed. The bundled Alpine.js runtime is also MIT; its notice is in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).

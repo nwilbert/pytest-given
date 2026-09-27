@@ -2,6 +2,7 @@
 
 ## Now
 
+- [ ] move the pin stuff in the changelog to the bottom
 - [ ] Review report readability with frontend design skill.
 
 ## Next
