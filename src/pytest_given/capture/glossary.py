@@ -23,10 +23,8 @@ from .source import capture_caller_source
 class LookupGlossary(BaseGlossary):
     """A glossary that reads a term back by name, as `g['Guest']`.
 
-    Both user-facing glossaries do this, and both have to hand back the *same*
-    handle for a repeated lookup — so the cache that guarantees it lives here
-    rather than once per subclass, where it was also the reason the lookup had
-    to take it as an argument.
+    Both user-facing glossaries do this, and a repeated lookup hands back the
+    *same* handle.
     """
 
     def __post_init__(self) -> None:
@@ -80,7 +78,7 @@ class Glossary(LookupGlossary):
         return self._declare('activity', name, definition)
 
     def __call__(self, name: str, definition: str | None = None) -> TermHandle:
-        """Declare-or-get a term whose kind inference will settle later."""
+        """Register a term whose kind inference will settle later."""
         return self._declare(None, name, definition)
 
 
@@ -246,11 +244,9 @@ def register_or_conflict(
 ) -> GlossaryTerm:
     """Register `term`, or return the equal one already there.
 
-    First-registration wins, and `terms_match` decides what "equal" means. The
-    identity rule already lived in one place; this puts the flow around it
-    there too, so the code glossary and the file-backed one cannot drift on
-    what counts as a re-registration. Only the message differs, which is what
-    the callback is for.
+    First-registration wins, and `terms_match` decides what "equal" means.
+    Shared by both glossaries so they agree on what counts as a
+    re-registration; only the message differs.
     """
     existing = glossary.get(term.id)
     if existing is not None:

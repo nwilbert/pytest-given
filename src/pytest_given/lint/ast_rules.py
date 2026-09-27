@@ -75,8 +75,7 @@ class _Resolved:
     A `when_then` pair is recognized as sibling `when`+`then` steps sharing
     one anchor — unambiguous, because cross-phase nesting is rejected at
     record time, so no other construct produces that shape. `pair_role` is
-    which half of such a pair this step is, or None when it is not in one; a
-    step has one phase, so the two halves were never independent.
+    which half of such a pair this step is, or None when it is not in one.
     """
 
     path: StepPath
@@ -143,11 +142,7 @@ def _scan_scenario(
 def _pair_role(
     step: Step, before: Step | None, after: Step | None, source: SourceLocation
 ) -> Phase | None:
-    """Which half of a `when_then` pair `step` is, or None when it is in none.
-
-    The two halves were never independent — a step has one phase — so this is
-    one answer rather than a flag per half.
-    """
+    """Which half of a `when_then` pair `step` is, or None when it is in none."""
     if (
         step.phase == 'when'
         and after is not None

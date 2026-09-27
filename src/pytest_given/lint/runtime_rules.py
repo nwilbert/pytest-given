@@ -26,14 +26,8 @@ def run_runtime_rules(
     stories: list[Story],
     enabled: Container[RuleId],
 ) -> list[RawFinding]:
-    """Every `enabled` rule here evaluates the grouped scenario list — one
-    evaluation per logical scenario.
-
-    A rule that is off is not evaluated at all. `dead-term` ships off and
-    walks every narration part of every scenario plus every clause of
-    every story, so computing its findings only to discard them was the bulk
-    of the lint's cost on a default run.
-    """
+    """Every `enabled` rule here, evaluated over the grouped scenario list —
+    once per logical scenario."""
     context = _Context(grouped=grouped, glossary=glossary, stories=stories)
     return [
         finding
@@ -168,9 +162,8 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
     ]
 
 
-# Keyed by rule id so `run_runtime_rules` can skip a disabled rule without
-# evaluating it — `dead-term` walks every narration part and every clause,
-# which was the bulk of the lint's cost on a default run.
+# Keyed by rule id so `run_runtime_rules` skips a disabled rule entirely —
+# `dead-term`, off by default, walks every narration part and every clause.
 _RUNTIME_RULES: dict[RuleId, Callable[[_Context], list[RawFinding]]] = {
     MISSING_PHASE: _missing_phase_findings,
     TAG_SHADOWS_TERM: _tag_shadows_term_findings,

@@ -109,11 +109,9 @@ def _strip_emphasis(cell: str) -> str:
     from a cell, leaving its text content. Applied to term and kind cells so a
     glossary written with emphasized term names renders clean pills.
 
-    Nesting unwraps by recursing into each match rather than by re-running the
-    pattern over the whole string: a repeated whole-string pass re-enters a
-    code span it has already unwrapped and strips markup that is literal
-    there, so `` `a*b*c` `` canonicalized to `abc` while the identical markup
-    in a definition cell rendered as `a*b*c`.
+    Nesting unwraps by recursing into each match rather than re-running the
+    pattern over the whole string, which would strip markup that is literal
+    inside an already unwrapped code span.
     """
     return EMPHASIS.sub(_unwrap_emphasis, cell).strip()
 

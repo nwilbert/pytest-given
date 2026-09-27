@@ -58,12 +58,9 @@ def begin_capture_session(rootdir: Path) -> None:
     with no collector active.
 
     Take a `capture_snapshot` first when the caller may be nested inside
-    another run, and `restore_capture_state` when this one is done.
-
-    All three globals, symmetrically with `restore_capture_state`: leaving the
-    collector alone left an *outer* session's collector active across a nested
-    run's conftest import and collection, so anything that run recorded in that
-    window landed in the outer session's open scenario.
+    another run, and `restore_capture_state` when this one is done. The
+    collector is cleared too, or a nested run's conftest import would record
+    into the outer session's open scenario.
     """
     set_rootdir(rootdir)
     restore_story_registry({})

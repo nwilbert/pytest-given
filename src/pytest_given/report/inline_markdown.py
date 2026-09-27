@@ -17,10 +17,9 @@ def render_inline_markdown(text: str) -> str:
     """HTML-escape `text`, then render **bold**/__bold__, *italic*, `code`, and
     hard breaks (<br> or a newline) as safe inline HTML.
 
-    One pass over the emphasis spans, so the code span protects its contents
-    from break substitution as well as from emphasis. Substituting breaks up
-    front instead let `` `<br>` `` through as a real break — the one thing a
-    definition documenting that escape hatch needs to render as text.
+    One pass over the emphasis spans, so a code span protects its contents
+    from break substitution as well as from emphasis: `` `<br>` `` renders as
+    text.
     """
     escaped = str(escape(text))
     out: list[str] = []

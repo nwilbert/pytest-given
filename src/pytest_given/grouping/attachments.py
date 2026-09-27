@@ -94,9 +94,6 @@ def _promote_occurrence(
     column = builder.new_column('attachment', attachment.label)
     for node_id, other in theirs.items():
         builder.set_cell(column.id, node_id, other)
-    # The badge is labeled with the *column* name, not the attachment's own
-    # label: a label attached twice gives two columns, and a badge repeating
-    # the bare label points the reader at the wrong one.
     return AttachmentRef(
         label=column.name,
         content_type=attachment.content_type,

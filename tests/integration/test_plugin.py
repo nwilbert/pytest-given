@@ -490,7 +490,7 @@ def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
 
 def test_two_test_files_sharing_a_basename_render_fine(pytester, tmp_path):
     """`tests/unit/test_x.py` beside `tests/integration/test_x.py` is an
-    ordinary layout; the HTML report used to abort on it."""
+    ordinary layout, and their slugs must not collide."""
     pytester.makepyfile(
         test_dup="""
         from pytest_given import scenario, then

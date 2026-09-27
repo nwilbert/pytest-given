@@ -124,11 +124,10 @@ type TermKind = Literal['actor', 'object', 'activity']
 
 @dataclass(frozen=True)
 class SourceLocation:
-    """A file/line pointer to a scenario's test function.
+    """A file/line pointer into the suite's source.
 
     `relpath` is POSIX-normalized and relative to pytest's rootdir; `line` is
-    1-indexed. Stored on Scenario; rootdir is never serialized to avoid
-    leaking local paths.
+    1-indexed. The rootdir itself is never serialized, so no local path leaks.
     """
 
     relpath: str

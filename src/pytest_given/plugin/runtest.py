@@ -65,12 +65,10 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     set_active_collector(collector)
     # Pre-fixture-setup work done; let pytest run fixture setup here.
     #
-    # `finally`, because all three of these matter most when setup *failed*: a
-    # fixture exception is recorded onto the scenario by `makereport`, and the
-    # scenario still needs the `given` steps its fixtures recorded before the
-    # failure. Old-style `hookwrapper` runs post-yield code after a raising
-    # inner hook anyway; `wrapper=True` throws in at the yield instead, so
-    # without this the migration pytest recommends would silently drop them.
+    # `finally`, because this matters most when setup *failed*: the scenario
+    # still needs the `given` steps its fixtures recorded before the failure.
+    # An old-style `hookwrapper` resumes after a raising inner hook anyway; a
+    # `wrapper=True` one would not without it.
     try:
         yield
     finally:

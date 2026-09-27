@@ -239,11 +239,7 @@ def check_attachment_labels(
     comparison is over the *distinct* labels, so a label attached a different
     number of times does not raise.
 
-    Takes label *sets* rather than the maps the promotion walk grouped: those
-    keys are all this reads, and asking for the whole map is what made this
-    module know the shape of an attachment store it never opens. Each set
-    arrives with its case id so the message can name the case, as every other
-    refusal does.
+    Takes label *sets*, each with its case id so the message can name the case.
     """
     for case_id, other in others:
         differing = sorted(baseline ^ other)

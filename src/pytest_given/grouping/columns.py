@@ -38,26 +38,15 @@ type Format = tuple[str | None, str]
 
 
 def trivial_format(fmt: Format) -> bool:
-    """Whether a slot carries no formatting of its own.
-
-    One predicate for both readers: `param_cell_formats` deciding whether a
-    column can adopt a shared formatting, and `templatize._slot_format`
-    deciding whether to render a cell the plain way. They used to disagree on
-    a `('', '')` pair, which only one of them treated as trivial.
-    """
+    """Whether a slot carries no formatting of its own — `None` and `''`
+    alike."""
     conversion, format_spec = fmt
     return not conversion and not format_spec
 
 
 @dataclass
 class ColumnBuilder:
-    """The columns and cells a group's walk accumulates, and the group it reads.
-
-    Both halves of the walk — `templatize` and `attachments` — take this one
-    object, which is what it is for, and both call it `builder`. `checks` still
-    takes a bare `Group`, so a module that only inspects a group does not also
-    carry the ability to add a column to it.
-    """
+    """The columns and cells a group's walk accumulates, and the group it reads."""
 
     group: Group
     _columns: list[ParameterColumn] = field(default_factory=list)
@@ -85,12 +74,7 @@ class ColumnBuilder:
         )
 
     def derived(self, name: str, rendered: dict[NodeId, str]) -> ParameterColumn:
-        """A new `derived` column, filled with what each case rendered.
-
-        Creating and filling are one act: every promotion does both, and three
-        call sites doing them separately is three chances to point a slot at an
-        empty column.
-        """
+        """A new `derived` column, filled with what each case rendered."""
         column = self.new_column('derived', name)
         for node_id, text in rendered.items():
             self.set_cell(column.id, node_id, text)

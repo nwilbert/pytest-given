@@ -99,8 +99,7 @@ class GlossaryView:
 
 
 class _KindRow(NamedTuple):
-    """How one kind heading is presented: the same three fields `KindGroup`
-    carries, minus the entries the view fills in."""
+    """How one kind heading is presented, and the noun its count reads in."""
 
     label: str
     key: KindKey
@@ -112,10 +111,8 @@ class _KindRow(NamedTuple):
 class KindTally:
     """One kind as the Glossary sidebar and header present it.
 
-    Carries its own count and its own summary phrase, so the template loops
-    over the catalog instead of restating it — four hand-written filter rows
-    and four hand-pluralized counts that had to be edited in step with
-    `_KIND_GROUPS` to stay true.
+    Carries its own count and summary phrase, so the template loops over the
+    catalog instead of restating it.
     """
 
     label: str
@@ -229,10 +226,7 @@ class TermCrossRefs:
     """The cross-reference index the Glossary view is built from: per-term
     aggregations, and which scenarios reference each term.
 
-    Built from one walk, so the two cannot disagree about what counts as a
-    reference — they did when one walked only the steps and the other the
-    scenario's own narration too, and a term used solely in a `@scenario` title
-    was listed as used by a scenario while contributing no instance.
+    Built from one walk, so the two agree on what counts as a reference.
     """
 
     aggregations: dict[TermId, GlossaryAggregation]
@@ -258,11 +252,8 @@ def build_term_crossrefs(report: ReportData) -> TermCrossRefs:
                 if not isinstance(part, NarrationTermRef):
                     continue
                 if glossary.get(part.term_id) is None:
-                    # A ref naming a term outside the selected glossary. The
-                    # renderer already draws it as plain text, and
-                    # `record_instance` skips it — so counting it here made
-                    # the two halves of this one walk disagree, and shipped a
-                    # phantom id into the Terms browse axis.
+                    # A ref naming a term outside the selected glossary: the
+                    # renderer draws it as plain text, so it is no reference.
                     continue
                 index.record_instance(
                     part.term_id, part.display, fixture_name=fixture_name

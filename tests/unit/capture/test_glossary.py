@@ -370,7 +370,7 @@ def test_call_returns_deferred_handle():
 
 def test_a_term_handle_is_hashable_and_keys_on_its_term():
     """Handles are public return values, so a user may put one in a set or key
-    a dict on it — which the mutable `Glossary` they carry used to refuse."""
+    a dict on it, although the `Glossary` they carry is mutable."""
     g = Glossary()
     guest, room = g.actor('Guest'), g.work_object('Room')
     assert {guest, room, guest} == {guest, room}

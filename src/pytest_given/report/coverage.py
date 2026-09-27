@@ -26,10 +26,8 @@ type CoverageMap = dict[NodeId, dict[StoryId, set[SentenceId]]]
 class StoryIndex:
     """A story's sentences reduced to what matching needs, built once.
 
-    Depends only on the story, so it is shared across every scenario instead
-    of rebuilt per scenario — which computes `a_refs` once per sentence rather
-    than once per sentence per scenario. `refs_by_sentence` is keyed by exactly
-    the eligible sentences.
+    Depends only on the story, so it is built once and shared across every
+    scenario. `refs_by_sentence` is keyed by exactly the eligible sentences.
     """
 
     story_id: StoryId
@@ -44,10 +42,6 @@ def build_coverage_map(report: ReportData) -> CoverageMap:
     story it covers a sentence of, which only a pin reaches.
 
     Each story is indexed once and reused across scenarios.
-
-    Here rather than beside the Story view it feeds: this is matching, not
-    presentation, and it is the only reason `StoryIndex` would have to be part
-    of another module's vocabulary.
     """
     indexes = [build_story_index(story) for story in report.stories]
     result: CoverageMap = {}

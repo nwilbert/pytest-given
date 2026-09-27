@@ -25,8 +25,7 @@ from typing import Literal
 
 from ..model import Status
 
-# How a status is painted, wherever it is painted — one map rather than a
-# Markdown constant and three separately-ordered conditionals in the template.
+# How a status is painted, wherever it is painted.
 STATUS_GLYPH: dict[Status, str] = {'passed': '✓', 'failed': '✗', 'skipped': '○'}
 
 # Where column 0 sits on the ring, as a fraction of the ring's circumference.

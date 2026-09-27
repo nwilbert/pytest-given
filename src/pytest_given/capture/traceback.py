@@ -21,9 +21,8 @@ from dataclasses import dataclass, field
 from ..model import TracebackFrame
 from .source import to_relpath
 
-# `\S` anchors the path: `.+?` also accepted leading whitespace, so an
-# indented source line inside a frame body could pass for a new frame
-# header and split one frame into two garbage ones.
+# `\S` anchors the path, so an indented source line inside a frame body
+# cannot pass for a new frame header.
 _FRAME_HEADER_RE = re.compile(r'^(?P<path>\S.*?):(?P<lineno>\d+): in (?P<func>.+)$')
 
 # Substrings (after backslash → forward-slash normalization) that mark a
@@ -142,12 +141,8 @@ def _portable_path(normalized_path: str) -> str:
 
 
 def is_internal_path(path: str) -> bool:
-    """Whether a traceback frame's file is ours or the machinery's.
-
-    Normalizes here rather than trusting the caller to have done it: the
-    precondition was named in the parameter and enforced by nothing, and both
-    call sites spelled the same fixup out beforehand.
-    """
+    """Whether a traceback frame's file, in either separator convention, is
+    ours or the machinery's."""
     normalized = path.replace('\\', '/')
     if any(s in normalized for s in _INTERNAL_SUBSTRINGS):
         return True

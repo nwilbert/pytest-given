@@ -23,7 +23,7 @@ def add_report_parser(
     subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
 ) -> None:
     report_parser = subparsers.add_parser(
-        'report', help='Generate HTML report from JSON data'
+        'report', help='Re-render a saved JSON report as HTML or Markdown'
     )
     report_parser.set_defaults(handler=run_report)
     report_parser.add_argument('json_file', type=Path, help='Path to JSON report data')
@@ -32,7 +32,10 @@ def add_report_parser(
         '--output',
         type=Path,
         default=None,
-        help='Output file path (default: given-report/report.html)',
+        help=(
+            f'Output file path (default: {DEFAULT_HTML_PATH.as_posix()} for '
+            'HTML, stdout for Markdown)'
+        ),
     )
     report_parser.add_argument(
         '--source-link',

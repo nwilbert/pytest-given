@@ -7,10 +7,9 @@ from collections.abc import Sequence
 class PytestGivenWarning(UserWarning):
     """Anything pytest-given wants to say without refusing to continue.
 
-    Its own type rather than `pytest.PytestWarning`: that spelling was the only
-    reason `capture/` imported pytest at all. A `UserWarning` subclass still
-    lands in pytest's warnings summary, and being our own type is what lets a
-    suite filter it by name.
+    Its own type rather than `pytest.PytestWarning`, so `capture/` needs no
+    pytest import; a suite can filter it by name, and as a `UserWarning` it
+    still lands in pytest's warnings summary.
     """
 
 

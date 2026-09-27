@@ -67,11 +67,7 @@ def _install_skills(dest: Path) -> int:
 
 
 def _report_drift(dest: Path) -> int:
-    """Report how ``dest`` differs from the bundled skills, without writing.
-
-    Derives the bundle and the stale set itself: both are functions of `dest`,
-    so passing them in only let a caller hand over a mismatched pair.
-    """
+    """Report how ``dest`` differs from the bundled skills, without writing."""
     bundled = _bundled_skill_tree()
     findings: list[str] = []
     for rel, data in bundled.items():

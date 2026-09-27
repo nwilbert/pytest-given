@@ -59,14 +59,10 @@ def pytest_fixture_setup(
     collector = session_collector(request.config)
     if not collector.recording and fixturedef.scope == 'function':
         # Set up outside any tracked scenario — an unannotated test pulling in
-        # a step fixture. A function-scoped one will be set up again for the
-        # next test that wants it, so skipping costs nothing.
-        #
-        # A wider scope is set up *once*: skipping there left the fixture
-        # unwrapped and unrecorded, and pytest then served the cached value to
-        # every later scenario without firing this hook again — so the step
-        # silently vanished from all of them, and which test happened to touch
-        # the fixture first decided whether the report was right.
+        # a step fixture. A function-scoped one is set up again for the next
+        # test that wants it, so skipping costs nothing. A wider scope is set
+        # up *once* and served from cache to every later scenario, so it is
+        # recorded regardless.
         yield
         return
     _ensure_teardown_wrapped(fixturedef, collector)
@@ -242,8 +238,8 @@ def _graft_annotated_leaves(
     """Graft the Annotated-only labels — parametrize values and built-in or
     undecorated fixtures — in test-signature order.
 
-    A decorated fixture is phase-1 territory even when it recorded nothing, so
-    its body is never replaced by a bodyless leaf.
+    A step fixture is grafted from its recording, even an empty one, and never
+    as a bodyless leaf.
     """
     for name, descriptor in descriptors.items():
         if name in grafted or _step_fixturedef(item, name) is not None:

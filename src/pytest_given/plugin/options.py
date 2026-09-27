@@ -1,11 +1,10 @@
 """The plugin's options: declaration, and the one place they are resolved.
 
 `pytest_configure` parses every option into a single `GivenConfig` before the
-suite runs, so a typo in a rule name, a theme — and, on an HTML run, a
-source-link preset — is a `UsageError` up front rather than a surprise after
-the last test.
-The preset is resolved only for an HTML run because the `github` one shells out
-to `git remote`, which a run that writes no HTML should not pay for.
+suite runs — the lint rules even when the lint is off — so a typo in a rule
+name, a theme or, on an HTML run, a source-link preset is a `UsageError` up
+front rather than a surprise after the last test. The preset is resolved only
+for an HTML run because the `github` one shells out to `git remote`.
 """
 
 import argparse
@@ -142,11 +141,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    # Everything is parsed eagerly (fail fast), even when the lint itself is
-    # disabled for this run: a typo in a rule name or a source-link preset is a
-    # UsageError up front rather than a surprise after the last test. Only an
-    # HTML run resolves a source link — `github` would otherwise run its
-    # org/repo detection for a run that never asks.
     try:
         lint = parse_lint_config(
             config.getini('given_lint_rules'), config.getini('given_lint_ignore')

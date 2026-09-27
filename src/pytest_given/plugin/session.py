@@ -77,12 +77,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector and hook bookkeeping.
-
-    Three of the stash's four values are seeded here; only `GivenConfig` has to
-    be built in `pytest_configure`, because there is one such hook per plugin
-    and the collector above reads `lint_enabled` out of it.
-    """
+    """Give the session its own collector and hook bookkeeping."""
     init_session_stash(session.config)
 
 

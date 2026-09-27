@@ -1,4 +1,5 @@
-"""Caller-frame source-location capture for non-pytest-item objects.
+"""Source locations — of caller frames, code objects and pytest items —
+made rootdir-relative.
 
 `Story` and `GlossaryTerm` are constructed at user-code import time, not inside
 a pytest hook, so their source location must be reconstructed from the call
@@ -70,19 +71,11 @@ def restore_rootdir(previous: Path | None) -> None:
 
 
 def capture_caller_source() -> SourceLocation | None:
-    """A SourceLocation for the nearest frame outside this package.
+    """A SourceLocation for the nearest frame outside this package, or None
+    when the stack never leaves it or that frame lies outside rootdir.
 
-    Walks out rather than counting in. Every call site used to pass its own
-    depth — `skip=2` from a direct caller, `skip=3` from one behind a shared
-    helper — and getting it wrong did not raise: the frame landed inside
-    `pytest_given/`, `_relativize` returned None, and the term or story
-    silently recorded `source=None`, losing its report link and, with it, the
-    lint's whole AST surface. Inserting one wrapper anywhere in a call chain
-    was enough to do that. The walk cannot be wrong that way, and adding a
-    frame costs nothing.
-
-    Returns None if the stack never leaves the package, or if the frame it
-    lands on cannot be made rootdir-relative.
+    Walks out rather than counting a fixed depth, so a wrapper added anywhere
+    in the call chain cannot shift the anchor into this package.
     """
     frame: types.FrameType | None = sys._getframe(1)
     while frame is not None and frame.f_code.co_filename.startswith(PACKAGE_ROOT):

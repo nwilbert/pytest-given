@@ -89,19 +89,10 @@ def recording_collector(
 ) -> Collector | None:
     """The collector to record into, or None when the caller should do nothing.
 
-    The one place the "may I record right now?" question is answered, so the
-    step `__enter__`, `__exit__`, decorator and `attach` paths cannot drift
-    into disagreeing about it. Three outcomes, and only this function knows
-    which is which: record into the collector, no-op, or refuse.
-
     None means an unannotated test, where `with given(...)` and `attach(...)`
-    are both legal and both no-ops: not a mistake, just a test with no report
-    to appear in. Anywhere else with nothing recording there is no such
-    reading, and the call raises.
-
-    Takes the attempt in pieces rather than pre-phrased: recording is the
-    common case and needs no sentence at all, so neither message is built on
-    the path that succeeds.
+    are legal no-ops that warn; anywhere else with nothing recording, the call
+    raises. Takes the attempt in pieces so no message is built on the common,
+    recording path.
     """
     collector = get_active_collector()
     if collector is None:
@@ -161,15 +152,8 @@ class Collector:
 
     @property
     def recording(self) -> bool:
-        """Whether a step pushed right now would be recorded — the one answer
-        the step `__enter__`, `__exit__` and decorator paths all ask, so they
-        cannot drift into disagreeing about it.
-
-        Teardown is *not* recording: a step pushed there raises. Answering True
-        for it — as "any state but idle" did — meant this could not be the one
-        answer it claims to be, and left the refusal to a second check further
-        in.
-        """
+        """Whether a step pushed right now would be recorded. Teardown is
+        not: a step pushed there raises."""
         return self._state in ('test', 'fixture_setup')
 
     def enter_unannotated_test(self) -> None:

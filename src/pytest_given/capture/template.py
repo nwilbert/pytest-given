@@ -157,8 +157,7 @@ def try_term_ref(
     conversion: str | None = None,
 ) -> NarrationTermRef | None:
     """Return a NarrationTermRef if `value` is a glossary handle, instance, or
-    inflection — else None (fall back to NarrationValue). Also used by
-    grouping to unwrap a parametrized term instance to its display.
+    inflection — else None (fall back to NarrationValue).
 
     Glossary handles render as kind-colored term refs carrying the term's
     canonical or instance display; format_spec and conversion have no

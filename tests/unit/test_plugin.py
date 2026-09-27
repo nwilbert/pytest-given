@@ -275,8 +275,8 @@ def test_pytest_runtest_teardown_returns_the_collector_to_idle(
 
 def test_reported_plugin_version_matches_pyproject() -> None:
     """The version in every report's metadata comes from the installed
-    distribution, so it cannot drift from `pyproject.toml` the way a literal
-    did — `docs/releasing.md` bumps one file, and nothing used to notice."""
+    distribution, so it cannot drift from `pyproject.toml`, the one file
+    `docs/releasing.md` bumps."""
     pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
     declared = tomllib.loads(pyproject.read_text(encoding='utf-8'))['project']
     assert version('pytest-given') == declared['version']

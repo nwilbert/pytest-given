@@ -196,12 +196,6 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
 
 
 def _step_from_dict(d: dict[str, Any]) -> Step:
-    """A step, dropping any `status` / `error` an older report carries.
-
-    Failure lives on the scenario and — for a parametrized run — on the case.
-    An old report's `"status": "passed"` is noise to discard, not data to
-    migrate.
-    """
     phase = _literal(d['phase'], PHASES, 'step phase')
     return Step(
         phase=phase,
@@ -289,10 +283,8 @@ def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
     """`value` as one of `allowed`, or a `PytestGivenError` naming the field.
 
     The `Status` / `Phase` / `TermKind` / `ColumnKind` annotations are erased at
-    runtime, so this is the only thing standing between a hand-edited report
-    and a renderer indexing a lookup table with an unknown string — which used
-    to surface as a bare `KeyError` from inside the glyph map or the kind
-    grouping, well away from the file that caused it.
+    runtime, so this is what stops a hand-edited report from reaching a
+    renderer's lookup table with an unknown string.
     """
     if value in allowed:
         return cast('T', value)

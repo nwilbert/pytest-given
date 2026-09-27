@@ -573,8 +573,8 @@ def test_round_trip_via_to_dict() -> None:
     ],
 )
 def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> None:
-    """`Status` and `TermKind` are erased at runtime, so a hand-edited report
-    used to reach the renderers and crash them with a bare `KeyError`."""
+    """`Status` and `TermKind` are erased at runtime, so without this check a
+    hand-edited report would crash the renderers with a bare `KeyError`."""
     report = ReportData(
         metadata=_meta(),
         scenarios=[

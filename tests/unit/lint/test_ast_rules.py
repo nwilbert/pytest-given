@@ -1086,9 +1086,8 @@ def test_empty_step_fires_on_empty_async_helper_function(tmp_path) -> None:
 
 
 def test_action_in_then_sees_through_an_async_when(tmp_path) -> None:
-    # An unresolved `when` returns None for the whole scenario, so an async
-    # helper that failed to anchor used to disable this rule for every step
-    # beside it. This `when` does not act, so the rule must fire on the then.
+    # An unresolved `when` skips the whole scenario, so an async helper has to
+    # anchor. This `when` does not act, so the rule must fire on the then.
     src = _write(
         tmp_path,
         """\

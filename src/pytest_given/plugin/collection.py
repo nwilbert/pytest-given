@@ -23,13 +23,9 @@ from .state import scenario_marker
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     """Validate Template-named scenarios eagerly at collection.
 
-    `trylast`, so `items` is what the run will actually execute. Plain hook
-    impls are called LIFO and entry-point plugins register after core, so
-    without it this ran *before* `_pytest.mark` deselected anything and a
-    `-k`-narrowed run died on a bad scenario it had already dropped — while
-    selecting the same test by file, where the bad one is never collected,
-    passed. The hook's own rationale is that such a scenario does not reach
-    grouping; a deselected one does not either.
+    `trylast`, so `items` is what the run will actually execute: entry-point
+    plugins register after core and hook impls run LIFO, so without it this
+    would also refuse items `-k` is about to deselect.
 
     Eagerly, because the alternative is late or never: a mistyped `Template`
     placeholder surfaces opaquely at session-finish grouping, and

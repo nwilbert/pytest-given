@@ -6,8 +6,7 @@ time; `SessionState` is the bookkeeping the per-item hooks pass between each
 other; `SessionOutcome` is what session finish leaves for the terminal summary.
 The stash rather than module globals throughout, so a nested in-process run
 (pytester, `pytest.main`) gets its own set instead of rebinding — and thereby
-clobbering — the outer session's. The keys are private and the two seeders are
-the only writers, so "one writer each" is enforced rather than asked for.
+clobbering — the outer session's.
 
 `scenario_marker` is here for the same reason the accessors are: it reads what
 a test function declared, and none of the hooks that ask owns the answer. It
@@ -53,10 +52,8 @@ class SessionOutcome:
 class FixtureInstanceKey(NamedTuple):
     """One fixture *instance*: the def it came from, plus its cache key.
 
-    Both ends of the graft build this key, and they reach the cache key two
-    ways — at setup from the request, at graft from what pytest cached. Named
-    rather than a bare `tuple[object, object]`, which said nothing about either
-    half and let them be built in the wrong order.
+    Both ends of the graft build this key, reaching the cache key two ways —
+    at setup from the request, at graft from what pytest cached.
     """
 
     fixturedef_id: int
@@ -115,11 +112,8 @@ def init_session_stash(config: pytest.Config) -> None:
 
 
 def scenario_marker(item: pytest.Item) -> ScenarioDecorator | None:
-    """Get the _scenario attribute from a test function, if present.
-
-    Returns None for items without a `.function` (e.g. DoctestItem) — those
-    can't carry @scenario, so they're never load-bearing here.
-    """
+    """The `@scenario` marker on an item's test function, or None — also for
+    items without a `.function` (e.g. DoctestItem), which cannot carry one."""
     return capture_scenario_marker(getattr(item, 'function', None))
 
 

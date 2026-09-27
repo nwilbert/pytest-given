@@ -1709,8 +1709,8 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
 def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
     """The full pipeline — typed ReportData → report_to_dict → JSON → renderer
     — must preserve the Glossary so term refs render as kind-colored words, not as
-    silent escape() fallbacks. Regression guard for the side-channel
-    `_glossaries` stash that previously didn't round-trip."""
+    silent escape() fallbacks — the `_glossaries` stash on the story tree
+    does not survive serde, so the serialized `glossary` field has to."""
     g = Glossary()
     g.register(GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'))
     g.register(GlossaryTerm(id=TermId('search'), kind='activity', canonical='search'))

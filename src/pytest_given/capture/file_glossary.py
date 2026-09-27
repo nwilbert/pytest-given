@@ -30,10 +30,8 @@ _KIND_ALIASES: dict[str, TermKind] = {
 class FileGlossary(LookupGlossary):
     """Glossary loaded from a Markdown file. Access terms by name: g['Guest'].
 
-    A `Glossary` rather than a wrapper around one: everything that consumes a
-    glossary — `resolve_glossary`, the report model, the name lookup — wants
-    the storage, and an `isinstance` that answered False for half the user-
-    facing glossaries made every one of those sites carry a second arm.
+    A `Glossary` rather than a wrapper around one, since every consumer of a
+    glossary wants the storage.
     """
 
     def __init__(

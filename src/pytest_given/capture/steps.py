@@ -175,11 +175,9 @@ class StepDescriptor:
         """Decorate `func`: reject the forms this label cannot take, then wrap
         it in whatever its own flavor needs.
 
-        Signature-preserving on purpose. Returning a Protocol here — one
-        carrying `_step_descriptor` and no `__call__` — left every decorated
-        helper uncallable to a type checker, which the in-repo mypy run could
-        not see because it checks `src` only. `@scenario` makes the same
-        promise by returning the function unwrapped.
+        Typed as returning `F`, so a decorated helper keeps its signature for
+        a type checker — a loss the in-repo mypy run, checking `src` only,
+        would not catch.
 
         The signature crosses between the two halves only for a `Template`
         label, whose per-call substitution needs what validation inspected.

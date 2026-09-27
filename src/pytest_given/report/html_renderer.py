@@ -149,13 +149,8 @@ def _build_env(
 def _make_param_color_class(
     param_color_map: ParamColorMap,
 ) -> Callable[[ParameterColumn], str]:
-    """Jinja filter: a column's colour class, or empty for one that gets none.
-
-    Which columns are coloured was decided in three places — the map builder
-    skipping attachment columns, the template re-deriving that with its own
-    `kind != 'attachment'`, and a `.get(name, 0)` fallback that would have
-    painted a column the map missed in column 0's colour rather than failing.
-    """
+    """Jinja filter: a column's colour class, or empty for an attachment
+    column — the one place that decides which columns are coloured."""
 
     def _class(column: ParameterColumn) -> str:
         if column.kind == 'attachment':
@@ -249,8 +244,7 @@ def _app_data(report: ReportData) -> dict[str, object]:
     """The projection of the report that `app.js` seeds its state from.
 
     Not the whole report: everything the page displays is already rendered into
-    the markup, and a second copy of every step, traceback and attachment
-    payload was the biggest single thing in a large report's HTML."""
+    the markup, and a second copy would dominate a large report's size."""
     return {
         'metadata': {'timestamp': report.metadata.timestamp},
         'glossary': (

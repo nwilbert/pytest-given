@@ -113,9 +113,8 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     """Map each parameter carrying ``Annotated[..., given(...)]`` to its
     descriptor.
 
-    Reads type hints off the unwrapped function (past the ``@scenario``
-    wrapper). Best-effort: if the annotations cannot be resolved, returns an
-    empty mapping rather than failing the test. Rejects the forbidden forms —
+    Best-effort: if the annotations cannot be resolved, returns an empty
+    mapping rather than failing the test. Rejects the forbidden forms —
     ``when(...)`` / ``then(...)``, a t-string label, or more than one
     descriptor on a single parameter.
     """

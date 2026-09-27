@@ -27,11 +27,8 @@ from ..model import (
 class PartSite:
     """Where the walk is: one narration part's position in the baseline tree.
 
-    `path` and `index` index different things — a step among its siblings, and
-    a part within that step's narration — and were threaded as adjacent
-    parameters in two different orders, which is exactly the confusion
-    `PartIndex` exists to name. `phase` rides along because a refusal message
-    quotes it; nothing looks anything up by it.
+    `path` indexes a step among its siblings, `index` a part within that step's
+    narration. `phase` rides along because a refusal message quotes it.
     """
 
     path: StepPath
