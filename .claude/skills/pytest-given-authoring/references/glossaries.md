@@ -43,14 +43,14 @@ from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
 
 `import tests.ubiquitous_language` binds a module, not a glossary: the scan finds nothing and the Glossary tab renders empty. Binding it anyway is the safe habit — it costs one line and survives a later refactor that drops the last story.
 
-**One glossary per suite.** Two distinct `Glossary` instances reaching the report — via stories or via conftests — raise `PytestGivenError`. Splitting vocabulary across bounded contexts means splitting the test suite too.
+**One glossary per suite.** Stories reaching two distinct `Glossary` instances raise `PytestGivenError`, and so do two in conftests; but once the stories reach one, a different conftest glossary is silently ignored — keep one instance and import it everywhere. Splitting vocabulary across bounded contexts means splitting the test suite too.
 
 ## Using terms in narration
 
 Look up handles by name — `g['Room']` (case-insensitive) — or use the captured variables from a code-defined glossary. Both work in t-string steps, `@scenario(...)` titles, and story sentences:
 
 ```python
-with when(t'a {g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
+with when(t'a {g["Guest"].low} {g["book"]("books")} a {g["Room"].low}'):
     ...
 ```
 
@@ -78,5 +78,6 @@ Terms are actors, activities, or work objects. Three ways a term gets its kind:
 
 - **Don't dilute the glossary — keep it sharp.** A term earns its row by being vocabulary the team actually speaks: something someone would look up, with a meaning specific to the domain. Never add terms to make sentences render more term refs or to improve lint metrics; a generic word in a sentence is better left a bare string. When a row genuinely doesn't earn its place, deleting it beats manufacturing a reference to it — but that is a judgment about the term, not about whether anything happens to reference it.
 - **Watch the size — a glossary is read whole, never sampled.** Authors and reviewers absorb every term in one pass; that is how a near-duplicate term gets caught before it is coined. A glossary that outgrows one comfortable reading is speaking for more than one bounded context: alert the user rather than start reading it piecemeal. The structural fix is one glossary per context — but a suite supports only one glossary, so that means splitting the suite as well; raise it as a design question, not a mechanical edit.
+- **A definition that asserts behavior is a spec sentence.** A row saying "must be unique" or "produces no step" makes a claim: back it with a scenario, and update the row when the behavior changes.
 - **Tags never duplicate terms** — filter a feature area via its term, and keep tags for what the glossary can't carry (behavior, mechanism). The `tag-shadows-term` lint rule enforces this.
 - **A term nothing references is normal, and usually needs no action.** A glossary documents the domain, not the test suite's coverage — real vocabulary can sit in the file with no scenario narrating it yet, and every file term appears in the report either way. That is why `dead-term` defaults to `off`. Opt in only where the glossary is meant to be fully exercised, and read what it reports as a prompt to look at the term, not a defect to clear — if an undecorated test already demonstrates the term's behavior, decorating that test is the fix, and a step already saying the term as plain text needs only the term ref.

@@ -40,7 +40,7 @@ def test_select_suite(carol):
         ...
 ```
 
-Coverage is matched **per step**: a sentence is covered when a *single step's* term refs include all of the sentence's terms — refs spread across several steps don't add up. The Stories tab shows a coverage chip per sentence with the scenarios that touch it; the JSON report carries the same result under `coverage[]` (below).
+Name a story in `stories=` only when a step can match or pin one of its sentences: a scenario that covers none of it still lists under the story. Coverage is matched **per step**: a sentence is covered when a *single step's* term refs include all of the sentence's terms — refs spread across several steps don't add up. The Stories tab shows a coverage chip per sentence with the scenarios that touch it; the JSON report carries the same result under `coverage[]` (below).
 
 What the rule means when you write:
 

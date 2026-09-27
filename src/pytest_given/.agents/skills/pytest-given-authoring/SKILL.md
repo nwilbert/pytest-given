@@ -1,6 +1,6 @@
 ---
 name: pytest-given-authoring
-description: Use when writing or changing @scenario tests, glossary terms, or domain stories in a project that uses pytest-given
+description: Use when writing or changing @scenario tests, glossary terms, or domain stories in a project that uses pytest-given, or converting plain pytest tests into scenarios
 ---
 
 # Authoring pytest-given artifacts
@@ -45,7 +45,7 @@ Each artifact kind stands on its own — scenarios-only is a perfectly good leve
 ## Verify before committing
 
 - Render the touched scenarios and read the output as a spec — every step text must be something its body actually does: `pytest <selection> --given-md`
-- If the project enables the narration lint, run it: `pytest <selection> --given-lint`. It catches structural lies (empty steps, a `then` that checks nothing); it cannot check semantic truth — that is the author's job.
+- If the project enables the narration lint, run it over the whole suite: `pytest --given-lint` (a selection fails on a `given_lint_ignore` entry for a test it skips). It catches structural lies (empty steps, a `then` that checks nothing); it cannot check semantic truth — that is the author's job.
 
 Auditing someone else's narration rather than writing your own? That is the `pytest-given-reviewing` skill, which restates these rules as a review rubric.
 

@@ -97,7 +97,7 @@ from tests.glossary import g  # noqa: F401 — plugin discovery
 
 `import tests.glossary` does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.
 
-A test suite can have only one glossary. If two different glossary objects reach the report, pytest-given raises `PytestGivenError`.
+A test suite can have only one glossary. If your stories reach two different glossary objects, or your `conftest.py` files hold two, pytest-given raises `PytestGivenError`. A `conftest.py` glossary other than the one your stories use is ignored, so keep one glossary object and import it everywhere.
 
 ## Examples
 
