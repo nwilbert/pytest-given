@@ -992,11 +992,17 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.3.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets <code>.low</code> as the mid-sentence term ref form, and corrects the one-glossary and lint-selection guidance.</li>
+<li>The bundled <code>pytest-given-reviewing</code> skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, and tags missing from part of the scenarios they describe.</li>
+</ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>An <code>Annotated[..., given(Template(...))]</code> label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.</li>
 <li>A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.</li>
 <li>A <code>FileGlossary</code> error about the file's tables — no table, a short row, a column not found — names the file.</li>
+<li>The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".</li>
 <li><code>pytest-given report --help</code> says it renders Markdown too, and where each format goes without <code>-o</code>.</li>
 </ul>
 <h2 id="030-2026-09-27"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0">0.3.0</a> - 2026-09-27<a class="headerlink" href="#030-2026-09-27" title="Permanent link">&para;</a></h2>
@@ -1010,7 +1016,7 @@
 <li>One scenario can document a flow that spans several stories: <code>@scenario(stories=[a, b])</code> lists it under each story in the Stories tab, and the Scenarios view's sentence filter names the story when a report has several.</li>
 <li>A sentence can be named (<code>sentence(..., name='checkout')</code>), so a pin can refer to it by name and survives reordering the story. The Stories timeline shows the name beside the sentence's coverage.</li>
 </ul>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Breaking.</strong> Story vocabulary follows Domain Storytelling: a story is made of <em>sentences</em>, and <em>activity</em> is the verb kind. <code>activity()</code> is now <code>sentence()</code>, <code>path()</code> is now <code>clause()</code>, and <code>Glossary.verb()</code> is now <code>Glossary.activity()</code>. A file glossary's kind column says <code>activity</code> instead of <code>verb</code>, the report's <code>#activity-filter=</code> link parameter is now <code>#sentence-filter=</code>, and the HTML report says <em>Sentence</em> and <em>Activities</em> where it said <em>Activity</em> and <em>Verbs</em>.</li>
 <li><strong>Breaking.</strong> <code>@scenario(story=)</code> is now <code>stories=</code>.</li>
@@ -1064,7 +1070,7 @@
 <li>A selected activity in the Stories view offers <strong>Open in Scenarios</strong>, filtering
   the Scenarios view down to the scenarios covering it.</li>
 </ul>
-<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
 <h4 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>Breaking.</strong> <code>--given-lint</code> is a plain boolean flag: write <code>--given-lint</code> and

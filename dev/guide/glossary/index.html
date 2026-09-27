@@ -1092,7 +1092,7 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.glossary</span><span class="w"> </span><span class="kn">import</span> <span class="n">g</span>  <span class="c1"># noqa: F401 — plugin discovery</span>
 </code></pre></div>
 <p><code>import tests.glossary</code> does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.</p>
-<p>A test suite can have only one glossary. If two different glossary objects reach the report, pytest-given raises <code>PytestGivenError</code>.</p>
+<p>A test suite can have only one glossary. If your stories reach two different glossary objects, or your <code>conftest.py</code> files hold two, pytest-given raises <code>PytestGivenError</code>. A <code>conftest.py</code> glossary other than the one your stories use is ignored, so keep one glossary object and import it everywhere.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <p>The hotel-booking and file-glossary-booking <a href="../../examples/">examples</a> show a glossary in use.</p>
 
