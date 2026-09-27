@@ -15,46 +15,46 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- One scenario can document a flow that spans several stories: `@scenario(stories=[a, b])` lists it under each story in the Stories tab, and the Scenarios view's sentence filter names the story when a report has several.
-- A sentence can be named (`sentence(..., name='checkout')`), so a pin can refer to it by name and survives reordering the story. The Stories timeline shows the name beside the sentence's coverage.
-- Tags can be organized hierarchically: a `/` in a tag nests it in the HTML report's Tags sidebar (`ticket/ABC-123` goes under a `ticket` heading), and selecting the heading filters to every tag beneath it.
+- A documentation site at <https://nwilbert.github.io/pytest-given/> has a user guide, configuration and CLI reference, and the example reports. The CLI help and bundled skills link to it.
 - The HTML report has a dark theme, with a Light / Dark / System control in its header that each browser remembers.
 - `--given-theme` / `given_theme` (and `--theme` on `pytest-given report`) set whether the HTML report opens light, dark, or following the viewer's system.
-- A documentation site at <https://nwilbert.github.io/pytest-given/> has a user guide, configuration and CLI reference, and the example reports. The CLI help and bundled skills link to it.
+- Tags can be organized hierarchically: a `/` in a tag nests it in the HTML report's Tags sidebar (`ticket/ABC-123` goes under a `ticket` heading), and selecting the heading filters to every tag beneath it.
 - Projects can also install the bundled skills with [library-skills](https://library-skills.io) (`uvx library-skills install --claude`), alongside the skills of their other dependencies.
+- One scenario can document a flow that spans several stories: `@scenario(stories=[a, b])` lists it under each story in the Stories tab, and the Scenarios view's sentence filter names the story when a report has several.
+- A sentence can be named (`sentence(..., name='checkout')`), so a pin can refer to it by name and survives reordering the story. The Stories timeline shows the name beside the sentence's coverage.
 
 ### Changed
 
 - **Breaking.** Story vocabulary follows Domain Storytelling: a story is made of *sentences*, and *activity* is the verb kind. `activity()` is now `sentence()`, `path()` is now `clause()`, and `Glossary.verb()` is now `Glossary.activity()`. A file glossary's kind column says `activity` instead of `verb`, the report's `#activity-filter=` link parameter is now `#sentence-filter=`, and the HTML report says *Sentence* and *Activities* where it said *Activity* and *Verbs*.
-- **Breaking.** Pins refer to sentences by handle under `pins=` instead of by number: `given(..., activity=3)` becomes `given(..., pins=the_story[3])`, and `@scenario(activities=[2, 3])` becomes `pins=[the_story[2], the_story[3]]`. `activity_id=` is gone, because sentences are numbered by position; to pin a sentence independently of its position, name it and pin `the_story['name']`. A pin no longer requires the scenario to bind the pinned sentence's story.
 - **Breaking.** `@scenario(story=)` is now `stories=`.
+- **Breaking.** Pins refer to sentences by handle under `pins=` instead of by number: `given(..., activity=3)` becomes `given(..., pins=the_story[3])`, and `@scenario(activities=[2, 3])` becomes `pins=[the_story[2], the_story[3]]`. `activity_id=` is gone, because sentences are numbered by position; to pin a sentence independently of its position, name it and pin `the_story['name']`. A pin no longer requires the scenario to bind the pinned sentence's story.
 - **Breaking.** A scenario's `pins=` now sets its coverage outright: it covers exactly those sentences plus its steps' pins, with no narration matching. `activities=` only narrowed which sentences narration could cover. Pass `pins=[]` to a step or scenario to turn off narration matching without pinning anything.
-- Story coverage ignores instances: a step narrating `guest`, or any guest instance, now covers a sentence naming `guest('Alice')`. Sentences that differ only by instance can be told apart only with a pin.
-- A story that no scenario covers now shows up in the report as uncovered, where before it was missing. The one exception is a story declared before the session started, such as one in a module still imported from an earlier `pytest.main()` in the same process: it is left out with a warning.
 - The HTML report is restyled. It embeds Source Sans 3 and Source Code Pro, so it looks the same on every machine and offline. Lists share one surface instead of a card per row, Given/When/Then sit in a gutter beside the steps, and sidebar labels and counts use sentence case.
 - The HTML report strips source comments from its inlined stylesheet and script, which saves about 29 KB per report and offsets part of the size the embedded fonts add.
 - Grouping errors for varying attachment labels and varying `str` narration name the parametrize case that differs. The varying-`str` error also suggests `group_parametrized=False` as a way out.
+- A story that no scenario covers now shows up in the report as uncovered, where before it was missing. The one exception is a story declared before the session started, such as one in a module still imported from an earlier `pytest.main()` in the same process: it is left out with a warning.
+- Story coverage ignores instances: a step narrating `guest`, or any guest instance, now covers a sentence naming `guest('Alice')`. Sentences that differ only by instance can be told apart only with a pin.
 - The authoring skill advises writing generic verbs (*searches for*, *adds*) as plain strings in sentences rather than glossary terms, keeping the glossary to domain vocabulary. The hotel-booking example follows it.
-- The authoring, reviewing and navigating skills cover sentence handles, `pins=` and `stories=`. The reviewing skill also checks that the test body exercises each sentence its scenario pins.
 - The authoring skill explains how coverage matching works (instances are ignored, and two sentences whose terms nest always cover together) and how to check coverage in the JSON report. The reviewing skill checks coverage from the report instead of re-deriving it.
 - The reviewing skill can list each scenario's narration beside its test's source for side-by-side review, and checks that a scenario demonstrates every rule the project's changelog announces. Both skills flag `match=` pins that use alternation, and a `when` that narrates setup while its body acts.
+- The authoring, reviewing and navigating skills cover sentence handles, `pins=` and `stories=`. The reviewing skill also checks that the test body exercises each sentence its scenario pins.
 
 ### Fixed
 
-- A pin on an `Annotated` `given(...)` label now takes effect instead of being silently dropped, replacing the pins of the fixture step it relabels (`pins=[]` clears them). A pin on a step fixture's own `@given(...)` label also takes effect now.
-- A pin on a `@given` fixture scoped wider than `function` now counts in every scenario the fixture reaches, even when a test without `@scenario` set it up first. The run used to fail with a bare `AssertionError`.
+- When rendering a report fails unexpectedly, the previous run's report is still discarded instead of staying on disk looking current.
+- A `#scenario=` deep link now opens the right scenario when two node ids differ only in a character the slug folds, and no longer breaks the URL.
+- `pytest-given report` reports a non-UTF-8 input file as an error instead of crashing with a traceback.
+- An unknown `--given-source-link` preset is reported under the flag the user typed, not under the `given_source_link` ini name.
+- A refused scenario on a run with no `--given-*` sink no longer reports itself under a "report not written" heading.
 - `when_then(...)` rejects a `Template` narration in a test body, as `given`/`when`/`then` already do.
+- The Glossary view no longer lists a term's own name in another case (`guest.low`) under Instances.
 - On native Windows, stories and glossary terms now record where they are declared, so the lint rules that depend on it run there too.
 - `tag-shadows-term` now catches a tag that collides with a term id through a non-ASCII character that lowercases into ASCII.
 - A `dead-term` finding's message states the rule's actual criterion, including that a term ref in a `@scenario` name keeps a term alive.
-- The Glossary view no longer lists a term's own name in another case (`guest.low`) under Instances.
-- A `#scenario=` deep link now opens the right scenario when two node ids differ only in a character the slug folds, and no longer breaks the URL.
-- A refused scenario on a run with no `--given-*` sink no longer reports itself under a "report not written" heading.
-- An unknown `--given-source-link` preset is reported under the flag the user typed, not under the `given_source_link` ini name.
-- When rendering a report fails unexpectedly, the previous run's report is still discarded instead of staying on disk looking current.
-- `pytest-given report` reports a non-UTF-8 input file as an error instead of crashing with a traceback.
 - The navigating skill shows the failure messages of a parametrized scenario's cases, where it printed an empty message. It also starts from a committed or CI-published report when one exists, instead of always rerunning the suite.
 - The reviewing skill lints the whole suite, where a selection failed on the project's ignore entries as stale, keeps the project's own `given_lint_rules` when enabling `dead-term`, and ranks findings in one explicit order.
+- A pin on an `Annotated` `given(...)` label now takes effect instead of being silently dropped, replacing the pins of the fixture step it relabels (`pins=[]` clears them). A pin on a step fixture's own `@given(...)` label also takes effect now.
+- A pin on a `@given` fixture scoped wider than `function` now counts in every scenario the fixture reaches, even when a test without `@scenario` set it up first. The run used to fail with a bare `AssertionError`.
 
 ## [0.2.0] - 2026-09-04
 
