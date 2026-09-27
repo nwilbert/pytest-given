@@ -288,8 +288,32 @@
 | [] | [] | ✓ |
 | [a[2]] | [{'story_id': 'book', 'sentence_id': 2}] | ✓ |
 
+## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
+`tests/integration/test_plugin.py:2633::test_annotated_template_label_without_parametrize_fails_scenario`
+
+- **given** a Template label on a plain fixture parameter
+  - 📎 suite:
+    ```
+    
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when, Template
+    
+        @pytest.fixture
+        def room():
+            return 101
+    
+        @scenario('a room is booked')
+        def test_it(room: Annotated[int, given(Template('room {room} is free'))]):
+            with when('it is booked'):
+                pass
+    ```
+- **when** the suite runs with an HTML «report»
+- **then** the scenario errors, naming the parameter and the fix
+- **then** the HTML «report» is still written
+
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:2689::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:2751::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -312,14 +336,14 @@
 - **then** nothing is written to disk
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:2702::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:2764::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ Each sink flag writes only its own «report» file
-`tests/integration/test_plugin.py:2723::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:2785::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -327,7 +351,7 @@
 - **then** no JSON lands beside it
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:2743::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:2805::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -335,7 +359,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:2776::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:2838::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -355,7 +379,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:2808::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:2870::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -364,7 +388,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:2911::test_given_theme_cli_flag_sets_the_report_default` · configuration
+`tests/integration/test_plugin.py:2973::test_given_theme_cli_flag_sets_the_report_default` · configuration
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -372,7 +396,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:2960::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:3022::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -380,7 +404,7 @@
 - **then** no test ran: the run stopped at configure, before collection
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:3077::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3139::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:

@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Fixed
+
+- An `Annotated[..., given(Template(...))]` label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.
+
 ## [0.3.0] - 2026-09-27
 
 ### Added

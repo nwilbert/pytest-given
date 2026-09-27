@@ -2614,6 +2614,68 @@ def test_annotated_given_tstring_on_param_fails_scenario(pytester, tmp_path):
     result.stdout.fnmatch_lines(['*t-string*'])
 
 
+_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE = """
+    from typing import Annotated
+    import pytest
+    from pytest_given import scenario, given, when, Template
+
+    @pytest.fixture
+    def room():
+        return 101
+
+    @scenario('a room is booked')
+    def test_it(room: Annotated[int, given(Template('room {room} is free'))]):
+        with when('it is booked'):
+            pass
+"""
+
+
+@scenario(
+    t'An Annotated Template label on an unparametrized {pg["Scenario"].low} '
+    t'fails that {pg["Scenario"].low}'
+)
+def test_annotated_template_label_without_parametrize_fails_scenario(
+    pytester: pytest.Pytester,
+) -> None:
+    with given('a Template label on a plain fixture parameter'):
+        pytester.makepyfile(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE)
+        attach('suite', _TEMPLATE_LABEL_WITHOUT_PARAMETRIZE)
+    with when(t'the suite runs with an HTML {pg["Report"].low}'):
+        result = pytester.runpytest('--given-html=report.html')
+    with then('the scenario errors, naming the parameter and the fix'):
+        result.assert_outcomes(errors=1)
+        result.stdout.fnmatch_lines(
+            ["*label on parameter 'room'*needs @pytest.mark.parametrize*"]
+        )
+    with then(t'the HTML {pg["Report"].low} is still written'):
+        assert (pytester.path / 'report.html').is_file()
+
+
+def test_annotated_template_label_naming_no_column_fails_scenario(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when, Template
+
+        @pytest.fixture
+        def room():
+            return 101
+
+        @scenario('bad')
+        @pytest.mark.parametrize('x', [1])
+        def test_it(x, room: Annotated[int, given(Template('room {room}'))]):
+            with when('it is booked'):
+                pass
+        """
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    result.stdout.fnmatch_lines(
+        ["*'{room}' in the Annotated label on parameter 'room' does not match*"]
+    )
+
+
 def test_param_without_annotated_stays_table_only(pytester, tmp_path):
     pytester.makepyfile(
         """

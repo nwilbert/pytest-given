@@ -24,8 +24,10 @@ from ..capture import (
     step_descriptor,
 )
 from ..model import (
+    NarrationPlaceholder,
     PytestGivenError,
     Step,
+    placeholder_mismatch,
 )
 from .state import FixtureInstanceKey, session_collector, session_state
 
@@ -155,8 +157,38 @@ def _fixture_instance_key(
 def graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     func = getattr(item, 'function', None)
     descriptors = annotated_given_descriptors(func) if func is not None else {}
+    _check_template_labels(item, descriptors)
     grafted = _graft_recorded_fixtures(item, collector, descriptors)
     _graft_annotated_leaves(item, collector, descriptors, grafted)
+
+
+def _check_template_labels(
+    item: pytest.Item, descriptors: dict[str, StepDescriptor]
+) -> None:
+    """Refuse a `Template` label whose placeholder names no parametrize column.
+
+    Nothing downstream can fill such a slot: an unparametrized scenario never
+    reaches grouping, so the placeholder would reach the renderers unresolved.
+    """
+    callspec = getattr(item, 'callspec', None)
+    param_names = list(callspec.params) if callspec is not None else []
+    for parameter, descriptor in descriptors.items():
+        for part in descriptor.narration.parts:
+            if not isinstance(part, NarrationPlaceholder):
+                continue
+            if callspec is None:
+                raise PytestGivenError(
+                    f'the Annotated given(Template(...)) label on parameter '
+                    f'{parameter!r} of {item.nodeid!r} needs '
+                    f'@pytest.mark.parametrize: its placeholders name '
+                    f'parametrize columns. Use a plain string label instead.'
+                )
+            if part.name not in param_names:
+                raise placeholder_mismatch(
+                    part.name,
+                    param_names,
+                    where=f'in the Annotated label on parameter {parameter!r}',
+                )
 
 
 def _graft_recorded_fixtures(
