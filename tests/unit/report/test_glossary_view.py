@@ -21,7 +21,7 @@ from pytest_given.model import (
     TermId,
     report_to_dict,
 )
-from pytest_given.report.glossary_view import build_term_crossrefs
+from pytest_given.report.glossary_view import build_glossary_view, build_term_crossrefs
 from tests.ubiquitous_language import pg
 
 
@@ -48,6 +48,19 @@ def _meta() -> Metadata:
 def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
     rd = ReportData(metadata=_meta())
     assert build_term_crossrefs(rd).aggregations == {}
+
+
+def test_kind_summaries_use_irregular_plurals() -> None:
+    glossary = _g()
+    glossary.register(
+        GlossaryTerm(id=TermId('book'), kind='activity', canonical='book')
+    )
+    view = build_glossary_view(ReportData(metadata=_meta(), glossary=glossary))
+    assert [kind.summary for kind in view.kinds] == [
+        '1 actor',
+        '1 work object',
+        '2 activities',
+    ]
 
 
 @scenario(

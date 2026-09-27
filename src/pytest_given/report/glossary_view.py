@@ -184,7 +184,9 @@ def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
             summary=(
                 f'{counts[row.key]} {row.noun}'
                 if row.key == 'kindless'
-                else plural(counts[row.key], row.noun)
+                # The heading is the noun's plural, which `+ 's'` gets wrong
+                # for "activity".
+                else plural(counts[row.key], row.noun, row.label.lower())
             ),
         )
         for row in _KIND_GROUPS

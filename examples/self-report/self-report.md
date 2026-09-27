@@ -1995,7 +1995,7 @@
 - **then** «Coverage» counts it, despite the missing anchors
 
 ## ✓ The «glossary» view aggregates «instances» and «activity» forms
-`tests/unit/report/test_glossary_view.py:53::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/report/test_glossary_view.py:66::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «Report» whose «Story» and «Scenario» reference entity «Instance»s and an «Inflection»
   - 📎 Report data:
@@ -2122,42 +2122,42 @@
 - **then** the activity collects its «Inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by a «sentence» record the «story»
-`tests/unit/report/test_glossary_view.py:153::test_build_glossary_aggregations_records_story_refs_via_sentences`
+`tests/unit/report/test_glossary_view.py:166::test_build_glossary_aggregations_records_story_refs_via_sentences`
 
 - **given** a «Story» whose «Sentence» references an actor and an activity
 - **when** the «Glossary» aggregations are built
 - **then** the actor and the activity each list that «Story»
 
 ## ✓ A «story» referencing a «term» twice lists it once
-`tests/unit/report/test_glossary_view.py:183::test_repeated_references_within_one_story_are_recorded_once`
+`tests/unit/report/test_glossary_view.py:196::test_repeated_references_within_one_story_are_recorded_once`
 
 - **given** a «Story» whose two «sentences» repeat the same «Term» and the same «Inflection»
 - **when** the «Glossary» aggregations are built
 - **then** the «Story» and the «Inflection» appear once each
 
 ## ✓ A canonical entity reference is not an «instance», whatever its case
-`tests/unit/report/test_glossary_view.py:238::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_glossary_view.py:251::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «Story» sentence referencing entities by canonical name, and a «Step» referencing one in lowercase
 - **when** the «Glossary» aggregations are built
 - **then** neither entity term records an «Instance»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_glossary_view.py:322::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_glossary_view.py:335::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «Kindless» «Term» referenced by a «Story» sentence
 - **when** the «Glossary» aggregations are built
 - **then** the «Term» lists the «Story» but no «Instance» and no «Inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_glossary_view.py:355::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_glossary_view.py:368::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «Scenario» whose fixture-sourced «Step» names an «Instance»
 - **when** the «Glossary» aggregations are built
 - **then** the «Instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_glossary_view.py:444::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_glossary_view.py:457::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «Scenario» referencing one «Term» in two steps and another in its name
 - **when** the term-scenario index is built

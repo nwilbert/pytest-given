@@ -8,7 +8,9 @@
   --font-mono: "Source Code Pro", 'SF Mono', Monaco, 'Cascadia Code', monospace;
   --font-size-sm: 0.75rem;     /* 12px: labels, counts, timings */
   --font-size-base: 0.8125rem; /* 13px: chrome */
-  --font-size-md: 0.875rem;    /* 14px: narration and titles */
+  /* Source Sans 3 runs small (x-height ~0.49em): 15px here reads like 14px
+     of most UI faces. Chrome stays at 12-13px, which is where density lives. */
+  --font-size-md: 0.9375rem;   /* 15px: narration and titles */
   --font-size-lg: 1.0625rem;   /* 17px: a view's heading */
   --font-size-xl: 1.375rem;    /* 22px: the report title */
 
@@ -20,6 +22,11 @@
   --bg-traceback: #f4f6f9;
   --border: #e1e5eb;
   --text-primary: #1a1d24;
+  /* Step prose, between primary and secondary (~10:1 on the card in both
+     themes): at secondary it ranked below the term refs and the keyword
+     gutter, and a step read as a row of highlighted nouns. Full primary
+     would glare against the washes in the dark theme. */
+  --text-narration: #3d4450;
   --text-secondary: #58606d;
   --text-muted: #646b78;
 
@@ -66,6 +73,7 @@
   --bg-traceback: #412c36;
   --border: #332b3e;
   --text-primary: #ece8f1;
+  --text-narration: #cfc9d8;
   --text-secondary: #a9a2b5;
   --text-muted: #948da1;
 
@@ -95,6 +103,9 @@
 
 /* === Reset & Base === */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Form controls take the UA's system font, not the body's; without this the
+   tabs, buttons and search boxes render in Arial. */
+button, input { font-family: inherit; }
 /* Chip- and row-shaped controls that are real <button>s so the keyboard
    reaches them. Declared up here so the component rules below keep winning on
    font and background at equal specificity. */
@@ -580,7 +591,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   position: relative;
 }
 
-.scenario-name { font-size: var(--font-size-md); font-weight: 500; }
+/* 600, not 500: the title shares the narration's size and nearly its ink. */
+.scenario-name { font-size: var(--font-size-md); font-weight: 600; }
 /* Story-view scenario title: a plain clickable heading. No hover underline —
    it would bleed onto the term refs the title can carry, whose own underline
    means something else; the trailing → cue signals clickability instead. */
@@ -633,16 +645,20 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    and so takes the next row. */
 .steps {
   display: grid;
-  grid-template-columns: 3.75em 1fr;
+  /* About 1em clear of "Given", the widest keyword: any wider and the gutter
+     reads as its own column rather than the start of each step. */
+  grid-template-columns: 3em 1fr;
   column-gap: var(--space-sm);
   padding-top: var(--space-md);
   padding-left: var(--space-lg);
   font-size: var(--font-size-md);
-  line-height: 1.6;
+  /* 22.5px at 15px, the line pitch 1.6 gave at 14px: the larger type costs
+     no rows. */
+  line-height: 1.5;
 }
 .phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
 .phase-steps { grid-column: 2; min-width: 0; }
-.step-text { color: var(--text-secondary); }
+.step-text { color: var(--text-narration); }
 .step-expand,
 .attachment-expand {
   display: grid;
@@ -973,7 +989,7 @@ span.param-highlight {
    lets the resting state spend nothing on a click affordance. */
 .term-ref--link:hover { text-decoration: underline; }
 .clause-word {
-  color: var(--text-secondary);
+  color: var(--text-narration);
 }
 /* Custom hover tooltip for term refs, replacing the native title: the
    canonical name as a heading above its definition. Positioned by app.js; one
@@ -1101,7 +1117,8 @@ span.param-highlight {
   flex-shrink: 0;
 }
 .sentence-row:hover .sentence-num:not(.sentence-num-highlight) { border-color: var(--color-accent); color: var(--color-accent); }
-.sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+/* A story's sentences are its narration, so they take the narration size. */
+.sentence-body { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: var(--font-size-md); }
 .sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 /* Counts side by side, separated by space rather than a glyph. */

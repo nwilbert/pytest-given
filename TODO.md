@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] Review report readability with frontend design skill.
 
 ## Next
 
