@@ -342,7 +342,8 @@ class Collector:
         if stack and stack[-1].phase != phase:
             raise PytestGivenError(
                 f"Cannot nest '{phase}' inside '{stack[-1].phase}'"
-                ' — restructure your test or use a phase-neutral helper'
+                ' — close the open step first, or call a helper without a '
+                'phase decorator'
             )
         step = Step(phase=phase, narration=narration, pins=pins, source=source)
         if stack:
