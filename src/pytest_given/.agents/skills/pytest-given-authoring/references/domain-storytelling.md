@@ -1,6 +1,6 @@
 # Domain Storytelling — the method behind stories
 
-pytest-given's story grammar is a code-native rendition of **Domain Storytelling**, a collaborative modeling technique. Canonical reference: [domainstorytelling.org](https://domainstorytelling.org/) — the method's official home, with a quick-start guide, the Hofer/Schwentner book (*Domain Storytelling*, Addison-Wesley Signature Series), and the open-source Egon.io modeling tool. This file gives only what you need to map the method onto pytest-given; link out rather than restating it.
+pytest-given's story grammar is a code-native rendition of **Domain Storytelling**, a collaborative modeling technique. Canonical reference: [domainstorytelling.org](https://domainstorytelling.org/) — the method's official home, with a quick-start guide, the Hofer/Schwentner book (*Domain Storytelling*, Addison-Wesley Signature Series), and the open-source Egon.io modeling tool. This file gives only what you need to map the method onto pytest-given.
 
 ## The method in one paragraph
 

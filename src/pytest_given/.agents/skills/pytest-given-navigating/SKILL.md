@@ -11,7 +11,7 @@ The test suite narrates itself: rendered scenarios are a behavioral spec, the gl
 
 1. **Look for an existing report.** A committed or CI-published `*.md` / `*.json` report (often under `given-report/`) is the spec of the last run and costs nothing: no test environment, no suite run. Re-render a saved JSON as Markdown with `pytest-given report <data.json> --format md`. Render fresh only when there is none, or the question is about *this* checkout.
 2. **Glossary first.** Read `GLOSSARY.md` (or the `Glossary()` / `FileGlossary` declaration the tests import): the domain vocabulary, with definitions.
-3. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout, fenced between `<!-- pytest-given:md:start -->` and `:end`. The output explains itself; the ``file.py:line::test_name`` line under each heading is the way back to the code. Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
+3. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout, fenced between `<!-- pytest-given:md:start -->` and `:end`. The ``file.py:line::test_name`` line under each heading is the way back to the code. Select with pytest's own args (`-k`, node ids, `--lf`); the renderer narrates whatever ran.
 4. **Stories.** Read the `story(...)` definitions — actor-level flows the scenarios implement; `stories=` on a `@scenario`, or a pin on it or a step, links them.
 
 ## Structured questions — JSON + jq

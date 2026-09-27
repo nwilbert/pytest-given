@@ -47,18 +47,15 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Glossary
 
-- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.activity('book', …)`. Where to define `g`, and how `conftest.py` must bind it for the plugin to find it: [glossaries.md](glossaries.md).
-- **File-backed**: `g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')` — needs at least one GFM pipe table; first column = term, second = description by default (`term_column=` / `description_column=` / `kind_column=` override, 0-based index or header name, case-insensitive).
-- **Handles in t-strings** render as kind-colored words with definition tooltips: `t'a {guest} {book("books")} a {room}'`. Three surface forms on every handle: **bare** `g['Room']`, **`.low`** `g['Room'].low`, and **called** `g['borrow']('borrows')`. Which to pick: [glossaries.md](glossaries.md).
-- **Lookup and deferral**: `g['Guest']` fetches a declared term (case-insensitive; raises if unknown). On a code-defined glossary, `g('foo')` declares an as-yet-unclassified term (lands in *Uncategorized*, shows *Undefined* until `definition=` is supplied); on a `FileGlossary` the vocabulary is closed — `g('foo')` only looks up, and new terms are added as rows in the file. Both forms return handles usable in t-strings and sentences.
-- An undeclared kind is inferred from clause slot positions (position 0 → actor, odd → activity, even ≥ 2 → work object); a term used only in steps stays kindless. A *declared* kind is instead checked against its slot when `sentence(...)` is built, so a mismatch raises there. Collision rules: [glossaries.md](glossaries.md).
-- **One glossary per suite** — two distinct `Glossary` instances reaching the report raise `PytestGivenError`. Discovery (story tree first, then a `conftest.py` scan): [glossaries.md](glossaries.md).
+- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.activity('book', …)`; `g('foo')` declares a kindless term, `g['Guest']` looks one up (case-insensitive, raises if unknown).
+- **File-backed**: `g = FileGlossary(path, *, term_column=0, description_column=1, kind_column=None)` over the file's GFM pipe tables, each column a 0-based index or a case-insensitive header name. The vocabulary is closed: `g('foo')` and `g['foo']` both only look up.
+- **Handles** interpolate into t-string steps, `@scenario` titles and sentences in three forms: bare `g['Room']`, `.low` `g['Room'].low`, and called `g['borrow']('borrows')`.
+
+Discovery, kinds, and the one-glossary-per-suite rule: [glossaries.md](glossaries.md).
 
 ## Stories
 
-- `story('Name', [sentence(...), ...])` — a flow of `sentence(actor, activity, work_object, ...)` rows, read left-to-right; parts may be bare strings, but a sentence needs **two distinct glossary terms** to be matched by narration; under-anchored sentences render as "not coverage-tracked" unless a step pins them. A sentence with several arrow chains under one number takes one `clause(...)` per chain: `sentence(clause(...), clause(...))`. Sentence numbers are the rows' 1-based positions and cannot be set; `sentence(..., name='cancel')` names a row, and `the_story['cancel']` / `the_story[3]` hand out sentence handles — see [stories.md](stories.md).
-- Every declared story reaches the report; `@scenario(..., stories=the_story)` names the stories a scenario is narration-matched against. Coverage matches **per step**, and `given(text, pins=the_story['name'])` pins a step to a sentence regardless of its narration. The matching rule and what it costs you when authoring: [stories.md](stories.md).
+- **`story(title, [sentence(...), ...])`** — sentences are numbered by position (1..N, never set by hand) and read left-to-right: `sentence(actor, activity, work_object, ..., name=None)`, any part a handle or a bare string. Several arrow chains under one number take one `clause(...)` each: `sentence(clause(...), clause(...))`.
+- **Sentence handles** — `the_story['cancel']` (by `name=`) or `the_story[3]` (by number), for `pins=`.
 
-## Verifying
-
-`pytest <selection> --given-md` renders the touched scenarios to stdout; `--given-lint` runs the narration lint, where only *error* findings fail the run. Its rule catalog is in [scenarios.md](scenarios.md) under "Mechanical counterparts".
+Coverage matching, pins, and when a sentence counts as coverage-tracked: [stories.md](stories.md).

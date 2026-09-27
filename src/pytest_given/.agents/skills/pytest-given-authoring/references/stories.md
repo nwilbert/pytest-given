@@ -27,7 +27,7 @@ sentence(
 ),
 ```
 
-**A multi-clause sentence is expensive to cover.** Coverage unions the term refs of *all* clauses, so covering it takes one step referencing every term in every clause — past two near-identical clauses that step stops being writable and the sentence is effectively uncoverable. Use several clauses only for chains you accept as uncovered; otherwise split them into separate sentences, or pin a covering step (below).
+**A multi-clause sentence is expensive to cover.** Coverage unions the term refs of *all* clauses, so covering it takes one step referencing every term in every clause, which quickly stops being a step anyone can write. Use several clauses only for chains you accept as uncovered; otherwise split them into separate sentences, or pin a covering step (below).
 
 ## Binding scenarios to a story
 
