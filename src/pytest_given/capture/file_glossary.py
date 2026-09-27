@@ -50,12 +50,15 @@ class FileGlossary(LookupGlossary):
             text = self._path.read_text(encoding='utf-8')
         except FileNotFoundError as exc:
             raise PytestGivenError(f'glossary file not found: {self._path}.') from exc
-        rows = parse_glossary_tables(
-            text,
-            term_column=term_column,
-            description_column=description_column,
-            kind_column=kind_column,
-        )
+        try:
+            rows = parse_glossary_tables(
+                text,
+                term_column=term_column,
+                description_column=description_column,
+                kind_column=kind_column,
+            )
+        except PytestGivenError as exc:
+            raise PytestGivenError(f'{self._path}: {exc}') from exc
         for row in rows:
             self._add_row(row)
 

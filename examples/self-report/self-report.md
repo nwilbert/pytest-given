@@ -841,7 +841,7 @@
 - **then** a PytestGivenError is raised with file:line context
 
 ## ✓ Conflicting duplicate rows are rejected
-`tests/unit/capture/test_file_glossary.py:243::test_conflicting_duplicate_rows_raise` · validation
+`tests/unit/capture/test_file_glossary.py:258::test_conflicting_duplicate_rows_raise` · validation
 
 - **given** two rows for one «Term» with different definitions
   - 📎 Glossary file:
@@ -855,7 +855,7 @@
 - **then** a PytestGivenError reports the conflicting rows
 
 ## ✓ A blank description normalizes to «undefined»
-`tests/unit/capture/test_file_glossary.py:267::test_blank_description_cell_normalizes_to_none`
+`tests/unit/capture/test_file_glossary.py:282::test_blank_description_cell_normalizes_to_none`
 
 - **given** a row whose description cell is blank
   - 📎 Glossary file:
@@ -868,7 +868,7 @@
 - **then** the «Term» definition is None, i.e. «Undefined»
 
 ## ✓ Identical duplicate rows collapse to one «term»
-`tests/unit/capture/test_file_glossary.py:282::test_idempotent_duplicate_rows_ok`
+`tests/unit/capture/test_file_glossary.py:297::test_idempotent_duplicate_rows_ok`
 
 - **given** two identical rows for the same «Term»
   - 📎 Glossary file:
@@ -882,7 +882,7 @@
 - **then** they collapse to a single «Term»
 
 ## ✓ Calling «FileGlossary» looks up a known «term»
-`tests/unit/capture/test_file_glossary.py:305::test_file_glossary_call_known_name_returns_handle`
+`tests/unit/capture/test_file_glossary.py:320::test_file_glossary_call_known_name_returns_handle`
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -899,7 +899,7 @@
 - **then** a «Deferred term» is returned
 
 ## ✓ «FileGlossary» is a closed vocabulary
-`tests/unit/capture/test_file_glossary.py:319::test_file_glossary_call_unknown_name_raises` · validation
+`tests/unit/capture/test_file_glossary.py:334::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «File glossary» loaded from a Markdown file
   - 📎 Glossary file:

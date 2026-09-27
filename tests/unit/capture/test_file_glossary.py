@@ -240,6 +240,21 @@ def test_empty_id_term_cell_raises(tmp_path):
         FileGlossary(path)
 
 
+@pytest.mark.parametrize(
+    ('doc', 'expected'),
+    [
+        ('# no table here\n', r'bad\.md: found no Markdown pipe table'),
+        ('| Term | Meaning |\n|---|---|\n| Guest |\n', r'bad\.md: data row at line 3'),
+        ('| Word | Meaning |\n|---|---|\n| Guest | x |\n', r"bad\.md: column 'Term'"),
+    ],
+)
+def test_table_errors_name_the_file(tmp_path, doc, expected):
+    path = tmp_path / 'bad.md'
+    path.write_text(doc, encoding='utf-8')
+    with pytest.raises(PytestGivenError, match=expected):
+        FileGlossary(path, term_column='Term')
+
+
 @scenario(
     'Conflicting duplicate rows are rejected',
     tags=['validation'],

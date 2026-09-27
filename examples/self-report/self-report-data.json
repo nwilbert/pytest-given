@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-27T15:58:27.853843+00:00",
+    "timestamp": "2026-09-27T15:59:55.809847+00:00",
     "pytest_version": "9.0.3",
     "plugin_version": "0.3.0",
-    "commit_sha": "4565877586f07fffeded252ba65e0deef15251fc",
+    "commit_sha": "e6364e23e1a3e0b2c146fea17f0dae7a7e5d116e",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -218,7 +218,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -361,7 +361,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -537,7 +537,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -603,7 +603,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -712,7 +712,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -810,7 +810,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -879,7 +879,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -1006,7 +1006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -1169,7 +1169,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1307,7 +1307,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1451,7 +1451,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -1736,7 +1736,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1850,7 +1850,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 146,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -2106,7 +2106,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -2199,7 +2199,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -2275,7 +2275,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 86,
+      "duration_ms": 85,
       "steps": [
         {
           "phase": "given",
@@ -2356,7 +2356,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -2530,7 +2530,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2736,7 +2736,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -2828,7 +2828,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -2898,7 +2898,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -3103,7 +3103,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -3230,7 +3230,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -5023,7 +5023,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -5323,7 +5323,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -5414,7 +5414,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -5520,7 +5520,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -5694,7 +5694,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6113,7 +6113,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 243
+        "line": 258
       },
       "story_ids": [],
       "pins": null
@@ -6136,7 +6136,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -6216,7 +6216,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 267
+        "line": 282
       },
       "story_ids": [],
       "pins": null
@@ -6239,7 +6239,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -6316,7 +6316,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 282
+        "line": 297
       },
       "story_ids": [],
       "pins": null
@@ -6430,7 +6430,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 305
+        "line": 320
       },
       "story_ids": [],
       "pins": null
@@ -6455,7 +6455,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6537,7 +6537,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 319
+        "line": 334
       },
       "story_ids": [],
       "pins": null
@@ -7177,7 +7177,7 @@
       "module": "tests.unit.capture.test_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -14926,7 +14926,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -16621,7 +16621,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -18749,7 +18749,7 @@
       "module": "tests.unit.report.test_coverage",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -20701,7 +20701,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 164,
+      "duration_ms": 168,
       "steps": [
         {
           "phase": "given",
