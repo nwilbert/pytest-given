@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Changed
+
+- The bundled `pytest-given-reviewing` skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, and tags missing from part of the scenarios they describe.
+
 ### Fixed
 
 - An `Annotated[..., given(Template(...))]` label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.
