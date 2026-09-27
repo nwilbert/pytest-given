@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/getting-started/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/getting-started/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/guide/scenarios/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/guide/scenarios/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/guide/step-text/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/guide/step-text/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/guide/parametrized/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/guide/parametrized/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/guide/attachments/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/guide/attachments/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/guide/glossary/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/guide/glossary/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/guide/domain-storytelling/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/guide/domain-storytelling/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/configuration/narration-lint/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/ai-agents/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/ai-agents/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/configuration/pytest-options/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/configuration/source-links/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/configuration/source-links/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/cli/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/cli/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/examples/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/examples/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/dev/changelog/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/dev/changelog/</loc>
       </url>
 </urlset>
