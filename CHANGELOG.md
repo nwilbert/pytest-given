@@ -15,8 +15,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
-- The bundled `pytest-given-authoring` skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets `.low` as the mid-sentence term ref form, and corrects the one-glossary and lint-selection guidance.
-- The bundled `pytest-given-reviewing` skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, and tags missing from part of the scenarios they describe.
+- The bundled `pytest-given-authoring` skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets `.low` as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables and merging sibling scenarios into one.
+- The bundled `pytest-given-reviewing` skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome.
 
 ### Fixed
 

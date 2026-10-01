@@ -39,7 +39,7 @@ Hard rules (each raises `PytestGivenError`):
 ## Parametrized tests
 
 - All cases group into **one scenario with a parameter table**. T-string interpolations naming a parametrize column render as colored values per row.
-- **The baseline case's steps are the template for every row** (the first case that passed) — but only their *structure*: a narrated value or an attachment payload that varies across cases becomes its own parameter-table column. Authoring forms that cannot be rendered honestly against that template raise `PytestGivenError` instead of shipping a wrong report; each message names its fix. The habits that avoid them are in [scenarios.md](scenarios.md) under "Phase structure".
+- **The baseline case's steps are the template for every row** (the first case that passed) — but only their *structure*: a narrated value or an attachment payload that varies across cases becomes its own parameter-table column. Authoring forms that cannot be rendered honestly against that template raise `PytestGivenError` instead of shipping a wrong report; each message names its fix. The habits that avoid them are in [scenarios.md](scenarios.md) under "Parameter tables".
 - **Narration that genuinely branches per case**: `@scenario(..., group_parametrized=False)` declines the merge and emits one scenario per case, each titled `<name> [<parametrize id>]` with any `Template` placeholders substituted per case first. No parameter table. On an unparametrized test it raises at collection.
 - Parametrized **scenario name**: `@scenario(Template('Brew {cup_size} ml'))`.
 - Surface a parametrize value as a `given`: `Annotated[int, given(Template('a {cup_size} ml cup'))]` on the parameter.
