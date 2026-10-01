@@ -13,6 +13,10 @@ mistake shipped to PyPI is permanent.
 
 ### 1. Prepare the bump
 
+- [ ] Upgrade the locked dependencies with `uv lock --upgrade`, run `uv run nox`,
+      and land the result as its own commit before the bump. Skim the
+      changelogs of what moved — a new ruff rule or a pytest deprecation is
+      cheaper to adopt now than to discover from a red `audit` mid-release.
 - [ ] Bump `version` in `pyproject.toml`.
 - [ ] Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow
       extracts this exact section as the GitHub Release body, and fails the build
