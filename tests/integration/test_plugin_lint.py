@@ -132,8 +132,10 @@ def test_enabled_error_finding_fails_the_run(pytester):
         result.stdout.fnmatch_lines(
             [
                 '*narration lint (1 finding, 1 error)*',
-                '*ERROR*empty-step*test_sample.py::test_empty_given*'
-                "*'a value'*has no code*",
+                (
+                    '*ERROR*empty-step*test_sample.py::test_empty_given*'
+                    "*'a value'*has no code*"
+                ),
             ]
         )
 
@@ -419,8 +421,10 @@ def test_dead_term_opt_in_flags_unreferenced_term(pytester):
     )
     result.stdout.fnmatch_lines(
         [
-            "*WARN*dead-term*guest*term 'Guest' is referenced by no scenario name, "
-            'no step and no story sentence*'
+            (
+                "*WARN*dead-term*guest*term 'Guest' is referenced by no scenario name, "
+                'no step and no story sentence*'
+            )
         ]
     )
 

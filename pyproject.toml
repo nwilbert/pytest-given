@@ -115,11 +115,13 @@ extend-exclude = ["benchmarks/test_large_scenarios.py"]
 
 [tool.ruff.format]
 quote-style = "single"
+# Markdown here is generated reports or skill prose whose snippets stay compact.
+exclude = ["*.md"]
 
 [tool.ruff.lint]
 # `explicit-preview-rules` keeps preview mode from pulling in every preview rule
 # of a selected family: a preview rule is active only when named by its exact
-# code below. PLW1514 is the only one that qualifies today.
+# code below: PLW1514 and RUF077 today.
 preview = true
 explicit-preview-rules = true
 select = [
@@ -156,6 +158,8 @@ select = [
     "BLE",     # flake8-blind-except — `except Exception` that swallows everything
     "PLW1510", # subprocess.run without an explicit check= argument
     "PLW1514", # open/read_text without encoding=; the locale default is cp1252 on Windows
+    "PLR1708", # `raise StopIteration` inside a generator, a RuntimeError when iterated
+    "RUF077",  # a default on `self`/`cls`, which method binding never uses
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -166,6 +170,8 @@ select = [
 
 [tool.pytest]
 testpaths = ["tests"]
+# A warning fails the run, so deprecations surface on the upgrade that adds them.
+max_warnings = "0"
 given_lint_ignore = [
     # Honestly two-phase: constructing the descriptor is the action under
     # test and there is no input to arrange (see the authoring skill's
