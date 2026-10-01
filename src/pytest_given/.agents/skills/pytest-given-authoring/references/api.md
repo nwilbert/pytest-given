@@ -16,8 +16,8 @@ This is the authoring-relevant surface, version-matched to the installed package
 - **`@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)`** — marks a test for the report; required for it to appear. `name` is a plain string, a `Template` (for parametrized names), or a t-string whose interpolations are all glossary handles (they render as term refs in the title). `stories=` takes a story or several to narration-match against; `pins=` takes sentence handles (`the_story['name']`, `the_story[3]`) and covers those sentences plus its steps' pins, with no narration matching; `pins=[]` keeps only the steps' pins. Bare numbers and names raise. The decorated function is returned unwrapped, so it keeps its own signature.
 - **`given(text, *, pins=None)` / `when(text, *, pins=None)` / `then(text, *, pins=None)`** — dual-purpose; `pins=` binds the step to story sentences instead of narration matching, and `pins=[]` opts it out of matching ([stories.md](stories.md)):
   - **Context manager** in a test body: `with when('…'): result = sut(x)`. Steps nest within a phase (a `when` inside a `when`); crossing phases raises `PytestGivenError` — including a decorated helper of another phase called inside an open step.
-  - **Fixture decorator** — `@given` only, with `@pytest.fixture` **outermost** (`@pytest.fixture` above `@given('…')`); the other order is rejected at decoration time, `@when`/`@then` on a fixture is rejected at runtime, and the label must be a plain string. Generator fixtures work, at any scope; a step or attachment after `yield` raises.
-  - **Helper-function decorator** (any phase): the helper records its own step per call; use `Template` to reference the helper's parameters (`@when(Template('I insert {amount}'))`). Placeholders must name one of the helper's named parameters; `*args`/`**kwargs` placeholders raise at decoration time. An `async def` helper works too: the step stays open across the awaited body.
+  - **Fixture decorator** — `@given` only, with `@pytest.fixture` **outermost** (`@pytest.fixture` above `@given('…')`) and a plain-string label. Generator fixtures work, at any scope; a step or attachment after `yield` raises.
+  - **Helper-function decorator** (any phase): the helper records its own step per call; use `Template` to reference the helper's parameters (`@when(Template('I insert {amount}'))`). Placeholders must name one of the helper's named parameters. An `async def` helper works too: the step stays open across the awaited body.
   - **Call-site label** via `Annotated` on a test parameter — `given` only: `def test(text: Annotated[str, given(Template('the name {text}'))])` surfaces a fixture or parametrize value as a `given` step. Plain string or `Template` only; a t-string is rejected here. A label's `pins=` replaces the fixture label's pins; `pins=[]` clears them.
 - **`when_then(when_text, then_text)`** — one `with` emitting a `when` (wrapping the body) and a sibling `then` (emitted once the body exits cleanly). Pair with a nested `pytest.raises(...)` for expected-raise scenarios. If the body raises uncaught, the `then` is skipped.
 - **`attach(label, content)`** — attach data to the current step. Must be called with a step open (a call from the test body, outside every `given`/`when`/`then`, raises). `label` is a plain `str` (a t-string or `Template` raises); strings stored verbatim, other types JSON-serialized.
@@ -47,11 +47,9 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Glossary
 
-- **Code-defined**: `g = Glossary()`, then `guest = g.actor('Guest', definition='…')`, `g.work_object('Room', …)`, `g.activity('book', …)`; `g('foo')` declares a kindless term, `g['Guest']` looks one up (case-insensitive, raises if unknown).
-- **File-backed**: `g = FileGlossary(path, *, term_column=0, description_column=1, kind_column=None)` over the file's GFM pipe tables, each column a 0-based index or a case-insensitive header name. The vocabulary is closed: `g('foo')` and `g['foo']` both only look up.
-- **Handles** interpolate into t-string steps, `@scenario` titles and sentences in three forms: bare `g['Room']`, `.low` `g['Room'].low`, and called `g['borrow']('borrows')`.
+- `Glossary()` with `g.actor(name, definition=…)`, `g.work_object(…)`, `g.activity(…)` and `g('foo')` (kindless); `FileGlossary(path, *, term_column=0, description_column=1, kind_column=None)`. `g['Guest']` looks a term up, case-insensitive.
 
-Discovery, kinds, and the one-glossary-per-suite rule: [glossaries.md](glossaries.md).
+Handle forms, discovery, kinds, and the one-glossary-per-suite rule: [glossaries.md](glossaries.md).
 
 ## Stories
 

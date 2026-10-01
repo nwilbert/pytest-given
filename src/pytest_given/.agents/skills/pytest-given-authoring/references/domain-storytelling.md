@@ -33,5 +33,3 @@ The step past the method: binding scenarios (`@scenario(..., stories=...)`) turn
 1. Run Domain Storytelling sessions with stakeholders (a whiteboard or Egon.io is fine — the method works on paper).
 2. Transfer the agreed stories into `story(...)` code; the glossary emerges from the clause slots (kinds inferred from positions).
 3. Write scenarios against the stories as behavior gets implemented; uncovered sentences are your living backlog.
-
-This is why a greenfield project may want stories *before* any scenarios: the domain understanding and vocabulary are established up front, and every later scenario has a place to link into.
