@@ -87,14 +87,21 @@ def _param_table_md(table: ParameterTable) -> str:
     content sits inline in backticks; multiline or backtick-bearing content
     shows the label in the cell and renders fenced below the table, keyed by
     the case's parametrize values.
+
+    The trailing status column only appears when the cases differ in status:
+    a column of one glyph says nothing the heading's glyph hasn't.
     """
-    header = '| ' + ' | '.join([*(_cell(c.name) for c in table.columns), '']) + '|'
-    separator = '|' + '---|' * (len(table.columns) + 1)
+    show_status = table.has_mixed_statuses
+    names = ' | '.join(_cell(column.name) for column in table.columns)
+    header = '| ' + names + ' |' + ' |' * show_status
+    separator = '|' + '---|' * (len(table.columns) + show_status)
     rows: list[str] = []
     blocks: list[str] = []
     for case in table.cases:
         cells = [_case_cell(column, value) for column, value in table.cells(case)]
-        rows.append('| ' + ' | '.join([*cells, STATUS_GLYPH[case.status]]) + ' |')
+        if show_status:
+            cells.append(STATUS_GLYPH[case.status])
+        rows.append('| ' + ' | '.join(cells) + ' |')
         blocks.extend(_case_error_block(table, case))
         blocks.extend(_case_attachment_blocks(table, case))
     return '\n'.join([header, separator, *rows, *blocks])

@@ -175,10 +175,10 @@
 - **when** the suite runs
 - **then** the test passes but its teardown errors with a PytestGivenError
 
-| late | suite | |
-|---|---|---|
-| step | suite | ✓ |
-| attachment | suite | ✓ |
+| late | suite |
+|---|---|
+| step | suite |
+| attachment | suite |
 
 - **step** — suite:
   ```
@@ -222,10 +222,10 @@
 - **when** the suite runs
 - **then** the run fails with a PytestGivenError that points at @given
 
-| decorator | suite | |
-|---|---|---|
-| when | suite | ✓ |
-| then | suite | ✓ |
+| decorator | suite |
+|---|---|
+| when | suite |
+| then | suite |
 
 - **when** — suite:
   ```
@@ -426,11 +426,11 @@
 - **when** the suite runs
 - **then** the grafted root carries the expected «pins», and the inner «step» keeps its own
 
-| label_pins | root_pins | |
-|---|---|---|
-| None | [{'story_id': 'book', 'sentence_id': 1}] | ✓ |
-| [] | [] | ✓ |
-| [a[2]] | [{'story_id': 'book', 'sentence_id': 2}] | ✓ |
+| label_pins | root_pins |
+|---|---|
+| None | [{'story_id': 'book', 'sentence_id': 1}] |
+| [] | [] |
+| [a[2]] | [{'story_id': 'book', 'sentence_id': 2}] |
 
 ## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
 `tests/integration/test_plugin.py:2651::test_annotated_template_label_without_parametrize_fails_scenario`
@@ -988,11 +988,11 @@
 - **when** a «file glossary» loads it
 - **then** a PytestGivenError names the file before the problem
 
-| problem | doc | expected | Glossary file | |
-|---|---|---|---|---|
-| no table | # no table here<br> | bad\.md: found no Markdown pipe table | Glossary file | ✓ |
-| a short row | \| Term \| Meaning \|<br>\|---\|---\|<br>\| Guest \|<br> | bad\.md: data row at line 3 | Glossary file | ✓ |
-| no Term column | \| Word \| Meaning \|<br>\|---\|---\|<br>\| Guest \| x \|<br> | bad\.md: column 'Term' | Glossary file | ✓ |
+| problem | doc | expected | Glossary file |
+|---|---|---|---|
+| no table | # no table here<br> | bad\.md: found no Markdown pipe table | Glossary file |
+| a short row | \| Term \| Meaning \|<br>\|---\|---\|<br>\| Guest \|<br> | bad\.md: data row at line 3 | Glossary file |
+| no Term column | \| Word \| Meaning \|<br>\|---\|---\|<br>\| Guest \| x \|<br> | bad\.md: column 'Term' | Glossary file |
 
 - **no table, # no table here<br>, bad\.md: found no Markdown pipe table** — Glossary file:
   ```
@@ -1096,16 +1096,16 @@
 - **when** it is slugified into a «term» id
 - **then** the id is the expected slug {expected}
 
-| text | expected | |
-|---|---|---|
-| Guest | 'guest' | ✓ |
-| Order received | 'order-received' | ✓ |
-|   Work Object   | 'work-object' | ✓ |
-| do_the_thing | 'do-the-thing' | ✓ |
-| Buy / sell | 'buy-sell' | ✓ |
-| Guest #1 | 'guest-1' | ✓ |
-| café | 'caf' | ✓ |
-| booking system | 'booking-system' | ✓ |
+| text | expected |
+|---|---|
+| Guest | 'guest' |
+| Order received | 'order-received' |
+|   Work Object   | 'work-object' |
+| do_the_thing | 'do-the-thing' |
+| Buy / sell | 'buy-sell' |
+| Guest #1 | 'guest-1' |
+| café | 'caf' |
+| booking system | 'booking-system' |
 
 ## ✓ A name with no id-able characters is rejected · 4 cases
 `tests/unit/capture/test_glossary.py:53::test_id_derive_raises_on_empty_result` · validation
@@ -1114,12 +1114,12 @@
 - **when** it is slugified into a «term» id
 - **then** a PytestGivenError reports the derived id is empty
 
-| text | |
-|---|---|
-| --- | ✓ |
-|     | ✓ |
-|  | ✓ |
-| ### | ✓ |
+| text |
+|---|
+| --- |
+|     |
+|  |
+| ### |
 
 ## ✓ Calling an «actor» names a distinct «instance»
 `tests/unit/capture/test_glossary.py:101::test_actor_call_returns_instance_with_distinct_display`
@@ -1573,10 +1573,10 @@
 - **then** a PytestGivenError reports the cross-phase nesting
 - **then** the «step stack» is left balanced
 
-| phase_name | |
-|---|---|
-| given | ✓ |
-| then | ✓ |
+| phase_name |
+|---|
+| given |
+| then |
 
 ## ✓ A nested when becomes a child of the «when_then» action
 `tests/unit/capture/test_step_descriptor.py:416::test_when_then_allows_nested_when_as_child_sub_step`
@@ -1600,11 +1600,11 @@
 - **when** it is attached
 - **then** a PytestGivenError says «attachment» labels are plain text
 
-| label_kind | |
-|---|---|
-| deferred-template | ✓ |
-| t-string | ✓ |
-| not-a-string | ✓ |
+| label_kind |
+|---|
+| deferred-template |
+| t-string |
+| not-a-string |
 
 ## ✓ A `Template` «narration» is refused in a test body · 3 cases
 `tests/unit/capture/test_step_descriptor.py:575::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
@@ -1613,11 +1613,11 @@
 - **when** a {phase_name} «step» opens on a `Template`
 - **then** a PytestGivenError says a template is not supported in a test body
 
-| phase_name | |
-|---|---|
-| given | ✓ |
-| when | ✓ |
-| then | ✓ |
+| phase_name |
+|---|
+| given |
+| when |
+| then |
 
 ## ✓ A bare number or name is refused where a «pin» goes · 3 cases
 `tests/unit/capture/test_step_descriptor.py:967::test_pins_refuse_a_bare_number_or_name` · validation
@@ -1626,11 +1626,11 @@
 - **when** a «step» is declared with it
 - **then** a PytestGivenError shows the handle form
 
-| bare | |
-|---|---|
-| 3 | ✓ |
-| cancel | ✓ |
-| [1, 2] | ✓ |
+| bare |
+|---|
+| 3 |
+| cancel |
+| [1, 2] |
 
 ## ✓ An «actor» handle in a «clause» becomes a «term ref»
 `tests/unit/capture/test_story.py:61::test_clause_dispatches_actor_to_clause_term_ref`
@@ -1851,11 +1851,11 @@
 - **when** a «sentence» is built with that name
 - **then** a PytestGivenError says what a name must be
 
-| bad_name | |
-|---|---|
-| '' | ✓ |
-| ' cancel' | ✓ |
-| 'cancel ' | ✓ |
+| bad_name |
+|---|
+| '' |
+| ' cancel' |
+| 'cancel ' |
 
 ## ✓ Two «stories» with the same id collide
 `tests/unit/capture/test_story.py:634::test_story_id_collision_raises_with_both_sites` · validation
@@ -1924,11 +1924,11 @@
 - **when** a `Template` is built from it
 - **then** a PytestGivenError says bare identifiers only
 
-| text | |
-|---|---|
-| count={obj.attr} | ✓ |
-| {d[key]} | ✓ |
-| {x + 1} | ✓ |
+| text |
+|---|
+| count={obj.attr} |
+| {d[key]} |
+| {x + 1} |
 
 ## ✓ A t-string interpolation becomes a value part
 `tests/unit/capture/test_template.py:152::test_parse_tstring_single_interpolation`
@@ -2022,10 +2022,10 @@
 - **when** the AST «rules» parse that source
 - **then** a warn «finding» names the {phase} step holding the assert
 
-| phase | step body | |
-|---|---|---|
-| given | step body | ✓ |
-| when | step body | ✓ |
+| phase | step body |
+|---|---|
+| given | step body |
+| when | step body |
 
 - **given** — step body:
   ```
@@ -2166,13 +2166,13 @@
 - **when** «coverage» is computed against the «story»
 - **then** the «scenario» covers what the «step» contributes
 
-| scenario_pins | step_pins | covered | |
-|---|---|---|---|
-| None | None | {1} | ✓ |
-| None | [2] | {2} | ✓ |
-| [] | None | set() | ✓ |
-| [] | [2] | {2} | ✓ |
-| [1] | [2] | {1, 2} | ✓ |
+| scenario_pins | step_pins | covered |
+|---|---|---|
+| None | None | {1} |
+| None | [2] | {2} |
+| [] | None | set() |
+| [] | [2] | {2} |
+| [1] | [2] | {1, 2} |
 
 ## ✓ A «sentence» with two distinct «terms» is «coverage»-eligible
 `tests/unit/report/test_coverage.py:471::test_is_coverage_eligible_true_for_two_distinct_terms`
@@ -2399,7 +2399,7 @@
 - **then** each column ink is a token set once per theme, so the dark theme only redefines the token
 
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
-`tests/unit/report/test_md_renderer.py:46::test_passed_scenario_heading_and_steps`
+`tests/unit/report/test_md_renderer.py:49::test_passed_scenario_heading_and_steps`
 
 - **given** a «report» holding a passed «scenario» with three steps
 - **when** the Markdown «report» is rendered
@@ -2417,7 +2417,7 @@
     ```
 
 ## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py:147::test_nested_steps_indent`
+`tests/unit/report/test_md_renderer.py:150::test_nested_steps_indent`
 
 - **given** a «scenario» whose when «step» has a nested child
 - **when** the Markdown «report» is rendered
@@ -2434,7 +2434,7 @@
     ```
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:174::test_narration_parts_resolve_terms_and_values`
+`tests/unit/report/test_md_renderer.py:177::test_narration_parts_resolve_terms_and_values`
 
 - **given** a «step» whose «narration» carries a «term ref», a value and a placeholder
 - **when** the Markdown «report» is rendered
@@ -2450,7 +2450,7 @@
     ```
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:246::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:249::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «parametrized scenario» with a two-«case» «parameter table»
 - **when** the Markdown «report» is rendered
@@ -2464,14 +2464,105 @@
     
     - **when** insert
     
-    | euros | expect | |
-    |---|---|---|
-    | 1 | False | ✓ |
-    | 2 | True | ✓ |
+    | euros | expect |
+    |---|---|
+    | 1 | False |
+    | 2 | True |
     ```
 
+## ✓ The «parameter table» shows a status column only when its cases differ in status · 5 cases
+`tests/unit/report/test_md_renderer.py:287::test_param_table_shows_status_column_only_when_case_statuses_differ` · parametrization
+
+- **given** a «parameter table» whose first «case» is {first_status} and whose second is {second_status}
+- **when** the Markdown «report» is rendered
+- **then** the status column is {status_column}
+  - 📎 Rendered Markdown — *see parameter table*
+
+| first_status | second_status | status_column | Rendered Markdown |
+|---|---|---|---|
+| passed | passed | omitted | Rendered Markdown |
+| skipped | skipped | omitted | Rendered Markdown |
+| failed | failed | omitted | Rendered Markdown |
+| passed | skipped | shown | Rendered Markdown |
+| passed | failed | shown | Rendered Markdown |
+
+- **passed, passed, omitted** — Rendered Markdown:
+  ```
+  # pytest-given — proj
+  
+  ## ✓ Att · 2 cases
+  `tests/t.py::test_att`
+  
+  - **when** act
+  
+  | coin |
+  |---|
+  | euro |
+  | token |
+  ```
+
+- **skipped, skipped, omitted** — Rendered Markdown:
+  ```
+  # pytest-given — proj
+  
+  ## ✓ Att · 2 cases
+  `tests/t.py::test_att`
+  
+  - **when** act
+  
+  | coin |
+  |---|
+  | euro |
+  | token |
+  ```
+
+- **failed, failed, omitted** — Rendered Markdown:
+  ```
+  # pytest-given — proj
+  
+  ## ✓ Att · 2 cases
+  `tests/t.py::test_att`
+  
+  - **when** act
+  
+  | coin |
+  |---|
+  | euro |
+  | token |
+  ```
+
+- **passed, skipped, shown** — Rendered Markdown:
+  ```
+  # pytest-given — proj
+  
+  ## ✓ Att · 2 cases
+  `tests/t.py::test_att`
+  
+  - **when** act
+  
+  | coin | |
+  |---|---|
+  | euro | ✓ |
+  | token | ○ |
+  ```
+
+- **passed, failed, shown** — Rendered Markdown:
+  ```
+  # pytest-given — proj
+  
+  ## ✓ Att · 2 cases
+  `tests/t.py::test_att`
+  
+  - **when** act
+  
+  | coin | |
+  |---|---|
+  | euro | ✓ |
+  | token | ✗ |
+  ```
+
 ## ✓ A failed «scenario» ends with a minimal error digest
-`tests/unit/report/test_md_renderer.py:284::test_failing_scenario_renders_a_minimal_error`
+`tests/unit/report/test_md_renderer.py:324::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
@@ -2514,7 +2605,7 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:355::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:395::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «step» carrying a multi-line «attachment»
 - **when** the Markdown «report» is rendered
@@ -2535,7 +2626,7 @@
     ````
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:520::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:559::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «scenario» with a reason
 - **when** the Markdown «report» is rendered
@@ -2579,12 +2670,12 @@
 - **when** the config value is resolved
 - **then** the template is that editor's URL scheme
 
-| preset | url_scheme | |
-|---|---|---|
-| vscode | vscode://file/{path}:{line} | ✓ |
-| cursor | cursor://file/{path}:{line} | ✓ |
-| zed | zed://file/{path}:{line} | ✓ |
-| pycharm | pycharm://open?file={path}&line={line} | ✓ |
+| preset | url_scheme |
+|---|---|
+| vscode | vscode://file/{path}:{line} |
+| cursor | cursor://file/{path}:{line} |
+| zed | zed://file/{path}:{line} |
+| pycharm | pycharm://open?file={path}&line={line} |
 
 ## ✓ A raw URL template is used as the «source link» verbatim
 `tests/unit/report/test_source_link.py:66::test_resolve_template_raw_template_passes_through`

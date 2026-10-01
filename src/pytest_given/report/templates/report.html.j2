@@ -279,6 +279,10 @@
       </div>
 
       {% if scenario.parameters %}
+      {#- Only when the cases differ in status: a column of one glyph repeats
+          the header's status badge on every row. -#}
+      {%- set show_status = scenario.parameters.has_mixed_statuses -%}
+      {%- set table_width = scenario.parameters.columns | length + show_status %}
       <div class="param-table-scroll">
       <table class="param-table">
         <thead>
@@ -286,7 +290,7 @@
             {% for col in scenario.parameters.columns %}
             <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}">{{ col.name }}</th>
             {% endfor %}
-            <th style="text-align:right">status</th>
+            {% if show_status %}<th class="param-status">status</th>{% endif %}
           </tr>
         </thead>
         <tbody>
@@ -310,13 +314,11 @@
             <td data-param="{{ col.id }}"{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
             {% endfor %}
-            <td style="text-align:right">
-              {{ status_dot(case.status) }}
-            </td>
+            {% if show_status %}<td class="param-status">{{ status_dot(case.status) }}</td>{% endif %}
           </tr>
           {% if case.error %}
           <tr>
-            <td colspan="{{ scenario.parameters.columns | length + 1 }}">
+            <td colspan="{{ table_width }}">
               {{ render_error(case.error) }}
             </td>
           </tr>
@@ -330,7 +332,7 @@
           {% if col.kind == 'attachment' and val %}
           {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
           <tr class="attachment-panel-row">
-            <td class="attachment-panel" colspan="{{ scenario.parameters.columns | length + 1 }}">
+            <td class="attachment-panel" colspan="{{ table_width }}">
               <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
                 <div class="attachment-expand-inner">
                   <div class="attachment-panel-body">

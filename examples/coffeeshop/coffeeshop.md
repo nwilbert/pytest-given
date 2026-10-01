@@ -43,11 +43,11 @@
 - **when** I insert ${euros}
 - **then** the purchase is allowed: {expect}
 
-| euros | expect | |
-|---|---|---|
-| 1 | False | ✓ |
-| 2 | True | ✓ |
-| 3 | True | ✓ |
+| euros | expect |
+|---|---|
+| 1 | False |
+| 2 | True |
+| 3 | True |
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py:76::test_annotated_given_label`
@@ -57,10 +57,10 @@
 - **when** I brew the cup
 - **then** the machine has one fewer coffee
 
-| cup_size | |
-|---|---|
-| 200 | ✓ |
-| 350 | ✓ |
+| cup_size |
+|---|
+| 200 |
+| 350 |
 
 ## ✓ T-string with a non-parametrize value (neutral highlight)
 `examples/coffeeshop/test_coffeeshop.py:88::test_neutral_highlight`
@@ -77,10 +77,10 @@
 - **when** I brew a {cup_size} ml cup
 - **then** the tank is down {cup_size} ml and the machine has one fewer coffee
 
-| cup_size | |
-|---|---|
-| 200 | ✓ |
-| 300 | ✓ |
+| cup_size |
+|---|
+| 200 |
+| 300 |
 
 ## ✓ Serve a 200 ml cup (one scenario per case) [200]
 `examples/coffeeshop/test_coffeeshop.py:109::test_serve`
@@ -106,10 +106,10 @@
 - **when** I brew a {flavor} coffee
 - **then** the drink costs {price} euros
 
-| flavor | brew log | price | |
-|---|---|---|---|
-| vanilla | brew log | 2 | ✓ |
-| mocha | brew log | 3 | ✓ |
+| flavor | brew log | price |
+|---|---|---|
+| vanilla | brew log | 2 |
+| mocha | brew log | 3 |
 
 - **vanilla** — brew log:
   ```
@@ -214,7 +214,7 @@
 `examples/coffeeshop/test_coffeeshop.py:273::test_parametrized_all_skipped` — reason: awaiting fixture
 
 
-| n | |
-|---|---|
-| 1 | ○ |
-| 2 | ○ |
+| n |
+|---|
+| 1 |
+| 2 |

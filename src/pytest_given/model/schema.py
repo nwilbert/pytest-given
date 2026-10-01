@@ -404,6 +404,10 @@ class ParameterTable:
         """
         return list(zip(self.columns, case.values, strict=True))
 
+    @property
+    def has_mixed_statuses(self) -> bool:
+        return len({case.status for case in self.cases}) > 1
+
 
 @dataclass
 class Scenario:

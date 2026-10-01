@@ -1012,16 +1012,16 @@ def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) ->
                 'scenarios': [
                     {
                         'id': 't::x',
-                        'narration': _narration('All skipped'),
+                        'narration': _narration('One skipped'),
                         'module': 'mod',
                         'tags': [],
-                        'status': 'skipped',
+                        'status': 'passed',
                         'duration_ms': 0,
                         'steps': [],
                         'parameters': {
                             'columns': [{'id': 'n', 'name': 'n', 'kind': 'param'}],
                             'cases': [
-                                {'values': [1], 'status': 'skipped', 'error': None},
+                                {'values': [1], 'status': 'passed', 'error': None},
                                 {'values': [2], 'status': 'skipped', 'error': None},
                             ],
                         },

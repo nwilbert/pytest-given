@@ -1,3 +1,5 @@
+import pytest
+
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Attachment,
@@ -15,6 +17,7 @@ from pytest_given.model import (
     ReportData,
     Scenario,
     SourceLocation,
+    Status,
     Step,
     TracebackFrame,
     report_to_dict,
@@ -276,9 +279,46 @@ def test_parametrized_scenario_renders_table() -> None:
     ):
         attach('Rendered Markdown', md)
         assert '## ✓ Pricing · 2 cases' in md
-        assert '| euros | expect | |' in md
-        assert '| 1 | False | ✓ |' in md
-        assert '| 2 | True | ✓ |' in md
+        assert '| euros | expect |' in md
+        assert '| 1 | False |' in md
+        assert '| 2 | True |' in md
+
+
+@scenario(
+    t'The {pg["Parameter table"].low} shows a status column only when its '
+    t'cases differ in status',
+    tags=['parametrization'],
+)
+@pytest.mark.parametrize(
+    ('first_status', 'second_status', 'status_column'),
+    [
+        ('passed', 'passed', 'omitted'),
+        ('skipped', 'skipped', 'omitted'),
+        ('failed', 'failed', 'omitted'),
+        ('passed', 'skipped', 'shown'),
+        ('passed', 'failed', 'shown'),
+    ],
+)
+def test_param_table_shows_status_column_only_when_case_statuses_differ(
+    first_status: Status, second_status: Status, status_column: str
+) -> None:
+    with given(
+        t'a {pg["Parameter table"].low} whose first {pg["Case"].low} is '
+        t'{first_status} and whose second is {second_status}'
+    ):
+        table = ParameterTable(
+            columns=[ParameterColumn(id='coin', name='coin', kind='param')],
+            cases=[
+                ParameterCase(values=['euro'], status=first_status),
+                ParameterCase(values=['token'], status=second_status),
+            ],
+        )
+    with when(t'the Markdown {pg["Report"].low} is rendered'):
+        md = render_md(_report_with(table))
+    with then(t'the status column is {status_column}'):
+        attach('Rendered Markdown', md)
+        header = next(line for line in md.splitlines() if line.startswith('| coin'))
+        assert header == ('| coin | |' if status_column == 'shown' else '| coin |')
 
 
 @scenario(
@@ -477,8 +517,7 @@ def test_param_table_escapes_pipe_in_value() -> None:
     )
     md = render_md(_report(scn))
     row = next(line for line in md.splitlines() if line.startswith('| a'))
-    assert row == '| a\\|b | ✓ |'
-    assert row.count(' | ') == 1
+    assert row == '| a\\|b |'
 
 
 def test_param_table_escapes_newline_in_value() -> None:
@@ -514,7 +553,7 @@ def test_param_table_renders_none_value_as_text_not_blank() -> None:
         ),
     )
     md = render_md(_report(scn))
-    assert '| None | ✓ |' in md
+    assert '| None |' in md
 
 
 @scenario(
@@ -595,7 +634,7 @@ def test_a_pipe_in_an_inline_attachment_cell_is_escaped() -> None:
     payload text into a table row, so an unescaped `|` in it would split the
     row into a new column and derail every cell after it."""
     md = render_md(_report_with(_attachment_table(short='ok|fine', long=None)))
-    assert '| 350 | `ok\\|fine` | ✓ |' in md
+    assert '| 350 | `ok\\|fine` |' in md
 
 
 def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() -> None:
@@ -604,13 +643,13 @@ def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() ->
     md = render_md(
         _report_with(_attachment_table(short=None, long='{"ml": 350,\n "full": true}'))
     )
-    assert '| 350 | machine state | ✓ |' in md
+    assert '| 350 | machine state |' in md
     assert '{"ml": 350,' in md
     # The fenced block belongs *after* the table, separated from it by a blank
     # line: emitted before the rows it leaves a header-only table followed by
     # loose text, and without the blank line a GFM parser keeps the block
     # header inside the table.
-    assert '| 350 | machine state | ✓ |\n\n- **350** — machine state:\n' in md
+    assert '| 350 | machine state |\n\n- **350** — machine state:\n' in md
 
 
 def test_a_backtick_bearing_attachment_cell_also_fences_below_the_table() -> None:
@@ -620,7 +659,7 @@ def test_a_backtick_bearing_attachment_cell_also_fences_below_the_table() -> Non
     md = render_md(
         _report_with(_attachment_table(short=None, long='use `attach` here'))
     )
-    assert '| 350 | machine state | ✓ |' in md
+    assert '| 350 | machine state |' in md
     assert '- **350** — machine state:' in md
 
 
@@ -647,7 +686,7 @@ def test_two_columns_sharing_a_label_get_distinct_block_headers() -> None:
         ],
     )
     md = render_md(_report_with(table))
-    assert '| 350 | log | log #2 | ✓ |' in md
+    assert '| 350 | log | log #2 |' in md
     assert '- **350** — log:' in md
     assert '- **350** — log #2:' in md
 
@@ -678,7 +717,7 @@ def test_a_generated_column_with_no_value_for_a_case_renders_blank() -> None:
         cases=[ParameterCase(values=[350, None], status='passed')],
     )
     md = render_md(_report_with(table))
-    assert '| 350 |  | ✓ |' in md
+    assert '| 350 |  |' in md
 
 
 def test_a_derived_column_cell_renders_through_the_ordinary_cell_path() -> None:
@@ -692,7 +731,7 @@ def test_a_derived_column_cell_renders_through_the_ordinary_cell_path() -> None:
         cases=[ParameterCase(values=[350, '3.5'], status='passed')],
     )
     md = render_md(_report_with(table))
-    assert '| 350 | 3.5 | ✓ |' in md
+    assert '| 350 | 3.5 |' in md
 
 
 def test_a_long_single_line_attachment_cell_fences_below_the_table() -> None:
@@ -702,7 +741,7 @@ def test_a_long_single_line_attachment_cell_fences_below_the_table() -> None:
     in the cell, the payload fenced below."""
     payload = '{"id": "ch_3PmZ", "amount": 250, ' + '"x": "y", ' * 30 + '"end": true}'
     md = render_md(_report_with(_attachment_table(short=payload, long=None)))
-    assert '| 350 | machine state | ✓ |' in md
+    assert '| 350 | machine state |' in md
     assert f'- **350** — machine state:\n  ```\n  {payload}\n  ```' in md
 
 
@@ -712,7 +751,7 @@ def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
     """
     payload = 'x' * 72
     md = render_md(_report_with(_attachment_table(short=payload, long=None)))
-    assert f'| 350 | `{payload}` | ✓ |' in md
+    assert f'| 350 | `{payload}` |' in md
 
 
 def test_header_prefers_the_title_over_the_project() -> None:

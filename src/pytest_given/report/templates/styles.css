@@ -731,6 +731,13 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
 }
+/* Set off from the parameters: the status is the outcome, not one more input.
+   No width here — a percentage width on a cell stretches an auto-width table
+   to the full card. */
+.param-table .param-status {
+  text-align: center;
+  border-left: 1px solid var(--border);
+}
 .param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
 /* A payload panel is not a case: it carries no cells to highlight and no row
