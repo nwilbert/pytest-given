@@ -6,7 +6,7 @@ When decorating a test with `@scenario`, the goal is a report that reads as a tr
 
 - **Convert behavior, not plumbing.** Decorate tests that assert a rule (a calculation, a validation, a dispatch decision). Leave trivial getters, constructors, and dataclass round-trips as plain tests — they add report noise, not behavior.
 - **One scenario per rule, not per branch.** Decorate the test that best states the rule — the one whose body shows what its name claims, so the end-to-end test when a unit test covers the same rule — and leave its edge cases plain. A user-visible rule you add or change needs its scenario, or the report never shows it.
-- **Sibling scenarios of one rule are one table.** Merge scenarios that share a step skeleton and vary one arrangement, or whose names negate each other ("the reviewer confirms, so it is rejected" / "the reviewer declines, so it is accepted"), into one parametrized scenario (see [Parameter tables](#parameter-tables)). Before you merge or delete a scenario, account for everything only it had:
+- **Sibling scenarios of one rule are one table.** Merge scenarios that share a step skeleton and vary one arrangement, or whose names negate each other ("the reviewer confirms, so it is rejected" / "the reviewer declines, so it is accepted"), into one parametrized scenario (see [Parameter tables](#parameter-tables)); plain tests of the rule that fit its steps become rows. Before you merge or delete a scenario, account for everything only it had:
   - an assertion: keep it, or name the scenario that still makes it;
   - an input the table holds fixed: a booking in another building is not just another "no clash" row;
   - a step that covers a story sentence or holds a term's last term ref: re-run the coverage check from [stories.md](stories.md).
@@ -26,9 +26,22 @@ A parametrized scenario renders as one narrated tree over a parameter table, and
 - **Step structure must not depend on parameter values.** Every row renders against the baseline case's step structure, so a conditional `with given/when/then(...)` on a parametrize value fails the run. When the steps genuinely differ per case, decline the merge with `@scenario(..., group_parametrized=False)`; when the cases are different behaviors rather than one behavior narrated two ways, split them into separate scenarios.
 - **Narrate what varies with a t-string interpolating a bare name.** `when(t'the drink costs {price} euros')` leaves a `{price}` token in the step and a column holding each case's value. Keep everything else identical across cases — the sentence, the `attach` labels, the term refs — and bind a value you derive from a column to its own local before narrating it (`price = cup_size * 0.01`, then `{price}`).
 - **A column must read on its own.** When the outcome depends on how a varied input relates to a fixed one, the column holds the relation (`hours_later`, `same_room`), not the varied input's own value (`existing_start=50` or `existing_room='B'` beside a new booking fixed in room A at hours 10 to 20 in another step). This applies to a merged table too: parametrizing the value an old step text happened to name is how such columns arise. Arrange the fixed side first, so the relation has something to refer to. Whole objects as columns fail the same way: a reader can't compare two `Booking(...)` reprs at a glance.
-- **Never turn a label back into data.** The body may unpack a relation column the way its narration says (`'A' if same_room else 'B'` under "same room: {same_room}"). It never maps a descriptive label to the input (`{'40 hours later': 40}[shift]`), and no label column sits beside the data it describes. Either way, the report shows a claim that nothing checks against the input.
-- **Contrast rows show what decides.** For each input that decides the outcome, include a row that changes only that input and flips the outcome, at the boundary where there is one (moved 10 hours later still shares an hour, 11 hours later does not). A table whose rows all share one outcome can't show which column matters, even when another scenario holds the flipped case.
-- **Outcomes are columns, asserted against.** An outcome that varies gets a column and a `then` that holds for every row (`assert (0 in result.clashes) == clashes`), not an `if` on the column inside the step. The headline outcome gets its own column even when another column implies it (`settled_by=None` implies "no clash", but a reader looks for the clash). Put the input columns first, then the outcomes.
+- **Never turn a label back into data.** The body may unpack a relation column the way its narration says (`'A' if same_room else 'B'` under "same room: {same_room}"). It never maps a descriptive label to the input (`{'40 hours later': 40}[shift]`), and no label column sits beside the data it describes. Either way, the report shows a claim that nothing checks against the input. A document is the exception, since it can't read as a column: parametrize a label, look the document up, and `attach` it, so the row shows both.
+- **Contrast rows show what decides.** For each input that decides the outcome, include a row that changes only that input and flips the outcome, at the boundary where there is one (moved 10 hours later still shares an hour, 11 hours later does not). A table whose rows all share one outcome can't show which column matters, even when another scenario holds the flipped case. Only a column listing forms the rule treats alike needs no flip, and a flip that needs other steps stays in its own scenario.
+- **A refusal is a row too.** `when_then` can't narrate a raise per row, so when accepted and refused inputs share the steps, catch the refusal in the `when` and assert it like any outcome:
+  ```python
+  with when(t'the {g["Guest"].low} books {nights} nights'):
+      try:
+          booking, refusal = book(room, nights), ''
+      except BookingRefused as error:
+          booking, refusal = None, str(error)
+  with then(t'the booking is accepted: {accepted}'):
+      assert (booking is not None) == accepted
+  with then('a refusal names the minimum stay'):
+      assert ('minimum stay' in refusal) == (not accepted)
+  ```
+  Keep `when_then` for a scenario whose every row refuses.
+- **Outcomes are columns, asserted against.** An outcome that varies gets a column, named in a `then` that holds for every row (`assert (0 in result.clashes) == clashes` under "it clashes: {clashes}"), not an `if` on the column inside the step. The headline outcome gets its own column even when another column implies it (`settled_by=None` implies "no clash", but a reader looks for the clash). Put the input columns first, then the outcomes.
 
 ## Arrangement
 
