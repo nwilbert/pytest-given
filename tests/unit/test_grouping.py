@@ -1122,12 +1122,12 @@ def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
         table = grouped[0].parameters
         assert table is not None
         assert [(c.id, c.name) for c in table.columns] == [
-            ('cup_size', 'cup_size'),
             ('derived:0', 'cup_size #2'),
+            ('cup_size', 'cup_size'),
         ]
         assert [c.values for c in table.cases] == [
-            [200, '200.00'],
-            [350, '350.00'],
+            ['200.00', 200],
+            ['350.00', 350],
         ]
     with then('the name renders the disambiguated token, text and parts agreeing'):
         slot = grouped[0].narration.parts[1]
@@ -1803,6 +1803,38 @@ def _att_step(*attachments: Attachment) -> Step:
         narration=Narration(text='the machine is stocked'),
         attachments=list(attachments),
     )
+
+
+@scenario(
+    t'A {pg["Parameter table"].low} orders its columns the way the '
+    t'{pg["Narration"].low} first shows them',
+    tags=['parametrization'],
+)
+def test_a_parameter_table_orders_its_columns_by_first_narration() -> None:
+    with given(
+        t'two {pg["Case"]("cases")} whose given attaches a varying log and whose '
+        t'later step narrates the parameter'
+    ):
+        scenarios, info = _two_case_group(
+            [
+                _att_step(Attachment(label='brew log', content='log-for-vanilla')),
+                _param_value_step('200'),
+            ],
+            [
+                _att_step(Attachment(label='brew log', content='log-for-mocha')),
+                _param_value_step('350'),
+            ],
+        )
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"]("cases")}'):
+        grouped = group_parametrized(scenarios, info)[0]
+    with then(t"the given's {pg['Attachment'].low} column comes first"):
+        assert grouped.parameters is not None
+        assert [column.id for column in grouped.parameters.columns] == [
+            'attachment:0',
+            'cup_size',
+        ]
+    with then(t'each {pg["Case"].low} row follows the same order'):
+        assert [case.values[1] for case in grouped.parameters.cases] == [200, 350]
 
 
 @scenario(

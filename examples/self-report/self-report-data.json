@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-02T06:43:48.951279+00:00",
+    "timestamp": "2026-10-02T06:47:46.734560+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.3.0",
-    "commit_sha": "5a4f6edf84be1efc6acec45f96f29ca541eeda39",
+    "commit_sha": "96c45dc18b12c81753237dad451d0ec01235d814",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -218,7 +218,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -361,7 +361,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -712,7 +712,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -810,7 +810,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -879,7 +879,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -998,7 +998,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -1132,7 +1132,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -1255,7 +1255,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -1336,26 +1336,26 @@
             "kind": "param"
           },
           {
-            "id": "outcome",
-            "name": "outcome",
-            "kind": "param"
-          },
-          {
             "id": "attachment:0",
             "name": "suite",
             "kind": "attachment"
+          },
+          {
+            "id": "outcome",
+            "name": "outcome",
+            "kind": "param"
           }
         ],
         "cases": [
           {
             "values": [
               "given",
-              "accepted",
               {
                 "label": "suite",
                 "content": "import pytest\nfrom pytest_given import scenario, then, given\n\n@pytest.fixture\n@given(\"a coin is inserted\")\ndef coin():\n    return 2\n\n@scenario(\"uses the fixture\")\ndef test_use(coin):\n    with then(\"the coin is 2\"):\n        assert coin == 2",
                 "content_type": "text"
-              }
+              },
+              "accepted"
             ],
             "status": "passed",
             "error": null
@@ -1363,12 +1363,12 @@
           {
             "values": [
               "when",
-              "refused",
               {
                 "label": "suite",
                 "content": "import pytest\nfrom pytest_given import scenario, then, when\n\n@pytest.fixture\n@when(\"a coin is inserted\")\ndef coin():\n    return 2\n\n@scenario(\"uses the fixture\")\ndef test_use(coin):\n    with then(\"the coin is 2\"):\n        assert coin == 2",
                 "content_type": "text"
-              }
+              },
+              "refused"
             ],
             "status": "passed",
             "error": null
@@ -1376,12 +1376,12 @@
           {
             "values": [
               "then",
-              "refused",
               {
                 "label": "suite",
                 "content": "import pytest\nfrom pytest_given import scenario, then, then\n\n@pytest.fixture\n@then(\"a coin is inserted\")\ndef coin():\n    return 2\n\n@scenario(\"uses the fixture\")\ndef test_use(coin):\n    with then(\"the coin is 2\"):\n        assert coin == 2",
                 "content_type": "text"
-              }
+              },
+              "refused"
             ],
             "status": "passed",
             "error": null
@@ -1423,7 +1423,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -1876,7 +1876,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -2161,7 +2161,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -2283,7 +2283,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 129,
+      "duration_ms": 131,
       "steps": [
         {
           "phase": "given",
@@ -2466,7 +2466,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -2573,7 +2573,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 118,
+      "duration_ms": 119,
       "steps": [
         {
           "phase": "given",
@@ -2651,26 +2651,26 @@
             "kind": "param"
           },
           {
-            "id": "error",
-            "name": "error",
-            "kind": "param"
-          },
-          {
             "id": "attachment:0",
             "name": "suite",
             "kind": "attachment"
+          },
+          {
+            "id": "error",
+            "name": "error",
+            "kind": "param"
           }
         ],
         "cases": [
           {
             "values": [
               "{x}",
-              null,
               {
                 "label": "suite",
                 "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {x}'))]):\n    with when('it is booked'):\n        pass",
                 "content_type": "text"
-              }
+              },
+              null
             ],
             "status": "passed",
             "error": null
@@ -2678,12 +2678,12 @@
           {
             "values": [
               "{room}",
-              "'{room}' in the Annotated label on parameter 'room' does not match",
               {
                 "label": "suite",
                 "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {room}'))]):\n    with when('it is booked'):\n        pass",
                 "content_type": "text"
-              }
+              },
+              "'{room}' in the Annotated label on parameter 'room' does not match"
             ],
             "status": "passed",
             "error": null
@@ -2691,12 +2691,12 @@
           {
             "values": [
               "{room.number}",
-              "bare identifiers",
               {
                 "label": "suite",
                 "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {room.number}'))]):\n    with when('it is booked'):\n        pass",
                 "content_type": "text"
-              }
+              },
+              "bare identifiers"
             ],
             "status": "passed",
             "error": null
@@ -2899,7 +2899,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -3070,7 +3070,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -3260,7 +3260,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 148,
+      "duration_ms": 145,
       "steps": [
         {
           "phase": "given",
@@ -3450,7 +3450,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -6051,7 +6051,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6243,7 +6243,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -6782,26 +6782,26 @@
             "kind": "param"
           },
           {
-            "id": "message",
-            "name": "message",
-            "kind": "param"
-          },
-          {
             "id": "attachment:0",
             "name": "Glossary file",
             "kind": "attachment"
+          },
+          {
+            "id": "message",
+            "name": "message",
+            "kind": "param"
           }
         ],
         "cases": [
           {
             "values": [
               "no table",
-              "bad.md: found no Markdown pipe table",
               {
                 "label": "Glossary file",
                 "content": "# no table here\n",
                 "content_type": "text"
-              }
+              },
+              "bad.md: found no Markdown pipe table"
             ],
             "status": "passed",
             "error": null
@@ -6809,12 +6809,12 @@
           {
             "values": [
               "a short row",
-              "bad.md: data row at line 3",
               {
                 "label": "Glossary file",
                 "content": "| Term | Meaning |\n|---|---|\n| Guest |\n",
                 "content_type": "text"
-              }
+              },
+              "bad.md: data row at line 3"
             ],
             "status": "passed",
             "error": null
@@ -6822,12 +6822,12 @@
           {
             "values": [
               "no Term column",
-              "bad.md: column 'Term'",
               {
                 "label": "Glossary file",
                 "content": "| Word | Meaning |\n|---|---|\n| Guest | x |\n",
                 "content_type": "text"
-              }
+              },
+              "bad.md: column 'Term'"
             ],
             "status": "passed",
             "error": null
@@ -6866,7 +6866,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -6967,26 +6967,26 @@
             "kind": "param"
           },
           {
-            "id": "outcome",
-            "name": "outcome",
-            "kind": "param"
-          },
-          {
             "id": "attachment:0",
             "name": "Glossary file",
             "kind": "attachment"
+          },
+          {
+            "id": "outcome",
+            "name": "outcome",
+            "kind": "param"
           }
         ],
         "cases": [
           {
             "values": [
               true,
-              "one term",
               {
                 "label": "Glossary file",
                 "content": "| Term | Meaning |\n|---|---|\n| Guest | First definition. |\n| Guest | First definition. |\n",
                 "content_type": "text"
-              }
+              },
+              "one term"
             ],
             "status": "passed",
             "error": null
@@ -6994,12 +6994,12 @@
           {
             "values": [
               false,
-              "refused",
               {
                 "label": "Glossary file",
                 "content": "| Term | Meaning |\n|---|---|\n| Guest | First definition. |\n| Guest | Second definition. |\n",
                 "content_type": "text"
-              }
+              },
+              "refused"
             ],
             "status": "passed",
             "error": null
@@ -16263,26 +16263,26 @@
             "kind": "param"
           },
           {
-            "id": "flagged",
-            "name": "flagged",
-            "kind": "param"
-          },
-          {
             "id": "attachment:0",
             "name": "step body",
             "kind": "attachment"
+          },
+          {
+            "id": "flagged",
+            "name": "flagged",
+            "kind": "param"
           }
         ],
         "cases": [
           {
             "values": [
               "given",
-              true,
               {
                 "label": "step body",
                 "content": "def test_a():\n    with given('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
                 "content_type": "text"
-              }
+              },
+              true
             ],
             "status": "passed",
             "error": null
@@ -16290,12 +16290,12 @@
           {
             "values": [
               "when",
-              true,
               {
                 "label": "step body",
                 "content": "def test_a():\n    with when('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
                 "content_type": "text"
-              }
+              },
+              true
             ],
             "status": "passed",
             "error": null
@@ -16303,12 +16303,12 @@
           {
             "values": [
               "then",
-              false,
               {
                 "label": "step body",
                 "content": "def test_a():\n    with then('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
                 "content_type": "text"
-              }
+              },
+              false
             ],
             "status": "passed",
             "error": null
@@ -20015,7 +20015,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 134,
+      "duration_ms": 133,
       "steps": [
         {
           "phase": "given",
@@ -23796,6 +23796,144 @@
       "pins": null
     },
     {
+      "id": "tests/unit/test_grouping.py::test_a_parameter_table_orders_its_columns_by_first_narration",
+      "narration": {
+        "text": "A parameter table orders its columns the way the narration first shows them",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "parameter-table",
+            "display": "parameter table",
+            "expression": "pg[\"Parameter table\"].low"
+          },
+          {
+            "value": " orders its columns the way the "
+          },
+          {
+            "term_id": "narration",
+            "display": "narration",
+            "expression": "pg[\"Narration\"].low"
+          },
+          {
+            "value": " first shows them"
+          }
+        ]
+      },
+      "module": "tests.unit.test_grouping",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "two cases whose given attaches a varying log and whose later step narrates the parameter",
+            "parts": [
+              {
+                "value": "two "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")"
+              },
+              {
+                "value": " whose given attaches a varying log and whose later step narrates the parameter"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "templatizing walks the cases",
+            "parts": [
+              {
+                "term_id": "templatize",
+                "display": "templatizing",
+                "expression": "pg[\"Templatize\"](\"templatizing\")"
+              },
+              {
+                "value": " walks the "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"](\"cases\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the given's attachment column comes first",
+            "parts": [
+              {
+                "value": "the given's "
+              },
+              {
+                "term_id": "attachment",
+                "display": "attachment",
+                "expression": "pg[\"Attachment\"].low"
+              },
+              {
+                "value": " column comes first"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each case row follows the same order",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].low"
+              },
+              {
+                "value": " row follows the same order"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 1808
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/unit/test_grouping.py::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge",
       "narration": {
         "text": "An attachment whose payload varies becomes an attachment column",
@@ -23928,7 +24066,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1808
+        "line": 1840
       },
       "story_ids": [],
       "pins": null
@@ -24062,7 +24200,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1864
+        "line": 1896
       },
       "story_ids": [],
       "pins": null
@@ -24181,7 +24319,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2410
+        "line": 2442
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -24311,7 +24449,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2570
+        "line": 2602
       },
       "story_ids": [],
       "pins": null
@@ -24428,7 +24566,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2720
+        "line": 2752
       },
       "story_ids": [],
       "pins": null

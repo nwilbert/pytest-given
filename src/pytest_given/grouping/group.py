@@ -18,7 +18,7 @@ from ..model import (
     node_base,
 )
 from .checks import check_rebound_params, check_same_template
-from .columns import ColumnBuilder, param_cell_formats
+from .columns import ColumnBuilder, narrated_column_order, param_cell_formats
 from .context import build_group
 from .percase import per_case_scenarios
 from .templatize import templatize_scenario_name, templatize_steps
@@ -76,7 +76,9 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     template_steps = templatize_steps(baseline.steps, (), builder)
     grouped_narration = templatize_scenario_name(anchor.narration, builder)
 
-    table = builder.table(group.cases)
+    table = builder.table(
+        group.cases, narrated_column_order(grouped_narration, template_steps)
+    )
     # `replace` rather than a field-by-field rebuild: the two fields a group
     # does *not* inherit are then the only two spelled out, and a field added
     # to `Scenario` later cannot go missing here by omission. `error` is

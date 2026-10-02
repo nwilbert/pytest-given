@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from ..capture import try_term_ref
 from ..model import (
     Attachment,
+    AttachmentRef,
     CellValue,
     ColumnId,
     ColumnKind,
@@ -26,6 +27,8 @@ from ..model import (
     ParamValue,
     RawParamValue,
     Scenario,
+    Step,
+    iter_steps,
     param_id,
     render_interpolation,
 )
@@ -54,18 +57,30 @@ class ColumnBuilder:
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
-    def table(self, cases: list[Scenario]) -> ParameterTable:
+    def table(self, cases: list[Scenario], narrated: list[ColumnId]) -> ParameterTable:
         """The finished table: the columns, and one row per case.
+
+        Columns follow `narrated`, the order a reader meets them in, so a
+        `given`'s inputs precede a `then`'s outcomes. A column nothing narrates
+        (a parameter no step names, an attachment occurrence past the
+        baseline's) stays right behind the column emitted before it.
 
         The transposition from the cell store to positional rows belongs to
         whatever owns the store, so nothing outside has to know that a row's
         values are ordered by `columns`.
         """
+        rank = {column_id: index for index, column_id in enumerate(narrated)}
+        keys: dict[ColumnId, tuple[int, int]] = {}
+        behind = -1
+        for emitted, column in enumerate(self._columns):
+            behind = rank.get(column.id, behind)
+            keys[column.id] = (behind, emitted)
+        columns = sorted(self._columns, key=lambda column: keys[column.id])
         return ParameterTable(
-            columns=self._columns,
+            columns=columns,
             cases=[
                 ParameterCase(
-                    values=[self.cell(column.id, case.id) for column in self._columns],
+                    values=[self.cell(column.id, case.id) for column in columns],
                     status=case.status,
                     error=case.error,
                 )
@@ -164,6 +179,23 @@ class ColumnBuilder:
             candidate = f'{name} #{suffix}'
         self._taken_names.add(candidate)
         return candidate
+
+
+def narrated_column_order(narration: Narration, steps: list[Step]) -> list[ColumnId]:
+    """Column ids in the order a reader meets them: the scenario name, then
+    each step's narration and attachments, depth-first."""
+    order: dict[ColumnId, None] = {}
+    for step_narration, attachments in [
+        (narration, []),
+        *((step.narration, step.attachments) for step in iter_steps(steps)),
+    ]:
+        for part in step_narration.parts:
+            if isinstance(part, NarrationPlaceholder):
+                order.setdefault(part.column_id)
+        for attachment in attachments:
+            if isinstance(attachment, AttachmentRef):
+                order.setdefault(attachment.column_id)
+    return list(order)
 
 
 def param_cell_formats(

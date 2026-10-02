@@ -41,7 +41,7 @@ A parametrized scenario renders as one narrated tree over a parameter table, and
       assert ('minimum stay' in refusal) == (not accepted)
   ```
   Keep `when_then` for a scenario whose every row refuses.
-- **Outcomes are columns, asserted against.** An outcome that varies gets a column, named in a `then` that holds for every row (`assert (0 in result.clashes) == clashes` under "it clashes: {clashes}"), not an `if` on the column inside the step. The headline outcome gets its own column even when another column implies it (`settled_by=None` implies "no clash", but a reader looks for the clash). Put the input columns first, then the outcomes.
+- **Outcomes are columns, asserted against.** An outcome that varies gets a column, named in a `then` that holds for every row (`assert (0 in result.clashes) == clashes` under "it clashes: {clashes}"), not an `if` on the column inside the step. The headline outcome gets its own column even when another column implies it (`settled_by=None` implies "no clash", but a reader looks for the clash). Columns follow the order the narration first shows them, so an input narrated in a `given` precedes an outcome in a `then`.
 
 ## Arrangement
 

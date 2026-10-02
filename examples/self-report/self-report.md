@@ -223,11 +223,11 @@
 - **then** the decorator is {outcome}
 - **then** a refusal is a PytestGivenError that points at @given
 
-| decorator | outcome | suite |
+| decorator | suite | outcome |
 |---|---|---|
-| given | accepted | suite |
-| when | refused | suite |
-| then | refused | suite |
+| given | suite | accepted |
+| when | suite | refused |
+| then | suite | refused |
 
 - **given, accepted** — suite:
   ```
@@ -482,11 +482,11 @@
 - **when** the suite runs
 - **then** the scenario errors, saying {error}
 
-| placeholder | error | suite |
+| placeholder | suite | error |
 |---|---|---|
-| {x} | None | suite |
-| {room} | '{room}' in the Annotated label on parameter 'room' does not match | suite |
-| {room.number} | bare identifiers | suite |
+| {x} | suite | None |
+| {room} | suite | '{room}' in the Annotated label on parameter 'room' does not match |
+| {room.number} | suite | bare identifiers |
 
 - **{x}, None** — suite:
   ```
@@ -1049,11 +1049,11 @@
 - **when** a «file glossary» loads it
 - **then** a PytestGivenError names the file before the problem: {message}
 
-| problem | message | Glossary file |
+| problem | Glossary file | message |
 |---|---|---|
-| no table | bad.md: found no Markdown pipe table | Glossary file |
-| a short row | bad.md: data row at line 3 | Glossary file |
-| no Term column | bad.md: column 'Term' | Glossary file |
+| no table | Glossary file | bad.md: found no Markdown pipe table |
+| a short row | Glossary file | bad.md: data row at line 3 |
+| no Term column | Glossary file | bad.md: column 'Term' |
 
 - **no table, bad.md: found no Markdown pipe table** — Glossary file:
   ```
@@ -1083,10 +1083,10 @@
 - **then** the rows yield {outcome}
 - **then** a refusal points at the second row as the conflict
 
-| identical | outcome | Glossary file |
+| identical | Glossary file | outcome |
 |---|---|---|
-| True | one term | Glossary file |
-| False | refused | Glossary file |
+| True | Glossary file | one term |
+| False | Glossary file | refused |
 
 - **True, one term** — Glossary file:
   ```
@@ -1976,11 +1976,11 @@
 - **when** the AST «rules» parse that source
 - **then** a warn «finding» names the {phase} step holding the assert: {flagged}
 
-| phase | flagged | step body |
+| phase | step body | flagged |
 |---|---|---|
-| given | True | step body |
-| when | True | step body |
-| then | False | step body |
+| given | step body | True |
+| when | step body | True |
+| then | step body | False |
 
 - **given, True** — step body:
   ```
@@ -2788,8 +2788,16 @@
 - **then** the grouping is refused
 - **then** the error points at the per-case «scenario» opt-out
 
+## ✓ A «parameter table» orders its columns the way the «narration» first shows them
+`tests/unit/test_grouping.py:1808::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
+
+- **given** two «cases» whose given attaches a varying log and whose later step narrates the parameter
+- **when** «templatizing» walks the «cases»
+- **then** the given's «attachment» column comes first
+- **then** each «case» row follows the same order
+
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1808::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1840::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2797,7 +2805,7 @@
 - **then** the «step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1864::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1896::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «attachment» label only one «case» attaches
 - **when** the «cases» are «grouped»
@@ -2805,7 +2813,7 @@
 - **then** the error names the label, the case, and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2410::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2442::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2813,7 +2821,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2570::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2602::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2821,7 +2829,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2720::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2752::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»
