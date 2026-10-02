@@ -28,6 +28,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A `FileGlossary` error about the file's tables — no table, a short row, a column not found — names the file.
 - The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".
 - The error for a declared kind found in an actor slot says "an actor slot", not "a actor slot".
+- In the Markdown report, the note below a parameter table that holds a case's attachment or error names the row by its short parametrize values only, or by its row number, instead of repeating multiline values.
 - `pytest-given report --help` says it renders Markdown too, and where each format goes without `-o`.
 
 ## [0.3.0] - 2026-09-27

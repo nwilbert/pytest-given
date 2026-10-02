@@ -97,17 +97,18 @@ def _param_table_md(table: ParameterTable) -> str:
     separator = '|' + '---|' * (len(table.columns) + show_status)
     rows: list[str] = []
     blocks: list[str] = []
-    for case in table.cases:
+    for row, case in enumerate(table.cases, start=1):
         cells = [_case_cell(column, value) for column, value in table.cells(case)]
         if show_status:
             cells.append(STATUS_GLYPH[case.status])
         rows.append('| ' + ' | '.join(cells) + ' |')
-        blocks.extend(_case_error_block(table, case))
-        blocks.extend(_case_attachment_blocks(table, case))
+        key = _case_key(table, case, row)
+        blocks.extend(_case_error_block(key, case))
+        blocks.extend(_case_attachment_blocks(table, case, key))
     return '\n'.join([header, separator, *rows, *blocks])
 
 
-def _case_error_block(table: ParameterTable, case: ParameterCase) -> list[str]:
+def _case_error_block(key: str, case: ParameterCase) -> list[str]:
     """A failing case's error, keyed by its parametrize values.
 
     Below the table rather than in the row: Markdown cannot nest a block inside
@@ -118,7 +119,7 @@ def _case_error_block(table: ParameterTable, case: ParameterCase) -> list[str]:
         return []
     return [
         '',
-        f'- **{_case_key(table, case)}** — failed:',
+        f'- **{key}** — failed:',
         *_error_lines(case.error, '  '),
     ]
 
@@ -146,14 +147,15 @@ def _case_cell(column: ParameterColumn, value: CellValue) -> str:
     return _cell(column.name)
 
 
-def _case_attachment_blocks(table: ParameterTable, case: ParameterCase) -> list[str]:
+def _case_attachment_blocks(
+    table: ParameterTable, case: ParameterCase, key: str
+) -> list[str]:
     """Fenced blocks for this case's attachment cells that did not fit inline,
     keyed by the case's parametrize values and headed by the column name.
 
     The column name, not the attachment label: two columns can share a label,
     which would head both blocks identically.
     """
-    key = _case_key(table, case)
     lines: list[str] = []
     for column, value in table.cells(case):
         if not isinstance(value, Attachment) or _fits_inline(value.content):
@@ -164,12 +166,20 @@ def _case_attachment_blocks(table: ParameterTable, case: ParameterCase) -> list[
     return lines
 
 
-def _case_key(table: ParameterTable, case: ParameterCase) -> str:
+def _case_key(table: ParameterTable, case: ParameterCase, row: int) -> str:
     """A case's parametrize values, joined — how a note below the table names
-    the row it belongs to."""
-    return ', '.join(
-        _cell(value) for column, value in table.cells(case) if column.kind == 'param'
+    the row it belongs to.
+
+    A value too long to inline is left out: the key points into the table, and
+    a document in it would repeat the table instead. With none left, the row
+    number names the row.
+    """
+    key = ', '.join(
+        _cell(value)
+        for column, value in table.cells(case)
+        if column.kind == 'param' and _fits_inline(str(value))
     )
+    return key or f'row {row}'
 
 
 _MAX_INLINE = 72

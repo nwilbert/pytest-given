@@ -652,6 +652,40 @@ def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() ->
     assert '| 350 | machine state |\n\n- **350** — machine state:\n' in md
 
 
+def test_a_block_key_leaves_out_a_param_value_too_long_to_inline() -> None:
+    """The key names the row in a bullet; a multiline value there turns it into
+    a `<br>`-strung wall that repeats the table instead of pointing into it."""
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='problem', name='problem', kind='param'),
+            ParameterColumn(id='doc', name='doc', kind='param'),
+            ParameterColumn(id='attachment:0', name='file', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(
+                values=['no table', '# no table\n', Attachment('file', '# no\ntable')]
+            ),
+        ],
+    )
+    md = render_md(_report_with(table))
+    assert '- **no table** — file:' in md
+
+
+def test_a_block_key_falls_back_to_the_row_number() -> None:
+    table = ParameterTable(
+        columns=[
+            ParameterColumn(id='doc', name='doc', kind='param'),
+            ParameterColumn(id='attachment:0', name='file', kind='attachment'),
+        ],
+        cases=[
+            ParameterCase(values=['a\nb', Attachment('file', 'one\ntwo')]),
+            ParameterCase(values=['c\nd', Attachment('file', 'three\nfour')]),
+        ],
+    )
+    md = render_md(_report_with(table))
+    assert '- **row 2** — file:' in md
+
+
 def test_a_backtick_bearing_attachment_cell_also_fences_below_the_table() -> None:
     """`_fits_inline` rejects backticks as well as newlines, and the cell path
     is a new caller of it — the multiline test above pins only one of its two
