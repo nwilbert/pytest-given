@@ -1004,13 +1004,15 @@ span.param-highlight {
 #term-tip {
   position: fixed;
   z-index: 1000;
-  max-width: 280px;
+  max-width: 320px;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
   background: var(--text-primary);
   color: var(--bg-surface);
   box-shadow: var(--shadow-tip);
-  font-size: var(--font-size-sm);
+  /* A definition is prose to read, not a label: one step below the narration
+     it pops over, never down at the 12px chrome size. */
+  font-size: var(--font-size-base);
   line-height: 1.4;
   pointer-events: none;
 }
