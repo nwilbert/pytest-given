@@ -999,15 +999,19 @@
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The parameter table in the HTML and Markdown reports shows its status column only when the cases differ in status.</li>
-<li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets <code>.low</code> as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables and merging sibling scenarios into one.</li>
-<li>The bundled <code>pytest-given-reviewing</code> skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome.</li>
+<li>The parameter table orders its columns the way the narration first shows them, so an input attached in a <code>given</code> precedes an outcome narrated in a <code>then</code>.</li>
+<li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets <code>.low</code> as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables, with refused inputs as rows, and merging sibling scenarios into one.</li>
+<li>The bundled <code>pytest-given-reviewing</code> skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome or that hold a column no step narrates.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>An <code>Annotated[..., given(Template(...))]</code> label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.</li>
+<li>An <code>Annotated[..., given(Template(...))]</code> label whose placeholder is not a bare name now fails its scenario, instead of silently dropping the given step from the report.</li>
 <li>A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.</li>
 <li>A <code>FileGlossary</code> error about the file's tables — no table, a short row, a column not found — names the file.</li>
 <li>The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".</li>
+<li>The error for a declared kind found in an actor slot says "an actor slot", not "a actor slot".</li>
+<li>In the Markdown report, the note below a parameter table that holds a case's attachment or error names the row by its short parametrize values only, or by its row number, instead of repeating multiline values.</li>
 <li><code>pytest-given report --help</code> says it renders Markdown too, and where each format goes without <code>-o</code>.</li>
 </ul>
 <h2 id="030-2026-09-27"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0">0.3.0</a> - 2026-09-27<a class="headerlink" href="#030-2026-09-27" title="Permanent link">&para;</a></h2>
