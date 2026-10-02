@@ -1284,7 +1284,7 @@
 | object | noun | kept |
 
 ## ✓ A «term» named only in the second «clause» of a «sentence» gets its kind inferred
-`tests/unit/capture/test_kind_inference.py:132::test_infers_kinds_from_a_second_clause`
+`tests/unit/capture/test_kind_inference.py:134::test_infers_kinds_from_a_second_clause`
 
 - **given** a glossary of «kindless» «term» entries
 - **given** a «sentence» whose second «clause» starts at another «actor»
@@ -1292,7 +1292,7 @@
 - **then** the first «term» of the second clause is an «actor»
 
 ## ✓ A conflict error names only the offending «stories»
-`tests/unit/capture/test_kind_inference.py:170::test_conflict_where_names_only_offending_stories` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:172::test_conflict_where_names_only_offending_stories` · diagnostics, validation
 
 - **given** an «actor» «term» that also appears in a verb slot
 - **when** «kind inference» runs over both «stories»
@@ -1300,7 +1300,7 @@
 - **then** only the offending story is named in the message
 
 ## ✓ A conflict message excludes «stories» with an unrelated «slot»
-`tests/unit/capture/test_kind_inference.py:197::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:199::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
 
 - **given** a «kindless» «term» used in verb, actor and noun slots
 - **when** «kind inference» runs over all three «stories»
@@ -1308,7 +1308,7 @@
 - **then** only the verb and actor stories are named, not the noun one
 
 ## ✓ «Slot» positions alternate verb/noun after the «actor»
-`tests/unit/capture/test_kind_inference.py:227::test_slot_for_maps_odd_positions_to_verb`
+`tests/unit/capture/test_kind_inference.py:229::test_slot_for_maps_odd_positions_to_verb`
 
 - **given** the five positions of a short clause
 - **when** the «slot» rule is applied to each position

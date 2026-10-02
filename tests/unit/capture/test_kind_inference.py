@@ -124,8 +124,10 @@ def test_a_declared_kind_must_fit_its_slot(declared, slot, outcome):
     with then(t'the declared kind is {outcome}'):
         assert ('kept' if inferred_kind == declared else 'refused') == outcome
     with then('a refusal names the declared kind and the slot'):
+        article = 'an' if slot == 'actor' else 'a'
         assert (
-            f"declared kind '{declared}' but appears in a {slot} slot" in refusal
+            f"declared kind '{declared}' but appears in {article} {slot} slot"
+            in refusal
         ) == (outcome == 'refused')
 
 

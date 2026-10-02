@@ -26,6 +26,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.
 - A `FileGlossary` error about the file's tables — no table, a short row, a column not found — names the file.
 - The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".
+- The error for a declared kind found in an actor slot says "an actor slot", not "a actor slot".
 - `pytest-given report --help` says it renders Markdown too, and where each format goes without `-o`.
 
 ## [0.3.0] - 2026-09-27

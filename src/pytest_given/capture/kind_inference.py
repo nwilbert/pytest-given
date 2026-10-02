@@ -96,13 +96,14 @@ def _infer_one(
 def _verify_declared(term: GlossaryTerm, sightings: SlotSightings) -> None:
     for slot in _SLOT_ORDER:
         if slot in sightings and term.kind not in ROLE_ACCEPTS[slot]:
-            _raise_declared(term, f'{slot} slot', _where(sightings, slot))
+            _raise_declared(term, slot, _where(sightings, slot))
 
 
-def _raise_declared(term: GlossaryTerm, slot: str, where: str) -> NoReturn:
+def _raise_declared(term: GlossaryTerm, slot: Slot, where: str) -> NoReturn:
+    article = 'an' if slot == 'actor' else 'a'
     raise PytestGivenError(
         f'term {term.canonical!r} is declared kind {term.kind!r} but appears in '
-        f'a {slot}{where}, which is incompatible.'
+        f'{article} {slot} slot{where}, which is incompatible.'
     )
 
 
