@@ -482,6 +482,15 @@ def test_extract_rejects_multiple_descriptors_on_one_param() -> None:
         annotated_given_descriptors(f)
 
 
+def test_extract_reraises_a_refusal_raised_inside_an_annotation() -> None:
+    # Annotations evaluate lazily, so the Template refuses its placeholder only
+    # when the descriptors are read, not when the test is defined.
+    def f(x: Annotated[int, given(Template('a {x.y} label'))]) -> None: ...
+
+    with pytest.raises(PytestGivenError, match='bare identifiers'):
+        annotated_given_descriptors(f)
+
+
 def test_extract_returns_empty_on_unresolvable_annotations() -> None:
     def f(
         x: 'DefinitelyNotAType',  # noqa: UP037, F821

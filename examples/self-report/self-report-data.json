@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-02T06:38:13.160800+00:00",
+    "timestamp": "2026-10-02T06:42:44.356687+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.3.0",
-    "commit_sha": "5254707c73f1ca04751c83a036f979b4aadee368",
+    "commit_sha": "c794d22b0ad25e8945850a79d6adac3ec13935be",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -110,7 +110,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -218,7 +218,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -361,7 +361,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -879,7 +879,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -1132,7 +1132,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -1255,7 +1255,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 73,
+      "duration_ms": 77,
       "steps": [
         {
           "phase": "given",
@@ -1423,7 +1423,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -1594,7 +1594,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -1732,7 +1732,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -2283,7 +2283,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 133,
+      "duration_ms": 130,
       "steps": [
         {
           "phase": "given",
@@ -2466,7 +2466,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 81,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -2551,29 +2551,34 @@
       "pins": null
     },
     {
-      "id": "tests/integration/test_plugin.py::test_annotated_template_label_naming_no_column_fails_scenario",
+      "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[column]",
       "narration": {
-        "text": "An Annotated Template label whose placeholder names no parametrize column fails its scenario",
+        "text": "An Annotated Template label fails its scenario unless its placeholder is a bare parametrize column",
         "parts": [
           {
-            "value": "An Annotated Template label whose placeholder names no parametrize column fails its "
+            "value": "An Annotated Template label fails its "
           },
           {
             "term_id": "scenario",
             "display": "scenario",
             "expression": "pg[\"Scenario\"].low"
+          },
+          {
+            "value": " unless its placeholder is a bare parametrize column"
           }
         ]
       },
       "module": "tests.integration.test_plugin",
-      "tags": [],
+      "tags": [
+        "validation"
+      ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 116,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a parametrized scenario whose Template label names a plain fixture, not a column",
+            "text": "a parametrized scenario whose Template label on a plain fixture holds {placeholder}",
             "parts": [
               {
                 "value": "a "
@@ -2584,7 +2589,13 @@
                 "expression": "pg[\"Parametrized scenario\"].low"
               },
               {
-                "value": " whose Template label names a plain fixture, not a column"
+                "value": " whose Template label on a plain fixture holds "
+              },
+              {
+                "name": "placeholder",
+                "column_id": "placeholder",
+                "format_spec": "",
+                "conversion": null
               }
             ]
           },
@@ -2592,8 +2603,8 @@
           "attachments": [
             {
               "label": "suite",
-              "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {room}'))]):\n    with when('it is booked'):\n        pass",
-              "content_type": "text"
+              "content_type": "text",
+              "column_id": "attachment:0"
             }
           ],
           "pins": null,
@@ -2613,8 +2624,18 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the scenario errors, naming the placeholder and its parameter",
-            "parts": []
+            "text": "the scenario errors, saying {error}",
+            "parts": [
+              {
+                "value": "the scenario errors, saying "
+              },
+              {
+                "name": "error",
+                "column_id": "error",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
           },
           "children": [],
           "attachments": [],
@@ -2622,7 +2643,66 @@
           "fixture_name": null
         }
       ],
-      "parameters": null,
+      "parameters": {
+        "columns": [
+          {
+            "id": "placeholder",
+            "name": "placeholder",
+            "kind": "param"
+          },
+          {
+            "id": "error",
+            "name": "error",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "suite",
+            "kind": "attachment"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "{x}",
+              null,
+              {
+                "label": "suite",
+                "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {x}'))]):\n    with when('it is booked'):\n        pass",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "{room}",
+              "'{room}' in the Annotated label on parameter 'room' does not match",
+              {
+                "label": "suite",
+                "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {room}'))]):\n    with when('it is booked'):\n        pass",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "{room.number}",
+              "bare identifiers",
+              {
+                "label": "suite",
+                "content": "from typing import Annotated\nimport pytest\nfrom pytest_given import scenario, given, when, Template\n\n@pytest.fixture\ndef room():\n    return 101\n\n@scenario('bad')\n@pytest.mark.parametrize('x', [1])\ndef test_it(x, room: Annotated[int, given(Template('room {room.number}'))]):\n    with when('it is booked'):\n        pass",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
       "error": null,
       "skip_reason": null,
       "source": {
@@ -2720,7 +2800,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2790
+        "line": 2805
       },
       "story_ids": [],
       "pins": null
@@ -2796,7 +2876,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2803
+        "line": 2818
       },
       "story_ids": [],
       "pins": null
@@ -2880,7 +2960,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2824
+        "line": 2839
       },
       "story_ids": [],
       "pins": null
@@ -2965,7 +3045,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2844
+        "line": 2859
       },
       "story_ids": [],
       "pins": null
@@ -2990,7 +3070,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -3048,7 +3128,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2877
+        "line": 2892
       },
       "story_ids": [],
       "pins": null
@@ -3074,7 +3154,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 63,
       "steps": [
         {
           "phase": "given",
@@ -3146,7 +3226,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2909
+        "line": 2924
       },
       "story_ids": [],
       "pins": null
@@ -3180,7 +3260,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 146,
+      "duration_ms": 145,
       "steps": [
         {
           "phase": "given",
@@ -3250,7 +3330,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3012
+        "line": 3027
       },
       "story_ids": [],
       "pins": null
@@ -3278,7 +3358,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -3342,7 +3422,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3060
+        "line": 3075
       },
       "story_ids": [],
       "pins": null
@@ -3370,7 +3450,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -3417,7 +3497,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3177
+        "line": 3192
       },
       "story_ids": [],
       "pins": null
@@ -3440,7 +3520,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -3541,7 +3621,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -3772,7 +3852,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -3883,7 +3963,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -3958,7 +4038,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 72,
+      "duration_ms": 73,
       "steps": [
         {
           "phase": "given",
@@ -5495,7 +5575,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -5580,7 +5660,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -5682,7 +5762,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -5786,7 +5866,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -5971,7 +6051,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -19935,7 +20015,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 132,
+      "duration_ms": 134,
       "steps": [
         {
           "phase": "given",

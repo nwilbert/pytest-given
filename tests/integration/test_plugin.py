@@ -2678,7 +2678,7 @@ def test_annotated_template_label_without_parametrize_fails_scenario(
         assert (pytester.path / 'report.html').is_file()
 
 
-_TEMPLATE_LABEL_NAMING_NO_COLUMN = """
+_ANNOTATED_TEMPLATE_SUITE = """
     from typing import Annotated
     import pytest
     from pytest_given import scenario, given, when, Template
@@ -2689,30 +2689,45 @@ _TEMPLATE_LABEL_NAMING_NO_COLUMN = """
 
     @scenario('bad')
     @pytest.mark.parametrize('x', [1])
-    def test_it(x, room: Annotated[int, given(Template('room {room}'))]):
+    def test_it(x, room: Annotated[int, given(Template('room PLACEHOLDER'))]):
         with when('it is booked'):
             pass
 """
 
 
 @scenario(
-    t'An Annotated Template label whose placeholder names no parametrize column '
-    t'fails its {pg["Scenario"].low}'
+    t'An Annotated Template label fails its {pg["Scenario"].low} unless its '
+    t'placeholder is a bare parametrize column',
+    tags=['validation'],
 )
-def test_annotated_template_label_naming_no_column_fails_scenario(pytester):
+@pytest.mark.parametrize(
+    ('placeholder', 'error'),
+    [
+        ('{x}', None),
+        (
+            '{room}',
+            "'{room}' in the Annotated label on parameter 'room' does not match",
+        ),
+        ('{room.number}', 'bare identifiers'),
+    ],
+    ids=['column', 'plain-fixture', 'attribute'],
+)
+def test_an_annotated_template_label_needs_a_bare_parametrize_column(
+    pytester, placeholder, error
+):
     with given(
-        t'a {pg["Parametrized scenario"].low} whose Template label names a plain '
-        t'fixture, not a column'
+        t'a {pg["Parametrized scenario"].low} whose Template label on a plain '
+        t'fixture holds {placeholder}'
     ):
-        pytester.makepyfile(_TEMPLATE_LABEL_NAMING_NO_COLUMN)
-        attach('suite', textwrap.dedent(_TEMPLATE_LABEL_NAMING_NO_COLUMN).strip())
+        suite = _ANNOTATED_TEMPLATE_SUITE.replace('PLACEHOLDER', placeholder)
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
-    with then('the scenario errors, naming the placeholder and its parameter'):
-        result.assert_outcomes(errors=1)
-        result.stdout.fnmatch_lines(
-            ["*'{room}' in the Annotated label on parameter 'room' does not match*"]
-        )
+    with then(t'the scenario errors, saying {error}'):
+        outcomes = result.parseoutcomes()
+        assert (outcomes.get('errors', 0) == 1) == (error is not None)
+        assert error is None or error in result.stdout.str()
 
 
 def test_param_without_annotated_stays_table_only(pytester, tmp_path):

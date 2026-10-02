@@ -114,13 +114,17 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
     descriptor.
 
     Best-effort: if the annotations cannot be resolved, returns an empty
-    mapping rather than failing the test. Rejects the forbidden forms —
+    mapping rather than failing the test — unless what failed is a refusal of
+    pytest-given's own, such as a `Template` rejecting its placeholder (lazy
+    annotations only evaluate here). Rejects the forbidden forms —
     ``when(...)`` / ``then(...)``, a t-string label, or more than one
     descriptor on a single parameter.
     """
     target = inspect.unwrap(cast('Callable[..., object]', func))
     try:
         hints = get_type_hints(target, include_extras=True)
+    except PytestGivenError:
+        raise
     except Exception:  # noqa: BLE001 — annotations are arbitrary user code; see the docstring
         return {}
     out: dict[str, StepDescriptor] = {}

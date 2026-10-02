@@ -22,6 +22,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - An `Annotated[..., given(Template(...))]` label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.
+- An `Annotated[..., given(Template(...))]` label whose placeholder is not a bare name now fails its scenario, instead of silently dropping the given step from the report.
 - A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.
 - A `FileGlossary` error about the file's tables — no table, a short row, a column not found — names the file.
 - The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".
