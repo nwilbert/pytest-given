@@ -124,21 +124,29 @@ def test_template_unclosed_brace_raises_value_error() -> None:
     tags=['validation'],
 )
 @pytest.mark.parametrize(
-    'text',
-    ['count={obj.attr}', '{d[key]}', '{x + 1}'],
-    ids=['attribute', 'indexing', 'expression'],
+    ('text', 'outcome'),
+    [
+        ('count={count}', 'accepted'),
+        ('count={obj.attr}', 'refused'),
+        ('{d[key]}', 'refused'),
+        ('{x + 1}', 'refused'),
+    ],
+    ids=['bare-identifier', 'attribute', 'indexing', 'expression'],
 )
-def test_template_non_identifier_raises_pytest_given_error(
+def test_a_template_accepts_bare_identifiers_only(
     text: Annotated[str, given(Template('the placeholder {text}'))],
+    outcome: str,
 ) -> None:
-    with (
-        when_then(
-            'a `Template` is built from it',
-            'a PytestGivenError says bare identifiers only',
-        ),
-        pytest.raises(PytestGivenError, match='bare identifiers'),
-    ):
-        Template(text)
+    with when('a `Template` is built from it'):
+        try:
+            Template(text)
+            refusal = ''
+        except PytestGivenError as error:
+            refusal = str(error)
+    with then(t'the placeholder is {outcome}'):
+        assert ('refused' if refusal else 'accepted') == outcome
+    with then('a refusal says bare identifiers only'):
+        assert ('bare identifiers' in refusal) == (outcome == 'refused')
 
 
 def test_parse_tstring_literal_only() -> None:
@@ -257,89 +265,37 @@ def glossary() -> Glossary:
 
 
 @scenario(
-    t'A {pg["Glossary"].low} handle in a t-string emits a {pg["Term ref"].low}',
+    t'A {pg["Glossary"].low} handle in a t-string emits a {pg["Term ref"].low} '
+    t'showing what the handle was called with, else the canonical name',
 )
-def test_tstring_with_actor_emits_term_ref(glossary: Glossary) -> None:
-    with given(t'an {pg["Actor"].low} handle from the glossary'):
-        guest = glossary.actor('Guest')  # idempotent re-fetch
+@pytest.mark.parametrize(
+    ('name', 'called_with', 'term_id', 'display'),
+    [
+        ('Guest', None, 'guest', 'Guest'),
+        ('Guest', 'Alice', 'guest', 'Alice'),
+        ('Room', None, 'room', 'Room'),
+        ('Room', 'Deluxe Suite', 'room', 'Deluxe Suite'),
+        ('search', None, 'search', 'search'),
+        ('search', 'searches for', 'search', 'searches for'),
+    ],
+)
+def test_a_tstring_term_ref_shows_what_its_handle_was_called_with(
+    glossary: Glossary,
+    name: str,
+    called_with: str | None,
+    term_id: str,
+    display: str,
+) -> None:
+    with given(t'the {name} handle from the glossary, called with {called_with}'):
+        term = glossary[name]
+        handle = term(called_with) if called_with else term
     with when('the handle is interpolated into a t-string step'):
-        parts = parse_tstring(t'a {guest} arrives')
-    with then(t'the step carries a {pg["Term ref"].low} for that {pg["Actor"].low}'):
-        assert any(
-            isinstance(p, NarrationTermRef)
-            and p.term_id == 'guest'
-            and p.display == 'Guest'
-            for p in parts
-        )
-
-
-def test_tstring_with_actor_instance_emits_term_ref_with_instance_display(
-    glossary: Glossary,
-) -> None:
-    guest = glossary.actor('Guest')
-    parts = parse_tstring(t'{guest("Alice")} arrives')
-    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-    assert len(term_refs) == 1
-    assert term_refs[0].term_id == 'guest'
-    assert term_refs[0].display == 'Alice'
-
-
-@scenario(
-    t'A {pg["Work Object"].low} handle in a t-string emits a {pg["Term ref"].low}',
-)
-def test_tstring_with_work_object_emits_term_ref(glossary: Glossary) -> None:
-    with given(t'a {pg["Work Object"].low} handle from the glossary'):
-        room = glossary.work_object('Room')
-    with when('it is interpolated into a t-string step'):
-        parts = parse_tstring(t'the {room} is clean')
-    with then(
-        t'the step carries a {pg["Term ref"].low} for that {pg["Work Object"].low}'
-    ):
-        term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-        assert term_refs[0].term_id == 'room'
-        assert term_refs[0].display == 'Room'
-
-
-def test_tstring_with_work_object_instance_emits_term_ref(glossary: Glossary) -> None:
-    room = glossary.work_object('Room')
-    parts = parse_tstring(t'the {room("Deluxe Suite")} is clean')
-    term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-    assert term_refs[0].display == 'Deluxe Suite'
-
-
-@scenario(
-    t'A bare {pg["Activity"].low} handle keeps its canonical display',
-)
-def test_tstring_with_activity_emits_term_ref_with_canonical_display(
-    glossary: Glossary,
-) -> None:
-    with given(
-        t'an {pg["Activity"].low} handle used without an {pg["Inflection"].low}'
-    ):
-        search = glossary.activity('search')
-    with when('it is interpolated into a t-string step'):
-        parts = parse_tstring(t'they {search}')
-    with then(t'the {pg["Term ref"].low} shows the canonical activity'):
-        term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-        assert term_refs[0].display == 'search'
-
-
-@scenario(
-    t'An inflected {pg["Activity"].low} in a t-string shows the {pg["Inflection"].low}',
-)
-def test_tstring_with_inflected_activity_emits_term_ref_with_inflected_display(
-    glossary: Glossary,
-) -> None:
-    with given(t'an {pg["Activity"].low} handle called with an {pg["Inflection"].low}'):
-        search = glossary.activity('search')
-    with when('it is interpolated into a t-string step'):
-        parts = parse_tstring(t'they {search("searches for")} a room')
-    with then(
-        t'the {pg["Term ref"].low} shows the inflection but keeps the activity id'
-    ):
-        term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
-        assert term_refs[0].display == 'searches for'
-        assert term_refs[0].term_id == 'search'
+        parts = parse_tstring(t'they meet {handle}')
+    with then(t'the step carries one {pg["Term ref"].low}, to {term_id}'):
+        [term_ref] = [part for part in parts if isinstance(part, NarrationTermRef)]
+        assert term_ref.term_id == term_id
+    with then(t'it shows {display}'):
+        assert term_ref.display == display
 
 
 def test_tstring_with_plain_value_still_emits_narration_value(

@@ -1,10 +1,9 @@
 import subprocess
 from pathlib import Path
-from typing import Annotated
 
 import pytest
 
-from pytest_given import Template, given, scenario, then, when, when_then
+from pytest_given import given, scenario, then, when, when_then
 from pytest_given.model import PytestGivenError, SourceLocation
 from pytest_given.report.source_link import (
     compile_source_link,
@@ -26,51 +25,39 @@ def test_compile_source_link_rejects_empty_positional_field() -> None:
         compile_source_link('file://{}', project='p', commit_sha=None)
 
 
-@scenario(t'The literal `none` disables the {pg["Source link"].low}')
-def test_resolve_template_none_returns_none() -> None:
-    with given(t'the {pg["Source link"].low} config set to `none`'):
-        value = 'none'
-    with when('the config value is resolved'):
-        template = resolve_source_link_template(value)
-    with then('no template comes back, so no link is rendered'):
-        assert template is None
-
-
-def test_resolve_template_empty_returns_none() -> None:
-    assert resolve_source_link_template('') is None
-    assert resolve_source_link_template(None) is None
+_RAW_TEMPLATE = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
 
 
 @scenario(
-    t"A named editor preset becomes that editor's {pg['Source link'].low} template"
+    t'A {pg["Source link"].low} config value resolves to its template: a preset '
+    t'name, a raw template, or `none`'
 )
 @pytest.mark.parametrize(
-    ('preset', 'url_scheme'),
+    ('value', 'template'),
     [
         ('vscode', 'vscode://file/{path}:{line}'),
         ('cursor', 'cursor://file/{path}:{line}'),
         ('zed', 'zed://file/{path}:{line}'),
         ('pycharm', 'pycharm://open?file={path}&line={line}'),
+        (_RAW_TEMPLATE, _RAW_TEMPLATE),
+        ('none', None),
     ],
 )
-def test_resolve_template_editor_preset(
-    preset: Annotated[str, given(Template('the config set to the {preset} preset'))],
-    url_scheme: str,
+def test_a_source_link_config_value_resolves_to_its_template(
+    value: str, template: str | None
 ) -> None:
+    """A `None` template renders no source link at all."""
+    with given(t'the {pg["Source link"].low} config set to {value}'):
+        config = value
     with when('the config value is resolved'):
-        template = resolve_source_link_template(preset)
-    with then("the template is that editor's URL scheme"):
-        assert template == url_scheme
+        resolved = resolve_source_link_template(config)
+    with then(t'the template is {template}'):
+        assert resolved == template
 
 
-@scenario(t'A raw URL template is used as the {pg["Source link"].low} verbatim')
-def test_resolve_template_raw_template_passes_through() -> None:
-    with given('a raw blob-URL template rather than a preset name'):
-        raw = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
-    with when('the config value is resolved'):
-        template = resolve_source_link_template(raw)
-    with then('it comes back unchanged'):
-        assert template == raw
+def test_resolve_template_empty_returns_none() -> None:
+    assert resolve_source_link_template('') is None
+    assert resolve_source_link_template(None) is None
 
 
 @scenario(

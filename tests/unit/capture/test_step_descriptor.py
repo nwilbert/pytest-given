@@ -382,66 +382,48 @@ def test_when_then_accepts_tstrings_for_glossary_refs() -> None:
 
 
 @scenario(
-    t'A cross-phase {pg["Step"].low} cannot open inside a {pg["when_then"]} body',
+    t'Inside a {pg["when_then"]} body only a when may open, as a child of the action',
+    stories=adopt_pytest_given,
     tags=['validation'],
 )
-@pytest.mark.parametrize('phase_name', ['given', 'then'])
-def test_when_then_rejects_cross_phase_nested_step(phase_name: str) -> None:
-    phase_factory = {'given': given, 'then': then}[phase_name]
-    session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
-        collector = Collector()
-        collector.start_scenario('id', 'name', 'mod', [])
-
-    def open_cross_phase_step() -> None:
-        set_active_collector(collector)
-        try:
-            with when_then('act', 'result'), phase_factory('sneaky'):
-                pass
-        finally:
-            set_active_collector(session_collector)
-
-    with (
-        when_then(
-            t'a given or then opens inside the {pg["when_then"]} body',
-            'a PytestGivenError reports the cross-phase nesting',
-        ),
-        pytest.raises(PytestGivenError, match=r"Cannot nest .* inside 'when'"),
-    ):
-        open_cross_phase_step()
-    with then(t'the {pg["Step stack"].low} is left balanced'):
-        assert collector._step_stack == []
-
-
-@scenario(
-    t'A nested when becomes a child of the {pg["when_then"]} action',
-    stories=adopt_pytest_given,
+@pytest.mark.parametrize(
+    ('phase_name', 'outcome'),
+    [('when', 'nested'), ('given', 'refused'), ('then', 'refused')],
 )
-def test_when_then_allows_nested_when_as_child_sub_step() -> None:
+def test_only_a_when_may_open_inside_a_when_then_body(
+    phase_name: str, outcome: str
+) -> None:
     session_collector = get_active_collector()
     with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
-        t'a when opens inside the {pg["when_then"]} body',
+        t'a {phase_name} {pg["Step"].low} opens inside the {pg["when_then"]} body',
         pins=adopt_pytest_given['narrate'],
     ):
+        phase_factory = {'given': given, 'when': when, 'then': then}[phase_name]
         set_active_collector(collector)
         try:
             with when_then('the action runs', 'the outcome holds'):
-                with when('a sub-action runs'):
+                with phase_factory('a sub-step runs'):
                     pass
-            recorded = collector.finish_scenario(status='passed')
+            refusal = ''
+        except PytestGivenError as error:
+            refusal = str(error)
         finally:
             set_active_collector(session_collector)
-    with then('the sub-action is a child of the action and the then still follows'):
-        assert [(s.phase, s.narration.text) for s in recorded.steps] == [
-            ('when', 'the action runs'),
-            ('then', 'the outcome holds'),
-        ]
-        assert [(c.phase, c.narration.text) for c in recorded.steps[0].children] == [
-            ('when', 'a sub-action runs'),
-        ]
+    with then(t'the inner {pg["Step"].low} is {outcome}'):
+        action = collector.finish_scenario(status='passed').steps[0]
+        nested = [(child.phase, child.narration.text) for child in action.children]
+        assert (
+            'nested' if nested == [(phase_name, 'a sub-step runs')] else 'refused'
+        ) == outcome
+    with then('a refusal reports the cross-phase nesting'):
+        assert bool(re.search(r"Cannot nest .* inside 'when'", refusal)) == (
+            outcome == 'refused'
+        )
+    with then(t'the {pg["Step stack"].low} is left balanced'):
+        assert collector._step_stack == []
 
 
 def test_when_then_exported_from_package() -> None:
@@ -964,22 +946,43 @@ def test_step_descriptor_records_the_pins_of_its_handles():
     assert then('an opt-out', pins=[]).pins == ()
 
 
+def _looked_up(the_story, written):
+    if isinstance(written, list):
+        return [the_story[item] for item in written]
+    return the_story[written]
+
+
 @scenario(
-    t'A bare number or name is refused where a {pg["Pin"].low} goes',
+    t'A sentence number or name pins only once looked up on its {pg["Story"].low}',
     tags=['validation'],
 )
-@pytest.mark.parametrize('bare', [3, 'cancel', [1, 2]])
-def test_pins_refuse_a_bare_number_or_name(bare):
-    with given(t'a sentence number or name written without its {pg["Story"].low}'):
-        pins = bare
-    with (
-        when_then(
-            t'a {pg["Step"].low} is declared with it',
-            'a PytestGivenError shows the handle form',
-        ),
-        pytest.raises(PytestGivenError, match=r"the_story\['name'\]"),
+@pytest.mark.parametrize(
+    ('written', 'looked_up', 'outcome'),
+    [
+        (2, True, 'accepted'),
+        (2, False, 'refused'),
+        ('cancel', True, 'accepted'),
+        ('cancel', False, 'refused'),
+        ([1, 2], True, 'accepted'),
+        ([1, 2], False, 'refused'),
+    ],
+)
+def test_a_sentence_pins_only_once_looked_up_on_its_story(written, looked_up, outcome):
+    with given(
+        t'the sentence {written}, looked up on its {pg["Story"].low}: {looked_up}'
     ):
-        given('x', pins=pins)  # type: ignore[arg-type]
+        the_story = _two_sentence_story('Bare Pins')
+        pins = _looked_up(the_story, written) if looked_up else written
+    with when(t'a {pg["Step"].low} is declared with it as its {pg["Pin"].low}'):
+        try:
+            given('x', pins=pins)
+            refusal = ''
+        except PytestGivenError as error:
+            refusal = str(error)
+    with then(t'the {pg["Pin"].low} is {outcome}'):
+        assert ('refused' if refusal else 'accepted') == outcome
+    with then('a refusal shows the handle form'):
+        assert ("the_story['name']" in refusal) == (outcome == 'refused')
 
 
 def test_scenario_refuses_a_bare_pin_too():

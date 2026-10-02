@@ -186,52 +186,29 @@ def test_data_row_with_fewer_columns_raises():
 
 
 @scenario(
-    t'Bold {pg["Term"].low} cells render as clean {pg["Term"]("terms")}',
+    t'A {pg["Term"].low} cell is read as its plain text, with emphasis unwrapped',
 )
-def test_strips_bold_from_term_cell():
-    with given(t'a {pg["Term"].low} cell written with **bold** emphasis'):
-        text = '| Term | Meaning |\n|---|---|\n| **Scenario** | A decorated test. |\n'
-        attach('Markdown document', text)
+@pytest.mark.parametrize(
+    ('cell', 'term'),
+    [
+        ('**Scenario**', 'Scenario'),
+        ('*Step*', 'Step'),
+        ('`given`', 'given'),
+        ('work_object', 'work_object'),
+        ('`a*b*c`', 'a*b*c'),
+    ],
+)
+def test_a_term_cell_is_read_as_its_plain_text(cell, term):
+    # Inside a code span `*` is text, which is how the same markup renders in a
+    # definition cell — the canonical name has to agree with the pill.
+    with given(t'a {pg["Term"].low} cell written as {cell}'):
+        text = f'| Term | Meaning |\n|---|---|\n| {cell} | A thing. |\n'
     with when('the parser reads the term cell'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
         )
-    with then('the emphasis is unwrapped to the plain canonical'):
-        assert rows == [
-            GlossaryRow(
-                term='Scenario', definition='A decorated test.', kind=None, line=3
-            )
-        ]
-
-
-@scenario(
-    t'Italic and inline-code {pg["Term"].low} cells are unwrapped',
-)
-def test_strips_italic_and_inline_code_from_term_cell():
-    with given(t'{pg["Term"].low} cells using *italic* and `code` emphasis'):
-        text = '| Term | Meaning |\n|---|---|\n| *Step* | one. |\n| `given` | two. |\n'
-        attach('Markdown document', text)
-    with when('the parser reads the term cells'):
-        rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
-        )
-    with then('each unwraps to its plain text'):
-        assert [row.term for row in rows] == ['Step', 'given']
-
-
-@scenario(
-    'Underscores inside an identifier survive',
-)
-def test_preserves_underscores_inside_term_identifier():
-    with given(t'a {pg["Term"].low} literally named work_object'):
-        text = '| Term | Meaning |\n|---|---|\n| work_object | a thing. |\n'
-        attach('Markdown document', text)
-    with when('the parser reads the term cell'):
-        rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
-        )
-    with then('the single underscores are not treated as emphasis'):
-        assert rows[0].term == 'work_object'
+    with then(t'the {pg["Term"].low} is {term}'):
+        assert [row.term for row in rows] == [term]
 
 
 @scenario(
@@ -287,25 +264,6 @@ def test_pipe_line_without_separator_is_skipped():
         )
     with then('only the real pipe table produces rows'):
         assert [row.term for row in rows] == ['Real']
-
-
-@scenario(
-    t'A code-span {pg["Term"].low} cell keeps the markup inside it',
-)
-def test_code_span_term_cell_keeps_inner_markup():
-    with given(
-        t'a {pg["Term"].low} cell written as a code span around an asterisk pair'
-    ):
-        text = '| Term | Meaning |\n|---|---|\n| `a*b*c` | a literal. |\n'
-        attach('Markdown document', text)
-    with when('the parser reads the term cell'):
-        rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
-        )
-    with then('the span unwraps once and its contents stay literal'):
-        # Inside a code span `*` is text, which is how the same markup renders
-        # in a definition cell — the canonical name has to agree with the pill.
-        assert rows[0].term == 'a*b*c'
 
 
 def test_nested_emphasis_unwraps_all_the_way():

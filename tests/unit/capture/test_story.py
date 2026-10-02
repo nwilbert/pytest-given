@@ -26,9 +26,11 @@ from pytest_given.model import (
     Clause,
     ClauseTermRef,
     ClauseWord,
+    GlossaryTerm,
     Pin,
     SentenceId,
     StoryId,
+    TermId,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -159,107 +161,65 @@ def test_clause_rejects_fewer_than_three_parts(guest, search):
 
 
 @scenario(
-    t'Position 0 of a {pg["Clause"].low} must be an {pg["Actor"].low}',
+    t'A {pg["Clause"].low} position takes only the kinds its {pg["Slot"].low} accepts',
     tags=['validation'],
 )
-def test_clause_rejects_work_object_in_position_0(search, room):
-    with (
-        when_then(
-            t'a {pg["Clause"].low} is built with a {pg["Work Object"].low} in position '
-            t'0',
-            t'a PytestGivenError says position 0 is the {pg["Actor"].low} slot',
-        ),
-        pytest.raises(PytestGivenError, match=r'position 0.*actor'),
-    ):
-        clause(room, search, room)
+@pytest.mark.parametrize(
+    ('kind', 'position', 'outcome'),
+    [
+        ('actor', 0, 'accepted'),
+        ('actor', 1, 'refused'),
+        ('actor', 2, 'accepted'),
+        ('object', 0, 'refused'),
+        ('object', 1, 'refused'),
+        ('object', 2, 'accepted'),
+        ('activity', 0, 'refused'),
+        ('activity', 1, 'accepted'),
+        ('activity', 2, 'refused'),
+        (None, 0, 'accepted'),
+        (None, 1, 'accepted'),
+        (None, 2, 'accepted'),
+    ],
+)
+def test_a_clause_position_takes_only_the_kinds_its_slot_accepts(
+    g, guest, search, room, kind, position, outcome
+):
+    with given(t'a {pg["Term"].low} declared as {kind}'):
+        g.register(GlossaryTerm(id=TermId('thing'), kind=kind, canonical='Thing'))
+        part = g['Thing']
+    with when(t'a {pg["Clause"].low} is built with it at position {position}'):
+        parts = [guest, search, room]
+        parts[position] = part
+        try:
+            clause(*parts)
+            refusal = ''
+        except PytestGivenError as error:
+            refusal = str(error)
+    with then(t'the {pg["Term"].low} is {outcome}'):
+        assert ('refused' if refusal else 'accepted') == outcome
+    with then('a refusal names the position and the declared kind'):
+        assert (
+            f'clause position {position} must be' in refusal
+            and "'Thing' is declared" in refusal
+        ) == (outcome == 'refused')
 
 
 @scenario(
-    t'An {pg["Activity"].low} cannot open a {pg["Clause"].low}',
-    tags=['validation'],
+    t'A bare string may fill any {pg["Slot"].low} of a {pg["Clause"].low}, as a word',
 )
-def test_clause_rejects_activity_in_position_0(guest, search, room):
-    with (
-        when_then(
-            t'an {pg["Activity"].low} is placed in position 0 of a {pg["Clause"].low}',
-            t'a PytestGivenError says position 0 is the {pg["Actor"].low} slot',
-        ),
-        pytest.raises(PytestGivenError, match=r'position 0.*actor'),
-    ):
-        clause(search, guest, room)
-
-
-@scenario(
-    t'A bare string may stand in for the {pg["Actor"].low} {pg["Slot"].low}',
-)
-def test_clause_allows_bare_string_in_position_0(search, room):
-    with when(t'a bare string takes position 0 of a {pg["Clause"].low}'):
-        built = clause('Guest', search, room)
-    with then(t'it is accepted as a {pg["Clause part"].low} word'):
-        assert built.parts[0] == ClauseWord(text='Guest')
-
-
-@scenario(
-    t'Position 1 of a {pg["Clause"].low} must be an {pg["Activity"].low}',
-    tags=['validation'],
-)
-def test_clause_rejects_actor_in_position_1(guest, room):
-    with (
-        when_then(
-            t'an {pg["Actor"].low} is placed in position 1 of a {pg["Clause"].low}',
-            t'a PytestGivenError says position 1 is the verb {pg["Slot"].low}',
-        ),
-        pytest.raises(PytestGivenError, match=r'position 1.*verb'),
-    ):
-        clause(guest, guest, room)
-
-
-@scenario(
-    t'A {pg["Work Object"].low} cannot fill the verb {pg["Slot"].low}',
-    tags=['validation'],
-)
-def test_clause_rejects_work_object_in_position_1(guest, room):
-    with (
-        when_then(
-            t'a {pg["Work Object"].low} is placed in position 1 of a '
-            t'{pg["Clause"].low}',
-            t'a PytestGivenError says position 1 is the verb {pg["Slot"].low}',
-        ),
-        pytest.raises(PytestGivenError, match=r'position 1.*verb'),
-    ):
-        clause(guest, room, room)
-
-
-@scenario(
-    t'Position 2 of a {pg["Clause"].low} must be a noun',
-    tags=['validation'],
-)
-def test_clause_rejects_activity_in_position_2(guest, search):
-    with (
-        when_then(
-            t'an {pg["Activity"].low} is placed in position 2 of a {pg["Clause"].low}',
-            'a PytestGivenError says position 2 is the noun slot',
-        ),
-        pytest.raises(PytestGivenError, match=r'position 2.*noun'),
-    ):
-        clause(guest, search, search)
-
-
-@scenario(
-    t'A bare verb may sit between two real entity nodes',
-)
-def test_clause_allows_bare_verb_between_term_nodes(guest, room):
-    with when(
-        t'a bare verb sits between an {pg["Actor"].low} and a {pg["Work Object"].low}'
-    ):
-        built = clause(guest, 'receives', room)
-    with then('the entities are term refs and the verb stays a bare word'):
-        assert [type(part) for part in built.parts] == [
-            ClauseTermRef,
-            ClauseWord,
-            ClauseTermRef,
-        ]
-        assert built.parts[1] == ClauseWord(text='receives')
+@pytest.mark.parametrize('position', [0, 1, 2])
+def test_a_bare_string_may_fill_any_slot(guest, search, room, position):
+    with given('the bare string "plain"'):
+        word = 'plain'
+    with when(t'a {pg["Clause"].low} is built with it at position {position}'):
+        parts: list[object] = [guest, search, room]
+        parts[position] = word
+        built = clause(*parts)
+    with then(t'it becomes a {pg["Clause part"].low} word there'):
+        assert built.parts[position] == ClauseWord(text='plain')
+    with then(t'the other parts stay {pg["Term ref"]("term refs")}'):
+        others = [part for index, part in enumerate(built.parts) if index != position]
+        assert all(isinstance(part, ClauseTermRef) for part in others)
 
 
 @scenario(
@@ -612,20 +572,35 @@ def test_story_rejects_duplicate_sentence_names(guest, search, room):
 
 
 @scenario(
-    t'An empty or padded {pg["Sentence"].low} name is refused', tags=['validation']
+    t'A {pg["Sentence"].low} name must be non-empty and unpadded',
+    tags=['validation'],
 )
-@pytest.mark.parametrize('bad_name', ['', ' cancel', 'cancel '])
-def test_sentence_rejects_an_empty_or_padded_name(guest, search, room, bad_name):
-    with given(t'the {pg["Sentence"].low} name {bad_name!r}'):
-        name = bad_name
-    with (
-        when_then(
-            t'a {pg["Sentence"].low} is built with that name',
-            'a PytestGivenError says what a name must be',
-        ),
-        pytest.raises(PytestGivenError, match='sentence name'),
-    ):
-        sentence(guest, search, room, name=name)
+@pytest.mark.parametrize(
+    ('name', 'outcome'),
+    [
+        ('cancel', 'accepted'),
+        ('', 'refused'),
+        (' cancel', 'refused'),
+        ('cancel ', 'refused'),
+    ],
+)
+def test_a_sentence_name_must_be_non_empty_and_unpadded(
+    guest, search, room, name, outcome
+):
+    with given(t'the {pg["Sentence"].low} name {name!r}'):
+        sentence_name = name
+    with when(t'a {pg["Sentence"].low} is built with that name'):
+        try:
+            sentence(guest, search, room, name=sentence_name)
+            refusal = ''
+        except PytestGivenError as error:
+            refusal = str(error)
+    with then(t'the name is {outcome}'):
+        assert ('refused' if refusal else 'accepted') == outcome
+    with then('a refusal says what a name must be'):
+        assert (
+            'a sentence name must be a non-empty str, with no leading or' in refusal
+        ) == (outcome == 'refused')
 
 
 # --- Task 4.5: story-id duplicate detection ---
@@ -811,21 +786,6 @@ def test_slot_error_message_stays_compact(guest, room, search):
         assert 'GlossaryTerm(' not in message
         assert len(message) < 300
         assert "'Room'" in message
-
-
-@scenario(
-    t'A kindless {pg["Term"].low} stays valid in any {pg["Slot"].low}',
-    tags=['validation'],
-)
-def test_kindless_term_is_accepted_in_either_slot(g):
-    with given(t'a {pg["Kindless"].low} {pg["Term"].low} declared with g(...)'):
-        loyalty = g('loyalty points')
-    with when(t'it is placed in a node {pg["Slot"].low} and a verb slot'):
-        node_path = clause(loyalty, 'given to', loyalty)
-        verb_path = clause(loyalty, loyalty, loyalty)
-    with then('both clauses construct, leaving the kind to inference'):
-        assert len(node_path.parts) == 3
-        assert len(verb_path.parts) == 3
 
 
 @scenario(

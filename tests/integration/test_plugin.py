@@ -963,9 +963,15 @@ def test_step_fixture_teardown_refuses_steps_and_attachments(pytester, late):
         result.stdout.fnmatch_lines(['*PytestGivenError*'])
 
 
-@scenario('A fixture decorated with @when or @then is refused', tags=['validation'])
-@pytest.mark.parametrize('decorator', ['when', 'then'])
-def test_when_or_then_on_a_fixture_is_refused(pytester, decorator):
+@scenario(
+    'A fixture takes only @given, never @when or @then',
+    tags=['validation'],
+)
+@pytest.mark.parametrize(
+    ('decorator', 'outcome'),
+    [('given', 'accepted'), ('when', 'refused'), ('then', 'refused')],
+)
+def test_a_fixture_takes_only_given(pytester, decorator, outcome):
     """Fixtures are setup, so only @given fits them."""
     with given(t'a fixture decorated with @{decorator}'):
         suite = f"""
@@ -986,9 +992,13 @@ def test_when_or_then_on_a_fixture_is_refused(pytester, decorator):
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
-    with then('the run fails with a PytestGivenError that points at @given'):
-        assert result.ret != 0
-        result.stdout.fnmatch_lines(['*PytestGivenError*', '*@given*'])
+    with then(t'the decorator is {outcome}'):
+        assert ('accepted' if result.ret == 0 else 'refused') == outcome
+    with then('a refusal is a PytestGivenError that points at @given'):
+        output = result.stdout.str()
+        assert (
+            'PytestGivenError' in output and 'only @given is allowed' in output
+        ) == (outcome == 'refused')
 
 
 def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
@@ -2164,12 +2174,8 @@ def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
     stories=adopt_pytest_given,
 )
 @pytest.mark.parametrize(
-    ('label_pins', 'root_pins'),
-    [
-        ('None', [{'story_id': 'book', 'sentence_id': 1}]),
-        ('[]', []),
-        ('[a[2]]', [{'story_id': 'book', 'sentence_id': 2}]),
-    ],
+    ('label_pins', 'root_sentences'),
+    [('None', [1]), ('[]', []), ('[a[2]]', [2])],
     ids=['none-keeps', 'empty-clears', 'list-replaces'],
 )
 def test_annotated_label_pins_retell_the_fixture_root(
@@ -2178,7 +2184,7 @@ def test_annotated_label_pins_retell_the_fixture_root(
         str,
         given(Template('a label with pins={label_pins} over a fixture pinning a[1]')),
     ],
-    root_pins,
+    root_sentences,
 ):
     pytester.makepyfile(f"""
         from typing import Annotated
@@ -2210,14 +2216,17 @@ def test_annotated_label_pins_retell_the_fixture_root(
     with when('the suite runs', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest('--given-json=report.json')
     with then(
-        t'the grafted root carries the expected {pg["Pin"]("pins")}, and the inner '
-        t'{pg["Step"].low} keeps its own'
+        t'the grafted root {pg["Pin"]("pins")} the sentences {root_sentences} of a'
     ):
         result.assert_outcomes(passed=1)
         data = json.loads(pytester.path.joinpath('report.json').read_text())
         root = data['scenarios'][0]['steps'][0]
         assert root['narration']['text'] == 'a retold label'
-        assert root['pins'] == root_pins
+        assert root['pins'] == [
+            {'story_id': 'book', 'sentence_id': sentence_id}
+            for sentence_id in root_sentences
+        ]
+    with then(t'the inner {pg["Step"].low} keeps its own {pg["Pin"].low}, a[3]'):
         assert root['children'][0]['pins'] == [{'story_id': 'book', 'sentence_id': 3}]
 
 

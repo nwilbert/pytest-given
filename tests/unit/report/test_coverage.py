@@ -402,11 +402,11 @@ def _search_and_book_story():
 @pytest.mark.parametrize(
     ('scenario_pins', 'step_pins', 'covered'),
     [
-        (None, None, {1}),
-        (None, [2], {2}),
-        ([], None, set()),
-        ([], [2], {2}),
-        ([1], [2], {1, 2}),
+        (None, None, [1]),
+        (None, [2], [2]),
+        ([], None, []),
+        ([], [2], [2]),
+        ([1], [2], [1, 2]),
     ],
     ids=[
         'nothing-pinned',
@@ -424,15 +424,17 @@ def test_narration_matching_runs_only_where_nothing_pins(
         list[int] | None,
         given(Template('a step matching sentence 1, with pins={step_pins}')),
     ],
-    covered: set[int],
+    covered: list[int],
 ):
     with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
         coverage = compute_coverage(
             _scenario_with_steps(_matching_step(pins=step_pins), pins=scenario_pins),
             build_story_index(_search_and_book_story()),
         )
-    with then(t'the {pg["Scenario"].low} covers what the {pg["Step"].low} contributes'):
-        assert coverage == {SentenceId(sentence_id) for sentence_id in covered}
+    with then(
+        t'the {pg["Scenario"].low} covers the {pg["Sentence"]("sentences")} {covered}'
+    ):
+        assert sorted(coverage) == covered
 
 
 def test_compute_coverage_mixes_pinned_and_matched_steps_in_one_story():
@@ -468,84 +470,75 @@ def test_a_scenario_naming_no_story_is_not_matched():
     )
 
 
+def _sentence_naming(*term_ids):
+    """Sentence 1 referencing these terms, padded with a bare word."""
+    parts = (*(_term_part(term_id) for term_id in term_ids), ClauseWord(text='words'))
+    return Sentence(id=SentenceId(1), clauses=(_clause(*parts),))
+
+
 @scenario(
-    t'A {pg["Sentence"].low} with two distinct {pg["Term"]("terms")} is '
-    t'{pg["Coverage"].low}-eligible',
+    t'A {pg["Sentence"].low} is {pg["Coverage"].low}-eligible only with two '
+    t'distinct {pg["Term"]("terms")}',
 )
-def test_is_coverage_eligible_true_for_two_distinct_terms():
+@pytest.mark.parametrize(
+    ('term_ids', 'eligible'),
+    [
+        (['guest', 'room'], True),
+        (['guest', 'guest'], False),
+        (['guest'], False),
+        ([], False),
+    ],
+)
+def test_coverage_eligibility_needs_two_distinct_terms(term_ids, eligible):
     with given(
-        t'a {pg["Sentence"].low} anchored by two distinct {pg["Term"].low} refs'
+        t'a {pg["Sentence"].low} referencing the {pg["Term"]("terms")} {term_ids}'
     ):
-        a = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                _clause(
-                    _entity('guest', 'Guest'),
-                    ClauseWord(text='x'),
-                    _entity('room', 'Room'),
-                ),
-            ),
-        )
+        sentence = _sentence_naming(*term_ids)
     with when(t'its {pg["Coverage"].low} eligibility is checked'):
-        eligible = is_coverage_eligible(a)
-    with then(t'it is eligible for {pg["Coverage"].low} tracking'):
-        assert eligible is True
+        checked = is_coverage_eligible(sentence)
+    with then(t'it is eligible: {eligible}'):
+        assert checked == eligible
 
 
 @scenario(
-    t'An under-anchored {pg["Sentence"].low} is not {pg["Coverage"].low}-eligible',
+    t'An under-anchored {pg["Sentence"].low} is covered only through a {pg["Pin"].low}',
 )
-def test_is_coverage_eligible_false_for_one_distinct_term():
+@pytest.mark.parametrize(
+    ('term_ids', 'pinned', 'covered'),
+    [
+        (['guest', 'room'], False, True),
+        (['guest', 'room'], True, True),
+        (['guest'], False, False),
+        (['guest'], True, True),
+    ],
+)
+def test_an_under_anchored_sentence_is_covered_only_through_a_pin(
+    term_ids, pinned, covered
+):
+    """Eligibility gates narration matching only. A pin says what the
+    narration cannot, so it covers an under-anchored sentence too."""
     with given(
-        t'a {pg["Sentence"].low} that mentions only one distinct {pg["Term"].low}'
+        t'a {pg["Story"].low} whose {pg["Sentence"].low} references the '
+        t'{pg["Term"]("terms")} {term_ids}'
     ):
-        # same term twice still counts as one distinct term id
-        a = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                _clause(
-                    _entity('guest', 'Guest'),
-                    ClauseWord(text='greets'),
-                    _entity('guest', 'Alice'),
-                ),
-            ),
+        story = Story(
+            id=StoryId('s'), title='S', sentences=(_sentence_naming(*term_ids),)
         )
-    with when(t'its {pg["Coverage"].low} eligibility is checked'):
-        eligible = is_coverage_eligible(a)
-    with then(t'it is ineligible — {pg["Coverage"].low} needs at least two anchors'):
-        assert eligible is False
-
-
-def test_is_coverage_eligible_false_for_all_bare_sentence():
-    a = Sentence(
-        id=SentenceId(1),
-        clauses=(_clause(ClauseWord(text='just'), ClauseWord(text='words')),),
-    )
-    assert is_coverage_eligible(a) is False
-
-
-@scenario(
-    t'An under-anchored {pg["Sentence"].low} is never covered by narration matching',
-)
-def test_compute_coverage_excludes_under_anchored_sentence():
-    """A sentence with fewer than two distinct terms is excluded from
-    narration matching (replaces the old 'empty refs matches every step'
-    behavior). A pin still reaches it — the sibling scenario below."""
-    with given(t'a {pg["Story"].low} whose {pg["Sentence"].low} is all bare words'):
-        a = Sentence(
-            id=SentenceId(1),
-            clauses=(_clause(ClauseWord(text='just'), ClauseWord(text='words')),),
-        )
-        story = Story(id=StoryId('s'), title='S', sentences=(a,))
-    with given(t'a {pg["Scenario"].low} narrating one {pg["Term ref"].low}'):
-        scenario = _scenario_with_steps(
-            _step('given', _term_ref('guest', 'Guest')),
-            _step('when'),
+    with given(
+        t'a {pg["Step"].low} narrating those {pg["Term"]("terms")}, '
+        t'{pg["Pin"]("pinning")} the {pg["Sentence"].low}: {pinned}'
+    ):
+        step = _step(
+            'when',
+            *(_term_ref(term_id, term_id) for term_id in term_ids),
+            pins=[1] if pinned else None,
         )
     with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
-        coverage = compute_coverage(scenario, build_story_index(story))
-    with then(t'{pg["Coverage"].low} excludes the under-anchored {pg["Sentence"].low}'):
-        assert SentenceId(1) not in coverage
+        coverage = compute_coverage(
+            _scenario_with_steps(step), build_story_index(story)
+        )
+    with then(t'the {pg["Sentence"].low} is covered: {covered}'):
+        assert (SentenceId(1) in coverage) == covered
 
 
 @scenario(
@@ -583,56 +576,4 @@ def test_compute_coverage_nested_steps_are_walked():
         t'the nested {pg["Step"].low} still counts and the {pg["Sentence"].low} is '
         t'covered'
     ):
-        assert SentenceId(1) in coverage
-
-
-@scenario(
-    t'A {pg["Step"].low} {pg["Pin"].low} covers an eligible {pg["Sentence"].low}',
-)
-def test_compute_coverage_explicit_step_binding_covers_eligible_sentence():
-    """A step pin covers an eligible (>=2 distinct
-    term) sentence directly, without narration matching."""
-    with given(t'a {pg["Story"].low} with a coverage-eligible {pg["Sentence"].low}'):
-        sentence = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                _clause(
-                    _entity('guest', 'Guest'),
-                    _term_part('search'),
-                    _entity('room', 'Room'),
-                ),
-            ),
-        )
-        story = Story(id=StoryId('s'), title='S', sentences=(sentence,))
-    with given(t'a {pg["Step"].low} {pg["Pin"]("pinning")} it by number'):
-        scenario = _scenario_with_steps(_step('when', pins=[1]))
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
-        coverage = compute_coverage(scenario, build_story_index(story))
-    with then(t'{pg["Coverage"].low} counts it directly, without narration matching'):
-        assert SentenceId(1) in coverage
-
-
-@scenario(
-    t'A {pg["Pin"].low} covers an under-anchored {pg["Sentence"].low}',
-)
-def test_compute_coverage_explicit_binding_covers_under_anchored_sentence():
-    """Eligibility gates narration matching only. A pin says what
-    the narration cannot, so it covers an under-anchored sentence too."""
-    with given(t'a {pg["Story"].low} whose {pg["Sentence"].low} is under-anchored'):
-        sentence = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                _clause(
-                    _entity('guest', 'Guest'),
-                    ClauseWord(text='browses'),
-                    ClauseWord(text='listings'),
-                ),
-            ),
-        )
-        story = Story(id=StoryId('s'), title='S', sentences=(sentence,))
-    with given(t'a {pg["Step"].low} {pg["Pin"]("pinning")} it by number'):
-        scenario = _scenario_with_steps(_step('when', pins=[1]))
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
-        coverage = compute_coverage(scenario, build_story_index(story))
-    with then(t'{pg["Coverage"].low} counts it, despite the missing anchors'):
         assert SentenceId(1) in coverage

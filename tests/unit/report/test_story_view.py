@@ -3,6 +3,8 @@ the tab visibility the report shell derives."""
 
 import dataclasses
 
+import pytest
+
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
     Clause,
@@ -206,77 +208,38 @@ def test_a_scenario_is_listed_under_its_stories_and_the_stories_it_covers() -> N
 
 
 @scenario(
-    t'An under-anchored {pg["Sentence"].low} is flagged ineligible in rollups',
+    t'An under-anchored {pg["Sentence"].low} reads as untracked until a '
+    t'{pg["Pin"].low} covers it',
 )
-def test_build_story_rollups_flags_under_anchored_sentence_ineligible() -> None:
-    with given(
-        t'a {pg["Story"].low} with an anchored and an under-anchored '
-        t'{pg["Sentence"].low}'
-    ):
-        g = _g()
-        eligible = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                Clause(
-                    parts=(
-                        _ent('guest', 'Guest'),
-                        _activity_part('search'),
-                        _ent('room', 'Room'),
-                    )
-                ),
-            ),
-        )
-        under_anchored = Sentence(
-            id=SentenceId(2),
-            clauses=(
-                Clause(
-                    parts=(
-                        _ent('guest', 'Guest'),
-                        ClauseWord(text='browses'),
-                        ClauseWord(text='listings'),
-                    )
-                ),
-            ),
-        )
-        story = Story(
-            id=StoryId('book'), title='Book', sentences=(eligible, under_anchored)
-        )
-        rd = ReportData(metadata=_meta(), scenarios=[], stories=[story], glossary=g)
-    with when('the story rollups are built'):
-        rollups = build_story_rollups(rd, build_coverage_map(rd))
-    with then(
-        t'only the anchored {pg["Sentence"].low} is {pg["Coverage"].low}-eligible'
-    ):
-        per_sentence = rollups[StoryId('book')].per_sentence
-        assert per_sentence[SentenceId(1)].eligible is True
-        assert per_sentence[SentenceId(2)].eligible is False
-
-
-@scenario(
-    t'A pinned under-anchored {pg["Sentence"].low} stops reading as untracked',
+@pytest.mark.parametrize(
+    ('anchored', 'pinned', 'eligible', 'untracked'),
+    [
+        (True, False, True, False),
+        (False, False, False, True),
+        (False, True, False, False),
+    ],
 )
-def test_build_story_rollups_pinned_under_anchored_sentence_is_tracked() -> None:
-    """`untracked` is what the timeline renders as '—'. An under-anchored
-    sentence earns it only while nothing pins it."""
+def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
+    anchored, pinned, eligible, untracked
+) -> None:
+    """`untracked` is what the timeline renders as '—'."""
     with given(
-        t'a {pg["Story"].low} whose only {pg["Sentence"].low} is under-anchored'
+        t'a {pg["Story"].low} whose only {pg["Sentence"].low} is anchored by at '
+        t'least two distinct {pg["Term"]("terms")}: {anchored}'
     ):
-        g = _g()
-        under_anchored = Sentence(
-            id=SentenceId(1),
-            clauses=(
-                Clause(
-                    parts=(
-                        _ent('guest', 'Guest'),
-                        ClauseWord(text='browses'),
-                        ClauseWord(text='listings'),
-                    )
-                ),
-            ),
+        guest = _ent('guest', 'Guest')
+        parts = (
+            (guest, _activity_part('search'), _ent('room', 'Room'))
+            if anchored
+            else (guest, ClauseWord(text='browses'), ClauseWord(text='listings'))
         )
-        story = Story(id=StoryId('book'), title='Book', sentences=(under_anchored,))
-    with given(t'a {pg["Scenario"].low} whose {pg["Step"].low} pins it by id'):
-        pinned = Scenario(
+        only = Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),))
+        story = Story(id=StoryId('book'), title='Book', sentences=(only,))
+    with given(
+        t'a {pg["Scenario"].low} whose {pg["Step"].low} {pg["Pin"]("pins")} it: '
+        t'{pinned}'
+    ):
+        scenario_ = Scenario(
             id=NodeId('test::a'),
             narration=Narration(text='a'),
             module='m',
@@ -286,20 +249,22 @@ def test_build_story_rollups_pinned_under_anchored_sentence_is_tracked() -> None
                 Step(
                     phase='when',
                     narration=Narration(text='the listing page is opened'),
-                    pins=(Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),),
+                    pins=(Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),)
+                    if pinned
+                    else None,
                 )
             ],
         )
         rd = ReportData(
-            metadata=_meta(), scenarios=[pinned], stories=[story], glossary=g
+            metadata=_meta(), scenarios=[scenario_], stories=[story], glossary=_g()
         )
     with when('the story rollups are built'):
-        rollups = build_story_rollups(rd, build_coverage_map(rd))
-    with then(t'it stays narration-ineligible but is no longer untracked'):
-        cov = rollups[StoryId('book')].per_sentence[SentenceId(1)]
-        assert cov.eligible is False
-        assert cov.total == 1
-        assert cov.untracked is False
+        coverage = build_story_rollups(rd, build_coverage_map(rd))
+        sentence_coverage = coverage[StoryId('book')].per_sentence[SentenceId(1)]
+    with then(t'it is {pg["Coverage"].low}-eligible: {eligible}'):
+        assert sentence_coverage.eligible == eligible
+    with then(t'it reads as untracked: {untracked}'):
+        assert sentence_coverage.untracked == untracked
 
 
 def _covering_scn(node_id: str, status: str) -> Scenario:

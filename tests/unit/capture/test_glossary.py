@@ -25,47 +25,40 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @scenario(
-    t'{pg["Term"]} ids are derived as URL-safe slugs',
-)
-@pytest.mark.parametrize(
-    ('text', 'expected'),
-    [
-        ('Guest', 'guest'),
-        ('Order received', 'order-received'),
-        ('  Work Object  ', 'work-object'),
-        ('do_the_thing', 'do-the-thing'),
-        ('Buy / sell', 'buy-sell'),
-        ('Guest #1', 'guest-1'),
-        ('café', 'caf'),
-        ('booking system', 'booking-system'),
-    ],
-)
-def test_id_derive_produces_expected_slug(
-    text: Annotated[str, given(Template('the name {text}'))],
-    expected,
-):
-    with when(t'it is slugified into a {pg["Term"].low} id'):
-        derived = id_derive(text)
-    with then(t'the id is the expected slug {expected!r}'):
-        assert derived == expected
-
-
-@scenario(
-    'A name with no id-able characters is rejected',
+    t'{pg["Term"]} ids are derived as URL-safe slugs, and a name with none is refused',
     tags=['validation'],
 )
-@pytest.mark.parametrize('text', ['---', '   ', '', '###'])
-def test_id_derive_raises_on_empty_result(
+@pytest.mark.parametrize(
+    ('text', 'refused', 'slug'),
+    [
+        ('Guest', False, 'guest'),
+        ('Order received', False, 'order-received'),
+        ('  Work Object  ', False, 'work-object'),
+        ('do_the_thing', False, 'do-the-thing'),
+        ('Buy / sell', False, 'buy-sell'),
+        ('Guest #1', False, 'guest-1'),
+        ('café', False, 'caf'),
+        ('booking system', False, 'booking-system'),
+        ('---', True, None),
+        ('   ', True, None),
+        ('', True, None),
+        ('###', True, None),
+    ],
+)
+def test_term_ids_are_derived_as_url_safe_slugs(
     text: Annotated[str, given(Template('the name {text}'))],
+    refused,
+    slug,
 ):
-    with (
-        when_then(
-            t'it is slugified into a {pg["Term"].low} id',
-            'a PytestGivenError reports the derived id is empty',
-        ),
-        pytest.raises(PytestGivenError, match='derived id is empty'),
-    ):
-        id_derive(text)
+    with when(t'it is slugified into a {pg["Term"].low} id'):
+        try:
+            derived, refusal = id_derive(text), ''
+        except PytestGivenError as error:
+            derived, refusal = None, str(error)
+    with then(t'a PytestGivenError reports the derived id is empty: {refused}'):
+        assert ('derived id is empty' in refusal) == refused
+    with then(t'the id is {slug!r}'):
+        assert derived == slug
 
 
 def _term(kind, name='X'):
@@ -180,38 +173,37 @@ def test_glossary_activity_registers_and_returns_handle():
 
 
 @scenario(
-    t'Re-registering a {pg["Term"].low} with matching fields is idempotent',
+    t'Re-registering a {pg["Term"].low} is idempotent only with matching fields',
     stories=adopt_pytest_given,
-)
-def test_glossary_re_registration_with_matching_fields_is_idempotent():
-    with given(t'an {pg["Actor"].low} already registered with a definition'):
-        g = Glossary()
-        a1 = g.actor('Guest', definition='d')
-    with when(
-        'the same name and definition are registered again',
-        pins=adopt_pytest_given['build'],
-    ):
-        a2 = g.actor('Guest', definition='d')
-    with then(t'both handles share the one {pg["Term"].low}'):
-        assert a1.term is a2.term
-
-
-@scenario(
-    t'Re-registering a {pg["Term"].low} with a different definition is rejected',
     tags=['validation'],
 )
-def test_glossary_re_registration_with_mismatched_definition_raises():
-    with given(t'an {pg["Actor"].low} already registered with one definition'):
+@pytest.mark.parametrize(
+    ('same_definition', 'outcome'),
+    [(True, 'one shared term'), (False, 'refused')],
+)
+def test_re_registering_a_term_is_idempotent_only_with_matching_fields(
+    same_definition, outcome
+):
+    with given(t'an {pg["Actor"].low} already registered with a definition'):
         g = Glossary()
-        g.actor('Guest', definition='one')
-    with (
-        when_then(
-            'the name is registered again with a different definition',
-            'a PytestGivenError reports the conflict with the prior registration',
-        ),
-        pytest.raises(PytestGivenError, match='conflicts with prior registration'),
+        first = g.actor('Guest', definition='d')
+    with when(
+        t'the same name is registered again, with the same definition: '
+        t'{same_definition}',
+        pins=adopt_pytest_given['build'],
     ):
-        g.actor('Guest', definition='two')
+        try:
+            second = g.actor('Guest', definition='d' if same_definition else 'two')
+            refusal = ''
+        except PytestGivenError as error:
+            second, refusal = None, str(error)
+    with then(t'the re-registration yields {outcome}'):
+        shared = second is not None and second.term is first.term
+        assert ('one shared term' if shared else 'refused') == outcome
+    with then('a refusal reports the conflict with the prior registration'):
+        assert ('conflicts with prior registration' in refusal) == (
+            outcome == 'refused'
+        )
 
 
 @scenario(

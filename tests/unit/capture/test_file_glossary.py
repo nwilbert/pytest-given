@@ -1,3 +1,4 @@
+import re
 from typing import Annotated
 
 import pytest
@@ -243,70 +244,78 @@ def test_empty_id_term_cell_raises(tmp_path):
         FileGlossary(path)
 
 
+_BAD_TABLES = {
+    'no table': '# no table here\n',
+    'a short row': '| Term | Meaning |\n|---|---|\n| Guest |\n',
+    'no Term column': '| Word | Meaning |\n|---|---|\n| Guest | x |\n',
+}
+
+
 @scenario(
     t'A {pg["File glossary"].low} error about its tables names the file',
     tags=['diagnostics', 'validation'],
 )
 @pytest.mark.parametrize(
-    ('problem', 'doc', 'expected'),
+    ('problem', 'message'),
     [
-        ('no table', '# no table here\n', r'bad\.md: found no Markdown pipe table'),
-        (
-            'a short row',
-            '| Term | Meaning |\n|---|---|\n| Guest |\n',
-            r'bad\.md: data row at line 3',
-        ),
-        (
-            'no Term column',
-            '| Word | Meaning |\n|---|---|\n| Guest | x |\n',
-            r"bad\.md: column 'Term'",
-        ),
+        ('no table', 'bad.md: found no Markdown pipe table'),
+        ('a short row', 'bad.md: data row at line 3'),
+        ('no Term column', "bad.md: column 'Term'"),
     ],
 )
 def test_table_errors_name_the_file(
     tmp_path,
     problem: Annotated[str, given(Template('a glossary file with {problem}'))],
-    doc,
-    expected,
+    message,
 ):
     with given('that file on disk as bad.md'):
+        doc = _BAD_TABLES[problem]
         attach('Glossary file', doc)
         path = tmp_path / 'bad.md'
         path.write_text(doc, encoding='utf-8')
     with (
         when_then(
             t'a {pg["File glossary"].low} loads it',
-            'a PytestGivenError names the file before the problem',
+            t'a PytestGivenError names the file before the problem: {message}',
         ),
-        pytest.raises(PytestGivenError, match=expected),
+        pytest.raises(PytestGivenError, match=re.escape(message)),
     ):
         FileGlossary(path, term_column='Term')
 
 
 @scenario(
-    'Conflicting duplicate rows are rejected',
+    t'Duplicate rows for one {pg["Term"].low} collapse only when identical',
     tags=['validation'],
 )
-def test_conflicting_duplicate_rows_raise(tmp_path):
-    with given(t'two rows for one {pg["Term"].low} with different definitions'):
+@pytest.mark.parametrize(
+    ('identical', 'outcome'),
+    [(True, 'one term'), (False, 'refused')],
+)
+def test_duplicate_rows_collapse_only_when_identical(tmp_path, identical, outcome):
+    with given(
+        t'two rows for one {pg["Term"].low}, with identical definitions: {identical}'
+    ):
+        second = 'First definition.' if identical else 'Second definition.'
         doc = (
             '| Term | Meaning |\n|---|---|\n'
             '| Guest | First definition. |\n'
-            '| Guest | Second definition. |\n'
+            f'| Guest | {second} |\n'
         )
         attach('Glossary file', doc)
         path = tmp_path / 'dup.md'
         path.write_text(doc, encoding='utf-8')
-    with (
-        when_then(
-            t'the {pg["File glossary"].low} loads the file',
-            'a PytestGivenError points at the second row as the conflict',
-        ),
-        pytest.raises(
-            PytestGivenError, match=r'dup\.md:4: .*conflicts with an earlier row'
-        ),
-    ):
-        FileGlossary(path)
+    with when(t'the {pg["File glossary"].low} loads the file'):
+        try:
+            terms, refusal = FileGlossary(path).terms, ''
+        except PytestGivenError as error:
+            terms, refusal = [], str(error)
+    with then(t'the rows yield {outcome}'):
+        assert ('one term' if len(terms) == 1 else 'refused') == outcome
+    with then('a refusal points at the second row as the conflict'):
+        assert (
+            re.search(r'dup\.md:4: .*conflicts with an earlier row', refusal)
+            is not None
+        ) == (outcome == 'refused')
 
 
 @scenario(
@@ -322,26 +331,6 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
         fg = FileGlossary(path)
     with then(t'the {pg["Term"].low} definition is None, i.e. {pg["Undefined"].low}'):
         assert fg.get(TermId('guest')).definition is None
-
-
-@scenario(
-    t'Identical duplicate rows collapse to one {pg["Term"].low}',
-)
-def test_idempotent_duplicate_rows_ok(tmp_path):
-    with given(t'two identical rows for the same {pg["Term"].low}'):
-        doc = (
-            '| Term | Meaning |\n|---|---|\n'
-            '| Guest | A person booking. |\n'
-            '| Guest | A person booking. |\n'
-        )
-        attach('Glossary file', doc)
-        path = tmp_path / 'dup_ok.md'
-        path.write_text(doc, encoding='utf-8')
-    with when(t'the {pg["File glossary"].low} parses them'):
-        fg = FileGlossary(path)
-    with then(t'they collapse to a single {pg["Term"].low}'):
-        assert len(fg.terms) == 1
-        assert fg.get(TermId('guest')) is not None
 
 
 # --- Task 3: FileGlossary.__call__ (lookup-only, closed vocabulary) ---
