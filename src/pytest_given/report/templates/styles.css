@@ -20,6 +20,11 @@
      inline code) sit on --bg-page: meaning lives in the failed-red rule, not
      in a fill. */
   --bg-traceback: #f4f6f9;
+  /* A row's hover preview on a surface. Its own token because --bg-page sits
+     below the surface in the dark theme, where a hovered row sank out of
+     sight; this one lifts there instead, staying just under the contrast of
+     the accent tint so a hover never reads as a selection. */
+  --bg-hover: #edf0f4;
   --border: #e1e5eb;
   --text-primary: #1a1d24;
   /* Step prose, between primary and secondary (~10:1 on the card in both
@@ -71,6 +76,7 @@
   --bg-page: #16121b;
   --bg-surface: #1f1a27;
   --bg-traceback: #412c36;
+  --bg-hover: #2b2533;
   --border: #332b3e;
   --text-primary: #ece8f1;
   --text-narration: #cfc9d8;
@@ -377,7 +383,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    not the accent tint of a real selection. The chevron inside it lights up
    differently, which is what separates "expand" from "filter by". */
 .nav-group:not(.nav-group-active):hover {
-  background: var(--bg-page);
+  background: var(--bg-hover);
   border-color: var(--border);
 }
 /* The chevron is a control inside a clickable row, so it gets a real button
@@ -1091,7 +1097,7 @@ span.param-highlight {
   border: 1px solid transparent;
   margin-bottom: var(--space-xs);
 }
-.story-sidebar-item:hover { background: var(--bg-surface); border-color: var(--border); }
+.story-sidebar-item:hover { background: var(--bg-hover); border-color: var(--border); }
 .story-sidebar-item.active {
   background: var(--color-accent-tint);
   border-color: var(--color-accent);
@@ -1109,7 +1115,7 @@ span.param-highlight {
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
 }
-.sentence-row:hover:not(.sentence-row-highlight) { background: var(--bg-page); }
+.sentence-row:hover:not(.sentence-row-highlight) { background: var(--bg-hover); }
 .sentence-num {
   min-width: 24px;
   padding: 0;
