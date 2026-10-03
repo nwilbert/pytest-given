@@ -664,6 +664,11 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
 .phase-steps { grid-column: 2; min-width: 0; }
+/* A gap at every phase change, so a long scenario reads as Given, When and
+   Then blocks rather than one run of steps. The step beside the label shares
+   its grid row and takes the same margin, keeping the two on one baseline. */
+.phase-label:not(:first-child),
+.phase-label:not(:first-child) + .phase-steps { margin-top: var(--space-md); }
 .step-text { color: var(--text-narration); }
 .step-expand,
 .attachment-expand {
@@ -918,11 +923,14 @@ span.param-highlight {
 .scenario-source {
   font-size: var(--font-size-sm);
   color: var(--text-muted);
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-xs) var(--space-md) 0;
   text-align: right;
   /* One unbreakable token, which a narrow card would otherwise clip. */
   overflow-wrap: anywhere;
 }
+/* A step's line height already clears the link; a table or error box ends
+   at its edge and keeps the padding. */
+.steps + .scenario-source { padding-top: 0; }
 .scenario-source a {
   color: inherit;
   text-decoration: none;

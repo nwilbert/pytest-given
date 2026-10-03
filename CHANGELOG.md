@@ -23,6 +23,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The parameter table orders its columns the way the narration first shows them, so an input attached in a `given` precedes an outcome narrated in a `then`.
 - The term ref hover tooltip in the HTML report sets its definition at 13px instead of 12px, in a slightly wider box.
 - A hovered story, sentence, or sidebar group in the HTML report gets a visible fill in both themes; the story list showed none, and the dark theme's hover sank into the background.
+- A scenario's narration in the HTML report leaves a gap at each change between given, when, and then, and its source link sits closer below it.
 - The bundled `pytest-given-authoring` skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets `.low` as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables, with refused inputs as rows, and merging sibling scenarios into one.
 - The bundled `pytest-given-reviewing` skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome or that hold a column no step narrates.
 
