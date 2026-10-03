@@ -1908,7 +1908,7 @@ def test_render_glossary_all_uncategorized_hides_kind_ui(tmp_path: Path) -> None
     # Kind filter section is gone.
     assert 'Show kinds' not in content
     # The 'Uncategorized' kind header is gone.
-    assert 'kind-title term-kindless' not in content
+    assert 'kind-title kind-kindless' not in content
     # But the terms still render.
     assert 'Widget' in content
     assert 'Gadget' in content
@@ -1942,7 +1942,7 @@ def test_render_glossary_with_categorized_terms_keeps_kind_ui(tmp_path: Path) ->
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'Show kinds' in content
-    assert 'kind-title term-kindless' in content
+    assert 'kind-title kind-kindless' in content
     # The header breakdown still names the kinds.
     assert '1 actor' in content
     assert '1 uncategorized' in content

@@ -516,7 +516,7 @@
         {% for kind in glossary_view.kinds %}
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.{{ kind.key }}">
-          <span class="kind-swatch kind-swatch-{{ kind.key }}"></span>
+          <span class="kind-swatch kind-{{ kind.key }}"></span>
           <span>{{ kind.label }}</span>
           <span class="nav-group-count">{{ kind.count }}</span>
         </label>
@@ -555,15 +555,15 @@
       </div>
 
       {% for group in glossary_view.groups %}
-      {% set kind_label, kind_key, kind_cls = group.label, group.key, group.css_class %}
+      {% set kind_label, kind_key = group.label, group.key %}
       <div x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
         {% if not all_uncategorized %}
         <div class="kind-header">
-          <span class="kind-title {{ kind_cls }}">{{ kind_label }}</span>
+          <span class="kind-title kind-{{ kind_key }}">{{ kind_label }}</span>
           <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
         </div>
         {% endif %}
-        <div class="entry-list">
+        <div class="entry-list kind-{{ kind_key }}">
         {% for entry in group.entries %}
         {% set term = entry.term %}
         {% set agg = entry.aggregation %}
@@ -580,7 +580,7 @@
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name {{ kind_cls }}">{{ term.canonical }}</span>
+              <span class="term-name">{{ term.canonical }}</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>

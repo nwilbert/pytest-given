@@ -78,7 +78,6 @@ class KindGroup:
 
     label: str
     key: KindKey
-    css_class: str
     entries: list[TermEntry]
 
 
@@ -103,7 +102,6 @@ class _KindRow(NamedTuple):
 
     label: str
     key: KindKey
-    css_class: str
     noun: str
 
 
@@ -121,12 +119,12 @@ class KindTally:
     summary: str
 
 
-# Each kind's heading, filter key, and pill class, in display order.
+# Each kind's heading, filter key, and count noun, in display order.
 _KIND_GROUPS: tuple[_KindRow, ...] = (
-    _KindRow('Actors', 'actor', 'term-actor', 'actor'),
-    _KindRow('Work Objects', 'object', 'term-obj', 'work object'),
-    _KindRow('Activities', 'activity', 'term-activity', 'activity'),
-    _KindRow('Uncategorized', 'kindless', 'term-kindless', 'uncategorized'),
+    _KindRow('Actors', 'actor', 'actor'),
+    _KindRow('Work Objects', 'object', 'work object'),
+    _KindRow('Activities', 'activity', 'activity'),
+    _KindRow('Uncategorized', 'kindless', 'uncategorized'),
 )
 
 # Only an entity has instances worth listing; an activity's surface forms are its
@@ -146,7 +144,6 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
         KindGroup(
             label=row.label,
             key=row.key,
-            css_class=row.css_class,
             entries=[
                 _term_entry(term, row.key, crossrefs) for term in by_kind[row.key]
             ],

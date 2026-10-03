@@ -49,12 +49,16 @@
   --color-skipped: #9a5300;
   --color-skipped-tint: #fbecd5;
 
-  /* Term-ref kinds: the ink says which kind, the edge underlines a term ref
-     (see the term-ref comment further down) and fills its sidebar swatch. */
-  --term-actor-ink: #8a4310;    --term-actor-edge: #f0b48a;
-  --term-object-ink: #0f6e64;   --term-object-edge: #7fd5c9;
-  --term-activity-ink: #5f2d9a; --term-activity-edge: #c6aef0;
-  --term-kindless-ink: #545962; --term-kindless-edge: #c9ccd3;
+  /* Term kinds: the line underlines a term ref (see the term-ref comment
+     further down) and marks the kind in the glossary — entry bar and sidebar
+     swatch — so the glossary is the narration's legend. The ink colors the
+     glossary's kind headers and a hovered ref's underline. The lines share a
+     lightness (OKLab L ~0.65) so no kind outweighs another; the actor's
+     carries more chroma, since a muted orange reads as brown. */
+  --term-actor-ink: #8a4310;    --term-actor-line: #cf763c;
+  --term-object-ink: #0f6e64;   --term-object-line: #4ca095;
+  --term-activity-ink: #5f2d9a; --term-activity-line: #906fc5;
+  --term-kindless-ink: #545962; --term-kindless-line: #8c9099;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   /* Inline code inside the tooltip, which is inverted (ink on bg). */
@@ -94,10 +98,10 @@
   --color-skipped: #f0b45c;
   --color-skipped-tint: #40332f;
 
-  --term-actor-ink: #f5b47a;    --term-actor-edge: #7a4a2e;
-  --term-object-ink: #7fded0;   --term-object-edge: #2a6b62;
-  --term-activity-ink: #cbb5f7; --term-activity-edge: #5b4886;
-  --term-kindless-ink: #b8b2c2; --term-kindless-edge: #4a4455;
+  --term-actor-ink: #f5b47a;    --term-actor-line: #cb773e;
+  --term-object-ink: #7fded0;   --term-object-line: #53a397;
+  --term-activity-ink: #cbb5f7; --term-activity-line: #917dbd;
+  --term-kindless-ink: #b8b2c2; --term-kindless-line: #7f798a;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -990,49 +994,31 @@ span.param-highlight {
 }
 
 /* === Term refs in narration (actor / object / activity / no kind) ===
-   A pale underline beneath the word, with the kind in the ink. The two
-   channels carry different things: the underline says "this word is a
-   glossary term", the ink says which kind, and only the first has to survive
-   every context the word lands in. Neither adds weight or a fill, so a line of
-   five terms still reads as a line of text.
+   The surrounding text's own ink, with an underline in the kind's color: the
+   underline alone says both "this word is a glossary term" and which kind.
+   Nothing changes the word itself — no ink, weight or fill — so a line of
+   five terms still reads as a line of text, in narration and titles alike.
 
-   That split is what solves the kindless term, which has no hue to give it.
-   No fourth hue clears the three kinds, the body text, the statuses, the
-   accent and the generated column ring while holding AA at readable
-   lightness; and weight cannot stand in for hue, since weight reads only
-   against its container — a ref legible in 400 body text vanishes in a 600
-   title. Its grey ink and grey underline are the whole of its mark.
-
-   The underline also keeps a term apart from a parameter value, which shares
-   the colored ink but is bold and never underlined. */
+   It also keeps a term apart from a parameter value, which is colored, bold
+   and never underlined. */
 .term-ref-actor,
 .term-ref-object,
 .term-ref-activity,
 .term-ref-unknown {
   text-decoration-line: underline;
+  text-decoration-color: var(--kind-line);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
   text-decoration-skip-ink: auto;
-  cursor: pointer;
 }
-/* The kind ink only part-way: `currentColor` here is the surrounding text,
-   so a ref leans toward its narration or title ink and the hue stays a hint.
-   The glossary's kind headers, which name the kind, keep the full ink. */
-.term-ref-actor { color: color-mix(in oklab, var(--term-actor-ink) 60%, currentColor); text-decoration-color: var(--term-actor-edge); }
-.term-ref-object { color: color-mix(in oklab, var(--term-object-ink) 60%, currentColor); text-decoration-color: var(--term-object-edge); }
-.term-ref-activity { color: color-mix(in oklab, var(--term-activity-ink) 60%, currentColor); text-decoration-color: var(--term-activity-edge); }
-/* The kindless ink is a grey that differs from the body ink in hue, not only
-   lightness: a lighter body ink reads as body text lightened — receding, the
-   opposite of marked. */
-.term-ref-unknown {
-  color: var(--term-kindless-ink);
-  text-decoration-color: var(--term-kindless-edge);
-  cursor: default;
-}
+.term-ref-actor { --kind-line: var(--term-actor-line); --kind-ink: var(--term-actor-ink); }
+.term-ref-object { --kind-line: var(--term-object-line); --kind-ink: var(--term-object-ink); }
+.term-ref-activity { --kind-line: var(--term-activity-line); --kind-ink: var(--term-activity-ink); }
+.term-ref-unknown { --kind-line: var(--term-kindless-line); --kind-ink: var(--term-kindless-ink); }
 .term-ref--link { cursor: pointer; }
-/* The resting underline already marks the term, so hover darkens it to the
-   ink rather than adding one. */
-.term-ref--link:hover { text-decoration-color: currentColor; text-decoration-thickness: 2px; }
+/* The resting underline already marks the term, so hover deepens it to the
+   kind's full ink rather than adding one. */
+.term-ref--link:hover { text-decoration-color: var(--kind-ink); text-decoration-thickness: 2px; }
 .clause-word {
   color: var(--text-narration);
 }
@@ -1261,10 +1247,14 @@ span.param-highlight {
   border-radius: 2px;
   flex-shrink: 0;
 }
-.kind-swatch-actor { background: var(--term-actor-edge); }
-.kind-swatch-object { background: var(--term-object-edge); }
-.kind-swatch-activity { background: var(--term-activity-edge); }
-.kind-swatch-kindless { background: var(--term-kindless-edge); }
+.kind-swatch { background: var(--kind-line); }
+
+/* One kind's two colors for whatever marks it in the Glossary view — sidebar
+   swatch, kind header, entry bar — keyed by the kind's filter key. */
+.kind-actor { --kind-line: var(--term-actor-line); --kind-ink: var(--term-actor-ink); }
+.kind-object { --kind-line: var(--term-object-line); --kind-ink: var(--term-object-ink); }
+.kind-activity { --kind-line: var(--term-activity-line); --kind-ink: var(--term-activity-ink); }
+.kind-kindless { --kind-line: var(--term-kindless-line); --kind-ink: var(--term-kindless-ink); }
 
 /* === Kind section headers === */
 .glossary-empty {
@@ -1279,36 +1269,40 @@ span.param-highlight {
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-xs);
 }
+/* The full ink, since the header is what names the kind. */
 .kind-title {
   font-size: var(--font-size-md);
   font-weight: 700;
+  color: var(--kind-ink);
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
-/* Kind colors for kind headers: the full ink, since the header is what names
-   the kind. */
-.term-actor { color: var(--term-actor-ink); }
-.term-obj { color: var(--term-object-ink); }
-.term-activity { color: var(--term-activity-ink); }
-.term-kindless { color: var(--term-kindless-ink); }
-
 /* === Term names === */
-/* The tint of a term ref's ink, without its underline: in the catalog every
-   name is a term, and the kind header above already says which kind. */
+/* No underline: in the catalog every name is a term, and the kind header
+   above already says which kind. */
 .term-name {
   font-weight: 600;
   font-size: var(--font-size-md);
 }
-.term-name.term-actor { color: color-mix(in oklab, var(--term-actor-ink) 60%, currentColor); }
-.term-name.term-obj { color: color-mix(in oklab, var(--term-object-ink) 60%, currentColor); }
-.term-name.term-activity { color: color-mix(in oklab, var(--term-activity-ink) 60%, currentColor); }
 
 /* === Glossary entry layout === */
+/* The kind mark: a scenario row's status bar, in the kind's underline color. */
+.entry { position: relative; }
+.entry::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: var(--space-sm);
+  bottom: var(--space-sm);
+  width: 4px;
+  border-radius: 2px;
+  background: var(--kind-line);
+}
 .entry-head {
   display: flex;
   align-items: flex-start;
   gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-lg) var(--space-sm) calc(var(--space-lg) + 5px);
   cursor: pointer;
   user-select: none;
 }
@@ -1331,9 +1325,10 @@ span.param-highlight {
 /* === Refs collapsible === */
 .refs-inner { overflow: hidden; min-height: 0; }
 .refs-content {
-  /* Lines up under the definition: the entry head's padding, the disclosure
-     button's 16px net of its margins, the 160px name column, and two gaps. */
-  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 16px + var(--space-sm) + 160px + var(--space-sm));
+  /* Lines up under the definition: the entry head's padding (with the kind
+     bar's 5px), the disclosure button's 16px net of its margins, the 160px
+     name column, and two gaps. */
+  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 5px + 16px + var(--space-sm) + 160px + var(--space-sm));
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);

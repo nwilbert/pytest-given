@@ -13,7 +13,7 @@ ratio, which is what makes every prefix spread by itself.
 Columns are the report's one *arbitrary* color vocabulary — the index means
 nothing, the colors only have to be told apart — which is why they can take
 the whole ring. The colors that carry meaning are spent elsewhere: the term
-kinds mark the word with an underline and only a tint of ink, so a column
+kinds mark the word with an underline only, never its ink, so a column
 sharing a hue with a kind still cannot be mistaken for one, and the statuses
 sit in their own slot beside a glyph.
 """
