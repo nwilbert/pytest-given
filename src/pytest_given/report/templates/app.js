@@ -765,6 +765,7 @@ function reportApp() {
       });
       this._initTermTooltip();
       this._initParamHover();
+      this._initPhaseHover();
     },
     // Parameter-table hover, delegated. A per-cell `@mouseenter` pair was
     // ~60% of every Alpine directive on a large report, and seconds of its
@@ -794,6 +795,66 @@ function reportApp() {
         leaveRow();
         leaveCell();
       });
+    },
+    // Phase hover, delegated the same way: a phase block in the narration and
+    // the table columns it narrates carry one `data-block`, and pointing at
+    // either outlines both. The status column is a block of its own.
+    _initPhaseHover() {
+      let hovered = null;
+      const leave = () => {
+        if (!hovered) return;
+        hovered.scope.querySelectorAll('.phase-hover').forEach(e => e.classList.remove('phase-hover'));
+        hovered.scope.querySelectorAll('.phase-outline').forEach(e => e.remove());
+        hovered = null;
+      };
+      document.addEventListener('pointerover', (event) => {
+        const el = event.target.closest('[data-block]');
+        const scope = el?.closest('.scenario');
+        if (hovered && scope === hovered.scope && el.dataset.block === hovered.block) return;
+        leave();
+        if (!scope) return;
+        hovered = { scope, block: el.dataset.block };
+        this._outlinePhase(scope, el.dataset.block);
+      });
+      document.addEventListener('pointerout', (event) => {
+        if (!event.relatedTarget) leave();
+      });
+    },
+    // One box per run of rows: a visible row without the block's cells (an
+    // error, an open payload) ends a box rather than being drawn through. A
+    // collapsed payload row has no height and does not.
+    _outlinePhase(scope, block) {
+      const safe = CSS.escape(block);
+      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
+      const table = scope.querySelector('.param-table');
+      if (!table) return;
+      const wrap = table.parentElement;
+      const origin = wrap.getBoundingClientRect();
+      const boxes = [];
+      let box = null;
+      for (const row of table.rows) {
+        const cells = row.querySelectorAll(`[data-block="${safe}"]`);
+        if (!cells.length) {
+          if (row.getBoundingClientRect().height > 1) box = null;
+          continue;
+        }
+        const first = cells[0].getBoundingClientRect();
+        const last = cells[cells.length - 1].getBoundingClientRect();
+        if (!box) {
+          box = { left: first.left, right: last.right, top: first.top };
+          boxes.push(box);
+        }
+        box.bottom = first.bottom;
+      }
+      for (const { left, right, top, bottom } of boxes) {
+        const outline = document.createElement('div');
+        outline.className = 'phase-outline';
+        outline.style.left = `${left - origin.left + wrap.scrollLeft}px`;
+        outline.style.top = `${top - origin.top}px`;
+        outline.style.width = `${right - left}px`;
+        outline.style.height = `${bottom - top}px`;
+        wrap.appendChild(outline);
+      }
     },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside

@@ -5,18 +5,22 @@ from pathlib import Path
 
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
+    AttachmentRef,
     Clause,
     ClauseTermRef,
     ClauseWord,
+    ColumnId,
     Glossary,
     GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
+    NarrationPlaceholder,
     NarrationTermRef,
     NodeId,
     ParameterColumn,
     ParameterTable,
+    Phase,
     ReportData,
     Scenario,
     Sentence,
@@ -34,10 +38,12 @@ from pytest_given.report.html_renderer import (
     _TEMPLATES_DIR,
     _app_data,
     _build_param_color_map,
+    _column_phase_blocks,
     _inline_md,
     _make_clause_part_filter,
     _make_narration_filter,
     _neutralize_script_data,
+    _phase_blocks,
     _strip_comments,
     render_html_string,
 )
@@ -1368,6 +1374,103 @@ def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert re.search(r'<td[^>]*\bdata-param="label"[^>]*>\s*None\s*</td>', content)
+
+
+def _placeholder_step(phase: Phase, *column_ids: str, children=()) -> Step:
+    return Step(
+        phase=phase,
+        narration=Narration(
+            text=' '.join(column_ids),
+            parts=tuple(
+                NarrationPlaceholder(name=column_id, column_id=ColumnId(column_id))
+                for column_id in column_ids
+            ),
+        ),
+        children=list(children),
+    )
+
+
+def _table_scenario(steps: list[Step], column_ids: list[str]) -> Scenario:
+    return Scenario(
+        id=NodeId('test.py::test_p'),
+        narration=Narration(text='Param scenario'),
+        module='mod',
+        steps=steps,
+        parameters=ParameterTable(
+            columns=[
+                ParameterColumn(id=ColumnId(column_id), name=column_id, kind='param')
+                for column_id in column_ids
+            ]
+        ),
+    )
+
+
+def test_phase_blocks_are_the_runs_of_top_level_steps_sharing_a_phase() -> None:
+    steps = [
+        _placeholder_step('given'),
+        _placeholder_step('given'),
+        _placeholder_step('when'),
+        _placeholder_step('then'),
+        _placeholder_step('when'),
+    ]
+
+    assert [[step.phase for step in block] for block in _phase_blocks(steps)] == [
+        ['given', 'given'],
+        ['when'],
+        ['then'],
+        ['when'],
+    ]
+
+
+def test_a_column_belongs_to_the_phase_block_a_reader_first_meets_it_in() -> None:
+    """Met nested, or as an attachment badge, it still belongs to the block of
+    its top-level step; a phase that recurs is a block of its own."""
+    attachment_step = Step(
+        phase='then',
+        narration=Narration(text='logged'),
+        attachments=[
+            AttachmentRef(label='log', content_type='text', column_id=ColumnId('log'))
+        ],
+    )
+    scenario = _table_scenario(
+        [
+            _placeholder_step('given', 'guest', 'room'),
+            _placeholder_step('when', children=[_placeholder_step('when', 'payment')]),
+            _placeholder_step('then', 'outcome', 'room'),
+            attachment_step,
+            _placeholder_step('when', 'refund'),
+        ],
+        ['guest', 'room', 'payment', 'outcome', 'log', 'refund'],
+    )
+
+    assert _column_phase_blocks(scenario) == {
+        'guest': 0,
+        'room': 0,
+        'payment': 1,
+        'outcome': 2,
+        'log': 2,
+        'refund': 3,
+    }
+
+
+def test_an_unnarrated_column_joins_the_phase_block_beside_it() -> None:
+    scenario = _table_scenario(
+        [_placeholder_step('given', 'guest'), _placeholder_step('then', 'outcome')],
+        ['unnamed', 'guest', 'also_unnamed', 'outcome'],
+    )
+
+    assert _column_phase_blocks(scenario) == {
+        'unnamed': 0,
+        'guest': 0,
+        'also_unnamed': 0,
+        'outcome': 1,
+    }
+
+
+def test_a_table_no_step_narrates_has_no_phase_blocks() -> None:
+    scenario = _table_scenario([_placeholder_step('given')], ['unnamed'])
+
+    assert _column_phase_blocks(scenario) == {}
 
 
 # ---------------------------------------------------------------------------

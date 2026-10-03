@@ -20,6 +20,7 @@ from ..model import (
     ClausePart,
     ClauseTermRef,
     ClauseWord,
+    ColumnId,
     Glossary,
     GlossaryTerm,
     Narration,
@@ -32,8 +33,10 @@ from ..model import (
     ReportData,
     Scenario,
     SourceLocation,
+    Step,
     TermId,
     TermKind,
+    iter_steps,
     placeholder_token,
 )
 from .coverage import build_coverage_map
@@ -142,6 +145,8 @@ def _build_env(
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
+    env.filters['phase_blocks'] = _phase_blocks
+    env.filters['column_phase_blocks'] = _column_phase_blocks
     env.globals['data_url'] = _data_url
     return env
 
@@ -158,6 +163,44 @@ def _make_param_color_class(
         return f'param-color-{param_color_map[column.name]}'
 
     return _class
+
+
+def _phase_blocks(steps: list[Step]) -> list[list[Step]]:
+    """Top-level steps in runs sharing a phase: one keyword each in the
+    narration, and what a phase hover outlines."""
+    blocks: list[list[Step]] = []
+    for step in steps:
+        if blocks and blocks[-1][0].phase == step.phase:
+            blocks[-1].append(step)
+        else:
+            blocks.append([step])
+    return blocks
+
+
+def _column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
+    """Each parameter-table column's phase block: the one a reader first meets
+    it in. A column no step narrates joins the block beside it, the one before
+    or, leading the table, the first."""
+    assert scenario.parameters is not None
+    met_in: dict[ColumnId, int] = {}
+    for index, block in enumerate(_phase_blocks(scenario.steps)):
+        for step in iter_steps(block):
+            for part in step.narration.parts:
+                if isinstance(part, NarrationPlaceholder):
+                    met_in.setdefault(part.column_id, index)
+            for attachment in step.attachments:
+                if isinstance(attachment, AttachmentRef):
+                    met_in.setdefault(attachment.column_id, index)
+    columns = scenario.parameters.columns
+    known = [met_in[column.id] for column in columns if column.id in met_in]
+    if not known:
+        return {}
+    current = known[0]
+    blocks: dict[ColumnId, int] = {}
+    for column in columns:
+        current = met_in.get(column.id, current)
+        blocks[column.id] = current
+    return blocks
 
 
 def _render_context(

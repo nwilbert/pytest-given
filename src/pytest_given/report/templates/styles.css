@@ -646,15 +646,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 /* Narration: the keyword sits in a fixed left gutter, in the ink at medium
    weight; steps align beside it. Structure comes from alignment, so the accent
-   stays reserved for interaction. Grid auto-placement does the rest — a label
-   is pinned to column 1 and so starts a row, each step is pinned to column 2
-   and so takes the next row. */
+   stays reserved for interaction. */
 .steps {
-  display: grid;
-  /* About 1em clear of "Given", the widest keyword: any wider and the gutter
-     reads as its own column rather than the start of each step. */
-  grid-template-columns: 3em 1fr;
-  column-gap: var(--space-sm);
   padding-top: var(--space-md);
   padding-left: var(--space-lg);
   font-size: var(--font-size-md);
@@ -662,13 +655,37 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
      no rows. */
   line-height: 1.5;
 }
+/* One keyword and its run of steps. The gutter is a fixed track in every
+   block, so the steps still align across blocks; the step track sizes to its
+   text, which is what lets the hover outline hug it. The width cap leaves room
+   for that outline, which the card's `overflow: hidden` would otherwise clip. */
+.phase-block {
+  position: relative;
+  display: grid;
+  /* About 1em clear of "Given", the widest keyword: any wider and the gutter
+     reads as its own column rather than the start of each step. */
+  grid-template-columns: 3em minmax(0, auto);
+  column-gap: var(--space-sm);
+  width: fit-content;
+  max-width: calc(100% - var(--space-sm));
+}
+/* A gap at every phase change, so a long scenario reads as Given, When and
+   Then blocks rather than one run of steps. */
+.phase-block + .phase-block { margin-top: var(--space-sm); }
 .phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
 .phase-steps { grid-column: 2; min-width: 0; }
-/* A gap at every phase change, so a long scenario reads as Given, When and
-   Then blocks rather than one run of steps. The step beside the label shares
-   its grid row and takes the same margin, keeping the two on one baseline. */
-.phase-label:not(:first-child),
-.phase-label:not(:first-child) + .phase-steps { margin-top: var(--space-md); }
+/* The hovered phase, outlined here and over its columns in the parameter
+   table (`.phase-outline`). A line, not a fill: the table's crosshair already
+   paints with the tint. Vertically it sits halfway into the gap between
+   phases, so it belongs to neither neighbour. */
+.phase-block.phase-hover::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--space-sm) / 2) calc(-1 * var(--space-sm));
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
 .step-text { color: var(--text-narration); }
 .step-expand,
 .attachment-expand {
@@ -712,7 +729,15 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    unbreakable value outgrows the `max-width` cap below however little room
    there is. The card is `overflow: hidden` for the expand animation, which
    would clip that with no scrollbar; this scroll box turns it into one. */
-.param-table-scroll { overflow-x: auto; }
+.param-table-scroll { overflow-x: auto; position: relative; }
+/* Drawn by app.js over a phase's cells rather than as cell borders, which the
+   table's rounded corners would clip. */
+.phase-outline {
+  position: absolute;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
 
 /* Param table */
 .param-table {
@@ -726,7 +751,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   background: var(--bg-page);
   border-radius: var(--radius-md);
   overflow: hidden;
-  margin-top: var(--space-sm);
+  /* Wider than the gap between phases: the last phase's hover outline sits
+     halfway into that gap, and this keeps it clear of its columns' outline. */
+  margin-top: var(--space-md);
   margin-left: var(--space-xl);
 }
 .param-table th {
@@ -742,13 +769,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
 }
-/* Set off from the parameters: the status is the outcome, not one more input.
-   No width here — a percentage width on a cell stretches an auto-width table
+/* No width here — a percentage width on a cell stretches an auto-width table
    to the full card. */
-.param-table .param-status {
-  text-align: center;
-  border-left: 1px solid var(--border);
-}
+.param-table .param-status { text-align: center; }
 .param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
 /* A payload panel is not a case: it carries no cells to highlight and no row
@@ -928,9 +951,6 @@ span.param-highlight {
   /* One unbreakable token, which a narrow card would otherwise clip. */
   overflow-wrap: anywhere;
 }
-/* A step's line height already clears the link; a table or error box ends
-   at its edge and keeps the padding. */
-.steps + .scenario-source { padding-top: 0; }
 .scenario-source a {
   color: inherit;
   text-decoration: none;

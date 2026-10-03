@@ -266,14 +266,18 @@
       {% endif %}
       <div class="steps">
         {%- set scenario_idx = loop.index0 -%}
-        {%- set ns = namespace(prev_phase=None) -%}
-        {%- for step in scenario.steps -%}
-          {%- if step.phase != ns.prev_phase -%}
-            <div class="phase-label">{{ step.phase | capitalize }}</div>
-            {%- set ns.prev_phase = step.phase -%}
-          {%- endif -%}
-          <div class="phase-steps">
-            {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ loop.index0) }}
+        {#- A running count, not the inner loop's index: step ids key
+            `expandedSteps`, so they must stay unique across blocks. -#}
+        {%- set ns = namespace(step_idx=0) -%}
+        {%- for block in scenario.steps | phase_blocks -%}
+          <div class="phase-block" data-block="{{ loop.index0 }}">
+            <div class="phase-label">{{ block[0].phase | capitalize }}</div>
+            {%- for step in block -%}
+            <div class="phase-steps">
+              {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ ns.step_idx) }}
+            </div>
+            {%- set ns.step_idx = ns.step_idx + 1 -%}
+            {%- endfor -%}
           </div>
         {%- endfor -%}
       </div>
@@ -283,14 +287,18 @@
           the header's status badge on every row. -#}
       {%- set show_status = scenario.parameters.has_mixed_statuses -%}
       {%- set table_width = scenario.parameters.columns | length + show_status %}
+      {#- Each column carries its phase block, the status column one of its
+          own, so a phase hover can outline the narration and its columns
+          together. -#}
+      {%- set col_blocks = scenario | column_phase_blocks %}
       <div class="param-table-scroll">
       <table class="param-table">
         <thead>
           <tr>
             {% for col in scenario.parameters.columns %}
-            <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}">{{ col.name }}</th>
+            <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>{{ col.name }}</th>
             {% endfor %}
-            {% if show_status %}<th class="param-status">status</th>{% endif %}
+            {% if show_status %}<th class="param-status" data-block="status">status</th>{% endif %}
           </tr>
         </thead>
         <tbody>
@@ -299,7 +307,7 @@
           <tr data-case-row class="{{ 'failed-row' if case.status == 'failed' else '' }}">
             {% for col, val in scenario.parameters.cells(case) %}
             {% if col.kind == 'attachment' %}
-            <td data-param="{{ col.id }}">
+            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
               {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name, val.content_type) }}
@@ -311,10 +319,10 @@
                substituting that blank would erase the step's {token} instead of
                replacing it. A `param` cell always substitutes — `None` there is
                a real parametrize value. #}
-            <td data-param="{{ col.id }}"{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
             {% endfor %}
-            {% if show_status %}<td class="param-status">{{ status_dot(case.status) }}</td>{% endif %}
+            {% if show_status %}<td class="param-status" data-block="status">{{ status_dot(case.status) }}</td>{% endif %}
           </tr>
           {% if case.error %}
           <tr>
