@@ -25,6 +25,11 @@ mistake shipped to PyPI is permanent.
       `[Unreleased]` at the new tag, and add a line for the new version.
 - [ ] Land it on `main` and wait for CI to go green. Releases can only be
       dispatched from `main`.
+- [ ] Actions → **Compat** → Run workflow on `main`, and wait for both jobs to
+      go green. It runs `nox -s compat` — the suite on every supported Python,
+      against pytest 9.0.x and the newest pytest — on Linux and Windows. CI
+      covers only the locked pytest on Python 3.14 on Linux, so this is the one
+      check of the pytest floor, of Python 3.15, and of Windows.
 
 A PR is not required: `main` carries no branch protection and CI gates direct
 pushes too, and the release workflow re-runs the whole gate in `verify` and
@@ -40,8 +45,8 @@ then runs it again. The usual "run `uv run nox` before committing" rule from
 isn't a release-specific step. The exception is a change to packaging itself
 (build config, the hatch include lists, anything affecting what lands in the
 wheel): there `uv run nox -s build` locally is worth the faster loop, and it is
-the only place a Windows-side packaging problem can surface at all, since CI is
-Linux-only.
+the only place a Windows-side packaging problem can surface at all, since CI and
+the release workflow build on Linux only.
 
 ### 2. Rehearse on TestPyPI
 

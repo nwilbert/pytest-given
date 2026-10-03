@@ -95,6 +95,26 @@ def test(session: nox.Session) -> None:
     session.run('pytest')
 
 
+@nox.session(python=['3.14', '3.15'])
+@nox.parametrize(
+    'pytest_version', ['9.0', 'latest'], ids=['pytest-9.0', 'pytest-latest']
+)
+def compat(session: nox.Session, pytest_version: str) -> None:
+    """Run the suite on every supported Python against pytest 9.0.x and the newest.
+
+    `latest` installs the newest release rather than trusting the lock, which
+    only moves on `uv lock --upgrade`. pytest 9.0 predates the `max_warnings`
+    option, so there an unknown-option warning replaces the warnings gate.
+    """
+    _sync(session, 'test', include_project=True)
+    if pytest_version == 'latest':
+        pytest_install = ['pytest', '--upgrade-package', 'pytest']
+    else:
+        pytest_install = [f'pytest~={pytest_version}.0']
+    session.run('uv', 'pip', 'install', *pytest_install, external=True)
+    session.run('pytest')
+
+
 @nox.session
 def coverage(session: nox.Session) -> None:
     _sync(session, 'coverage', include_project=True)

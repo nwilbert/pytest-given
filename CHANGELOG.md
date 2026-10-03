@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- Python 3.15 is supported.
+
 ### Changed
 
 - The parameter table in the HTML and Markdown reports shows its status column only when the cases differ in status.

@@ -1,0 +1,29 @@
+name: Compat
+
+# Manual dispatch, run before every release (see docs/releasing.md): the
+# `compat` nox session tests every supported Python against pytest 9.0.x and the
+# newest pytest, here on both Linux and Windows.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compat:
+    strategy:
+      # One OS failing says nothing about the other; let both finish.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+      # nox sessions inherit nox's own interpreter, so it must satisfy the
+      # project's requires-python (>=3.14). The `compat` session picks its own
+      # Pythons, which uv downloads as needed.
+      - run: uv tool install --python 3.14 nox
+      - run: nox -s compat
