@@ -547,6 +547,24 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .scenario.failed::before { background: var(--color-failed); }
 .scenario.skipped::before { background: var(--color-skipped); }
+/* A grouped scenario with several cases: a thinner, shorter bar behind the
+   status mark, a second card under the first. The mark itself keeps its full
+   width, so the status reads as strongly as on any other row. Hung off the
+   header rather than the card, so it stays beside the title when the card
+   expands: 2px right of the mark, which ends 11px left of the header. */
+.scenario.multi-case > .scenario-header { position: relative; }
+.scenario.multi-case > .scenario-header::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--color-passed);
+}
+.scenario.multi-case.failed > .scenario-header::before { background: var(--color-failed); }
+.scenario.multi-case.skipped > .scenario-header::before { background: var(--color-skipped); }
 .scenario-header {
   display: flex;
   justify-content: space-between;

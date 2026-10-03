@@ -25,6 +25,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A hovered story, sentence, or sidebar group in the HTML report gets a visible fill in both themes; the story list showed none, and the dark theme's hover sank into the background.
 - A scenario's narration in the HTML report leaves a gap at each change between given, when, and then, and its source link sits closer below it.
 - Hovering a phase in the HTML report's narration, or a parameter table column, outlines that phase in both the narration and the table, and the status column loses its separator line.
+- A parametrized scenario with several cases shows a second, thinner status bar in the HTML report's scenario lists.
 - The bundled `pytest-given-authoring` skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets `.low` as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables, with refused inputs as rows, and merging sibling scenarios into one.
 - The bundled `pytest-given-reviewing` skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome or that hold a column no step narrates.
 

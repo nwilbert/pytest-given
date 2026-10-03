@@ -223,7 +223,7 @@
   <div class="scenario-list">
   {% for scenario in scenarios %}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
-  <div class="scenario {{ scenario.status }}"
+  <div class="scenario {{ scenario.status }}{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
        x-show="isVisible({{ loop.index0 }})"
        id="scenario-{{ loop.index0 }}"
        data-scenario-id="{{ scenario.id }}">
@@ -458,7 +458,7 @@
           <div class="scenario-list">
           {% for scn in story_scns %}
           {% set covers = scn_covers[scn.id][story.id] %}
-          <div class="scenario {{ scn.status }}"
+          <div class="scenario {{ scn.status }}{{ ' multi-case' if scn.parameters and scn.parameters.cases | length > 1 else '' }}"
                {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
                   the `"` its own string literals need. #}
                data-covers='{{ covers | tojson }}'
