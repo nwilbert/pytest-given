@@ -7,6 +7,8 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
     --source-link=vscode
 ```
 
+The CLI takes its settings from flags only, never from your pytest config, and imports none of your code, so it also runs without installing: `uvx pytest-given@<version> report …`, pinned to the version that wrote the JSON file.
+
 `--source-link` takes the same presets and URL templates as `--given-source-link` (see [Source links](configuration/source-links.md)). Without it (or with `--source-link=none`), file:line is shown as plain text, without a link. With `--format md`, the option is checked but has no effect.
 
 `--theme=light|dark|auto` sets the theme the report opens in, like `--given-theme`. The default is `auto`.
