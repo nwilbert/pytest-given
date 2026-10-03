@@ -1266,7 +1266,6 @@ span.param-highlight {
   display: flex;
   align-items: baseline;
   gap: var(--space-sm);
-  margin-top: var(--space-xl);
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-xs);
 }
@@ -1287,6 +1286,28 @@ span.param-highlight {
 }
 
 /* === Glossary entry layout === */
+/* One column set for the whole view, passed down through every level by
+   subgrid, so the widest name sizes the name column for all groups alike:
+   disclosure button, name, then the definition with its counts. */
+.glossary-entries {
+  display: grid;
+  grid-template-columns: auto fit-content(min(16rem, 30%)) minmax(0, 1fr);
+  column-gap: var(--space-sm);
+  /* Grid rows don't collapse margins, so the groups are spaced by the gap;
+     the negative margin takes back the one before the sizer's empty row. */
+  row-gap: var(--space-xl);
+  margin-bottom: calc(-1 * var(--space-xl));
+}
+.kind-group,
+.kind-group > .entry-list,
+.entry,
+.entry-head,
+.refs {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+.kind-header { grid-column: 1 / -1; }
 /* The kind mark: a scenario row's status bar, in the kind's underline color. */
 .entry { position: relative; }
 .entry::before {
@@ -1300,18 +1321,33 @@ span.param-highlight {
   background: var(--kind-line);
 }
 .entry-head {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-sm);
+  align-items: start;
   padding: var(--space-sm) var(--space-lg) var(--space-sm) calc(var(--space-lg) + 5px);
   cursor: pointer;
   user-select: none;
 }
 .entry-head .disclosure-btn { margin-top: 2px; }
-.entry-head .scenario-chevron { flex-shrink: 0; }
-.entry-name { flex-shrink: 0; min-width: 160px; }
-.entry-body { flex: 1; }
-.entry-def { font-size: var(--font-size-md); color: var(--text-primary); }
+/* The padding is the gap before the definition, wide enough for the copy-link
+   button to sit in beside even the widest name. A floor, so a glossary of
+   short names does not crowd its definitions against them. */
+.entry-name { min-width: 6rem; padding-right: var(--space-lg); }
+.entry-name .term-name { position: relative; display: inline-block; }
+.entry-name .anchor-link {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 0;
+}
+.entry-name-sizer {
+  grid-column: 2;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.entry-name-sizer .term-name { display: block; }
+.entry-body { display: flex; align-items: flex-start; gap: var(--space-sm); }
+.entry-def { flex: 1; font-size: var(--font-size-md); color: var(--text-narration); }
 .entry-def-badge {
   display: inline-block;
   font-size: 0.75rem;
@@ -1321,15 +1357,22 @@ span.param-highlight {
   border-radius: var(--radius-sm);
   padding: 0 6px;
 }
-.entry-summary { font-size: var(--font-size-sm); color: var(--text-muted); margin-top: 2px; }
+/* The term's counts sit at the row's right edge, as a scenario header's
+   meta does, on one line: wrapped, their ragged stacks make rows uneven. */
+.entry-summary {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  margin-top: 2px;
+}
 
 /* === Refs collapsible === */
-.refs-inner { overflow: hidden; min-height: 0; }
+/* In the definition's column, so it lines up under the definition. */
+.refs-inner { grid-column: 3; overflow: hidden; min-height: 0; }
 .refs-content {
-  /* Lines up under the definition: the entry head's padding (with the kind
-     bar's 5px), the disclosure button's 16px net of its margins, the 160px
-     name column, and two gaps. */
-  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 5px + 16px + var(--space-sm) + 160px + var(--space-sm));
+  padding: 0 var(--space-lg) var(--space-md) 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
