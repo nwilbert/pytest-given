@@ -84,10 +84,13 @@
   
 
 
-  --term-actor-ink: #8a4310;    --term-actor-wash: #fde5d3;    --term-actor-edge: #f0b48a;
-  --term-object-ink: #0f6e64;   --term-object-wash: #d5f2ee;   --term-object-edge: #7fd5c9;
-  --term-activity-ink: #5f2d9a; --term-activity-wash: #ece0f7; --term-activity-edge: #c6aef0;
-  --term-kindless-ink: #545962; --term-kindless-wash: #e9ecf0; --term-kindless-edge: #c9ccd3;
+
+
+
+  --term-actor-ink: #8a4310;    --term-actor-line: #cf763c;
+  --term-object-ink: #0f6e64;   --term-object-line: #4ca095;
+  --term-activity-ink: #5f2d9a; --term-activity-line: #906fc5;
+  --term-kindless-ink: #545962; --term-kindless-line: #8c9099;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   
@@ -127,10 +130,10 @@
   --color-skipped: #f0b45c;
   --color-skipped-tint: #40332f;
 
-  --term-actor-ink: #f5b47a;    --term-actor-wash: #47302b;    --term-actor-edge: #7a4a2e;
-  --term-object-ink: #7fded0;   --term-object-wash: #21383f;   --term-object-edge: #2a6b62;
-  --term-activity-ink: #cbb5f7; --term-activity-wash: #372e4d; --term-activity-edge: #5b4886;
-  --term-kindless-ink: #b8b2c2; --term-kindless-wash: #312c38; --term-kindless-edge: #4a4455;
+  --term-actor-ink: #f5b47a;    --term-actor-line: #cb773e;
+  --term-object-ink: #7fded0;   --term-object-line: #53a397;
+  --term-activity-ink: #cbb5f7; --term-activity-line: #917dbd;
+  --term-kindless-ink: #b8b2c2; --term-kindless-line: #7f798a;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -335,6 +338,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 
 
+
 .status-pills { display: flex; gap: var(--space-xs); }
 .status-pill {
   flex: 1;
@@ -342,7 +346,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   font-size: var(--font-size-sm);
   padding: 2px 4px;
   white-space: nowrap;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   border: 1px solid var(--border);
   background: var(--bg-surface);
@@ -1030,55 +1034,24 @@ span.param-highlight {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .term-ref-actor,
 .term-ref-object,
 .term-ref-activity,
 .term-ref-unknown {
-  padding: 1px 3px;
-  border-radius: 3px;
-  font-weight: 500;
-  cursor: pointer;
-  
-
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+  text-decoration-line: underline;
+  text-decoration-color: var(--kind-line);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-skip-ink: auto;
 }
-.term-ref-actor { background: var(--term-actor-wash); color: var(--term-actor-ink); }
-.term-ref-object { background: var(--term-object-wash); color: var(--term-object-ink); }
-.term-ref-activity { background: var(--term-activity-wash); color: var(--term-activity-ink); }
-
-
-
-.term-ref-unknown {
-  background: var(--term-kindless-wash);
-  color: var(--term-kindless-ink);
-  cursor: default;
-}
+.term-ref-actor { --kind-line: var(--term-actor-line); --kind-ink: var(--term-actor-ink); }
+.term-ref-object { --kind-line: var(--term-object-line); --kind-ink: var(--term-object-ink); }
+.term-ref-activity { --kind-line: var(--term-activity-line); --kind-ink: var(--term-activity-ink); }
+.term-ref-unknown { --kind-line: var(--term-kindless-line); --kind-ink: var(--term-kindless-ink); }
 .term-ref--link { cursor: pointer; }
 
 
-.term-ref--link:hover { text-decoration: underline; }
+.term-ref--link:hover { text-decoration-color: var(--kind-ink); text-decoration-thickness: 2px; }
 .clause-word {
   color: var(--text-narration);
 }
@@ -1307,10 +1280,14 @@ span.param-highlight {
   border-radius: 2px;
   flex-shrink: 0;
 }
-.kind-swatch-actor { background: var(--term-actor-edge); }
-.kind-swatch-object { background: var(--term-object-edge); }
-.kind-swatch-activity { background: var(--term-activity-edge); }
-.kind-swatch-kindless { background: var(--term-kindless-edge); }
+.kind-swatch { background: var(--kind-line); }
+
+
+
+.kind-actor { --kind-line: var(--term-actor-line); --kind-ink: var(--term-actor-ink); }
+.kind-object { --kind-line: var(--term-object-line); --kind-ink: var(--term-object-ink); }
+.kind-activity { --kind-line: var(--term-activity-line); --kind-ink: var(--term-activity-ink); }
+.kind-kindless { --kind-line: var(--term-kindless-line); --kind-ink: var(--term-kindless-ink); }
 
 
 .glossary-empty {
@@ -1325,39 +1302,40 @@ span.param-highlight {
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-xs);
 }
+
 .kind-title {
   font-size: var(--font-size-md);
   font-weight: 700;
+  color: var(--kind-ink);
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 
 
 
-.term-actor { color: var(--term-actor-ink); }
-.term-obj { color: var(--term-object-ink); }
-.term-activity { color: var(--term-activity-ink); }
-.term-kindless { color: var(--term-kindless-ink); }
-
-
-.term-pill {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
+.term-name {
   font-weight: 600;
   font-size: var(--font-size-md);
 }
-.term-pill.term-actor { background: var(--term-actor-wash); border: 1px solid var(--term-actor-edge); }
-.term-pill.term-obj { background: var(--term-object-wash); border: 1px solid var(--term-object-edge); }
-.term-pill.term-activity { background: var(--term-activity-wash); border: 1px solid var(--term-activity-edge); }
-.term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
 
 
+
+.entry { position: relative; }
+.entry::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: var(--space-sm);
+  bottom: var(--space-sm);
+  width: 4px;
+  border-radius: 2px;
+  background: var(--kind-line);
+}
 .entry-head {
   display: flex;
   align-items: flex-start;
   gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-lg) var(--space-sm) calc(var(--space-lg) + 5px);
   cursor: pointer;
   user-select: none;
 }
@@ -1380,7 +1358,10 @@ span.param-highlight {
 
 .refs-inner { overflow: hidden; min-height: 0; }
 .refs-content {
-  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 8px + var(--space-sm) + 160px + var(--space-sm));
+  
+
+
+  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 5px + 16px + var(--space-sm) + 160px + var(--space-sm));
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -1656,7 +1637,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1702,7 +1683,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1897,7 +1878,7 @@ span.param-highlight {
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -1925,28 +1906,28 @@ span.param-highlight {
         
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.actor">
-          <span class="kind-swatch kind-swatch-actor"></span>
+          <span class="kind-swatch kind-actor"></span>
           <span>Actors</span>
           <span class="nav-group-count">1</span>
         </label>
         
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.object">
-          <span class="kind-swatch kind-swatch-object"></span>
+          <span class="kind-swatch kind-object"></span>
           <span>Work Objects</span>
           <span class="nav-group-count">2</span>
         </label>
         
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.activity">
-          <span class="kind-swatch kind-swatch-activity"></span>
+          <span class="kind-swatch kind-activity"></span>
           <span>Activities</span>
           <span class="nav-group-count">1</span>
         </label>
         
         <label class="kind-filter-row">
           <input type="checkbox" x-model="glossaryKindFilter.kindless">
-          <span class="kind-swatch kind-swatch-kindless"></span>
+          <span class="kind-swatch kind-kindless"></span>
           <span>Uncategorized</span>
           <span class="nav-group-count">2</span>
         </label>
@@ -1989,11 +1970,11 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.actor && visibleTermCount('actor') > 0">
         
         <div class="kind-header">
-          <span class="kind-title term-actor">Actors</span>
+          <span class="kind-title kind-actor">Actors</span>
           <span class="kind-meta" x-text="visibleTermLabel('actor')"></span>
         </div>
         
-        <div class="entry-list">
+        <div class="entry-list kind-actor">
         
         
         
@@ -2010,7 +1991,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-actor">Guest</span>
+              <span class="term-name">Guest</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A person making a room reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2042,7 +2023,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -2056,11 +2037,11 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.object && visibleTermCount('object') > 0">
         
         <div class="kind-header">
-          <span class="kind-title term-obj">Work Objects</span>
+          <span class="kind-title kind-object">Work Objects</span>
           <span class="kind-meta" x-text="visibleTermLabel('object')"></span>
         </div>
         
-        <div class="entry-list">
+        <div class="entry-list kind-object">
         
         
         
@@ -2077,7 +2058,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-obj">Room</span>
+              <span class="term-name">Room</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2109,7 +2090,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -2131,7 +2112,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="confirmation" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-obj">Confirmation</span>
+              <span class="term-name">Confirmation</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A notification acknowledging a successful reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2163,7 +2144,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -2177,11 +2158,11 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.activity && visibleTermCount('activity') > 0">
         
         <div class="kind-header">
-          <span class="kind-title term-activity">Activities</span>
+          <span class="kind-title kind-activity">Activities</span>
           <span class="kind-meta" x-text="visibleTermLabel('activity')"></span>
         </div>
         
-        <div class="entry-list">
+        <div class="entry-list kind-activity">
         
         
         
@@ -2198,7 +2179,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="book" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-activity">book</span>
+              <span class="term-name">book</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2237,7 +2218,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -2251,11 +2232,11 @@ span.param-highlight {
       <div x-show="glossaryKindFilter.kindless && visibleTermCount('kindless') > 0">
         
         <div class="kind-header">
-          <span class="kind-title term-kindless">Uncategorized</span>
+          <span class="kind-title kind-kindless">Uncategorized</span>
           <span class="kind-meta" x-text="visibleTermLabel('kindless')"></span>
         </div>
         
-        <div class="entry-list">
+        <div class="entry-list kind-kindless">
         
         
         
@@ -2272,7 +2253,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="cancellation-policy" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-kindless">Cancellation Policy</span>
+              <span class="term-name">Cancellation Policy</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">The rules governing <strong>how</strong> and <strong>when</strong> a booking may be cancelled.<br>Applies to every <code>Room</code> rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2297,7 +2278,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2319,7 +2300,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="overbooking" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-pill term-kindless">Overbooking</span>
+              <span class="term-name">Overbooking</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2337,7 +2318,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/c12e762c74af659c663c7c6c57660ba5202715cc/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/170f668a36d621d8eba22444d9ee722b99c6d41a/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2363,7 +2344,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-03T10:34:28.107602+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest books an available room\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-03T11:21:01.250978+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest books an available room\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
