@@ -30,7 +30,7 @@
   /* Step prose, between primary and secondary (~10:1 on the card in both
      themes): at secondary it ranked below the term refs and the keyword
      gutter, and a step read as a row of highlighted nouns. Full primary
-     would glare against the washes in the dark theme. */
+     would glare in the dark theme. */
   --text-narration: #3d4450;
   --text-secondary: #58606d;
   --text-muted: #646b78;
@@ -49,13 +49,12 @@
   --color-skipped: #9a5300;
   --color-skipped-tint: #fbecd5;
 
-  /* Term-ref kinds: the wash says "this is a term", the ink says which kind
-     (see the term-ref comment further down). The edge is the pill border and
-     the sidebar swatch. */
-  --term-actor-ink: #8a4310;    --term-actor-wash: #fde5d3;    --term-actor-edge: #f0b48a;
-  --term-object-ink: #0f6e64;   --term-object-wash: #d5f2ee;   --term-object-edge: #7fd5c9;
-  --term-activity-ink: #5f2d9a; --term-activity-wash: #ece0f7; --term-activity-edge: #c6aef0;
-  --term-kindless-ink: #545962; --term-kindless-wash: #e9ecf0; --term-kindless-edge: #c9ccd3;
+  /* Term-ref kinds: the ink says which kind, the edge underlines a term ref
+     (see the term-ref comment further down) and fills its sidebar swatch. */
+  --term-actor-ink: #8a4310;    --term-actor-edge: #f0b48a;
+  --term-object-ink: #0f6e64;   --term-object-edge: #7fd5c9;
+  --term-activity-ink: #5f2d9a; --term-activity-edge: #c6aef0;
+  --term-kindless-ink: #545962; --term-kindless-edge: #c9ccd3;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   /* Inline code inside the tooltip, which is inverted (ink on bg). */
@@ -95,10 +94,10 @@
   --color-skipped: #f0b45c;
   --color-skipped-tint: #40332f;
 
-  --term-actor-ink: #f5b47a;    --term-actor-wash: #47302b;    --term-actor-edge: #7a4a2e;
-  --term-object-ink: #7fded0;   --term-object-wash: #21383f;   --term-object-edge: #2a6b62;
-  --term-activity-ink: #cbb5f7; --term-activity-wash: #372e4d; --term-activity-edge: #5b4886;
-  --term-kindless-ink: #b8b2c2; --term-kindless-wash: #312c38; --term-kindless-edge: #4a4455;
+  --term-actor-ink: #f5b47a;    --term-actor-edge: #7a4a2e;
+  --term-object-ink: #7fded0;   --term-object-edge: #2a6b62;
+  --term-activity-ink: #cbb5f7; --term-activity-edge: #5b4886;
+  --term-kindless-ink: #b8b2c2; --term-kindless-edge: #4a4455;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -991,62 +990,49 @@ span.param-highlight {
 }
 
 /* === Term refs in narration (actor / object / activity / no kind) ===
-   A light wash behind the word, with the kind in the ink. The two channels
-   carry different things: the wash says "this word is a glossary term", the
-   ink says which kind, and only the first has to survive every context the
-   word lands in.
+   A pale underline beneath the word, with the kind in the ink. The two
+   channels carry different things: the underline says "this word is a
+   glossary term", the ink says which kind, and only the first has to survive
+   every context the word lands in. Neither adds weight or a fill, so a line of
+   five terms still reads as a line of text.
 
    That split is what solves the kindless term, which has no hue to give it.
    No fourth hue clears the three kinds, the body text, the statuses, the
    accent and the generated column ring while holding AA at readable
    lightness; and weight cannot stand in for hue, since weight reads only
-   against its container — a ref legible in 400 body text vanishes in a 500
-   title, and a third of the kindless refs sit in titles. A neutral wash is
-   measured against the card, which does not change.
+   against its container — a ref legible in 400 body text vanishes in a 600
+   title. Its grey ink and grey underline are the whole of its mark.
 
-   The washes are equalized perceptually rather than at a fixed chroma, each
-   placed at dE00 12 from the card; the neutral needs less, since a gray wash
-   is never mistaken for paper tone the way a pale hue is.
-
-   No border, and 3px of padding: boxiness came from the old pills' borders and
-   padding, not their fill, and a line of five terms made the boxes the line.
-   The wash costs 6px a term and carries no negative margin to pull them back.
-   Gecko subtracts negative inline margins from a block's max-content width but
-   does not apply them the same way when it breaks lines, so `margin: 0 -1px`
-   left a max-content title 2px short per ref and wrapped its last word onto an
-   empty row — a third of the self-report's titles, at every viewport width, in
-   Firefox only. Keep inline margins off the wash; if the 6px ever needs pulling
-   back, spend it on the padding. A `box-shadow` spread cannot buy it back
-   either: a 2px bleed would swallow the gap that keeps two adjacent refs
-   reading as two marks, and would collide with the line above. */
+   The underline also keeps a term apart from a parameter value, which shares
+   the colored ink but is bold and never underlined. */
 .term-ref-actor,
 .term-ref-object,
 .term-ref-activity,
 .term-ref-unknown {
-  padding: 1px 3px;
-  border-radius: 3px;
-  font-weight: 500;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-skip-ink: auto;
   cursor: pointer;
-  /* Without this a term ref that wraps loses its padding and rounding on one
-     of the two fragments. */
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
 }
-.term-ref-actor { background: var(--term-actor-wash); color: var(--term-actor-ink); }
-.term-ref-object { background: var(--term-object-wash); color: var(--term-object-ink); }
-.term-ref-activity { background: var(--term-activity-wash); color: var(--term-activity-ink); }
+/* The kind ink only part-way: `currentColor` here is the surrounding text,
+   so a ref leans toward its narration or title ink and the hue stays a hint.
+   The glossary's kind headers, which name the kind, keep the full ink. */
+.term-ref-actor { color: color-mix(in oklab, var(--term-actor-ink) 60%, currentColor); text-decoration-color: var(--term-actor-edge); }
+.term-ref-object { color: color-mix(in oklab, var(--term-object-ink) 60%, currentColor); text-decoration-color: var(--term-object-edge); }
+.term-ref-activity { color: color-mix(in oklab, var(--term-activity-ink) 60%, currentColor); text-decoration-color: var(--term-activity-edge); }
 /* The kindless ink is a grey that differs from the body ink in hue, not only
    lightness: a lighter body ink reads as body text lightened — receding, the
    opposite of marked. */
 .term-ref-unknown {
-  background: var(--term-kindless-wash);
   color: var(--term-kindless-ink);
+  text-decoration-color: var(--term-kindless-edge);
   cursor: default;
 }
 .term-ref--link { cursor: pointer; }
-/* Colored text underlining on hover is the plain link idiom, which is what
-   lets the resting state spend nothing on a click affordance. */
-.term-ref--link:hover { text-decoration: underline; }
+/* The resting underline already marks the term, so hover darkens it to the
+   ink rather than adding one. */
+.term-ref--link:hover { text-decoration-color: currentColor; text-decoration-thickness: 2px; }
 .clause-word {
   color: var(--text-narration);
 }
@@ -1299,33 +1285,30 @@ span.param-highlight {
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
-/* Kind colors for kind headers and term pills: the same ink, wash and edge
-   the narration gives each kind, so one kind is one color across both views.
-   The kindless border stays dashed — the catalog's own mark for "not a kind". */
+/* Kind colors for kind headers: the full ink, since the header is what names
+   the kind. */
 .term-actor { color: var(--term-actor-ink); }
 .term-obj { color: var(--term-object-ink); }
 .term-activity { color: var(--term-activity-ink); }
 .term-kindless { color: var(--term-kindless-ink); }
 
-/* === Term pills === */
-.term-pill {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
+/* === Term names === */
+/* The tint of a term ref's ink, without its underline: in the catalog every
+   name is a term, and the kind header above already says which kind. */
+.term-name {
   font-weight: 600;
   font-size: var(--font-size-md);
 }
-.term-pill.term-actor { background: var(--term-actor-wash); border: 1px solid var(--term-actor-edge); }
-.term-pill.term-obj { background: var(--term-object-wash); border: 1px solid var(--term-object-edge); }
-.term-pill.term-activity { background: var(--term-activity-wash); border: 1px solid var(--term-activity-edge); }
-.term-pill.term-kindless { background: var(--term-kindless-wash); border: 1px dashed var(--term-kindless-edge); }
+.term-name.term-actor { color: color-mix(in oklab, var(--term-actor-ink) 60%, currentColor); }
+.term-name.term-obj { color: color-mix(in oklab, var(--term-object-ink) 60%, currentColor); }
+.term-name.term-activity { color: color-mix(in oklab, var(--term-activity-ink) 60%, currentColor); }
 
 /* === Glossary entry layout === */
 .entry-head {
   display: flex;
   align-items: flex-start;
   gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
   cursor: pointer;
   user-select: none;
 }
@@ -1348,7 +1331,9 @@ span.param-highlight {
 /* === Refs collapsible === */
 .refs-inner { overflow: hidden; min-height: 0; }
 .refs-content {
-  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 8px + var(--space-sm) + 160px + var(--space-sm));
+  /* Lines up under the definition: the entry head's padding, the disclosure
+     button's 16px net of its margins, the 160px name column, and two gaps. */
+  padding: 0 var(--space-lg) var(--space-md) calc(var(--space-lg) + 16px + var(--space-sm) + 160px + var(--space-sm));
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
