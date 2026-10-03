@@ -679,14 +679,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 
-
-
 .steps {
-  display: grid;
-  
-
-  grid-template-columns: 3em 1fr;
-  column-gap: var(--space-sm);
   padding-top: var(--space-md);
   padding-left: var(--space-lg);
   font-size: var(--font-size-md);
@@ -694,13 +687,37 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
   line-height: 1.5;
 }
+
+
+
+
+.phase-block {
+  position: relative;
+  display: grid;
+  
+
+  grid-template-columns: 3em minmax(0, auto);
+  column-gap: var(--space-sm);
+  width: fit-content;
+  max-width: calc(100% - var(--space-sm));
+}
+
+
+.phase-block + .phase-block { margin-top: var(--space-sm); }
 .phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
 .phase-steps { grid-column: 2; min-width: 0; }
 
 
 
-.phase-label:not(:first-child),
-.phase-label:not(:first-child) + .phase-steps { margin-top: var(--space-md); }
+
+.phase-block.phase-hover::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--space-sm) / 2) calc(-1 * var(--space-sm));
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
 .step-text { color: var(--text-narration); }
 .step-expand,
 .attachment-expand {
@@ -744,7 +761,15 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 
-.param-table-scroll { overflow-x: auto; }
+.param-table-scroll { overflow-x: auto; position: relative; }
+
+
+.phase-outline {
+  position: absolute;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
 
 
 .param-table {
@@ -758,7 +783,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   background: var(--bg-page);
   border-radius: var(--radius-md);
   overflow: hidden;
-  margin-top: var(--space-sm);
+  
+
+  margin-top: var(--space-md);
   margin-left: var(--space-xl);
 }
 .param-table th {
@@ -776,11 +803,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 
 
-
-.param-table .param-status {
-  text-align: center;
-  border-left: 1px solid var(--border);
-}
+.param-table .param-status { text-align: center; }
 .param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
 
@@ -960,9 +983,6 @@ span.param-highlight {
   
   overflow-wrap: anywhere;
 }
-
-
-.steps + .scenario-source { padding-top: 0; }
 .scenario-source a {
   color: inherit;
   text-decoration: none;
@@ -1600,12 +1620,15 @@ span.param-highlight {
     <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I insert $2</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">I get a coffee</div><div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I insert $2</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">I get a coffee</div><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s0_2_att_0']"
             @click="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Machine state</button>
@@ -1619,14 +1642,14 @@ span.param-highlight {
       </div>
     </div>
     </div>
-          </div></div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
       
     </div>
     </div>
@@ -1654,10 +1677,11 @@ span.param-highlight {
     <div class="scenario-body" id="scenario-body-1" :class="{ expanded: expandedScenarios[1] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">a printed receipt</div><div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">a printed receipt</div><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s1_1_att_0']"
             @click="toggleAttachment('s1_1_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Receipt</button>
@@ -1669,18 +1693,20 @@ Total:        $2.00</pre></div>
       </div>
     </div>
     </div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">the total line is read back</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">it shows the $2.00 total</div>
-          </div></div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">the total line is read back</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">it shows the $2.00 total</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L44">examples/coffeeshop/test_coffeeshop.py:44</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L44">examples/coffeeshop/test_coffeeshop.py:44</a></div>
       
     </div>
     </div>
@@ -1708,20 +1734,23 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-2" :class="{ expanded: expandedScenarios[2] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a database connection</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I run a query</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the connection is open and the query was logged</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a database connection</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I run a query</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the connection is open and the query was logged</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L55">examples/coffeeshop/test_coffeeshop.py:55</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L55">examples/coffeeshop/test_coffeeshop.py:55</a></div>
       
     </div>
     </div>
@@ -1751,13 +1780,16 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-3" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I insert $<span class="param-color-0" data-param="euros" data-subst="euros">{euros}</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the purchase is allowed: <span class="param-color-1" data-param="expect" data-subst="expect">{expect}</span></div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I insert $<span class="param-color-0" data-param="euros" data-subst="euros">{euros}</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the purchase is allowed: <span class="param-color-1" data-param="expect" data-subst="expect">{expect}</span></div>
+            </div></div></div>
 
       
       <div class="param-table-scroll">
@@ -1765,9 +1797,9 @@ Total:        $2.00</pre></div>
         <thead>
           <tr>
             
-            <th class="param-color-0" data-param="euros">euros</th>
+            <th class="param-color-0" data-param="euros" data-block="1">euros</th>
             
-            <th class="param-color-1" data-param="expect">expect</th>
+            <th class="param-color-1" data-param="expect" data-block="2">expect</th>
             
             
           </tr>
@@ -1777,31 +1809,12 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="euros" data-subst="euros">1</td>
+            <td data-param="euros" data-block="1" data-subst="euros">1</td>
             
             
             
             
-            <td data-param="expect" data-subst="expect">False</td>
-            
-            
-            
-          </tr>
-          
-          
-          
-          
-          
-          <tr data-case-row class="">
-            
-            
-            
-            <td data-param="euros" data-subst="euros">2</td>
-            
-            
-            
-            
-            <td data-param="expect" data-subst="expect">True</td>
+            <td data-param="expect" data-block="2" data-subst="expect">False</td>
             
             
             
@@ -1815,12 +1828,31 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="euros" data-subst="euros">3</td>
+            <td data-param="euros" data-block="1" data-subst="euros">2</td>
             
             
             
             
-            <td data-param="expect" data-subst="expect">True</td>
+            <td data-param="expect" data-block="2" data-subst="expect">True</td>
+            
+            
+            
+          </tr>
+          
+          
+          
+          
+          
+          <tr data-case-row class="">
+            
+            
+            
+            <td data-param="euros" data-block="1" data-subst="euros">3</td>
+            
+            
+            
+            
+            <td data-param="expect" data-block="2" data-subst="expect">True</td>
             
             
             
@@ -1839,7 +1871,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L64">examples/coffeeshop/test_coffeeshop.py:64</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L64">examples/coffeeshop/test_coffeeshop.py:64</a></div>
       
     </div>
     </div>
@@ -1867,15 +1899,18 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-4" :class="{ expanded: expandedScenarios[4] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">an order for a <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml cup</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I brew the cup</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the machine has one fewer coffee</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">an order for a <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml cup</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I brew the cup</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the machine has one fewer coffee</div>
+            </div></div></div>
 
       
       <div class="param-table-scroll">
@@ -1883,7 +1918,7 @@ Total:        $2.00</pre></div>
         <thead>
           <tr>
             
-            <th class="param-color-2" data-param="cup_size">cup_size</th>
+            <th class="param-color-2" data-param="cup_size" data-block="0">cup_size</th>
             
             
           </tr>
@@ -1893,7 +1928,7 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="cup_size" data-subst="cup_size">200</td>
+            <td data-param="cup_size" data-block="0" data-subst="cup_size">200</td>
             
             
             
@@ -1905,7 +1940,7 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="cup_size" data-subst="cup_size">350</td>
+            <td data-param="cup_size" data-block="0" data-subst="cup_size">350</td>
             
             
             
@@ -1922,7 +1957,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L76">examples/coffeeshop/test_coffeeshop.py:76</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L76">examples/coffeeshop/test_coffeeshop.py:76</a></div>
       
     </div>
     </div>
@@ -1950,22 +1985,25 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-5" :class="{ expanded: expandedScenarios[5] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">I have some coins in hand</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I insert $<span class="value-highlight">5</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the machine has <span class="value-highlight">9</span> coffees left</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">I have some coins in hand</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I insert $<span class="value-highlight">5</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the machine has <span class="value-highlight">9</span> coffees left</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L88">examples/coffeeshop/test_coffeeshop.py:88</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L88">examples/coffeeshop/test_coffeeshop.py:88</a></div>
       
     </div>
     </div>
@@ -1993,13 +2031,16 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-6" :class="{ expanded: expandedScenarios[6] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I brew a <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml cup</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the tank is down <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml and the machine has one fewer coffee</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I brew a <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml cup</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the tank is down <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml and the machine has one fewer coffee</div>
+            </div></div></div>
 
       
       <div class="param-table-scroll">
@@ -2007,7 +2048,7 @@ Total:        $2.00</pre></div>
         <thead>
           <tr>
             
-            <th class="param-color-2" data-param="cup_size">cup_size</th>
+            <th class="param-color-2" data-param="cup_size" data-block="1">cup_size</th>
             
             
           </tr>
@@ -2017,7 +2058,7 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="cup_size" data-subst="cup_size">200</td>
+            <td data-param="cup_size" data-block="1" data-subst="cup_size">200</td>
             
             
             
@@ -2029,7 +2070,7 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="cup_size" data-subst="cup_size">300</td>
+            <td data-param="cup_size" data-block="1" data-subst="cup_size">300</td>
             
             
             
@@ -2046,7 +2087,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L99">examples/coffeeshop/test_coffeeshop.py:99</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L99">examples/coffeeshop/test_coffeeshop.py:99</a></div>
       
     </div>
     </div>
@@ -2074,20 +2115,23 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-7" :class="{ expanded: expandedScenarios[7] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I order a <span class="value-highlight">200</span> ml cup</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the tank is down <span class="value-highlight">200</span> ml and the machine has one fewer coffee</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I order a <span class="value-highlight">200</span> ml cup</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the tank is down <span class="value-highlight">200</span> ml and the machine has one fewer coffee</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L109">examples/coffeeshop/test_coffeeshop.py:109</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L109">examples/coffeeshop/test_coffeeshop.py:109</a></div>
       
     </div>
     </div>
@@ -2115,22 +2159,25 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-8" :class="{ expanded: expandedScenarios[8] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">the barista reaches for a takeaway cup</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I order a <span class="value-highlight">400</span> ml cup</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the tank is down <span class="value-highlight">400</span> ml and the machine has one fewer coffee</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">the barista reaches for a takeaway cup</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I order a <span class="value-highlight">400</span> ml cup</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the tank is down <span class="value-highlight">400</span> ml and the machine has one fewer coffee</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L109">examples/coffeeshop/test_coffeeshop.py:109</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L109">examples/coffeeshop/test_coffeeshop.py:109</a></div>
       
     </div>
     </div>
@@ -2160,17 +2207,20 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-9" :class="{ expanded: expandedScenarios[9] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">the machine is primed for <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span></div><div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">the machine is primed for <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span></div><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>brew log</span>
     </div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I brew a <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span> coffee</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the drink costs <span class="param-color-4" data-param="derived:0" data-subst="derived:0">{price}</span> euros</div>
-          </div></div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I brew a <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span> coffee</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the drink costs <span class="param-color-4" data-param="derived:0" data-subst="derived:0">{price}</span> euros</div>
+            </div></div></div>
 
       
       <div class="param-table-scroll">
@@ -2178,11 +2228,11 @@ Total:        $2.00</pre></div>
         <thead>
           <tr>
             
-            <th class="param-color-3" data-param="flavor">flavor</th>
+            <th class="param-color-3" data-param="flavor" data-block="0">flavor</th>
             
-            <th data-param="attachment:0">brew log</th>
+            <th data-param="attachment:0" data-block="0">brew log</th>
             
-            <th class="param-color-4" data-param="derived:0">price</th>
+            <th class="param-color-4" data-param="derived:0" data-block="2">price</th>
             
             
           </tr>
@@ -2192,11 +2242,11 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="flavor" data-subst="flavor">vanilla</td>
+            <td data-param="flavor" data-block="0" data-subst="flavor">vanilla</td>
             
             
             
-            <td data-param="attachment:0">
+            <td data-param="attachment:0" data-block="0">
               
               
               <button type="button" class="btn-reset attachment-badge"
@@ -2208,7 +2258,7 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="derived:0" data-subst="derived:0">2</td>
+            <td data-param="derived:0" data-block="2" data-subst="derived:0">2</td>
             
             
             
@@ -2242,11 +2292,11 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="flavor" data-subst="flavor">mocha</td>
+            <td data-param="flavor" data-block="0" data-subst="flavor">mocha</td>
             
             
             
-            <td data-param="attachment:0">
+            <td data-param="attachment:0" data-block="0">
               
               
               <button type="button" class="btn-reset attachment-badge"
@@ -2258,7 +2308,7 @@ Total:        $2.00</pre></div>
             
             
             
-            <td data-param="derived:0" data-subst="derived:0">3</td>
+            <td data-param="derived:0" data-block="2" data-subst="derived:0">3</td>
             
             
             
@@ -2297,7 +2347,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L127">examples/coffeeshop/test_coffeeshop.py:127</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L127">examples/coffeeshop/test_coffeeshop.py:127</a></div>
       
     </div>
     </div>
@@ -2331,10 +2381,12 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-10" :class="{ expanded: expandedScenarios[10] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s10_1')">
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="step-toggle" @click="toggleStep('s10_1')">
         <button type="button" class="disclosure-btn"
                 :aria-expanded="!!expandedSteps['s10_1']"
                 :aria-label="(expandedSteps['s10_1'] ? 'Collapse' : 'Expand') + ' sub-steps'"
@@ -2343,10 +2395,11 @@ Total:        $2.00</pre></div>
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s10_1'] }">
       <div class="step-children"><div class="step-text">the coin is validated for $<span class="value-highlight">2</span></div><div class="step-text">the balance is updated</div></div>
     </div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the coin is accepted</div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s10_3')">
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the coin is accepted</div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="step-toggle" @click="toggleStep('s10_3')">
         <button type="button" class="disclosure-btn"
                 :aria-expanded="!!expandedSteps['s10_3']"
                 :aria-label="(expandedSteps['s10_3'] ? 'Collapse' : 'Expand') + ' sub-steps'"
@@ -2368,14 +2421,14 @@ Total:        $2.00</pre></div>
     </div>
     </div></div>
     </div>
-          </div></div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L174">examples/coffeeshop/test_coffeeshop.py:174</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L174">examples/coffeeshop/test_coffeeshop.py:174</a></div>
       
     </div>
     </div>
@@ -2411,12 +2464,14 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-11" :class="{ expanded: expandedScenarios[11] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">a loyalty card with 5 points</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s11_2')">
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">a loyalty card with 5 points</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="step-toggle" @click="toggleStep('s11_2')">
         <button type="button" class="disclosure-btn"
                 :aria-expanded="!!expandedSteps['s11_2']"
                 :aria-label="(expandedSteps['s11_2'] ? 'Collapse' : 'Expand') + ' sub-steps'"
@@ -2433,8 +2488,9 @@ Total:        $2.00</pre></div>
       <div class="step-children"><div class="step-text">the loyalty card is validated</div><div class="step-text">the discount is calculated</div></div>
     </div></div>
     </div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text"><span class="step-toggle" @click="toggleStep('s11_3')">
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text"><span class="step-toggle" @click="toggleStep('s11_3')">
         <button type="button" class="disclosure-btn"
                 :aria-expanded="!!expandedSteps['s11_3']"
                 :aria-label="(expandedSteps['s11_3'] ? 'Collapse' : 'Expand') + ' sub-steps'"
@@ -2462,8 +2518,8 @@ Total:        $2.00</pre></div>
     </div></div>
     </div></div>
     </div>
-          </div><div class="phase-steps">
-            <div class="step-text">the machine state is consistent</div><div>
+            </div><div class="phase-steps">
+              <div class="step-text">the machine state is consistent</div><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s11_4_att_0']"
             @click="toggleAttachment('s11_4_att_0')"><svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>Final machine state</button>
@@ -2477,14 +2533,14 @@ Total:        $2.00</pre></div>
       </div>
     </div>
     </div>
-          </div></div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L190">examples/coffeeshop/test_coffeeshop.py:190</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L190">examples/coffeeshop/test_coffeeshop.py:190</a></div>
       
     </div>
     </div>
@@ -2518,22 +2574,25 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-12" :class="{ expanded: expandedScenarios[12] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">a machine that has sold its last coffee</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">a customer tries to buy a coffee</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the machine reports it is sold out</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">a machine that has sold its last coffee</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">a customer tries to buy a coffee</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the machine reports it is sold out</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L227">examples/coffeeshop/test_coffeeshop.py:227</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L227">examples/coffeeshop/test_coffeeshop.py:227</a></div>
       
     </div>
     </div>
@@ -2573,24 +2632,27 @@ Total:        $2.00</pre></div>
     <div class="scenario-body" id="scenario-body-13" :class="{ expanded: expandedScenarios[13] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-steps">
-            <div class="step-text">a loyalty card good for a $1 discount</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">I buy a coffee with the discount</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">I pay $1</div>
-          </div><div class="phase-steps">
-            <div class="step-text">a coffee is dispensed</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div><div class="phase-steps">
+              <div class="step-text">a loyalty card good for a $1 discount</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">I buy a coffee with the discount</div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">I pay $1</div>
+            </div><div class="phase-steps">
+              <div class="step-text">a coffee is dispensed</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2611,18 +2673,20 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">80ms</span>
+        <span class="scenario-duration">81ms</span>
       </span>
     </div>
 
     <div class="scenario-body" id="scenario-body-14" :class="{ expanded: expandedScenarios[14] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">a coffee machine</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the machine has 20 coffees</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">a coffee machine</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the machine has 20 coffees</div>
+            </div></div></div>
 
       
 
@@ -2683,7 +2747,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L260">examples/coffeeshop/test_coffeeshop.py:260</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L260">examples/coffeeshop/test_coffeeshop.py:260</a></div>
       
     </div>
     </div>
@@ -2723,7 +2787,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L266">examples/coffeeshop/test_coffeeshop.py:266</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L266">examples/coffeeshop/test_coffeeshop.py:266</a></div>
       
     </div>
     </div>
@@ -2803,7 +2867,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/coffeeshop/test_coffeeshop.py#L273">examples/coffeeshop/test_coffeeshop.py:273</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/coffeeshop/test_coffeeshop.py#L273">examples/coffeeshop/test_coffeeshop.py:273</a></div>
       
     </div>
     </div>
@@ -2832,7 +2896,7 @@ Total:        $2.00</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-03T09:33:06.375047+00:00\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario name)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":{},\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":{},\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":{},\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":{},\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":{},\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":{},\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":{},\"examples/coffeeshop/test_coffeeshop.py::test_failing\":{},\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":{},\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-03T10:04:09.258063+00:00\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario name)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":{},\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":{},\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":{},\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":{},\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":{},\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":{},\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":{},\"examples/coffeeshop/test_coffeeshop.py::test_failing\":{},\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":{},\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3600,6 +3664,7 @@ function reportApp() {
       });
       this._initTermTooltip();
       this._initParamHover();
+      this._initPhaseHover();
     },
 
 
@@ -3629,6 +3694,66 @@ function reportApp() {
         leaveRow();
         leaveCell();
       });
+    },
+
+
+
+    _initPhaseHover() {
+      let hovered = null;
+      const leave = () => {
+        if (!hovered) return;
+        hovered.scope.querySelectorAll('.phase-hover').forEach(e => e.classList.remove('phase-hover'));
+        hovered.scope.querySelectorAll('.phase-outline').forEach(e => e.remove());
+        hovered = null;
+      };
+      document.addEventListener('pointerover', (event) => {
+        const el = event.target.closest('[data-block]');
+        const scope = el?.closest('.scenario');
+        if (hovered && scope === hovered.scope && el.dataset.block === hovered.block) return;
+        leave();
+        if (!scope) return;
+        hovered = { scope, block: el.dataset.block };
+        this._outlinePhase(scope, el.dataset.block);
+      });
+      document.addEventListener('pointerout', (event) => {
+        if (!event.relatedTarget) leave();
+      });
+    },
+
+
+
+    _outlinePhase(scope, block) {
+      const safe = CSS.escape(block);
+      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
+      const table = scope.querySelector('.param-table');
+      if (!table) return;
+      const wrap = table.parentElement;
+      const origin = wrap.getBoundingClientRect();
+      const boxes = [];
+      let box = null;
+      for (const row of table.rows) {
+        const cells = row.querySelectorAll(`[data-block="${safe}"]`);
+        if (!cells.length) {
+          if (row.getBoundingClientRect().height > 1) box = null;
+          continue;
+        }
+        const first = cells[0].getBoundingClientRect();
+        const last = cells[cells.length - 1].getBoundingClientRect();
+        if (!box) {
+          box = { left: first.left, right: last.right, top: first.top };
+          boxes.push(box);
+        }
+        box.bottom = first.bottom;
+      }
+      for (const { left, right, top, bottom } of boxes) {
+        const outline = document.createElement('div');
+        outline.className = 'phase-outline';
+        outline.style.left = `${left - origin.left + wrap.scrollLeft}px`;
+        outline.style.top = `${top - origin.top}px`;
+        outline.style.width = `${right - left}px`;
+        outline.style.height = `${bottom - top}px`;
+        wrap.appendChild(outline);
+      }
     },
 
 

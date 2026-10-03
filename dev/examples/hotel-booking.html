@@ -679,14 +679,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 
-
-
 .steps {
-  display: grid;
-  
-
-  grid-template-columns: 3em 1fr;
-  column-gap: var(--space-sm);
   padding-top: var(--space-md);
   padding-left: var(--space-lg);
   font-size: var(--font-size-md);
@@ -694,13 +687,37 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
   line-height: 1.5;
 }
+
+
+
+
+.phase-block {
+  position: relative;
+  display: grid;
+  
+
+  grid-template-columns: 3em minmax(0, auto);
+  column-gap: var(--space-sm);
+  width: fit-content;
+  max-width: calc(100% - var(--space-sm));
+}
+
+
+.phase-block + .phase-block { margin-top: var(--space-sm); }
 .phase-label { grid-column: 1; font-weight: 500; color: var(--text-primary); }
 .phase-steps { grid-column: 2; min-width: 0; }
 
 
 
-.phase-label:not(:first-child),
-.phase-label:not(:first-child) + .phase-steps { margin-top: var(--space-md); }
+
+.phase-block.phase-hover::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--space-sm) / 2) calc(-1 * var(--space-sm));
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
 .step-text { color: var(--text-narration); }
 .step-expand,
 .attachment-expand {
@@ -744,7 +761,15 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 
-.param-table-scroll { overflow-x: auto; }
+.param-table-scroll { overflow-x: auto; position: relative; }
+
+
+.phase-outline {
+  position: absolute;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
 
 
 .param-table {
@@ -758,7 +783,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   background: var(--bg-page);
   border-radius: var(--radius-md);
   overflow: hidden;
-  margin-top: var(--space-sm);
+  
+
+  margin-top: var(--space-md);
   margin-left: var(--space-xl);
 }
 .param-table th {
@@ -776,11 +803,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 
 
-
-.param-table .param-status {
-  text-align: center;
-  border-left: 1px solid var(--border);
-}
+.param-table .param-status { text-align: center; }
 .param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
 
@@ -960,9 +983,6 @@ span.param-highlight {
   
   overflow-wrap: anywhere;
 }
-
-
-.steps + .scenario-source { padding-top: 0; }
 .scenario-source a {
   color: inherit;
   text-decoration: none;
@@ -1606,24 +1626,27 @@ span.param-highlight {
     <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">our organizer <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span> is listed as available</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> searches for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> selects the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span> is held for the group</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">our organizer <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span> is listed as available</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> searches for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> selects the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span> is held for the group</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L167">examples/hotel-booking/test_hotel_booking.py:167</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L167">examples/hotel-booking/test_hotel_booking.py:167</a></div>
       
     </div>
     </div>
@@ -1651,34 +1674,39 @@ span.param-highlight {
     <div class="scenario-body" id="scenario-body-1" :class="{ expanded: expandedScenarios[1] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">our organizer <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> has selected the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> adds <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="confirm">confirms</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> sends the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> check in to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">both guests are checked in</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">our organizer <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> has selected the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> adds <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="confirm">confirms</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> sends the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
+            </div></div><div class="phase-block" data-block="3">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> check in to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
+            </div></div><div class="phase-block" data-block="4">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">both guests are checked in</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L187">examples/hotel-booking/test_hotel_booking.py:187</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L187">examples/hotel-booking/test_hotel_booking.py:187</a></div>
       
     </div>
     </div>
@@ -1699,28 +1727,31 @@ span.param-highlight {
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">31ms</span>
+        <span class="scenario-duration">30ms</span>
       </span>
     </div>
 
     <div class="scenario-body" id="scenario-body-2" :class="{ expanded: expandedScenarios[2] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">our organizer <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> has added <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="decline">declines</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-1" data-param="decline_reason" data-subst="decline_reason">{decline_reason}</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending and no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> is sent to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> or <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">our organizer <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> has added <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> and <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="organizer">Carol</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="decline">declines</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-1" data-param="decline_reason" data-subst="decline_reason">{decline_reason}</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending and no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> is sent to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> or <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
+            </div></div></div>
 
       
       <div class="param-table-scroll">
@@ -1728,11 +1759,11 @@ span.param-highlight {
         <thead>
           <tr>
             
-            <th class="param-color-0" data-param="payment_method">payment_method</th>
+            <th class="param-color-0" data-param="payment_method" data-block="1">payment_method</th>
             
-            <th class="param-color-1" data-param="decline_reason">decline_reason</th>
+            <th class="param-color-1" data-param="decline_reason" data-block="2">decline_reason</th>
             
-            <th class="param-status">status</th>
+            <th class="param-status" data-block="status">status</th>
           </tr>
         </thead>
         <tbody>
@@ -1740,15 +1771,15 @@ span.param-highlight {
             
             
             
-            <td data-param="payment_method" data-subst="payment_method">credit card</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason">insufficient funds</td>
+            <td data-param="decline_reason" data-block="2" data-subst="decline_reason">insufficient funds</td>
             
             
-            <td class="param-status"><span class="dot-passed">✓</span></td>
+            <td class="param-status" data-block="status"><span class="dot-passed">✓</span></td>
           </tr>
           
           
@@ -1759,15 +1790,15 @@ span.param-highlight {
             
             
             
-            <td data-param="payment_method" data-subst="payment_method">debit card</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason">expired card</td>
+            <td data-param="decline_reason" data-block="2" data-subst="decline_reason">expired card</td>
             
             
-            <td class="param-status"><span class="dot-passed">✓</span></td>
+            <td class="param-status" data-block="status"><span class="dot-passed">✓</span></td>
           </tr>
           
           
@@ -1778,15 +1809,15 @@ span.param-highlight {
             
             
             
-            <td data-param="payment_method" data-subst="payment_method">bank transfer</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">bank transfer</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason">fraud check failed</td>
+            <td data-param="decline_reason" data-block="2" data-subst="decline_reason">fraud check failed</td>
             
             
-            <td class="param-status"><span class="dot-passed">✓</span></td>
+            <td class="param-status" data-block="status"><span class="dot-passed">✓</span></td>
           </tr>
           
           
@@ -1797,15 +1828,15 @@ span.param-highlight {
             
             
             
-            <td data-param="payment_method" data-subst="payment_method">gift card</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
             
             
             
             
-            <td data-param="decline_reason" data-subst="decline_reason">partial balance</td>
+            <td data-param="decline_reason" data-block="2" data-subst="decline_reason">partial balance</td>
             
             
-            <td class="param-status"><span class="dot-failed">✗</span></td>
+            <td class="param-status" data-block="status"><span class="dot-failed">✗</span></td>
           </tr>
           
           <tr>
@@ -1837,7 +1868,7 @@ E     + unsupported payment method</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L231">examples/hotel-booking/test_hotel_booking.py:231</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L231">examples/hotel-booking/test_hotel_booking.py:231</a></div>
       
     </div>
     </div>
@@ -1865,24 +1896,27 @@ E     + unsupported payment method</pre></div>
     <div class="scenario-body" id="scenario-body-3" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="cancel">cancels</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="refund">refunds</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> sends a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="cancel">cancels</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="refund">refunds</span> the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> for the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text">the <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="booking-system">Booking System</span> sends a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L278">examples/hotel-booking/test_hotel_booking.py:278</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L278">examples/hotel-booking/test_hotel_booking.py:278</a></div>
       
     </div>
     </div>
@@ -1910,30 +1944,37 @@ E     + unsupported payment method</pre></div>
     <div class="scenario-body" id="scenario-body-4" :class="{ expanded: expandedScenarios[4] }">
     <div class="scenario-body-inner">
       
-      <div class="steps"><div class="phase-label">Given</div><div class="phase-steps">
-            <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
-          </div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> now and one next month</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> checks in to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">her current stay is checked in</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="cancel">cancels</span> her later <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the later booking is cancelled</div>
-          </div><div class="phase-label">When</div><div class="phase-steps">
-            <div class="step-text">she tries to cancel the stay she has checked in to</div>
-          </div><div class="phase-label">Then</div><div class="phase-steps">
-            <div class="step-text">the cancellation is refused</div>
-          </div></div>
+      <div class="steps"><div class="phase-block" data-block="0">
+            <div class="phase-label">Given</div><div class="phase-steps">
+              <div class="step-text">our guest <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span></div>
+            </div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> now and one next month</div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> checks in to the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Deluxe Suite</span></div>
+            </div></div><div class="phase-block" data-block="2">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">her current stay is checked in</div>
+            </div></div><div class="phase-block" data-block="3">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="cancel">cancels</span> her later <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+            </div></div><div class="phase-block" data-block="4">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the later booking is cancelled</div>
+            </div></div><div class="phase-block" data-block="5">
+            <div class="phase-label">When</div><div class="phase-steps">
+              <div class="step-text">she tries to cancel the stay she has checked in to</div>
+            </div></div><div class="phase-block" data-block="6">
+            <div class="phase-label">Then</div><div class="phase-steps">
+              <div class="step-text">the cancellation is refused</div>
+            </div></div></div>
 
       
 
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L312">examples/hotel-booking/test_hotel_booking.py:312</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L312">examples/hotel-booking/test_hotel_booking.py:312</a></div>
       
     </div>
     </div>
@@ -2363,7 +2404,7 @@ E     + unsupported payment method</pre></div>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L92">examples/hotel-booking/test_hotel_booking.py:92</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L92">examples/hotel-booking/test_hotel_booking.py:92</a></div>
         
       </div>
       
@@ -2533,7 +2574,7 @@ E     + unsupported payment method</pre></div>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L135">examples/hotel-booking/test_hotel_booking.py:135</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L135">examples/hotel-booking/test_hotel_booking.py:135</a></div>
         
       </div>
       
@@ -2686,7 +2727,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L72">examples/hotel-booking/test_hotel_booking.py:72</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L72">examples/hotel-booking/test_hotel_booking.py:72</a></div>
                 
               </div>
             </div>
@@ -2751,7 +2792,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L73">examples/hotel-booking/test_hotel_booking.py:73</a></div>
                 
               </div>
             </div>
@@ -2807,7 +2848,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L74">examples/hotel-booking/test_hotel_booking.py:74</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L74">examples/hotel-booking/test_hotel_booking.py:74</a></div>
                 
               </div>
             </div>
@@ -2881,7 +2922,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L76">examples/hotel-booking/test_hotel_booking.py:76</a></div>
                 
               </div>
             </div>
@@ -2937,7 +2978,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L77">examples/hotel-booking/test_hotel_booking.py:77</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L77">examples/hotel-booking/test_hotel_booking.py:77</a></div>
                 
               </div>
             </div>
@@ -2993,7 +3034,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L78">examples/hotel-booking/test_hotel_booking.py:78</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L78">examples/hotel-booking/test_hotel_booking.py:78</a></div>
                 
               </div>
             </div>
@@ -3049,7 +3090,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
                 
               </div>
             </div>
@@ -3096,7 +3137,7 @@ E     + unsupported payment method</pre></div>
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L120">examples/hotel-booking/test_hotel_booking.py:120</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L120">examples/hotel-booking/test_hotel_booking.py:120</a></div>
                 
               </div>
             </div>
@@ -3170,7 +3211,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
                 
               </div>
             </div>
@@ -3217,7 +3258,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
                 
               </div>
             </div>
@@ -3278,7 +3319,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
                 
               </div>
             </div>
@@ -3339,7 +3380,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L89">examples/hotel-booking/test_hotel_booking.py:89</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L89">examples/hotel-booking/test_hotel_booking.py:89</a></div>
                 
               </div>
             </div>
@@ -3386,7 +3427,7 @@ E     + unsupported payment method</pre></div>
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/14936b916db1b5d3808db23d0470064ee3a77d06/examples/hotel-booking/test_hotel_booking.py#L119">examples/hotel-booking/test_hotel_booking.py:119</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/6b0b6be161837b723c3fe5058699ebee07e79dd1/examples/hotel-booking/test_hotel_booking.py#L119">examples/hotel-booking/test_hotel_booking.py:119</a></div>
                 
               </div>
             </div>
@@ -3412,7 +3453,7 @@ E     + unsupported payment method</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-03T09:33:06.806272+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Carol picks a suite for the group\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Carol completes the booking for both guests\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"failed\",\"narration\":{\"text\":\"Payment is declined \\u2014 the booking is not finalized\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Alice cancels her booking and is refunded\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Alice checks in, then cancels a later booking\"}}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-03T10:04:09.684335+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Carol picks a suite for the group\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Carol completes the booking for both guests\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"failed\",\"narration\":{\"text\":\"Payment is declined \\u2014 the booking is not finalized\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Alice cancels her booking and is refunded\"}},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Alice checks in, then cancels a later booking\"}}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -4180,6 +4221,7 @@ function reportApp() {
       });
       this._initTermTooltip();
       this._initParamHover();
+      this._initPhaseHover();
     },
 
 
@@ -4209,6 +4251,66 @@ function reportApp() {
         leaveRow();
         leaveCell();
       });
+    },
+
+
+
+    _initPhaseHover() {
+      let hovered = null;
+      const leave = () => {
+        if (!hovered) return;
+        hovered.scope.querySelectorAll('.phase-hover').forEach(e => e.classList.remove('phase-hover'));
+        hovered.scope.querySelectorAll('.phase-outline').forEach(e => e.remove());
+        hovered = null;
+      };
+      document.addEventListener('pointerover', (event) => {
+        const el = event.target.closest('[data-block]');
+        const scope = el?.closest('.scenario');
+        if (hovered && scope === hovered.scope && el.dataset.block === hovered.block) return;
+        leave();
+        if (!scope) return;
+        hovered = { scope, block: el.dataset.block };
+        this._outlinePhase(scope, el.dataset.block);
+      });
+      document.addEventListener('pointerout', (event) => {
+        if (!event.relatedTarget) leave();
+      });
+    },
+
+
+
+    _outlinePhase(scope, block) {
+      const safe = CSS.escape(block);
+      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
+      const table = scope.querySelector('.param-table');
+      if (!table) return;
+      const wrap = table.parentElement;
+      const origin = wrap.getBoundingClientRect();
+      const boxes = [];
+      let box = null;
+      for (const row of table.rows) {
+        const cells = row.querySelectorAll(`[data-block="${safe}"]`);
+        if (!cells.length) {
+          if (row.getBoundingClientRect().height > 1) box = null;
+          continue;
+        }
+        const first = cells[0].getBoundingClientRect();
+        const last = cells[cells.length - 1].getBoundingClientRect();
+        if (!box) {
+          box = { left: first.left, right: last.right, top: first.top };
+          boxes.push(box);
+        }
+        box.bottom = first.bottom;
+      }
+      for (const { left, right, top, bottom } of boxes) {
+        const outline = document.createElement('div');
+        outline.className = 'phase-outline';
+        outline.style.left = `${left - origin.left + wrap.scrollLeft}px`;
+        outline.style.top = `${top - origin.top}px`;
+        outline.style.width = `${right - left}px`;
+        outline.style.height = `${bottom - top}px`;
+        wrap.appendChild(outline);
+      }
     },
 
 
