@@ -305,7 +305,8 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   outline-offset: 2px;
 }
 
-/* Status filter pills */
+/* Status filters: separate buttons, since they multi-select, but cornered and
+   sized like the segmented toggle below them — a control, not a tag. */
 .status-pills { display: flex; gap: var(--space-xs); }
 .status-pill {
   flex: 1;
@@ -313,7 +314,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   font-size: var(--font-size-sm);
   padding: 2px 4px;
   white-space: nowrap;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   border: 1px solid var(--border);
   background: var(--bg-surface);
