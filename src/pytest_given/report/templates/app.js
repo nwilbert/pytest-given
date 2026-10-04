@@ -268,6 +268,9 @@ function reportApp() {
       this._clearParamHighlight(part);
       this._restoreTokens(part);
       this._clearPhaseOutline(part);
+      // Likewise the tick a copy just set, which the copy's timer clears only
+      // on the original.
+      part.querySelectorAll('.anchor-copied').forEach(el => el.classList.remove('anchor-copied'));
       // A tag here shows the active filter but toggles nothing, so it is not
       // announced as a pressed toggle. Dropped before Alpine sees the clone.
       part.querySelectorAll('.scenario-tag').forEach(el => {
@@ -311,7 +314,8 @@ function reportApp() {
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
-      return ['actor', 'object', 'activity', 'kindless'].some(k => counts[k] > 0);
+      return ['actor', 'object', 'activity', 'kindless']
+        .some(k => this.glossaryKindFilter[k] && counts[k] > 0);
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -336,7 +340,7 @@ function reportApp() {
         if (this.showPassed && hasStatus('passed')) shown.push('passed');
         if (this.showFailed && hasStatus('failed')) shown.push('failed');
         if (this.showSkipped && hasStatus('skipped')) shown.push('skipped');
-        if (shown.length) parts.push(shown.join(', '));
+        parts.push(shown.length ? shown.join(', ') : 'no statuses');
       }
       if (this.search) parts.push('"' + this.search + '"');
       // Term/tag/module filters each have their own removable chip, so they
@@ -683,12 +687,14 @@ function reportApp() {
       if (this.expandedAttachments[key]) delete this.expandedAttachments[key];
       else this.expandedAttachments[key] = true;
     },
+    // Copies the link without visiting it: writing it into the address bar
+    // would overwrite the history entry holding the current filters.
     copyAnchor(hashString, event) {
-      history.replaceState(null, '', '#' + hashString);
+      const url = window.location.href.split('#')[0] + '#' + hashString;
       const btn = event.currentTarget;
       // Only flip to the "copied" state once the URL is actually on the
       // clipboard, or the icon would claim a success that never happened.
-      this._copyText(window.location.href).then((ok) => {
+      this._copyText(url).then((ok) => {
         if (!ok) return;
         btn.classList.add('anchor-copied');
         setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
@@ -968,16 +974,12 @@ function reportApp() {
       // would create bogus history entries on back/forward).
       this._suppressHashWrite = true;
       const params = parseHash();
-      // Comma-separated; a single-value link from an older report still reads.
-      if (params.has('tag')) this.tagFilters = params.get('tag').split(',').filter(Boolean);
-      else this.tagFilters = [];
+      // One parameter per selected key, not a joined list: a tag is free text
+      // and may itself hold any separator.
+      this.tagFilters = params.getAll('tag').filter(Boolean);
       if (params.has('module')) this.moduleFilter = params.get('module');
       else this.moduleFilter = null;
-      if (params.has('term-filter')) {
-        this.termFilters = params.get('term-filter').split(',').filter(Boolean);
-      } else {
-        this.termFilters = [];
-      }
+      this.termFilters = params.getAll('term-filter').filter(Boolean);
       if (params.has('sentence-filter')) this.sentenceFilter = params.get('sentence-filter');
       else this.sentenceFilter = null;
       if (params.has('status')) {
@@ -1026,9 +1028,9 @@ function reportApp() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
-      if (this.tagFilters.length) params.set('tag', this.tagFilters.join(','));
+      for (const tag of this.tagFilters) params.append('tag', tag);
       if (this.moduleFilter) params.set('module', this.moduleFilter);
-      if (this.termFilters.length) params.set('term-filter', this.termFilters.join(','));
+      for (const termId of this.termFilters) params.append('term-filter', termId);
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
 
       const shown = [];
