@@ -438,12 +438,11 @@
                   with the other metadata rather than in the prose. -#}
               {% if sentence.name %}<span class="sentence-name" title="Sentence name, for pinning it">{{ sentence.name }}</span>{% endif %}
               {% if cov.untracked %}
-              <span class="cov-chip cov-untracked" title="insufficient number of glossary terms for matching">—</span>
+              <span class="cov-count cov-untracked" title="insufficient number of glossary terms for matching">—</span>
               {% elif cov.total == 0 %}
-              <span class="cov-chip cov-uncovered">no coverage</span>
+              <span class="cov-count">no coverage</span>
               {% else %}
-              {% set cov_class = 'cov-passed' if (cov.failed == 0 and cov.skipped == 0) else ('cov-failed' if cov.failed == cov.total else 'cov-mixed') %}
-              <span class="cov-chip {{ cov_class }}"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span>{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span>{{ cov.skipped }} skipped</span>{% endif %}</span>
+              <span class="cov-count meta-list"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span class="cov-failing">{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span class="cov-skipped">{{ cov.skipped }} skipped</span>{% endif %}</span>
               {% endif %}
               {#- Revealed by CSS once the row is selected (see .sentence-jump),
                   so the row keeps one meaning per click: the row selects, this

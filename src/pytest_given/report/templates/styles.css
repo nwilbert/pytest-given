@@ -1142,35 +1142,34 @@ span.param-highlight {
 .sentence-clause { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
 
 /* Counts side by side, separated by space rather than a glyph. */
-.meta-list { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); }
-
-/* === Coverage chip === */
-.sentence-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
-/* A flex row so its counts, when there are several, sit a space apart. */
-.cov-chip {
-  display: inline-flex;
-  gap: var(--space-sm);
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-.cov-chip.cov-passed { background: var(--color-passed-tint); color: var(--color-passed); }
-.cov-chip.cov-failed { background: var(--color-failed-tint); color: var(--color-failed); }
-.cov-chip.cov-mixed { background: var(--color-skipped-tint); color: var(--color-skipped); }
-.cov-chip.cov-uncovered { background: var(--bg-page); color: var(--text-muted); }
-.cov-chip.cov-untracked {
-  background: transparent;
+.meta-list { display: inline-flex; flex-wrap: wrap; }
+/* A dot between the parts, in the plain ink whatever a part's own colour. */
+.meta-list > span + span::before {
+  content: '·';
+  margin: 0 var(--space-xs);
   color: var(--text-muted);
-  border: 1px dashed var(--border);
-  cursor: help;
+  font-weight: 400;
 }
-/* The sentence name: a code key, not a status. Outlined on the surface colour
-   beside the tinted coverage chip, so it keeps its shape on a selected row too;
-   one pixel less padding so the border keeps the two the same height. */
+
+/* === Sentence coverage === */
+.sentence-cov { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-sm); }
+/* Plain counts, as a glossary entry's are, not a pill: in this report a pill
+   is a label or a control. Colour goes only on the part that reports trouble. */
+.cov-count {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cov-failing { color: var(--color-failed); }
+.cov-skipped { color: var(--color-skipped); }
+.cov-untracked { cursor: help; }
+/* The sentence name: a code key, not a status, so a label's pill. Filled grey
+   as a tag is, which sets it apart from the plain count beside it; outlined,
+   so it keeps its shape on a selected row too. */
 .sentence-name {
   padding: 1px 7px;
-  background: var(--bg-surface);
+  background: var(--bg-page);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
