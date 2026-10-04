@@ -1,6 +1,7 @@
 """Unit tests for the case-grouping pass."""
 
 import dataclasses
+import math
 from datetime import UTC, datetime
 
 import pytest
@@ -236,6 +237,28 @@ def test_a_non_scalar_parametrize_value_still_reaches_the_cell_as_a_string() -> 
     param_info = {nid: ParamSpec(names=['when'], values=[moment])}
     grouped = group_parametrized(scenarios, param_info)
     assert grouped[0].parameters.cases[0].values == [str(moment)]
+
+
+def test_a_non_finite_float_reaches_the_cell_as_a_string() -> None:
+    """JSON has no spelling for infinity or NaN; `json.dumps` would write
+    `Infinity` / `NaN`, which strict parsers reject."""
+    values = [math.inf, -math.inf, math.nan, 1.5]
+    ids = [NodeId(f't::x[{index}]') for index in range(len(values))]
+    scenarios = [
+        Scenario(id=nid, narration=Narration(text='x'), module='m', status='passed')
+        for nid in ids
+    ]
+    param_info = {
+        nid: ParamSpec(names=['x'], values=[value])
+        for nid, value in zip(ids, values, strict=True)
+    }
+    grouped = group_parametrized(scenarios, param_info)
+    assert [case.values[0] for case in grouped[0].parameters.cases] == [
+        'inf',
+        '-inf',
+        'nan',
+        1.5,
+    ]
 
 
 def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:

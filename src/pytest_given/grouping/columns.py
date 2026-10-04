@@ -6,6 +6,7 @@ the cell store. The rest is cell construction, which answers to one rule: a
 row hover substitutes the one into the other.
 """
 
+import math
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
@@ -262,11 +263,14 @@ def _param_value(value: RawParamValue) -> ParamValue:
 
     A glossary term instance unwraps to its display: `str()` on one would store
     a dataclass repr of the whole `Glossary` in the table and the JSON report.
-    JSON primitives pass through; everything else is its `str()`.
+    JSON primitives pass through; everything else is its `str()` — a
+    non-finite float included, which JSON has no literal for.
     """
     term_ref = try_term_ref(value)
     if term_ref is not None:
         return term_ref.display
+    if isinstance(value, float) and not math.isfinite(value):
+        return str(value)
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)

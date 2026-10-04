@@ -29,6 +29,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A `@given` fixture parametrized with an unhashable value, such as a list, no longer errors every test that requests it.
 - Editor source links build `{path}` from pytest's rootdir instead of the working directory, so they no longer point at a doubled path when pytest runs from a subdirectory.
+- A parametrize value of infinity or NaN reaches the JSON report as a string (`"inf"`, `"nan"`), so the report stays valid JSON.
 - A `@given` generator fixture that yields twice errors with pytest's own "more than one 'yield'" message again, instead of passing silently.
 - An `Annotated[..., given(Template(...))]` label whose placeholder is not a bare parametrize column name now fails its scenario with the fix, instead of crashing the HTML report or silently dropping the step.
 - A scenario failing on a pytest-given refusal raised from its test body points at the test's own line, not at pytest-given's.
