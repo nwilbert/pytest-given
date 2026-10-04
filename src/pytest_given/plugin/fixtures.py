@@ -8,7 +8,6 @@ instance, and `item.session._fixturemanager.getfixturedefs` resolves what a
 test requested. Each is unavoidable and none is public API.
 """
 
-import contextlib
 import functools
 import inspect
 from collections.abc import Callable, Generator
@@ -109,8 +108,13 @@ def _ensure_teardown_wrapped(
         # Past the yield → teardown. Use the captured collector (not the
         # ContextVar): session-scoped fixtures tear down at session end, after
         # the per-test active collector is cleared.
-        with collector.fixture_teardown(), contextlib.suppress(StopIteration):
-            next(gen)
+        with collector.fixture_teardown():
+            try:
+                extra = next(gen)
+            except StopIteration:
+                return
+        # A second yield is pytest's to refuse; handing it on keeps its error.
+        yield extra
 
     # `functools.wraps` copies `__dict__`, so the wrapper already carries the
     # original's `_step_descriptor`; only the idempotence flag is new.

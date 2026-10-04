@@ -963,6 +963,34 @@ def test_step_fixture_teardown_refuses_steps_and_attachments(pytester, late):
         result.stdout.fnmatch_lines(['*PytestGivenError*'])
 
 
+def test_step_fixture_yielding_twice_keeps_pytests_error(pytester):
+    """The teardown wrapper must not swallow the second yield pytest refuses —
+    in a scenario, nor in a later unannotated test reusing the wrapped def."""
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, given, then
+
+        @pytest.fixture
+        @given("a thing")
+        def thing():
+            yield 1
+            yield 2
+
+        @scenario("Uses the thing")
+        def test_scenario(thing):
+            with then("it is one"):
+                assert thing == 1
+
+        def test_plain(thing):
+            assert thing == 1
+        """
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes(passed=2, errors=2)
+    result.stdout.fnmatch_lines(["*fixture function has more than one 'yield'*"])
+
+
 @scenario(
     'A fixture takes only @given, never @when or @then',
     tags=['validation'],
