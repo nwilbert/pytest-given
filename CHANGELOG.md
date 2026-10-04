@@ -16,33 +16,22 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - Python 3.15 is supported.
+- Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.
 
 ### Changed
 
-- The parameter table in the HTML and Markdown reports shows its status column only when the cases differ in status.
-- The parameter table orders its columns the way the narration first shows them, so an input attached in a `given` precedes an outcome narrated in a `then`.
-- The term ref hover tooltip in the HTML report sets its definition at 13px instead of 12px, in a slightly wider box.
-- A hovered story, sentence, or sidebar group in the HTML report gets a visible fill in both themes; the story list showed none, and the dark theme's hover sank into the background.
-- A scenario's narration in the HTML report leaves a gap at each change between given, when, and then, and its source link sits closer below it.
-- Hovering a phase in the HTML report's narration, or a parameter table column, outlines that phase in both the narration and the table, and the status column loses its separator line.
-- A parametrized scenario with several cases shows a second, thinner status bar in the HTML report's scenario lists.
-- Term refs in the HTML report keep the surrounding text color and are marked by a kind-colored underline instead of a tinted background, and the Glossary view shows term names as plain bold text instead of colored pills, in tighter rows marked by a kind-colored bar, with a name column as wide as the longest term and the term's counts at the right edge.
-- The HTML report's sidebar status filters take the same corners as the sidebar's other controls.
+- The parameter table orders its columns the way the narration first shows them, and shows its status column only when the cases differ in status.
 - The HTML report's Stories view shows each scenario as a full card that expands in place, and a tag clicked there opens the Scenarios view filtered by it.
-- A story sentence's coverage in the HTML report reads as plain text instead of a tinted pill, with only its failing and skipped counts in their status colors, its name pill takes a grey fill, and count lists across the report separate their parts with a dot.
-- The bundled `pytest-given-authoring` skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets `.low` as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables, with refused inputs as rows, and merging sibling scenarios into one.
-- The bundled `pytest-given-reviewing` skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome or that hold a column no step narrates.
+- The HTML report is visually tidied: term refs are marked by a kind-colored underline instead of a tinted background, the Glossary view lists terms as plain names in tighter rows, story coverage reads as plain counts, the narration leaves a gap between phases, a parametrized scenario is marked by a second status bar, and hover states show in both themes.
+- The bundled `pytest-given-authoring` skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the `pytest-given-reviewing` skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.
 
 ### Fixed
 
-- An `Annotated[..., given(Template(...))]` label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.
-- An `Annotated[..., given(Template(...))]` label whose placeholder is not a bare name now fails its scenario, instead of silently dropping the given step from the report.
-- A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.
-- A `FileGlossary` error about the file's tables — no table, a short row, a column not found — names the file.
-- The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".
-- The error for a declared kind found in an actor slot says "an actor slot", not "a actor slot".
-- In the Markdown report, the note below a parameter table that holds a case's attachment or error names the row by its short parametrize values only, or by its row number, instead of repeating multiline values.
-- `pytest-given report --help` says it renders Markdown too, and where each format goes without `-o`.
+- An `Annotated[..., given(Template(...))]` label whose placeholder is not a bare parametrize column name now fails its scenario with the fix, instead of crashing the HTML report or silently dropping the step.
+- A scenario failing on a pytest-given refusal raised from its test body points at the test's own line, not at pytest-given's.
+- Error messages are clearer: a `FileGlossary` table error names the file, and a step nested across phases gets a concrete fix suggested.
+- The Markdown report's note below a parameter table names the row by its short parametrize values or its row number, instead of repeating multiline values.
+- `pytest-given report --help` mentions Markdown output and says where each format goes without `-o`.
 
 ## [0.3.0] - 2026-09-27
 
