@@ -927,7 +927,7 @@
 <p>The CLI takes its settings from flags only, never from your pytest config, and imports none of your code, so it also runs without installing: <code>uvx pytest-given@&lt;version&gt; report …</code>, pinned to the version that wrote the JSON file.</p>
 <p><code>--source-link</code> takes the same presets and URL templates as <code>--given-source-link</code> (see <a href="../configuration/source-links/">Source links</a>). Without it (or with <code>--source-link=none</code>), file:line is shown as plain text, without a link. With <code>--format md</code>, the option is checked but has no effect.</p>
 <p><code>--theme=light|dark|auto</code> sets the theme the report opens in, like <code>--given-theme</code>. The default is <code>auto</code>.</p>
-<p>Pass <code>--format md</code> to get Markdown instead of HTML. You can also just use a <code>.md</code> file name: <code>-o report.md</code> needs no <code>--format</code>.</p>
+<p>Pass <code>--format md</code> to get Markdown instead of HTML. You can also just use a <code>.md</code> or <code>.markdown</code> file name: <code>-o report.md</code> needs no <code>--format</code>.</p>
 <p>With <code>--format md</code> and no <code>-o</code>, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no <code>&lt;!-- pytest-given:md:start --&gt;</code> markers; the plugin only adds them to separate the report from pytest's own output.</p>
 <p>The same command also installs the agent skills with <code>pytest-given skills install</code>; see <a href="../ai-agents/#agent-skills">Agent skills</a>.</p>
 

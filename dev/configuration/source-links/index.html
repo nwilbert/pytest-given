@@ -1039,7 +1039,7 @@
 <tbody>
 <tr>
 <td><code>{path}</code></td>
-<td>Absolute POSIX path (resolved at render time against the cwd)</td>
+<td>Absolute POSIX path: pytest's rootdir joined with <code>{relpath}</code> (the working directory under <code>pytest-given report</code>)</td>
 </tr>
 <tr>
 <td><code>{relpath}</code></td>
@@ -1062,7 +1062,7 @@
 <p>For reports archived in CI, <code>given_source_link = "github"</code> links to the exact commit. If <code>origin</code> is a mirror, a fork, or a remote the preset can't read, write the same link as a template: <code>"https://github.com/myorg/myrepo/blob/{sha}/{relpath}#L{line}"</code>.</p>
 <p>Caveats:</p>
 <ul>
-<li>Editor presets (<code>vscode</code>, <code>cursor</code>, <code>zed</code>) build <code>{path}</code> from the current working directory when the report is rendered. If you download a JSON report from CI and render it in a different directory, the links break.</li>
+<li>Editor presets (<code>vscode</code>, <code>cursor</code>, <code>zed</code>, <code>pycharm</code>) build <code>{path}</code> from pytest's rootdir. A saved JSON report doesn't record the rootdir, so <code>pytest-given report</code> uses the directory you run it in: run it from your checkout's root, or the links break.</li>
 <li>GitHub links point to a specific commit, so they keep working after the code moves. That's what an archived CI report needs.</li>
 </ul>
 <h2 id="traceback-frames">Traceback frames<a class="headerlink" href="#traceback-frames" title="Permanent link">&para;</a></h2>

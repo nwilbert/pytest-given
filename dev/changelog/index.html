@@ -999,33 +999,33 @@
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Python 3.15 is supported.</li>
+<li>Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>The parameter table in the HTML and Markdown reports shows its status column only when the cases differ in status.</li>
-<li>The parameter table orders its columns the way the narration first shows them, so an input attached in a <code>given</code> precedes an outcome narrated in a <code>then</code>.</li>
-<li>The term ref hover tooltip in the HTML report sets its definition at 13px instead of 12px, in a slightly wider box.</li>
-<li>A hovered story, sentence, or sidebar group in the HTML report gets a visible fill in both themes; the story list showed none, and the dark theme's hover sank into the background.</li>
-<li>A scenario's narration in the HTML report leaves a gap at each change between given, when, and then, and its source link sits closer below it.</li>
-<li>Hovering a phase in the HTML report's narration, or a parameter table column, outlines that phase in both the narration and the table, and the status column loses its separator line.</li>
-<li>A parametrized scenario with several cases shows a second, thinner status bar in the HTML report's scenario lists.</li>
-<li>Term refs in the HTML report keep the surrounding text color and are marked by a kind-colored underline instead of a tinted background, and the Glossary view shows term names as plain bold text instead of colored pills, in tighter rows marked by a kind-colored bar, with a name column as wide as the longest term and the term's counts at the right edge.</li>
-<li>The HTML report's sidebar status filters take the same corners as the sidebar's other controls.</li>
+<li>The parameter table orders its columns the way the narration first shows them, and shows its status column only when the cases differ in status.</li>
 <li>The HTML report's Stories view shows each scenario as a full card that expands in place, and a tag clicked there opens the Scenarios view filtered by it.</li>
-<li>A story sentence's coverage in the HTML report reads as plain text instead of a tinted pill, with only its failing and skipped counts in their status colors, its name pill takes a grey fill, and count lists across the report separate their parts with a dot.</li>
-<li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule, backs glossary definitions that assert behavior, sets <code>.low</code> as the mid-sentence term ref form, corrects the one-glossary and lint-selection guidance, and covers parametrized scenarios as decision tables, with refused inputs as rows, and merging sibling scenarios into one.</li>
-<li>The bundled <code>pytest-given-reviewing</code> skill also flags term refs that name the wrong term, glossary rows a scenario contradicts, unbacked step pins, scenarios that name a story yet cover none of it, tags missing from part of the scenarios they describe, and parameter tables whose columns or rows can't show what decides the outcome or that hold a column no step narrates.</li>
+<li>The HTML report is visually tidied: term refs are marked by a kind-colored underline instead of a tinted background, the Glossary view lists terms as plain names in tighter rows, story coverage reads as plain counts, the narration leaves a gap between phases, a parametrized scenario is marked by a second status bar, hover states show in both themes, the report title shares one row with the view tabs, the sidebars sit on the page background, and a status filter no scenario has is disabled.</li>
+<li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the <code>pytest-given-reviewing</code> skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>An <code>Annotated[..., given(Template(...))]</code> label whose placeholder names no parametrize column now fails its scenario with the fix, instead of crashing the HTML report.</li>
-<li>An <code>Annotated[..., given(Template(...))]</code> label whose placeholder is not a bare name now fails its scenario, instead of silently dropping the given step from the report.</li>
-<li>A scenario failing on a pytest-given refusal from its test body — a step nested across phases, an unknown glossary term or sentence — shows the test's own line as its failure location, not pytest-given's.</li>
-<li>A <code>FileGlossary</code> error about the file's tables — no table, a short row, a column not found — names the file.</li>
-<li>The error for a step nested across phases suggests closing the open step or dropping the helper's phase decorator, instead of an undefined "phase-neutral helper".</li>
-<li>The error for a declared kind found in an actor slot says "an actor slot", not "a actor slot".</li>
-<li>In the Markdown report, the note below a parameter table that holds a case's attachment or error names the row by its short parametrize values only, or by its row number, instead of repeating multiline values.</li>
-<li><code>pytest-given report --help</code> says it renders Markdown too, and where each format goes without <code>-o</code>.</li>
+<li>A <code>@given</code> fixture parametrized with an unhashable value, such as a list, no longer errors every test that requests it.</li>
+<li>Editor source links build <code>{path}</code> from pytest's rootdir instead of the working directory, so they no longer point at a doubled path when pytest runs from a subdirectory.</li>
+<li>A scenario deep link stays working when the test's file or directory name contains <code>+</code>, <code>&amp;</code>, <code>=</code> or <code>#</code>.</li>
+<li>A parametrize value of infinity or NaN reaches the JSON report as a string (<code>"inf"</code>, <code>"nan"</code>), so the report stays valid JSON.</li>
+<li>A <code>@given</code> generator fixture that yields twice errors with pytest's own "more than one 'yield'" message again, instead of passing silently.</li>
+<li>An <code>Annotated[..., given(Template(...))]</code> label whose placeholder is not a bare parametrize column name now fails its scenario with the fix, instead of crashing the HTML report or silently dropping the step.</li>
+<li>A scenario failing on a pytest-given refusal raised from its test body points at the test's own line, not at pytest-given's.</li>
+<li>Error messages are clearer: a <code>FileGlossary</code> table error names the file, so does a glossary file that is a directory or not UTF-8, and a step nested across phases gets a concrete fix suggested.</li>
+<li>The Markdown report's note below a parameter table names the row by its short parametrize values or its row number, instead of repeating multiline values.</li>
+<li>A failure inside the narration lint is summarized under <code>pytest-given: narration lint failed</code>, no longer as <code>report not written</code> beside a report that was kept.</li>
+<li>The <code>tag-shadows-term</code> lint finding counts a scenario once when it carries two spellings of the tag, such as <code>Guest</code> and <code>guest</code>.</li>
+<li><code>pytest-given report -o report.markdown</code> writes Markdown, as <code>-o report.md</code> does, instead of refusing the path as an HTML one.</li>
+<li><code>pytest-given report --help</code> mentions Markdown output and says where each format goes without <code>-o</code>.</li>
+<li>The HTML report's links keep a tag filter whose tag contains a comma, by repeating the parameter per tag or term (<code>#tag=a&amp;tag=b</code>), and copying a link no longer replaces the current page's entry in the browser history.</li>
+<li>The HTML report no longer says "All Scenarios" when every status is filtered out, and the Glossary view says no terms match when every kind is unchecked.</li>
+<li>The HTML report's view tabs and search boxes show a visible keyboard focus ring, and a turned-off status filter keeps readable contrast.</li>
 </ul>
 <h2 id="030-2026-09-27"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0">0.3.0</a> - 2026-09-27<a class="headerlink" href="#030-2026-09-27" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
