@@ -2280,7 +2280,7 @@ def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
     render_html(report, html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<title>Coffee Shop Example — pytest-given Report</title>' in content
-    assert '<div class="topbar-title">Coffee Shop Example</div>' in content
+    assert re.search(r'class="topbar-title"[^>]*>Coffee Shop Example<', content)
 
 
 def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:

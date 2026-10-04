@@ -63,11 +63,39 @@
 
   {%- from '_macros.html.j2' import source_link, anchor_link, render_error, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
 
+  {#- The view divs read this too: `role="tabpanel"` only where a tablist
+      exists to belong to. -#}
+  {%- set visible_count = tab_visibility.visible_count -%}
+  {%- set report_title = metadata.title or metadata.project %}
   <header class="topbar">
-    <div class="topbar-title">{{ metadata.title or metadata.project }}</div>
+    {#- The title attribute is for when the title runs out of room and ends in
+        an ellipsis. -#}
+    <div class="topbar-title" title="{{ report_title }}">{{ report_title }}</div>
+    {% if visible_count > 1 %}
+    {#- The class paints the active tab; `aria-selected` announces it. No roving
+        tabindex: three tabs do not earn the arrow-key handling. -#}
+    <nav class="frame-nav" role="tablist" aria-label="Report views">
+      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
+              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+              :aria-selected="mainView === 'scenarios'"
+              @click="mainView = 'scenarios'">Scenarios</button>
+      {% if tab_visibility.stories %}
+      <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
+              :class="{ 'nav-tab-active': mainView === 'stories' }"
+              :aria-selected="mainView === 'stories'"
+              @click="mainView = 'stories'">Stories</button>
+      {% endif %}
+      {% if tab_visibility.glossary %}
+      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
+              :class="{ 'nav-tab-active': mainView === 'glossary' }"
+              :aria-selected="mainView === 'glossary'"
+              @click="mainView = 'glossary'">Glossary</button>
+      {% endif %}
+    </nav>
+    {% endif %}
     <div class="topbar-meta">
-      <span>pytest {{ metadata.pytest_version }}</span>
-      <span>pytest-given {{ metadata.plugin_version }}</span>
+      <span class="topbar-version">pytest {{ metadata.pytest_version }}</span>
+      <span class="topbar-version">pytest-given {{ metadata.plugin_version }}</span>
       <span x-text="formattedTimestamp"></span>
       {#- Text, not an icon: the current state has to be readable without
           hovering. `aria-pressed` on each segment is the accessible state. -#}
@@ -78,32 +106,6 @@
       </div>
     </div>
   </header>
-
-  {#- The view divs read this too: `role="tabpanel"` only where a tablist
-      exists to belong to. -#}
-  {%- set visible_count = tab_visibility.visible_count -%}
-  {% if visible_count > 1 %}
-  {#- The class paints the active tab; `aria-selected` announces it. No roving
-      tabindex: three tabs do not earn the arrow-key handling. -#}
-  <nav class="frame-nav" role="tablist" aria-label="Report views">
-    <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
-            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-            :aria-selected="mainView === 'scenarios'"
-            @click="mainView = 'scenarios'">Scenarios</button>
-    {% if tab_visibility.stories %}
-    <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
-            :class="{ 'nav-tab-active': mainView === 'stories' }"
-            :aria-selected="mainView === 'stories'"
-            @click="mainView = 'stories'">Stories</button>
-    {% endif %}
-    {% if tab_visibility.glossary %}
-    <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
-            :class="{ 'nav-tab-active': mainView === 'glossary' }"
-            :aria-selected="mainView === 'glossary'"
-            @click="mainView = 'glossary'">Glossary</button>
-    {% endif %}
-  </nav>
-  {% endif %}
 
   <div id="view-scenarios" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-scenarios"{% endif %} x-show="mainView === 'scenarios'">
   <div class="view-layout">
@@ -119,8 +121,11 @@
     <div class="sidebar-section">
       <div class="sidebar-label">Status</div>
       <div class="status-pills">
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
+        {#- Disabled at zero: the counts are report totals, so there is
+            nothing to filter, and `_visible` ignores a status no scenario
+            has. Skipped hides instead, being the rare one. -#}
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" :disabled="counts.passed === 0" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" :disabled="counts.failed === 0" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
         <button type="button" class="btn-reset status-pill" :class="{ 'active-skipped': showSkipped }" :aria-pressed="showSkipped" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></button>
       </div>
     </div>
@@ -385,7 +390,6 @@
   {% if stories %}
   <div class="view-layout">
     <div class="sidebar">
-      <div class="sidebar-label">Stories</div>
       {% for story in stories %}
       {% set scns = story_rollups[story.id].scenarios %}
       <button type="button" class="btn-reset story-sidebar-item" data-story-id="{{ story.id }}"

@@ -101,6 +101,7 @@
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 20px;
+  --space-2xl: 32px;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -204,12 +205,19 @@ body {
 }
 
 
+
+
+
 .sidebar {
   
 
   width: var(--sidebar-w, 260px);
-  background: var(--bg-surface);
-  padding: var(--space-lg);
+  
+
+
+
+  margin-left: -6px;
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg) 6px;
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
@@ -228,17 +236,18 @@ body {
   cursor: col-resize;
   touch-action: none;
 }
+
+
 .sidebar-resize::before {
   content: '';
   position: absolute;
   inset: 0 2px;
-  background: var(--color-accent);
-  opacity: 0;
-  transition: opacity 0.12s ease;
+  border-left: 1px solid var(--border);
+  transition: border-color 0.12s ease;
 }
 .sidebar-resize:hover::before,
 .sidebar-resize:focus-visible::before,
-body.resizing-sidebar .sidebar-resize::before { opacity: 1; }
+body.resizing-sidebar .sidebar-resize::before { border-left-color: var(--color-accent); }
 
 
 .sidebar-resize:focus-visible { outline: none; }
@@ -255,14 +264,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .search-box input[type="text"] {
   width: 100%;
   padding: 6px 28px 6px 28px;
-  background: var(--bg-page);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: var(--font-size-sm);
   outline: none;
 }
-.search-box input[type="text"]:focus { border-color: var(--color-accent); }
+
+
+.search-box input[type="text"]:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
 .search-box-icon {
   position: absolute;
   left: 8px;
@@ -293,7 +307,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 .sidebar-section {
   margin-top: var(--space-xl);
-  padding-top: var(--space-lg);
+  padding-top: var(--space-sm);
 }
 
 
@@ -356,7 +370,17 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .status-pill.active-passed { background: var(--color-passed-tint); color: var(--color-passed); border-color: var(--color-passed); }
 .status-pill.active-failed { background: var(--color-failed-tint); color: var(--color-failed); border-color: var(--color-failed); }
 .status-pill.active-skipped { background: var(--color-skipped-tint); color: var(--color-skipped); border-color: var(--color-skipped); }
-.status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
+
+.status-pill:not([class*="active-"]) { text-decoration: line-through; }
+
+
+.status-pill:disabled {
+  background: var(--bg-surface);
+  border-color: var(--border);
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: default;
+}
 
 
 
@@ -418,8 +442,10 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 
+
+
 .nav-group:not(.nav-group-active):hover {
-  background: var(--bg-hover);
+  background: var(--bg-surface);
   border-color: var(--border);
 }
 
@@ -506,11 +532,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 #view-stories,
 #view-glossary { flex: 1; min-height: 0; display: flex; }
 .view-layout { display: flex; flex: 1; min-height: 0; }
-.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-xl); overflow-y: auto; }
-.header {
-  margin-bottom: var(--space-xl);
-  padding-bottom: var(--space-lg);
-}
+.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-2xl) var(--space-xl) var(--space-xl); overflow-y: auto; }
+
+.header { margin-bottom: var(--space-lg); }
 .header-context {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
@@ -1075,43 +1099,66 @@ span.param-highlight {
 .term-tip-def code { background: var(--bg-tip-code); }
 
 
+
+
 .topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border);
 }
 .topbar-title {
+  flex: 0 1 auto;
+  
+
+
+
+
+
+  min-width: min(calc(var(--sidebar-w, 260px) + 15px), 45%);
+  
+  padding: var(--space-sm) var(--space-xl) var(--space-sm) 0;
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .topbar-meta {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: var(--space-md);
+  margin-left: auto;
+  padding-left: var(--space-xl);
   color: var(--text-muted);
   font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .topbar-version { display: none; }
 }
 
 
 .topbar-meta .seg-btn { flex: none; padding: 2px 9px; }
 
 
+
+
 .frame-nav {
   display: flex;
-  gap: var(--space-xs);
-  border-bottom: 2px solid var(--border);
-  padding-bottom: 0;
+  flex-shrink: 0;
+  align-self: stretch;
+  gap: 28px;
 }
 .nav-tab {
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  padding: var(--space-sm) var(--space-lg);
+  margin-bottom: -1px;
+  padding: 14px 0;
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1119,6 +1166,11 @@ span.param-highlight {
   transition: color 0.15s, border-color 0.15s;
 }
 .nav-tab:hover { color: var(--color-accent); }
+.nav-tab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
 .nav-tab-active {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
@@ -1134,7 +1186,8 @@ span.param-highlight {
   border: 1px solid transparent;
   margin-bottom: var(--space-xs);
 }
-.story-sidebar-item:hover { background: var(--bg-hover); border-color: var(--border); }
+
+.story-sidebar-item:not(.active):hover { background: var(--bg-surface); border-color: var(--border); }
 .story-sidebar-item.active {
   background: var(--color-accent-tint);
   border-color: var(--color-accent);
@@ -1273,14 +1326,33 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
-.kind-filter-row input[type="checkbox"] { flex-shrink: 0; accent-color: var(--color-accent); }
-.kind-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  flex-shrink: 0;
+
+
+
+
+.kind-filter-row { position: relative; }
+.kind-filter-row input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
 }
-.kind-swatch { background: var(--kind-line); }
+.kind-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 2px solid var(--kind-line);
+  background: var(--kind-line);
+}
+.kind-filter-row input:not(:checked) + .kind-swatch { background: transparent; }
+.kind-filter-row:has(input:not(:checked)) { color: var(--text-muted); }
+.kind-filter-row input:focus-visible + .kind-swatch {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 
 
 
@@ -1512,36 +1584,37 @@ span.param-highlight {
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
-<div class="main"><header class="topbar">
-    <div class="topbar-title">File Glossary Example</div>
+<div class="main">
+  <header class="topbar"><div class="topbar-title" title="File Glossary Example">File Glossary Example</div>
+    <nav class="frame-nav" role="tablist" aria-label="Report views">
+      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
+              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+              :aria-selected="mainView === 'scenarios'"
+              @click="mainView = 'scenarios'">Scenarios</button>
+      
+      <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
+              :class="{ 'nav-tab-active': mainView === 'stories' }"
+              :aria-selected="mainView === 'stories'"
+              @click="mainView = 'stories'">Stories</button>
+      
+      
+      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
+              :class="{ 'nav-tab-active': mainView === 'glossary' }"
+              :aria-selected="mainView === 'glossary'"
+              @click="mainView = 'glossary'">Glossary</button>
+      
+    </nav>
+    
     <div class="topbar-meta">
-      <span>pytest 9.1.1</span>
-      <span>pytest-given 0.3.0</span>
+      <span class="topbar-version">pytest 9.1.1</span>
+      <span class="topbar-version">pytest-given 0.3.0</span>
       <span x-text="formattedTimestamp"></span><div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
       </div>
     </div>
-  </header><nav class="frame-nav" role="tablist" aria-label="Report views">
-    <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
-            :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-            :aria-selected="mainView === 'scenarios'"
-            @click="mainView = 'scenarios'">Scenarios</button>
-    
-    <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
-            :class="{ 'nav-tab-active': mainView === 'stories' }"
-            :aria-selected="mainView === 'stories'"
-            @click="mainView = 'stories'">Stories</button>
-    
-    
-    <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
-            :class="{ 'nav-tab-active': mainView === 'glossary' }"
-            :aria-selected="mainView === 'glossary'"
-            @click="mainView = 'glossary'">Glossary</button>
-    
-  </nav>
-  
+  </header>
 
   <div id="view-scenarios" role="tabpanel" aria-labelledby="tab-scenarios" x-show="mainView === 'scenarios'">
   <div class="view-layout">
@@ -1556,9 +1629,8 @@ span.param-highlight {
 
     <div class="sidebar-section">
       <div class="sidebar-label">Status</div>
-      <div class="status-pills">
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
+      <div class="status-pills"><button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" :disabled="counts.passed === 0" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" :disabled="counts.failed === 0" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
         <button type="button" class="btn-reset status-pill" :class="{ 'active-skipped': showSkipped }" :aria-pressed="showSkipped" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></button>
       </div>
     </div>
@@ -1680,7 +1752,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/test_file_glossary_booking.py#L52">examples/file-glossary-booking/test_file_glossary_booking.py:52</a></div>
       
     </div>
     </div>
@@ -1726,7 +1798,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/test_file_glossary_booking.py#L67">examples/file-glossary-booking/test_file_glossary_booking.py:67</a></div>
       
     </div>
     </div>
@@ -1742,7 +1814,6 @@ span.param-highlight {
   
   <div class="view-layout">
     <div class="sidebar">
-      <div class="sidebar-label">Stories</div>
       
       
       <button type="button" class="btn-reset story-sidebar-item" data-story-id="book-a-room"
@@ -1905,7 +1976,7 @@ span.param-highlight {
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -2050,7 +2121,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -2116,7 +2187,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -2169,7 +2240,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -2242,7 +2313,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -2301,7 +2372,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2340,7 +2411,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/7b281797c5d0d807b708a3c8983954224437b8e2/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a327ba0203c982d2c75d544583cc367687254ff9/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2367,7 +2438,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-04T09:02:24.239182+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest books an available room\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-04T10:42:54.935766+00:00\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest books an available room\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));

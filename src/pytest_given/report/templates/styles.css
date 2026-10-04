@@ -69,6 +69,7 @@
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 20px;
+  --space-2xl: 32px;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -172,22 +173,29 @@ body {
 }
 
 /* === Sidebar === */
+/* On the page ground, with the rest of the chrome: a white surface means
+   content, and a white sidebar read as one more card beside the results it
+   filters. */
 .sidebar {
   /* Set on <body> by the resize handle below; the fallback is what the page
      renders at before Alpine binds it, and if scripting is off. */
   width: var(--sidebar-w, 260px);
-  background: var(--bg-surface);
-  padding: var(--space-lg);
+  /* The 6px inset, pulled back by the negative margin, keeps the controls on
+     the report title's edge while leaving room for the rows' bleed and the
+     focus rings, which the scroll box would otherwise clip. The top matches
+     `.view-main`, so the first control and the view heading stay level. */
+  margin-left: -6px;
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg) 6px;
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
   position: sticky;
   top: 0;
 }
-/* The seam between the sidebar and the content it filters: 5px of grab area,
-   invisible until pointed at, then a 1px accent rule down the full height. It
-   overlaps its neighbours by 2px on each side, so widening the grab area costs
-   the layout nothing. */
+/* The seam between the sidebar and the content it filters: 5px of grab area
+   around a 1px rule, which turns accent while pointed at. It overlaps its
+   neighbours by 2px on each side, so widening the grab area costs the layout
+   nothing. */
 .sidebar-resize {
   flex: 0 0 5px;
   margin: 0 -2px;
@@ -196,17 +204,18 @@ body {
   cursor: col-resize;
   touch-action: none;
 }
+/* A border, not a filled 1px box: at fractional display scaling a box can snap
+   to two device pixels, while a border snaps exactly as the tab rule's does. */
 .sidebar-resize::before {
   content: '';
   position: absolute;
   inset: 0 2px;
-  background: var(--color-accent);
-  opacity: 0;
-  transition: opacity 0.12s ease;
+  border-left: 1px solid var(--border);
+  transition: border-color 0.12s ease;
 }
 .sidebar-resize:hover::before,
 .sidebar-resize:focus-visible::before,
-body.resizing-sidebar .sidebar-resize::before { opacity: 1; }
+body.resizing-sidebar .sidebar-resize::before { border-left-color: var(--color-accent); }
 /* The rule above *is* the focus indicator, so the default ring would only
    double it — and it would sit on a 1px-wide box. */
 .sidebar-resize:focus-visible { outline: none; }
@@ -223,14 +232,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .search-box input[type="text"] {
   width: 100%;
   padding: 6px 28px 6px 28px;
-  background: var(--bg-page);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: var(--font-size-sm);
   outline: none;
 }
-.search-box input[type="text"]:focus { border-color: var(--color-accent); }
+/* The shadow doubles the border into a 2px ring: a 1px color change alone is
+   too faint to find the focus by. */
+.search-box input[type="text"]:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
 .search-box-icon {
   position: absolute;
   left: 8px;
@@ -261,7 +275,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 .sidebar-section {
   margin-top: var(--space-xl);
-  padding-top: var(--space-lg);
+  padding-top: var(--space-sm);
 }
 /* The one caption register: sidebar section labels, the story view's section
    heading and the attachment payload's label. */
@@ -324,7 +338,17 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .status-pill.active-passed { background: var(--color-passed-tint); color: var(--color-passed); border-color: var(--color-passed); }
 .status-pill.active-failed { background: var(--color-failed-tint); color: var(--color-failed); border-color: var(--color-failed); }
 .status-pill.active-skipped { background: var(--color-skipped-tint); color: var(--color-skipped); border-color: var(--color-skipped); }
-.status-pill:not([class*="active-"]) { opacity: 0.5; text-decoration: line-through; }
+/* Off reads as excluded by the strike alone, at full muted contrast. */
+.status-pill:not([class*="active-"]) { text-decoration: line-through; }
+/* A status no scenario has: nothing to filter, so no colour to raise an alarm
+   with — "Failed 0" is good news. After the active rules, to outrank them. */
+.status-pill:disabled {
+  background: var(--bg-surface);
+  border-color: var(--border);
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: default;
+}
 
 
 /* Segmented toggle — a connected single-select control, shared by "Browse by"
@@ -385,9 +409,11 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 /* Hovering the row previews the selection it would make — quiet, and clearly
    not the accent tint of a real selection. The chevron inside it lights up
-   differently, which is what separates "expand" from "filter by". */
+   differently, which is what separates "expand" from "filter by". The surface,
+   not --bg-hover: on the page ground the row lifts, where that tint would all
+   but vanish. */
 .nav-group:not(.nav-group-active):hover {
-  background: var(--bg-hover);
+  background: var(--bg-surface);
   border-color: var(--border);
 }
 /* The chevron is a control inside a clickable row, so it gets a real button
@@ -474,11 +500,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 #view-stories,
 #view-glossary { flex: 1; min-height: 0; display: flex; }
 .view-layout { display: flex; flex: 1; min-height: 0; }
-.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-xl); overflow-y: auto; }
-.header {
-  margin-bottom: var(--space-xl);
-  padding-bottom: var(--space-lg);
-}
+.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-2xl) var(--space-xl) var(--space-xl); overflow-y: auto; }
+/* Nearer its own list than the tab rule above it. */
+.header { margin-bottom: var(--space-lg); }
 .header-context {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
@@ -1042,44 +1066,67 @@ span.param-highlight {
 .entry-def code { background: var(--bg-page); }
 .term-tip-def code { background: var(--bg-tip-code); }
 
-/* === Topbar === */
+/* === Topbar ===
+   One row: title, the view tabs, the run meta. Its bottom border is the tab
+   rule, and the active tab's underline sits on it. */
 .topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border);
 }
 .topbar-title {
+  flex: 0 1 auto;
+  /* At least the sidebar's column — net 15px past `--sidebar-w`, after the
+     sidebar's bleed, the seam and the view's padding — so the tabs start over
+     the content column, level with its heading, and follow the seam on a
+     resize. Capped, so a wide sidebar on a narrow window cannot push the row
+     out of the page. A longer title pushes the tabs right and is the first to
+     give way, to an ellipsis (the full title is its tooltip). */
+  min-width: min(calc(var(--sidebar-w, 260px) + 15px), 45%);
+  /* The block padding holds the row's height when there are no tabs. */
+  padding: var(--space-sm) var(--space-xl) var(--space-sm) 0;
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .topbar-meta {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: var(--space-md);
+  margin-left: auto;
+  padding-left: var(--space-xl);
   color: var(--text-muted);
   font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* The least needed part of the row, so the first to go when it runs short. */
+@media (max-width: 1100px) {
+  .topbar-version { display: none; }
 }
 /* The theme control is the sidebar's segmented toggle, sized to sit inline
    with the meta text rather than fill a sidebar row. */
 .topbar-meta .seg-btn { flex: none; padding: 2px 9px; }
 
-/* === Tab strip === */
+/* === Tab strip ===
+   Spaced by a gap rather than padded, so each underline is as wide as its
+   label. */
 .frame-nav {
   display: flex;
-  gap: var(--space-xs);
-  border-bottom: 2px solid var(--border);
-  padding-bottom: 0;
+  flex-shrink: 0;
+  align-self: stretch;
+  gap: 28px;
 }
 .nav-tab {
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  padding: var(--space-sm) var(--space-lg);
+  margin-bottom: -1px;
+  padding: 14px 0;
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1087,6 +1134,11 @@ span.param-highlight {
   transition: color 0.15s, border-color 0.15s;
 }
 .nav-tab:hover { color: var(--color-accent); }
+.nav-tab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
 .nav-tab-active {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
@@ -1102,7 +1154,8 @@ span.param-highlight {
   border: 1px solid transparent;
   margin-bottom: var(--space-xs);
 }
-.story-sidebar-item:hover { background: var(--bg-hover); border-color: var(--border); }
+/* Lifts to the surface, as a hovered `.nav-group` does. */
+.story-sidebar-item:not(.active):hover { background: var(--bg-surface); border-color: var(--border); }
 .story-sidebar-item.active {
   background: var(--color-accent-tint);
   border-color: var(--color-accent);
@@ -1241,14 +1294,33 @@ span.param-highlight {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
-.kind-filter-row input[type="checkbox"] { flex-shrink: 0; accent-color: var(--color-accent); }
-.kind-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  flex-shrink: 0;
+/* The swatch is the checkbox: filled while the kind shows, hollow while it is
+   hidden. The native input stays, visually hidden, so the label click, the
+   keyboard and `x-model` all work as before; its focus ring moves onto the
+   swatch. */
+.kind-filter-row { position: relative; }
+.kind-filter-row input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
 }
-.kind-swatch { background: var(--kind-line); }
+.kind-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 2px solid var(--kind-line);
+  background: var(--kind-line);
+}
+.kind-filter-row input:not(:checked) + .kind-swatch { background: transparent; }
+.kind-filter-row:has(input:not(:checked)) { color: var(--text-muted); }
+.kind-filter-row input:focus-visible + .kind-swatch {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 
 /* One kind's two colors for whatever marks it in the Glossary view — sidebar
    swatch, kind header, entry bar — keyed by the kind's filter key. */

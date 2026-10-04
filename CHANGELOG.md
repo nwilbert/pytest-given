@@ -22,7 +22,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - The parameter table orders its columns the way the narration first shows them, and shows its status column only when the cases differ in status.
 - The HTML report's Stories view shows each scenario as a full card that expands in place, and a tag clicked there opens the Scenarios view filtered by it.
-- The HTML report is visually tidied: term refs are marked by a kind-colored underline instead of a tinted background, the Glossary view lists terms as plain names in tighter rows, story coverage reads as plain counts, the narration leaves a gap between phases, a parametrized scenario is marked by a second status bar, and hover states show in both themes.
+- The HTML report is visually tidied: term refs are marked by a kind-colored underline instead of a tinted background, the Glossary view lists terms as plain names in tighter rows, story coverage reads as plain counts, the narration leaves a gap between phases, a parametrized scenario is marked by a second status bar, hover states show in both themes, the report title shares one row with the view tabs, the sidebars sit on the page background, and a status filter no scenario has is disabled.
 - The bundled `pytest-given-authoring` skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the `pytest-given-reviewing` skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.
 
 ### Fixed
@@ -42,6 +42,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given report --help` mentions Markdown output and says where each format goes without `-o`.
 - The HTML report's links keep a tag filter whose tag contains a comma, by repeating the parameter per tag or term (`#tag=a&tag=b`), and copying a link no longer replaces the current page's entry in the browser history.
 - The HTML report no longer says "All Scenarios" when every status is filtered out, and the Glossary view says no terms match when every kind is unchecked.
+- The HTML report's view tabs and search boxes show a visible keyboard focus ring, and a turned-off status filter keeps readable contrast.
 
 ## [0.3.0] - 2026-09-27
 
