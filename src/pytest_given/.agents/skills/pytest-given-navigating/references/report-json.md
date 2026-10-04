@@ -18,8 +18,9 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `narration.text` | The scenario name (grouped template for parametrized scenarios) — for a *step* in a grouped parametrized scenario this is the template too (`the drink costs {price} euros`), not the first case's rendering |
 | `module` | Python module the test lives in |
 | `tags[]` | `tags=` from `@scenario` — report metadata, **not** pytest marks |
-| `status` | `passed` / `failed` / `skipped` |
+| `status` | `passed` / `failed` / `skipped` / `xfailed` (failed as expected: an `xfail` mark or `pytest.xfail()`) |
 | `skip_reason` | `null`, or the reason a skipped scenario carries instead of a traceback |
+| `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail; it keeps its steps and error as well |
 | `duration_ms` | Wall-clock time for the test |
 | `steps[]` | Recursive step tree (see below) |
 | `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
@@ -75,6 +76,10 @@ jq -r '.scenarios[] | select(.status == "failed")
           // ([.parameters.cases[] | select(.status == "failed")
               | "[" + (.values | map(tostring) | join(", ")) + "] " + .error.message]
              | join("; ")))' report.json
+
+# Expected failures with their reasons — planned behavior not yet working
+jq -r '.scenarios[] | select(.status == "xfailed")
+       | .narration.text + (if .xfail_reason then " — " + .xfail_reason else "" end)' report.json
 
 # Scenarios whose narration references a term (any step depth: use recursion for nested steps)
 jq -r '.scenarios[] | select([.. | .term_id? // empty] | index("waitlist"))

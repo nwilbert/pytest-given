@@ -302,9 +302,31 @@ def test_makereport_ignores_a_failure_outside_the_active_scenario(
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
     call = SimpleNamespace(when='call', excinfo=SimpleNamespace())
     item = cast(pytest.Item, SimpleNamespace(nodeid='t::b', config=fake_config))
-    runtest.pytest_runtest_makereport(item, cast(Any, call))
+    hook = runtest.pytest_runtest_makereport(item, cast(Any, call))
+    next(hook)
+    report = SimpleNamespace(skipped=False, failed=True, longrepr='boom')
+    with pytest.raises(StopIteration):
+        hook.send(cast(pytest.TestReport, report))
     recorded = fresh_collector.finish_scenario(status='passed')
     assert recorded.status == 'passed'
+    assert recorded.error is None
+
+
+def test_makereport_takes_only_pytests_strict_xpass_message_as_an_error(
+    fake_config: Any,
+    fresh_collector: Collector,
+) -> None:
+    """A failed call that raised nothing is a strict xpass only when pytest
+    says so; another plugin's failure text is not ours to record."""
+    fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
+    call = SimpleNamespace(when='call', excinfo=None)
+    item = cast(pytest.Item, SimpleNamespace(nodeid='t::a', config=fake_config))
+    hook = runtest.pytest_runtest_makereport(item, cast(Any, call))
+    next(hook)
+    report = SimpleNamespace(skipped=False, failed=True, longrepr='Timeout >1.0s')
+    with pytest.raises(StopIteration):
+        hook.send(cast(pytest.TestReport, report))
+    recorded = fresh_collector.finish_scenario(status='failed')
     assert recorded.error is None
 
 

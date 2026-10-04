@@ -17,6 +17,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - Python 3.15 is supported.
 - Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.
+- Scenarios that fail as expected (`xfail`) get their own `xfailed` status, with their reason, steps and error, in every report format.
 
 ### Changed
 
@@ -43,6 +44,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The HTML report's links keep a tag filter whose tag contains a comma, by repeating the parameter per tag or term (`#tag=a&tag=b`), and copying a link no longer replaces the current page's entry in the browser history.
 - The HTML report no longer says "All Scenarios" when every status is filtered out, and the Glossary view says no terms match when every kind is unchecked.
 - The HTML report's view tabs and search boxes show a visible keyboard focus ring, and a turned-off status filter keeps readable contrast.
+- The HTML report's status filters wrap onto a second row instead of being cut off in a narrow sidebar.
+- A parametrized scenario shows a skip reason only when every case was skipped, no longer its first case's reason beside cases that ran.
 
 ## [0.3.0] - 2026-09-27
 

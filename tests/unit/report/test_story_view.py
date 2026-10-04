@@ -21,6 +21,7 @@ from pytest_given.model import (
     Scenario,
     Sentence,
     SentenceId,
+    Status,
     Step,
     Story,
     StoryId,
@@ -267,7 +268,7 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
         assert sentence_coverage.untracked == untracked
 
 
-def _covering_scn(node_id: str, status: str) -> Scenario:
+def _covering_scn(node_id: str, status: Status) -> Scenario:
     """A scenario whose single step references guest/search/room, so it covers
     the guest-search-room sentence used across the rollup-count tests."""
     step = Step(
@@ -291,7 +292,7 @@ def _covering_scn(node_id: str, status: str) -> Scenario:
     )
 
 
-def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
+def test_build_story_rollups_counts_each_status_apart() -> None:
     g = _g()
     sentence = Sentence(
         id=SentenceId(1),
@@ -311,14 +312,16 @@ def test_build_story_rollups_counts_passed_failed_and_skipped() -> None:
         _covering_scn('test::b', 'passed'),
         _covering_scn('test::c', 'failed'),
         _covering_scn('test::d', 'skipped'),
+        _covering_scn('test::e', 'xfailed'),
     ]
     rd = ReportData(metadata=_meta(), scenarios=scns, stories=[story], glossary=g)
     rollups = build_story_rollups(rd, build_coverage_map(rd))
     cov = rollups[StoryId('book')].per_sentence[SentenceId(1)]
-    assert cov.total == 4
+    assert cov.total == 5
     assert cov.passed == 2
     assert cov.failed == 1
     assert cov.skipped == 1
+    assert cov.xfailed == 1
 
 
 @scenario(

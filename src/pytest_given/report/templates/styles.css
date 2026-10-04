@@ -48,6 +48,8 @@
   --color-failed-tint: #fdeee4;
   --color-skipped: #9a5300;
   --color-skipped-tint: #fbecd5;
+  --color-xfailed: #3d5f86;
+  --color-xfailed-tint: #e3ebf4;
 
   /* Term kinds: the line underlines a term ref (see the term-ref comment
      further down) and marks the kind in the glossary — entry bar and sidebar
@@ -98,6 +100,8 @@
   --color-failed-tint: #412c36;
   --color-skipped: #f0b45c;
   --color-skipped-tint: #40332f;
+  --color-xfailed: #8fb4dc;
+  --color-xfailed-tint: #283240;
 
   --term-actor-ink: #f5b47a;    --term-actor-line: #cb773e;
   --term-object-ink: #7fded0;   --term-object-line: #53a397;
@@ -320,10 +324,15 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 
 /* Status filters: separate buttons, since they multi-select, but cornered and
-   sized like the segmented toggle below them — a control, not a tag. */
-.status-pills { display: flex; gap: var(--space-xs); }
+   sized like the segmented toggle below them — a control, not a tag. They
+   wrap rather than overflow. A row grows to fill the width, but no pill past half of
+   it, so a pill wrapped alone keeps a pill's width, at the left edge; its
+   label still never squeezes, as `min-width` outranks `max-width`. */
+.status-pills { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .status-pill {
-  flex: 1;
+  flex: 1 1 auto;
+  max-width: calc(50% - var(--space-xs) / 2);
+  min-width: max-content;
   text-align: center;
   font-size: var(--font-size-sm);
   padding: 2px 4px;
@@ -338,6 +347,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .status-pill.active-passed { background: var(--color-passed-tint); color: var(--color-passed); border-color: var(--color-passed); }
 .status-pill.active-failed { background: var(--color-failed-tint); color: var(--color-failed); border-color: var(--color-failed); }
 .status-pill.active-skipped { background: var(--color-skipped-tint); color: var(--color-skipped); border-color: var(--color-skipped); }
+.status-pill.active-xfailed { background: var(--color-xfailed-tint); color: var(--color-xfailed); border-color: var(--color-xfailed); }
 /* Off reads as excluded by the strike alone, at full muted contrast. */
 .status-pill:not([class*="active-"]) { text-decoration: line-through; }
 /* A status no scenario has: nothing to filter, so no colour to raise an alarm
@@ -575,6 +585,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .scenario.failed::before { background: var(--color-failed); }
 .scenario.skipped::before { background: var(--color-skipped); }
+.scenario.xfailed::before { background: var(--color-xfailed); }
 /* A grouped scenario with several cases: a thinner, shorter bar behind the
    status mark, a second card under the first. The mark itself keeps its full
    width, so the status reads as strongly as on any other row. Hung off the
@@ -593,6 +604,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .scenario.multi-case.failed > .scenario-header::before { background: var(--color-failed); }
 .scenario.multi-case.skipped > .scenario-header::before { background: var(--color-skipped); }
+.scenario.multi-case.xfailed > .scenario-header::before { background: var(--color-xfailed); }
 .scenario-header {
   display: flex;
   justify-content: space-between;
@@ -675,6 +687,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .scenario-status.passed { color: var(--color-passed); }
 .scenario-status.failed { color: var(--color-failed); }
 .scenario-status.skipped { color: var(--color-skipped); }
+.scenario-status.xfailed { color: var(--color-xfailed); }
 
 /* Narration: the keyword sits in a fixed left gutter, in the ink at medium
    weight; steps align beside it. Structure comes from alignment, so the accent
@@ -805,10 +818,11 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
    to the full card. */
 .param-table .param-status { text-align: center; }
 .param-table tr.failed-row { background: var(--color-failed-tint); }
+.param-table tr.xfailed-row { background: var(--color-xfailed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
 /* A payload panel is not a case: it carries no cells to highlight and no row
    to substitute from, so hovering it must not look like hovering a case row. */
-.param-table tbody tr:hover:not(.failed-row):not(.attachment-panel-row) { background: var(--color-accent-tint); }
+.param-table tbody tr:hover:not(.failed-row):not(.xfailed-row):not(.attachment-panel-row) { background: var(--color-accent-tint); }
 
 /* Crosshair: hovering a th/td highlights the column header, every cell in the
    column, and any narration placeholder bound to that parameter. */
@@ -824,15 +838,20 @@ span.param-highlight {
    background of its own. The value text in its retained param-color-N is the
    "filled-in" cue, and the tint stays reserved for the cell crosshair. */
 
-/* Error */
+/* Error. An expected failure's error is evidence, not an alarm: the xfailed
+   ink, on a neutral ground since the dark theme's traceback ground is the
+   failed tint. */
 .error-block {
+  --error-ink: var(--color-failed);
+  --error-ground: var(--bg-traceback);
   margin-top: var(--space-sm);
-  background: var(--bg-traceback);
-  border-left: 3px solid var(--color-failed);
+  background: var(--error-ground);
+  border-left: 3px solid var(--error-ink);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: var(--space-md);
 }
-.error-message { color: var(--color-failed); font-family: var(--font-mono); font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-xs); white-space: pre-wrap; }
+.error-block.xfailed { --error-ink: var(--color-xfailed); --error-ground: var(--bg-page); }
+.error-message { color: var(--error-ink); font-family: var(--font-mono); font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-xs); white-space: pre-wrap; }
 .error-toggle {
   margin-top: var(--space-xs);
   background: transparent;
@@ -882,22 +901,24 @@ span.param-highlight {
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   white-space: pre-wrap;
-  color: var(--color-failed);
+  color: var(--error-ink);
 }
 [x-cloak] { display: none !important; }
 
-/* Skip reason */
-.skip-reason {
+/* Reason: why a scenario was skipped or expected to fail, in its status colour. */
+.reason-box.skipped { --reason-ink: var(--color-skipped); --reason-tint: var(--color-skipped-tint); }
+.reason-box.xfailed { --reason-ink: var(--color-xfailed); --reason-tint: var(--color-xfailed-tint); }
+.reason-box {
   margin-top: var(--space-sm);
-  background: var(--color-skipped-tint);
-  border-left: 3px solid var(--color-skipped);
+  background: var(--reason-tint);
+  border-left: 3px solid var(--reason-ink);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: var(--space-md);
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
-.skip-reason-label {
-  color: var(--color-skipped);
+.reason-box-label {
+  color: var(--reason-ink);
   font-weight: 600;
   margin-right: var(--space-xs);
 }
@@ -968,6 +989,7 @@ span.param-highlight {
 .dot-passed { color: var(--color-passed); }
 .dot-failed { color: var(--color-failed); }
 .dot-skipped { color: var(--color-skipped); }
+.dot-xfailed { color: var(--color-xfailed); }
 
 /* Parameter colors. Each column's color is generated per report (see
    report/palette.py) and emitted as a `.param-color-N` rule after this sheet;
@@ -1216,6 +1238,7 @@ span.param-highlight {
 }
 .cov-failing { color: var(--color-failed); }
 .cov-skipped { color: var(--color-skipped); }
+.cov-xfailed { color: var(--color-xfailed); }
 .cov-untracked { cursor: help; }
 /* The sentence name: a code key, not a status, so a label's pill. Filled grey
    as a tag is, which sets it apart from the plain count beside it; outlined,

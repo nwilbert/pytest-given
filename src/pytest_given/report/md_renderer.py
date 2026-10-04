@@ -24,7 +24,7 @@ from ..model import (
     node_base,
     placeholder_token,
 )
-from .text import STATUS_GLYPH, plural
+from .text import STATUS_GLYPH, STATUS_LABEL, plural
 
 
 def render_md(report: ReportData) -> str:
@@ -38,8 +38,12 @@ def render_md(report: ReportData) -> str:
 def _scenario_md(scenario: Scenario) -> str:
     glyph = STATUS_GLYPH[scenario.status]
     suffix = ''
-    if scenario.status == 'skipped':
-        suffix = ' · skipped'
+    # A grouped scenario counts its cases instead: an all-skipped group has
+    # nothing else to say, but one xfailed row is what its status column shows.
+    if scenario.status == 'skipped' or (
+        scenario.status == 'xfailed' and scenario.parameters is None
+    ):
+        suffix = f' · {STATUS_LABEL[scenario.status]}'
     elif scenario.parameters is not None:
         suffix = f' · {plural(len(scenario.parameters.cases), "case")}'
     lines = [f'## {glyph} {_narration_md(scenario.narration)}{suffix}']
@@ -48,6 +52,8 @@ def _scenario_md(scenario: Scenario) -> str:
         subtitle += ' · ' + ', '.join(scenario.tags)
     if scenario.skip_reason:
         subtitle += f' — reason: {scenario.skip_reason}'
+    if scenario.xfail_reason:
+        subtitle += f' — expected to fail: {scenario.xfail_reason}'
     lines.append(subtitle)
     lines.append('')
     lines.extend(_step_md(step, depth=0) for step in scenario.steps)
@@ -109,7 +115,7 @@ def _param_table_md(table: ParameterTable) -> str:
 
 
 def _case_error_block(key: str, case: ParameterCase) -> list[str]:
-    """A failing case's error, keyed by its parametrize values.
+    """A failing or xfailed case's error, keyed by its parametrize values.
 
     Below the table rather than in the row: Markdown cannot nest a block inside
     a table cell. A grouped scenario carries no error of its own, so without
@@ -119,7 +125,7 @@ def _case_error_block(key: str, case: ParameterCase) -> list[str]:
         return []
     return [
         '',
-        f'- **{key}** — failed:',
+        f'- **{key}** — {STATUS_LABEL[case.status]}:',
         *_error_lines(case.error, '  '),
     ]
 

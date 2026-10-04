@@ -220,6 +220,7 @@ class Collector:
         self,
         status: Status,
         skip_reason: str | None = None,
+        xfail_reason: str | None = None,
     ) -> Scenario:
         """Close the active scenario and return it.
 
@@ -232,6 +233,7 @@ class Collector:
         self._current_scenario.status = status
         self._current_scenario.duration_ms = self._elapsed_ms()
         self._current_scenario.skip_reason = skip_reason
+        self._current_scenario.xfail_reason = xfail_reason
         scenario = self._current_scenario
         self._scenarios[scenario.id] = scenario
         self._current_scenario = None
@@ -438,13 +440,36 @@ class Collector:
 
         The first error wins: a call-phase failure is what the reader opened
         the scenario for, and a teardown error after it is the lesser story.
+        A failed scenario was not expected to fail, so it keeps no xfail reason.
         """
         scenario = self._scenario_for(node_id)
-        if scenario is None:
-            return
+        assert scenario is not None, node_id
         scenario.status = 'failed'
+        scenario.xfail_reason = None
         if scenario.error is None:
             scenario.error = error
+
+    def fail_as_expected(
+        self, node_id: NodeId, error: ErrorInfo | None, reason: str | None
+    ) -> None:
+        """Mark `node_id`'s scenario xfailed, open or finished, for a phase
+        pytest counted as an expected failure. `error` is None when the phase
+        called `pytest.xfail()` itself.
+
+        A failed scenario stays failed, and takes no reason: after a strict
+        xpass pytest still fails the run on the call, whatever it makes of the
+        teardown.
+        """
+        scenario = self._scenario_for(node_id)
+        assert scenario is not None, node_id
+        if scenario.error is None:
+            scenario.error = error
+        if scenario.status == 'failed':
+            return
+        scenario.status = 'xfailed'
+        scenario.skip_reason = None
+        if scenario.xfail_reason is None:
+            scenario.xfail_reason = reason
 
     def _scenario_for(self, node_id: NodeId) -> Scenario | None:
         if self._current_scenario is not None and self._current_scenario.id == node_id:

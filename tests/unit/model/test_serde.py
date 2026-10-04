@@ -151,6 +151,20 @@ def test_scenario_with_source_and_no_steps() -> None:
     assert s.skip_reason is None
 
 
+def test_an_xfailed_scenario_round_trips_with_its_reason() -> None:
+    restored = _restored(
+        Scenario(
+            id=NodeId('t.py::test_x'),
+            narration=Narration(text='x'),
+            module='t',
+            status='xfailed',
+            xfail_reason='not implemented yet',
+        )
+    )
+    assert restored.status == 'xfailed'
+    assert restored.xfail_reason == 'not implemented yet'
+
+
 def test_scenario_source_optional_defaults_to_none() -> None:
     report = report_from_dict(
         {

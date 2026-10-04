@@ -65,7 +65,21 @@ def test_generator_fixture(db):
     'Parametrized test (renders as a parameter table)',
     tags=['pricing'],
 )
-@pytest.mark.parametrize(('euros', 'expect'), [(1, False), (2, True), (3, True)])
+@pytest.mark.parametrize(
+    ('euros', 'expect'),
+    [
+        (1, False),
+        (2, True),
+        (3, True),
+        pytest.param(
+            1.5,
+            True,
+            marks=pytest.mark.xfail(
+                strict=True, reason='happy-hour pricing not implemented yet'
+            ),
+        ),
+    ],
+)
 def test_pricing(machine, euros, expect):
     with when(t'I insert ${euros}'):
         purchase_allowed = euros >= machine['price']
@@ -268,6 +282,21 @@ def test_failing(machine):
 def test_skipped(machine):
     with then('this step never runs'):
         assert machine['coffees'] == 10
+
+
+def pay_with_loyalty_card(machine, card):
+    raise NotImplementedError('the machine does not read loyalty cards yet')
+
+
+@scenario('Loyalty card earns a free coffee (planned feature)', tags=['loyalty'])
+@pytest.mark.xfail(strict=True, reason='loyalty cards not implemented yet')
+def test_loyalty_card_free_coffee(machine):
+    with given('a loyalty card with nine stamps'):
+        card = {'stamps': 9}
+    with when('I buy a coffee with the card'):
+        price_paid = pay_with_loyalty_card(machine, card)
+    with then('the coffee is free'):
+        assert price_paid == 0
 
 
 @scenario('All cases skipped')

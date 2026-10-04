@@ -61,7 +61,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
       exists to belong to. -#}
@@ -123,10 +123,11 @@
       <div class="status-pills">
         {#- Disabled at zero: the counts are report totals, so there is
             nothing to filter, and `_visible` ignores a status no scenario
-            has. Skipped hides instead, being the rare one. -#}
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-passed': showPassed }" :aria-pressed="showPassed" :disabled="counts.passed === 0" @click="showPassed = !showPassed">✓ Passed <span x-text="counts.passed"></span></button>
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-failed': showFailed }" :aria-pressed="showFailed" :disabled="counts.failed === 0" @click="showFailed = !showFailed">✗ Failed <span x-text="counts.failed"></span></button>
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-skipped': showSkipped }" :aria-pressed="showSkipped" @click="showSkipped = !showSkipped" x-show="counts.skipped > 0">○ Skipped <span x-text="counts.skipped"></span></button>
+            has. Skipped and Expected failure hide instead, being the rare
+            ones. -#}
+        {%- for status in statuses %}
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-{{ status }}': shownStatuses.{{ status }} }" :aria-pressed="shownStatuses.{{ status }}" @click="shownStatuses.{{ status }} = !shownStatuses.{{ status }}" {% if status in ('passed', 'failed') %}:disabled="counts.{{ status }} === 0"{% else %}x-show="counts.{{ status }} > 0"{% endif %}>{{ status | status_glyph }} {{ status | status_label | capitalize }} <span x-text="counts.{{ status }}"></span></button>
+        {%- endfor %}
       </div>
     </div>
 
@@ -227,7 +228,7 @@
 
   <div class="scenario-list">
   {% for scenario in scenarios %}
-  {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason -%}
+  {%- set has_body = scenario.steps or scenario.parameters or scenario.error or scenario.skip_reason or scenario.xfail_reason -%}
   <div class="scenario {{ scenario.status }}{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
        x-show="isVisible({{ loop.index0 }})"
        id="scenario-{{ loop.index0 }}"
@@ -263,12 +264,8 @@
 
     <div class="scenario-body" id="scenario-body-{{ loop.index0 }}" :class="{ expanded: expandedScenarios[{{ loop.index0 }}] }">
     <div class="scenario-body-inner">
-      {% if scenario.skip_reason %}
-      <div class="skip-reason">
-        <span class="skip-reason-label">Skipped:</span>
-        <span>{{ scenario.skip_reason }}</span>
-      </div>
-      {% endif %}
+      {% if scenario.skip_reason %}{{ reason_box('skipped', 'Skipped:', scenario.skip_reason) }}{% endif %}
+      {% if scenario.xfail_reason %}{{ reason_box('xfailed', 'Expected to fail:', scenario.xfail_reason) }}{% endif %}
       <div class="steps">
         {%- set scenario_idx = loop.index0 -%}
         {#- A running count, not the inner loop's index: step ids key
@@ -309,7 +306,7 @@
         <tbody>
           {% for case in scenario.parameters.cases %}
           {%- set case_idx = loop.index0 -%}
-          <tr data-case-row class="{{ 'failed-row' if case.status == 'failed' else '' }}">
+          <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
             {% for col, val in scenario.parameters.cells(case) %}
             {% if col.kind == 'attachment' %}
             <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>
@@ -332,7 +329,7 @@
           {% if case.error %}
           <tr>
             <td colspan="{{ table_width }}">
-              {{ render_error(case.error) }}
+              {{ render_error(case.error, case.status) }}
             </td>
           </tr>
           {% endif %}
@@ -370,7 +367,7 @@
       {% endif %}
 
       {% if scenario.error %}
-      {{ render_error(scenario.error) }}
+      {{ render_error(scenario.error, scenario.status) }}
       {% endif %}
 
       {% if scenario.source %}
@@ -446,7 +443,7 @@
               {% elif cov.total == 0 %}
               <span class="cov-count">no coverage</span>
               {% else %}
-              <span class="cov-count meta-list"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span class="cov-failing">{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span class="cov-skipped">{{ cov.skipped }} skipped</span>{% endif %}</span>
+              <span class="cov-count meta-list"><span>{{ cov.total | plural('scenario') }}</span>{% if cov.failed %}<span class="cov-failing">{{ cov.failed }} failing</span>{% endif %}{% if cov.skipped %}<span class="cov-skipped">{{ cov.skipped }} skipped</span>{% endif %}{% if cov.xfailed %}<span class="cov-xfailed">{{ cov.xfailed }} expected to fail</span>{% endif %}</span>
               {% endif %}
               {#- Revealed by CSS once the row is selected (see .sentence-jump),
                   so the row keeps one meaning per click: the row selects, this

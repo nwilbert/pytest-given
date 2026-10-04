@@ -79,26 +79,38 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     table = builder.table(
         group.cases, narrated_column_order(grouped_narration, template_steps)
     )
-    # `replace` rather than a field-by-field rebuild: the two fields a group
-    # does *not* inherit are then the only two spelled out, and a field added
-    # to `Scenario` later cannot go missing here by omission. `error` is
-    # dropped because a grouped scenario carries none of its own — each case's
-    # sits in the table; `skip_reason` is the anchor's, which is the reason
-    # every case shares when they all skipped.
+    # `replace` rather than a field-by-field rebuild: the fields a group
+    # derives rather than inherits are then the only ones spelled out, and a
+    # field added to `Scenario` later cannot go missing here by omission.
+    # `error` is dropped because a grouped scenario carries none of its own —
+    # each case's sits in the table. A reason goes only with its status:
+    # `skip_reason` is then the anchor's, the one every case shares when they
+    # all skipped; `xfail_reason` cannot be, as the one xfailed row of a table
+    # is seldom the anchor.
+    status = _grouped_status(table.cases)
     return replace(
         anchor,
         narration=grouped_narration,
-        status=_grouped_status(table.cases),
+        status=status,
         duration_ms=sum(case.duration_ms for case in group.cases),
         steps=template_steps,
         parameters=table,
         error=None,
+        skip_reason=anchor.skip_reason if status == 'skipped' else None,
+        xfail_reason=_shared_xfail_reason(group.cases) if status == 'xfailed' else None,
     )
 
 
 def _grouped_status(cases: list[ParameterCase]) -> Status:
     if any(c.status == 'failed' for c in cases):
         return 'failed'
+    if any(c.status == 'xfailed' for c in cases):
+        return 'xfailed'
     if all(c.status == 'skipped' for c in cases):
         return 'skipped'
     return 'passed'
+
+
+def _shared_xfail_reason(cases: list[Scenario]) -> str | None:
+    reasons = {case.xfail_reason for case in cases if case.status == 'xfailed'}
+    return reasons.pop() if len(reasons) == 1 else None

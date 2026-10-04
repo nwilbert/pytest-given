@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-27T09:29:10.247407+00:00",
-    "pytest_version": "9.0.3",
+    "timestamp": "2026-10-04T11:41:40.872592+00:00",
+    "pytest_version": "9.1.1",
     "plugin_version": "0.3.0",
-    "commit_sha": "d6914a0c4ff12be895adaebc20019248dcad889b",
+    "commit_sha": "67f3b6334399aa980897f6913fb07fa4ebe95ad2",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -64,6 +64,7 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 32
@@ -136,6 +137,7 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 44
@@ -191,6 +193,7 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 55
@@ -208,8 +211,8 @@
       "tags": [
         "pricing"
       ],
-      "status": "passed",
-      "duration_ms": 0,
+      "status": "xfailed",
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -302,11 +305,116 @@
             ],
             "status": "passed",
             "error": null
+          },
+          {
+            "values": [
+              1.5,
+              true
+            ],
+            "status": "xfailed",
+            "error": {
+              "message": "assert False == True",
+              "frames": [
+                {
+                  "path": "site-packages/_pytest/runner.py",
+                  "lineno": 361,
+                  "func": "from_call",
+                  "code": "    result: TResult | None = func()\n                             ^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/runner.py",
+                  "lineno": 250,
+                  "func": "<lambda>",
+                  "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/pluggy/_hooks.py",
+                  "lineno": 512,
+                  "func": "__call__",
+                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/pluggy/_manager.py",
+                  "lineno": 120,
+                  "func": "_hookexec",
+                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/logging.py",
+                  "lineno": 865,
+                  "func": "pytest_runtest_call",
+                  "code": "    yield",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/capture.py",
+                  "lineno": 900,
+                  "func": "pytest_runtest_call",
+                  "code": "    return (yield)\n            ^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/skipping.py",
+                  "lineno": 268,
+                  "func": "pytest_runtest_call",
+                  "code": "    return (yield)\n            ^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/runner.py",
+                  "lineno": 184,
+                  "func": "pytest_runtest_call",
+                  "code": "    item.runtest()",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/python.py",
+                  "lineno": 1707,
+                  "func": "runtest",
+                  "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/pluggy/_hooks.py",
+                  "lineno": 512,
+                  "func": "__call__",
+                  "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/pluggy/_manager.py",
+                  "lineno": 120,
+                  "func": "_hookexec",
+                  "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "site-packages/_pytest/python.py",
+                  "lineno": 167,
+                  "func": "pytest_pyfunc_call",
+                  "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
+                  "is_internal": true
+                },
+                {
+                  "path": "examples/coffeeshop/test_coffeeshop.py",
+                  "lineno": 87,
+                  "func": "test_pricing",
+                  "code": "    assert purchase_allowed == expect",
+                  "is_internal": false
+                }
+              ],
+              "error_tail": "E   assert False == True"
+            }
           }
         ]
       },
       "error": null,
       "skip_reason": null,
+      "xfail_reason": "happy-hour pricing not implemented yet",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
         "line": 64
@@ -410,9 +518,10 @@
       },
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 76
+        "line": 90
       },
       "story_ids": [],
       "pins": null
@@ -499,9 +608,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 88
+        "line": 102
       },
       "story_ids": [],
       "pins": null
@@ -617,9 +727,10 @@
       },
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 99
+        "line": 113
       },
       "story_ids": [],
       "pins": null
@@ -714,9 +825,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 109
+        "line": 123
       },
       "story_ids": [],
       "pins": null
@@ -822,9 +934,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 109
+        "line": 123
       },
       "story_ids": [],
       "pins": null
@@ -991,9 +1104,10 @@
       },
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 127
+        "line": 141
       },
       "story_ids": [],
       "pins": null
@@ -1116,9 +1230,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 174
+        "line": 188
       },
       "story_ids": [],
       "pins": null
@@ -1291,9 +1406,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 190
+        "line": 204
       },
       "story_ids": [],
       "pins": null
@@ -1361,9 +1477,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 227
+        "line": 241
       },
       "story_ids": [],
       "pins": null
@@ -1444,9 +1561,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 244
+        "line": 258
       },
       "story_ids": [],
       "pins": null
@@ -1460,7 +1578,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 108,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1491,14 +1609,14 @@
         "frames": [
           {
             "path": "site-packages/_pytest/runner.py",
-            "lineno": 353,
+            "lineno": 361,
             "func": "from_call",
             "code": "    result: TResult | None = func()\n                             ^^^^^^",
             "is_internal": true
           },
           {
             "path": "site-packages/_pytest/runner.py",
-            "lineno": 245,
+            "lineno": 250,
             "func": "<lambda>",
             "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
@@ -1519,7 +1637,7 @@
           },
           {
             "path": "site-packages/_pytest/logging.py",
-            "lineno": 850,
+            "lineno": 865,
             "func": "pytest_runtest_call",
             "code": "    yield",
             "is_internal": true
@@ -1540,14 +1658,14 @@
           },
           {
             "path": "site-packages/_pytest/runner.py",
-            "lineno": 179,
+            "lineno": 184,
             "func": "pytest_runtest_call",
             "code": "    item.runtest()",
             "is_internal": true
           },
           {
             "path": "site-packages/_pytest/python.py",
-            "lineno": 1720,
+            "lineno": 1707,
             "func": "runtest",
             "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
             "is_internal": true
@@ -1568,14 +1686,14 @@
           },
           {
             "path": "site-packages/_pytest/python.py",
-            "lineno": 166,
+            "lineno": 167,
             "func": "pytest_pyfunc_call",
             "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 263,
+            "lineno": 277,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -1584,9 +1702,10 @@
         "error_tail": "E   assert 10 == 20"
       },
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 260
+        "line": 274
       },
       "story_ids": [],
       "pins": null
@@ -1605,9 +1724,171 @@
       "parameters": null,
       "error": null,
       "skip_reason": "demonstrates skipped status",
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 266
+        "line": 280
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee",
+      "narration": {
+        "text": "Loyalty card earns a free coffee (planned feature)",
+        "parts": []
+      },
+      "module": "test_coffeeshop",
+      "tags": [
+        "loyalty"
+      ],
+      "status": "xfailed",
+      "duration_ms": 47,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a coffee machine",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": "machine"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a loyalty card with nine stamps",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "I buy a coffee with the card",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": {
+        "message": "the machine does not read loyalty cards yet",
+        "frames": [
+          {
+            "path": "site-packages/_pytest/runner.py",
+            "lineno": 361,
+            "func": "from_call",
+            "code": "    result: TResult | None = func()\n                             ^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/runner.py",
+            "lineno": 250,
+            "func": "<lambda>",
+            "code": "    lambda: runtest_hook(item=item, **kwds),\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/pluggy/_hooks.py",
+            "lineno": 512,
+            "func": "__call__",
+            "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/pluggy/_manager.py",
+            "lineno": 120,
+            "func": "_hookexec",
+            "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/logging.py",
+            "lineno": 865,
+            "func": "pytest_runtest_call",
+            "code": "    yield",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/capture.py",
+            "lineno": 900,
+            "func": "pytest_runtest_call",
+            "code": "    return (yield)\n            ^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/skipping.py",
+            "lineno": 268,
+            "func": "pytest_runtest_call",
+            "code": "    return (yield)\n            ^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/runner.py",
+            "lineno": 184,
+            "func": "pytest_runtest_call",
+            "code": "    item.runtest()",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/python.py",
+            "lineno": 1707,
+            "func": "runtest",
+            "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/pluggy/_hooks.py",
+            "lineno": 512,
+            "func": "__call__",
+            "code": "    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/pluggy/_manager.py",
+            "lineno": 120,
+            "func": "_hookexec",
+            "code": "    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "site-packages/_pytest/python.py",
+            "lineno": 167,
+            "func": "pytest_pyfunc_call",
+            "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": true
+          },
+          {
+            "path": "examples/coffeeshop/test_coffeeshop.py",
+            "lineno": 297,
+            "func": "test_loyalty_card_free_coffee",
+            "code": "    price_paid = pay_with_loyalty_card(machine, card)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+            "is_internal": false
+          },
+          {
+            "path": "examples/coffeeshop/test_coffeeshop.py",
+            "lineno": 288,
+            "func": "pay_with_loyalty_card",
+            "code": "    raise NotImplementedError('the machine does not read loyalty cards yet')",
+            "is_internal": false
+          }
+        ],
+        "error_tail": "E   NotImplementedError: the machine does not read loyalty cards yet"
+      },
+      "skip_reason": null,
+      "xfail_reason": "loyalty cards not implemented yet",
+      "source": {
+        "relpath": "examples/coffeeshop/test_coffeeshop.py",
+        "line": 291
       },
       "story_ids": [],
       "pins": null
@@ -1650,9 +1931,10 @@
       },
       "error": null,
       "skip_reason": "awaiting fixture",
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 273
+        "line": 302
       },
       "story_ids": [],
       "pins": null

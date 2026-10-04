@@ -577,6 +577,45 @@ def test_skipped_scenario_shows_reason() -> None:
         assert '`tests/t.py::test_skip` — reason: needs fixture data' in md
 
 
+def test_an_xfailed_scenario_heading_and_subtitle() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_planned',
+        narration=Narration(text='Planned'),
+        module='tests/t.py',
+        status='xfailed',
+        xfail_reason='not implemented yet',
+    )
+    md = render_md(_report(scn))
+    assert '## ⊗ Planned · expected failure' in md
+    assert '`tests/t.py::test_planned` — expected to fail: not implemented yet' in md
+
+
+def test_a_grouped_xfailed_scenario_keeps_its_case_count_and_labels_the_case() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_price',
+        narration=Narration(text='Pricing'),
+        module='tests/t.py',
+        status='xfailed',
+        steps=[Step(phase='when', narration=Narration(text='insert'))],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='coin', name='coin', kind='param')],
+            cases=[
+                ParameterCase(values=['euro'], status='passed'),
+                ParameterCase(
+                    values=['token'],
+                    status='xfailed',
+                    error=ErrorInfo(message='tokens are planned'),
+                ),
+            ],
+        ),
+    )
+    md = render_md(_report(scn))
+    assert '## ⊗ Pricing · 2 cases' in md
+    assert '| token | ⊗ |' in md
+    assert '- **token** — expected failure:' in md
+    assert '— failed:' not in md
+
+
 def _attachment_table(*, short: str | None, long: str | None) -> ParameterTable:
     """A one-parameter table with one attachment cell.
 

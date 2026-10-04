@@ -14,7 +14,7 @@
       from `STATUS_GLYPH` through the `status_glyph` filter, so the Markdown
       sink and every place here paint one run the same way. -#}
   {%- macro status_badge(status) -%}
-    <span class="scenario-status {{ status }}">{{ status | status_glyph }} {{ status }}</span>
+    <span class="scenario-status {{ status }}">{{ status | status_glyph }} {{ status | status_label }}</span>
   {%- endmacro -%}
 
   {%- macro status_dot(status) -%}
@@ -54,9 +54,18 @@
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
   {%- endmacro -%}
 
-  {%- macro render_error(error) -%}
+  {#- Why a scenario was skipped or expected to fail, in its status colour. -#}
+  {%- macro reason_box(status, label, reason) -%}
+    <div class="reason-box {{ status }}">
+      <span class="reason-box-label">{{ label }}</span>
+      <span>{{ reason }}</span>
+    </div>
+  {%- endmacro -%}
+
+  {#- The status colours the block: an xfailed one is not an alarm. -#}
+  {%- macro render_error(error, status) -%}
     {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
-    <div class="error-block"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
+    <div class="error-block {{ status }}"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
       <div class="error-message">{{ error.message }}</div>
       {%- if internal_count -%}
         <button class="error-toggle" type="button" @click="showInternal = !showInternal">

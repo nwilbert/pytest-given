@@ -94,8 +94,8 @@ def test_param_column_colors_meet_wcag_aa_on_every_background_they_land_on(
     surface: Surface,
 ) -> None:
     # A parameter value renders over the surface, the page, the hovered row's
-    # accent tint and the failed row's tint — on the dark theme the last is the
-    # lightest and so the tightest. AA for body text is 4.5:1.
+    # accent tint and the failed and xfailed rows' tints — on the dark theme the
+    # failed tint is the lightest and so the tightest. AA for body text is 4.5:1.
     tokens = _theme_tokens(surface)
     backgrounds = [
         tokens[name]
@@ -104,6 +104,7 @@ def test_param_column_colors_meet_wcag_aa_on_every_background_they_land_on(
             '--bg-page',
             '--color-accent-tint',
             '--color-failed-tint',
+            '--color-xfailed-tint',
         )
     ]
     for count in range(1, 25):

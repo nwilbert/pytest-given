@@ -31,12 +31,13 @@ def sentence_key(story_id: StoryId, sentence_id: SentenceId) -> SentenceKey:
 
 @dataclass
 class SentenceCoverage:
-    """Per-sentence coverage rollup: which scenarios cover it, pass/skip counts,
-    total, and whether it is eligible for narration matching at all."""
+    """Per-sentence coverage rollup: which scenarios cover it, per-status
+    counts, total, and whether it is eligible for narration matching at all."""
 
     scenario_ids: list[NodeId] = field(default_factory=list)
     passed: int = 0
     skipped: int = 0
+    xfailed: int = 0
     eligible: bool = True
 
     @property
@@ -54,7 +55,7 @@ class SentenceCoverage:
 
     @property
     def failed(self) -> int:
-        return self.total - self.passed - self.skipped
+        return self.total - self.passed - self.skipped - self.xfailed
 
 
 @dataclass
@@ -84,6 +85,7 @@ def build_story_rollups(
             covered_by: list[NodeId] = []
             passed = 0
             skipped = 0
+            xfailed = 0
             for scn in scenarios:
                 if sentence.id not in coverage_maps[scn.id][story.id]:
                     continue
@@ -92,10 +94,13 @@ def build_story_rollups(
                     passed += 1
                 elif scn.status == 'skipped':
                     skipped += 1
+                elif scn.status == 'xfailed':
+                    xfailed += 1
             per_sentence[sentence.id] = SentenceCoverage(
                 scenario_ids=covered_by,
                 passed=passed,
                 skipped=skipped,
+                xfailed=xfailed,
                 eligible=is_coverage_eligible(sentence),
             )
         rollups[story.id] = StoryRollup(scenarios=scenarios, per_sentence=per_sentence)

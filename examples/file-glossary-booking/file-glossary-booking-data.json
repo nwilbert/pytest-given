@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-27T09:29:11.323162+00:00",
-    "pytest_version": "9.0.3",
+    "timestamp": "2026-10-04T11:41:41.699243+00:00",
+    "pytest_version": "9.1.1",
     "plugin_version": "0.3.0",
-    "commit_sha": "d6914a0c4ff12be895adaebc20019248dcad889b",
+    "commit_sha": "67f3b6334399aa980897f6913fb07fa4ebe95ad2",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -135,6 +135,7 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 52
@@ -261,6 +262,7 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
         "line": 67

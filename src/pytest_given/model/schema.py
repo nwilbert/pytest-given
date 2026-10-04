@@ -243,9 +243,9 @@ PHASES: tuple[Phase, ...] = ('given', 'when', 'then')
 # `cast` at the JSON boundary is a runtime no-op, so a hand-edited report.json
 # can still carry any string — the glyph lookup falls back and every
 # `== 'passed'` reads false.
-type Status = Literal['passed', 'failed', 'skipped']
+type Status = Literal['passed', 'failed', 'skipped', 'xfailed']
 
-STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped')
+STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped', 'xfailed')
 
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
 # pass through; anything else (dates, objects) is coerced to its str() when the
@@ -421,6 +421,7 @@ class Scenario:
     parameters: ParameterTable | None = None
     error: ErrorInfo | None = None
     skip_reason: str | None = None
+    xfail_reason: str | None = None
     source: SourceLocation | None = None
     story_ids: tuple[StoryId, ...] = ()
     pins: tuple[Pin, ...] | None = None

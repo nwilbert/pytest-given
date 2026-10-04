@@ -129,12 +129,13 @@ function reportApp() {
   const searchHaystacks = data.scenarios.map(
     s => (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase(),
   );
-  const statusesPresent = new Set(data.scenarios.map(s => s.status));
-  const statusCounts = {
-    passed: data.scenarios.filter(s => s.status === 'passed').length,
-    failed: data.scenarios.filter(s => s.status === 'failed').length,
-    skipped: data.scenarios.filter(s => s.status === 'skipped').length,
-  };
+  // Every status in filter order, labelled as the Markdown report words them.
+  const STATUS_LABELS = data.status_labels;
+  const STATUSES = Object.keys(STATUS_LABELS);
+  const allStatusesShown = () => Object.fromEntries(STATUSES.map(s => [s, true]));
+  const statusCounts = Object.fromEntries(STATUSES.map(s => [s, 0]));
+  for (const s of data.scenarios) statusCounts[s.status] += 1;
+  const statusesPresent = STATUSES.filter(s => statusCounts[s] > 0);
   const moduleSkipDepth = commonDepth(allModules);
   function termLabel(id) {
     if (id === NO_TERMS) return 'no terms';
@@ -196,9 +197,7 @@ function reportApp() {
     glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
     expandedTerms: {},
-    showPassed: true,
-    showFailed: true,
-    showSkipped: true,
+    shownStatuses: allStatusesShown(),
     expandedGroups: {},
     expandedSteps: {},
     expandedAttachments: {},
@@ -331,16 +330,9 @@ function reportApp() {
     },
     get filterSummary() {
       const parts = [];
-      const hasStatus = (s) => statusesPresent.has(s);
-      const allShown = (this.showPassed || !hasStatus('passed'))
-        && (this.showFailed || !hasStatus('failed'))
-        && (this.showSkipped || !hasStatus('skipped'));
-      if (!allShown) {
-        const shown = [];
-        if (this.showPassed && hasStatus('passed')) shown.push('passed');
-        if (this.showFailed && hasStatus('failed')) shown.push('failed');
-        if (this.showSkipped && hasStatus('skipped')) shown.push('skipped');
-        parts.push(shown.length ? shown.join(', ') : 'no statuses');
+      const shown = statusesPresent.filter(s => this.shownStatuses[s]);
+      if (shown.length !== statusesPresent.length) {
+        parts.push(shown.length ? shown.map(s => STATUS_LABELS[s]).join(', ') : 'no statuses');
       }
       if (this.search) parts.push('"' + this.search + '"');
       // Term/tag/module filters each have their own removable chip, so they
@@ -369,7 +361,7 @@ function reportApp() {
     // filters compare by identity — both are replaced, never mutated.
     _visible() {
       const state = [
-        this.showPassed, this.showFailed, this.showSkipped,
+        ...STATUSES.map(s => this.shownStatuses[s]),
         this.moduleFilter, this.sentenceFilter, this.search,
         this.tagFilters, this.termFilters,
       ];
@@ -460,9 +452,7 @@ function reportApp() {
     // Called from `_visible` alone. `index` addresses the precomputed
     // haystack; `query` is the search box, lowercased once by the caller.
     _matchesFilters(s, index, query) {
-      if (s.status === 'passed' && !this.showPassed) return false;
-      if (s.status === 'failed' && !this.showFailed) return false;
-      if (s.status === 'skipped' && !this.showSkipped) return false;
+      if (!this.shownStatuses[s.status]) return false;
       // A scenario has exactly one module, so this axis is single-select. The
       // filter is a path prefix, not an exact id: selecting a package in the
       // browse tree takes everything under it.
@@ -591,9 +581,7 @@ function reportApp() {
       this.moduleFilter = null;
       this.sentenceFilter = null;
       this.search = '';
-      this.showPassed = true;
-      this.showFailed = true;
-      this.showSkipped = true;
+      this.shownStatuses = allStatusesShown();
     },
     goToTerm(id) {
       // A stale `#term=` link would otherwise open an empty Glossary tab.
@@ -787,7 +775,7 @@ function reportApp() {
       // spam); discrete navigations and filters push a back-able one. All
       // writes are suppressed while state is being applied FROM the hash.
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       ['mainView', 'selectedStory'].forEach(key => {
@@ -984,13 +972,9 @@ function reportApp() {
       else this.sentenceFilter = null;
       if (params.has('status')) {
         const shown = new Set(params.get('status').split(',').filter(Boolean));
-        this.showPassed = shown.has('passed');
-        this.showFailed = shown.has('failed');
-        this.showSkipped = shown.has('skipped');
+        this.shownStatuses = Object.fromEntries(STATUSES.map(s => [s, shown.has(s)]));
       } else {
-        this.showPassed = true;
-        this.showFailed = true;
-        this.showSkipped = true;
+        this.shownStatuses = allStatusesShown();
       }
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
@@ -1033,13 +1017,8 @@ function reportApp() {
       for (const termId of this.termFilters) params.append('term-filter', termId);
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
 
-      const shown = [];
-      if (this.showPassed) shown.push('passed');
-      if (this.showFailed) shown.push('failed');
-      if (this.showSkipped) shown.push('skipped');
-      const shownInReport = shown.filter(s => statusesPresent.has(s));
-      const presentList = ['passed', 'failed', 'skipped'].filter(s => statusesPresent.has(s));
-      if (shownInReport.length !== presentList.length) {
+      const shownInReport = statusesPresent.filter(s => this.shownStatuses[s]);
+      if (shownInReport.length !== statusesPresent.length) {
         params.set('status', shownInReport.join(','));
       }
 

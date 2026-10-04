@@ -8,6 +8,8 @@ pytest-given groups all cases of a parametrized test into one scenario with a pa
 - a t-string value that differs between cases. The step shows a `{name}` placeholder that points to the column.
 - an attachment whose content differs between cases. The step shows a badge that points to the column, instead of the content.
 
+The group fails if any case failed. Otherwise it is an expected failure (`xfailed`) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.
+
 The columns appear in the order the narration first shows them: the scenario name, then the steps from top to bottom. Inputs narrated in a `given` come before outcomes narrated in a `then`. A parametrize argument that no step narrates stays next to the argument before it.
 
 ```python

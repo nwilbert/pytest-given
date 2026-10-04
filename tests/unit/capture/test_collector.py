@@ -514,6 +514,69 @@ def test_fail_keeps_an_existing_error() -> None:
         assert recorded.error.message == 'body boom'
 
 
+def test_fail_drops_the_xfail_reason_of_a_scenario_it_turns_failed() -> None:
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    recorded = collector.finish_scenario(status='xfailed', xfail_reason='planned')
+    collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
+    assert recorded.status == 'failed'
+    assert recorded.xfail_reason is None
+
+
+def test_fail_as_expected_turns_a_finished_passed_scenario_xfailed() -> None:
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    recorded = collector.finish_scenario(status='passed')
+    collector.fail_as_expected(
+        NodeId('test.py::test_x'), _error('teardown boom'), 'planned'
+    )
+    assert recorded.status == 'xfailed'
+    assert recorded.error is not None
+    assert recorded.error.message == 'teardown boom'
+    assert recorded.xfail_reason == 'planned'
+
+
+def test_fail_as_expected_keeps_the_first_error_and_reason() -> None:
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    collector.fail(NodeId('test.py::test_x'), _error('body boom'))
+    recorded = collector.finish_scenario(status='xfailed', xfail_reason='planned')
+    collector.fail_as_expected(
+        NodeId('test.py::test_x'), _error('teardown boom'), 'other'
+    )
+    assert recorded.status == 'xfailed'
+    assert recorded.error is not None
+    assert recorded.error.message == 'body boom'
+    assert recorded.xfail_reason == 'planned'
+
+
+def test_fail_as_expected_never_downgrades_a_failed_scenario() -> None:
+    """A strict xpass fails the call; pytest rewrites the teardown error after
+    it to an expected failure, but the run still fails on the call."""
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    recorded = collector.finish_scenario(status='failed')
+    collector.fail_as_expected(
+        NodeId('test.py::test_x'), _error('teardown boom'), 'planned'
+    )
+    assert recorded.status == 'failed'
+    assert recorded.xfail_reason is None
+
+
+def test_fail_as_expected_drops_the_skip_reason_of_a_skipped_scenario() -> None:
+    """A body that skips under an xfail mark, then a teardown that errors:
+    pytest counts it xfailed, so the skip's reason no longer applies."""
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    recorded = collector.finish_scenario(status='skipped', skip_reason='no network')
+    collector.fail_as_expected(
+        NodeId('test.py::test_x'), _error('teardown boom'), 'planned'
+    )
+    assert recorded.status == 'xfailed'
+    assert recorded.skip_reason is None
+    assert recorded.xfail_reason == 'planned'
+
+
 @scenario(
     t'A {pg["Collector"].low} reports which {pg["Node ID"]("node ids")} it recorded',
 )
@@ -625,14 +688,6 @@ def test_push_step_source_defaults_to_none() -> None:
     collector.start_scenario('id', 'name', 'mod', [])
     step = collector.push_step('given', _n('a thing'))
     assert step.source is None
-
-
-def test_fail_ignores_a_node_id_the_collector_never_recorded() -> None:
-    """`records()` is the caller's cheap pre-check, not a precondition: an
-    unknown id is a no-op rather than a KeyError out of a teardown hook."""
-    collector = Collector()
-    collector.fail(NodeId('test.py::never_seen'), _error('boom'))
-    assert collector.scenarios == []
 
 
 def _pin(story_id: str) -> Pin:

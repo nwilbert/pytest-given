@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-04T06:34:12.988818+00:00",
+    "timestamp": "2026-10-04T11:48:46.176581+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.3.0",
-    "commit_sha": "93ffa8d2d8db6acad22ac8c1b6a6b37a3fefed3b",
+    "commit_sha": "aac60510c41cf5763853ff68831902e09b22881e",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -149,9 +149,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 171
+        "line": 179
       },
       "story_ids": [
         "book-a-group-trip"
@@ -461,9 +462,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 191
+        "line": 199
       },
       "story_ids": [
         "book-a-group-trip"
@@ -482,7 +484,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 37,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -766,7 +768,7 @@
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 275,
+                  "lineno": 283,
                   "func": "test_payment_declined",
                   "code": "    assert processor_response == decline_reason",
                   "is_internal": false
@@ -779,9 +781,10 @@
       },
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 235
+        "line": 243
       },
       "story_ids": [
         "book-a-group-trip"
@@ -964,9 +967,132 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 284
+        "line": 292
+      },
+      "story_ids": [
+        "cancel-a-booking"
+      ],
+      "pins": null
+    },
+    {
+      "id": "examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking",
+      "narration": {
+        "text": "Alice rebooks her cancelled booking (planned feature)",
+        "parts": []
+      },
+      "module": "test_hotel_booking",
+      "tags": [],
+      "status": "xfailed",
+      "duration_ms": 3,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "our guest Alice",
+            "parts": [
+              {
+                "value": "our guest "
+              },
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": "alice"
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "Alice has cancelled her stay",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              },
+              {
+                "value": " has cancelled her stay"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "Alice rebooks the Booking",
+            "parts": [
+              {
+                "term_id": "guest",
+                "display": "Alice",
+                "expression": "guest(\"Alice\")"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "rebook",
+                "display": "rebooks",
+                "expression": "rebook(\"rebooks\")"
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "booking",
+                "display": "Booking",
+                "expression": "booking"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": [
+            {
+              "story_id": "cancel-a-booking",
+              "sentence_id": 4
+            }
+          ],
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": {
+        "message": "rebooking a cancelled booking is not supported yet",
+        "frames": [
+          {
+            "path": "examples/hotel-booking/test_hotel_booking.py",
+            "lineno": 329,
+            "func": "test_rebook_cancelled_booking",
+            "code": "    rebook_cancelled_booking(stay)",
+            "is_internal": false
+          },
+          {
+            "path": "examples/hotel-booking/test_hotel_booking.py",
+            "lineno": 315,
+            "func": "rebook_cancelled_booking",
+            "code": "    raise NotImplementedError('rebooking a cancelled booking is not supported yet')",
+            "is_internal": false
+          }
+        ],
+        "error_tail": "E   NotImplementedError: rebooking a cancelled booking is not supported yet"
+      },
+      "skip_reason": null,
+      "xfail_reason": "rebooking is not implemented yet",
+      "source": {
+        "relpath": "examples/hotel-booking/test_hotel_booking.py",
+        "line": 318
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1140,9 +1266,10 @@
       "parameters": null,
       "error": null,
       "skip_reason": null,
+      "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 318
+        "line": 346
       },
       "story_ids": [
         "cancel-a-booking",
@@ -1160,7 +1287,7 @@
         "definition": "Person booking accommodation on behalf of a group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 76
+          "line": 79
         }
       },
       {
@@ -1170,7 +1297,7 @@
         "definition": "Individual traveler in the group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 77
+          "line": 80
         }
       },
       {
@@ -1180,7 +1307,7 @@
         "definition": "Automated reservation back-end.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 78
+          "line": 81
         }
       },
       {
@@ -1190,7 +1317,7 @@
         "definition": "A bookable hotel room.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 80
+          "line": 83
         }
       },
       {
@@ -1200,7 +1327,7 @@
         "definition": "A reservation for one or more rooms.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 81
+          "line": 84
         }
       },
       {
@@ -1210,7 +1337,7 @@
         "definition": "Money transferred for a booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 82
+          "line": 85
         }
       },
       {
@@ -1220,7 +1347,7 @@
         "definition": "Notification of a successful booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 83
+          "line": 86
         }
       },
       {
@@ -1230,7 +1357,7 @@
         "definition": "Guarantee a paid booking so its rooms are held for arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 85
+          "line": 88
         }
       },
       {
@@ -1240,7 +1367,7 @@
         "definition": "Refuse a payment, leaving its booking pending.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 90
+          "line": 93
         }
       },
       {
@@ -1250,7 +1377,7 @@
         "definition": "Withdraw a booking before arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 92
+          "line": 95
         }
       },
       {
@@ -1260,7 +1387,17 @@
         "definition": "Return the payment for a cancelled booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 93
+          "line": 96
+        }
+      },
+      {
+        "id": "rebook",
+        "kind": "activity",
+        "canonical": "rebook",
+        "definition": "Restore a cancelled booking for the same rooms and dates.",
+        "source": {
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
+          "line": 97
         }
       },
       {
@@ -1270,7 +1407,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 123
+          "line": 129
         }
       },
       {
@@ -1280,7 +1417,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 124
+          "line": 130
         }
       }
     ]
@@ -1543,7 +1680,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 96
+        "line": 102
       }
     },
     {
@@ -1628,11 +1765,33 @@
             }
           ],
           "name": null
+        },
+        {
+          "id": 4,
+          "clauses": [
+            {
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice"
+                },
+                {
+                  "term_id": "rebook",
+                  "display": "rebooks"
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking"
+                }
+              ]
+            }
+          ],
+          "name": "rebook"
         }
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 139
+        "line": 145
       }
     }
   ],
@@ -1726,6 +1885,14 @@
       "tracked": true,
       "scenario_ids": [
         "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking"
+      ]
+    },
+    {
+      "story_id": "cancel-a-booking",
+      "sentence_id": 4,
+      "tracked": true,
+      "scenario_ids": [
+        "examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking"
       ]
     }
   ]

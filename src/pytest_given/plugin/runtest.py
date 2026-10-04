@@ -132,41 +132,66 @@ def pytest_runtest_teardown(item: pytest.Item) -> None:
     set_active_collector(None)
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]) -> None:
+@pytest.hookimpl(wrapper=True, tryfirst=True)
+def pytest_runtest_makereport(
+    item: pytest.Item, call: pytest.CallInfo[None]
+) -> Generator[None, pytest.TestReport, pytest.TestReport]:
     """Put the error behind a failing phase on the scenario.
+
+    A wrapper, `tryfirst` so it wraps `_pytest/skipping.py`'s: the error is
+    captured before pytest renders its own longrepr, so the frame filter speeds
+    that too, and its meaning is read after skipping has rewritten the report —
+    only then is an error under an xfail mark an expected failure.
 
     Setup (a fixture exception) and call (a test-body failure) fail the
     *active* scenario. Teardown is the odd one out: the call report has already
     run `finish_scenario`, so there is no active scenario left and the one with
     that node id is amended instead — otherwise a fixture raising past its
     `yield` leaves a green scenario behind a run pytest counted as an error.
+    `pytest_runtest_logreport` cannot do it, as `pytest_runtest_teardown` has
+    unpublished the collector by then.
     """
-    if call.excinfo is None or call.when not in ('setup', 'call', 'teardown'):
-        return
     collector = session_collector(item.config)
     node_id = NodeId(item.nodeid)
-    # Checked before any traceback work: `getrepr` below is the expensive
-    # per-frame scan, and an item this plugin recorded nothing for — an
-    # undecorated test in a suite that merely installs pytest-given — would
-    # otherwise pay it on every teardown error only to discard the result.
+    # Before any traceback work: `getrepr` is the expensive per-frame scan, and
+    # an item this plugin recorded nothing for — an undecorated test in a suite
+    # that merely installs pytest-given — would otherwise pay it on every error
+    # only to discard the result.
     if not collector.records(node_id):
-        return
-    # A skip's traceback is pure skip machinery — the scenario carries a
-    # structured skip_reason instead. Short-circuited before getrepr, whose
-    # per-frame AST scan would otherwise run for every skipped scenario. Not
-    # gated on --given-all-frames: a skip never wants a traceback regardless.
-    if call.excinfo.errisinstance(pytest.skip.Exception):
-        return
+        return (yield)
+    error = _capture_error(item, call)
+    report = yield
+    wasxfail = _wasxfail(report)
+    if report.skipped and wasxfail is not None:
+        collector.fail_as_expected(node_id, error, _xfail_reason(wasxfail))
+    elif error is not None:
+        collector.fail(node_id, error)
+    elif (
+        call.when == 'call'
+        and report.failed
+        and isinstance(report.longrepr, str)
+        and report.longrepr.startswith('[XPASS(strict)]')
+    ):
+        # A strict xpass: pytest fails a test that raised nothing, with a message.
+        collector.fail(node_id, ErrorInfo(message=report.longrepr))
+    return report
+
+
+def _capture_error(item: pytest.Item, call: pytest.CallInfo[None]) -> ErrorInfo | None:
+    if call.excinfo is None or call.when not in ('setup', 'call', 'teardown'):
+        return None
+    # A skip's or an imperative xfail's traceback is pure outcome machinery —
+    # the scenario carries a structured reason instead. Short-circuited before
+    # getrepr, whose per-frame AST scan would otherwise run for every such
+    # scenario. Not gated on --given-all-frames: neither ever wants a traceback.
+    if call.excinfo.errisinstance((pytest.skip.Exception, pytest.xfail.Exception)):
+        return None
     if not given_config(item.config).all_frames:
         _filter_internal_frames(call.excinfo)
     error_repr = call.excinfo.getrepr(style='short')
     message = str(call.excinfo.value)
     frames, error_tail = parse_short_repr(str(error_repr))
-    collector.fail(
-        node_id,
-        ErrorInfo(message=message, frames=frames, error_tail=error_tail),
-    )
+    return ErrorInfo(message=message, frames=frames, error_tail=error_tail)
 
 
 @pytest.hookimpl(trylast=True)
@@ -187,6 +212,12 @@ def pytest_runtest_logreport(report: pytest.TestReport) -> None:
     setup_skip = report.when == 'setup' and report.skipped
     setup_fail = report.when == 'setup' and report.failed
     if report.when != 'call' and not setup_skip and not setup_fail:
+        return
+    wasxfail = _wasxfail(report)
+    if report.skipped and wasxfail is not None:
+        collector.finish_scenario(
+            status='xfailed', xfail_reason=_xfail_reason(wasxfail)
+        )
         return
     status: Status = (
         'passed' if report.passed else 'failed' if report.failed else 'skipped'
@@ -238,3 +269,14 @@ def _extract_skip_reason(longrepr: object) -> str | None:
     if not message or message in ('<Skipped instance>', 'unconditional skip'):
         return None
     return message
+
+
+def _wasxfail(report: pytest.TestReport) -> str | None:
+    """pytest's expected-failure reason, set by `_pytest/skipping.py` on a
+    report it counted xfailed (skipped) or xpassed (passed)."""
+    wasxfail = getattr(report, 'wasxfail', None)
+    return wasxfail if isinstance(wasxfail, str) else None
+
+
+def _xfail_reason(wasxfail: str) -> str | None:
+    return wasxfail.removeprefix('[NOTRUN] ').strip() or None

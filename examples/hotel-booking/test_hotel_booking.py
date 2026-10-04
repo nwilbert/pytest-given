@@ -11,7 +11,7 @@ classified by kind inference.
 The glossary holds only vocabulary with a meaning specific to the domain. The
 verbs that are plain sentence prose — *searches for*, *selects*, *adds*,
 *submits*, *sends*, *checks in to* — stay bare strings in the sentences; only
-the activities a hotel would define (confirm, decline, cancel, refund) are
+the activities a hotel would define (confirm, decline, cancel, refund, rebook) are
 terms.
 
 Four scenarios bind to the Story. Three implement it at varying detail, each
@@ -45,7 +45,10 @@ vocabulary still needs to be exercised by a test.
 A second, shorter Story — `Cancel a Booking` — shares the same glossary to
 exercise the multi-story parts of the report (Stories tab, story filter) and to
 show vocabulary reused across stories (Guest, Booking, Payment, Confirmation,
-Booking System). `test_cancel_booking` covers all three of its sentences.
+Booking System). `test_cancel_booking` covers its first three sentences. The
+fourth, rebooking, is a planned feature: `test_rebook_cancelled_booking` pins it
+and is marked `xfail(strict=True)`, so the Stories tab reads that sentence as
+expected to fail rather than as broken or uncovered.
 `test_check_in_then_cancel` binds both stories with `stories=`: Alice checks in
 to the Deluxe Suite (sentence 8 of the first story), then cancels a later
 booking (the `'cancel'` sentence of the second), so the Stories tab lists it
@@ -91,6 +94,9 @@ decline = g.activity('decline', 'Refuse a payment, leaving its booking pending.'
 # Vocabulary for the second Story.
 cancel = g.activity('cancel', 'Withdraw a booking before arrival.')
 refund = g.activity('refund', 'Return the payment for a cancelled booking.')
+rebook = g.activity(
+    'rebook', 'Restore a cancelled booking for the same rooms and dates.'
+)
 
 
 book_a_group_trip = story(
@@ -146,6 +152,8 @@ cancel_a_booking = story(
         sentence(booking_system, refund('refunds'), payment, 'for', booking),
         # Reuses the confirmation vocabulary from the first story.
         sentence(booking_system, 'sends', confirmation, 'to', guest('Alice')),
+        # Planned: no implementation yet, so its one scenario is an xfail.
+        sentence(guest('Alice'), rebook('rebooks'), booking, name='rebook'),
     ],
 )
 
@@ -301,6 +309,26 @@ def test_cancel_booking(alice):
     with then(t'the {booking_system} sends a {confirmation} to {guest("Alice")}'):
         booking_state['notified'] = [alice['name']]
         assert booking_state['notified'] == ['Alice']
+
+
+def rebook_cancelled_booking(stay):
+    raise NotImplementedError('rebooking a cancelled booking is not supported yet')
+
+
+@scenario(
+    'Alice rebooks her cancelled booking (planned feature)', stories=cancel_a_booking
+)
+@pytest.mark.xfail(strict=True, reason='rebooking is not implemented yet')
+def test_rebook_cancelled_booking(alice):
+    with given(t'{guest("Alice")} has cancelled her stay'):
+        stay = {'guest': alice['name'], 'status': 'cancelled'}
+    with when(
+        t'{guest("Alice")} {rebook("rebooks")} the {booking}',
+        pins=cancel_a_booking['rebook'],
+    ):
+        rebook_cancelled_booking(stay)
+    with then(t'the {booking} is confirmed again'):
+        assert stay['status'] == 'confirmed'
 
 
 def check_in(stay):

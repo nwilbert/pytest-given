@@ -1507,6 +1507,329 @@ def test_parametrized_all_cases_skipped_groups_as_skipped(pytester, tmp_path):
     assert data['scenarios'][0]['status'] == 'skipped'
 
 
+# --- Expected failures ---
+
+
+@scenario(
+    t'A {pg["Scenario"].low} that fails as expected keeps its steps, error '
+    t'and reason under its own status',
+)
+def test_marked_expected_failure_is_xfailed(pytester, tmp_path):
+    with given(t'a {pg["Scenario"].low} marked xfail whose body fails'):
+        suite = """
+            import pytest
+            from pytest_given import scenario, given, then
+
+            @scenario("Planned")
+            @pytest.mark.xfail(reason="not implemented yet")
+            def test_planned():
+                with given("a value"):
+                    value = 1
+                with then("it is two"):
+                    assert value == 2
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('pytest counts the test xfailed'):
+        result.assert_outcomes(xfailed=1)
+    with then(
+        t'the {pg["Report"].low} marks the {pg["Scenario"].low} xfailed with '
+        t'its reason, its steps and the error that broke it'
+    ):
+        s = json.loads(json_path.read_text())['scenarios'][0]
+        assert s['status'] == 'xfailed'
+        assert s['xfail_reason'] == 'not implemented yet'
+        assert s['skip_reason'] is None
+        assert [step['phase'] for step in s['steps']] == ['given', 'then']
+        assert 'assert 1 == 2' in s['error']['message']
+
+
+_TEARDOWN_BOOM = """
+    @pytest.fixture
+    def boom():
+        yield
+        raise RuntimeError("teardown boom")
+"""
+
+
+def _run_one_scenario(
+    pytester: pytest.Pytester,
+    tmp_path: Path,
+    body: str,
+    *args: str,
+    fixtures: str = '',
+) -> tuple[pytest.RunResult, dict[str, object]]:
+    """Run a one-scenario suite whose module imports pytest, `scenario`,
+    `given` and `then`; return pytest's result and the scenario's JSON."""
+    header = 'import pytest\nfrom pytest_given import scenario, given, then\n'
+    source = header + textwrap.dedent(fixtures) + textwrap.dedent(body)
+    pytester.makepyfile(source)
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}', *args)
+    [scenario_json] = json.loads(json_path.read_text())['scenarios']
+    return result, scenario_json
+
+
+@pytest.mark.parametrize(
+    'body',
+    [
+        """
+        @scenario("X")
+        @pytest.mark.xfail
+        def test_x():
+            assert False
+        """,
+        """
+        @scenario("X")
+        def test_x():
+            pytest.xfail("")
+        """,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(run=False)
+        def test_x():
+            pass
+        """,
+    ],
+    ids=['mark', 'imperative', 'run-false'],
+)
+def test_an_expected_failure_without_a_reason_has_none(pytester, tmp_path, body):
+    """`run=False` without a reason still reaches us as `'[NOTRUN] '`."""
+    result, s = _run_one_scenario(pytester, tmp_path, body)
+    result.assert_outcomes(xfailed=1)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] is None
+
+
+def test_in_body_pytest_xfail_records_steps_and_reason_without_error(
+    pytester, tmp_path
+):
+    """The imperative call's traceback is xfail machinery, not a failure."""
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        def test_x():
+            with given("a precondition"):
+                pass
+            pytest.xfail("blocked upstream")
+        """,
+    )
+    result.assert_outcomes(xfailed=1)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] == 'blocked upstream'
+    assert s['error'] is None
+    assert [step['phase'] for step in s['steps']] == ['given']
+
+
+def test_pytest_xfail_in_a_fixture_is_xfailed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @pytest.fixture
+        def blocked():
+            pytest.xfail("fixture says so")
+
+        @scenario("X")
+        def test_x(blocked):
+            pass
+        """,
+    )
+    result.assert_outcomes(xfailed=1)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] == 'fixture says so'
+    assert s['error'] is None
+
+
+def test_xfail_run_false_drops_the_notrun_prefix(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(run=False, reason="crashes the interpreter")
+        def test_x():
+            with then("never runs"):
+                pass
+        """,
+    )
+    result.assert_outcomes(xfailed=1)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] == 'crashes the interpreter'
+    assert s['error'] is None
+    assert s['steps'] == []
+
+
+def test_non_strict_xpass_stays_passed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(reason="r")
+        def test_x():
+            with then("it holds"):
+                pass
+        """,
+    )
+    result.assert_outcomes(xpassed=1)
+    assert s['status'] == 'passed'
+    assert s['xfail_reason'] is None
+    assert s['error'] is None
+
+
+def test_strict_xpass_fails_with_pytests_message(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(strict=True, reason="r")
+        def test_x():
+            with then("it holds"):
+                pass
+        """,
+    )
+    result.assert_outcomes(failed=1)
+    assert s['status'] == 'failed'
+    assert s['xfail_reason'] is None
+    assert s['error']['message'].startswith('[XPASS(strict)]')
+
+
+def test_raises_mismatch_is_failed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(raises=KeyError)
+        def test_x():
+            raise ValueError("v")
+        """,
+    )
+    result.assert_outcomes(failed=1)
+    assert s['status'] == 'failed'
+    assert 'v' in s['error']['message']
+
+
+def test_runxfail_reports_a_marked_failure_as_failed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(reason="r")
+        def test_x():
+            assert False
+        """,
+        '--runxfail',
+    )
+    result.assert_outcomes(failed=1)
+    assert s['status'] == 'failed'
+    assert s['xfail_reason'] is None
+    assert s['error'] is not None
+
+
+def test_teardown_error_under_the_mark_stays_xfailed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(reason="planned")
+        def test_x(boom):
+            assert False
+        """,
+        fixtures=_TEARDOWN_BOOM,
+    )
+    result.assert_outcomes(xfailed=2)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] == 'planned'
+    assert 'assert False' in s['error']['message']
+
+
+def test_teardown_error_after_an_xpass_under_the_mark_is_xfailed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(reason="planned")
+        def test_x(boom):
+            pass
+        """,
+        fixtures=_TEARDOWN_BOOM,
+    )
+    result.assert_outcomes(xpassed=1, xfailed=1)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] == 'planned'
+    assert 'teardown boom' in s['error']['message']
+
+
+def test_teardown_error_after_a_strict_xpass_stays_failed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.xfail(strict=True, reason="planned")
+        def test_x(boom):
+            pass
+        """,
+        fixtures=_TEARDOWN_BOOM,
+    )
+    result.assert_outcomes(failed=1, xfailed=1)
+    assert s['status'] == 'failed'
+    assert s['xfail_reason'] is None
+    assert s['error']['message'].startswith('[XPASS(strict)]')
+
+
+def test_teardown_error_after_an_imperative_xfail_is_failed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        def test_x(boom):
+            pytest.xfail("imperative")
+        """,
+        fixtures=_TEARDOWN_BOOM,
+    )
+    result.assert_outcomes(xfailed=1, errors=1)
+    assert s['status'] == 'failed'
+    assert s['xfail_reason'] is None
+    assert 'teardown boom' in s['error']['message']
+
+
+def test_parametrized_group_with_one_xfailed_row_is_xfailed(pytester, tmp_path):
+    result, s = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("X")
+        @pytest.mark.parametrize(
+            "n", [1, pytest.param(2, marks=pytest.mark.xfail(reason="two is planned"))]
+        )
+        def test_x(n):
+            with then(t"{n} is one"):
+                assert n == 1
+        """,
+    )
+    result.assert_outcomes(passed=1, xfailed=1)
+    assert s['status'] == 'xfailed'
+    assert s['xfail_reason'] == 'two is planned'
+    assert s['error'] is None
+    assert [case['status'] for case in s['parameters']['cases']] == [
+        'passed',
+        'xfailed',
+    ]
+
+
 # --- Helper-function step decorators ---
 
 

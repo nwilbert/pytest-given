@@ -838,31 +838,6 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
     assert 'toggleScenario' in content
 
 
-def test_render_status_filter_pills(tmp_path: Path) -> None:
-    """Report includes clickable status filter pills in sidebar."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [],
-            }
-        )
-    )
-    html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
-    content = html_path.read_text(encoding='utf-8')
-    assert 'status-pill' in content
-    assert 'showPassed' in content
-    assert 'showFailed' in content
-    assert 'showSkipped' in content
-
-
 def _report_with_glossary(tmp_path: Path, *, terms: list[dict]) -> str:
     """Render a one-scenario report whose glossary carries `terms`."""
     json_path = tmp_path / 'data.json'
@@ -963,7 +938,7 @@ def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'awaiting fixture' in content
-    assert 'skip-reason' in content
+    assert 'reason-box skipped' in content
     # Chevron present (scenario has a body): the placeholder span element is absent.
     assert '<span class="scenario-chevron-placeholder">' not in content
 
@@ -1000,7 +975,7 @@ def test_render_skipped_without_reason_has_no_chevron(tmp_path: Path) -> None:
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<span class="scenario-chevron-placeholder">' in content
-    assert 'class="skip-reason"' not in content
+    assert 'class="reason-box' not in content
 
 
 def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) -> None:

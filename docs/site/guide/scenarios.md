@@ -123,6 +123,21 @@ with when('I place a large order'):
 
 Nesting a different phase raises `PytestGivenError`, for example a `then` inside a `when`. This includes decorated helpers: calling a `@when` helper inside a `given` block raises too. So if you call a helper from more than one phase, don't decorate it; narrate it where you call it instead.
 
+## Expected failures
+
+A scenario that fails as expected gets the status `xfailed`. That covers `@pytest.mark.xfail`, a `pytest.param(..., marks=pytest.mark.xfail)` row of a parametrized test, and `pytest.xfail()` in the body. The report keeps its steps up to where it broke, the error that broke it and the reason, and does not count it as failing.
+
+The main use is a scenario written ahead of its implementation: an executable statement of planned behavior.
+
+```python
+@scenario('Loyalty card earns a free coffee')
+@pytest.mark.xfail(strict=True, reason='loyalty cards not implemented yet')
+def test_loyalty_card_free_coffee(machine):
+    ...
+```
+
+Mark it `strict=True`, or set the `xfail_strict` ini option, so the run fails once the scenario starts passing and the mark comes off. A non-strict mark passes quietly and stays, so a later regression reports as an expected failure instead of failing the run.
+
 ## `when_then`
 
 `when_then(when_text, then_text)`

@@ -190,6 +190,7 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
         parameters=_param_table_from_dict(d.get('parameters')),
         error=_error_from_dict(d.get('error')),
         skip_reason=d.get('skip_reason'),
+        xfail_reason=d.get('xfail_reason'),
         source=_source_from_dict(d.get('source')),
         story_ids=tuple(StoryId(story_id) for story_id in d.get('story_ids') or ()),
         pins=_pins_from_list(d.get('pins')),

@@ -31,6 +31,7 @@ from pytest_given.model import (
     Scenario,
     SentenceId,
     SourceLocation,
+    Status,
     Step,
     StepPath,
     StoryId,
@@ -99,6 +100,117 @@ def test_group_parametrized_all_skipped_keeps_the_skip_reason() -> None:
     [grouped] = group_parametrized(scenarios, param_info)
     assert grouped.status == 'skipped'
     assert grouped.skip_reason == 'needs a database'
+
+
+def _cases(*specs: tuple[Status, str | None]) -> tuple[list[Scenario], ParamInfo]:
+    scenarios = [
+        Scenario(
+            id=NodeId(f't::x[{index}]'),
+            narration=Narration(text='x'),
+            module='m',
+            status=status,
+            xfail_reason=reason,
+        )
+        for index, (status, reason) in enumerate(specs, start=1)
+    ]
+    param_info: ParamInfo = {
+        scenario.id: ParamSpec(names=['n'], values=[index])
+        for index, scenario in enumerate(scenarios, start=1)
+    }
+    return scenarios, param_info
+
+
+@scenario(
+    t'One xfailed {pg["Case"].low} makes its {pg["Parametrized scenario"].low} '
+    t"an expected failure, with that case's reason",
+    tags=['parametrization'],
+)
+def test_one_xfailed_case_makes_the_group_xfailed() -> None:
+    with given(
+        t'a passed {pg["Case"].low} and an xfailed one with the reason "planned"'
+    ):
+        cases, param_info = _cases(('passed', None), ('xfailed', 'planned'))
+    with when(t'the {pg["Group"]("grouping")} pass collapses them'):
+        [grouped] = group_parametrized(cases, param_info)
+    with then(
+        t'the {pg["Scenario"].low} is xfailed and carries the xfailed '
+        t"{pg['Case'].low}'s reason"
+    ):
+        assert grouped.status == 'xfailed'
+        assert grouped.xfail_reason == 'planned'
+
+
+def test_a_failed_case_outranks_an_xfailed_one() -> None:
+    [grouped] = group_parametrized(*_cases(('xfailed', 'planned'), ('failed', None)))
+    assert grouped.status == 'failed'
+    assert grouped.xfail_reason is None
+
+
+def test_xfailed_outranks_skipped() -> None:
+    [grouped] = group_parametrized(*_cases(('skipped', None), ('xfailed', 'planned')))
+    assert grouped.status == 'xfailed'
+
+
+def test_xfailed_cases_with_different_reasons_leave_the_group_without_one() -> None:
+    [grouped] = group_parametrized(*_cases(('xfailed', 'one'), ('xfailed', 'two')))
+    assert grouped.status == 'xfailed'
+    assert grouped.xfail_reason is None
+
+
+def test_a_passed_group_does_not_inherit_a_skipped_anchors_reason() -> None:
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(
+            id=nid1,
+            narration=Narration(text='x'),
+            module='m',
+            status='skipped',
+            skip_reason='needs a database',
+        ),
+        Scenario(id=nid2, narration=Narration(text='x'), module='m', status='passed'),
+    ]
+    param_info: ParamInfo = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    [grouped] = group_parametrized(scenarios, param_info)
+    assert grouped.status == 'passed'
+    assert grouped.skip_reason is None
+
+
+def test_an_xfailed_group_does_not_inherit_a_skipped_anchors_reason() -> None:
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(
+            id=nid1,
+            narration=Narration(text='x'),
+            module='m',
+            status='skipped',
+            skip_reason='needs a database',
+        ),
+        Scenario(
+            id=nid2,
+            narration=Narration(text='x'),
+            module='m',
+            status='xfailed',
+            xfail_reason='planned',
+        ),
+    ]
+    param_info: ParamInfo = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    [grouped] = group_parametrized(scenarios, param_info)
+    assert grouped.status == 'xfailed'
+    assert grouped.skip_reason is None
+    assert grouped.xfail_reason == 'planned'
+
+
+def test_the_shared_reason_ignores_passed_cases() -> None:
+    [grouped] = group_parametrized(
+        *_cases(('passed', None), ('xfailed', 'planned'), ('xfailed', 'planned'))
+    )
+    assert grouped.xfail_reason == 'planned'
 
 
 def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:

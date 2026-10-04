@@ -51,7 +51,7 @@ from .story_view import (
     build_story_rollups,
     sentence_key,
 )
-from .text import STATUS_GLYPH, plural
+from .text import STATUS_GLYPH, STATUS_LABEL, plural
 from .theme import DEFAULT_THEME, Theme
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
@@ -132,6 +132,9 @@ def _build_env(
     # for the jump button and `app.js` looks the label up by it, so both sides
     # go through the one constructor.
     env.globals['sentence_key'] = sentence_key
+    # The status filter's pills, in order; `app.js` reads the same table from
+    # its data, so a new status touches neither.
+    env.globals['statuses'] = tuple(STATUS_LABEL)
     # The step-tree macro branches on this: an AttachmentRef has no content to
     # expand, only a column to point at.
     env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
@@ -149,6 +152,7 @@ def _build_env(
     env.filters['inline_md'] = _inline_md
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
+    env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     env.filters['phase_blocks'] = _phase_blocks
     env.filters['column_phase_blocks'] = _column_phase_blocks
@@ -296,6 +300,7 @@ def _app_data(report: ReportData) -> dict[str, object]:
     the markup, and a second copy would dominate a large report's size."""
     return {
         'metadata': {'timestamp': report.metadata.timestamp},
+        'status_labels': STATUS_LABEL,
         'glossary': (
             {
                 'terms': [
