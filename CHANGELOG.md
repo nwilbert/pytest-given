@@ -11,6 +11,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 <!-- --8<-- [start:site] -->
 
+## [Unreleased]
+
 ## [0.4.0] - 2026-10-04
 
 ### Added
