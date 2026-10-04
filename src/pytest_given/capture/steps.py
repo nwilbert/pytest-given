@@ -6,11 +6,12 @@ attachment call that binds to whatever step is open. They share
 warning, or refuses. The scenario marker is `scenario.py`'s.
 """
 
+import contextlib
 import functools
 import inspect
 import json
 import types
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from string import templatelib
 from typing import (
     Self,
@@ -25,7 +26,7 @@ from ..model import (
     SourceLocation,
     narration_of,
 )
-from .collector import Collector, get_active_collector, recording_collector
+from .collector import get_active_collector, recording_collector
 from .source import capture_caller_source, code_source
 from .story import Pins, pins_of
 from .template import (
@@ -228,25 +229,15 @@ class StepDescriptor:
 
             @functools.wraps(func)
             async def async_wrapper(*args: object, **kwargs: object) -> object:
-                collector = self._push_call_step(func, sig, args, kwargs)
-                if collector is None:
+                with self._call_step(func, sig, args, kwargs):
                     return await func(*args, **kwargs)
-                try:
-                    return await func(*args, **kwargs)
-                finally:
-                    collector.pop_step()
 
             return self._marked(cast('F', async_wrapper))
 
         @functools.wraps(func)
         def wrapper(*args: object, **kwargs: object) -> object:
-            collector = self._push_call_step(func, sig, args, kwargs)
-            if collector is None:
+            with self._call_step(func, sig, args, kwargs):
                 return func(*args, **kwargs)
-            try:
-                return func(*args, **kwargs)
-            finally:
-                collector.pop_step()
 
         return self._marked(cast('F', wrapper))
 
@@ -255,15 +246,16 @@ class StepDescriptor:
         func._step_descriptor = self  # type: ignore[attr-defined]
         return func
 
-    def _push_call_step(
+    @contextlib.contextmanager
+    def _call_step(
         self,
         func: Callable[..., object],
         sig: inspect.Signature | None,
         args: tuple[object, ...],
         kwargs: Mapping[str, object],
-    ) -> Collector | None:
-        """Open this step for one helper call, returning the collector to pop
-        it with — or None when the call passes straight through.
+    ) -> Iterator[None]:
+        """This step, open for the duration of one helper call — or nothing,
+        when the call passes straight through.
 
         Nothing recording is a pass-through rather than an error here: a
         decorated helper is an ordinary function its module may call outside
@@ -277,7 +269,8 @@ class StepDescriptor:
             or not collector.recording
             or collector.active_fixture_descriptor is self
         ):
-            return None
+            yield
+            return
         narration = (
             self._narration_for_call(sig, args, kwargs)
             if sig is not None
@@ -287,7 +280,10 @@ class StepDescriptor:
         # walk needed.
         source = code_source(func.__code__) if collector.capture_step_source else None
         collector.push_step(self.phase, narration, pins=self.pins, source=source)
-        return collector
+        try:
+            yield
+        finally:
+            collector.pop_step()
 
     def _check_tstring_decorator_safety(self) -> None:
         reject_baked_values(
