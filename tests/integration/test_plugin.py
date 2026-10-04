@@ -1798,6 +1798,38 @@ def test_given_source_link_cli_flag_emits_anchor(pytester, tmp_path):
     assert '<div class="scenario-source">' in content
 
 
+@scenario(
+    t'An editor {pg["Source link"].low} opens the file under the rootdir, '
+    t'wherever pytest runs from'
+)
+def test_editor_source_link_resolves_against_the_rootdir(
+    pytester, monkeypatch, tmp_path
+):
+    with given('a suite whose test sits in a subdirectory, run from inside it'):
+        pytester.makepyprojecttoml('[tool.pytest]\n')
+        suite = """
+            from pytest_given import scenario, when
+
+            @scenario("A")
+            def test_a():
+                with when("x"):
+                    pass
+            """
+        subdir = pytester.path / 'sub'
+        subdir.mkdir()
+        (subdir / 'test_a.py').write_text(textwrap.dedent(suite), encoding='utf-8')
+        monkeypatch.chdir(subdir)
+    with when('the HTML report renders with the vscode preset'):
+        html_path = tmp_path / 'report.html'
+        result = pytester.runpytest(
+            f'--given-html={html_path}', '--given-source-link=vscode'
+        )
+    with then("the link names the test file's path from the rootdir"):
+        result.assert_outcomes(passed=1)
+        expected = (subdir / 'test_a.py').resolve().as_posix()
+        assert f'vscode://file/{expected}:' in html_path.read_text(encoding='utf-8')
+
+
 def test_given_source_link_ini_value(pytester, tmp_path):
     pytester.makeini(
         """

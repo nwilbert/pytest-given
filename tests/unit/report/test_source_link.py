@@ -232,6 +232,18 @@ def test_format_vscode_uses_absolute_path(
     assert url == f'vscode://file/{expected}:7'
 
 
+def test_format_path_joins_the_root_rather_than_the_cwd(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    root = tmp_path / 'project'
+    url = compile_source_link(
+        'vscode://file/{path}:{line}', project='proj', commit_sha=None, root=root
+    )(_src())
+    expected = (root / 'tests/test_x.py').resolve().as_posix()
+    assert url == f'vscode://file/{expected}:7'
+
+
 def test_format_pycharm_uses_absolute_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

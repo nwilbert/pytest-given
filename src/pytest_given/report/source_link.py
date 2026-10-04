@@ -82,14 +82,18 @@ def compile_source_link(
     *,
     project: str,
     commit_sha: str | None,
+    root: Path | None = None,
 ) -> Callable[[SourceLocation], str]:
     """Validate `template` once and return a per-location substitution function.
 
     The returned function substitutes `{path}`, `{relpath}`, `{line}`,
     `{project}`, `{sha}` for a given `SourceLocation`. Validation depends only
     on the template, so it runs once here and its errors surface before any
-    location is rendered. `{path}` is resolved against the current working
-    directory at call time.
+    location is rendered.
+
+    `{path}` joins `relpath` to `root`, the directory it is relative to. Only
+    a live run knows that — a saved report does not carry its rootdir — so
+    without one the working directory stands in.
     """
     used = set(_extract_field_names(template))
     unknown = used - _VALID_VARS
@@ -105,10 +109,10 @@ def compile_source_link(
             'from a git working tree so `git rev-parse HEAD` can resolve.'
         )
 
-    cwd = Path.cwd()
+    base = Path.cwd() if root is None else root
 
     def substitute(source: SourceLocation) -> str:
-        abspath = (cwd / source.relpath).resolve().as_posix()
+        abspath = (base / source.relpath).resolve().as_posix()
         return template.format(
             path=abspath,
             relpath=source.relpath,

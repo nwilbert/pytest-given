@@ -232,6 +232,7 @@ def _resolve_sinks(
             md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
             md_to_stdout=md_opt == '-',
             source_link_template=source_link_template,
+            source_root=config.rootpath,
             theme=theme,
         )
     except PytestGivenError as error:

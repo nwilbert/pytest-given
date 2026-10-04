@@ -27,7 +27,7 @@ For your own URL template, use any of these variables:
 
 | Variable     | Source                                                                                                   |
 |--------------|----------------------------------------------------------------------------------------------------------|
-| `{path}`     | Absolute POSIX path (resolved at render time against the cwd)                                            |
+| `{path}`     | Absolute POSIX path: pytest's rootdir joined with `{relpath}` (the working directory under `pytest-given report`) |
 | `{relpath}`  | POSIX path relative to pytest's rootdir                                                                  |
 | `{line}`     | 1-indexed line of the scenario's `def`                                                                   |
 | `{project}`  | Basename of pytest's rootdir                                                                             |
@@ -37,7 +37,7 @@ For reports archived in CI, `given_source_link = "github"` links to the exact co
 
 Caveats:
 
-- Editor presets (`vscode`, `cursor`, `zed`) build `{path}` from the current working directory when the report is rendered. If you download a JSON report from CI and render it in a different directory, the links break.
+- Editor presets (`vscode`, `cursor`, `zed`, `pycharm`) build `{path}` from pytest's rootdir. A saved JSON report doesn't record the rootdir, so `pytest-given report` uses the directory you run it in: run it from your checkout's root, or the links break.
 - GitHub links point to a specific commit, so they keep working after the code moves. That's what an archived CI report needs.
 
 ## Traceback frames

@@ -95,19 +95,22 @@ def render_html_string(
     report: ReportData,
     source_link_template: str | None,
     theme: Theme = DEFAULT_THEME,
+    source_root: Path | None = None,
 ) -> str:
     """Render a report model to a self-contained HTML document.
 
     `source_link_template` is the already-resolved template string (preset
     expansion happens before this point). None disables source linking.
-    `theme` is the default the page opens in until the viewer picks one.
+    `source_root` is what `{path}` resolves against (see
+    `compile_source_link`). `theme` is the default the page opens in until the
+    viewer picks one.
 
     Returns the document rather than writing it — `sinks` owns the writing.
     """
     # Built once and handed to both: the narration filter colors placeholders
     # with it, and the template emits the matching `.param-color-N` rules.
     param_color_map = _build_param_color_map(report.scenarios)
-    env = _build_env(report, source_link_template, param_color_map)
+    env = _build_env(report, source_link_template, source_root, param_color_map)
     return env.get_template('report.html.j2').render(
         **_render_context(report, param_color_map, theme)
     )
@@ -116,6 +119,7 @@ def render_html_string(
 def _build_env(
     report: ReportData,
     source_link_template: str | None,
+    source_root: Path | None,
     param_color_map: ParamColorMap,
 ) -> jinja2.Environment:
     """The Jinja environment: the template loader plus every filter and test
@@ -135,6 +139,7 @@ def _build_env(
         template=source_link_template,
         project=report.metadata.project,
         commit_sha=report.metadata.commit_sha,
+        root=source_root,
     )
     env.filters['narration'] = _make_narration_filter(
         param_color_map,
@@ -396,6 +401,7 @@ def _make_source_url_filter(
     template: str | None,
     project: str,
     commit_sha: str | None,
+    root: Path | None,
 ) -> Callable[[SourceLocation | None], str | None]:
     """Build a Jinja filter that resolves a SourceLocation to a URL string.
 
@@ -406,7 +412,9 @@ def _make_source_url_filter(
     substitute = (
         None
         if template is None
-        else compile_source_link(template, project=project, commit_sha=commit_sha)
+        else compile_source_link(
+            template, project=project, commit_sha=commit_sha, root=root
+        )
     )
 
     def _filter(source: SourceLocation | None) -> str | None:

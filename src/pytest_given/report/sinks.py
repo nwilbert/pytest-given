@@ -39,7 +39,9 @@ class SinkConfig:
     """Which sinks a run was told to write, and how to render them.
 
     `md_to_stdout` is its own flag rather than a sentinel path, so nothing
-    downstream has to know that a bare `--given-md` means `-`.
+    downstream has to know that a bare `--given-md` means `-`. `source_root`
+    is the rootdir a live run's source paths are relative to; None for a saved
+    report, which does not carry it.
     """
 
     json_path: Path | None = None
@@ -47,6 +49,7 @@ class SinkConfig:
     md_path: Path | None = None
     md_to_stdout: bool = False
     source_link_template: str | None = None
+    source_root: Path | None = None
     theme: Theme = DEFAULT_THEME
 
     def __post_init__(self) -> None:
@@ -149,6 +152,7 @@ def render_sinks(
                     report,
                     source_link_template=config.source_link_template,
                     theme=config.theme,
+                    source_root=config.source_root,
                 ),
             )
         )
