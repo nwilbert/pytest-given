@@ -11,7 +11,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 <!-- --8<-- [start:site] -->
 
-## [Unreleased]
+## [0.4.0] - 2026-10-04
 
 ### Added
 
@@ -23,7 +23,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - The parameter table orders its columns the way the narration first shows them, and shows its status column only when the cases differ in status.
 - The HTML report's Stories view shows each scenario as a full card that expands in place, and a tag clicked there opens the Scenarios view filtered by it.
-- The HTML report is visually tidied: term refs are marked by a kind-colored underline instead of a tinted background, the Glossary view lists terms as plain names in tighter rows, story coverage reads as plain counts, the narration leaves a gap between phases, a parametrized scenario is marked by a second status bar, hover states show in both themes, the report title shares one row with the view tabs, the sidebars sit on the page background, and a status filter no scenario has is disabled.
+- The HTML report is visually tidied: term refs, the Glossary view, story coverage, narration spacing, hover states and the header row are restyled, and a parametrized scenario is marked by a second status bar.
 - The bundled `pytest-given-authoring` skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the `pytest-given-reviewing` skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.
 
 ### Fixed
@@ -32,7 +32,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Editor source links build `{path}` from pytest's rootdir instead of the working directory, so they no longer point at a doubled path when pytest runs from a subdirectory.
 - A scenario deep link stays working when the test's file or directory name contains `+`, `&`, `=` or `#`.
 - A parametrize value of infinity or NaN reaches the JSON report as a string (`"inf"`, `"nan"`), so the report stays valid JSON.
-- A `@given` generator fixture that yields twice errors with pytest's own "more than one 'yield'" message again, instead of passing silently.
+- A `@given` generator fixture that yields twice errors with pytest's own "more than one 'yield'" message, as it does without pytest-given, instead of passing silently.
 - An `Annotated[..., given(Template(...))]` label whose placeholder is not a bare parametrize column name now fails its scenario with the fix, instead of crashing the HTML report or silently dropping the step.
 - A scenario failing on a pytest-given refusal raised from its test body points at the test's own line, not at pytest-given's.
 - Error messages are clearer: a `FileGlossary` table error names the file, so does a glossary file that is a directory or not UTF-8, and a step nested across phases gets a concrete fix suggested.
@@ -42,7 +42,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given report -o report.markdown` writes Markdown, as `-o report.md` does, instead of refusing the path as an HTML one.
 - `pytest-given report --help` mentions Markdown output and says where each format goes without `-o`.
 - The HTML report's links keep a tag filter whose tag contains a comma, by repeating the parameter per tag or term (`#tag=a&tag=b`), and copying a link no longer replaces the current page's entry in the browser history.
-- The HTML report no longer says "All Scenarios" when every status is filtered out, and the Glossary view says no terms match when every kind is unchecked.
+- The HTML report no longer says "All Scenarios" when every status is filtered out, disables a status filter no scenario has, and the Glossary view says no terms match when every kind is unchecked.
 - The HTML report's view tabs and search boxes show a visible keyboard focus ring, and a turned-off status filter keeps readable contrast.
 - The HTML report's status filters wrap onto a second row instead of being cut off in a narrow sidebar.
 - A parametrized scenario shows a skip reason only when every case was skipped, no longer its first case's reason beside cases that ran.
@@ -388,7 +388,8 @@ First public release.
 - Bundled authoring, navigating, and reviewing skills for AI agents, shipped in
   the wheel and version-matched to the plugin.
 
-[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/nwilbert/pytest-given/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0
