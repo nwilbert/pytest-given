@@ -400,7 +400,11 @@
     {{ sidebar_resizer() }}
     <div class="view-main">
       {% for story in stories %}
-      <div data-story-id="{{ story.id }}" x-show="selectedStory === $el.dataset.storyId">
+      {#- Its own open-state maps, which the cards cloned in below find before
+          the page's: a story's cards open apart from their originals and from
+          another story's, and stay out of what "Expand all" counts. -#}
+      <div data-story-id="{{ story.id }}" x-show="selectedStory === $el.dataset.storyId"
+           x-data="{ expandedScenarios: {}, expandedSteps: {}, expandedAttachments: {}, expandedTags: {} }">
         {% set rollup = story_rollups[story.id] %}
         {% set story_scns = rollup.scenarios %}
         {% set total_scns = story_scns | length %}
@@ -458,22 +462,18 @@
           <div class="scenario-list">
           {% for scn in story_scns %}
           {% set covers = scn_covers[scn.id][story.id] %}
+          {% set scn_index = scenario_index[scn.id] %}
+          {#- A slot for the Scenarios view's card (see `fillStoryCards`): its
+              header lands above the Covers row, its body below. -#}
           <div class="scenario {{ scn.status }}{{ ' multi-case' if scn.parameters and scn.parameters.cases | length > 1 else '' }}"
+               data-clone-of="{{ scn_index }}"
                {# Single-quoted: `tojson` escapes `<`, `>`, `&` and `'`, but not
                   the `"` its own string literals need. #}
                data-covers='{{ covers | tojson }}'
                x-show="sentenceSelectionMatches(JSON.parse($el.dataset.covers))">
-            <div class="scenario-header scenario-header-empty">
-              <div style="display:flex; align-items:center;">
-                <button type="button" class="btn-reset scenario-name scenario-name--goto"
-                        data-goto-scenario="{{ scn.id }}">{{ scn.narration | narration }}</button>
-              </div>
-              <span class="scenario-meta">
-                {{ status_badge(scn.status) }}
-              </span>
-            </div>
-            {% if covers %}
-            <div class="scn-sentence-strip">
+            {#- Without covers the row holds only the jump, so it opens with it. -#}
+            <div class="scn-sentence-strip"{% if not covers %} x-show="expandedScenarios[{{ scn_index }}]" x-cloak{% endif %}>
+              {% if covers %}
               <span class="scn-sentence-label">Covers:</span>
               {% for sentence_id in covers %}
               <button type="button" class="btn-reset use-chip" data-sentence-id="{{ sentence_id }}"
@@ -481,8 +481,13 @@
                       :aria-pressed="!!highlightedSentences[$el.dataset.sentenceId]"
                       aria-label="Select sentence {{ sentence_id }}">{{ sentence_id }}</button>
               {% endfor %}
+              {% endif %}
+              {#- Only on an open card, as the sentence rows' jump only on a
+                  selected row. -#}
+              <button type="button" class="btn-reset use-chip scenario-jump"
+                      x-show="expandedScenarios[{{ scn_index }}]" x-cloak
+                      data-goto-scenario="{{ scn.id }}">Open in Scenarios <span aria-hidden="true">→</span></button>
             </div>
-            {% endif %}
           </div>
           {% endfor %}
           </div>

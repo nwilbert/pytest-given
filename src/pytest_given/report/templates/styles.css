@@ -621,20 +621,6 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 /* 600, not 500: the title shares the narration's size and nearly its ink. */
 .scenario-name { font-size: var(--font-size-md); font-weight: 600; }
-/* Story-view scenario title: a plain clickable heading. No hover underline —
-   it would bleed onto the term refs the title can carry, whose own underline
-   means something else; the trailing → cue signals clickability instead. */
-.scenario-name--goto {
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-}
-.scenario-name--goto::after {
-  content: " →";
-  opacity: 0;
-  transition: opacity 0.1s;
-}
-.scenario-header:hover .scenario-name--goto::after { opacity: 0.6; }
 /* Neutral at rest: a tag is a label until it is the filter, and only then
    does it take the accent. */
 .scenario-tag {
@@ -1208,24 +1194,39 @@ span.param-highlight {
 /* Non-interactive chips (term instances, activity forms): no link affordance. */
 .use-chip--static { cursor: default; }
 .use-chip--static:hover { border-color: var(--border); color: var(--text-secondary); }
+/* The Covers row of a Stories-view card, under its header. Indented by the
+   chevron placeholder's width plus its margin, so it starts where the title
+   does and reads as the title's subtitle. */
 .scn-sentence-strip {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-md);
+  padding: var(--space-xs) 0 0 calc(8px + var(--space-sm));
   font-size: var(--font-size-sm);
   flex-wrap: wrap;
 }
 .scn-sentence-label { color: var(--text-muted); font-weight: 600; }
-/* Sentence-id bubbles are single numbers: keep them round, not elongated pills. */
+/* One height for the row's chips, so it does not grow when an open card
+   shows its jump. */
 .scn-sentence-strip .use-chip {
-  min-width: 22px;
   height: 22px;
-  padding: 0 6px;
+  padding-block: 0;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
+}
+/* Sentence-id bubbles are single numbers: keep them round, not elongated pills. */
+.scn-sentence-strip .use-chip[data-sentence-id] {
+  min-width: 22px;
+  padding-inline: 6px;
   justify-content: center;
+}
+/* Pushed to the row's far end, under the status badge. */
+.scenario-jump {
+  margin-left: auto;
+  white-space: nowrap;
+  /* A flex item's edge swallows the space before the arrow. */
+  gap: 0.25em;
 }
 .scn-sentence-strip-section { margin-top: var(--space-xl); }
 /* Section label separating the scenario list from the sentence timeline above. */
@@ -1449,7 +1450,7 @@ span.param-highlight {
 /* A selected sentence's timeline row takes the accent tint, like a selected
    sidebar row; its bubble and the matching scenario bubbles go solid accent. */
 .sentence-row-highlight { background: var(--color-accent-tint); }
-.scn-sentence-strip .use-chip:not(.use-chip-highlight) { background: var(--bg-surface); }
+.scn-sentence-strip .use-chip[data-sentence-id]:not(.use-chip-highlight) { background: var(--bg-surface); }
 .sentence-num-highlight,
 .sentence-num-highlight:hover,
 .use-chip-highlight,

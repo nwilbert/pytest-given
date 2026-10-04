@@ -236,6 +236,45 @@ function reportApp() {
       this.selectedStory = id;
       this.highlightedSentences = {};
     },
+    // A Stories-view slot borrows its card from the Scenarios view rather than
+    // the page rendering each scenario again per story; Alpine initializes the
+    // fresh clones on insertion, under the story's own open-state maps.
+    fillStoryCards() {
+      if (this.mainView !== 'stories' || !this.selectedStory) return;
+      const story = document.querySelector(
+        `#view-stories .view-main > [data-story-id="${CSS.escape(this.selectedStory)}"]`,
+      );
+      if (!story) return;
+      // Two stories can list one scenario, so the id prefix names the story.
+      const prefix = `story-${this.selectedStory}-`;
+      for (const slot of story.querySelectorAll('[data-clone-of]:not([data-filled])')) {
+        const card = document.getElementById('scenario-' + slot.dataset.cloneOf);
+        const header = card.querySelector(':scope > .scenario-header').cloneNode(true);
+        const body = card.querySelector(':scope > .scenario-body').cloneNode(true);
+        for (const part of [header, body]) this._prepareClone(part, prefix);
+        slot.prepend(header);
+        slot.append(body);
+        slot.dataset.filled = '';
+      }
+    },
+    // A clone copies the original's DOM as it stands, including what the hover
+    // handlers wrote into it imperatively, which nothing would undo on the copy.
+    _prepareClone(part, prefix) {
+      for (const el of [part, ...part.querySelectorAll('[id], [aria-controls]')]) {
+        if (el.id) el.id = prefix + el.id;
+        const controls = el.getAttribute('aria-controls');
+        if (controls) el.setAttribute('aria-controls', prefix + controls);
+      }
+      this._clearParamHighlight(part);
+      this._restoreTokens(part);
+      this._clearPhaseOutline(part);
+      // A tag here shows the active filter but toggles nothing, so it is not
+      // announced as a pressed toggle. Dropped before Alpine sees the clone.
+      part.querySelectorAll('.scenario-tag').forEach(el => {
+        el.removeAttribute(':aria-pressed');
+        el.removeAttribute('aria-pressed');
+      });
+    },
     // Story-view scenario cards filter on the selected sentences: a card stays
     // visible when nothing is selected, or when it covers ANY selected sentence.
     sentenceSelectionMatches(coveredIds) {
@@ -624,6 +663,11 @@ function reportApp() {
       if (selecting && group.hasChildren) this.expandedGroups[group.id] = true;
     },
     filterByTag(tag) {
+      // From Stories, a tag opens the Scenarios view filtered to it alone.
+      if (this.mainView === 'stories') {
+        this.resetFilters();
+        this.mainView = 'scenarios';
+      }
       if (this.tagFilters.includes(tag)) {
         this.tagFilters = this.tagFilters.filter(t => t !== tag);
       } else {
@@ -682,7 +726,7 @@ function reportApp() {
     setHoverParam(name, el) {
       const scope = el?.closest('.scenario');
       if (!scope) return;
-      scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
+      this._clearParamHighlight(scope);
       if (!name) return;
       const safe = CSS.escape(name);
       scope.querySelectorAll(
@@ -711,6 +755,14 @@ function reportApp() {
     clearHoverRow(rowEl) {
       const scope = rowEl?.closest('.scenario');
       if (!scope) return;
+      this._restoreTokens(scope);
+    },
+    // The undo of each hover effect, by scope rather than by the hovered
+    // element: a clone being prepared is not in the page yet.
+    _clearParamHighlight(scope) {
+      scope.querySelectorAll('.param-highlight').forEach(e => e.classList.remove('param-highlight'));
+    },
+    _restoreTokens(scope) {
       scope.querySelectorAll('span.param-substituted').forEach(span => {
         if (span.dataset.token !== undefined) {
           span.textContent = span.dataset.token;
@@ -718,6 +770,10 @@ function reportApp() {
         }
         span.classList.remove('param-substituted');
       });
+    },
+    _clearPhaseOutline(scope) {
+      scope.querySelectorAll('.phase-hover').forEach(e => e.classList.remove('phase-hover'));
+      scope.querySelectorAll('.phase-outline').forEach(e => e.remove());
     },
     init() {
       this._readHash();
@@ -728,8 +784,15 @@ function reportApp() {
       ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'showPassed', 'showFailed', 'showSkipped'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
-      this.$watch('mainView', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
-      this.$watch('selectedStory', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      ['mainView', 'selectedStory'].forEach(key => {
+        this.$watch(key, () => {
+          if (!this._suppressHashWrite) this._writeHash('push');
+          this.fillStoryCards();
+        });
+      });
+      // Once Alpine has walked the page, so the cards cloned are initialized
+      // ones and a `#view=stories` link lands with its story filled.
+      this.$nextTick(() => this.fillStoryCards());
       // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
@@ -756,7 +819,7 @@ function reportApp() {
         if (!jump) return;
         this.filterScenariosBySentence(jump.dataset.sentenceJump);
       });
-      // Story-view scenario card titles jump to the scenario in the Scenarios view.
+      // A Stories-view card's jump opens the scenario in the Scenarios view.
       document.addEventListener('click', (event) => {
         const link = event.target.closest('[data-goto-scenario]');
         if (!link) return;
@@ -803,8 +866,7 @@ function reportApp() {
       let hovered = null;
       const leave = () => {
         if (!hovered) return;
-        hovered.scope.querySelectorAll('.phase-hover').forEach(e => e.classList.remove('phase-hover'));
-        hovered.scope.querySelectorAll('.phase-outline').forEach(e => e.remove());
+        this._clearPhaseOutline(hovered.scope);
         hovered = null;
       };
       document.addEventListener('pointerover', (event) => {

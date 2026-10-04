@@ -225,6 +225,7 @@ def _render_context(
         'tab_visibility': tab_visibility(report),
         'story_rollups': build_story_rollups(report, coverage),
         'scn_covers': scn_covers,
+        'scenario_index': {scn.id: index for index, scn in enumerate(report.scenarios)},
         'scenario_slugs': scenario_slugs,
         # The colors themselves, one (light, dark) pair per column, emitted as
         # `--param-color-N` tokens beside the stylesheet. They are generated
