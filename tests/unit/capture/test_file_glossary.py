@@ -216,6 +216,18 @@ def test_missing_file_raises(tmp_path):
         FileGlossary(missing)
 
 
+@pytest.mark.parametrize('unreadable', ['directory', 'not utf-8'])
+def test_an_unreadable_glossary_file_is_reported_with_its_path(tmp_path, unreadable):
+    path = tmp_path / 'GLOSSARY.md'
+    if unreadable == 'directory':
+        path.mkdir()
+    else:
+        path.write_bytes(b'| Term | Meaning |\n|---|---|\n| Gu\xe9st | x |\n')
+    with pytest.raises(PytestGivenError, match='cannot read glossary file') as exc:
+        FileGlossary(path)
+    assert str(path) in str(exc.value)
+
+
 def test_a_file_glossary_is_a_glossary(glossary_file):
     """A FileGlossary *is* the storage rather than wrapping it, so every
     consumer of a glossary takes one without a second isinstance arm."""

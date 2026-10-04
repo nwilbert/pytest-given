@@ -48,6 +48,10 @@ class FileGlossary(LookupGlossary):
             text = self._path.read_text(encoding='utf-8')
         except FileNotFoundError as exc:
             raise PytestGivenError(f'glossary file not found: {self._path}.') from exc
+        except (OSError, UnicodeDecodeError) as exc:
+            raise PytestGivenError(
+                f'cannot read glossary file {self._path}: {exc}'
+            ) from exc
         try:
             rows = parse_glossary_tables(
                 text,
