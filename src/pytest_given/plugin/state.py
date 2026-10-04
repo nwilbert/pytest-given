@@ -14,7 +14,6 @@ adds only the `.function` hop — reading the marker itself is `capture`'s.
 """
 
 from dataclasses import dataclass, field
-from typing import NamedTuple
 
 import pytest
 
@@ -49,17 +48,6 @@ class SessionOutcome:
     findings: list[Finding] = field(default_factory=list)
 
 
-class FixtureInstanceKey(NamedTuple):
-    """One fixture *instance*: the def it came from, plus its cache key.
-
-    Both ends of the graft build this key, reaching the cache key two ways —
-    at setup from the request, at graft from what pytest cached.
-    """
-
-    fixturedef_id: int
-    cache_key: object
-
-
 @dataclass(kw_only=True)
 class SessionState:
     """The per-item bookkeeping the hooks pass between each other.
@@ -70,14 +58,16 @@ class SessionState:
 
     `published_for` is the item whose setup published the collector to the
     ContextVar, so teardown clears only what it published. `fixture_recordings`
-    is insertion-ordered by setup time, which is what lets the graft take them
-    in dependency order — `item.fixturenames` can list a dependent before its
+    holds the latest recording per fixturedef — pytest caches one instance per
+    def, so that is the one its cached value came from — and is
+    insertion-ordered by setup time, which is what lets the graft take them in
+    dependency order: `item.fixturenames` can list a dependent before its
     dependency.
     """
 
     param_info: ParamInfo = field(default_factory=dict)
     published_for: NodeId | None = None
-    fixture_recordings: dict[FixtureInstanceKey, FixtureRecording] = field(
+    fixture_recordings: dict[pytest.FixtureDef[object], FixtureRecording] = field(
         default_factory=dict
     )
 

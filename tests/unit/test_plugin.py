@@ -87,6 +87,14 @@ def _fake_func(desc: StepDescriptor | None = None) -> Any:
     return f
 
 
+class _FakeFixtureDef(SimpleNamespace):
+    """Hashed by identity, as pytest's `FixtureDef` is — the recording store
+    keys on it."""
+
+    __eq__ = object.__eq__
+    __hash__ = object.__hash__
+
+
 def _fake_item(fixturedefs: dict[str, Any], config: Any) -> pytest.Item:
     fm = SimpleNamespace(getfixturedefs=lambda name, _item: fixturedefs.get(name))
     session = SimpleNamespace(_fixturemanager=fm)
@@ -130,11 +138,10 @@ def test_pytest_fixture_setup_records_a_cached_scope_while_idle(
     permanent: pytest serves the cached value to every later scenario without
     firing this hook again, so the step would vanish from all of them.
     """
-    fixturedef = SimpleNamespace(
+    fixturedef = _FakeFixtureDef(
         func=_fake_func(StepDescriptor('given', 'a shared thing')),
         scope='session',
         argname='shared',
-        cache_key=lambda _request: None,
     )
     assert fresh_collector.state == 'idle'
     _drive_fixture_setup(fixturedef, SimpleNamespace(config=fake_config))
@@ -506,13 +513,13 @@ def test_graft_skips_recording_not_belonging_to_item(
     fresh_collector: Collector,
     fresh_state: state.SessionState,
 ) -> None:
-    """A recording left by another item (its key isn't among this item's step
-    fixtures) is skipped, not grafted."""
+    """A recording left by another item (its fixturedef isn't among this
+    item's step fixtures) is skipped, not grafted."""
     fresh_collector.start_scenario(NodeId('t::x'), 'x', 'mod', [])
     stale = FixtureRecording(
         root=Step(phase='given', narration=Narration(text='stale'), fixture_name='o')
     )
-    fresh_state.fixture_recordings[(object(), None)] = stale
+    fresh_state.fixture_recordings[_FakeFixtureDef()] = stale
     item = _fake_item({}, fake_config)
     fixtures.graft_fixture_recordings(item, fresh_collector)
     assert fresh_collector._current_scenario is not None

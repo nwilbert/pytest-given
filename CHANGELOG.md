@@ -27,6 +27,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Fixed
 
+- A `@given` fixture parametrized with an unhashable value, such as a list, no longer errors every test that requests it.
 - An `Annotated[..., given(Template(...))]` label whose placeholder is not a bare parametrize column name now fails its scenario with the fix, instead of crashing the HTML report or silently dropping the step.
 - A scenario failing on a pytest-given refusal raised from its test body points at the test's own line, not at pytest-given's.
 - Error messages are clearer: a `FileGlossary` table error names the file, and a step nested across phases gets a concrete fix suggested.

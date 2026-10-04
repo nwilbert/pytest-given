@@ -3,7 +3,7 @@ it recorded onto the test that requested it.
 
 Where the plugin's coupling to pytest internals concentrates, so a pytest
 upgrade's blast radius is greppable: `fixturedef.func` is reassigned to wrap a
-generator body, `fixturedef.cache_key(request)` identifies one fixture
+generator body, `fixturedef.cached_result` says whether a test holds an
 instance, and `item.session._fixturemanager.getfixturedefs` resolves what a
 test requested. Each is unavoidable and none is public API.
 """
@@ -12,7 +12,7 @@ import contextlib
 import functools
 import inspect
 from collections.abc import Callable, Generator
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import pytest
 
@@ -29,10 +29,7 @@ from ..model import (
     Step,
     placeholder_mismatch,
 )
-from .state import FixtureInstanceKey, session_collector, session_state
-
-if TYPE_CHECKING:
-    from _pytest.fixtures import SubRequest
+from .state import session_collector, session_state
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -78,8 +75,11 @@ def pytest_fixture_setup(
         with collector.fixture_setup(recording, desc):
             yield
     finally:
-        key = _setup_instance_key(fixturedef, request)
-        session_state(request.config).fixture_recordings[key] = recording
+        recordings = session_state(request.config).fixture_recordings
+        # Popped first, so a re-setup moves to the end: the graft reads the
+        # store in setup order.
+        recordings.pop(fixturedef, None)
+        recordings[fixturedef] = recording
 
 
 def _ensure_teardown_wrapped(
@@ -116,38 +116,6 @@ def _ensure_teardown_wrapped(
     # original's `_step_descriptor`; only the idempotence flag is new.
     wrapped._pytest_given_teardown_wrapped = True  # type: ignore[attr-defined]
     fixturedef.func = wrapped  # type: ignore[misc]
-
-
-def _setup_instance_key(
-    fixturedef: pytest.FixtureDef[object],
-    request: pytest.FixtureRequest,
-) -> FixtureInstanceKey:
-    """The key at setup time, deriving the cache key from the live request."""
-    return _fixture_instance_key(
-        fixturedef, fixturedef.cache_key(cast('SubRequest', request))
-    )
-
-
-def _cached_instance_key(
-    fixturedef: pytest.FixtureDef[object],
-) -> FixtureInstanceKey:
-    """The key at graft time, reading back the cache key pytest stored.
-
-    `cached_result` is `(value, cache_key, exc)`; element 1 rather than a
-    re-derivation, since the request that produced it is gone by now.
-    """
-    assert fixturedef.cached_result is not None
-    return _fixture_instance_key(fixturedef, fixturedef.cached_result[1])
-
-
-def _fixture_instance_key(
-    fixturedef: pytest.FixtureDef[object],
-    cache_key: object,
-) -> FixtureInstanceKey:
-    """Built here rather than at either end of the graft, so the two cannot
-    drift into keys that no longer meet — a miss is silent, and costs the
-    fixture's whole recorded subtree."""
-    return FixtureInstanceKey(fixturedef_id=id(fixturedef), cache_key=cache_key)
 
 
 def graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
@@ -197,36 +165,31 @@ def _graft_recorded_fixtures(
     fixture names grafted — what `_graft_annotated_leaves` must leave alone.
     """
     recordings = session_state(item.config).fixture_recordings
-    scopes = _recorded_fixture_scopes(item)
+    cached = _cached_step_fixturedefs(item)
     grafted: set[str | None] = set()
-    # Function-scoped recordings won't be re-consumed; drop after grafting so
-    # the store doesn't grow unboundedly across the session.
-    to_drop: list[FixtureInstanceKey] = []
-    for key, recording in recordings.items():
-        if key not in scopes:
+    for fixturedef, recording in list(recordings.items()):
+        if fixturedef not in cached:
             continue
         name = recording.root.fixture_name
         label = descriptors.get(name) if name is not None else None
         collector.graft_recording(recording.root, label=label)
         grafted.add(name)
-        if scopes[key] == 'function':
-            to_drop.append(key)
-    for key in to_drop:
-        del recordings[key]
+        if fixturedef.scope == 'function':
+            # Never re-consumed; dropped so the store doesn't grow
+            # unboundedly across the session.
+            del recordings[fixturedef]
     return grafted
 
 
-def _recorded_fixture_scopes(item: pytest.Item) -> dict[FixtureInstanceKey, str]:
-    """The instance key of every step fixture this item has cached, and its
-    scope — which is what says whether its recording is still needed after."""
+def _cached_step_fixturedefs(item: pytest.Item) -> set[pytest.FixtureDef[object]]:
+    """Every step fixture this item holds an instance of."""
     assert hasattr(item, 'fixturenames'), f'expected fixturenames on {item!r}'
-    scopes: dict[FixtureInstanceKey, str] = {}
-    for name in item.fixturenames:
-        fixturedef = _step_fixturedef(item, name)
-        if fixturedef is None or fixturedef.cached_result is None:
-            continue
-        scopes[_cached_instance_key(fixturedef)] = fixturedef.scope
-    return scopes
+    return {
+        fixturedef
+        for name in item.fixturenames
+        if (fixturedef := _step_fixturedef(item, name)) is not None
+        and fixturedef.cached_result is not None
+    }
 
 
 def _graft_annotated_leaves(

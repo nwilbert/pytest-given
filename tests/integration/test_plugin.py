@@ -1071,6 +1071,45 @@ def test_class_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
         assert s['steps'][0]['children'][0]['narration']['text'] == 'navigated to /'
 
 
+@pytest.mark.parametrize('scope', ['function', 'module'])
+def test_step_fixture_with_unhashable_params_records_each_instance(
+    pytester, tmp_path, scope
+):
+    """A param pytest cannot hash — a list here — still keys one recording
+    per fixture instance."""
+    pytester.makepyfile(
+        f"""
+        import pytest
+        from pytest_given import scenario, given, when, then
+
+        @pytest.fixture(scope={scope!r}, params=[[1, 2], [3]])
+        @given("a list")
+        def items(request):
+            items = request.param
+            with given(t"holding {{items}}"):
+                pass
+            return items
+
+        @scenario("Sums a list")
+        def test_sum(items):
+            with when("summing"):
+                total = sum(items)
+            with then("it is positive"):
+                assert total > 0
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(f'--given-json={json_path}')
+    result.assert_outcomes(passed=2)
+    [grouped] = json.loads(json_path.read_text())['scenarios']
+    assert grouped['steps'][0]['narration']['text'] == 'a list'
+    assert grouped['steps'][0]['children'][0]['narration']['text'] == 'holding {items}'
+    assert [case['values'] for case in grouped['parameters']['cases']] == [
+        ['[1, 2]'],
+        ['[3]'],
+    ]
+
+
 def test_nested_step_fixtures_appear_as_siblings(pytester, tmp_path):
     """Fixture B depending on fixture A: both recordings graft as top-level."""
     pytester.makepyfile(
