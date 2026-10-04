@@ -13,7 +13,7 @@ The CLI takes its settings from flags only, never from your pytest config, and i
 
 `--theme=light|dark|auto` sets the theme the report opens in, like `--given-theme`. The default is `auto`.
 
-Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md` file name: `-o report.md` needs no `--format`.
+Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md` or `.markdown` file name: `-o report.md` needs no `--format`.
 
 With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no `<!-- pytest-given:md:start -->` markers; the plugin only adds them to separate the report from pytest's own output.
 

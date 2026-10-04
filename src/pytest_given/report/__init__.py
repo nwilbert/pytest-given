@@ -9,6 +9,7 @@ lives — importing this package must not drag argparse in behind it.
 from .sinks import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
+    MD_SUFFIXES,
     RenderedFile,
     RenderedSinks,
     SinkConfig,
@@ -26,6 +27,7 @@ __all__ = [
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
     'DEFAULT_THEME',
+    'MD_SUFFIXES',
     'SOURCE_LINK_HELP',
     'THEME_HELP',
     'RenderedFile',

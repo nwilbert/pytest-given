@@ -10,6 +10,7 @@ from ..model import PytestGivenError
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_THEME,
+    MD_SUFFIXES,
     SOURCE_LINK_HELP,
     THEME_HELP,
     SinkConfig,
@@ -123,6 +124,6 @@ def _sink_config(
 
 
 def _infer_format(output: Path | None) -> str:
-    if output is not None and output.suffix.lower() == '.md':
+    if output is not None and output.suffix.lower() in MD_SUFFIXES:
         return 'md'
     return 'html'

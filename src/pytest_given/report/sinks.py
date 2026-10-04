@@ -33,6 +33,10 @@ from .theme import DEFAULT_THEME, Theme
 DEFAULT_JSON_PATH = Path('given-report/report-data.json')
 DEFAULT_HTML_PATH = Path('given-report/report.html')
 
+# What a Markdown sink path may end in — also how `pytest-given report` tells
+# a Markdown `-o` from an HTML one.
+MD_SUFFIXES = ('.md', '.markdown')
+
 
 @dataclass(frozen=True)
 class SinkConfig:
@@ -55,7 +59,7 @@ class SinkConfig:
     def __post_init__(self) -> None:
         _require_suffix('JSON', self.json_path, ('.json',))
         _require_suffix('HTML', self.html_path, ('.html', '.htm'))
-        _require_suffix('Markdown', self.md_path, ('.md', '.markdown'))
+        _require_suffix('Markdown', self.md_path, MD_SUFFIXES)
 
     def file_paths(self) -> list[Path]:
         """The paths this run would write, in sink order. Only real files —

@@ -144,7 +144,8 @@ def test_cli_format_md_to_stdout(tmp_path, capsys) -> None:
     assert '## ✓ Alpha' in capsys.readouterr().out
 
 
-def test_cli_md_inferred_from_output_extension(tmp_path) -> None:
+@pytest.mark.parametrize('name', ['r.md', 'r.markdown', 'R.MD'])
+def test_cli_md_inferred_from_output_extension(tmp_path, name) -> None:
     json_path = tmp_path / 'data.json'
     json_path.write_text(
         json.dumps(
@@ -159,7 +160,7 @@ def test_cli_md_inferred_from_output_extension(tmp_path) -> None:
             }
         )
     )
-    out = tmp_path / 'r.md'
+    out = tmp_path / name
     rc = main(['report', str(json_path), '-o', str(out)])
     assert rc == 0
     assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
