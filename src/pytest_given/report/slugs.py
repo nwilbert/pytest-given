@@ -89,19 +89,19 @@ def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
     func = func_part.removeprefix('test_')
     if not with_tail:
         func = node_base(func)
-    return '/'.join([*parents, basename, _fragment_safe(func)])
+    return _fragment_safe('/'.join([*parents, basename, func]))
 
 
 def _fragment_safe(text: str) -> str:
     """`text` with anything that would break the fragment folded to a `-`.
 
     The slug is addressed as `#scenario=<slug>` and the page parses the
-    fragment with `URLSearchParams`, so a parametrize tail carrying `&` would
-    truncate the value and one carrying `+` would decode to a space — either
+    fragment with `URLSearchParams`, so an `&` in a parametrize tail or a file
+    name would truncate the value and a `+` would decode to a space — either
     way the reverse map misses and the deep link silently does nothing. pytest
     keeps all three, plus `#` and spaces, in a node id.
 
-    Folding can make two tails collide; the escalation loop above already
+    Folding can make two slugs collide; the escalation loop above already
     handles that, down to the node-id fallback.
     """
     return _UNSAFE_IN_FRAGMENT.sub('-', text)

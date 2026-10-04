@@ -56,6 +56,19 @@ def test_scenario_slug_keeps_tail_only_for_colliding_scenarios() -> None:
     assert index[NodeId('pkg/test_pour.py::test_drain[once]')] == 'pour/drain'
 
 
+def test_scenario_slug_folds_unsafe_characters_in_the_path_too() -> None:
+    """A `+` in a file or directory name would decode to a space in the
+    fragment, as one in a parametrize tail would."""
+    node_id = 'tests/c+d/test_a+b.py::test_x'
+    rd = ReportData(metadata=_meta(), scenarios=[_scn(node_id)])
+    assert build_scenario_slug_index(rd)[NodeId(node_id)] == 'a-b/x'
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[_scn(node_id), _scn('tests/e/test_a+b.py::test_x')],
+    )
+    assert build_scenario_slug_index(rd)[NodeId(node_id)] == 'c-d/a-b/x'
+
+
 def test_scenario_slug_file_without_test_prefix_kept_verbatim() -> None:
     rd = ReportData(metadata=_meta(), scenarios=[_scn('checks.py::test_run')])
     index = build_scenario_slug_index(rd)
