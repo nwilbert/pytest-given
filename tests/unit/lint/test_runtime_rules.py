@@ -186,6 +186,20 @@ def test_tag_shadows_term_skips_a_tag_with_no_derivable_slug() -> None:
     assert finding.subject == 'guest'
 
 
+def test_tag_shadows_term_counts_a_scenario_once_across_spellings() -> None:
+    """Two tags folding to one slug on the same scenario are one scenario."""
+    glossary = _glossary('Guest')
+    scenarios = [
+        _phases_scenario(
+            'test_x.py::test_a', ['given', 'when', 'then'], tags=['Guest', 'guest']
+        )
+    ]
+    [finding] = _rule_findings(
+        _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
+    )
+    assert '(1 scenario, e.g. test_x.py::test_a)' in finding.message
+
+
 def test_tag_shadows_term_passes_orthogonal_tags() -> None:
     glossary = _glossary('File glossary')
     scenarios = [

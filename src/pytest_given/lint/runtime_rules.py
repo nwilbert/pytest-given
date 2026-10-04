@@ -2,7 +2,7 @@
 source access needed."""
 
 from collections.abc import Callable, Container
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..model import (
     PHASES,
@@ -83,7 +83,8 @@ class _ShadowingTag:
     tag: str
     term: GlossaryTerm
     example: NodeId
-    scenarios: int = 1
+    # A set, so a scenario carrying two spellings of the tag counts once.
+    scenarios: set[NodeId] = field(default_factory=set)
 
 
 def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
@@ -106,14 +107,16 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
             term = glossary.get(slug)
             if term is None:
                 continue
-            seen = shadowing.get(slug)
-            if seen is None:
-                shadowing[slug] = _ShadowingTag(tag=tag, term=term, example=scenario.id)
-            else:
-                seen.scenarios += 1
+            shadow = shadowing.get(slug)
+            if shadow is None:
+                shadow = shadowing[slug] = _ShadowingTag(
+                    tag=tag, term=term, example=scenario.id
+                )
+            shadow.scenarios.add(scenario.id)
     findings: list[RawFinding] = []
     for slug, shadow in shadowing.items():
-        noun = 'scenario' if shadow.scenarios == 1 else 'scenarios'
+        count = len(shadow.scenarios)
+        noun = 'scenario' if count == 1 else 'scenarios'
         findings.append(
             RawFinding(
                 rule=TAG_SHADOWS_TERM,
@@ -121,7 +124,7 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
                 location=None,
                 message=(
                     f'tag {shadow.tag!r} duplicates glossary term '
-                    f'{shadow.term.canonical!r} ({shadow.scenarios} {noun}, '
+                    f'{shadow.term.canonical!r} ({count} {noun}, '
                     f'e.g. {shadow.example})'
                 ),
             )

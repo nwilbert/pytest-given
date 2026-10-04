@@ -36,6 +36,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A scenario failing on a pytest-given refusal raised from its test body points at the test's own line, not at pytest-given's.
 - Error messages are clearer: a `FileGlossary` table error names the file, so does a glossary file that is a directory or not UTF-8, and a step nested across phases gets a concrete fix suggested.
 - The Markdown report's note below a parameter table names the row by its short parametrize values or its row number, instead of repeating multiline values.
+- The `tag-shadows-term` lint finding counts a scenario once when it carries two spellings of the tag, such as `Guest` and `guest`.
 - `pytest-given report -o report.markdown` writes Markdown, as `-o report.md` does, instead of refusing the path as an HTML one.
 - `pytest-given report --help` mentions Markdown output and says where each format goes without `-o`.
 - The HTML report's links keep a tag filter whose tag contains a comma, by repeating the parameter per tag or term (`#tag=a&tag=b`), and copying a link no longer replaces the current page's entry in the browser history.
