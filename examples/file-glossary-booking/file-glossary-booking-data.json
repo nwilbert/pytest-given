@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-04T12:42:38.694393+00:00",
+    "timestamp": "2026-10-04T17:59:13.823708+00:00",
     "pytest_version": "9.1.1",
-    "plugin_version": "0.4.0",
-    "commit_sha": "e8272cc00f57d54f1bdf6a16a0d530bbbfb40829",
+    "plugin_version": "0.4.1",
+    "commit_sha": "fb34e08900eb507bf45c414b863f25e9d4785420",
     "title": "File Glossary Example"
   },
   "scenarios": [
