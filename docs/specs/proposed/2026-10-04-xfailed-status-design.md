@@ -6,7 +6,7 @@ Give a scenario that fails as expected (`@pytest.mark.xfail`, `pytest.param(...,
 
 An xfailed scenario is neither of those:
 
-- **It ran.** Unlike a skipped one, it recorded steps up to where it broke and carries the error that broke it. Both are what a reader opens it for: the steps document the intended behavior, and the error shows how far the implementation is from it.
+- **It ran.** Unlike a skipped one, it recorded steps up to where it broke and carries the error that broke it. Both are what a reader opens it for: the steps document the intended behavior, and the error shows how far the implementation is from it. `xfail(run=False)` is the exception: it never runs, so it has neither, only its reason.
 - **It does not fail the run.** Unlike a failed one, the team has already declared it known-broken. Rendering it red, or counting it as failing story coverage, would raise an alarm pytest itself does not raise.
 
 pytest draws the same line: its summary counts `xfailed` apart from both `failed` and `skipped`.
@@ -24,7 +24,7 @@ pytest draws the same line: its summary counts `xfailed` apart from both `failed
 
 | Case | `report.when` | `report.outcome` | `report.wasxfail` |
 |---|---|---|---|
-| marked test fails (and `raises=` matches, if given) | `call`, or `setup` when a fixture raises | `skipped` | the mark's `reason` (may be `''`) |
+| marked test fails (and `raises=` matches, if given) | `call`, or `setup` / `teardown` when a fixture raises | `skipped` | the mark's `reason` (may be `''`) |
 | `pytest.xfail('msg')` in the body or a fixture | `call` / `setup` | `skipped` | `'msg'` |
 | `xfail(run=False)` | `setup` | `skipped` | `'[NOTRUN] ' + reason` |
 | marked test passes, non-strict | `call` | `passed` | the mark's `reason` |
@@ -55,11 +55,16 @@ class Scenario:
 
 `plugin/runtest.py`:
 
-- `pytest_runtest_logreport` treats a skipped report carrying `wasxfail` as `xfailed`, at setup or call — the setup-skip branch already reaches `finish_scenario`, which covers `run=False` and a fixture calling `pytest.xfail()`. `xfail_reason` is `wasxfail` stripped, or None when empty.
+- `pytest_runtest_logreport` treats a skipped report carrying `wasxfail` as `xfailed`, at setup or call — the setup-skip branch already reaches `finish_scenario`, which covers `run=False` and a fixture calling `pytest.xfail()`. `xfail_reason` is `wasxfail` with pytest's `[NOTRUN] ` prefix removed and stripped, or None when that leaves it empty: the prefix is pytest's terminal jargon, and a card with no steps already says the test never ran.
 - `pytest_runtest_makereport` already attaches the error of a marked test that fails as expected, which is the error the reader wants. It skips the error for `pytest.xfail.Exception`, exactly as it does for `pytest.skip.Exception`: the imperative call's traceback is the xfail machinery, not the failure.
 - `Collector.finish_scenario` takes `xfail_reason` alongside `skip_reason`. It overwrites the status that `Collector.fail` set in `makereport`, as it already does for a skip, and keeps the error.
 
-A teardown error after an expected failure still turns the scenario `failed` through `Collector.fail`, which is what pytest's own exit code says.
+A teardown error follows pytest's verdict on the teardown report, which differs by how the test was declared to fail:
+
+- **Under an `xfail` mark**, pytest rewrites a teardown error to an expected failure too (skipped, carrying `wasxfail`) and the run stays green — even after a non-strict xpass, which pytest then counts as both `xpassed` and `xfailed`. The scenario ends `xfailed`, keeping the first error.
+- **After an imperative `pytest.xfail()`** with no mark, the teardown error is a plain error that fails the run, and the scenario ends `failed`.
+
+Today `makereport` amends a finished scenario to `failed` through `Collector.fail` on any teardown error. It runs inside `_pytest/skipping.py`'s wrapper, so before the rewrite, and cannot tell the two apart. The amend therefore moves to `pytest_runtest_logreport`, which sees the final teardown report: `makereport` still records the error, and the teardown report sets the status — `xfailed` when it carries `wasxfail`, `failed` when it failed. Its guard on the active scenario has to admit a teardown report for the scenario just finished.
 
 ## Grouping
 
@@ -74,7 +79,7 @@ A single xfailed case is the common shape — `pytest.param(..., marks=pytest.ma
 
 `comparable` stays the passed cases only: an xfailed case may stop mid-tree like a failed one. `_baseline` already prefers a case that recorded a tree over a skipped one, and an xfailed case records one.
 
-A grouped scenario's `xfail_reason` is the anchor's, as `skip_reason` is.
+A grouped scenario's `xfail_reason` is the reason its xfailed cases share, or None when they differ. It cannot be the anchor's, as `skip_reason` is: a group is `skipped` only when every case is, so the anchor's skip reason is everyone's, but the one xfailed row of a decision table is seldom the anchor, so the anchor's `xfail_reason` would usually be None.
 
 ## Rendering
 
@@ -82,12 +87,15 @@ The glyph is `⊗` — a cross held in a circle: a failure, but a contained one.
 
 **HTML.**
 
-- A scenario card takes the `xfailed` class, styled from a new `--status-xfailed` token in both themes: a muted amber, apart from failed red and skipped grey.
-- Its body renders steps, error and reason. The reason sits where a skip reason does, worded "Expected to fail: …".
+- A scenario card takes the `xfailed` class, styled from new `--color-xfailed` and `--color-xfailed-tint` tokens in both themes: a muted steel blue. The other hues are taken — red failed, amber skipped, green passed, aubergine the accent and activity terms, teal object terms — and blue reads as calmer than any of them.
+- Every surface that paints a status in the skipped token gets an xfailed counterpart: the card's status bar and its multi-case bar, the status badge, the parameter table's status dot, and the Stories tab's coverage count.
+- The status badge reads `⊗ expected failure`, not the raw `xfailed` the badge macro would print today, so badge, filter pill and Markdown use one wording.
+- Its body renders steps, error and reason. The reason sits where a skip reason does, in a box styled like `.skip-reason` but in the xfailed token, labelled "Expected to fail:".
 - The status filter gains an `⊗ Expected failure` pill, shown only when the report has one, like `Skipped`. `#status=` accepts `xfailed`, and the "All Scenarios" / "no statuses" summary counts it like the other three.
+- The status pills wrap instead of overflowing the sidebar. Four need about 330px, more than the 238px the default sidebar width gives them, so at that width the expected-failure pill takes a second row; the sidebar's minimum width already clips three pills today, which the wrap fixes too. The wrapped layout and the new pill are designed with the `frontend-design` skill, not just made to fit.
 - A parameter-table row whose case is xfailed takes an `xfailed-row` class, tinted like `failed-row` but in the xfailed token.
 
-**Markdown.** The heading suffix reads `· expected failure` where a skipped one reads `· skipped`, and the subtitle carries `— expected to fail: <reason>`. Steps and error render as for a failed scenario.
+**Markdown.** The heading suffix reads `· expected failure` where a skipped one reads `· skipped`, and the subtitle carries `— expected to fail: <reason>` where a skipped one carries `— reason: <reason>`. Steps and error render as for a failed scenario.
 
 ## Story coverage
 
@@ -100,7 +108,7 @@ No rule changes. `missing-phase` already considers only `passed` scenarios, and 
 ## Documentation
 
 - The navigating skill's `references/report-json.md` lists `xfailed` among the statuses and `xfail_reason` among the scenario fields, with a `jq` filter for it.
-- The docs site page that lists statuses gets the same. The authoring skill notes that `xfail` marks are fine on scenarios and on individual parametrize rows, and that a scenario written ahead of its implementation is the main use: an xfailed scenario is an executable statement of planned behavior. It recommends `strict=True` (or the `xfail_strict` ini), so a scenario that starts passing fails the run until its mark comes off. Otherwise the report keeps calling working behavior "expected to fail".
+- No docs site page lists the statuses today. `guide/scenarios.md` gains an "Expected failures" section — the status, its reason, and the planned-feature use with `strict=True` — and `guide/parametrized.md` notes that a group with an xfailed row reads `xfailed`. The authoring skill notes that `xfail` marks are fine on scenarios and on individual parametrize rows, and that a scenario written ahead of its implementation is the main use: an xfailed scenario is an executable statement of planned behavior. It recommends `strict=True` (or the `xfail_strict` ini), so a scenario that starts passing fails the run until its mark comes off. Otherwise the report keeps calling working behavior "expected to fail".
 - A self-report scenario demonstrates an expected failure.
 - The coffeeshop example gains two, so its report shows both shapes:
   - a planned-feature scenario — a loyalty card earning a free coffee — marked `xfail(strict=True, reason='not implemented yet')`, whose body runs into the missing feature. It shows the card, the steps up to the break, the error and the reason.
@@ -111,5 +119,5 @@ No rule changes. `missing-phase` already considers only `passed` scenarios, and 
 ## Testing
 
 - Unit: `_grouped_status` precedence; serde round-trip of `xfailed` and `xfail_reason`; `SentenceCoverage` counts.
-- Integration, through `pytester`: a marked failure, `pytest.xfail()` in the body and in a fixture, `run=False`, a non-strict xpass (stays `passed`), a strict xpass (`failed`), a `raises=` mismatch (`failed`), and a parametrized group with one xfailed row.
-- Frontend: Playwright, in both themes, on the regenerated coffeeshop report — the card, the filter pill and its `#status=` round-trip, the table row — and on the hotel-booking report for the Stories count.
+- Integration, through `pytester`: a marked failure, `pytest.xfail()` in the body and in a fixture, `run=False`, a non-strict xpass (stays `passed`), a strict xpass (`failed`), a `raises=` mismatch (`failed`), a teardown error under a mark (`xfailed`) and after an imperative `pytest.xfail()` (`failed`), and a parametrized group with one xfailed row.
+- Frontend: Playwright, in both themes, on the regenerated coffeeshop report — the card, the filter pill and its `#status=` round-trip, all four pills unclipped at the minimum, default and maximum sidebar widths, the table row — and on the hotel-booking report for the Stories count.
