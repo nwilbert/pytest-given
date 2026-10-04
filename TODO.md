@@ -15,6 +15,7 @@
 
 ## Later
 
+- [ ] migrate JS to TS and add unittests
 - [ ] continue work on the story-diagrams branch
 - [ ] define a UI component library?
 - [ ] `GLOSSARY.md` export from a code-defined glossary (reverse direction of `FileGlossary`), plus sectioned/heading-scoped glossaries — one table per section on input, grouped sections in the HTML Glossary view. Both features pair naturally and were deferred from the file-backed glossary spec (see `docs/specs/2026-06-18-file-backed-glossary-design.md` forward notes).
