@@ -50,6 +50,10 @@ Booking System). `test_cancel_booking` covers all three of its sentences.
 to the Deluxe Suite (sentence 8 of the first story), then cancels a later
 booking (the `'cancel'` sentence of the second), so the Stories tab lists it
 under each; the stay she has checked in to can no longer be cancelled.
+
+The two scenarios that end in a refusal carry an `error-handling` tag, and
+`test_payment_declined` a `ticket/HB-17` tag for the unwired gift card, so the
+Stories tab shows tagged scenarios too.
 """
 
 import pytest
@@ -229,7 +233,9 @@ SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
 
 
 @scenario(
-    'Payment is declined — the booking is not finalized', stories=book_a_group_trip
+    'Payment is declined — the booking is not finalized',
+    stories=book_a_group_trip,
+    tags=['error-handling', 'ticket/HB-17'],
 )
 @pytest.mark.parametrize(
     ('payment_method', 'decline_reason'),
@@ -312,6 +318,7 @@ def cancel_before_arrival(stay):
 @scenario(
     'Alice checks in, then cancels a later booking',
     stories=[cancel_a_booking, book_a_group_trip],
+    tags=['error-handling'],
 )
 def test_check_in_then_cancel(alice):
     with given(t'{guest("Alice")} has a confirmed {booking} now and one next month'):

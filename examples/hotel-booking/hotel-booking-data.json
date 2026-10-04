@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-09-27T09:29:10.818897+00:00",
-    "pytest_version": "9.0.3",
+    "timestamp": "2026-10-04T06:34:12.988818+00:00",
+    "pytest_version": "9.1.1",
     "plugin_version": "0.3.0",
-    "commit_sha": "d6914a0c4ff12be895adaebc20019248dcad889b",
+    "commit_sha": "93ffa8d2d8db6acad22ac8c1b6a6b37a3fefed3b",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -151,7 +151,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 167
+        "line": 171
       },
       "story_ids": [
         "book-a-group-trip"
@@ -463,7 +463,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 187
+        "line": 191
       },
       "story_ids": [
         "book-a-group-trip"
@@ -477,9 +477,12 @@
         "parts": []
       },
       "module": "test_hotel_booking",
-      "tags": [],
+      "tags": [
+        "error-handling",
+        "ticket/HB-17"
+      ],
       "status": "failed",
-      "duration_ms": 41,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -763,7 +766,7 @@
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 269,
+                  "lineno": 275,
                   "func": "test_payment_declined",
                   "code": "    assert processor_response == decline_reason",
                   "is_internal": false
@@ -778,7 +781,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 231
+        "line": 235
       },
       "story_ids": [
         "book-a-group-trip"
@@ -963,7 +966,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 278
+        "line": 284
       },
       "story_ids": [
         "cancel-a-booking"
@@ -977,7 +980,9 @@
         "parts": []
       },
       "module": "test_hotel_booking",
-      "tags": [],
+      "tags": [
+        "error-handling"
+      ],
       "status": "passed",
       "duration_ms": 0,
       "steps": [
@@ -1137,7 +1142,7 @@
       "skip_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 312
+        "line": 318
       },
       "story_ids": [
         "cancel-a-booking",
@@ -1155,7 +1160,7 @@
         "definition": "Person booking accommodation on behalf of a group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 72
+          "line": 76
         }
       },
       {
@@ -1165,7 +1170,7 @@
         "definition": "Individual traveler in the group.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 73
+          "line": 77
         }
       },
       {
@@ -1175,7 +1180,7 @@
         "definition": "Automated reservation back-end.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 74
+          "line": 78
         }
       },
       {
@@ -1185,7 +1190,7 @@
         "definition": "A bookable hotel room.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 76
+          "line": 80
         }
       },
       {
@@ -1195,7 +1200,7 @@
         "definition": "A reservation for one or more rooms.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 77
+          "line": 81
         }
       },
       {
@@ -1205,7 +1210,7 @@
         "definition": "Money transferred for a booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 78
+          "line": 82
         }
       },
       {
@@ -1215,7 +1220,7 @@
         "definition": "Notification of a successful booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 79
+          "line": 83
         }
       },
       {
@@ -1225,7 +1230,7 @@
         "definition": "Guarantee a paid booking so its rooms are held for arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 81
+          "line": 85
         }
       },
       {
@@ -1235,7 +1240,7 @@
         "definition": "Refuse a payment, leaving its booking pending.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 86
+          "line": 90
         }
       },
       {
@@ -1245,7 +1250,7 @@
         "definition": "Withdraw a booking before arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 88
+          "line": 92
         }
       },
       {
@@ -1255,7 +1260,7 @@
         "definition": "Return the payment for a cancelled booking.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 89
+          "line": 93
         }
       },
       {
@@ -1265,7 +1270,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 119
+          "line": 123
         }
       },
       {
@@ -1275,7 +1280,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 120
+          "line": 124
         }
       }
     ]
@@ -1538,7 +1543,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 92
+        "line": 96
       }
     },
     {
@@ -1627,7 +1632,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 135
+        "line": 139
       }
     }
   ],
