@@ -1000,6 +1000,7 @@
 <ul>
 <li>Python 3.15 is supported.</li>
 <li>Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.</li>
+<li>Scenarios that fail as expected (<code>xfail</code>) get their own <code>xfailed</code> status, with their reason, steps and error, in every report format.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1026,6 +1027,8 @@
 <li>The HTML report's links keep a tag filter whose tag contains a comma, by repeating the parameter per tag or term (<code>#tag=a&amp;tag=b</code>), and copying a link no longer replaces the current page's entry in the browser history.</li>
 <li>The HTML report no longer says "All Scenarios" when every status is filtered out, and the Glossary view says no terms match when every kind is unchecked.</li>
 <li>The HTML report's view tabs and search boxes show a visible keyboard focus ring, and a turned-off status filter keeps readable contrast.</li>
+<li>The HTML report's status filters wrap onto a second row instead of being cut off in a narrow sidebar.</li>
+<li>A parametrized scenario shows a skip reason only when every case was skipped, no longer its first case's reason beside cases that ran.</li>
 </ul>
 <h2 id="030-2026-09-27"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0">0.3.0</a> - 2026-09-27<a class="headerlink" href="#030-2026-09-27" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
