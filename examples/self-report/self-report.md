@@ -769,7 +769,7 @@
 
 - **given** a clean suite and a lint pass that raises
 - **when** the suite runs with an HTML sink
-- **then** the failure is summarized rather than raised as a traceback
+- **then** the failure is summarized as the lint's, rather than raised as a traceback or titled as a report that was not written
 - **then** the report that was already written is still there
 
 ## ✓ A «scenario» records under its «node ID»
@@ -1035,7 +1035,7 @@
 - **then** a PytestGivenError reports the file is not found
 
 ## ✓ A «term» cell with no alphanumeric characters is rejected
-`tests/unit/capture/test_file_glossary.py:227::test_empty_id_term_cell_raises` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:239::test_empty_id_term_cell_raises` · diagnostics, validation
 
 - **given** a row whose «term» cell has no id-able characters
   - 📎 Glossary file:
@@ -1048,7 +1048,7 @@
 - **then** a PytestGivenError is raised with file:line context
 
 ## ✓ A «file glossary» error about its tables names the file · 3 cases
-`tests/unit/capture/test_file_glossary.py:254::test_table_errors_name_the_file` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:266::test_table_errors_name_the_file` · diagnostics, validation
 
 - **given** a glossary file with {problem}
 - **given** that file on disk as bad.md
@@ -1082,7 +1082,7 @@
   ```
 
 ## ✓ Duplicate rows for one «term» collapse only when identical · 2 cases
-`tests/unit/capture/test_file_glossary.py:286::test_duplicate_rows_collapse_only_when_identical` · validation
+`tests/unit/capture/test_file_glossary.py:298::test_duplicate_rows_collapse_only_when_identical` · validation
 
 - **given** two rows for one «term», with identical definitions: {identical}
   - 📎 Glossary file — *see parameter table*
@@ -1112,7 +1112,7 @@
   ```
 
 ## ✓ A blank description normalizes to «undefined»
-`tests/unit/capture/test_file_glossary.py:321::test_blank_description_cell_normalizes_to_none`
+`tests/unit/capture/test_file_glossary.py:333::test_blank_description_cell_normalizes_to_none`
 
 - **given** a row whose description cell is blank
   - 📎 Glossary file:
@@ -1125,7 +1125,7 @@
 - **then** the «term» definition is None, i.e. «undefined»
 
 ## ✓ Calling «FileGlossary» looks up a known «term»
-`tests/unit/capture/test_file_glossary.py:339::test_file_glossary_call_known_name_returns_handle`
+`tests/unit/capture/test_file_glossary.py:351::test_file_glossary_call_known_name_returns_handle`
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -1142,7 +1142,7 @@
 - **then** a «deferred term» is returned
 
 ## ✓ «FileGlossary» is a closed vocabulary
-`tests/unit/capture/test_file_glossary.py:353::test_file_glossary_call_unknown_name_raises` · validation
+`tests/unit/capture/test_file_glossary.py:365::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -2058,7 +2058,7 @@
 - **then** a single warn «finding» names the «tag» and the «term» it shadows, counting the scenarios and naming one
 
 ## ✓ «Narration lint» flags a «term» referenced by no «scenario» name, «step» or «story»
-`tests/unit/lint/test_runtime_rules.py:225::test_dead_term_flags_unreferenced_term`
+`tests/unit/lint/test_runtime_rules.py:239::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
 - **when** the runtime «rules» run over no scenarios and no stories
@@ -2066,7 +2066,7 @@
 - **then** its «severity» is off — the rule is opt-in
 
 ## ✓ «Narration lint» counts a «term» named only in the second «clause» of a «sentence» as referenced
-`tests/unit/lint/test_runtime_rules.py:296::test_dead_term_passes_term_referenced_only_by_a_second_clause`
+`tests/unit/lint/test_runtime_rules.py:310::test_dead_term_passes_term_referenced_only_by_a_second_clause`
 
 - **given** a «story» whose one «sentence» names the «term» only in its second «clause»
 - **when** the runtime «rules» run over that story
@@ -2695,35 +2695,35 @@
 - **then** the label gives the number, then reads as prose under a story-scoped key, with the «clause» texts joined
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:117::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:118::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «case» records of one «parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:154::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:155::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ Same-named «parametrized scenarios» on different test functions stay apart
-`tests/unit/test_grouping.py:180::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
+`tests/unit/test_grouping.py:181::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
 
 - **given** two test functions whose «cases» share one name
 - **when** the «grouping» pass runs
 - **then** each function keeps its own «scenario» and «parameter table»
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:265::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:288::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:492::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:515::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -2732,7 +2732,7 @@
 - **then** it names the «case» whose values were baked in, and the per-case opt-out
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:615::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:638::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -2741,7 +2741,7 @@
 - **then** the placeholder keeps the format spec and conversion it narrated
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:728::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:751::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2749,14 +2749,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1094::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1117::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1109::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1132::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -2764,7 +2764,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1152::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1175::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -2772,7 +2772,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1234::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1257::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2780,7 +2780,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1585::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1608::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -2788,7 +2788,7 @@
 - **then** the error names the «term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1644::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1667::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -2796,7 +2796,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ A «parameter table» orders its columns the way the «narration» first shows them
-`tests/unit/test_grouping.py:1808::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
+`tests/unit/test_grouping.py:1831::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
 
 - **given** two «cases» whose given attaches a varying log and whose later step narrates the parameter
 - **when** «templatizing» walks the «cases»
@@ -2804,7 +2804,7 @@
 - **then** each «case» row follows the same order
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1840::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1863::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2812,7 +2812,7 @@
 - **then** the «step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:1896::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:1919::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «attachment» label only one «case» attaches
 - **when** the «cases» are «grouped»
@@ -2820,7 +2820,7 @@
 - **then** the error names the label, the case, and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2442::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2465::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2828,7 +2828,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2602::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2625::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2836,7 +2836,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2752::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2775::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»

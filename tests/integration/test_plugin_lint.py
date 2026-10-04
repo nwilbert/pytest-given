@@ -490,8 +490,13 @@ def test_a_lint_failure_is_reported_and_keeps_the_written_report(pytester):
         )
     with when('the suite runs with an HTML sink'):
         result = pytester.runpytest('--given-html=report.html', '--given-lint')
-    with then('the failure is summarized rather than raised as a traceback'):
+    with then(
+        "the failure is summarized as the lint's, rather than raised as a "
+        'traceback or titled as a report that was not written'
+    ):
+        result.stdout.fnmatch_lines(['*pytest-given: narration lint failed*'])
         assert 'lint exploded' in result.stdout.str()
+        assert 'report not written' not in result.stdout.str()
         assert result.ret == pytest.ExitCode.TESTS_FAILED
     with then('the report that was already written is still there'):
         assert (pytester.path / 'report.html').is_file()

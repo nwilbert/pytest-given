@@ -44,6 +44,7 @@ class SessionOutcome:
     """What session finish leaves for the terminal summary to print."""
 
     report_error: str | None = None
+    lint_error: str | None = None
     md_stdout: str | None = None
     findings: list[Finding] = field(default_factory=list)
 

@@ -133,7 +133,7 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     try:
         _run_lint(session, built)
     except (PytestGivenError, OSError) as error:
-        session_outcome(config).report_error = str(error)
+        session_outcome(config).lint_error = str(error)
         _fail_run(session)
 
 
@@ -261,32 +261,28 @@ def _run_lint(session: pytest.Session, built: _SessionReport) -> None:
 
 def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     outcome = session_outcome(terminalreporter.config)
-    _write_report_error(
-        terminalreporter,
-        outcome.report_error,
-        wrote_sinks=given_config(terminalreporter.config).sinks.writes_anything(),
+    # Grouping refuses on every run, sinks or not, so a run that was never
+    # going to write must not be told its report was skipped.
+    report_title = (
+        'pytest-given: report not written'
+        if given_config(terminalreporter.config).sinks.writes_anything()
+        else 'pytest-given: scenario refused'
+    )
+    _write_error(terminalreporter, report_title, outcome.report_error)
+    _write_error(
+        terminalreporter, 'pytest-given: narration lint failed', outcome.lint_error
     )
     _write_lint_findings(terminalreporter, outcome.findings)
     _write_md(terminalreporter, outcome.md_stdout)
 
 
-def _write_report_error(
-    terminalreporter: pytest.TerminalReporter,
-    report_error: str | None,
-    *,
-    wrote_sinks: bool,
+def _write_error(
+    terminalreporter: pytest.TerminalReporter, title: str, message: str | None
 ) -> None:
-    if report_error is None:
+    if message is None:
         return
-    # Grouping refuses on every run, sinks or not, so a run that was never
-    # going to write must not be told its report was skipped.
-    title = (
-        'pytest-given: report not written'
-        if wrote_sinks
-        else 'pytest-given: scenario refused'
-    )
     terminalreporter.write_sep('=', title, red=True)
-    terminalreporter.line(report_error)
+    terminalreporter.line(message)
     _count_as_error(terminalreporter, title)
 
 
