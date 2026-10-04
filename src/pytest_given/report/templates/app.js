@@ -855,11 +855,19 @@ function reportApp() {
     },
     // Phase hover, delegated the same way: a phase block in the narration and
     // the table columns it narrates carry one `data-block`, and pointing at
-    // either outlines both. The status column is a block of its own.
+    // either outlines both. The status column is a block of its own. The
+    // boxes are measured, so they are redrawn whenever the table resizes
+    // under a still pointer — a payload opened from its own badge, mid-hover.
     _initPhaseHover() {
       let hovered = null;
+      const redraw = new ResizeObserver(() => {
+        if (!hovered) return;
+        this._clearPhaseOutline(hovered.scope);
+        this._outlinePhase(hovered.scope, hovered.block);
+      });
       const leave = () => {
         if (!hovered) return;
+        redraw.disconnect();
         this._clearPhaseOutline(hovered.scope);
         hovered = null;
       };
@@ -871,6 +879,8 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
+        const table = scope.querySelector('.param-table');
+        if (table) redraw.observe(table);
       });
       document.addEventListener('pointerout', (event) => {
         if (!event.relatedTarget) leave();

@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Fixed
+
+- The HTML report's phase hover outline in a parameter table now follows an attachment payload opened or closed under the pointer.
+
 ## [0.4.0] - 2026-10-04
 
 ### Added
