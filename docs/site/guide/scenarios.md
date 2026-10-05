@@ -127,7 +127,7 @@ Nesting a different phase raises `PytestGivenError`, for example a `then` inside
 
 A scenario that fails as expected gets the status `xfailed`. That covers `@pytest.mark.xfail`, a `pytest.param(..., marks=pytest.mark.xfail)` row of a parametrized test, and `pytest.xfail()` in the body. The report keeps its steps up to where it broke, the error that broke it and the reason, and does not count it as failing.
 
-The main use is a scenario written ahead of its implementation: an executable statement of planned behavior.
+The main use is test-first development at the scenario level: a scenario written ahead of its implementation, as an executable statement of planned behavior. The report lists it under *Expected failure* with its reason, so planned behavior reads alongside working behavior until the implementation lands.
 
 ```python
 @scenario('Loyalty card earns a free coffee')
