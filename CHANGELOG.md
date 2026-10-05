@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Changed
+
+- The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.
+
 ## [0.4.1] - 2026-10-04
 
 ### Fixed

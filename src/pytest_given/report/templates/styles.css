@@ -497,9 +497,11 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .nav-status-icon { font-size: 0.625rem; }
 
 /* === Main === */
+/* A short top, so the topbar sits near the edge: the title's cap height lands
+   about as far below it as the content starts from the left. */
 .main {
   flex: 1;
-  padding: var(--space-xl);
+  padding: var(--space-sm) var(--space-xl) var(--space-xl);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1090,10 +1092,12 @@ span.param-highlight {
 
 /* === Topbar ===
    One row: title, the view tabs, the run meta. Its bottom border is the tab
-   rule, and the active tab's underline sits on it. */
+   rule, and the active tab's underline sits on it. The height is set here,
+   not by the title or the tabs, so a report without tabs gets the same bar. */
 .topbar {
   display: flex;
   align-items: center;
+  height: 48px;
   border-bottom: 1px solid var(--border);
 }
 .topbar-title {
@@ -1105,8 +1109,7 @@ span.param-highlight {
      out of the page. A longer title pushes the tabs right and is the first to
      give way, to an ellipsis (the full title is its tooltip). */
   min-width: min(calc(var(--sidebar-w, 260px) + 15px), 45%);
-  /* The block padding holds the row's height when there are no tabs. */
-  padding: var(--space-sm) var(--space-xl) var(--space-sm) 0;
+  padding-right: var(--space-xl);
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--text-primary);
@@ -1148,7 +1151,6 @@ span.param-highlight {
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  padding: 14px 0;
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   cursor: pointer;
