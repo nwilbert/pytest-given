@@ -179,9 +179,7 @@ def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
             summary=(
                 f'{counts[row.key]} {row.noun}'
                 if row.key == 'kindless'
-                # The heading is the noun's plural, which `+ 's'` gets wrong
-                # for "activity".
-                else plural(counts[row.key], row.noun, row.label.lower())
+                else plural(counts[row.key], row.noun)
             ),
         )
         for row in _KIND_GROUPS
@@ -205,7 +203,7 @@ def _term_entry(
             part
             for part in (
                 _some(len(aggregation.instances), 'instance') if show_instances else '',
-                _some(len(aggregation.stories), 'story', 'stories'),
+                _some(len(aggregation.stories), 'story'),
                 _some(len(scenario_ids), 'scenario'),
             )
             if part
@@ -213,10 +211,10 @@ def _term_entry(
     )
 
 
-def _some(n: int, singular: str, plural_form: str | None = None) -> str:
+def _some(n: int, singular: str) -> str:
     """`'3 scenarios'`, or empty for a count of zero — the summary lists only
     what a term actually has."""
-    return plural(n, singular, plural_form) if n else ''
+    return plural(n, singular) if n else ''
 
 
 @dataclass(frozen=True)
