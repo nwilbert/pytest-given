@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given.model import PytestGivenError, derived_id, id_derive, s_form
+from pytest_given.model import PytestGivenError, derived_id, id_derive, plural, s_form
 
 
 def test_derived_id_returns_none_where_id_derive_raises() -> None:
@@ -44,3 +44,11 @@ def test_s_form_follows_the_regular_english_spelling_rules(
     word: str, s_form_of_word: str
 ) -> None:
     assert s_form(word) == s_form_of_word
+
+
+def test_plural_agrees_the_noun_with_its_count() -> None:
+    assert [plural(count, 'story') for count in (0, 1, 2)] == [
+        '0 stories',
+        '1 story',
+        '2 stories',
+    ]

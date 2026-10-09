@@ -7,7 +7,7 @@ both must recognize exactly the same spans. Only the pattern is shared; what a
 match becomes differs by caller.
 
 `s_form` is shared so that what a handle's `.s` spells, the report recognizes
-as the same term.
+as the same term; `plural` so the lint summary and the report count alike.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
@@ -53,6 +53,13 @@ def id_derive(name: str) -> str:
             f'one ASCII alphanumeric character.'
         )
     return slug
+
+
+def plural(count: int, singular: str) -> str:
+    """`'1 scenario'` / `'3 stories'` — the noun agreeing with its count."""
+    if count == 1:
+        return f'{count} {singular}'
+    return f'{count} {s_form(singular)}'
 
 
 def s_form(text: str) -> str:

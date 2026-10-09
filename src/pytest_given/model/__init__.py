@@ -84,7 +84,7 @@ from .steps import (
     iter_steps,
     walk_steps,
 )
-from .text import EMPHASIS, derived_id, id_derive, s_form
+from .text import EMPHASIS, derived_id, id_derive, plural, s_form
 
 __all__ = [
     'CONTENT_TYPES',
@@ -153,6 +153,7 @@ __all__ = [
     'placeholder_mismatch',
     'placeholder_token',
     'placeholder_value',
+    'plural',
     'rebuilt',
     'render_interpolation',
     'report_from_dict',

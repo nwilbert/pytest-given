@@ -5,7 +5,7 @@ Not the order: `config.apply_config` sorts, because it is the only place that
 can (see its docstring). Everything here renders the sequence it is handed.
 """
 
-from ..model import location_suffix
+from ..model import location_suffix, plural
 from .base import Finding
 
 
@@ -18,7 +18,7 @@ def summary_title(findings: list[Finding]) -> str:
     errors = error_count(findings)
     return (
         f'pytest-given: narration lint '
-        f'({_count(len(findings), "finding")}, {_count(errors, "error")})'
+        f'({plural(len(findings), "finding")}, {plural(errors, "error")})'
     )
 
 
@@ -39,7 +39,3 @@ def summary_rows(findings: list[Finding]) -> list[str]:
         f'{location_suffix(finding.location)}'
         for finding in findings
     ]
-
-
-def _count(n: int, noun: str) -> str:
-    return f'{n} {noun}' if n == 1 else f'{n} {noun}s'

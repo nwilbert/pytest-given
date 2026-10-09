@@ -20,9 +20,9 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
+    plural,
     s_form,
 )
-from .text import plural
 
 
 @dataclass

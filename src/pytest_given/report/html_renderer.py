@@ -38,6 +38,7 @@ from ..model import (
     TermKind,
     iter_steps,
     placeholder_token,
+    plural,
 )
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
@@ -51,7 +52,7 @@ from .story_view import (
     build_story_rollups,
     sentence_key,
 )
-from .text import STATUS_GLYPH, STATUS_LABEL, plural
+from .text import STATUS_GLYPH, STATUS_LABEL
 from .theme import DEFAULT_THEME, Theme
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'

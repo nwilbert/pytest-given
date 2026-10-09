@@ -23,8 +23,9 @@ from ..model import (
     StepAttachment,
     node_base,
     placeholder_token,
+    plural,
 )
-from .text import STATUS_GLYPH, STATUS_LABEL, plural
+from .text import STATUS_GLYPH, STATUS_LABEL
 
 
 def render_md(report: ReportData) -> str:
