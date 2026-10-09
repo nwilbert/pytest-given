@@ -1018,8 +1018,15 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A handle's <code>.s</code> form reads the term's S-form, its regular plural or verb -s (<code>room.s</code> reads <em>Rooms</em>), and <code>.l</code> and <code>.s</code> chain and apply to a called form (<code>room.l.s</code> reads <em>rooms</em>).</li>
+</ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
+<li><strong>Breaking.</strong> A handle's <code>.low</code> form is now <code>.l</code>: replace <code>.low</code> with <code>.l</code>.</li>
+<li>A handle's <code>.l</code> form lowercases only capitalized words, so an acronym keeps its case (<code>LLM Call</code> reads <em>LLM call</em>).</li>
+<li>The Glossary view counts a term ref reading as the term's S-form as the term itself, so <code>room('rooms')</code> and <code>book('books')</code> no longer appear under Instances or "Also used as".</li>
 <li>The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.</li>
 </ul>
 <h2 id="041-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1">0.4.1</a> - 2026-10-04<a class="headerlink" href="#041-2026-10-04" title="Permanent link">&para;</a></h2>
@@ -1028,7 +1035,7 @@
 <li>The HTML report's phase hover outline in a parameter table now follows an attachment payload opened or closed under the pointer.</li>
 </ul>
 <h2 id="040-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.3.0...v0.4.0">0.4.0</a> - 2026-10-04<a class="headerlink" href="#040-2026-10-04" title="Permanent link">&para;</a></h2>
-<h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Python 3.15 is supported.</li>
 <li>Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.</li>
@@ -1063,7 +1070,7 @@
 <li>A parametrized scenario shows a skip reason only when every case was skipped, no longer its first case's reason beside cases that ran.</li>
 </ul>
 <h2 id="030-2026-09-27"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0">0.3.0</a> - 2026-09-27<a class="headerlink" href="#030-2026-09-27" title="Permanent link">&para;</a></h2>
-<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A documentation site at <a href="https://nwilbert.github.io/pytest-given/">https://nwilbert.github.io/pytest-given/</a> has a user guide, configuration and CLI reference, and the example reports. The bundled skills link to it, and the CLI help names the page on source-link templates.</li>
 <li>The HTML report has a dark theme, with a Light / Dark / System control in its header that each browser remembers.</li>
@@ -1107,7 +1114,7 @@
 <li>A pin on a <code>@given</code> fixture scoped wider than <code>function</code> now counts in every scenario the fixture reaches, even when a test without <code>@scenario</code> set it up first. The run used to fail with a bare <code>AssertionError</code>.</li>
 </ul>
 <h2 id="020-2026-09-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0">0.2.0</a> - 2026-09-04<a class="headerlink" href="#020-2026-09-04" title="Permanent link">&para;</a></h2>
-<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>pytest_given.PytestGivenWarning</code> is a top-level export, and a step or
   <code>attach()</code> recorded in a test without <code>@scenario</code> now warns with it instead of
@@ -1385,7 +1392,7 @@
 </ul>
 <h2 id="010-2026-08-08"><a href="https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0">0.1.0</a> - 2026-08-08<a class="headerlink" href="#010-2026-08-08" title="Permanent link">&para;</a></h2>
 <p>First public release.</p>
-<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>@scenario</code> decorator plus <code>given</code> / <code>when</code> / <code>then</code> step blocks, usable as
   both context managers and decorators, including on fixtures.</li>

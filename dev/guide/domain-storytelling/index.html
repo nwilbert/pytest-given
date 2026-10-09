@@ -1010,7 +1010,7 @@
 <h3 id="sentences">Sentences<a class="headerlink" href="#sentences" title="Permanent link">&para;</a></h3>
 <p>A sentence reads left to right: actor, activity, work object. Connecting words like <code>'to'</code> can go in between.</p>
 <p>Each part can be a glossary handle or a plain string. Use plain strings for generic verbs like <em>searches for</em>. Only words with a specific meaning in your domain need a glossary entry.</p>
-<p>Handles from a <a href="../glossary/#file-glossary">file glossary</a> work the same way: <code>sentence(g['Guest'], g['book']('books'), g['Room'])</code>.</p>
+<p>Handles from a <a href="../glossary/#file-glossary">file glossary</a> work the same way: <code>sentence(g['Guest'], g['book'].s, g['Room'])</code>.</p>
 <p>To be matched against your tests, a sentence needs at least two different glossary terms. The report marks a sentence with fewer as "not coverage-tracked". You can still cover it with a <a href="#pins">pin</a>.</p>
 <h3 id="clauses">Clauses<a class="headerlink" href="#clauses" title="Permanent link">&para;</a></h3>
 <p>Sometimes one sentence has more than one arrow: an actor hands a work object to two people, or two actors do something at the same time. Write one <code>clause(...)</code> per arrow chain:</p>
@@ -1040,7 +1040,7 @@
 <p>For several stories, pass a list: <code>stories=[book_a_group_trip, check_in]</code>, where <code>check_in</code> is another story. The scenario then appears under each of them.</p>
 <p>pytest-given works out which sentences of these stories the scenario covers. By default, it matches the text of the scenario's steps against the sentences. With pins, you state the covered sentences yourself.</p>
 <h3 id="narration-matching">Narration matching<a class="headerlink" href="#narration-matching" title="Permanent link">&para;</a></h3>
-<p>A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: <code>{room}</code>, <code>{room.low}</code> and <code>room('Deluxe Suite')</code> all count as the term <em>Room</em>.</p>
+<p>A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: <code>{room}</code>, <code>{room.l.s}</code> and <code>room('Deluxe Suite')</code> all count as the term <em>Room</em>.</p>
 <h3 id="coverage-in-the-report">Coverage in the report<a class="headerlink" href="#coverage-in-the-report" title="Permanent link">&para;</a></h3>
 <p>The Stories tab shows each story as a timeline of its sentences. Each sentence has a coverage chip and lists the scenarios that cover it. Select a sentence and choose <em>Open in Scenarios</em> to see only those scenarios. Below the timeline, the story's scenarios open in place to show their steps, and selecting sentences shows only the scenarios covering one of them. Every story you declare appears in the tab, even if no scenario covers it.</p>
 <p>The JSON report contains the same data under the top-level <code>coverage</code> key.</p>
