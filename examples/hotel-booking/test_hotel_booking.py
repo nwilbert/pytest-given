@@ -116,7 +116,7 @@ book_a_group_trip = story(
         # 4. Two work objects connected by a preposition.
         sentence(organizer('Carol'), 'submits', payment, 'for', booking),
         # 5. System confirms the booking.
-        sentence(booking_system, confirm('confirms'), booking),
+        sentence(booking_system, confirm.s, booking),
         # 6. Multi-clause send — one confirmation per guest, in parallel.
         sentence(
             clause(booking_system, 'sends', confirmation, 'to', guest('Alice')),
@@ -146,14 +146,15 @@ cancel_a_booking = story(
     'Cancel a Booking',
     [
         # Guest instance withdraws a booking made on their behalf.
-        sentence(guest('Alice'), cancel('cancels'), booking, name='cancel'),
+        sentence(guest('Alice'), cancel.s, booking, name='cancel'),
         # Two work objects joined by a preposition — the refund settles the
         # payment for that booking.
-        sentence(booking_system, refund('refunds'), payment, 'for', booking),
+        sentence(booking_system, refund.s, payment, 'for', booking),
         # Reuses the confirmation vocabulary from the first story.
         sentence(booking_system, 'sends', confirmation, 'to', guest('Alice')),
-        # Planned: no implementation yet, so its one scenario is an xfail.
-        sentence(guest('Alice'), rebook('rebooks'), booking, name='rebook'),
+        # The planned feature the xfail scenario demonstrates; "asks to rebook"
+        # shows a multi-word inflection under the activity's "Also used as".
+        sentence(guest('Alice'), rebook('asks to rebook'), booking, name='rebook'),
     ],
 )
 
@@ -216,7 +217,7 @@ def test_complete_booking(carol, alice, bob):
         booking_state['guests'] = [alice['name'], bob['name']]
     with when(t'{organizer("Carol")} submits the {payment} for the {booking}'):
         booking_state['paid'] = True
-    with then(t'the {booking_system} {confirm("confirms")} the {booking}'):
+    with then(t'the {booking_system} {confirm.s} the {booking}'):
         booking_state['confirmed'] = booking_state['paid']
         assert booking_state['confirmed']
     with then(
@@ -277,8 +278,7 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
         else:
             processor_response = 'unsupported payment method'
     with then(
-        t'the {booking_system} {decline("declines")} the {payment} '
-        t'because of {decline_reason}'
+        t'the {booking_system} {decline.s} the {payment} because of {decline_reason}'
     ):
         assert processor_response == decline_reason
         assert not booking_state['paid']
@@ -299,11 +299,9 @@ def test_cancel_booking(alice):
             'refunded': False,
             'notified': [],
         }
-    with when(t'{guest("Alice")} {cancel("cancels")} the {booking}'):
+    with when(t'{guest("Alice")} {cancel.s} the {booking}'):
         booking_state['cancelled'] = True
-    with then(
-        t'the {booking_system} {refund("refunds")} the {payment} for the {booking}'
-    ):
+    with then(t'the {booking_system} {refund.s} the {payment} for the {booking}'):
         booking_state['refunded'] = booking_state['cancelled'] and booking_state['paid']
         assert booking_state['refunded']
     with then(t'the {booking_system} sends a {confirmation} to {guest("Alice")}'):
@@ -323,7 +321,7 @@ def test_rebook_cancelled_booking(alice):
     with given(t'{guest("Alice")} has cancelled her stay'):
         stay = {'guest': alice['name'], 'status': 'cancelled'}
     with when(
-        t'{guest("Alice")} {rebook("rebooks")} the {booking}',
+        t'{guest("Alice")} {rebook.s} the {booking}',
         pins=cancel_a_booking['rebook'],
     ):
         rebook_cancelled_booking(stay)
@@ -364,7 +362,7 @@ def test_check_in_then_cancel(alice):
         check_in(current_stay)
     with then('her current stay is checked in'):
         assert current_stay['status'] == 'checked in'
-    with when(t'{guest("Alice")} {cancel("cancels")} her later {booking}'):
+    with when(t'{guest("Alice")} {cancel.s} her later {booking}'):
         cancel_before_arrival(later_stay)
     with then('the later booking is cancelled'):
         assert later_stay['status'] == 'cancelled'

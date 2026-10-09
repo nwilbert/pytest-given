@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given.model import PytestGivenError, derived_id, id_derive
+from pytest_given.model import PytestGivenError, derived_id, id_derive, s_form
 
 
 def test_derived_id_returns_none_where_id_derive_raises() -> None:
@@ -20,3 +20,27 @@ def test_a_character_that_lowercases_into_ascii_still_derives(name: str) -> None
     original characters for ASCII-ness would wrongly call these underivable."""
     assert derived_id(name) is not None
     assert derived_id(name) == id_derive(name)
+
+
+@pytest.mark.parametrize(
+    ('word', 's_form_of_word'),
+    [
+        ('room', 'rooms'),
+        ('book', 'books'),
+        ('bus', 'buses'),
+        ('box', 'boxes'),
+        ('watch', 'watches'),
+        ('wish', 'wishes'),
+        ('category', 'categories'),
+        ('key', 'keys'),
+        ('buy', 'buys'),
+        ('booking request', 'booking requests'),
+        ('API', 'APIs'),
+        ('SMS', 'SMSs'),
+        ('Y', 'Ys'),
+    ],
+)
+def test_s_form_follows_the_regular_english_spelling_rules(
+    word: str, s_form_of_word: str
+) -> None:
+    assert s_form(word) == s_form_of_word

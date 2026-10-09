@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-04T17:59:13.823708+00:00",
+    "timestamp": "2026-10-09T19:15:21.130848+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "fb34e08900eb507bf45c414b863f25e9d4785420",
+    "commit_sha": "0aa01004c7cbd01d13f0b18428c128f31f343c30",
     "title": "File Glossary Example"
   },
   "scenarios": [
@@ -58,7 +58,7 @@
               {
                 "term_id": "book",
                 "display": "books",
-                "expression": "g[\"book\"](\"books\")"
+                "expression": "g[\"book\"].s"
               },
               {
                 "value": " the "
@@ -195,7 +195,7 @@
               {
                 "term_id": "book",
                 "display": "books",
-                "expression": "g[\"book\"](\"books\")"
+                "expression": "g[\"book\"].s"
               },
               {
                 "value": " a "

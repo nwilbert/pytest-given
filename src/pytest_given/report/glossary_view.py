@@ -20,6 +20,7 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
+    s_form,
 )
 from .text import plural
 
@@ -38,8 +39,8 @@ class TermOccurrence:
 TermForm = NewType('TermForm', str)
 """One activity surface form collected from story clause parts.
 
-The inflection as story prose spells it (`books` for `book`), never the term's
-own canonical name — `record_form` drops that one. A distinct type, so it
+The inflection as story prose spells it (`searches for` for `search`), never
+a reading `_is_own_name` accepts — `record_form` drops those. A distinct type, so it
 cannot be confused with the canonical name or with a `TermId`.
 """
 
@@ -286,10 +287,14 @@ def _story_term_refs(story: Story) -> Iterator[ClauseTermRef]:
 
 
 def _is_own_name(display: str, term: GlossaryTerm) -> bool:
-    """Whether a reference reads as the term's canonical name in any case —
-    `guest.low` and `Guest` alike — and so names the concept itself rather
-    than an instance or an inflection of it."""
-    return display.lower() == term.canonical.lower()
+    """Whether a reference reads as the term's canonical name or its S-form, in
+    any case — `Guest`, `guest.l` and `guest.l.s` alike — and so names the
+    concept itself rather than an instance or an inflection of it."""
+    return display.lower() in (
+        term.canonical.lower(),
+        s_form(term.canonical).lower(),
+        s_form(term.canonical.lower()),
+    )
 
 
 class _GlossaryIndex:
@@ -316,10 +321,10 @@ class _GlossaryIndex:
     ) -> None:
         """Note one occurrence of an entity term reading as `display`.
 
-        A reference whose display is the term's canonical name — in any case,
-        so ``guest.low`` too — is the concept itself, not an instance; only
-        specific displays (``Alice`` for ``Guest``) reach the Instances list.
-        Activities and kindless terms have no instances and are ignored here.
+        A reading `_is_own_name` accepts is the concept itself, not an
+        instance; only specific displays (``Alice`` for ``Guest``) reach the
+        Instances list. Activities and kindless terms have no instances and are
+        ignored here.
         """
         term = self._glossary.get(term_id)
         if term is None or term.kind not in _INSTANCE_KINDS:
@@ -335,8 +340,8 @@ class _GlossaryIndex:
     def record_form(self, term_id: TermId, display: str) -> None:
         """Note one surface form of an activity term.
 
-        The canonical form is the term's own name — in any case — and is not a
-        *form* of it, so only inflections are listed. Non-activities are ignored.
+        A reading `_is_own_name` accepts is not a *form* of the term, so only
+        other inflections are listed. Non-activities are ignored.
         """
         term = self._glossary.get(term_id)
         if term is None or term.kind != 'activity':

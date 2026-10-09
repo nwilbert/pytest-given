@@ -10,13 +10,13 @@ from pytest_given import clause, sentence, story
 book_a_group_trip = story('Book a Group Trip', [
     sentence(organizer('Carol'), 'searches for', room),
     sentence(organizer('Carol'), 'submits', payment, 'for', booking),
-    sentence(booking_system, confirm('confirms'), booking, name='confirm'),
+    sentence(booking_system, confirm.s, booking, name='confirm'),
 ])
 ```
 
 - A sentence reads left-to-right: **actor → activity → work object**, with optional connective words (`'for'`, `'to'`) between parts. Structurally each clause is a strict node/edge alternation of odd length ≥ 3: even positions are entity nodes (position 0 is the acting actor), odd positions are edges (an activity or a connective) — the verb slots.
 - **A bare word consumes a position.** Write a connective as one string in an edge slot (`'to the'`, `'with a'`); never insert a standalone article before a noun — it shifts the noun into a verb slot.
-- Handles come from the glossary; calling one supplies an instance or inflection — `organizer('Carol')`, `confirm('confirms')`.
+- Handles come from the glossary; calling one supplies an instance or inflection — `organizer('Carol')`; `confirm.s` reads *confirms*.
 - Any part may be a **bare string** instead of a glossary handle — the right place for a verb that is just sentence prose (*searches for*, *submits*; see [Authoring workflow](#authoring-workflow)). But a sentence needs at least two distinct glossary terms to be matched by narration; under-anchored sentences render as "not coverage-tracked" unless a step pins them (below).
 - A sentence with several arrow chains under one number — an actor handing a work object to two recipients, two actors working side by side — takes one `clause(...)` per chain:
 
@@ -45,7 +45,7 @@ Name a story in `stories=` only when a step can match or pin one of its sentence
 What the rule means when you write:
 
 - **Only step narration counts.** Term refs in the `@scenario` name never contribute. A scenario titled with both actors stays uncovered until those refs also appear in a `given`/`when`/`then`.
-- **Only the term counts, not its surface form.** `room`, `room.low` and `room('Deluxe Suite')` are one ref, as are `select` and `select('selects')` — the instance in the step above is narration, not a constraint. Two sentences differing only by instance are one to matching: give them a distinguishing term, or pin (below).
+- **Only the term counts, not its surface form.** `room`, `room.l.s` and `room('Deluxe Suite')` are one ref, as are `select` and `select.s` — the instance in the step above is narration, not a constraint. Two sentences differing only by instance are one to matching: give them a distinguishing term, or pin (below).
 - **Two sentences cover together when one's terms are a subset of the other's.** The test is `sentence terms ⊆ step terms`, so a step covering `organizer · adds · guest · booking` also covers an `organizer · adds · guest` sentence, whatever that row meant — the two are never distinguishable by narration. When two rows come out nested, give the narrower one a term the wider lacks (a distinct activity usually does it), merge them, or accept the shared chip; a pin on the covering step reaches only the sentences it names, so it separates them too.
 - **Growing a sentence's terms raises its coverage bar.** Adding a term makes every covering step carry it too, so editing a story can silently uncover a scenario that used to cover it (a pinned step is immune).
 

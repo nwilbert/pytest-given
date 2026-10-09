@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-04T17:59:13.239871+00:00",
+    "timestamp": "2026-10-09T20:30:18.782212+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "fb34e08900eb507bf45c414b863f25e9d4785420",
+    "commit_sha": "a500df92752af9a4ffb562738aa2ba7e5897c3ee",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
@@ -152,7 +152,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 179
+        "line": 180
       },
       "story_ids": [
         "book-a-group-trip"
@@ -353,7 +353,7 @@
               {
                 "term_id": "confirm",
                 "display": "confirms",
-                "expression": "confirm(\"confirms\")"
+                "expression": "confirm.s"
               },
               {
                 "value": " the "
@@ -465,7 +465,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 199
+        "line": 200
       },
       "story_ids": [
         "book-a-group-trip"
@@ -484,7 +484,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 39,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -648,7 +648,7 @@
               {
                 "term_id": "decline",
                 "display": "declines",
-                "expression": "decline(\"declines\")"
+                "expression": "decline.s"
               },
               {
                 "value": " the "
@@ -784,7 +784,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 243
+        "line": 244
       },
       "story_ids": [
         "book-a-group-trip"
@@ -866,7 +866,7 @@
               {
                 "term_id": "cancel",
                 "display": "cancels",
-                "expression": "cancel(\"cancels\")"
+                "expression": "cancel.s"
               },
               {
                 "value": " the "
@@ -902,7 +902,7 @@
               {
                 "term_id": "refund",
                 "display": "refunds",
-                "expression": "refund(\"refunds\")"
+                "expression": "refund.s"
               },
               {
                 "value": " the "
@@ -986,7 +986,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "xfailed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -1044,7 +1044,7 @@
               {
                 "term_id": "rebook",
                 "display": "rebooks",
-                "expression": "rebook(\"rebooks\")"
+                "expression": "rebook.s"
               },
               {
                 "value": " the "
@@ -1073,14 +1073,14 @@
         "frames": [
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 329,
+            "lineno": 327,
             "func": "test_rebook_cancelled_booking",
             "code": "    rebook_cancelled_booking(stay)",
             "is_internal": false
           },
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 315,
+            "lineno": 313,
             "func": "rebook_cancelled_booking",
             "code": "    raise NotImplementedError('rebooking a cancelled booking is not supported yet')",
             "is_internal": false
@@ -1092,7 +1092,7 @@
       "xfail_reason": "rebooking is not implemented yet",
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 318
+        "line": 316
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1212,7 +1212,7 @@
               {
                 "term_id": "cancel",
                 "display": "cancels",
-                "expression": "cancel(\"cancels\")"
+                "expression": "cancel.s"
               },
               {
                 "value": " her later "
@@ -1269,7 +1269,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 346
+        "line": 344
       },
       "story_ids": [
         "cancel-a-booking",
@@ -1777,7 +1777,7 @@
                 },
                 {
                   "term_id": "rebook",
-                  "display": "rebooks"
+                  "display": "asks to rebook"
                 },
                 {
                   "term_id": "booking",

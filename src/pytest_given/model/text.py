@@ -6,6 +6,9 @@ markup, and by `report/inline_markdown.py`, which *renders* it — a term writte
 both must recognize exactly the same spans. Only the pattern is shared; what a
 match becomes differs by caller.
 
+`s_form` is shared so that what a handle's `.s` spells, the report recognizes
+as the same term.
+
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
 """
@@ -25,6 +28,8 @@ from .errors import PytestGivenError
 EMPHASIS = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
 
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
+_SIBILANT_ENDINGS = ('s', 'x', 'z', 'ch', 'sh')
+_CONSONANT_Y = re.compile(r'[b-df-hj-np-tv-z]y$')
 
 
 def derived_id(name: str) -> str | None:
@@ -48,3 +53,14 @@ def id_derive(name: str) -> str:
             f'one ASCII alphanumeric character.'
         )
     return slug
+
+
+def s_form(text: str) -> str:
+    """`text` with the regular English -s ending: a plural noun, or a verb's
+    third person singular. Only a lowercase ending takes -es or -ies, so an
+    acronym takes a plain -s (``APIs``); irregular words are the caller's."""
+    if text.endswith(_SIBILANT_ENDINGS):
+        return f'{text}es'
+    if _CONSONANT_Y.search(text):
+        return f'{text[:-1]}ies'
+    return f'{text}s'

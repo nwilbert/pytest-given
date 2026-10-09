@@ -155,7 +155,7 @@ _AUTHORING_MISTAKES = """
 
 
 @scenario(
-    t'A {pg["Scenario"].low} failing on a pytest-given refusal points at the '
+    t'A {pg["Scenario"].l} failing on a pytest-given refusal points at the '
     t'test, not at pytest-given'
 )
 def test_refusal_frame_points_at_the_test(
@@ -175,7 +175,7 @@ def test_refusal_frame_points_at_the_test(
         assert [frame['func'] for frame in innermost] == ['test_nest', 'test_lookup']
 
 
-@scenario(t'A test without `@scenario` stays out of the {pg["Report"].low}')
+@scenario(t'A test without `@scenario` stays out of the {pg["Report"].l}')
 def test_unannotated_test_not_in_report(pytester, tmp_path):
     with given('a suite whose only test is undecorated'):
         pytester.makepyfile(
@@ -189,7 +189,7 @@ def test_unannotated_test_not_in_report(pytester, tmp_path):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then('the test itself passes'):
         result.assert_outcomes(passed=1)
-    with then(t'the {pg["Report"].low} holds no {pg["Scenario"].low}'):
+    with then(t'the {pg["Report"].l} holds no {pg["Scenario"].l}'):
         data = json.loads(json_path.read_text())
         assert len(data['scenarios']) == 0
 
@@ -245,12 +245,12 @@ def test_attach_outside_a_step_fails_the_test(pytester, tmp_path):
 
 
 @scenario(
-    t'A {pg["Step fixture"].low} is {pg["Graft"]("grafted")} in as a given '
-    t'{pg["Step"].low}',
+    t'A {pg["Step fixture"].l} is {pg["Graft"]("grafted")} in as a given '
+    t'{pg["Step"].l}',
     stories=adopt_pytest_given,
 )
 def test_step_fixture_appears_as_given_step(pytester, tmp_path):
-    with given(t'a {pg["Scenario"].low} consuming a {pg["Step fixture"].low}'):
+    with given(t'a {pg["Scenario"].l} consuming a {pg["Step fixture"].l}'):
         suite = """
             import pytest
             from pytest_given import scenario, given, then
@@ -272,7 +272,7 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then('the test passes'):
         result.assert_outcomes(passed=1)
-    with then(t'the {pg["Step"].low} from the fixture leads the recorded steps'):
+    with then(t'the {pg["Step"].l} from the fixture leads the recorded steps'):
         data = json.loads(json_path.read_text())
         steps = data['scenarios'][0]['steps']
         assert steps[0]['phase'] == 'given'
@@ -283,13 +283,13 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
 
 
 @scenario(
-    t'The {pg["Case"]("cases")} of a {pg["Parametrized scenario"].low} become one '
-    t'{pg["Scenario"].low} with a {pg["Parameter table"].low}',
+    t'The {pg["Case"].l.s} of a {pg["Parametrized scenario"].l} become one '
+    t'{pg["Scenario"].l} with a {pg["Parameter table"].l}',
     tags=['parametrization'],
     stories=adopt_pytest_given,
 )
 def test_parametrized_test_as_table(pytester, tmp_path):
-    with given(t'a {pg["Parametrized scenario"].low} over two {pg["Case"]("cases")}'):
+    with given(t'a {pg["Parametrized scenario"].l} over two {pg["Case"].l.s}'):
         suite = """
             import pytest
             from pytest_given import scenario, given, when, then
@@ -309,18 +309,18 @@ def test_parametrized_test_as_table(pytester, tmp_path):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then('both cases pass'):
         result.assert_outcomes(passed=2)
-    with then(t'the two runs collapse into one {pg["Scenario"].low}'):
+    with then(t'the two runs collapse into one {pg["Scenario"].l}'):
         data = json.loads(json_path.read_text())
         assert len(data['scenarios']) == 1
         s = data['scenarios'][0]
         assert s['narration']['text'] == 'Param test'
-    with then(t'the {pg["Parameter table"].low} holds a param column per argument'):
+    with then(t'the {pg["Parameter table"].l} holds a param column per argument'):
         assert s['parameters'] is not None
         columns = s['parameters']['columns']
         assert [c['name'] for c in columns] == ['a', 'b', 'expected']
         assert all(c['kind'] == 'param' for c in columns)
         assert all(c['id'] == c['name'] for c in columns)
-    with then(t"it holds one row per {pg['Case'].low}, with that row's values"):
+    with then(t"it holds one row per {pg['Case'].l}, with that row's values"):
         assert len(s['parameters']['cases']) == 2
         assert s['parameters']['cases'][0]['values'] == [1, 2, 3]
         assert s['parameters']['cases'][0]['status'] == 'passed'
@@ -422,7 +422,7 @@ def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tm
 
 
 @scenario(
-    t'A refusal on a run with no sink does not claim a {pg["Report"].low} was skipped',
+    t'A refusal on a run with no sink does not claim a {pg["Report"].l} was skipped',
     tags=['validation'],
 )
 def test_a_grouping_error_without_sinks_does_not_say_report_not_written(pytester):
@@ -450,7 +450,7 @@ def test_a_grouping_error_without_sinks_does_not_say_report_not_written(pytester
 
 
 @scenario(
-    t"A refused run discards the previous run's {pg['Report'].low}",
+    t"A refused run discards the previous run's {pg['Report'].l}",
     tags=['validation'],
 )
 def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
@@ -471,7 +471,7 @@ def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
             """
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
-    with given(t'a {pg["Report"].low} on disk from a previous run'):
+    with given(t'a {pg["Report"].l} on disk from a previous run'):
         json_path = tmp_path / 'report.json'
         html_path = tmp_path / 'report.html'
         json_path.write_text('{"stale": true}')
@@ -518,7 +518,7 @@ def test_two_test_files_sharing_a_basename_render_fine(pytester, tmp_path):
 
 
 @scenario(
-    t'An unknown {pg["Source link"].low} preset stops the run before it collects',
+    t'An unknown {pg["Source link"].l} preset stops the run before it collects',
     tags=['validation'],
 )
 def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
@@ -538,7 +538,7 @@ def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
             """
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
-    with when(t'the suite runs with a misspelled {pg["Source link"].low} preset'):
+    with when(t'the suite runs with a misspelled {pg["Source link"].l} preset'):
         result = pytester.runpytest(
             '--given-html=report.html', '--given-source-link=bogus'
         )
@@ -550,7 +550,7 @@ def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
 
 
 @scenario(
-    t'An unknown {pg["Source link"].low} preset in an ini reports the ini name',
+    t'An unknown {pg["Source link"].l} preset in an ini reports the ini name',
     tags=['validation'],
 )
 def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
@@ -576,7 +576,7 @@ def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
 
 
 @scenario(
-    t'A {pg["Report"].low} that fails to render discards the previous one too',
+    t'A {pg["Report"].l} that fails to render discards the previous one too',
     tags=['validation'],
 )
 def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
@@ -585,7 +585,7 @@ def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
     Otherwise the JSON lands, the HTML render raises, and the pair on disk
     describes two different runs with nothing saying so.
     """
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         pytester.makepyfile(
             """
             from pytest_given import scenario, then
@@ -596,12 +596,12 @@ def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
                     assert True
             """
         )
-    with given(t'a {pg["Report"].low} pair on disk from a previous run'):
+    with given(t'a {pg["Report"].l} pair on disk from a previous run'):
         json_path = tmp_path / 'report.json'
         html_path = tmp_path / 'report.html'
         json_path.write_text('{"stale": true}')
         html_path.write_text('<html>stale</html>')
-    with when(t'the run trips a {pg["Renderer"].low} failure'):
+    with when(t'the run trips a {pg["Renderer"].l} failure'):
         # A raw template passes preset resolution at configure time and fails
         # when the renderer compiles it — the last point a sink can still raise.
         result = pytester.runpytest(
@@ -794,7 +794,7 @@ def test_fixture_setup_failure_appears_in_report(pytester, tmp_path):
     assert 'fixture boom' in s['error']['message']
 
 
-@scenario(t'A fixture failing in teardown fails its finished {pg["Scenario"].low}')
+@scenario(t'A fixture failing in teardown fails its finished {pg["Scenario"].l}')
 def test_fixture_teardown_failure_fails_the_scenario(pytester, tmp_path):
     """A scenario whose fixture errors *after* its yield must not stay green.
 
@@ -802,7 +802,7 @@ def test_fixture_teardown_failure_fails_the_scenario(pytester, tmp_path):
     active scenario, so without an explicit teardown path the error is dropped
     and the report shows `passed` for a run pytest counted as an error.
     """
-    with given(t'a {pg["Scenario"].low} whose fixture raises after its yield'):
+    with given(t'a {pg["Scenario"].l} whose fixture raises after its yield'):
         suite = """
             import pytest
             from pytest_given import scenario, given, then
@@ -827,7 +827,7 @@ def test_fixture_teardown_failure_fails_the_scenario(pytester, tmp_path):
     with then('pytest counts the test passed and its teardown an error'):
         result.assert_outcomes(passed=1, errors=1)
     with then(
-        t'the {pg["Report"].low} marks the {pg["Scenario"].low} failed with the '
+        t'the {pg["Report"].l} marks the {pg["Scenario"].l} failed with the '
         t'teardown error'
     ):
         data = json.loads(json_path.read_text())
@@ -932,13 +932,13 @@ _LATE_TEARDOWN_CALLS = {
 
 
 @scenario(
-    t'A {pg["Step fixture"].low} refuses {pg["Step"]("steps")} and '
-    t'{pg["Attachment"]("attachments")} in its teardown',
+    t'A {pg["Step fixture"].l} refuses {pg["Step"].l.s} and '
+    t'{pg["Attachment"].l.s} in its teardown',
     tags=['validation'],
 )
 @pytest.mark.parametrize('late', list(_LATE_TEARDOWN_CALLS))
 def test_step_fixture_teardown_refuses_steps_and_attachments(pytester, late):
-    with given(t'a {pg["Step fixture"].low} that adds a {late} after its yield'):
+    with given(t'a {pg["Step fixture"].l} that adds a {late} after its yield'):
         suite = f"""
             import pytest
             from pytest_given import scenario, given, then, attach
@@ -1511,11 +1511,11 @@ def test_parametrized_all_cases_skipped_groups_as_skipped(pytester, tmp_path):
 
 
 @scenario(
-    t'A {pg["Scenario"].low} that fails as expected keeps its steps, error '
+    t'A {pg["Scenario"].l} that fails as expected keeps its steps, error '
     t'and reason under its own status',
 )
 def test_marked_expected_failure_is_xfailed(pytester, tmp_path):
-    with given(t'a {pg["Scenario"].low} marked xfail whose body fails'):
+    with given(t'a {pg["Scenario"].l} marked xfail whose body fails'):
         suite = """
             import pytest
             from pytest_given import scenario, given, then
@@ -1536,7 +1536,7 @@ def test_marked_expected_failure_is_xfailed(pytester, tmp_path):
     with then('pytest counts the test xfailed'):
         result.assert_outcomes(xfailed=1)
     with then(
-        t'the {pg["Report"].low} marks the {pg["Scenario"].low} xfailed with '
+        t'the {pg["Report"].l} marks the {pg["Scenario"].l} xfailed with '
         t'its reason, its steps and the error that broke it'
     ):
         s = json.loads(json_path.read_text())['scenarios'][0]
@@ -2122,7 +2122,7 @@ def test_given_source_link_cli_flag_emits_anchor(pytester, tmp_path):
 
 
 @scenario(
-    t'An editor {pg["Source link"].low} opens the file under the rootdir, '
+    t'An editor {pg["Source link"].l} opens the file under the rootdir, '
     t'wherever pytest runs from'
 )
 def test_editor_source_link_resolves_against_the_rootdir(
@@ -2290,13 +2290,13 @@ def test_scenario_story_ids_and_pins_appear_in_report(pytester):
 
 
 @scenario(
-    t'A {pg["Scenario"].low} is matched against each of its {pg["Story"]("stories")}',
+    t'A {pg["Scenario"].l} is matched against each of its {pg["Story"].l.s}',
     stories=adopt_pytest_given,
 )
 def test_scenario_matched_against_two_stories(pytester, tmp_path):
     with given(
-        t'a {pg["Scenario"].low} binding two {pg["Story"]("stories")} whose '
-        t'{pg["Sentence"].low} its {pg["Narration"].low} fits'
+        t'a {pg["Scenario"].l} binding two {pg["Story"].l.s} whose '
+        t'{pg["Sentence"].l} its {pg["Narration"].l} fits'
     ):
         suite = """
             from pytest_given import Glossary, scenario, sentence, story, when
@@ -2321,8 +2321,8 @@ def test_scenario_matched_against_two_stories(pytester, tmp_path):
     with then('the test passes'):
         result.assert_outcomes(passed=1)
     with then(
-        t'the {pg["Scenario"].low} {pg["Scenario↔sentence binding"]("binds")} both '
-        t'{pg["Story"]("stories")} and covers the {pg["Sentence"].low} of each'
+        t'the {pg["Scenario"].l} {pg["Scenario↔sentence binding"]("binds")} both '
+        t'{pg["Story"].l.s} and covers the {pg["Sentence"].l} of each'
     ):
         data = json.loads(json_path.read_text())
         scenario_id = data['scenarios'][0]['id']
@@ -2362,14 +2362,13 @@ def test_scenario_pin_missing_from_its_story_raises_at_import(pytester):
 
 
 @scenario(
-    t'A declared {pg["Story"].low} no {pg["Scenario"].low} covers appears in the '
-    t'report',
+    t'A declared {pg["Story"].l} no {pg["Scenario"].l} covers appears in the report',
     stories=adopt_pytest_given,
 )
 def test_a_declared_story_no_scenario_covers_appears(pytester, tmp_path):
     with given(
-        t'a suite declaring a {pg["Story"].low} that no {pg["Scenario"].low} '
-        t'names or {pg["Pin"]("pins")}'
+        t'a suite declaring a {pg["Story"].l} that no {pg["Scenario"].l} '
+        t'names or {pg["Pin"].l.s}'
     ):
         suite = """
             from pytest_given import Glossary, given, scenario, sentence, story
@@ -2391,7 +2390,7 @@ def test_a_declared_story_no_scenario_covers_appears(pytester, tmp_path):
     with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
         pytester.runpytest(f'--given-json={json_path}')
     with then(
-        t'the report lists the {pg["Story"].low}, its {pg["Sentence"].low} covered '
+        t'the report lists the {pg["Story"].l}, its {pg["Sentence"].l} covered '
         t'by nothing'
     ):
         data = json.loads(json_path.read_text())
@@ -2400,14 +2399,13 @@ def test_a_declared_story_no_scenario_covers_appears(pytester, tmp_path):
 
 
 @scenario(
-    t'A pinned {pg["Scenario"].low} still counts its {pg["Step"].low} '
-    t'{pg["Pin"]("pins")}',
+    t'A pinned {pg["Scenario"].l} still counts its {pg["Step"].l} {pg["Pin"].l.s}',
     stories=adopt_pytest_given,
 )
 def test_a_pinned_scenario_still_counts_its_step_pins(pytester, tmp_path):
     with given(
-        t'a {pg["Scenario"].low} pinning one {pg["Sentence"].low}, whose '
-        t'{pg["Step"]("steps")} pin a second and narrate a third'
+        t'a {pg["Scenario"].l} pinning one {pg["Sentence"].l}, whose '
+        t'{pg["Step"].l.s} pin a second and narrate a third'
     ):
         suite = """
             from pytest_given import Glossary, given, scenario, sentence, story
@@ -2434,7 +2432,7 @@ def test_a_pinned_scenario_still_counts_its_step_pins(pytester, tmp_path):
     with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
         pytester.runpytest(f'--given-json={json_path}')
     with then(
-        t'the {pg["Scenario"].low} covers both pinned {pg["Sentence"]("sentences")} '
+        t'the {pg["Scenario"].l} covers both pinned {pg["Sentence"].l.s} '
         t'and not the one its narration would match'
     ):
         data = json.loads(json_path.read_text())
@@ -2447,13 +2445,12 @@ def test_a_pinned_scenario_still_counts_its_step_pins(pytester, tmp_path):
 
 
 @scenario(
-    t'A {pg["Step"].low} {pg["Pin"].low} into a {pg["Story"].low} outside '
-    t'stories= covers it',
+    t'A {pg["Step"].l} {pg["Pin"].l} into a {pg["Story"].l} outside stories= covers it',
     stories=adopt_pytest_given,
 )
 def test_a_step_pin_into_a_story_outside_stories_covers_it(pytester, tmp_path):
     with given(
-        t'a {pg["Step"].low} pinning a {pg["Story"].low} its {pg["Scenario"].low} '
+        t'a {pg["Step"].l} pinning a {pg["Story"].l} its {pg["Scenario"].l} '
         t'does not name'
     ):
         suite = """
@@ -2477,8 +2474,8 @@ def test_a_step_pin_into_a_story_outside_stories_covers_it(pytester, tmp_path):
     with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then(
-        t'the {pg["Scenario"].low} passes and covers the pinned '
-        t'{pg["Sentence"].low}, in the {pg["Story"].low} it did not name'
+        t'the {pg["Scenario"].l} passes and covers the pinned '
+        t'{pg["Sentence"].l}, in the {pg["Story"].l} it did not name'
     ):
         result.assert_outcomes(passed=1)
         data = json.loads(json_path.read_text())
@@ -2489,13 +2486,13 @@ def test_a_step_pin_into_a_story_outside_stories_covers_it(pytester, tmp_path):
 
 
 @scenario(
-    t'A wide {pg["Fixture recording"].low} keeps its {pg["Pin"]("pins")} in every '
-    t'{pg["Scenario"].low} it is grafted into',
+    t'A wide {pg["Fixture recording"].l} keeps its {pg["Pin"].l.s} in every '
+    t'{pg["Scenario"].l} it is grafted into',
     stories=adopt_pytest_given,
 )
 def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_path):
     with given(
-        t'a module-scoped {pg["Step fixture"].low} pinning a {pg["Sentence"].low}, '
+        t'a module-scoped {pg["Step fixture"].l} pinning a {pg["Sentence"].l}, '
         t'set up first by an unannotated test'
     ):
         suite = """
@@ -2533,8 +2530,8 @@ def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_pa
     with when('the suite runs with --given-json', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then(
-        t'every test passes, and both {pg["Scenario"]("scenarios")} cover the pinned '
-        t'{pg["Sentence"].low}, whichever {pg["Story"].low} they name'
+        t'every test passes, and both {pg["Scenario"].l.s} cover the pinned '
+        t'{pg["Sentence"].l}, whichever {pg["Story"].l} they name'
     ):
         result.assert_outcomes(passed=3)
         data = json.loads(json_path.read_text())
@@ -2551,13 +2548,13 @@ def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_pa
 
 
 @scenario(
-    t'An Annotated label carrying a {pg["Pin"].low} pins its {pg["Step"].low}',
+    t'An Annotated label carrying a {pg["Pin"].l} pins its {pg["Step"].l}',
     stories=adopt_pytest_given,
 )
 def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
     with given(
-        t'a {pg["Scenario"].low} whose Annotated given(...) label on a '
-        t'{pg["Plain fixture"].low} carries a {pg["Pin"].low}'
+        t'a {pg["Scenario"].l} whose Annotated given(...) label on a '
+        t'{pg["Plain fixture"].l} carries a {pg["Pin"].l}'
     ):
         suite = """
             from typing import Annotated
@@ -2582,7 +2579,7 @@ def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs', pins=adopt_pytest_given['record']):
         result = pytester.runpytest('--given-json=report.json')
-    with then(t"the label's {pg['Step'].low} carries the {pg['Pin'].low}"):
+    with then(t"the label's {pg['Step'].l} carries the {pg['Pin'].l}"):
         result.assert_outcomes(passed=1)
         data = json.loads(pytester.path.joinpath('report.json').read_text())
         assert data['scenarios'][0]['steps'][0]['pins'] == [
@@ -2591,8 +2588,7 @@ def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
 
 
 @scenario(
-    t'An Annotated label retells the {pg["Pin"]("pins")} of the fixture label it '
-    t'replaces',
+    t'An Annotated label retells the {pg["Pin"].l.s} of the fixture label it replaces',
     stories=adopt_pytest_given,
 )
 @pytest.mark.parametrize(
@@ -2637,9 +2633,7 @@ def test_annotated_label_pins_retell_the_fixture_root(
     """)
     with when('the suite runs', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest('--given-json=report.json')
-    with then(
-        t'the grafted root {pg["Pin"]("pins")} the sentences {root_sentences} of a'
-    ):
+    with then(t'the grafted root {pg["Pin"].l.s} the sentences {root_sentences} of a'):
         result.assert_outcomes(passed=1)
         data = json.loads(pytester.path.joinpath('report.json').read_text())
         root = data['scenarios'][0]['steps'][0]
@@ -2648,7 +2642,7 @@ def test_annotated_label_pins_retell_the_fixture_root(
             {'story_id': 'book', 'sentence_id': sentence_id}
             for sentence_id in root_sentences
         ]
-    with then(t'the inner {pg["Step"].low} keeps its own {pg["Pin"].low}, a[3]'):
+    with then(t'the inner {pg["Step"].l} keeps its own {pg["Pin"].l}, a[3]'):
         assert root['children'][0]['pins'] == [{'story_id': 'book', 'sentence_id': 3}]
 
 
@@ -3080,8 +3074,8 @@ _TEMPLATE_LABEL_WITHOUT_PARAMETRIZE = """
 
 
 @scenario(
-    t'An Annotated Template label on an unparametrized {pg["Scenario"].low} '
-    t'fails that {pg["Scenario"].low}'
+    t'An Annotated Template label on an unparametrized {pg["Scenario"].l} '
+    t'fails that {pg["Scenario"].l}'
 )
 def test_annotated_template_label_without_parametrize_fails_scenario(
     pytester: pytest.Pytester,
@@ -3089,14 +3083,14 @@ def test_annotated_template_label_without_parametrize_fails_scenario(
     with given('a Template label on a plain fixture parameter'):
         pytester.makepyfile(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE)
         attach('suite', textwrap.dedent(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE).strip())
-    with when(t'the suite runs with an HTML {pg["Report"].low}'):
+    with when(t'the suite runs with an HTML {pg["Report"].l}'):
         result = pytester.runpytest('--given-html=report.html')
     with then('the scenario errors, naming the parameter and the fix'):
         result.assert_outcomes(errors=1)
         result.stdout.fnmatch_lines(
             ["*label on parameter 'room'*needs @pytest.mark.parametrize*"]
         )
-    with then(t'the HTML {pg["Report"].low} is still written'):
+    with then(t'the HTML {pg["Report"].l} is still written'):
         assert (pytester.path / 'report.html').is_file()
 
 
@@ -3118,7 +3112,7 @@ _ANNOTATED_TEMPLATE_SUITE = """
 
 
 @scenario(
-    t'An Annotated Template label fails its {pg["Scenario"].low} unless its '
+    t'An Annotated Template label fails its {pg["Scenario"].l} unless its '
     t'placeholder is a bare parametrize column',
     tags=['validation'],
 )
@@ -3138,7 +3132,7 @@ def test_an_annotated_template_label_needs_a_bare_parametrize_column(
     pytester, placeholder, error
 ):
     with given(
-        t'a {pg["Parametrized scenario"].low} whose Template label on a plain '
+        t'a {pg["Parametrized scenario"].l} whose Template label on a plain '
         t'fixture holds {placeholder}'
     ):
         suite = _ANNOTATED_TEMPLATE_SUITE.replace('PLACEHOLDER', placeholder)
@@ -3224,9 +3218,9 @@ _SUITE = """
 """
 
 
-@scenario(t'A bare run writes no {pg["Report"].low} at all')
+@scenario(t'A bare run writes no {pg["Report"].l} at all')
 def test_no_output_flags_writes_nothing(pytester: pytest.Pytester) -> None:
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         pytester.makepyfile(_SUITE)
         attach('suite', _SUITE)
     with when('the suite runs with no output flag'):
@@ -3237,9 +3231,9 @@ def test_no_output_flags_writes_nothing(pytester: pytest.Pytester) -> None:
         assert not (pytester.path / 'given-report').exists()
 
 
-@scenario(t'A bare `--given-md` prints the {pg["Narration"].low} to stdout')
+@scenario(t'A bare `--given-md` prints the {pg["Narration"].l} to stdout')
 def test_given_md_prints_fenced_block(pytester: pytest.Pytester) -> None:
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         pytester.makepyfile(_SUITE)
     with when('the suite runs with a bare --given-md'):
         result = pytester.runpytest('--given-md')
@@ -3258,9 +3252,9 @@ def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
     assert 'pytest-given:md:start' not in result.stdout.str()
 
 
-@scenario(t'`--given-html` alone writes no JSON {pg["Report"].low}')
+@scenario(t'`--given-html` alone writes no JSON {pg["Report"].l}')
 def test_given_html_alone_writes_no_json(pytester: pytest.Pytester) -> None:
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         pytester.makepyfile(_SUITE)
         html_path = pytester.path / 'r.html'
     with when('the suite runs with --given-html alone'):
@@ -3285,7 +3279,7 @@ def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
 def test_a_sink_path_that_is_not_a_report_file_is_refused(pytester) -> None:
     """A bare `--given-html` takes the next argument as its path, so the
     natural mis-ordering aims the renderer at the author's own test file."""
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         source = pytester.makepyfile(_SUITE)
         original = source.read_text(encoding='utf-8')
     with when('a bare --given-html swallows the test path that follows it'):
@@ -3312,7 +3306,7 @@ def test_brew(cup_size):
 
 
 @scenario(
-    t'A rejected authoring form fails the run and writes no {pg["Report"].low}',
+    t'A rejected authoring form fails the run and writes no {pg["Report"].l}',
     tags=['validation'],
 )
 def test_a_rejected_form_fails_the_run_and_writes_no_sink(pytester):
@@ -3343,9 +3337,9 @@ def test_a_rejected_form_fails_the_run_with_no_sink_flag(pytester):
 # --- Report title ---
 
 
-@scenario(t'`--given-title` names the {pg["Report"].low} instead of the rootdir')
+@scenario(t'`--given-title` names the {pg["Report"].l} instead of the rootdir')
 def test_given_title_cli_flag_names_the_report(pytester, tmp_path):
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         pytester.makepyfile(
             """
             from pytest_given import scenario, when
@@ -3447,17 +3441,17 @@ def test_given_title_cli_overrides_ini(pytester, tmp_path):
 
 
 @scenario(
-    t'`--given-theme` sets the {pg["Theme"].low} the HTML {pg["Report"].low} opens in'
+    t'`--given-theme` sets the {pg["Theme"].l} the HTML {pg["Report"].l} opens in'
 )
 def test_given_theme_cli_flag_sets_the_report_default(pytester, tmp_path):
-    with given(t'a suite with one {pg["Scenario"].low}'):
+    with given(t'a suite with one {pg["Scenario"].l}'):
         pytester.makepyfile(_SUITE)
         html_path = tmp_path / 'report.html'
     with when('the suite runs with --given-theme=dark'):
         result = pytester.runpytest(f'--given-html={html_path}', '--given-theme=dark')
     with then('the test passes'):
         result.assert_outcomes(passed=1)
-    with then(t'the page declares dark as its default {pg["Theme"].low}'):
+    with then(t'the page declares dark as its default {pg["Theme"].l}'):
         assert 'data-theme-default="dark"' in html_path.read_text(encoding='utf-8')
 
 
@@ -3495,7 +3489,7 @@ def test_given_theme_absent_follows_the_system(pytester, tmp_path):
 
 
 @scenario(
-    t'An unknown {pg["Theme"].low} stops the run before it collects',
+    t'An unknown {pg["Theme"].l} stops the run before it collects',
     tags=['validation'],
 )
 def test_an_unknown_theme_fails_before_the_suite_runs(pytester):
@@ -3503,7 +3497,7 @@ def test_an_unknown_theme_fails_before_the_suite_runs(pytester):
     side effects, so a typo in pyproject.toml fails the next run outright."""
     with given('a suite that would otherwise pass'):
         pytester.makepyfile(_SUITE)
-    with when(t'the suite runs with a misspelled {pg["Theme"].low}, and no HTML sink'):
+    with when(t'the suite runs with a misspelled {pg["Theme"].l}, and no HTML sink'):
         result = pytester.runpytest('--given-theme=Dark')
     with then('the run ends as a usage error, naming the flag the user typed'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR

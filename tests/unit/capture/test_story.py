@@ -61,13 +61,12 @@ def search(g):
 
 
 @scenario(
-    t'An {pg["Actor"].low} handle in a {pg["Clause"].low} becomes a '
-    t'{pg["Term ref"].low}',
+    t'An {pg["Actor"].l} handle in a {pg["Clause"].l} becomes a {pg["Term ref"].l}',
 )
 def test_clause_dispatches_actor_to_clause_term_ref(guest, search, room):
-    with when(t'a {pg["Clause"].low} is built from three glossary handles'):
+    with when(t'a {pg["Clause"].l} is built from three glossary handles'):
         built = clause(guest, search, room)
-    with then(t'the {pg["Actor"].low} slot becomes a {pg["Term ref"].low}'):
+    with then(t'the {pg["Actor"].l} slot becomes a {pg["Term ref"].l}'):
         assert isinstance(built, Clause)
         assert built.parts[0] == ClauseTermRef(term_id=guest.id, display='Guest')
 
@@ -105,21 +104,20 @@ def test_clause_dispatches_activity_to_clause_term_ref_with_canonical_display(
 
 
 @scenario(
-    t'An inflected {pg["Activity"].low} keeps its {pg["Term"].low} identity '
-    t'but shows the {pg["Inflection"].low}',
+    t'An inflected {pg["Activity"].l} keeps its {pg["Term"].l} identity '
+    t'but shows the {pg["Inflection"].l}',
 )
 def test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_display(
     guest,
     search,
     room,
 ):
-    with given(t'an {pg["Activity"].low} handle called with an {pg["Inflection"].low}'):
+    with given(t'an {pg["Activity"].l} handle called with an {pg["Inflection"].l}'):
         inflected = search('searches for')
-    with when(t'it takes the verb slot of a {pg["Clause"].low}'):
+    with when(t'it takes the verb slot of a {pg["Clause"].l}'):
         built = clause(guest, inflected, room)
     with then(
-        t'the {pg["Term ref"].low} shows the inflection over the same '
-        t'{pg["Activity"].low}'
+        t'the {pg["Term ref"].l} shows the inflection over the same {pg["Activity"].l}'
     ):
         assert built.parts[1] == ClauseTermRef(
             term_id=search.id, display='searches for'
@@ -127,14 +125,13 @@ def test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_
 
 
 @scenario(
-    t'A bare string in a {pg["Clause"].low} becomes a connective word',
+    t'A bare string in a {pg["Clause"].l} becomes a connective word',
 )
 def test_clause_dispatches_bare_string_to_clause_word(guest, search, room):
-    with when(t'a {pg["Clause"].low} is built with a bare word between term nodes'):
+    with when(t'a {pg["Clause"].l} is built with a bare word between term nodes'):
         built = clause(guest, search, room, 'for', guest('Alice'))
     with then(
-        t'the bare word becomes a {pg["Clause part"].low} word, not a '
-        t'{pg["Term ref"].low}'
+        t'the bare word becomes a {pg["Clause part"].l} word, not a {pg["Term ref"].l}'
     ):
         assert built.parts[3] == ClauseWord(text='for')
 
@@ -143,14 +140,14 @@ def test_clause_dispatches_bare_string_to_clause_word(guest, search, room):
 
 
 @scenario(
-    t'A {pg["Clause"].low} needs at least an {pg["Actor"].low}, an '
-    t'{pg["Activity"].low} and a node',
+    t'A {pg["Clause"].l} needs at least an {pg["Actor"].l}, an '
+    t'{pg["Activity"].l} and a node',
     tags=['validation'],
 )
 def test_clause_rejects_fewer_than_three_parts(guest, search):
     with (
         when_then(
-            t'a {pg["Clause"].low} of only two parts is built',
+            t'a {pg["Clause"].l} of only two parts is built',
             'a PytestGivenError rejects it as too short, counting the parts',
         ),
         # The part count is the only thing separating this message from the
@@ -161,7 +158,7 @@ def test_clause_rejects_fewer_than_three_parts(guest, search):
 
 
 @scenario(
-    t'A {pg["Clause"].low} position takes only the kinds its {pg["Slot"].low} accepts',
+    t'A {pg["Clause"].l} position takes only the kinds its {pg["Slot"].l} accepts',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -184,10 +181,10 @@ def test_clause_rejects_fewer_than_three_parts(guest, search):
 def test_a_clause_position_takes_only_the_kinds_its_slot_accepts(
     g, guest, search, room, kind, position, outcome
 ):
-    with given(t'a {pg["Term"].low} declared as {kind}'):
+    with given(t'a {pg["Term"].l} declared as {kind}'):
         g.register(GlossaryTerm(id=TermId('thing'), kind=kind, canonical='Thing'))
         part = g['Thing']
-    with when(t'a {pg["Clause"].low} is built with it at position {position}'):
+    with when(t'a {pg["Clause"].l} is built with it at position {position}'):
         parts = [guest, search, room]
         parts[position] = part
         try:
@@ -195,7 +192,7 @@ def test_a_clause_position_takes_only_the_kinds_its_slot_accepts(
             refusal = ''
         except PytestGivenError as error:
             refusal = str(error)
-    with then(t'the {pg["Term"].low} is {outcome}'):
+    with then(t'the {pg["Term"].l} is {outcome}'):
         assert ('refused' if refusal else 'accepted') == outcome
     with then('a refusal names the position and the declared kind'):
         assert (
@@ -205,32 +202,32 @@ def test_a_clause_position_takes_only_the_kinds_its_slot_accepts(
 
 
 @scenario(
-    t'A bare string may fill any {pg["Slot"].low} of a {pg["Clause"].low}, as a word',
+    t'A bare string may fill any {pg["Slot"].l} of a {pg["Clause"].l}, as a word',
 )
 @pytest.mark.parametrize('position', [0, 1, 2])
 def test_a_bare_string_may_fill_any_slot(guest, search, room, position):
     with given('the bare string "plain"'):
         word = 'plain'
-    with when(t'a {pg["Clause"].low} is built with it at position {position}'):
+    with when(t'a {pg["Clause"].l} is built with it at position {position}'):
         parts: list[object] = [guest, search, room]
         parts[position] = word
         built = clause(*parts)
-    with then(t'it becomes a {pg["Clause part"].low} word there'):
+    with then(t'it becomes a {pg["Clause part"].l} word there'):
         assert built.parts[position] == ClauseWord(text='plain')
-    with then(t'the other parts stay {pg["Term ref"]("term refs")}'):
+    with then(t'the other parts stay {pg["Term ref"].l.s}'):
         others = [part for index, part in enumerate(built.parts) if index != position]
         assert all(isinstance(part, ClauseTermRef) for part in others)
 
 
 @scenario(
-    t'A {pg["Clause"].low} may be fully bare words',
+    t'A {pg["Clause"].l} may be fully bare words',
 )
 def test_clause_allows_fully_bare_words():
     with given('three plain words with no glossary handles'):
         words = ('Guest', 'receives', 'Confirmation')
-    with when(t'a {pg["Clause"].low} is built from them'):
+    with when(t'a {pg["Clause"].l} is built from them'):
         built = clause(*words)
-    with then(t'every part is a {pg["Clause part"].low} word'):
+    with then(t'every part is a {pg["Clause part"].l} word'):
         assert [type(part) for part in built.parts] == [
             ClauseWord,
             ClauseWord,
@@ -246,7 +243,7 @@ def test_clause_allows_fully_bare_words():
 )
 def test_clause_allows_node_edge_alternation_with_connective():
     with given(
-        t'an {pg["Actor"].low}, an {pg["Activity"].low}, a {pg["Work Object"].low} '
+        t'an {pg["Actor"].l}, an {pg["Activity"].l}, a {pg["Work Object"].l} '
         t'and a second actor'
     ):
         g = Glossary()
@@ -254,7 +251,7 @@ def test_clause_allows_node_edge_alternation_with_connective():
         verb = g.activity('adds')
         guest = g.actor('Guest')
         booking = g.work_object('Booking')
-    with when(t'they form a five-part {pg["Clause"].low} joined by a connective'):
+    with when(t'they form a five-part {pg["Clause"].l} joined by a connective'):
         result = clause(actor, verb, booking, 'to', guest)
     with then('even positions are term-ref nodes and the connective stays a word'):
         assert [type(part) for part in result.parts] == [
@@ -268,12 +265,12 @@ def test_clause_allows_node_edge_alternation_with_connective():
 
 
 @scenario(
-    t'A {pg["Clause"].low} may not end on a dangling edge',
+    t'A {pg["Clause"].l} may not end on a dangling edge',
     tags=['validation'],
 )
 def test_clause_rejects_dangling_edge():
     with given(
-        t'an {pg["Actor"].low}, {pg["Activity"].low} and {pg["Work Object"].low} plus '
+        t'an {pg["Actor"].l}, {pg["Activity"].l} and {pg["Work Object"].l} plus '
         t'a '
         t'connective'
     ):
@@ -298,31 +295,31 @@ def test_clause_rejects_dangling_edge():
 
 
 @scenario(
-    t'A single-clause {pg["Sentence"].low} synthesizes one {pg["Clause"].low}',
+    t'A single-clause {pg["Sentence"].l} synthesizes one {pg["Clause"].l}',
     stories=adopt_pytest_given,
 )
 def test_sentence_single_clause_synthesizes_one_clause(guest, search, room):
     with when(
-        t'a {pg["Sentence"].low} is built from handles directly',
+        t'a {pg["Sentence"].l} is built from handles directly',
         pins=adopt_pytest_given['capture'],
     ):
         a = sentence(guest, search, room)
-    with then(t'it wraps a single {pg["Clause"].low}'):
+    with then(t'it wraps a single {pg["Clause"].l}'):
         assert isinstance(a, UnnumberedSentence)
         assert len(a.clauses) == 1
         assert a.clauses[0].parts[0].display == 'Guest'
 
 
 @scenario(
-    t'A {pg["Sentence"].low} may hold several {pg["Clause"]("clauses")}',
+    t'A {pg["Sentence"].l} may hold several {pg["Clause"].l.s}',
     stories=adopt_pytest_given,
 )
 def test_sentence_accepts_multiple_clauses(guest, search, room):
-    with given(t'two {pg["Clause"]("clauses")}'):
+    with given(t'two {pg["Clause"].l.s}'):
         first = clause(guest, search, room)
         second = clause(guest('Bob'), search, room)
     with when(
-        t'they are combined into one {pg["Sentence"].low}',
+        t'they are combined into one {pg["Sentence"].l}',
         pins=adopt_pytest_given['capture'],
     ):
         a = sentence(first, second)
@@ -331,15 +328,15 @@ def test_sentence_accepts_multiple_clauses(guest, search, room):
 
 
 @scenario(
-    t'Mixing loose parts and prebuilt {pg["Clause"]("clauses")} is rejected',
+    t'Mixing loose parts and prebuilt {pg["Clause"].l.s} is rejected',
     tags=['validation'],
 )
 def test_sentence_mixing_parts_and_clauses_raises(guest, search, room):
-    with given(t'a prebuilt {pg["Clause"].low}'):
+    with given(t'a prebuilt {pg["Clause"].l}'):
         built = clause(guest, search, room)
     with (
         when_then(
-            t'it is combined with loose handles in one {pg["Sentence"].low}',
+            t'it is combined with loose handles in one {pg["Sentence"].l}',
             'a PytestGivenError rejects the mix',
         ),
         pytest.raises(PytestGivenError, match='mix'),
@@ -351,12 +348,12 @@ def test_sentence_mixing_parts_and_clauses_raises(guest, search, room):
 
 
 @scenario(
-    t'A {pg["Story"].low} auto-numbers its {pg["Sentence"]("sentences")} from one',
+    t'A {pg["Story"].l} auto-numbers its {pg["Sentence"].l.s} from one',
     stories=adopt_pytest_given,
 )
 def test_story_auto_numbers_sentences_from_one(guest, search, room):
     with when(
-        t'a {pg["Story"].low} is built from two {pg["Sentence"].low} rows',
+        t'a {pg["Story"].l} is built from two {pg["Sentence"].l} rows',
         pins=adopt_pytest_given['capture'],
     ):
         s = story(
@@ -369,19 +366,19 @@ def test_story_auto_numbers_sentences_from_one(guest, search, room):
 
 
 @scenario(
-    t'A {pg["Story"].low} derives its id from its title',
+    t'A {pg["Story"].l} derives its id from its title',
 )
 def test_story_derives_id_from_title():
     with given('a human-readable story title'):
         title = 'Book a Room'
-    with when(t'a {pg["Story"].low} is built from it'):
+    with when(t'a {pg["Story"].l} is built from it'):
         s = story(title, [])
     with then('its id is the slugified title'):
         assert s.id == StoryId('book-a-room')
 
 
 @scenario(
-    t'A {pg["Story"].low} may span only one {pg["Glossary"].low}',
+    t'A {pg["Story"].l} may span only one {pg["Glossary"].l}',
     tags=['validation'],
 )
 def test_story_rejects_two_glossaries(guest, search, room):
@@ -390,7 +387,7 @@ def test_story_rejects_two_glossaries(guest, search, room):
         other_search = other.activity('search')
     with (
         when_then(
-            t'a {pg["Story"].low} is built spanning both glossaries',
+            t'a {pg["Story"].l} is built spanning both glossaries',
             'a PytestGivenError says a story spans multiple glossaries',
         ),
         pytest.raises(PytestGivenError, match='spans multiple glossaries'),
@@ -427,10 +424,10 @@ def test_story_captures_source_from_call_site(g):
 
 
 @scenario(
-    t'A {pg["Sentence"].low} {pg["Handle"].low} is looked up by name or by number',
+    t'A {pg["Sentence"].l} {pg["Handle"].l} is looked up by name or by number',
 )
 def test_story_hands_out_a_sentence_by_name_and_by_number(guest, search, room):
-    with given(t'a {pg["Story"].low} whose second {pg["Sentence"].low} is named'):
+    with given(t'a {pg["Story"].l} whose second {pg["Sentence"].l} is named'):
         built = story(
             'Lookup',
             [
@@ -438,26 +435,24 @@ def test_story_hands_out_a_sentence_by_name_and_by_number(guest, search, room):
                 sentence(guest('Alice'), search, room, name='cancel'),
             ],
         )
-    with when(t'the {pg["Sentence"].low} is looked up by its name and by its number'):
+    with when(t'the {pg["Sentence"].l} is looked up by its name and by its number'):
         by_name = built['cancel']
         by_number = built[2]
-    with then(
-        t'both {pg["Handle"]("handles")} name sentence 2 of that {pg["Story"].low}'
-    ):
+    with then(t'both {pg["Handle"].l.s} name sentence 2 of that {pg["Story"].l}'):
         expected = Pin(story_id=built.id, sentence_id=SentenceId(2))
         assert by_name.pin == by_number.pin == expected
 
 
-@scenario(t'Iterating a {pg["Story"].low} yields its {pg["Sentence"].low} handles')
+@scenario(t'Iterating a {pg["Story"].l} yields its {pg["Sentence"].l} handles')
 def test_iterating_a_story_yields_its_sentence_handles(guest, search, room):
-    with given(t'a {pg["Story"].low} of two {pg["Sentence"]("sentences")}'):
+    with given(t'a {pg["Story"].l} of two {pg["Sentence"].l.s}'):
         built = story(
             'Iterated',
             [sentence(guest, search, room), sentence(guest('Alice'), search, room)],
         )
-    with when(t'the {pg["Story"].low} is iterated'):
+    with when(t'the {pg["Story"].l} is iterated'):
         handles = list(built)
-    with then(t'it yields each {pg["Sentence"].low} handle in order'):
+    with then(t'it yields each {pg["Sentence"].l} handle in order'):
         assert handles == [built[1], built[2]]
 
 
@@ -486,11 +481,10 @@ def test_the_registry_lists_declared_stories_in_order(guest, search, room):
 
 
 @scenario(
-    t'Looking up a {pg["Sentence"].low} the {pg["Story"].low} lacks lists the '
-    t'ones it has',
+    t'Looking up a {pg["Sentence"].l} the {pg["Story"].l} lacks lists the ones it has',
 )
 def test_story_lookup_miss_lists_the_sentences(guest, search, room):
-    with given(t'a {pg["Story"].low} with an unnamed and a named {pg["Sentence"].low}'):
+    with given(t'a {pg["Story"].l} with an unnamed and a named {pg["Sentence"].l}'):
         built = story(
             'Lookup Miss',
             [
@@ -554,16 +548,16 @@ def test_story_numbers_sentences_by_position(guest, search, room):
 
 
 @scenario(
-    t'Two {pg["Sentence"]("sentences")} of one {pg["Story"].low} cannot share a name',
+    t'Two {pg["Sentence"].l.s} of one {pg["Story"].l} cannot share a name',
     tags=['validation'],
 )
 def test_story_rejects_duplicate_sentence_names(guest, search, room):
-    with given(t'two {pg["Sentence"]("sentences")} both named "cancel"'):
+    with given(t'two {pg["Sentence"].l.s} both named "cancel"'):
         first = sentence(guest, search, room, name='cancel')
         second = sentence(guest('Alice'), search, room, name='cancel')
     with (
         when_then(
-            t'a {pg["Story"].low} is built from them',
+            t'a {pg["Story"].l} is built from them',
             'a PytestGivenError names the duplicate and both numbers',
         ),
         pytest.raises(PytestGivenError, match=r"'cancel'.*sentences 1 and 2"),
@@ -572,7 +566,7 @@ def test_story_rejects_duplicate_sentence_names(guest, search, room):
 
 
 @scenario(
-    t'A {pg["Sentence"].low} name must be non-empty and unpadded',
+    t'A {pg["Sentence"].l} name must be non-empty and unpadded',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -587,9 +581,9 @@ def test_story_rejects_duplicate_sentence_names(guest, search, room):
 def test_a_sentence_name_must_be_non_empty_and_unpadded(
     guest, search, room, name, outcome
 ):
-    with given(t'the {pg["Sentence"].low} name {name!r}'):
+    with given(t'the {pg["Sentence"].l} name {name!r}'):
         sentence_name = name
-    with when(t'a {pg["Sentence"].low} is built with that name'):
+    with when(t'a {pg["Sentence"].l} is built with that name'):
         try:
             sentence(guest, search, room, name=sentence_name)
             refusal = ''
@@ -607,11 +601,11 @@ def test_a_sentence_name_must_be_non_empty_and_unpadded(
 
 
 @scenario(
-    t'Two {pg["Story"]("stories")} with the same id collide',
+    t'Two {pg["Story"].l.s} with the same id collide',
     tags=['validation'],
 )
 def test_story_id_collision_raises_with_both_sites():
-    with given(t'a {pg["Story"].low} already declared under an id'):
+    with given(t'a {pg["Story"].l} already declared under an id'):
         story('Book a Room', [])
     with (
         when_then(
@@ -690,12 +684,12 @@ def test_clause_accepts_extended_alternation(guest, search, room):
 
 
 @scenario(
-    t'A {pg["Clause"].low} may chain a second verb-object pair',
+    t'A {pg["Clause"].l} may chain a second verb-object pair',
 )
 def test_clause_allows_second_verb_edge():
     with given(
-        t'an {pg["Actor"].low}, two {pg["Activity"].low} and two '
-        t'{pg["Work Object"].low} '
+        t'an {pg["Actor"].l}, two {pg["Activity"].l} and two '
+        t'{pg["Work Object"].l} '
         t'handles'
     ):
         g = Glossary()
@@ -705,10 +699,10 @@ def test_clause_allows_second_verb_edge():
         send = g.activity('sends')
         note = g.work_object('Confirmation')
     with when(
-        t'they form a five-node {pg["Clause"].low} (actor verb object verb object)'
+        t'they form a five-node {pg["Clause"].l} (actor verb object verb object)'
     ):
         result = clause(actor, confirm, booking, send, note)
-    with then(t'every slot is a {pg["Term ref"].low}, with no bare words'):
+    with then(t'every slot is a {pg["Term ref"].l}, with no bare words'):
         assert [type(part) for part in result.parts] == [ClauseTermRef] * 5
 
 
@@ -742,12 +736,12 @@ def test_top_level_imports():
 
 
 @scenario(
-    t'A declared {pg["Work Object"].low} in a verb {pg["Slot"].low} '
+    t'A declared {pg["Work Object"].l} in a verb {pg["Slot"].l} '
     t'is rejected at construction',
     tags=['validation'],
 )
 def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):
-    with given(t'a {pg["File glossary"].low} declaring Room a work object'):
+    with given(t'a {pg["File glossary"].l} declaring Room a work object'):
         glossary_file = tmp_path / 'GLOSSARY.md'
         glossary_file.write_text(
             '| Term | Meaning | Kind |\n'
@@ -759,7 +753,7 @@ def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):
         fg = FileGlossary(glossary_file, kind_column='Kind')
     with (
         when_then(
-            t'Room is placed in the verb {pg["Slot"].low}',
+            t'Room is placed in the verb {pg["Slot"].l}',
             'a PytestGivenError names the term and its declared kind',
         ),
         pytest.raises(PytestGivenError, match=r"'Room'.*declared a work object"),
@@ -768,13 +762,13 @@ def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):
 
 
 @scenario(
-    t'A {pg["Slot"].low} error names the {pg["Term"].low}, not its repr',
+    t'A {pg["Slot"].l} error names the {pg["Term"].l}, not its repr',
     tags=['diagnostics'],
 )
 def test_slot_error_message_stays_compact(guest, room, search):
     with (
         when_then(
-            t'a {pg["Work Object"].low} is placed in the verb slot',
+            t'a {pg["Work Object"].l} is placed in the verb slot',
             'the message names the term without dumping the glossary',
         ),
         pytest.raises(PytestGivenError) as excinfo,
@@ -789,13 +783,13 @@ def test_slot_error_message_stays_compact(guest, room, search):
 
 
 @scenario(
-    t'A non-handle {pg["Clause part"].low} names its type',
+    t'A non-handle {pg["Clause part"].l} names its type',
     tags=['validation', 'diagnostics'],
 )
 def test_non_handle_part_names_its_type(guest, room):
     with (
         when_then(
-            t'an int is passed where an {pg["Activity"].low} handle belongs',
+            t'an int is passed where an {pg["Activity"].l} handle belongs',
             'a PytestGivenError names the offending type and the clause',
         ),
         pytest.raises(

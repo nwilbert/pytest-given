@@ -22,14 +22,14 @@ def simple_doc():
 
 
 @scenario(
-    t'A pipe table parses into {pg["Term"].low} and definition rows',
+    t'A pipe table parses into {pg["Term"].l} and definition rows',
 )
 def test_parses_default_columns(simple_doc):
-    with when(t'the parser reads it into rows for a {pg["File glossary"].low}'):
+    with when(t'the parser reads it into rows for a {pg["File glossary"].l}'):
         rows = parse_glossary_tables(
             simple_doc, term_column=0, description_column=1, kind_column=None
         )
-    with then(t'each row carries a {pg["Term"].low}, definition and source line'):
+    with then(t'each row carries a {pg["Term"].l}, definition and source line'):
         assert rows == [
             GlossaryRow(
                 term='Guest', definition='A person booking.', kind=None, line=5
@@ -52,7 +52,7 @@ def test_merges_multiple_tables():
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
         )
-    with then(t'every table contributes its {pg["Term"].low} rows'):
+    with then(t'every table contributes its {pg["Term"].l} rows'):
         assert [row.term for row in rows] == ['Guest', 'Room', 'Search']
 
 
@@ -116,7 +116,7 @@ def test_no_table_raises():
         attach('Markdown document', text)
     with (
         when_then(
-            t'the parser reads it for a {pg["File glossary"].low}',
+            t'the parser reads it for a {pg["File glossary"].l}',
             'a PytestGivenError reports that the file has no pipe table',
         ),
         pytest.raises(PytestGivenError, match=r'no .*table'),
@@ -186,7 +186,7 @@ def test_data_row_with_fewer_columns_raises():
 
 
 @scenario(
-    t'A {pg["Term"].low} cell is read as its plain text, with emphasis unwrapped',
+    t'A {pg["Term"].l} cell is read as its plain text, with emphasis unwrapped',
 )
 @pytest.mark.parametrize(
     ('cell', 'term'),
@@ -201,13 +201,13 @@ def test_data_row_with_fewer_columns_raises():
 def test_a_term_cell_is_read_as_its_plain_text(cell, term):
     # Inside a code span `*` is text, which is how the same markup renders in a
     # definition cell — the canonical name has to agree with the pill.
-    with given(t'a {pg["Term"].low} cell written as {cell}'):
+    with given(t'a {pg["Term"].l} cell written as {cell}'):
         text = f'| Term | Meaning |\n|---|---|\n| {cell} | A thing. |\n'
     with when('the parser reads the term cell'):
         rows = parse_glossary_tables(
             text, term_column=0, description_column=1, kind_column=None
         )
-    with then(t'the {pg["Term"].low} is {term}'):
+    with then(t'the {pg["Term"].l} is {term}'):
         assert [row.term for row in rows] == [term]
 
 

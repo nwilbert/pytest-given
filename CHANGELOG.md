@@ -13,9 +13,15 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- A handle's `.s` form reads the term's S-form, its regular plural or verb -s (`room.s` reads *Rooms*), and `.l` and `.s` chain and apply to a called form (`room.l.s` reads *rooms*).
+
 ### Changed
 
-- A handle's `.low` form lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*).
+- **Breaking.** A handle's `.low` form is now `.l`: replace `.low` with `.l`.
+- A handle's `.l` form lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*).
+- The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
 - The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.
 
 ## [0.4.1] - 2026-10-04

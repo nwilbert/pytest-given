@@ -28,7 +28,7 @@ This is the authoring-relevant surface, version-matched to the installed package
 |---|---|---|
 | Plain string / f-string | anywhere | Rendered verbatim; f-string values are not highlighted. In a parametrized scenario, text that varies across cases fails the run — use a t-string. |
 | T-string `t'a {cup_size} cup'` | test-body steps only | Interpolated at runtime; values color-coded when the expression matches a parametrize column. Full expression syntax allowed. |
-| T-string `t'a {guest.low} checks in'` | `@scenario(...)` name — glossary handles only | Evaluated eagerly at import; each handle renders as a term ref in the title. A value/expression interpolation is rejected (values aren't in scope at import). |
+| T-string `t'a {guest.l} checks in'` | `@scenario(...)` name — glossary handles only | Evaluated eagerly at import; each handle renders as a term ref in the title. A value/expression interpolation is rejected (values aren't in scope at import). |
 | `Template('… {col} …')` | `@scenario(...)`, helper decorators, `Annotated[..., given(...)]` | Deferred substitution — against parametrize columns (`@scenario`, `Annotated`) or the helper's bound arguments (decorators). |
 
 Hard rules (each raises `PytestGivenError`):

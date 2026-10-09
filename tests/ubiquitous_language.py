@@ -82,7 +82,7 @@ adopt_pytest_given = story(
         # 8
         sentence(
             collector_t,
-            pg['Graft']('grafts'),
+            pg['Graft'].l.s,
             fixture_recording_t,
             'from a',
             step_fixture_t,
@@ -91,7 +91,7 @@ adopt_pytest_given = story(
         # 9
         sentence(
             collector_t,
-            pg['Group']('groups'),
+            pg['Group'].l.s,
             parametrized_scenario_t,
             'into a',
             parameter_table_t,

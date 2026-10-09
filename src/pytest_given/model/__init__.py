@@ -84,7 +84,7 @@ from .steps import (
     iter_steps,
     walk_steps,
 )
-from .text import EMPHASIS, derived_id, id_derive
+from .text import EMPHASIS, derived_id, id_derive, s_form
 
 __all__ = [
     'CONTENT_TYPES',
@@ -157,6 +157,7 @@ __all__ = [
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',
+    's_form',
     'snapshot_param_value',
     'walk_steps',
 ]

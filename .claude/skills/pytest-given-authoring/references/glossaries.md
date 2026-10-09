@@ -50,15 +50,16 @@ from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
 Look up handles by name — `g['Room']` (case-insensitive) — or use the captured variables from a code-defined glossary. Both work in t-string steps, `@scenario(...)` titles, and story sentences:
 
 ```python
-with when(t'a {g["Guest"].low} {g["book"]("books")} a {g["Room"].low}'):
+with when(t'a {g["Guest"].l} {g["book"].s} a {g["Room"].l}'):
     ...
 ```
 
-Pick the lightest surface form for the word you need — the same three forms on every handle, captured (`guest = g.actor(...)`) or looked up (`g['Guest']`):
+Pick the lightest surface form for the word you need — the same four forms on every handle, captured (`guest = g.actor(...)`) or looked up (`g['Guest']`):
 
 - **Bare handle** — `g['Room']` renders the term's canonical text. Use it whenever the word appears as-is — restating it as `g['Room']('Room')` is redundant noise.
-- **`.low`** — `g['Attachment'].low` (or `guest.low`) renders the canonical lowercased, the usual mid-sentence form; acronyms keep their case (`LLM Call` → *LLM call*). Prefer it over the equivalent `g['Attachment']('attachment')`.
-- **Called** — `g['book']('books')` supplies any *other* surface: an activity inflection, a plural (`g['Term']('terms')`), or a concrete instance (`organizer('Carol')`).
+- **`.l`** — `g['Attachment'].l` (or `guest.l`) renders the canonical lowercased, the usual mid-sentence form; acronyms keep their case (`LLM Call` → *LLM call*). Prefer it over `g['Attachment']('attachment')`.
+- **`.s`** — the S-form: `room.s` → *Rooms*, `book.s` → *books*; chains with `.l` (`room.l.s` → *rooms*). Prefer it over `room('rooms')`. It only adds -s/-es/-ies to the last word; anything else (*people*, *checks in*) takes the called form.
+- **Called** — `g['search']('searches for')` supplies any *other* surface: an irregular plural (`person('people')`), another inflection, or a concrete instance (`organizer('Carol')`). `.l` and `.s` apply to it too.
 
 ## Naming terms
 

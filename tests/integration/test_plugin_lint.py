@@ -88,7 +88,7 @@ def _run_observed(pytester, source, *args):
 
 @scenario(t'{pg["Narration lint"]} is off unless it is asked for')
 def test_disabled_by_default_records_no_sources_and_reports_nothing(pytester):
-    with given(t'a suite with one flawed {pg["Step"].low}'):
+    with given(t'a suite with one flawed {pg["Step"].l}'):
         attach('suite', EMPTY_GIVEN)
     with when('the suite runs without the lint flag'):
         result, steps = _run_observed(pytester, EMPTY_GIVEN)
@@ -116,15 +116,15 @@ def test_an_error_finding_shows_in_the_summary_line(pytester):
 
 
 @scenario(
-    t'An error-{pg["Severity"].low} {pg["Finding"].low} fails the run',
+    t'An error-{pg["Severity"].l} {pg["Finding"].l} fails the run',
     stories=adopt_pytest_given,
 )
 def test_enabled_error_finding_fails_the_run(pytester):
-    with given(t'a suite whose given {pg["Step"].low} has an empty body'):
+    with given(t'a suite whose given {pg["Step"].l} has an empty body'):
         attach('suite', EMPTY_GIVEN)
     with when('the suite runs with the lint enabled', pins=adopt_pytest_given['flag']):
         result = _run(pytester, EMPTY_GIVEN, '--given-lint')
-    with then(t'the run exits failed, naming the {pg["Lint rule"].low} and the step'):
+    with then(t'the run exits failed, naming the {pg["Lint rule"].l} and the step'):
         # The test itself passed; the error is pytest-given's own, registered
         # so the summary line cannot read green over a non-zero exit.
         result.assert_outcomes(passed=1, errors=1)
@@ -150,14 +150,14 @@ def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
 
 
 @scenario(
-    t'A {pg["Lint rule"].low} downgraded to warn reports without failing the run',
+    t'A {pg["Lint rule"].l} downgraded to warn reports without failing the run',
     stories=adopt_pytest_given,
 )
 def test_warn_override_prints_but_does_not_fail(pytester):
-    with given(t'a suite whose given {pg["Step"].low} has an empty body'):
+    with given(t'a suite whose given {pg["Step"].l} has an empty body'):
         attach('suite', EMPTY_GIVEN)
     with when(
-        t'the suite runs with that {pg["Lint rule"].low} set to warn',
+        t'the suite runs with that {pg["Lint rule"].l} set to warn',
         pins=adopt_pytest_given['flag'],
     ):
         result = _run(
@@ -170,7 +170,7 @@ def test_warn_override_prints_but_does_not_fail(pytester):
     with then('the run still passes'):
         result.assert_outcomes(passed=1)
         assert result.ret == 0
-    with then(t'the {pg["Finding"].low} is printed anyway'):
+    with then(t'the {pg["Finding"].l} is printed anyway'):
         # One fnmatch pattern means "some line matches"; the assert says the
         # same thing, and `then-without-check` can see it.
         assert any(
@@ -228,11 +228,11 @@ def test_stale_ignore_entry_fails_the_run(pytester):
 
 
 @scenario(
-    t'Either {pg["Narration lint"].low} flag overrides the ini for one run',
+    t'Either {pg["Narration lint"].l} flag overrides the ini for one run',
     stories=adopt_pytest_given,
 )
 def test_the_flag_overrides_the_ini_in_both_directions(pytester):
-    with given(t'a suite with one flawed {pg["Step"].low}'):
+    with given(t'a suite with one flawed {pg["Step"].l}'):
         attach('suite', EMPTY_GIVEN)
     with when('the suite runs with the lint enabled by ini but off by flag'):
         off = _run(pytester, EMPTY_GIVEN, '-o', 'given_lint=true', '--no-given-lint')
@@ -441,7 +441,7 @@ def test_removed_phase_check_ini_key_is_unknown(pytester):
     assert 'Unknown config option: given_phase_check' in result.stdout.str()
 
 
-@scenario(t'An error {pg["Finding"].low} leaves a more specific exit code alone')
+@scenario(t'An error {pg["Finding"].l} leaves a more specific exit code alone')
 def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
     with given('a suite whose lint would fail, under a stale ignore entry'):
         attach('suite', EMPTY_GIVEN)
@@ -458,7 +458,7 @@ def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
 
 
 @scenario(
-    t'A failure inside the lint keeps the {pg["Report"].low} it was handed',
+    t'A failure inside the lint keeps the {pg["Report"].l} it was handed',
     tags=['validation'],
 )
 def test_a_lint_failure_is_reported_and_keeps_the_written_report(pytester):

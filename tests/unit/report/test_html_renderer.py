@@ -237,8 +237,8 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
 )
 def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> None:
     with given(
-        t'a {pg["Report"].low} holding a {pg["Parametrized scenario"].low} '
-        t'with a {pg["Parameter table"].low}'
+        t'a {pg["Report"].l} holding a {pg["Parametrized scenario"].l} '
+        t'with a {pg["Parameter table"].l}'
     ):
         json_path = tmp_path / 'data.json'
         json_path.write_text(
@@ -305,14 +305,14 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
             )
         )
     with when(
-        t'the {pg["Renderer"].low} renders the HTML page',
+        t'the {pg["Renderer"].l} renders the HTML page',
         pins=adopt_pytest_given['render'],
     ):
         html_path = tmp_path / 'report.html'
         render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
         content = html_path.read_text(encoding='utf-8')
     with then(
-        t'{pg["Parameter coloring"].low} classes mark the grouped placeholder '
+        t'{pg["Parameter coloring"].l} classes mark the grouped placeholder '
         t'and the table headers'
     ):
         assert 'param-color-0' in content

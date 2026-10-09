@@ -47,7 +47,7 @@ def test_template_parses_single_placeholder() -> None:
         source = 'Brew {cup_size} ml'
     with when('the template is parsed'):
         t = Template(source)
-    with then(t'it splits into literal and placeholder {pg["Narration"].low} parts'):
+    with then(t'it splits into literal and placeholder {pg["Narration"].l} parts'):
         assert t.parts == (
             NarrationLiteral(value='Brew '),
             NarrationPlaceholder(
@@ -166,7 +166,7 @@ def test_parse_tstring_single_interpolation() -> None:
     with when('the t-string is parsed at runtime'):
         parts = parse_tstring(t'a {cup_size} ml cup')
         rendered = narration_text(parts)
-    with then(t'the interpolation becomes a {pg["Narration"].low} value part'):
+    with then(t'the interpolation becomes a {pg["Narration"].l} value part'):
         assert rendered == 'a 200 ml cup'
         assert parts == (
             NarrationLiteral(value='a '),
@@ -233,7 +233,7 @@ def test_parse_tstring_expression() -> None:
     with when('the t-string is parsed'):
         parts = parse_tstring(t'cost: {price * 1.2}')
         rendered = narration_text(parts)
-    with then(t'the {pg["Value highlight"].low} part records the full expression'):
+    with then(t'the {pg["Value highlight"].l} part records the full expression'):
         assert rendered == 'cost: 12.0'
         assert parts[1] == NarrationValue(
             rendered='12.0',
@@ -265,7 +265,7 @@ def glossary() -> Glossary:
 
 
 @scenario(
-    t'A {pg["Glossary"].low} handle in a t-string emits a {pg["Term ref"].low} '
+    t'A {pg["Glossary"].l} handle in a t-string emits a {pg["Term ref"].l} '
     t'showing what the handle was called with, else the canonical name',
 )
 @pytest.mark.parametrize(
@@ -291,7 +291,7 @@ def test_a_tstring_term_ref_shows_what_its_handle_was_called_with(
         handle = term(called_with) if called_with else term
     with when('the handle is interpolated into a t-string step'):
         parts = parse_tstring(t'they meet {handle}')
-    with then(t'the step carries one {pg["Term ref"].low}, to {term_id}'):
+    with then(t'the step carries one {pg["Term ref"].l}, to {term_id}'):
         [term_ref] = [part for part in parts if isinstance(part, NarrationTermRef)]
         assert term_ref.term_id == term_id
     with then(t'it shows {display}'):
@@ -323,16 +323,16 @@ def test_tstring_with_term_ref_populates_expression(glossary: Glossary) -> None:
 
 
 @scenario(
-    t'A {pg["Term ref"].low} may not carry a format spec',
+    t'A {pg["Term ref"].l} may not carry a format spec',
     tags=['validation'],
 )
 def test_tstring_term_ref_with_format_spec_raises(glossary: Glossary) -> None:
-    with given(t'an {pg["Actor"].low} handle interpolated with a format spec'):
+    with given(t'an {pg["Actor"].l} handle interpolated with a format spec'):
         guest = glossary.actor('Guest')
     with (
         when_then(
             'the t-string is parsed',
-            t'a PytestGivenError says a {pg["Term ref"].low} takes no format spec',
+            t'a PytestGivenError says a {pg["Term ref"].l} takes no format spec',
         ),
         pytest.raises(PytestGivenError, match='format spec or conversion'),
     ):
@@ -367,19 +367,19 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 
 @scenario(
     t'A {pg["File glossary"]("FileGlossary")} handle works in a t-string '
-    t'{pg["Step"].low}',
+    t'{pg["Step"].l}',
     stories=adopt_pytest_given,
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,
 ) -> None:
-    with given(t'a {pg["Deferred term"].low} from a {pg["File glossary"].low}'):
+    with given(t'a {pg["Deferred term"].l} from a {pg["File glossary"].l}'):
         guest = file_glossary['Guest']
     with when(
         'it is interpolated into a t-string step', pins=adopt_pytest_given['write']
     ):
         parts = parse_tstring(t'a {guest} arrives')
-    with then(t'the step carries a single {pg["Term ref"].low}'):
+    with then(t'the step carries a single {pg["Term ref"].l}'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]
         assert len(term_refs) == 1
         assert term_refs[0].term_id == 'guest'

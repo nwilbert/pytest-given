@@ -1,3 +1,4 @@
+from operator import attrgetter
 from pathlib import Path
 from typing import Annotated
 
@@ -50,7 +51,7 @@ def test_term_ids_are_derived_as_url_safe_slugs(
     refused,
     slug,
 ):
-    with when(t'it is slugified into a {pg["Term"].low} id'):
+    with when(t'it is slugified into a {pg["Term"].l} id'):
         try:
             derived, refusal = id_derive(text), ''
         except PytestGivenError as error:
@@ -92,16 +93,16 @@ def test_activity_carries_term_and_glossary_back_ref():
 
 
 @scenario(
-    t'Calling an {pg["Actor"].low} names a distinct {pg["Instance"].low}',
+    t'Calling an {pg["Actor"].l} names a distinct {pg["Instance"].l}',
 )
 def test_actor_call_returns_instance_with_distinct_display():
-    with given(t'an {pg["Actor"].low} handle for Guest'):
+    with given(t'an {pg["Actor"].l} handle for Guest'):
         g = Glossary()
         t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
         a = TermHandle(_term=t, _glossary=g)
-    with when(t'the {pg["Actor"].low} is called with a name'):
+    with when(t'the {pg["Actor"].l} is called with a name'):
         inst = a('Alice')
-    with then(t'an {pg["Instance"].low} with a distinct display is returned'):
+    with then(t'an {pg["Instance"].l} with a distinct display is returned'):
         assert isinstance(inst, TermInstance)
         assert inst.handle is a
         assert inst.display == 'Alice'
@@ -118,17 +119,17 @@ def test_work_object_call_returns_instance_with_distinct_display():
 
 
 @scenario(
-    t'Calling an {pg["Activity"].low} records an {pg["Inflection"].low} '
-    t'of the same {pg["Term"].low}',
+    t'Calling an {pg["Activity"].l} records an {pg["Inflection"].l} '
+    t'of the same {pg["Term"].l}',
 )
 def test_activity_call_returns_inflection_sharing_term_identity():
-    with given(t'an {pg["Activity"].low} handle for confirm'):
+    with given(t'an {pg["Activity"].l} handle for confirm'):
         g = Glossary()
         t = GlossaryTerm(id=TermId('confirm'), kind='activity', canonical='confirm')
         v = TermHandle(_term=t, _glossary=g)
-    with when(t'the {pg["Activity"].low} is called with a surface form'):
+    with when(t'the {pg["Activity"].l} is called with a surface form'):
         infl = v('confirms')
-    with then(t'an {pg["Inflection"].low} sharing the activity identity is returned'):
+    with then(t'an {pg["Inflection"].l} sharing the activity identity is returned'):
         assert isinstance(infl, TermInstance)
         assert infl.handle is v
         assert infl.display == 'confirms'
@@ -138,18 +139,18 @@ def test_activity_call_returns_inflection_sharing_term_identity():
 
 
 @scenario(
-    t'Registering an {pg["Actor"].low} returns a typed handle',
+    t'Registering an {pg["Actor"].l} returns a typed handle',
     stories=adopt_pytest_given,
 )
 def test_glossary_actor_registers_and_returns_handle():
     with given('an empty glossary'):
         g = Glossary()
     with when(
-        t'an {pg["Actor"].low} is registered with a definition',
+        t'an {pg["Actor"].l} is registered with a definition',
         pins=adopt_pytest_given['build'],
     ):
         a = g.actor('Guest', definition='Person booking accommodation.')
-    with then(t'a handle carrying the {pg["Actor"].low} kind is returned'):
+    with then(t'a handle carrying the {pg["Actor"].l} kind is returned'):
         assert isinstance(a, TermHandle)
         assert a.declared_kind == 'actor'
         assert a.id == 'guest'
@@ -173,7 +174,7 @@ def test_glossary_activity_registers_and_returns_handle():
 
 
 @scenario(
-    t'Re-registering a {pg["Term"].low} is idempotent only with matching fields',
+    t'Re-registering a {pg["Term"].l} is idempotent only with matching fields',
     stories=adopt_pytest_given,
     tags=['validation'],
 )
@@ -184,7 +185,7 @@ def test_glossary_activity_registers_and_returns_handle():
 def test_re_registering_a_term_is_idempotent_only_with_matching_fields(
     same_definition, outcome
 ):
-    with given(t'an {pg["Actor"].low} already registered with a definition'):
+    with given(t'an {pg["Actor"].l} already registered with a definition'):
         g = Glossary()
         first = g.actor('Guest', definition='d')
     with when(
@@ -211,12 +212,12 @@ def test_re_registering_a_term_is_idempotent_only_with_matching_fields(
     tags=['validation'],
 )
 def test_glossary_cross_kind_collision_raises():
-    with given(t'a name already registered as an {pg["Actor"].low}'):
+    with given(t'a name already registered as an {pg["Actor"].l}'):
         g = Glossary()
         g.actor('Foo')
     with (
         when_then(
-            t'the same name is registered as an {pg["Activity"].low}',
+            t'the same name is registered as an {pg["Activity"].l}',
             'a PytestGivenError reports the conflict with the prior registration',
         ),
         pytest.raises(PytestGivenError, match='conflicts with prior registration'),
@@ -231,18 +232,16 @@ def test_glossary_actor_empty_name_raises():
 
 
 @scenario(
-    t'Registering an {pg["Actor"].low} captures its definition site',
+    t'Registering an {pg["Actor"].l} captures its definition site',
 )
 def test_glossary_actor_captures_source():
     source_mod.set_rootdir(Path(__file__).resolve().parents[3])
     try:
         with given('a rootdir-aware glossary'):
             g = Glossary()
-        with when(t'an {pg["Actor"].low} is registered'):
+        with when(t'an {pg["Actor"].l} is registered'):
             a = g.actor('Guest')
-        with then(
-            t'the {pg["Term"].low} records a {pg["Source link"].low} to this file'
-        ):
+        with then(t'the {pg["Term"].l} records a {pg["Source link"].l} to this file'):
             assert a.term.source is not None
             assert a.term.source.relpath.endswith('test_glossary.py')
             assert a.term.source.line > 0
@@ -325,19 +324,18 @@ def test_real_definition_is_kept():
 
 
 @scenario(
-    t'Calling the {pg["Glossary"].low} declares a '
-    t'{pg["Kindless"].low} {pg["Term"].low}',
+    t'Calling the {pg["Glossary"].l} declares a {pg["Kindless"].l} {pg["Term"].l}',
     stories=adopt_pytest_given,
 )
 def test_call_declares_kindless_term():
     with given('an empty glossary'):
         g = Glossary()
     with when(
-        t'a {pg["Term"].low} is declared by call, without a kind',
+        t'a {pg["Term"].l} is declared by call, without a kind',
         pins=adopt_pytest_given['build'],
     ):
         handle = g('loyalty points')
-    with then(t'the {pg["Term"].low} is registered as {pg["Kindless"].low}'):
+    with then(t'the {pg["Term"].l} is registered as {pg["Kindless"].l}'):
         assert handle.term.kind is None
         assert handle.term.canonical == 'loyalty points'
 
@@ -377,18 +375,9 @@ def test_a_lookup_equals_the_registration_of_the_same_term():
     assert g.actor('Guest') == g['Guest']
 
 
-def test_low_yields_lowercased_display_instance():
-    g = Glossary()
-    handle = g('Loyalty Points')
-    low = handle.low
-    assert isinstance(low, TermInstance)
-    assert low.handle is handle
-    assert low.display == 'loyalty points'
-
-
 @scenario(
-    t'The lowercase {pg["Handle"].low} form lowercases only capitalized words, '
-    t'so acronyms keep their case',
+    t'The lowercase {pg["Handle"].l} form lowercases only capitalized words, '
+    t'so acronyms and standalone letters keep their case',
 )
 @pytest.mark.parametrize(
     ('canonical', 'lowered'),
@@ -397,65 +386,72 @@ def test_low_yields_lowercased_display_instance():
         ('LLM Call', 'LLM call'),
         ('Check-In', 'check-in'),
         ('Plan B', 'plan B'),
+        ('E-Mail', 'e-mail'),
+        ('LLM-Based Search', 'LLM-based search'),
         ('iPhone', 'iPhone'),
         ('McDonald', 'McDonald'),
     ],
 )
-def test_low_keeps_acronyms_and_mixed_case_words(canonical, lowered):
-    with given(t'a {pg["Term"].low} named {canonical!r}'):
+def test_lowercase_form_keeps_acronyms_and_mixed_case_words(canonical, lowered):
+    with given(t'a {pg["Term"].l} named {canonical!r}'):
         handle = Glossary()(canonical)
-    with when(t'its lowercase {pg["Handle"].low} form is taken'):
-        low = handle.low
+    with when(t'its lowercase {pg["Handle"].l} form is taken'):
+        result = handle.l
     with then(t'it reads {lowered!r}'):
-        assert low.display == lowered
-
-
-def test_actor_low_yields_lowercased_instance():
-    g = Glossary()
-    a = TermHandle(
-        _term=GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'),
-        _glossary=g,
-    )
-    low = a.low
-    assert isinstance(low, TermInstance)
-    assert low.handle is a
-    assert low.display == 'guest'
-
-
-def test_work_object_low_yields_lowercased_instance():
-    g = Glossary()
-    w = TermHandle(
-        _term=GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'),
-        _glossary=g,
-    )
-    low = w.low
-    assert isinstance(low, TermInstance)
-    assert low.handle is w
-    assert low.display == 'room'
-
-
-def test_activity_low_yields_lowercased_inflection():
-    g = Glossary()
-    v = TermHandle(
-        _term=GlossaryTerm(id=TermId('confirm'), kind='activity', canonical='Confirm'),
-        _glossary=g,
-    )
-    low = v.low
-    assert isinstance(low, TermInstance)
-    assert low.handle is v
-    assert low.display == 'confirm'
+        assert result.display == lowered
 
 
 @scenario(
-    t'Subscript looks up an already-declared {pg["Term"].low}',
+    t'The {pg["S-form"]} and lowercase {pg["Handle"].l} forms chain, '
+    t'and every reading stays the same {pg["Term"].l}',
+)
+@pytest.mark.parametrize(
+    ('canonical', 'forms', 'reading'),
+    [
+        ('Room', 's', 'Rooms'),
+        ('Room', 'l.s', 'rooms'),
+        ('Room', 's.l', 'rooms'),
+        ('Box', 'l.s', 'boxes'),
+        ('Category', 'l.s', 'categories'),
+        ('API Key', 'l.s', 'API keys'),
+        ('API', 's', 'APIs'),
+        ('book', 's', 'books'),
+    ],
+)
+def test_s_form_chains_with_lowercase_form(canonical, forms, reading):
+    with given(t'a {pg["Term"].l} named {canonical!r}'):
+        handle = Glossary()(canonical)
+    with when(t'the {pg["Handle"].l} forms {forms!r} are applied in order'):
+        result = attrgetter(forms)(handle)
+    with then(t'it reads {reading!r} and refers to the same {pg["Term"].l}'):
+        assert result.display == reading
+        assert result.handle is handle
+
+
+@scenario(
+    t'The {pg["S-form"]} and lowercase {pg["Handle"].l} forms also apply to '
+    t'a called form',
+)
+def test_s_form_and_lowercase_form_apply_to_a_called_form():
+    with given(t'a {pg["Term"].l} named "Room"'):
+        room = Glossary()('Room')
+    with when(t'it is called as "Deluxe Suite" and both forms are applied'):
+        suites = room('Deluxe Suite').l.s
+    with then(t'it reads "deluxe suites" and refers to the same {pg["Term"].l}'):
+        assert suites.display == 'deluxe suites'
+        assert suites.handle is room
+
+
+@scenario(
+    t'Subscript looks up an already-declared {pg["Term"].l}',
 )
 def test_subscript_get_only_returns_handle():
-    with given(t'a glossary with one declared {pg["Term"].low}'):
+    with given(t'a glossary with one declared {pg["Term"].l}'):
         g = Glossary()
         g('redeems')
     with when('the name is looked up by subscript'):
         handle = g['redeems']
-    with then(t'the returned {pg["Term"].low} is the declared one'):
+    with then(t'the returned {pg["Term"].l} is the declared one'):
         assert handle.term.canonical == 'redeems'
 
 
@@ -464,7 +460,7 @@ def test_subscript_get_only_returns_handle():
     tags=['diagnostics', 'validation'],
 )
 def test_subscript_unknown_name_raises_with_hint():
-    with given(t'a glossary with one declared {pg["Term"].low}'):
+    with given(t'a glossary with one declared {pg["Term"].l}'):
         g = Glossary()
         g('redeems')
     with (

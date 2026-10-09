@@ -61,27 +61,27 @@ def _runtime(grouped=(), glossary=None, stories=()):
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a passed {pg["Scenario"].low} that skips a '
-    t'{pg["Phase"].low}',
+    t'{pg["Narration lint"]} flags a passed {pg["Scenario"].l} that skips a '
+    t'{pg["Phase"].l}',
     stories=adopt_pytest_given,
 )
 def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
-    with given(t'a passed {pg["Scenario"].low} narrating only given and then'):
+    with given(t'a passed {pg["Scenario"].l} narrating only given and then'):
         two_phase = _phases_scenario('test_x.py::test_a', ['given', 'then'])
     with when(
         t'the runtime {pg["Lint rule"]("rules")} run', pins=adopt_pytest_given['flag']
     ):
         findings = _runtime(grouped=[two_phase])
     with then(
-        t'one missing-phase {pg["Finding"].low} names the absent when and the '
-        t'{pg["Scenario"].low} source'
+        t'one missing-phase {pg["Finding"].l} names the absent when and the '
+        t'{pg["Scenario"].l} source'
     ):
         [finding] = findings
         assert finding.rule == RuleId('missing-phase')
         assert finding.subject == 'test_x.py::test_a'
         assert finding.location == SourceLocation(relpath='test_x.py', line=7)
         assert finding.message == 'missing: when'
-    with then(t'its {pg["Severity"].low} is the catalog default, warn'):
+    with then(t'its {pg["Severity"].l} is the catalog default, warn'):
         assert DEFAULTS[finding.rule] == 'warn'
 
 
@@ -132,14 +132,13 @@ def _glossary(*names):
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a {pg["Tag"].low} that duplicates a '
-    t'{pg["Term"].low}',
+    t'{pg["Narration lint"]} flags a {pg["Tag"].l} that duplicates a {pg["Term"].l}',
     stories=adopt_pytest_given,
 )
 def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
-    with given(t'a {pg["Glossary"].low} defining one {pg["Term"].low}'):
+    with given(t'a {pg["Glossary"].l} defining one {pg["Term"].l}'):
         glossary = _glossary('File glossary')
-    with given(t'two scenarios carrying that word as a {pg["Tag"].low}'):
+    with given(t'two scenarios carrying that word as a {pg["Tag"].l}'):
         scenarios = [
             _phases_scenario(
                 'test_x.py::test_a', ['given', 'when', 'then'], tags=['File Glossary']
@@ -155,8 +154,8 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
             _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
         )
     with then(
-        t'a single warn {pg["Finding"].low} names the {pg["Tag"].low} and the '
-        t'{pg["Term"].low} it shadows, counting the scenarios and naming one'
+        t'a single warn {pg["Finding"].l} names the {pg["Tag"].l} and the '
+        t'{pg["Term"].l} it shadows, counting the scenarios and naming one'
     ):
         [finding] = findings
         assert DEFAULTS[finding.rule] == 'warn'
@@ -237,26 +236,26 @@ def _dead_term_findings(glossary, grouped=(), stories=()):
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a {pg["Term"].low} referenced by no '
-    t'{pg["Scenario"].low} name, {pg["Step"].low} or {pg["Story"].low}',
+    t'{pg["Narration lint"]} flags a {pg["Term"].l} referenced by no '
+    t'{pg["Scenario"].l} name, {pg["Step"].l} or {pg["Story"].l}',
     stories=adopt_pytest_given,
 )
 def test_dead_term_flags_unreferenced_term() -> None:
-    with given(t'a {pg["Glossary"].low} holding one unreferenced {pg["Term"].low}'):
+    with given(t'a {pg["Glossary"].l} holding one unreferenced {pg["Term"].l}'):
         glossary = _glossary('Ghost term')
     with when(
         t'the runtime {pg["Lint rule"]("rules")} run over no scenarios and no stories',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _dead_term_findings(glossary)
-    with then(t'the {pg["Finding"].low} names the unreferenced {pg["Term"].low}'):
+    with then(t'the {pg["Finding"].l} names the unreferenced {pg["Term"].l}'):
         [finding] = findings
         assert finding.subject == 'ghost-term'
         assert finding.message == (
             "term 'Ghost term' is referenced by no scenario name, "
             'no step and no story sentence'
         )
-    with then(t'its {pg["Severity"].low} is off — the rule is opt-in'):
+    with then(t'its {pg["Severity"].l} is off — the rule is opt-in'):
         # Catalog default; `apply_config` drops it unless the suite opts in.
         assert DEFAULTS[finding.rule] == 'off'
 
@@ -308,16 +307,16 @@ def test_dead_term_passes_term_referenced_by_a_story() -> None:
 
 
 @scenario(
-    t'{pg["Narration lint"]} counts a {pg["Term"].low} named only in the '
-    t'second {pg["Clause"].low} of a {pg["Sentence"].low} as referenced',
+    t'{pg["Narration lint"]} counts a {pg["Term"].l} named only in the '
+    t'second {pg["Clause"].l} of a {pg["Sentence"].l} as referenced',
 )
 def test_dead_term_passes_term_referenced_only_by_a_second_clause() -> None:
     def ref(name):
         return ClauseTermRef(term_id=id_derive(name), display=name)
 
     with given(
-        t'a {pg["Story"].low} whose one {pg["Sentence"].low} names the '
-        t'{pg["Term"].low} only in its second {pg["Clause"].low}'
+        t'a {pg["Story"].l} whose one {pg["Sentence"].l} names the '
+        t'{pg["Term"].l} only in its second {pg["Clause"].l}'
     ):
         story = Story(
             id=StoryId('s'),

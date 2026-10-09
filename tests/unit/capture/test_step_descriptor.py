@@ -52,16 +52,16 @@ pytestmark = pytest.mark.usefixtures('isolated_story_registry')
 
 
 @scenario(
-    t'A {pg["Step"].low} pairs its {pg["Narration"].low} with a {pg["Phase"].low}',
+    t'A {pg["Step"].l} pairs its {pg["Narration"].l} with a {pg["Phase"].l}',
     stories=adopt_pytest_given,
 )
 def test_context_manager_basic() -> None:
     with when(
-        t'a given {pg["Step"].low} descriptor is created',
+        t'a given {pg["Step"].l} descriptor is created',
         pins=adopt_pytest_given['narrate'],
     ):
         desc = StepDescriptor('given', 'a coffee machine')
-    with then(t'it carries the given {pg["Phase"].low} and its {pg["Narration"].low}'):
+    with then(t'it carries the given {pg["Phase"].l} and its {pg["Narration"].l}'):
         assert desc.phase == 'given'
         assert desc.narration.text == 'a coffee machine'
 
@@ -152,14 +152,13 @@ def test_context_manager_in_idle_collector_raises() -> None:
 
 
 @scenario(
-    t'A {pg["Step"].low} opened outside a {pg["Scenario"].low} warns rather than '
-    t'raising'
+    t'A {pg["Step"].l} opened outside a {pg["Scenario"].l} warns rather than raising'
 )
 def test_context_manager_unannotated_test_warns_instead_of_raises() -> None:
-    with given(t'a {pg["Collector"].low} recording inside an undecorated test'):
+    with given(t'a {pg["Collector"].l} recording inside an undecorated test'):
         collector = Collector()
         collector.enter_unannotated_test()
-    with when(t'a given {pg["Step"].low} is opened against it'):
+    with when(t'a given {pg["Step"].l} is opened against it'):
         # The swap is undone inside the step: this session's own collector is
         # what the surrounding narration records onto.
         outer = get_active_collector()
@@ -290,7 +289,7 @@ def test_step_descriptor_decorator_rejects_tstring_mixed_glossary_and_value() ->
 )
 def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
+    with given(t'an {pg["Active scenario"].l} in a local {pg["Collector"].l}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
@@ -303,7 +302,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
             recorded = collector.finish_scenario(status='passed')
         finally:
             set_active_collector(session_collector)
-    with then(t'a when and a sibling then {pg["Step"].low} are recorded'):
+    with then(t'a when and a sibling then {pg["Step"].l} are recorded'):
         assert [(s.phase, s.narration.text) for s in recorded.steps] == [
             ('when', 'the action runs'),
             ('then', 'the outcome holds'),
@@ -316,7 +315,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
 )
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
+    with given(t'an {pg["Active scenario"].l} in a local {pg["Collector"].l}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
@@ -345,7 +344,7 @@ def test_when_then_pairs_with_inner_pytest_raises() -> None:
 )
 def test_when_then_omits_then_when_body_raises_uncaught() -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
+    with given(t'an {pg["Active scenario"].l} in a local {pg["Collector"].l}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(t'the {pg["when_then"]} body raises with nothing catching inside'):
@@ -394,11 +393,11 @@ def test_only_a_when_may_open_inside_a_when_then_body(
     phase_name: str, outcome: str
 ) -> None:
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
+    with given(t'an {pg["Active scenario"].l} in a local {pg["Collector"].l}'):
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
-        t'a {phase_name} {pg["Step"].low} opens inside the {pg["when_then"]} body',
+        t'a {phase_name} {pg["Step"].l} opens inside the {pg["when_then"]} body',
         pins=adopt_pytest_given['narrate'],
     ):
         phase_factory = {'given': given, 'when': when, 'then': then}[phase_name]
@@ -412,7 +411,7 @@ def test_only_a_when_may_open_inside_a_when_then_body(
             refusal = str(error)
         finally:
             set_active_collector(session_collector)
-    with then(t'the inner {pg["Step"].low} is {outcome}'):
+    with then(t'the inner {pg["Step"].l} is {outcome}'):
         action = collector.finish_scenario(status='passed').steps[0]
         nested = [(child.phase, child.narration.text) for child in action.children]
         assert (
@@ -422,7 +421,7 @@ def test_only_a_when_may_open_inside_a_when_then_body(
         assert bool(re.search(r"Cannot nest .* inside 'when'", refusal)) == (
             outcome == 'refused'
         )
-    with then(t'the {pg["Step stack"].low} is left balanced'):
+    with then(t'the {pg["Step stack"].l} is left balanced'):
         assert collector._step_stack == []
 
 
@@ -461,7 +460,7 @@ def test_scenario_marks_the_function_without_wrapping_it() -> None:
     with then('the very same function comes back, keeping its signature'):
         assert marked is brew
         assert list(inspect.signature(marked).parameters) == ['machine']
-    with then(t'it carries the {pg["Scenario"].low} marker, and a plain one does not'):
+    with then(t'it carries the {pg["Scenario"].l} marker, and a plain one does not'):
         assert brew._scenario.name == 'Brew coffee'  # type: ignore[attr-defined]
 
         def plain() -> None:
@@ -514,16 +513,16 @@ _BAD_LABELS: dict[str, object] = {
 
 @pytest.mark.parametrize('label_kind', list(_BAD_LABELS))
 @scenario(
-    t'An {pg["Attachment"].low} label must be plain text',
+    t'An {pg["Attachment"].l} label must be plain text',
     tags=['validation'],
 )
 def test_attach_rejects_a_non_str_label(label_kind: str) -> None:
-    with given(t'a non-str {pg["Attachment"].low} label of kind {label_kind}'):
+    with given(t'a non-str {pg["Attachment"].l} label of kind {label_kind}'):
         candidate = cast(str, _BAD_LABELS[label_kind])
     with (
         when_then(
             t'it is attached',
-            t'a PytestGivenError says {pg["Attachment"].low} labels are plain text',
+            t'a PytestGivenError says {pg["Attachment"].l} labels are plain text',
         ),
         pytest.raises(PytestGivenError, match='attachment labels are plain text'),
     ):
@@ -555,7 +554,7 @@ def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
 
 
 @scenario(
-    t'A `Template` {pg["Narration"].low} is refused in a test body',
+    t'A `Template` {pg["Narration"].l} is refused in a test body',
     tags=['validation'],
 )
 @pytest.mark.parametrize('phase_name', ['given', 'when', 'then'])
@@ -565,7 +564,7 @@ def test_phase_with_pytest_given_template_as_context_manager_raises(
     """`with given/when/then(Template(...))` is rejected — t-strings handle
     the body case."""
     session_collector = get_active_collector()
-    with given(t'an {pg["Active scenario"].low} in a local {pg["Collector"].low}'):
+    with given(t'an {pg["Active scenario"].l} in a local {pg["Collector"].l}'):
         phase_factory = {'given': given, 'when': when, 'then': then}[phase_name]
         collector = Collector()
         collector.start_scenario('id', 'name', 'mod', [])
@@ -580,7 +579,7 @@ def test_phase_with_pytest_given_template_as_context_manager_raises(
 
     with (
         when_then(
-            t'a {phase_name} {pg["Step"].low} opens on a `Template`',
+            t'a {phase_name} {pg["Step"].l} opens on a `Template`',
             'a PytestGivenError says a template is not supported in a test body',
         ),
         pytest.raises(PytestGivenError, match='not supported in a test body'),
@@ -953,7 +952,7 @@ def _looked_up(the_story, written):
 
 
 @scenario(
-    t'A sentence number or name pins only once looked up on its {pg["Story"].low}',
+    t'A sentence number or name pins only once looked up on its {pg["Story"].l}',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -969,17 +968,17 @@ def _looked_up(the_story, written):
 )
 def test_a_sentence_pins_only_once_looked_up_on_its_story(written, looked_up, outcome):
     with given(
-        t'the sentence {written}, looked up on its {pg["Story"].low}: {looked_up}'
+        t'the sentence {written}, looked up on its {pg["Story"].l}: {looked_up}'
     ):
         the_story = _two_sentence_story('Bare Pins')
         pins = _looked_up(the_story, written) if looked_up else written
-    with when(t'a {pg["Step"].low} is declared with it as its {pg["Pin"].low}'):
+    with when(t'a {pg["Step"].l} is declared with it as its {pg["Pin"].l}'):
         try:
             given('x', pins=pins)
             refusal = ''
         except PytestGivenError as error:
             refusal = str(error)
-    with then(t'the {pg["Pin"].low} is {outcome}'):
+    with then(t'the {pg["Pin"].l} is {outcome}'):
         assert ('refused' if refusal else 'accepted') == outcome
     with then('a refusal shows the handle form'):
         assert ("the_story['name']" in refusal) == (outcome == 'refused')

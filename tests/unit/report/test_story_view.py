@@ -209,8 +209,8 @@ def test_a_scenario_is_listed_under_its_stories_and_the_stories_it_covers() -> N
 
 
 @scenario(
-    t'An under-anchored {pg["Sentence"].low} reads as untracked until a '
-    t'{pg["Pin"].low} covers it',
+    t'An under-anchored {pg["Sentence"].l} reads as untracked until a '
+    t'{pg["Pin"].l} covers it',
 )
 @pytest.mark.parametrize(
     ('anchored', 'pinned', 'eligible', 'untracked'),
@@ -225,8 +225,8 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
 ) -> None:
     """`untracked` is what the timeline renders as '—'."""
     with given(
-        t'a {pg["Story"].low} whose only {pg["Sentence"].low} is anchored by at '
-        t'least two distinct {pg["Term"]("terms")}: {anchored}'
+        t'a {pg["Story"].l} whose only {pg["Sentence"].l} is anchored by at '
+        t'least two distinct {pg["Term"].l.s}: {anchored}'
     ):
         guest = _ent('guest', 'Guest')
         parts = (
@@ -237,8 +237,7 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
         only = Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),))
         story = Story(id=StoryId('book'), title='Book', sentences=(only,))
     with given(
-        t'a {pg["Scenario"].low} whose {pg["Step"].low} {pg["Pin"]("pins")} it: '
-        t'{pinned}'
+        t'a {pg["Scenario"].l} whose {pg["Step"].l} {pg["Pin"].l.s} it: {pinned}'
     ):
         scenario_ = Scenario(
             id=NodeId('test::a'),
@@ -262,7 +261,7 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
     with when('the story rollups are built'):
         coverage = build_story_rollups(rd, build_coverage_map(rd))
         sentence_coverage = coverage[StoryId('book')].per_sentence[SentenceId(1)]
-    with then(t'it is {pg["Coverage"].low}-eligible: {eligible}'):
+    with then(t'it is {pg["Coverage"].l}-eligible: {eligible}'):
         assert sentence_coverage.eligible == eligible
     with then(t'it reads as untracked: {untracked}'):
         assert sentence_coverage.untracked == untracked
@@ -325,13 +324,11 @@ def test_build_story_rollups_counts_each_status_apart() -> None:
 
 
 @scenario(
-    t'A {pg["Scenario"].low} bound to two {pg["Story"]("stories")} is matched '
-    t'against each',
+    t'A {pg["Scenario"].l} bound to two {pg["Story"].l.s} is matched against each',
 )
 def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
     with given(
-        t'two {pg["Story"]("stories")} each with a guest-search-room '
-        t'{pg["Sentence"].low}'
+        t'two {pg["Story"].l.s} each with a guest-search-room {pg["Sentence"].l}'
     ):
         glossary = _g()
         clauses = (
@@ -354,7 +351,7 @@ def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
             sentences=(Sentence(id=SentenceId(1), clauses=clauses),),
         )
     with given(
-        t'a {pg["Scenario"].low} bound to both whose {pg["Step"].low} names those terms'
+        t'a {pg["Scenario"].l} bound to both whose {pg["Step"].l} names those terms'
     ):
         both = dataclasses.replace(
             _covering_scn('test::both', 'passed'),
@@ -366,8 +363,7 @@ def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
     with when('the story rollups are built'):
         rollups = build_story_rollups(report, build_coverage_map(report))
     with then(
-        t'the {pg["Scenario"].low} is listed under, and covers, both '
-        t'{pg["Story"]("stories")}'
+        t'the {pg["Scenario"].l} is listed under, and covers, both {pg["Story"].l.s}'
     ):
         for story_id in (StoryId('book'), StoryId('stay')):
             assert rollups[story_id].scenarios == [both]
@@ -377,12 +373,10 @@ def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
 
 
 @scenario(
-    t'A {pg["Sentence"].low} is labeled by the prose of its {pg["Clause"]("clauses")}',
+    t'A {pg["Sentence"].l} is labeled by the prose of its {pg["Clause"].l.s}',
 )
 def test_build_sentence_labels_joins_parts_into_prose() -> None:
-    with given(
-        t'a {pg["Story"].low} with a two-{pg["Clause"].low} {pg["Sentence"].low}'
-    ):
+    with given(t'a {pg["Story"].l} with a two-{pg["Clause"].l} {pg["Sentence"].l}'):
         sentence = Sentence(
             id=SentenceId(3),
             clauses=(
@@ -399,11 +393,11 @@ def test_build_sentence_labels_joins_parts_into_prose() -> None:
         )
         story = Story(id=StoryId('book'), title='Book', sentences=(sentence,))
         rd = ReportData(metadata=_meta(), stories=[story], glossary=_g())
-    with when(t'the {pg["Sentence"].low} labels are built'):
+    with when(t'the {pg["Sentence"].l} labels are built'):
         labels = build_sentence_labels(rd)
     with then(
         t'the label gives the number, then reads as prose under a story-scoped '
-        t'key, with the {pg["Clause"].low} texts joined'
+        t'key, with the {pg["Clause"].l} texts joined'
     ):
         assert labels == {'book:3': 'Sentence 3: Carol search for Room · Bob search'}
 

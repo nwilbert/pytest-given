@@ -31,10 +31,10 @@ def glossary_file(tmp_path):
     t'{pg["File glossary"]("FileGlossary")} lookup is case-insensitive',
 )
 def test_lookup_is_case_insensitive(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
-    with when(t'the same {pg["Term"].low} is looked up in three different cases'):
+    with when(t'the same {pg["Term"].l} is looked up in three different cases'):
         handles = [glossary['Guest'], glossary['guest'], glossary['GUEST']]
     with then('every lookup resolves to one handle type and the same id'):
         assert all(isinstance(h, TermHandle) for h in handles)
@@ -45,26 +45,25 @@ def test_lookup_is_case_insensitive(glossary_file):
     'Repeated lookups return the same handle',
 )
 def test_handles_are_memoized(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
-    with when(t'the same {pg["Term"].low} is looked up twice'):
+    with when(t'the same {pg["Term"].l} is looked up twice'):
         first, second = glossary['Room'], glossary['room']
     with then('both lookups return the one memoized handle'):
         assert first is second
 
 
 @scenario(
-    t'File-loaded {pg["Term"]("terms")} start {pg["Kindless"].low}',
+    t'File-loaded {pg["Term"].l.s} start {pg["Kindless"].l}',
 )
 def test_terms_start_kindless(glossary_file):
     with given('a Markdown glossary file with no kind column'):
         attach('Glossary file', GLOSSARY_MD)
-    with when(t'a {pg["File glossary"].low} loads it'):
+    with when(t'a {pg["File glossary"].l} loads it'):
         glossary = FileGlossary(glossary_file)
     with then(
-        t'each {pg["Term"].low} is {pg["Kindless"].low} until '
-        t'{pg["Kind inference"].low} runs'
+        t'each {pg["Term"].l} is {pg["Kindless"].l} until {pg["Kind inference"].l} runs'
     ):
         assert glossary['Guest'].term.kind is None
         assert glossary['Room'].term.kind is None
@@ -76,12 +75,12 @@ def test_terms_start_kindless(glossary_file):
     tags=['diagnostics', 'validation'],
 )
 def test_unknown_name_raises_with_suggestion(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with (
         when_then(
-            t'a misspelt {pg["Term"].low} is looked up',
+            t'a misspelt {pg["Term"].l} is looked up',
             'a PytestGivenError is raised with a spelling hint',
         ),
         pytest.raises(PytestGivenError, match='Did you mean: Guest'),
@@ -90,15 +89,15 @@ def test_unknown_name_raises_with_suggestion(glossary_file):
 
 
 @scenario(
-    t'Handles are usable inline in a {pg["Sentence"].low}',
+    t'Handles are usable inline in a {pg["Sentence"].l}',
 )
 def test_usable_inline_in_sentence(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
-    with when(t'its handles build a {pg["Sentence"].low}'):
+    with when(t'its handles build a {pg["Sentence"].l}'):
         built = sentence(glossary['Guest'], glossary['search'], glossary['Room'])
-    with then(t'each slot becomes a {pg["Term ref"].low}'):
+    with then(t'each slot becomes a {pg["Term ref"].l}'):
         parts = built.clauses[0].parts
         assert parts[0] == ClauseTermRef(term_id='guest', display='Guest')
         assert parts[1] == ClauseTermRef(term_id='search', display='search')
@@ -109,23 +108,23 @@ def test_usable_inline_in_sentence(glossary_file):
     'Calling a handle overrides its display',
 )
 def test_call_overrides_display(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
-    with when(t'a handle is called to name an {pg["Instance"].low}'):
+    with when(t'a handle is called to name an {pg["Instance"].l}'):
         built = sentence(
             glossary['Guest']('Carol'),
             glossary['search']('searches for'),
             glossary['Room'],
         )
-    with then(t'the {pg["Term ref"].low} carries the overridden display'):
+    with then(t'the {pg["Term ref"].l} carries the overridden display'):
         assert built.clauses[0].parts[0] == ClauseTermRef(
             term_id='guest', display='Carol'
         )
 
 
 @scenario(
-    t'An explicit kind column sets {pg["Term"].low} kinds',
+    t'An explicit kind column sets {pg["Term"].l} kinds',
 )
 def test_explicit_kind_column(tmp_path):
     with given(t'a Markdown glossary with an explicit Kind column'):
@@ -137,9 +136,9 @@ def test_explicit_kind_column(tmp_path):
         attach('Glossary file', doc)
         path = tmp_path / 'g.md'
         path.write_text(doc, encoding='utf-8')
-    with when(t'the {pg["File glossary"].low} reads the Kind column'):
+    with when(t'the {pg["File glossary"].l} reads the Kind column'):
         glossary = FileGlossary(path, kind_column='Kind')
-    with then(t'kinds come straight from the file, not {pg["Kind inference"].low}'):
+    with then(t'kinds come straight from the file, not {pg["Kind inference"].l}'):
         assert glossary['Guest'].term.kind == 'actor'
         assert glossary['Room'].term.kind == 'object'
         assert glossary['book'].term.kind == 'activity'
@@ -157,7 +156,7 @@ def test_kind_column_by_integer_index(tmp_path):
         attach('Glossary file', doc)
         path = tmp_path / 'g.md'
         path.write_text(doc, encoding='utf-8')
-    with when(t'the {pg["File glossary"].low} selects the kind column by index'):
+    with when(t'the {pg["File glossary"].l} selects the kind column by index'):
         glossary = FileGlossary(path, kind_column=2)
     with then('the kinds are read from that column'):
         assert glossary['Guest'].term.kind == 'actor'
@@ -173,9 +172,9 @@ def test_work_object_underscore_alias(tmp_path):
         attach('Glossary file', doc)
         path = tmp_path / 'g.md'
         path.write_text(doc, encoding='utf-8')
-    with when(t'the {pg["File glossary"].low} parses the kind'):
+    with when(t'the {pg["File glossary"].l} parses the kind'):
         glossary = FileGlossary(path, kind_column='Kind')
-    with then(t'it normalizes to the {pg["Work Object"].low} kind'):
+    with then(t'it normalizes to the {pg["Work Object"].l} kind'):
         assert glossary['Room'].term.kind == 'object'
 
 
@@ -191,7 +190,7 @@ def test_unrecognized_kind_value_raises(tmp_path):
         path.write_text(doc, encoding='utf-8')
     with (
         when_then(
-            t'the {pg["File glossary"].low} loads the file',
+            t'the {pg["File glossary"].l} loads the file',
             'a PytestGivenError names the unrecognized kind',
         ),
         pytest.raises(PytestGivenError, match='Wizard'),
@@ -200,7 +199,7 @@ def test_unrecognized_kind_value_raises(tmp_path):
 
 
 @scenario(
-    t'A missing {pg["Glossary"].low} file is reported clearly',
+    t'A missing {pg["Glossary"].l} file is reported clearly',
     tags=['validation'],
 )
 def test_missing_file_raises(tmp_path):
@@ -208,7 +207,7 @@ def test_missing_file_raises(tmp_path):
         missing = tmp_path / 'nope.md'
     with (
         when_then(
-            t'a {pg["File glossary"].low} is opened on that path',
+            t'a {pg["File glossary"].l} is opened on that path',
             'a PytestGivenError reports the file is not found',
         ),
         pytest.raises(PytestGivenError, match='glossary file not found'),
@@ -237,18 +236,18 @@ def test_a_file_glossary_is_a_glossary(glossary_file):
 
 
 @scenario(
-    t'A {pg["Term"].low} cell with no alphanumeric characters is rejected',
+    t'A {pg["Term"].l} cell with no alphanumeric characters is rejected',
     tags=['diagnostics', 'validation'],
 )
 def test_empty_id_term_cell_raises(tmp_path):
-    with given(t'a row whose {pg["Term"].low} cell has no id-able characters'):
+    with given(t'a row whose {pg["Term"].l} cell has no id-able characters'):
         doc = '| Term | Meaning |\n|---|---|\n| @#$ | some definition |\n'
         attach('Glossary file', doc)
         path = tmp_path / 'bad.md'
         path.write_text(doc, encoding='utf-8')
     with (
         when_then(
-            t'the {pg["File glossary"].low} loads the file',
+            t'the {pg["File glossary"].l} loads the file',
             'a PytestGivenError is raised with file:line context',
         ),
         pytest.raises(PytestGivenError, match=r'bad\.md:3'),
@@ -264,7 +263,7 @@ _BAD_TABLES = {
 
 
 @scenario(
-    t'A {pg["File glossary"].low} error about its tables names the file',
+    t'A {pg["File glossary"].l} error about its tables names the file',
     tags=['diagnostics', 'validation'],
 )
 @pytest.mark.parametrize(
@@ -287,7 +286,7 @@ def test_table_errors_name_the_file(
         path.write_text(doc, encoding='utf-8')
     with (
         when_then(
-            t'a {pg["File glossary"].low} loads it',
+            t'a {pg["File glossary"].l} loads it',
             t'a PytestGivenError names the file before the problem: {message}',
         ),
         pytest.raises(PytestGivenError, match=re.escape(message)),
@@ -296,7 +295,7 @@ def test_table_errors_name_the_file(
 
 
 @scenario(
-    t'Duplicate rows for one {pg["Term"].low} collapse only when identical',
+    t'Duplicate rows for one {pg["Term"].l} collapse only when identical',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -305,7 +304,7 @@ def test_table_errors_name_the_file(
 )
 def test_duplicate_rows_collapse_only_when_identical(tmp_path, identical, outcome):
     with given(
-        t'two rows for one {pg["Term"].low}, with identical definitions: {identical}'
+        t'two rows for one {pg["Term"].l}, with identical definitions: {identical}'
     ):
         second = 'First definition.' if identical else 'Second definition.'
         doc = (
@@ -316,7 +315,7 @@ def test_duplicate_rows_collapse_only_when_identical(tmp_path, identical, outcom
         attach('Glossary file', doc)
         path = tmp_path / 'dup.md'
         path.write_text(doc, encoding='utf-8')
-    with when(t'the {pg["File glossary"].low} loads the file'):
+    with when(t'the {pg["File glossary"].l} loads the file'):
         try:
             terms, refusal = FileGlossary(path).terms, ''
         except PytestGivenError as error:
@@ -331,7 +330,7 @@ def test_duplicate_rows_collapse_only_when_identical(tmp_path, identical, outcom
 
 
 @scenario(
-    t'A blank description normalizes to {pg["Undefined"].low}',
+    t'A blank description normalizes to {pg["Undefined"].l}',
 )
 def test_blank_description_cell_normalizes_to_none(tmp_path):
     with given(t'a row whose description cell is blank'):
@@ -339,9 +338,9 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
         attach('Glossary file', doc)
         path = tmp_path / 'g.md'
         path.write_text(doc, encoding='utf-8')
-    with when(t'the {pg["File glossary"].low} parses it'):
+    with when(t'the {pg["File glossary"].l} parses it'):
         fg = FileGlossary(path)
-    with then(t'the {pg["Term"].low} definition is None, i.e. {pg["Undefined"].low}'):
+    with then(t'the {pg["Term"].l} definition is None, i.e. {pg["Undefined"].l}'):
         assert fg.get(TermId('guest')).definition is None
 
 
@@ -349,15 +348,15 @@ def test_blank_description_cell_normalizes_to_none(tmp_path):
 
 
 @scenario(
-    t'Calling {pg["File glossary"]("FileGlossary")} looks up a known {pg["Term"].low}',
+    t'Calling {pg["File glossary"]("FileGlossary")} looks up a known {pg["Term"].l}',
 )
 def test_file_glossary_call_known_name_returns_handle(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
-    with when(t'a known {pg["Term"].low} is looked up by call'):
+    with when(t'a known {pg["Term"].l} is looked up by call'):
         handle = glossary('Guest')
-    with then(t'a {pg["Deferred term"].low} is returned'):
+    with then(t'a {pg["Deferred term"].l} is returned'):
         assert handle.declared_kind is None
         assert handle.term.canonical == 'Guest'
 
@@ -367,7 +366,7 @@ def test_file_glossary_call_known_name_returns_handle(glossary_file):
     tags=['validation'],
 )
 def test_file_glossary_call_unknown_name_raises(glossary_file):
-    with given(t'a {pg["File glossary"].low} loaded from a Markdown file'):
+    with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
         attach('Glossary file', GLOSSARY_MD)
         glossary = FileGlossary(glossary_file)
     with (
@@ -378,5 +377,5 @@ def test_file_glossary_call_unknown_name_raises(glossary_file):
         pytest.raises(PytestGivenError, match='no glossary term'),
     ):
         glossary('Unknown Term')
-    with then(t'no new {pg["Term"].low} was created'):
+    with then(t'no new {pg["Term"].l} was created'):
         assert len(glossary.terms) == 3

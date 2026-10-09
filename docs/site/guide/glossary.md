@@ -25,15 +25,16 @@ Each call returns a **handle**. If the term already exists, `g(...)` returns its
 
 ## Term refs
 
-A **term ref** is a glossary term used in a step or a scenario title. To create one, put a handle into a [t-string](step-text.md), like `t'a {guest} {book("books")} a {room}'`. The report shows each term ref as a highlighted word with the term's definition on hover.
+A **term ref** is a glossary term used in a step or a scenario title. To create one, put a handle into a [t-string](step-text.md), like `t'a {guest} {book.s} a {room}'`. The report shows each term ref as a highlighted word with the term's definition on hover.
 
-A term ref has three forms. Use the simplest one that fits your sentence:
+A term ref has four forms. Use the simplest one that fits your sentence:
 
 - **`{guest}`** shows the term as declared: *Guest*.
-- **`{guest.low}`** shows the term in lowercase: *guest*. This is the usual form in the middle of a sentence. Only capitalized words are lowercased, so acronyms keep their case: `LLM Call` reads *LLM call*.
-- **`guest('Alice')`** shows any other text: a verb form (`book('books')`), a plural (`room('rooms')`), or a specific instance (`guest('Alice')`). Don't write `guest('Guest')` or `guest('guest')`; use `{guest}` or `{guest.low}` instead.
+- **`{guest.l}`** shows the term in lowercase: *guest*. This is the usual form in the middle of a sentence. Only capitalized words are lowercased, so acronyms keep their case: `LLM Call` reads *LLM call*.
+- **`{room.s}`** shows the term's **S-form**: the plural of a noun (*Rooms*), or the third person singular of a verb (`book.s` reads *books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies. Anything else, such as *people* or *checks in*, takes the called form.
+- **`guest('Alice')`** shows any other text: an irregular form (`person('people')`), another verb form (`search('searches for')`), or a specific instance (`guest('Alice')`). Don't write `guest('Guest')`, `guest('guest')` or `room('rooms')`; use `{guest}`, `{guest.l}` or `{room.l.s}` instead.
 
-All three forms work on every handle, including handles you look up by name.
+`.l` and `.s` chain and also apply to the called form: `{room.l.s}` reads *rooms*, `{room('suite').s}` reads *suites*. All forms work on every handle, including handles you look up by name.
 
 ## File glossary
 
@@ -55,7 +56,7 @@ g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning'
 Look up a term by name with `g['Guest']` (case-insensitive). The result is a handle like any other:
 
 ```python
-with when(t'{g["Guest"]} {g["book"]("books")} a {g["Room"]}'):
+with when(t'{g["Guest"]} {g["book"].s} a {g["Room"]}'):
     ...
 ```
 

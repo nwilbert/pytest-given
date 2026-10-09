@@ -99,11 +99,11 @@ def _rule_findings(findings, rule):
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a {pg["Step"].low} whose body does nothing',
+    t'{pg["Narration lint"]} flags a {pg["Step"].l} whose body does nothing',
     stories=adopt_pytest_given,
 )
 def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
-    with given(t'a given {pg["Step"].low} whose body is only `pass`'):
+    with given(t'a given {pg["Step"].l} whose body is only `pass`'):
         src = _write(
             tmp_path,
             """\
@@ -120,13 +120,13 @@ def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([empty], tmp_path)
-    with then(t'an empty-step {pg["Finding"].low} points at the {pg["Step"].low} line'):
+    with then(t'an empty-step {pg["Finding"].l} points at the {pg["Step"].l} line'):
         [finding] = findings
         assert finding.rule == RuleId('empty-step')
         assert finding.subject == 'test_x.py::test_a'
         assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
         assert finding.message == ("given 'a value' has no code")
-    with then(t'its {pg["Severity"].low} is error'):
+    with then(t'its {pg["Severity"].l} is error'):
         assert DEFAULTS[finding.rule] == 'error'
 
 
@@ -263,11 +263,11 @@ def test_then_with_bare_assert_passes(tmp_path) -> None:
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a then {pg["Step"].low} that checks nothing',
+    t'{pg["Narration lint"]} flags a then {pg["Step"].l} that checks nothing',
     stories=adopt_pytest_given,
 )
 def test_then_without_check_fires(tmp_path) -> None:
-    with given(t'a then {pg["Step"].low} whose body only calls'):
+    with given(t'a then {pg["Step"].l} whose body only calls'):
         # Neither a plain call, nor a call through a subscripted callable,
         # counts as a check.
         src = _write(
@@ -287,7 +287,7 @@ def test_then_without_check_fires(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([unchecked], tmp_path)
-    with then(t'a then-without-check {pg["Finding"].low} reports the unchecked then'):
+    with then(t'a then-without-check {pg["Finding"].l} reports the unchecked then'):
         [finding] = findings
         assert finding.rule == RuleId('then-without-check')
         assert finding.message == ("then 'it is one' contains no assertion")
@@ -430,7 +430,7 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags an assert outside a then {pg["Step"].low}',
+    t'{pg["Narration lint"]} flags an assert outside a then {pg["Step"].l}',
     stories=adopt_pytest_given,
 )
 @pytest.mark.parametrize(
@@ -439,7 +439,7 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
 def test_check_outside_then_flags_an_assert_only_outside_a_then(
     tmp_path, phase, flagged
 ) -> None:
-    with given(t'a {phase} {pg["Step"].low} whose body asserts'):
+    with given(t'a {phase} {pg["Step"].l} whose body asserts'):
         src = _write(
             tmp_path,
             f"""\
@@ -460,8 +460,7 @@ def test_check_outside_then_flags_an_assert_only_outside_a_then(
             _ast_rules([checking], tmp_path), 'check-outside-then'
         )
     with then(
-        t'a warn {pg["Finding"].low} names the {phase} step holding the assert: '
-        t'{flagged}'
+        t'a warn {pg["Finding"].l} names the {phase} step holding the assert: {flagged}'
     ):
         expected = [f"assert inside {phase} 'a stocked machine'"] if flagged else []
         assert [finding.message for finding in findings] == expected
@@ -577,11 +576,11 @@ def test_check_outside_then_fires_on_helper_body_assert(tmp_path) -> None:
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a then {pg["Step"].low} that folds in the action',
+    t'{pg["Narration lint"]} flags a then {pg["Step"].l} that folds in the action',
     stories=adopt_pytest_given,
 )
 def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
-    with given(t'a {pg["Scenario"].low} with no when, acting inside its then'):
+    with given(t'a {pg["Scenario"].l} with no when, acting inside its then'):
         src = _write(
             tmp_path,
             """\
@@ -605,7 +604,7 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _rule_findings(_ast_rules([folded], tmp_path), 'action-in-then')
-    with then(t'a warn {pg["Finding"].low} points at the then and says no when acts'):
+    with then(t'a warn {pg["Finding"].l} points at the then and says no when acts'):
         [finding] = findings
         assert DEFAULTS[finding.rule] == 'warn'
         assert finding.subject == 'test_x.py::test_a'
@@ -757,12 +756,12 @@ def _value_step(phase, text, line, expressions, children=()):
 
 
 @scenario(
-    t'{pg["Narration lint"]} flags a {pg["Narration"].low} interpolating a name the '
+    t'{pg["Narration lint"]} flags a {pg["Narration"].l} interpolating a name the '
     t'body never uses',
     stories=adopt_pytest_given,
 )
 def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
-    with given(t'a given {pg["Step"].low} whose body never loads the name'):
+    with given(t'a given {pg["Step"].l} whose body never loads the name'):
         # The `{size}` inside the step's own t-string narration must not count
         # as a use — only code uses count.
         src = _write(
@@ -783,7 +782,7 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         findings = _rule_findings(
             _ast_rules([unused], tmp_path), 'unused-interpolation'
         )
-    with then(t'a warn {pg["Finding"].low} names the interpolation the body ignores'):
+    with then(t'a warn {pg["Finding"].l} names the interpolation the body ignores'):
         [finding] = findings
         assert DEFAULTS[finding.rule] == 'warn'
         assert finding.message == (
@@ -929,7 +928,7 @@ def test_unused_interpolation_skips_term_refs(tmp_path) -> None:
         tmp_path,
         """\
         def test_a():
-            with given(t'a {pg["File glossary"].low} on disk'):
+            with given(t'a {pg["File glossary"].l} on disk'):
                 y = 1
         """,
     )

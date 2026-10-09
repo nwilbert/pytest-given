@@ -52,13 +52,13 @@ def _clause(*parts):
 
 
 @scenario(
-    t'A {pg["Sentence"].low} is referenced by its {pg["Term"]("terms")}, '
+    t'A {pg["Sentence"].l} is referenced by its {pg["Term"].l.s}, '
     t'whatever their surface form',
 )
 def test_a_refs_collects_term_ids_whatever_the_display():
     with given(
-        t'a {pg["Sentence"].low} written with an {pg["Instance"].low} and an '
-        t'{pg["Inflection"].low}'
+        t'a {pg["Sentence"].l} written with an {pg["Instance"].l} and an '
+        t'{pg["Inflection"].l}'
     ):
         a = Sentence(
             id=SentenceId(1),
@@ -71,18 +71,18 @@ def test_a_refs_collects_term_ids_whatever_the_display():
                 ),
             ),
         )
-    with when(t'{pg["Coverage"].low} collects the {pg["Sentence"].low} references'):
+    with when(t'{pg["Coverage"].l} collects the {pg["Sentence"].l} references'):
         refs = a_refs(a)
-    with then(t'they are the {pg["Term"].low} ids alone; words contribute nothing'):
+    with then(t'they are the {pg["Term"].l} ids alone; words contribute nothing'):
         assert refs == {TermId('guest'), TermId('search'), TermId('room')}
 
 
 @scenario(
-    t'A multi-clause {pg["Sentence"].low} unions references across its '
-    t'{pg["Clause"]("clauses")}',
+    t'A multi-clause {pg["Sentence"].l} unions references across its '
+    t'{pg["Clause"].l.s}',
 )
 def test_a_refs_unions_across_multi_clause_sentence():
-    with given(t'a {pg["Sentence"].low} with two {pg["Clause"]("clauses")}'):
+    with given(t'a {pg["Sentence"].l} with two {pg["Clause"].l.s}'):
         a = Sentence(
             id=SentenceId(1),
             clauses=(
@@ -98,20 +98,20 @@ def test_a_refs_unions_across_multi_clause_sentence():
                 ),
             ),
         )
-    with when(t'{pg["Coverage"].low} collects the {pg["Sentence"].low} references'):
+    with when(t'{pg["Coverage"].l} collects the {pg["Sentence"].l} references'):
         refs = a_refs(a)
-    with then(t'the {pg["Term"]("terms")} of both clauses are present'):
+    with then(t'the {pg["Term"].l.s} of both clauses are present'):
         assert TermId('room') in refs
         assert TermId('booking') in refs
 
 
 @scenario(
-    t'A {pg["Sentence"].low} whose {pg["Clause"]("clauses")} start at '
-    t'different {pg["Actor"]("actors")} builds and is covered',
+    t'A {pg["Sentence"].l} whose {pg["Clause"].l.s} start at '
+    t'different {pg["Actor"].l.s} builds and is covered',
 )
 def test_sentence_with_clauses_from_different_actors_is_covered():
     with given(
-        t'a {pg["Sentence"].low} of two {pg["Clause"]("clauses")}: a guest signs the '
+        t'a {pg["Sentence"].l} of two {pg["Clause"].l.s}: a guest signs the '
         t'register, and a clerk signs the register'
     ):
         g = Glossary()
@@ -123,7 +123,7 @@ def test_sentence_with_clauses_from_different_actors_is_covered():
         )
         built = Sentence(id=SentenceId(1), clauses=unnumbered.clauses)
         story = Story(id=StoryId('s'), title='S', sentences=(built,))
-    with given(t'a {pg["Step"].low} naming both actors, the activity and the register'):
+    with given(t'a {pg["Step"].l} naming both actors, the activity and the register'):
         scenario_ = _scenario_with_steps(
             _step(
                 'when',
@@ -133,9 +133,9 @@ def test_sentence_with_clauses_from_different_actors_is_covered():
                 _term_ref('register', 'Register'),
             )
         )
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
+    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(scenario_, build_story_index(story))
-    with then(t'the {pg["Sentence"].low} is covered'):
+    with then(t'the {pg["Sentence"].l} is covered'):
         assert coverage == {built.id}
 
 
@@ -162,20 +162,19 @@ def _term_ref(tid, display):
 
 
 @scenario(
-    t'A {pg["Step"].low} is referenced by its {pg["Term"]("terms")}, '
+    t'A {pg["Step"].l} is referenced by its {pg["Term"].l.s}, '
     t'whatever their surface form',
 )
 def test_s_for_step_collects_term_ids_whatever_the_display():
     with given(
-        t'a {pg["Step"].low} naming an {pg["Instance"].low} and an '
-        t'{pg["Inflection"].low}'
+        t'a {pg["Step"].l} naming an {pg["Instance"].l} and an {pg["Inflection"].l}'
     ):
         step = _step(
             'when', _term_ref('guest', 'Alice'), _term_ref('search', 'searches for')
         )
-    with when(t'{pg["Coverage"].low} collects the {pg["Step"].low} references'):
+    with when(t'{pg["Coverage"].l} collects the {pg["Step"].l} references'):
         refs = s_for_step(step)
-    with then(t'they are the {pg["Term"].low} ids alone'):
+    with then(t'they are the {pg["Term"].l} ids alone'):
         assert refs == {TermId('guest'), TermId('search')}
 
 
@@ -191,10 +190,10 @@ def _scenario_with_steps(*steps, pins=None, pins_story='s', stories=('s',)):
 
 
 @scenario(
-    t'An {pg["Instance"].low} and its bare {pg["Term"].low} cover each other',
+    t'An {pg["Instance"].l} and its bare {pg["Term"].l} cover each other',
 )
 def test_compute_coverage_matches_instance_and_bare_term_both_ways():
-    with given(t'a {pg["Sentence"].low} naming a bare {pg["Actor"].low}'):
+    with given(t'a {pg["Sentence"].l} naming a bare {pg["Actor"].l}'):
         bare = Sentence(
             id=SentenceId(1),
             clauses=(
@@ -206,7 +205,7 @@ def test_compute_coverage_matches_instance_and_bare_term_both_ways():
             ),
         )
     with given(
-        t'the same {pg["Sentence"].low} naming an {pg["Instance"].low} of that actor'
+        t'the same {pg["Sentence"].l} naming an {pg["Instance"].l} of that actor'
     ):
         instance = Sentence(
             id=SentenceId(1),
@@ -219,8 +218,7 @@ def test_compute_coverage_matches_instance_and_bare_term_both_ways():
             ),
         )
     with given(
-        t'a {pg["Step"].low} naming the {pg["Instance"].low}, and one naming the bare '
-        t'actor'
+        t'a {pg["Step"].l} naming the {pg["Instance"].l}, and one naming the bare actor'
     ):
         instance_step = _scenario_with_steps(
             _step(
@@ -238,7 +236,7 @@ def test_compute_coverage_matches_instance_and_bare_term_both_ways():
                 _term_ref('room', 'Room'),
             ),
         )
-    with when(t'{pg["Coverage"].low} is computed for each pairing'):
+    with when(t'{pg["Coverage"].l} is computed for each pairing'):
         bare_index = build_story_index(
             Story(id=StoryId('s'), title='S', sentences=(bare,))
         )
@@ -248,31 +246,29 @@ def test_compute_coverage_matches_instance_and_bare_term_both_ways():
         bare_by_instance = compute_coverage(instance_step, bare_index)
         instance_by_bare = compute_coverage(bare_step, instance_index)
     with then(
-        t'the {pg["Instance"].low} {pg["Step"].low} covers the bare '
-        t'{pg["Sentence"].low}'
+        t'the {pg["Instance"].l} {pg["Step"].l} covers the bare {pg["Sentence"].l}'
     ):
         assert SentenceId(1) in bare_by_instance
     with then(
-        t'the bare {pg["Step"].low} covers the {pg["Instance"].low} '
-        t'{pg["Sentence"].low}'
+        t'the bare {pg["Step"].l} covers the {pg["Instance"].l} {pg["Sentence"].l}'
     ):
         assert SentenceId(1) in instance_by_bare
 
 
 @scenario(
-    t'Promoting a bare word to an {pg["Activity"].low} ref drops '
-    t'{pg["Coverage"].low} from a {pg["Step"].low} that matched',
+    t'Promoting a bare word to an {pg["Activity"].l} ref drops '
+    t'{pg["Coverage"].l} from a {pg["Step"].l} that matched',
 )
 def test_compute_coverage_lost_when_sentence_gains_a_term():
     """Widening a sentence's identity set silently uncovers it: a step that
     covered the sentence before the edit no longer does."""
-    with given(t'a {pg["Step"].low} naming two {pg["Term ref"]("term refs")}'):
+    with given(t'a {pg["Step"].l} naming two {pg["Term ref"].l.s}'):
         scenario = _scenario_with_steps(
             _step('when', _term_ref('guest', 'Guest'), _term_ref('room', 'Room'))
         )
     with given(
-        t'the same {pg["Sentence"].low} with that middle slot a bare word, '
-        t'then an {pg["Activity"].low} ref'
+        t'the same {pg["Sentence"].l} with that middle slot a bare word, '
+        t'then an {pg["Activity"].l} ref'
     ):
         bare = Sentence(
             id=SentenceId(1),
@@ -294,7 +290,7 @@ def test_compute_coverage_lost_when_sentence_gains_a_term():
                 ),
             ),
         )
-    with when(t'{pg["Coverage"].low} is computed against each {pg["Story"].low}'):
+    with when(t'{pg["Coverage"].l} is computed against each {pg["Story"].l}'):
         before = compute_coverage(
             scenario,
             build_story_index(Story(id=StoryId('s'), title='S', sentences=(bare,))),
@@ -303,20 +299,18 @@ def test_compute_coverage_lost_when_sentence_gains_a_term():
             scenario,
             build_story_index(Story(id=StoryId('s'), title='S', sentences=(promoted,))),
         )
-    with then(t'the two-ref {pg["Sentence"].low} is covered'):
+    with then(t'the two-ref {pg["Sentence"].l} is covered'):
         assert SentenceId(1) in before
-    with then(t'the widened {pg["Sentence"].low} is no longer covered'):
+    with then(t'the widened {pg["Sentence"].l} is no longer covered'):
         assert SentenceId(1) not in after
 
 
 @scenario(
-    t'A {pg["Scenario"].low} {pg["Pin"].low} covers exactly its '
-    t'{pg["Sentence"]("sentences")}',
+    t'A {pg["Scenario"].l} {pg["Pin"].l} covers exactly its {pg["Sentence"].l.s}',
 )
 def test_compute_coverage_scenario_pin_replaces_matching():
     with given(
-        t'a {pg["Story"].low} with a matching and an under-anchored '
-        t'{pg["Sentence"].low}'
+        t'a {pg["Story"].l} with a matching and an under-anchored {pg["Sentence"].l}'
     ):
         matching = _guest_search_room_story().sentences[0]
         under_anchored = Sentence(
@@ -331,14 +325,14 @@ def test_compute_coverage_scenario_pin_replaces_matching():
         )
         story = Story(id=StoryId('s'), title='S', sentences=(matching, under_anchored))
     with given(
-        t'a {pg["Scenario"].low} whose {pg["Step"].low} matches sentence 1 but which '
+        t'a {pg["Scenario"].l} whose {pg["Step"].l} matches sentence 1 but which '
         t'pins '
         t'sentence 2'
     ):
         scenario_ = _scenario_with_steps(_matching_step(), pins=[2])
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
+    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(scenario_, build_story_index(story))
-    with then(t'only the pinned {pg["Sentence"].low} is covered, matching never ran'):
+    with then(t'only the pinned {pg["Sentence"].l} is covered, matching never ran'):
         assert coverage == {SentenceId(2)}
 
 
@@ -396,8 +390,8 @@ def _search_and_book_story():
 
 
 @scenario(
-    t'A {pg["Step"].low} is narration-matched only where neither it nor its '
-    t'{pg["Scenario"].low} {pg["Pin"]("pins")}',
+    t'A {pg["Step"].l} is narration-matched only where neither it nor its '
+    t'{pg["Scenario"].l} {pg["Pin"].l.s}',
 )
 @pytest.mark.parametrize(
     ('scenario_pins', 'step_pins', 'covered'),
@@ -426,14 +420,12 @@ def test_narration_matching_runs_only_where_nothing_pins(
     ],
     covered: list[int],
 ):
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
+    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(
             _scenario_with_steps(_matching_step(pins=step_pins), pins=scenario_pins),
             build_story_index(_search_and_book_story()),
         )
-    with then(
-        t'the {pg["Scenario"].low} covers the {pg["Sentence"]("sentences")} {covered}'
-    ):
+    with then(t'the {pg["Scenario"].l} covers the {pg["Sentence"].l.s} {covered}'):
         assert sorted(coverage) == covered
 
 
@@ -477,8 +469,8 @@ def _sentence_naming(*term_ids):
 
 
 @scenario(
-    t'A {pg["Sentence"].low} is {pg["Coverage"].low}-eligible only with two '
-    t'distinct {pg["Term"]("terms")}',
+    t'A {pg["Sentence"].l} is {pg["Coverage"].l}-eligible only with two '
+    t'distinct {pg["Term"].l.s}',
 )
 @pytest.mark.parametrize(
     ('term_ids', 'eligible'),
@@ -490,18 +482,16 @@ def _sentence_naming(*term_ids):
     ],
 )
 def test_coverage_eligibility_needs_two_distinct_terms(term_ids, eligible):
-    with given(
-        t'a {pg["Sentence"].low} referencing the {pg["Term"]("terms")} {term_ids}'
-    ):
+    with given(t'a {pg["Sentence"].l} referencing the {pg["Term"].l.s} {term_ids}'):
         sentence = _sentence_naming(*term_ids)
-    with when(t'its {pg["Coverage"].low} eligibility is checked'):
+    with when(t'its {pg["Coverage"].l} eligibility is checked'):
         checked = is_coverage_eligible(sentence)
     with then(t'it is eligible: {eligible}'):
         assert checked == eligible
 
 
 @scenario(
-    t'An under-anchored {pg["Sentence"].low} is covered only through a {pg["Pin"].low}',
+    t'An under-anchored {pg["Sentence"].l} is covered only through a {pg["Pin"].l}',
 )
 @pytest.mark.parametrize(
     ('term_ids', 'pinned', 'covered'),
@@ -518,35 +508,35 @@ def test_an_under_anchored_sentence_is_covered_only_through_a_pin(
     """Eligibility gates narration matching only. A pin says what the
     narration cannot, so it covers an under-anchored sentence too."""
     with given(
-        t'a {pg["Story"].low} whose {pg["Sentence"].low} references the '
-        t'{pg["Term"]("terms")} {term_ids}'
+        t'a {pg["Story"].l} whose {pg["Sentence"].l} references the '
+        t'{pg["Term"].l.s} {term_ids}'
     ):
         story = Story(
             id=StoryId('s'), title='S', sentences=(_sentence_naming(*term_ids),)
         )
     with given(
-        t'a {pg["Step"].low} narrating those {pg["Term"]("terms")}, '
-        t'{pg["Pin"]("pinning")} the {pg["Sentence"].low}: {pinned}'
+        t'a {pg["Step"].l} narrating those {pg["Term"].l.s}, '
+        t'{pg["Pin"]("pinning")} the {pg["Sentence"].l}: {pinned}'
     ):
         step = _step(
             'when',
             *(_term_ref(term_id, term_id) for term_id in term_ids),
             pins=[1] if pinned else None,
         )
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
+    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(
             _scenario_with_steps(step), build_story_index(story)
         )
-    with then(t'the {pg["Sentence"].low} is covered: {covered}'):
+    with then(t'the {pg["Sentence"].l} is covered: {covered}'):
         assert (SentenceId(1) in coverage) == covered
 
 
 @scenario(
-    t'Nested {pg["Step"]("steps")} are walked for {pg["Coverage"].low}',
+    t'Nested {pg["Step"].l.s} are walked for {pg["Coverage"].l}',
 )
 def test_compute_coverage_nested_steps_are_walked():
     """Steps nested as children are also examined for coverage."""
-    with given(t'a {pg["Story"].low} with one canonical {pg["Sentence"].low}'):
+    with given(t'a {pg["Story"].l} with one canonical {pg["Sentence"].l}'):
         a = Sentence(
             id=SentenceId(1),
             clauses=(
@@ -558,9 +548,7 @@ def test_compute_coverage_nested_steps_are_walked():
             ),
         )
         story = Story(id=StoryId('s'), title='S', sentences=(a,))
-    with given(
-        t'the covering {pg["Term ref"]("term refs")} in a nested child {pg["Step"].low}'
-    ):
+    with given(t'the covering {pg["Term ref"].l.s} in a nested child {pg["Step"].l}'):
         parent = _step('given')
         child = _step(
             'when',
@@ -570,10 +558,9 @@ def test_compute_coverage_nested_steps_are_walked():
         )
         parent.children.append(child)
         scenario = _scenario_with_steps(parent)
-    with when(t'{pg["Coverage"].low} is computed against the {pg["Story"].low}'):
+    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(scenario, build_story_index(story))
     with then(
-        t'the nested {pg["Step"].low} still counts and the {pg["Sentence"].low} is '
-        t'covered'
+        t'the nested {pg["Step"].l} still counts and the {pg["Sentence"].l} is covered'
     ):
         assert SentenceId(1) in coverage

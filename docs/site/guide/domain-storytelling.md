@@ -31,7 +31,7 @@ A sentence reads left to right: actor, activity, work object. Connecting words l
 
 Each part can be a glossary handle or a plain string. Use plain strings for generic verbs like *searches for*. Only words with a specific meaning in your domain need a glossary entry.
 
-Handles from a [file glossary](glossary.md#file-glossary) work the same way: `sentence(g['Guest'], g['book']('books'), g['Room'])`.
+Handles from a [file glossary](glossary.md#file-glossary) work the same way: `sentence(g['Guest'], g['book'].s, g['Room'])`.
 
 To be matched against your tests, a sentence needs at least two different glossary terms. The report marks a sentence with fewer as "not coverage-tracked". You can still cover it with a [pin](#pins).
 
@@ -79,7 +79,7 @@ pytest-given works out which sentences of these stories the scenario covers. By 
 
 ### Narration matching
 
-A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: `{room}`, `{room.low}` and `room('Deluxe Suite')` all count as the term *Room*.
+A step covers a sentence when the step's text mentions every glossary term in that sentence. The form of the term ref doesn't matter: `{room}`, `{room.l.s}` and `room('Deluxe Suite')` all count as the term *Room*.
 
 ### Coverage in the report
 

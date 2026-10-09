@@ -29,7 +29,7 @@ _RAW_TEMPLATE = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
 
 
 @scenario(
-    t'A {pg["Source link"].low} config value resolves to its template: a preset '
+    t'A {pg["Source link"].l} config value resolves to its template: a preset '
     t'name, a raw template, or `none`'
 )
 @pytest.mark.parametrize(
@@ -47,7 +47,7 @@ def test_a_source_link_config_value_resolves_to_its_template(
     value: str, template: str | None
 ) -> None:
     """A `None` template renders no source link at all."""
-    with given(t'the {pg["Source link"].low} config set to {value}'):
+    with given(t'the {pg["Source link"].l} config set to {value}'):
         config = value
     with when('the config value is resolved'):
         resolved = resolve_source_link_template(config)

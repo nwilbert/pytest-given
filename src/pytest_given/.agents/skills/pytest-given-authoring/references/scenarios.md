@@ -30,7 +30,7 @@ A parametrized scenario renders as one narrated tree over a parameter table, and
 - **Contrast rows show what decides.** For each input that decides the outcome, include a row that changes only that input and flips the outcome, at the boundary where there is one (moved 10 hours later still shares an hour, 11 hours later does not). A table whose rows all share one outcome can't show which column matters, even when another scenario holds the flipped case. Only a column listing forms the rule treats alike needs no flip, and a flip that needs other steps stays in its own scenario.
 - **A refusal is a row too.** `when_then` can't narrate a raise per row, so when accepted and refused inputs share the steps, catch the refusal in the `when` and assert it like any outcome:
   ```python
-  with when(t'the {g["Guest"].low} books {nights} nights'):
+  with when(t'the {g["Guest"].l} books {nights} nights'):
       try:
           booking, refusal = book(room, nights), ''
       except BookingRefused as error:
@@ -64,7 +64,7 @@ A parametrized scenario renders as one narrated tree over a parameter table, and
 
 ## Vocabulary and tags
 
-- **Narrate in glossary vocabulary.** Reference terms through handles in t-string step text — `t'a {g["Room"].low} is booked'` ([glossaries.md](glossaries.md)) — so they render as kind-colored words and feed the Glossary tab's per-term filter. Use `.low` mid-sentence and the bare handle to start a sentence. Pick a term for its meaning, not its word: a ref whose definition isn't what the sentence means links the reader to the wrong row. (Skip this rule if the project has no glossary yet.)
+- **Narrate in glossary vocabulary.** Reference terms through handles in t-string step text — `t'a {g["Room"].l} is booked'` ([glossaries.md](glossaries.md)) — so they render as kind-colored words and feed the Glossary tab's per-term filter. Use `.l` mid-sentence and the bare handle to start a sentence; `.s` for a regular plural or verb -s (`.l.s` mid-sentence). Pick a term for its meaning, not its word: a ref whose definition isn't what the sentence means links the reader to the wrong row. (Skip this rule if the project has no glossary yet.)
 - **The code speaks the language too.** Each referenced term should be reflected in the naming within the step: the body and the SUT names it directly calls. `File glossary` over a `FileGlossary` call matches by design (term names are natural language), but `{g["Reservation"]}` over code that only knows `Booking` is language drift — rename one side.
 - **Tag orthogonally to the glossary.** A tag that restates a term is redundant — filter by the term instead. `tag-shadows-term` catches literal collisions, not a tag naming a feature area the glossary covers under a different word (`markdown` over scenarios referencing `File glossary`).
 - **Expect tagging to be sparse.** Tags carry only what the glossary can't: behavior (`validation`) and mechanism (`parametrization`). A tag must cut across modules (one confined to a test file repeats the module grouping) and stay a minority of the suite — `happy-path` on most scenarios filters nothing. Once used, a tag goes on every scenario it describes, or filtering by it under-reports.

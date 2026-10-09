@@ -172,12 +172,12 @@ def _story_report() -> ReportData:
 
 
 @scenario(
-    t"The JSON report carries each {pg['Sentence'].low}'s {pg['Coverage'].low}",
+    t"The JSON report carries each {pg['Sentence'].l}'s {pg['Coverage'].l}",
 )
 def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
     with given(
-        t'a {pg["Story"].low} with a covered, an uncovered, an untracked '
-        t'{pg["Sentence"].low}'
+        t'a {pg["Story"].l} with a covered, an uncovered, an untracked '
+        t'{pg["Sentence"].l}'
     ):
         report = _story_report()
     with when('the JSON sink is rendered'):
@@ -185,7 +185,7 @@ def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
             report_to_dict(report), SinkConfig(json_path=tmp_path / 'report.json')
         )
         data = json.loads(rendered.files[0].text)
-    with then(t'a top-level `coverage` lists every {pg["Sentence"].low} once'):
+    with then(t'a top-level `coverage` lists every {pg["Sentence"].l} once'):
         assert data['coverage'] == [
             {
                 'story_id': 'book',
@@ -207,7 +207,7 @@ def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
 
 
 @scenario(
-    t'A re-rendered report recomputes {pg["Coverage"].low} rather than carrying it',
+    t'A re-rendered report recomputes {pg["Coverage"].l} rather than carrying it',
 )
 def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
     with given('a saved report dict whose `coverage` no longer matches its steps'):
@@ -218,9 +218,7 @@ def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
             stale, SinkConfig(json_path=tmp_path / 'report.json')
         )
         data = json.loads(rendered.files[0].text)
-    with then(
-        t'the {pg["Coverage"].low} is the one the {pg["Step"].low}s actually earn'
-    ):
+    with then(t'the {pg["Coverage"].l} is the one the {pg["Step"].l.s} actually earn'):
         covered = [
             row['sentence_id'] for row in data['coverage'] if row['scenario_ids']
         ]

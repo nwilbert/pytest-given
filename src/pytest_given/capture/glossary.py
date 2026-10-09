@@ -17,6 +17,7 @@ from ..model import (
     TermId,
     TermKind,
     id_derive,
+    s_form,
 )
 from .source import capture_caller_source
 
@@ -123,6 +124,24 @@ class TermHandleBase(ABC):
         settles it."""
         return self.term.kind
 
+    # Named for brevity inside a t-string (`{guest.l.s}`), at the cost of E743's
+    # l-versus-1 ambiguity.
+    @property
+    def l(self) -> TermInstance:  # noqa: E743
+        """This reading lowercased — the common mid-sentence form
+        (``guest.l`` instead of ``guest('guest')``)."""
+        return self._reading(_lowercase_words(self.display))
+
+    @property
+    def s(self) -> TermInstance:
+        """This reading's S-form — a plural, or a verb's third person singular
+        (``room.s``, ``room.l.s``)."""
+        return self._reading(s_form(self.display))
+
+    @abstractmethod
+    def _reading(self, surface: str) -> TermInstance:
+        """The same term, read as `surface`."""
+
 
 @dataclass(frozen=True)
 class TermHandle(TermHandleBase):
@@ -148,11 +167,8 @@ class TermHandle(TermHandleBase):
         """
         return TermInstance(handle=self, surface=display)
 
-    @property
-    def low(self) -> TermInstance:
-        """The canonical term lowercased — the common mid-sentence form
-        (``guest.low`` instead of ``guest('guest')``)."""
-        return self(_lowercase_words(self.canonical))
+    def _reading(self, surface: str) -> TermInstance:
+        return self(surface)
 
     @property
     def term(self) -> GlossaryTerm:
@@ -193,21 +209,26 @@ class TermInstance(TermHandleBase):
     def display(self) -> str:
         return self.surface
 
+    def _reading(self, surface: str) -> TermInstance:
+        return self.handle(surface)
+
 
 _WORD = re.compile(r'[^\W\d_]+')
 
 
 def _lowercase_words(text: str) -> str:
-    """Lowercase each capitalized word, leaving acronyms (``LLM``), single
-    letters (``Plan B``) and mixed case (``iPhone``) as written."""
-    return _WORD.sub(
-        lambda match: (
-            match[0].lower()
-            if match[0][0].isupper() and match[0][1:].islower()
-            else match[0]
-        ),
-        text,
-    )
+    """Lowercase each capitalized word, leaving acronyms (``LLM``), standalone
+    letters (``Plan B``) and mixed case (``iPhone``) as written. A letter before
+    a hyphen starts a word (``E-Mail``), so it is lowercased."""
+
+    def lowered(match: re.Match[str]) -> str:
+        word = match[0]
+        starts_hyphenated = len(word) == 1 and text[match.end() :].startswith('-')
+        if word[0].isupper() and (word[1:].islower() or starts_hyphenated):
+            return word.lower()
+        return word
+
+    return _WORD.sub(lowered, text)
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:

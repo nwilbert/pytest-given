@@ -352,7 +352,7 @@
 - **then** the report lists the «story», its «sentence» covered by nothing
 
 ## ✓ A pinned «scenario» still counts its «step» «pins»
-`tests/integration/test_plugin.py:2402::test_a_pinned_scenario_still_counts_its_step_pins`
+`tests/integration/test_plugin.py:2401::test_a_pinned_scenario_still_counts_its_step_pins`
 
 - **given** a «scenario» pinning one «sentence», whose «steps» pin a second and narrate a third
   - 📎 suite:
@@ -379,7 +379,7 @@
 - **then** the «scenario» covers both pinned «sentences» and not the one its narration would match
 
 ## ✓ A «step» «pin» into a «story» outside stories= covers it
-`tests/integration/test_plugin.py:2449::test_a_step_pin_into_a_story_outside_stories_covers_it`
+`tests/integration/test_plugin.py:2447::test_a_step_pin_into_a_story_outside_stories_covers_it`
 
 - **given** a «step» pinning a «story» its «scenario» does not name
   - 📎 suite:
@@ -402,7 +402,7 @@
 - **then** the «scenario» passes and covers the pinned «sentence», in the «story» it did not name
 
 ## ✓ A wide «fixture recording» keeps its «pins» in every «scenario» it is grafted into
-`tests/integration/test_plugin.py:2491::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
+`tests/integration/test_plugin.py:2488::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
 
 - **given** a module-scoped «step fixture» pinning a «sentence», set up first by an unannotated test
   - 📎 suite:
@@ -439,7 +439,7 @@
 - **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
 ## ✓ An Annotated label carrying a «pin» pins its «step»
-`tests/integration/test_plugin.py:2553::test_annotated_label_carrying_a_pin_pins_its_step`
+`tests/integration/test_plugin.py:2550::test_annotated_label_carrying_a_pin_pins_its_step`
 
 - **given** a «scenario» whose Annotated given(...) label on a «plain fixture» carries a «pin»
   - 📎 suite:
@@ -466,7 +466,7 @@
 - **then** the label's «step» carries the «pin»
 
 ## ✓ An Annotated label retells the «pins» of the fixture label it replaces · 3 cases
-`tests/integration/test_plugin.py:2593::test_annotated_label_pins_retell_the_fixture_root`
+`tests/integration/test_plugin.py:2590::test_annotated_label_pins_retell_the_fixture_root`
 
 - **given** a label with pins={label_pins} over a fixture pinning a[1]
 - **when** the suite runs
@@ -480,7 +480,7 @@
 | [a[2]] | [2] |
 
 ## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
-`tests/integration/test_plugin.py:3082::test_annotated_template_label_without_parametrize_fails_scenario`
+`tests/integration/test_plugin.py:3076::test_annotated_template_label_without_parametrize_fails_scenario`
 
 - **given** a Template label on a plain fixture parameter
   - 📎 suite:
@@ -503,7 +503,7 @@
 - **then** the HTML «report» is still written
 
 ## ✓ An Annotated Template label fails its «scenario» unless its placeholder is a bare parametrize column · 3 cases
-`tests/integration/test_plugin.py:3120::test_an_annotated_template_label_needs_a_bare_parametrize_column` · validation
+`tests/integration/test_plugin.py:3114::test_an_annotated_template_label_needs_a_bare_parametrize_column` · validation
 
 - **given** a «parametrized scenario» whose Template label on a plain fixture holds {placeholder}
   - 📎 suite — *see parameter table*
@@ -568,7 +568,7 @@
   ```
 
 ## ✓ A bare run writes no «report» at all
-`tests/integration/test_plugin.py:3227::test_no_output_flags_writes_nothing`
+`tests/integration/test_plugin.py:3221::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
   - 📎 suite:
@@ -591,14 +591,14 @@
 - **then** no report directory appears in the default location
 
 ## ✓ A bare `--given-md` prints the «narration» to stdout
-`tests/integration/test_plugin.py:3240::test_given_md_prints_fenced_block`
+`tests/integration/test_plugin.py:3234::test_given_md_prints_fenced_block`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
 ## ✓ `--given-html` alone writes no JSON «report»
-`tests/integration/test_plugin.py:3261::test_given_html_alone_writes_no_json`
+`tests/integration/test_plugin.py:3255::test_given_html_alone_writes_no_json`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-html alone
@@ -606,7 +606,7 @@
 - **then** no JSON lands in the default location
 
 ## ✓ A sink flag pointed at a source file is refused before the suite runs
-`tests/integration/test_plugin.py:3281::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
+`tests/integration/test_plugin.py:3275::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
 - **when** a bare --given-html swallows the test path that follows it
@@ -614,7 +614,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py:3314::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py:3308::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -634,7 +634,7 @@
 - **then** not one sink is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
-`tests/integration/test_plugin.py:3346::test_given_title_cli_flag_names_the_report`
+`tests/integration/test_plugin.py:3340::test_given_title_cli_flag_names_the_report`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-title
@@ -643,7 +643,7 @@
 - **then** the title also heads the Markdown rendering
 
 ## ✓ `--given-theme` sets the «theme» the HTML «report» opens in
-`tests/integration/test_plugin.py:3449::test_given_theme_cli_flag_sets_the_report_default`
+`tests/integration/test_plugin.py:3443::test_given_theme_cli_flag_sets_the_report_default`
 
 - **given** a suite with one «scenario»
 - **when** the suite runs with --given-theme=dark
@@ -651,7 +651,7 @@
 - **then** the page declares dark as its default «theme»
 
 ## ✓ An unknown «theme» stops the run before it collects
-`tests/integration/test_plugin.py:3497::test_an_unknown_theme_fails_before_the_suite_runs` · validation
+`tests/integration/test_plugin.py:3491::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
 - **when** the suite runs with a misspelled «theme», and no HTML sink
@@ -659,7 +659,7 @@
 - **then** no test ran
 
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:3614::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3608::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -836,56 +836,56 @@
 - **then** the step lives only in the recording, not the scenario
 
 ## ✓ An «attachment» outside every «step» is refused
-`tests/unit/capture/test_collector.py:325::test_attach_outside_any_step_raises` · validation
+`tests/unit/capture/test_collector.py:324::test_attach_outside_any_step_raises` · validation
 
 - **given** an «active scenario» with no «step» open
 - **when** an «attachment» is made from the test body
 - **then** it is refused rather than dropped
 
 ## ✓ A «fixture recording» is deep-copied when «grafted»
-`tests/unit/capture/test_collector.py:343::test_graft_recording_deep_copies_into_scenario`
+`tests/unit/capture/test_collector.py:342::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «fixture recording» with a nested child «step»
 - **when** a «graft» copies it into the «active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
 ## ✓ The «collector» fails a «scenario» that already finished
-`tests/unit/capture/test_collector.py:485::test_fail_marks_a_finished_scenario_failed`
+`tests/unit/capture/test_collector.py:484::test_fail_marks_a_finished_scenario_failed`
 
 - **given** a «scenario» that already finished as passed
 - **when** the «collector» is told of a failure after that
 - **then** the recorded «scenario» carries the failure
 
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:501::test_fail_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:500::test_fail_keeps_an_existing_error`
 
 - **given** a «scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A «collector» reports which «node ids» it recorded
-`tests/unit/capture/test_collector.py:580::test_records_reports_only_recorded_node_ids`
+`tests/unit/capture/test_collector.py:579::test_records_reports_only_recorded_node_ids`
 
 - **given** a «collector» that recorded one «scenario»
 - **when** the recorded and an unrecorded node id are both asked about
 - **then** only the recorded node id is claimed
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:598::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:597::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «active scenario» is being recorded
 - **when** a leaf «graft» appends a childless «step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:619::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:618::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «fixture recording» whose root has a label and a child
 - **when** a «graft» supplies an override «narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py:649::test_graft_leaf_given_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py:648::test_graft_leaf_given_without_scenario_is_refused`
 
 - **given** a collector with no «active scenario»
 - **when** a leaf «graft» runs
@@ -943,7 +943,7 @@
 - **then** each «term» is «kindless» until «kind inference» runs
 
 ## ✓ An unknown name raises with a suggestion
-`tests/unit/capture/test_file_glossary.py:74::test_unknown_name_raises_with_suggestion` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:73::test_unknown_name_raises_with_suggestion` · diagnostics, validation
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -960,7 +960,7 @@
 - **then** a PytestGivenError is raised with a spelling hint
 
 ## ✓ Handles are usable inline in a «sentence»
-`tests/unit/capture/test_file_glossary.py:92::test_usable_inline_in_sentence`
+`tests/unit/capture/test_file_glossary.py:91::test_usable_inline_in_sentence`
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -977,7 +977,7 @@
 - **then** each slot becomes a «term ref»
 
 ## ✓ Calling a handle overrides its display
-`tests/unit/capture/test_file_glossary.py:108::test_call_overrides_display`
+`tests/unit/capture/test_file_glossary.py:107::test_call_overrides_display`
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -994,7 +994,7 @@
 - **then** the «term ref» carries the overridden display
 
 ## ✓ An explicit kind column sets «term» kinds
-`tests/unit/capture/test_file_glossary.py:127::test_explicit_kind_column`
+`tests/unit/capture/test_file_glossary.py:126::test_explicit_kind_column`
 
 - **given** a Markdown glossary with an explicit Kind column
   - 📎 Glossary file:
@@ -1009,7 +1009,7 @@
 - **then** kinds come straight from the file, not «kind inference»
 
 ## ✓ A kind column can be selected by integer index
-`tests/unit/capture/test_file_glossary.py:148::test_kind_column_by_integer_index`
+`tests/unit/capture/test_file_glossary.py:147::test_kind_column_by_integer_index`
 
 - **given** a Markdown glossary with the kind in the third column
   - 📎 Glossary file:
@@ -1023,7 +1023,7 @@
 - **then** the kinds are read from that column
 
 ## ✓ A «work_object» kind alias maps to the object kind
-`tests/unit/capture/test_file_glossary.py:167::test_work_object_underscore_alias`
+`tests/unit/capture/test_file_glossary.py:166::test_work_object_underscore_alias`
 
 - **given** a glossary whose Kind cell says work_object
   - 📎 Glossary file:
@@ -1036,7 +1036,7 @@
 - **then** it normalizes to the «work object» kind
 
 ## ✓ An unrecognized kind value is rejected
-`tests/unit/capture/test_file_glossary.py:182::test_unrecognized_kind_value_raises` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:181::test_unrecognized_kind_value_raises` · diagnostics, validation
 
 - **given** a glossary whose Kind cell holds an unknown value
   - 📎 Glossary file:
@@ -1049,14 +1049,14 @@
 - **then** a PytestGivenError names the unrecognized kind
 
 ## ✓ A missing «glossary» file is reported clearly
-`tests/unit/capture/test_file_glossary.py:202::test_missing_file_raises` · validation
+`tests/unit/capture/test_file_glossary.py:201::test_missing_file_raises` · validation
 
 - **given** a path to a file that does not exist
 - **when** a «file glossary» is opened on that path
 - **then** a PytestGivenError reports the file is not found
 
 ## ✓ A «term» cell with no alphanumeric characters is rejected
-`tests/unit/capture/test_file_glossary.py:239::test_empty_id_term_cell_raises` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:238::test_empty_id_term_cell_raises` · diagnostics, validation
 
 - **given** a row whose «term» cell has no id-able characters
   - 📎 Glossary file:
@@ -1069,7 +1069,7 @@
 - **then** a PytestGivenError is raised with file:line context
 
 ## ✓ A «file glossary» error about its tables names the file · 3 cases
-`tests/unit/capture/test_file_glossary.py:266::test_table_errors_name_the_file` · diagnostics, validation
+`tests/unit/capture/test_file_glossary.py:265::test_table_errors_name_the_file` · diagnostics, validation
 
 - **given** a glossary file with {problem}
 - **given** that file on disk as bad.md
@@ -1103,7 +1103,7 @@
   ```
 
 ## ✓ Duplicate rows for one «term» collapse only when identical · 2 cases
-`tests/unit/capture/test_file_glossary.py:298::test_duplicate_rows_collapse_only_when_identical` · validation
+`tests/unit/capture/test_file_glossary.py:297::test_duplicate_rows_collapse_only_when_identical` · validation
 
 - **given** two rows for one «term», with identical definitions: {identical}
   - 📎 Glossary file — *see parameter table*
@@ -1133,7 +1133,7 @@
   ```
 
 ## ✓ A blank description normalizes to «undefined»
-`tests/unit/capture/test_file_glossary.py:333::test_blank_description_cell_normalizes_to_none`
+`tests/unit/capture/test_file_glossary.py:332::test_blank_description_cell_normalizes_to_none`
 
 - **given** a row whose description cell is blank
   - 📎 Glossary file:
@@ -1146,7 +1146,7 @@
 - **then** the «term» definition is None, i.e. «undefined»
 
 ## ✓ Calling «FileGlossary» looks up a known «term»
-`tests/unit/capture/test_file_glossary.py:351::test_file_glossary_call_known_name_returns_handle`
+`tests/unit/capture/test_file_glossary.py:350::test_file_glossary_call_known_name_returns_handle`
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -1163,7 +1163,7 @@
 - **then** a «deferred term» is returned
 
 ## ✓ «FileGlossary» is a closed vocabulary
-`tests/unit/capture/test_file_glossary.py:365::test_file_glossary_call_unknown_name_raises` · validation
+`tests/unit/capture/test_file_glossary.py:364::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «file glossary» loaded from a Markdown file
   - 📎 Glossary file:
@@ -1181,7 +1181,7 @@
 - **then** no new «term» was created
 
 ## ✓ «Term» ids are derived as URL-safe slugs, and a name with none is refused · 12 cases
-`tests/unit/capture/test_glossary.py:27::test_term_ids_are_derived_as_url_safe_slugs` · validation
+`tests/unit/capture/test_glossary.py:28::test_term_ids_are_derived_as_url_safe_slugs` · validation
 
 - **given** the name {text}
 - **when** it is slugified into a «term» id
@@ -1204,28 +1204,28 @@
 | ### | True | None |
 
 ## ✓ Calling an «actor» names a distinct «instance»
-`tests/unit/capture/test_glossary.py:94::test_actor_call_returns_instance_with_distinct_display`
+`tests/unit/capture/test_glossary.py:95::test_actor_call_returns_instance_with_distinct_display`
 
 - **given** an «actor» handle for Guest
 - **when** the «actor» is called with a name
 - **then** an «instance» with a distinct display is returned
 
 ## ✓ Calling an «activity» records an «inflection» of the same «term»
-`tests/unit/capture/test_glossary.py:120::test_activity_call_returns_inflection_sharing_term_identity`
+`tests/unit/capture/test_glossary.py:121::test_activity_call_returns_inflection_sharing_term_identity`
 
 - **given** an «activity» handle for confirm
 - **when** the «activity» is called with a surface form
 - **then** an «inflection» sharing the activity identity is returned
 
 ## ✓ Registering an «actor» returns a typed handle
-`tests/unit/capture/test_glossary.py:140::test_glossary_actor_registers_and_returns_handle`
+`tests/unit/capture/test_glossary.py:141::test_glossary_actor_registers_and_returns_handle`
 
 - **given** an empty glossary
 - **when** an «actor» is registered with a definition
 - **then** a handle carrying the «actor» kind is returned
 
 ## ✓ Re-registering a «term» is idempotent only with matching fields · 2 cases
-`tests/unit/capture/test_glossary.py:175::test_re_registering_a_term_is_idempotent_only_with_matching_fields` · validation
+`tests/unit/capture/test_glossary.py:176::test_re_registering_a_term_is_idempotent_only_with_matching_fields` · validation
 
 - **given** an «actor» already registered with a definition
 - **when** the same name is registered again, with the same definition: {same_definition}
@@ -1238,28 +1238,28 @@
 | False | refused |
 
 ## ✓ The same name cannot be two different kinds
-`tests/unit/capture/test_glossary.py:209::test_glossary_cross_kind_collision_raises` · validation
+`tests/unit/capture/test_glossary.py:210::test_glossary_cross_kind_collision_raises` · validation
 
 - **given** a name already registered as an «actor»
 - **when** the same name is registered as an «activity»
 - **then** a PytestGivenError reports the conflict with the prior registration
 
 ## ✓ Registering an «actor» captures its definition site
-`tests/unit/capture/test_glossary.py:233::test_glossary_actor_captures_source`
+`tests/unit/capture/test_glossary.py:234::test_glossary_actor_captures_source`
 
 - **given** a rootdir-aware glossary
 - **when** an «actor» is registered
 - **then** the «term» records a «source link» to this file
 
 ## ✓ Calling the «glossary» declares a «kindless» «term»
-`tests/unit/capture/test_glossary.py:327::test_call_declares_kindless_term`
+`tests/unit/capture/test_glossary.py:326::test_call_declares_kindless_term`
 
 - **given** an empty glossary
 - **when** a «term» is declared by call, without a kind
 - **then** the «term» is registered as «kindless»
 
-## ✓ The lowercase «handle» form lowercases only capitalized words, so acronyms keep their case · 6 cases
-`tests/unit/capture/test_glossary.py:389::test_low_keeps_acronyms_and_mixed_case_words`
+## ✓ The lowercase «handle» form lowercases only capitalized words, so acronyms and standalone letters keep their case · 8 cases
+`tests/unit/capture/test_glossary.py:378::test_lowercase_form_keeps_acronyms_and_mixed_case_words`
 
 - **given** a «term» named {canonical}
 - **when** its lowercase «handle» form is taken
@@ -1271,18 +1271,45 @@
 | 'LLM Call' | 'LLM call' |
 | 'Check-In' | 'check-in' |
 | 'Plan B' | 'plan B' |
+| 'E-Mail' | 'e-mail' |
+| 'LLM-Based Search' | 'LLM-based search' |
 | 'iPhone' | 'iPhone' |
 | 'McDonald' | 'McDonald' |
 
+## ✓ The «S-form» and lowercase «handle» forms chain, and every reading stays the same «term» · 8 cases
+`tests/unit/capture/test_glossary.py:404::test_s_form_chains_with_lowercase_form`
+
+- **given** a «term» named {canonical}
+- **when** the «handle» forms {forms} are applied in order
+- **then** it reads {reading} and refers to the same «term»
+
+| canonical | forms | reading |
+|---|---|---|
+| 'Room' | 's' | 'Rooms' |
+| 'Room' | 'l.s' | 'rooms' |
+| 'Room' | 's.l' | 'rooms' |
+| 'Box' | 'l.s' | 'boxes' |
+| 'Category' | 'l.s' | 'categories' |
+| 'API Key' | 'l.s' | 'API keys' |
+| 'API' | 's' | 'APIs' |
+| 'book' | 's' | 'books' |
+
+## ✓ The «S-form» and lowercase «handle» forms also apply to a called form
+`tests/unit/capture/test_glossary.py:431::test_s_form_and_lowercase_form_apply_to_a_called_form`
+
+- **given** a «term» named "Room"
+- **when** it is called as "Deluxe Suite" and both forms are applied
+- **then** it reads "deluxe suites" and refers to the same «term»
+
 ## ✓ Subscript looks up an already-declared «term»
-`tests/unit/capture/test_glossary.py:449::test_subscript_get_only_returns_handle`
+`tests/unit/capture/test_glossary.py:445::test_subscript_get_only_returns_handle`
 
 - **given** a glossary with one declared «term»
 - **when** the name is looked up by subscript
 - **then** the returned «term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:462::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
+`tests/unit/capture/test_glossary.py:458::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
 
 - **given** a glossary with one declared «term»
 - **when** a near-miss name is subscripted
@@ -1336,7 +1363,7 @@
 - **then** the first «term» of the second clause is an «actor»
 
 ## ✓ A conflict error names only the offending «stories»
-`tests/unit/capture/test_kind_inference.py:172::test_conflict_where_names_only_offending_stories` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:170::test_conflict_where_names_only_offending_stories` · diagnostics, validation
 
 - **given** an «actor» «term» that also appears in a verb slot
 - **when** «kind inference» runs over both «stories»
@@ -1344,7 +1371,7 @@
 - **then** only the offending story is named in the message
 
 ## ✓ A conflict message excludes «stories» with an unrelated «slot»
-`tests/unit/capture/test_kind_inference.py:199::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
+`tests/unit/capture/test_kind_inference.py:195::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
 
 - **given** a «kindless» «term» used in verb, actor and noun slots
 - **when** «kind inference» runs over all three «stories»
@@ -1352,7 +1379,7 @@
 - **then** only the verb and actor stories are named, not the noun one
 
 ## ✓ «Slot» positions alternate verb/noun after the «actor»
-`tests/unit/capture/test_kind_inference.py:229::test_slot_for_maps_odd_positions_to_verb`
+`tests/unit/capture/test_kind_inference.py:224::test_slot_for_maps_odd_positions_to_verb`
 
 - **given** the five positions of a short clause
 - **when** the «slot» rule is applied to each position
@@ -1572,28 +1599,28 @@
 - **then** it names the missing `@scenario`, so a suite can filter it
 
 ## ✓ «when_then» records the action and its outcome as siblings
-`tests/unit/capture/test_step_descriptor.py:287::test_when_then_records_two_sibling_steps_on_clean_exit`
+`tests/unit/capture/test_step_descriptor.py:286::test_when_then_records_two_sibling_steps_on_clean_exit`
 
 - **given** an «active scenario» in a local «collector»
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «step» are recorded
 
 ## ✓ «when_then» pairs with an inner pytest.raises
-`tests/unit/capture/test_step_descriptor.py:314::test_when_then_pairs_with_inner_pytest_raises`
+`tests/unit/capture/test_step_descriptor.py:313::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «active scenario» in a local «collector»
 - **when** the «when_then» body raises and an inner pytest.raises swallows it
 - **then** both sibling steps are still recorded
 
 ## ✓ «when_then» omits the then when the body raises uncaught
-`tests/unit/capture/test_step_descriptor.py:342::test_when_then_omits_then_when_body_raises_uncaught` · validation
+`tests/unit/capture/test_step_descriptor.py:341::test_when_then_omits_then_when_body_raises_uncaught` · validation
 
 - **given** an «active scenario» in a local «collector»
 - **when** the «when_then» body raises with nothing catching inside
 - **then** only the when step is recorded — the outcome never held
 
 ## ✓ Inside a «when_then» body only a when may open, as a child of the action · 3 cases
-`tests/unit/capture/test_step_descriptor.py:384::test_only_a_when_may_open_inside_a_when_then_body` · validation
+`tests/unit/capture/test_step_descriptor.py:383::test_only_a_when_may_open_inside_a_when_then_body` · validation
 
 - **given** an «active scenario» in a local «collector»
 - **when** a {phase_name} «step» opens inside the «when_then» body
@@ -1608,7 +1635,7 @@
 | then | refused |
 
 ## ✓ `@scenario` marks the test function without wrapping it
-`tests/unit/capture/test_step_descriptor.py:445::test_scenario_marks_the_function_without_wrapping_it`
+`tests/unit/capture/test_step_descriptor.py:444::test_scenario_marks_the_function_without_wrapping_it`
 
 - **given** a test function taking one fixture
 - **when** the function is decorated
@@ -1616,7 +1643,7 @@
 - **then** it carries the «scenario» marker, and a plain one does not
 
 ## ✓ An «attachment» label must be plain text · 3 cases
-`tests/unit/capture/test_step_descriptor.py:515::test_attach_rejects_a_non_str_label` · validation
+`tests/unit/capture/test_step_descriptor.py:514::test_attach_rejects_a_non_str_label` · validation
 
 - **given** a non-str «attachment» label of kind {label_kind}
 - **when** it is attached
@@ -1629,7 +1656,7 @@
 | not-a-string |
 
 ## ✓ A `Template` «narration» is refused in a test body · 3 cases
-`tests/unit/capture/test_step_descriptor.py:557::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
+`tests/unit/capture/test_step_descriptor.py:556::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
 
 - **given** an «active scenario» in a local «collector»
 - **when** a {phase_name} «step» opens on a `Template`
@@ -1642,7 +1669,7 @@
 | then |
 
 ## ✓ A sentence number or name pins only once looked up on its «story» · 6 cases
-`tests/unit/capture/test_step_descriptor.py:955::test_a_sentence_pins_only_once_looked_up_on_its_story` · validation
+`tests/unit/capture/test_step_descriptor.py:954::test_a_sentence_pins_only_once_looked_up_on_its_story` · validation
 
 - **given** the sentence {written}, looked up on its «story»: {looked_up}
 - **when** a «step» is declared with it as its «pin»
@@ -1668,7 +1695,7 @@
 - **then** the «actor» slot becomes a «term ref»
 
 ## ✓ An inflected «activity» keeps its «term» identity but shows the «inflection»
-`tests/unit/capture/test_story.py:107::test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_display`
+`tests/unit/capture/test_story.py:106::test_clause_dispatches_inflected_activity_to_clause_term_ref_with_inflected_display`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1678,7 +1705,7 @@
 - **then** the «term ref» shows the inflection over the same «activity»
 
 ## ✓ A bare string in a «clause» becomes a connective word
-`tests/unit/capture/test_story.py:129::test_clause_dispatches_bare_string_to_clause_word`
+`tests/unit/capture/test_story.py:127::test_clause_dispatches_bare_string_to_clause_word`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1687,7 +1714,7 @@
 - **then** the bare word becomes a «clause part» word, not a «term ref»
 
 ## ✓ A «clause» needs at least an «actor», an «activity» and a node
-`tests/unit/capture/test_story.py:145::test_clause_rejects_fewer_than_three_parts` · validation
+`tests/unit/capture/test_story.py:142::test_clause_rejects_fewer_than_three_parts` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1695,7 +1722,7 @@
 - **then** a PytestGivenError rejects it as too short, counting the parts
 
 ## ✓ A «clause» position takes only the kinds its «slot» accepts · 12 cases
-`tests/unit/capture/test_story.py:163::test_a_clause_position_takes_only_the_kinds_its_slot_accepts` · validation
+`tests/unit/capture/test_story.py:160::test_a_clause_position_takes_only_the_kinds_its_slot_accepts` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1721,7 +1748,7 @@
 | None | 2 | accepted |
 
 ## ✓ A bare string may fill any «slot» of a «clause», as a word · 3 cases
-`tests/unit/capture/test_story.py:207::test_a_bare_string_may_fill_any_slot`
+`tests/unit/capture/test_story.py:204::test_a_bare_string_may_fill_any_slot`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1738,28 +1765,28 @@
 | 2 |
 
 ## ✓ A «clause» may be fully bare words
-`tests/unit/capture/test_story.py:225::test_clause_allows_fully_bare_words`
+`tests/unit/capture/test_story.py:222::test_clause_allows_fully_bare_words`
 
 - **given** three plain words with no glossary handles
 - **when** a «clause» is built from them
 - **then** every part is a «clause part» word
 
 ## ✓ Node/edge alternation allows a trailing connective node
-`tests/unit/capture/test_story.py:244::test_clause_allows_node_edge_alternation_with_connective`
+`tests/unit/capture/test_story.py:241::test_clause_allows_node_edge_alternation_with_connective`
 
 - **given** an «actor», an «activity», a «work object» and a second actor
 - **when** they form a five-part «clause» joined by a connective
 - **then** even positions are term-ref nodes and the connective stays a word
 
 ## ✓ A «clause» may not end on a dangling edge
-`tests/unit/capture/test_story.py:270::test_clause_rejects_dangling_edge` · validation
+`tests/unit/capture/test_story.py:267::test_clause_rejects_dangling_edge` · validation
 
 - **given** an «actor», «activity» and «work object» plus a connective
 - **when** a clause ending on a connective edge is built
 - **then** a PytestGivenError names the trailing arrow with no target
 
 ## ✓ A single-clause «sentence» synthesizes one «clause»
-`tests/unit/capture/test_story.py:300::test_sentence_single_clause_synthesizes_one_clause`
+`tests/unit/capture/test_story.py:297::test_sentence_single_clause_synthesizes_one_clause`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1768,7 +1795,7 @@
 - **then** it wraps a single «clause»
 
 ## ✓ A «sentence» may hold several «clauses»
-`tests/unit/capture/test_story.py:316::test_sentence_accepts_multiple_clauses`
+`tests/unit/capture/test_story.py:313::test_sentence_accepts_multiple_clauses`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1778,7 +1805,7 @@
 - **then** the sentence carries both clauses
 
 ## ✓ Mixing loose parts and prebuilt «clauses» is rejected
-`tests/unit/capture/test_story.py:333::test_sentence_mixing_parts_and_clauses_raises` · validation
+`tests/unit/capture/test_story.py:330::test_sentence_mixing_parts_and_clauses_raises` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1788,7 +1815,7 @@
 - **then** a PytestGivenError rejects the mix
 
 ## ✓ A «story» auto-numbers its «sentences» from one
-`tests/unit/capture/test_story.py:353::test_story_auto_numbers_sentences_from_one`
+`tests/unit/capture/test_story.py:350::test_story_auto_numbers_sentences_from_one`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1797,14 +1824,14 @@
 - **then** the sentences are numbered 1 and 2
 
 ## ✓ A «story» derives its id from its title
-`tests/unit/capture/test_story.py:371::test_story_derives_id_from_title`
+`tests/unit/capture/test_story.py:368::test_story_derives_id_from_title`
 
 - **given** a human-readable story title
 - **when** a «story» is built from it
 - **then** its id is the slugified title
 
 ## ✓ A «story» may span only one «glossary»
-`tests/unit/capture/test_story.py:383::test_story_rejects_two_glossaries` · validation
+`tests/unit/capture/test_story.py:380::test_story_rejects_two_glossaries` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1814,7 +1841,7 @@
 - **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ A «sentence» «handle» is looked up by name or by number
-`tests/unit/capture/test_story.py:429::test_story_hands_out_a_sentence_by_name_and_by_number`
+`tests/unit/capture/test_story.py:426::test_story_hands_out_a_sentence_by_name_and_by_number`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1824,7 +1851,7 @@
 - **then** both «handles» name sentence 2 of that «story»
 
 ## ✓ Iterating a «story» yields its «sentence» handles
-`tests/unit/capture/test_story.py:451::test_iterating_a_story_yields_its_sentence_handles`
+`tests/unit/capture/test_story.py:446::test_iterating_a_story_yields_its_sentence_handles`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1834,7 +1861,7 @@
 - **then** it yields each «sentence» handle in order
 
 ## ✓ Looking up a «sentence» the «story» lacks lists the ones it has
-`tests/unit/capture/test_story.py:488::test_story_lookup_miss_lists_the_sentences`
+`tests/unit/capture/test_story.py:483::test_story_lookup_miss_lists_the_sentences`
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1844,7 +1871,7 @@
 - **then** a PytestGivenError lists the story's sentences
 
 ## ✓ Two «sentences» of one «story» cannot share a name
-`tests/unit/capture/test_story.py:556::test_story_rejects_duplicate_sentence_names` · validation
+`tests/unit/capture/test_story.py:550::test_story_rejects_duplicate_sentence_names` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1854,7 +1881,7 @@
 - **then** a PytestGivenError names the duplicate and both numbers
 
 ## ✓ A «sentence» name must be non-empty and unpadded · 4 cases
-`tests/unit/capture/test_story.py:574::test_a_sentence_name_must_be_non_empty_and_unpadded` · validation
+`tests/unit/capture/test_story.py:568::test_a_sentence_name_must_be_non_empty_and_unpadded` · validation
 
 - **given** a Guest actor
 - **given** a search activity
@@ -1872,28 +1899,28 @@
 | 'cancel ' | refused |
 
 ## ✓ Two «stories» with the same id collide
-`tests/unit/capture/test_story.py:609::test_story_id_collision_raises_with_both_sites` · validation
+`tests/unit/capture/test_story.py:603::test_story_id_collision_raises_with_both_sites` · validation
 
 - **given** a «story» already declared under an id
 - **when** a second story is declared with the same slug
 - **then** a PytestGivenError reports the id was already declared
 
 ## ✓ A «clause» may chain a second verb-object pair
-`tests/unit/capture/test_story.py:692::test_clause_allows_second_verb_edge`
+`tests/unit/capture/test_story.py:686::test_clause_allows_second_verb_edge`
 
 - **given** an «actor», two «activity» and two «work object» handles
 - **when** they form a five-node «clause» (actor verb object verb object)
 - **then** every slot is a «term ref», with no bare words
 
 ## ✓ A declared «work object» in a verb «slot» is rejected at construction
-`tests/unit/capture/test_story.py:744::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
+`tests/unit/capture/test_story.py:738::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «file glossary» declaring Room a work object
 - **when** Room is placed in the verb «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
 ## ✓ A «slot» error names the «term», not its repr
-`tests/unit/capture/test_story.py:770::test_slot_error_message_stays_compact` · diagnostics
+`tests/unit/capture/test_story.py:764::test_slot_error_message_stays_compact` · diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -1903,7 +1930,7 @@
 - **then** the message is short and free of dataclass reprs
 
 ## ✓ A non-handle «clause part» names its type
-`tests/unit/capture/test_story.py:791::test_non_handle_part_names_its_type` · validation, diagnostics
+`tests/unit/capture/test_story.py:785::test_non_handle_part_names_its_type` · validation, diagnostics
 
 - **given** a Guest actor
 - **given** a Room work object
@@ -2051,7 +2078,7 @@
   ```
 
 ## ✓ «Narration lint» flags a then «step» that folds in the action
-`tests/unit/lint/test_ast_rules.py:579::test_action_in_then_fires_when_no_when_exists`
+`tests/unit/lint/test_ast_rules.py:578::test_action_in_then_fires_when_no_when_exists`
 
 - **given** a «scenario» with no when, acting inside its then
   - 📎 step body:
@@ -2066,7 +2093,7 @@
 - **then** a warn «finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
-`tests/unit/lint/test_ast_rules.py:759::test_unused_interpolation_fires_on_unused_bare_identifier`
+`tests/unit/lint/test_ast_rules.py:758::test_unused_interpolation_fires_on_unused_bare_identifier`
 
 - **given** a given «step» whose body never loads the name
   - 📎 step body:
@@ -2095,7 +2122,7 @@
 - **then** a single warn «finding» names the «tag» and the «term» it shadows, counting the scenarios and naming one
 
 ## ✓ «Narration lint» flags a «term» referenced by no «scenario» name, «step» or «story»
-`tests/unit/lint/test_runtime_rules.py:239::test_dead_term_flags_unreferenced_term`
+`tests/unit/lint/test_runtime_rules.py:238::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
 - **when** the runtime «rules» run over no scenarios and no stories
@@ -2103,7 +2130,7 @@
 - **then** its «severity» is off — the rule is opt-in
 
 ## ✓ «Narration lint» counts a «term» named only in the second «clause» of a «sentence» as referenced
-`tests/unit/lint/test_runtime_rules.py:310::test_dead_term_passes_term_referenced_only_by_a_second_clause`
+`tests/unit/lint/test_runtime_rules.py:309::test_dead_term_passes_term_referenced_only_by_a_second_clause`
 
 - **given** a «story» whose one «sentence» names the «term» only in its second «clause»
 - **when** the runtime «rules» run over that story
@@ -2139,7 +2166,7 @@
 - **then** they are the «term» ids alone
 
 ## ✓ An «instance» and its bare «term» cover each other
-`tests/unit/report/test_coverage.py:193::test_compute_coverage_matches_instance_and_bare_term_both_ways`
+`tests/unit/report/test_coverage.py:192::test_compute_coverage_matches_instance_and_bare_term_both_ways`
 
 - **given** a «sentence» naming a bare «actor»
 - **given** the same «sentence» naming an «instance» of that actor
@@ -2149,7 +2176,7 @@
 - **then** the bare «step» covers the «instance» «sentence»
 
 ## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py:262::test_compute_coverage_lost_when_sentence_gains_a_term`
+`tests/unit/report/test_coverage.py:258::test_compute_coverage_lost_when_sentence_gains_a_term`
 
 - **given** a «step» naming two «term refs»
 - **given** the same «sentence» with that middle slot a bare word, then an «activity» ref
@@ -2158,7 +2185,7 @@
 - **then** the widened «sentence» is no longer covered
 
 ## ✓ A «scenario» «pin» covers exactly its «sentences»
-`tests/unit/report/test_coverage.py:312::test_compute_coverage_scenario_pin_replaces_matching`
+`tests/unit/report/test_coverage.py:308::test_compute_coverage_scenario_pin_replaces_matching`
 
 - **given** a «story» with a matching and an under-anchored «sentence»
 - **given** a «scenario» whose «step» matches sentence 1 but which pins sentence 2
@@ -2166,7 +2193,7 @@
 - **then** only the pinned «sentence» is covered, matching never ran
 
 ## ✓ A «step» is narration-matched only where neither it nor its «scenario» «pins» · 5 cases
-`tests/unit/report/test_coverage.py:398::test_narration_matching_runs_only_where_nothing_pins`
+`tests/unit/report/test_coverage.py:392::test_narration_matching_runs_only_where_nothing_pins`
 
 - **given** a scenario with pins={scenario_pins}
 - **given** a step matching sentence 1, with pins={step_pins}
@@ -2182,7 +2209,7 @@
 | [1] | [2] | [1, 2] |
 
 ## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
-`tests/unit/report/test_coverage.py:479::test_coverage_eligibility_needs_two_distinct_terms`
+`tests/unit/report/test_coverage.py:471::test_coverage_eligibility_needs_two_distinct_terms`
 
 - **given** a «sentence» referencing the «terms» {term_ids}
 - **when** its «coverage» eligibility is checked
@@ -2196,7 +2223,7 @@
 | [] | False |
 
 ## ✓ An under-anchored «sentence» is covered only through a «pin» · 4 cases
-`tests/unit/report/test_coverage.py:503::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
+`tests/unit/report/test_coverage.py:493::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
 
 - **given** a «story» whose «sentence» references the «terms» {term_ids}
 - **given** a «step» narrating those «terms», «pinning» the «sentence»: {pinned}
@@ -2211,7 +2238,7 @@
 | ['guest'] | True | True |
 
 ## ✓ Nested «steps» are walked for «coverage»
-`tests/unit/report/test_coverage.py:544::test_compute_coverage_nested_steps_are_walked`
+`tests/unit/report/test_coverage.py:534::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «story» with one canonical «sentence»
 - **given** the covering «term refs» in a nested child «step»
@@ -2221,7 +2248,7 @@
 ## ✓ The «glossary» view aggregates «instances» and «activity» forms
 `tests/unit/report/test_glossary_view.py:66::test_build_glossary_aggregations_collects_instances_and_forms`
 
-- **given** a «report» whose «story» and «scenario» reference entity «instance»s and an «inflection»
+- **given** a «report» whose «story» and «scenario» reference entity «instances» and an «inflection»
   - 📎 Report data:
     ```
     {
@@ -2343,7 +2370,7 @@
     }
     ```
 - **when** the «glossary» aggregations are built
-- **then** the entity terms collect their «instance»s
+- **then** the entity terms collect their «instances»
 - **then** the activity collects its «inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by a «sentence» record the «story»
@@ -2354,35 +2381,42 @@
 - **then** the actor and the activity each list that «story»
 
 ## ✓ A «story» referencing a «term» twice lists it once
-`tests/unit/report/test_glossary_view.py:198::test_repeated_references_within_one_story_are_recorded_once`
+`tests/unit/report/test_glossary_view.py:197::test_repeated_references_within_one_story_are_recorded_once`
 
 - **given** a «story» whose two «sentences» repeat the same «term» and the same «inflection»
 - **when** the «glossary» aggregations are built
 - **then** the «story» and the «inflection» appear once each
 
 ## ✓ A canonical entity reference is not an «instance», whatever its case
-`tests/unit/report/test_glossary_view.py:253::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+`tests/unit/report/test_glossary_view.py:252::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
 
 - **given** a «story» sentence referencing entities by canonical name, and a «step» referencing one in lowercase
 - **when** the «glossary» aggregations are built
 - **then** neither entity term records an «instance»
 
+## ✓ An «S-form» reference is the «term» itself, not an «instance» or an «inflection»
+`tests/unit/report/test_glossary_view.py:296::test_build_glossary_aggregations_s_form_ref_is_the_term_itself`
+
+- **given** a «story» «sentence» referencing an entity and an activity by their «s-forms», each lowercase and capitalized
+- **when** the «glossary» aggregations are built
+- **then** the entity records no «instance» and the activity no «inflection»
+
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_glossary_view.py:337::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/report/test_glossary_view.py:382::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «kindless» «term» referenced by a «story» sentence
 - **when** the «glossary» aggregations are built
 - **then** the «term» lists the «story» but no «instance» and no «inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_glossary_view.py:371::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/report/test_glossary_view.py:415::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «scenario» whose fixture-sourced «step» names an «instance»
 - **when** the «glossary» aggregations are built
 - **then** the «instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_glossary_view.py:460::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/report/test_glossary_view.py:504::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «scenario» referencing one «term» in two steps and another in its name
 - **when** the term-scenario index is built
@@ -2433,7 +2467,7 @@
     ```
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
-`tests/unit/report/test_md_renderer.py:177::test_narration_parts_resolve_terms_and_values`
+`tests/unit/report/test_md_renderer.py:175::test_narration_parts_resolve_terms_and_values`
 
 - **given** a «step» whose «narration» carries a «term ref», a value and a placeholder
 - **when** the Markdown «report» is rendered
@@ -2449,7 +2483,7 @@
     ```
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
-`tests/unit/report/test_md_renderer.py:249::test_parametrized_scenario_renders_table` · parametrization
+`tests/unit/report/test_md_renderer.py:246::test_parametrized_scenario_renders_table` · parametrization
 
 - **given** a «parametrized scenario» with a two-«case» «parameter table»
 - **when** the Markdown «report» is rendered
@@ -2470,7 +2504,7 @@
     ```
 
 ## ✓ The «parameter table» shows a status column only when its cases differ in status · 5 cases
-`tests/unit/report/test_md_renderer.py:287::test_param_table_shows_status_column_only_when_case_statuses_differ` · parametrization
+`tests/unit/report/test_md_renderer.py:283::test_param_table_shows_status_column_only_when_case_statuses_differ` · parametrization
 
 - **given** a «parameter table» whose first «case» is {first_status} and whose second is {second_status}
 - **when** the Markdown «report» is rendered
@@ -2561,7 +2595,7 @@
   ```
 
 ## ✓ A failed «scenario» ends with a minimal error digest
-`tests/unit/report/test_md_renderer.py:324::test_failing_scenario_renders_a_minimal_error`
+`tests/unit/report/test_md_renderer.py:320::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «scenario» carrying a two-line error and an internal frame
   - 📎 Error record:
@@ -2604,7 +2638,7 @@
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
-`tests/unit/report/test_md_renderer.py:395::test_multiline_attachment_renders_fenced_block`
+`tests/unit/report/test_md_renderer.py:391::test_multiline_attachment_renders_fenced_block`
 
 - **given** a «step» carrying a multi-line «attachment»
 - **when** the Markdown «report» is rendered
@@ -2625,7 +2659,7 @@
     ````
 
 ## ✓ A skipped scenario shows its skip reason
-`tests/unit/report/test_md_renderer.py:559::test_skipped_scenario_shows_reason`
+`tests/unit/report/test_md_renderer.py:555::test_skipped_scenario_shows_reason`
 
 - **given** a skipped «scenario» with a reason
 - **when** the Markdown «report» is rendered
@@ -2653,7 +2687,7 @@
 
 - **given** a saved report dict whose `coverage` no longer matches its steps
 - **when** `pytest-given report` re-renders it to JSON
-- **then** the «coverage» is the one the «step»s actually earn
+- **then** the «coverage» is the one the «steps» actually earn
 
 ## ✓ A «source link» config value resolves to its template: a preset name, a raw template, or `none` · 6 cases
 `tests/unit/report/test_source_link.py:31::test_a_source_link_config_value_resolves_to_its_template`
@@ -2718,7 +2752,7 @@
 | False | True | False | False |
 
 ## ✓ A «scenario» bound to two «stories» is matched against each
-`tests/unit/report/test_story_view.py:327::test_build_story_rollups_lists_a_scenario_under_each_bound_story`
+`tests/unit/report/test_story_view.py:326::test_build_story_rollups_lists_a_scenario_under_each_bound_story`
 
 - **given** two «stories» each with a guest-search-room «sentence»
 - **given** a «scenario» bound to both whose «step» names those terms
@@ -2726,7 +2760,7 @@
 - **then** the «scenario» is listed under, and covers, both «stories»
 
 ## ✓ A «sentence» is labeled by the prose of its «clauses»
-`tests/unit/report/test_story_view.py:379::test_build_sentence_labels_joins_parts_into_prose`
+`tests/unit/report/test_story_view.py:375::test_build_sentence_labels_joins_parts_into_prose`
 
 - **given** a «story» with a two-«clause» «sentence»
 - **when** the «sentence» labels are built
@@ -2740,35 +2774,35 @@
 - **then** the «scenario» is xfailed and carries the xfailed «case»'s reason
 
 ## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
-`tests/unit/test_grouping.py:230::test_group_parametrized_any_failed_groups_as_failed` · parametrization
+`tests/unit/test_grouping.py:228::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «case» records of one «parametrized scenario»
 - **when** the «grouping» pass collapses them
 - **then** one scenario remains and any failed «case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:267::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:263::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ Same-named «parametrized scenarios» on different test functions stay apart
-`tests/unit/test_grouping.py:293::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
+`tests/unit/test_grouping.py:289::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
 
 - **given** two test functions whose «cases» share one name
 - **when** the «grouping» pass runs
 - **then** each function keeps its own «scenario» and «parameter table»
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:400::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:395::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:627::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:622::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -2777,7 +2811,7 @@
 - **then** it names the «case» whose values were baked in, and the per-case opt-out
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:750::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:744::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -2786,7 +2820,7 @@
 - **then** the placeholder keeps the format spec and conversion it narrated
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:863::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:856::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2794,14 +2828,14 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1229::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1222::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
 ## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1244::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1237::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
@@ -2809,7 +2843,7 @@
 - **then** the name renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1287::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+`tests/unit/test_grouping.py:1280::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
@@ -2817,7 +2851,7 @@
 - **then** the step renders the disambiguated token, text and parts agreeing
 
 ## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1369::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+`tests/unit/test_grouping.py:1362::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2825,7 +2859,7 @@
 - **then** the error names the column and what the case actually narrated
 
 ## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py:1720::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1713::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «term ref» reads differently
 - **when** the «cases» are «grouped»
@@ -2833,7 +2867,7 @@
 - **then** the error names the «term ref» and the split-it-out fix
 
 ## ✓ A «term ref» that *is* the parametrize value is refused too
-`tests/unit/test_grouping.py:1779::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+`tests/unit/test_grouping.py:1769::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «term ref» is the parameter itself
 - **when** the «cases» are «grouped»
@@ -2841,7 +2875,7 @@
 - **then** the error points at the per-case «scenario» opt-out
 
 ## ✓ A «parameter table» orders its columns the way the «narration» first shows them
-`tests/unit/test_grouping.py:1943::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
+`tests/unit/test_grouping.py:1933::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
 
 - **given** two «cases» whose given attaches a varying log and whose later step narrates the parameter
 - **when** «templatizing» walks the «cases»
@@ -2849,7 +2883,7 @@
 - **then** each «case» row follows the same order
 
 ## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py:1975::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+`tests/unit/test_grouping.py:1965::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
 
 - **given** two «cases» attaching a label with differing payloads
 - **when** «templatizing» walks the «cases»
@@ -2857,7 +2891,7 @@
 - **then** the «step» keeps a content-less badge pointing at it
 
 ## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py:2031::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+`tests/unit/test_grouping.py:2021::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
 
 - **given** an «attachment» label only one «case» attaches
 - **when** the «cases» are «grouped»
@@ -2865,7 +2899,7 @@
 - **then** the error names the label, the case, and asks for a constant one
 
 ## ✓ A «parameter table» cell reads the way the «step» that points at it read
-`tests/unit/test_grouping.py:2577::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+`tests/unit/test_grouping.py:2567::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec
 - **when** «grouping» builds the «parameter table»
@@ -2873,7 +2907,7 @@
 - **then** the step keeps its placeholder, which that cell substitutes into
 
 ## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py:2737::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+`tests/unit/test_grouping.py:2727::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
 
 - **given** two «cases» whose «step» trees differ
 - **when** the «cases» are «grouped»
@@ -2881,7 +2915,7 @@
 - **then** the error names the divergence and the opt-out that answers it
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py:2887::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+`tests/unit/test_grouping.py:2877::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
 - **given** a step narrating a parameter bound to a glossary term instance
 - **when** the «cases» are «grouped»
