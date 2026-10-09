@@ -1,6 +1,7 @@
 """User-facing Glossary API: id derivation, value classes, registration."""
 
 import difflib
+import re
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -151,7 +152,7 @@ class TermHandle(TermHandleBase):
     def low(self) -> TermInstance:
         """The canonical term lowercased — the common mid-sentence form
         (``guest.low`` instead of ``guest('guest')``)."""
-        return self(self.canonical.lower())
+        return self(_lowercase_words(self.canonical))
 
     @property
     def term(self) -> GlossaryTerm:
@@ -191,6 +192,22 @@ class TermInstance(TermHandleBase):
     @property
     def display(self) -> str:
         return self.surface
+
+
+_WORD = re.compile(r'[^\W\d_]+')
+
+
+def _lowercase_words(text: str) -> str:
+    """Lowercase each capitalized word, leaving acronyms (``LLM``), single
+    letters (``Plan B``) and mixed case (``iPhone``) as written."""
+    return _WORD.sub(
+        lambda match: (
+            match[0].lower()
+            if match[0][0].isupper() and match[0][1:].islower()
+            else match[0]
+        ),
+        text,
+    )
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:

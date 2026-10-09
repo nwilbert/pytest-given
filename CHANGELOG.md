@@ -15,6 +15,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+- A handle's `.low` form lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*).
 - The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.
 
 ## [0.4.1] - 2026-10-04

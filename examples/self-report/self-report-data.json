@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-04T17:59:30.737004+00:00",
+    "timestamp": "2026-10-09T19:09:36.177911+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "fb34e08900eb507bf45c414b863f25e9d4785420",
+    "commit_sha": "bd7710a282fc0d367db1cae0179678e43a869d90",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -111,7 +111,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -220,7 +220,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -364,7 +364,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -541,7 +541,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -718,7 +718,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -817,7 +817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -887,7 +887,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -1142,7 +1142,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -1266,7 +1266,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -1430,7 +1430,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1547,7 +1547,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 153,
+      "duration_ms": 152,
       "steps": [
         {
           "phase": "given",
@@ -1620,7 +1620,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -1931,7 +1931,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -2076,7 +2076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -2229,7 +2229,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2363,7 +2363,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -2486,7 +2486,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 132,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
@@ -2670,7 +2670,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 90,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -2778,7 +2778,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 118,
+      "duration_ms": 126,
       "steps": [
         {
           "phase": "given",
@@ -2939,7 +2939,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -3033,7 +3033,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -3107,7 +3107,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 75,
+      "duration_ms": 101,
       "steps": [
         {
           "phase": "given",
@@ -3365,7 +3365,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -3472,7 +3472,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 154,
+      "duration_ms": 161,
       "steps": [
         {
           "phase": "given",
@@ -3571,7 +3571,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -3664,7 +3664,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -3735,7 +3735,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -3837,7 +3837,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -3942,7 +3942,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4070,7 +4070,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -4182,7 +4182,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -4258,7 +4258,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 80,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -6104,7 +6104,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6398,7 +6398,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6485,7 +6485,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6571,7 +6571,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7114,7 +7114,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -8609,6 +8609,177 @@
       "pins": null
     },
     {
+      "id": "tests/unit/capture/test_glossary.py::test_low_keeps_acronyms_and_mixed_case_words[Booking Request-booking request]",
+      "narration": {
+        "text": "The lowercase handle form lowercases only capitalized words, so acronyms keep their case",
+        "parts": [
+          {
+            "value": "The lowercase "
+          },
+          {
+            "term_id": "handle",
+            "display": "handle",
+            "expression": "pg[\"Handle\"].low"
+          },
+          {
+            "value": " form lowercases only capitalized words, so acronyms keep their case"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a term named {canonical}",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].low"
+              },
+              {
+                "value": " named "
+              },
+              {
+                "name": "canonical",
+                "column_id": "canonical",
+                "format_spec": "",
+                "conversion": "r"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "its lowercase handle form is taken",
+            "parts": [
+              {
+                "value": "its lowercase "
+              },
+              {
+                "term_id": "handle",
+                "display": "handle",
+                "expression": "pg[\"Handle\"].low"
+              },
+              {
+                "value": " form is taken"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it reads {lowered}",
+            "parts": [
+              {
+                "value": "it reads "
+              },
+              {
+                "name": "lowered",
+                "column_id": "lowered",
+                "format_spec": "",
+                "conversion": "r"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "canonical",
+            "name": "canonical",
+            "kind": "param"
+          },
+          {
+            "id": "lowered",
+            "name": "lowered",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "values": [
+              "'Booking Request'",
+              "'booking request'"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "'LLM Call'",
+              "'LLM call'"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "'Check-In'",
+              "'check-in'"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "'Plan B'",
+              "'plan B'"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "'iPhone'",
+              "'iPhone'"
+            ],
+            "status": "passed",
+            "error": null
+          },
+          {
+            "values": [
+              "'McDonald'",
+              "'McDonald'"
+            ],
+            "status": "passed",
+            "error": null
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_glossary.py",
+        "line": 389
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/unit/capture/test_glossary.py::test_subscript_get_only_returns_handle",
       "narration": {
         "text": "Subscript looks up an already-declared term",
@@ -8689,7 +8860,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 425
+        "line": 449
       },
       "story_ids": [],
       "pins": null
@@ -8757,7 +8928,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 438
+        "line": 462
       },
       "story_ids": [],
       "pins": null
@@ -15072,7 +15243,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -16202,7 +16373,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -16474,7 +16645,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -16679,7 +16850,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -16801,7 +16972,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -20366,7 +20537,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 140,
+      "duration_ms": 137,
       "steps": [
         {
           "phase": "given",
@@ -25568,7 +25739,7 @@
         "id": "handle",
         "kind": null,
         "canonical": "Handle",
-        "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of three surface forms: **bare** (`room` \u2014 the canonical display), **`.low`** (`room.low` \u2014 lowercased), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
+        "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of three surface forms: **bare** (`room` \u2014 the canonical display), **`.low`** (`room.low` \u2014 capitalized words lowercased, acronyms kept), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 81

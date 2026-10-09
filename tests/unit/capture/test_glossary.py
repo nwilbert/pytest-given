@@ -386,6 +386,30 @@ def test_low_yields_lowercased_display_instance():
     assert low.display == 'loyalty points'
 
 
+@scenario(
+    t'The lowercase {pg["Handle"].low} form lowercases only capitalized words, '
+    t'so acronyms keep their case',
+)
+@pytest.mark.parametrize(
+    ('canonical', 'lowered'),
+    [
+        ('Booking Request', 'booking request'),
+        ('LLM Call', 'LLM call'),
+        ('Check-In', 'check-in'),
+        ('Plan B', 'plan B'),
+        ('iPhone', 'iPhone'),
+        ('McDonald', 'McDonald'),
+    ],
+)
+def test_low_keeps_acronyms_and_mixed_case_words(canonical, lowered):
+    with given(t'a {pg["Term"].low} named {canonical!r}'):
+        handle = Glossary()(canonical)
+    with when(t'its lowercase {pg["Handle"].low} form is taken'):
+        low = handle.low
+    with then(t'it reads {lowered!r}'):
+        assert low.display == lowered
+
+
 def test_actor_low_yields_lowercased_instance():
     g = Glossary()
     a = TermHandle(

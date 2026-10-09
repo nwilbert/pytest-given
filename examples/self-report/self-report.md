@@ -1258,15 +1258,31 @@
 - **when** a «term» is declared by call, without a kind
 - **then** the «term» is registered as «kindless»
 
+## ✓ The lowercase «handle» form lowercases only capitalized words, so acronyms keep their case · 6 cases
+`tests/unit/capture/test_glossary.py:389::test_low_keeps_acronyms_and_mixed_case_words`
+
+- **given** a «term» named {canonical}
+- **when** its lowercase «handle» form is taken
+- **then** it reads {lowered}
+
+| canonical | lowered |
+|---|---|
+| 'Booking Request' | 'booking request' |
+| 'LLM Call' | 'LLM call' |
+| 'Check-In' | 'check-in' |
+| 'Plan B' | 'plan B' |
+| 'iPhone' | 'iPhone' |
+| 'McDonald' | 'McDonald' |
+
 ## ✓ Subscript looks up an already-declared «term»
-`tests/unit/capture/test_glossary.py:425::test_subscript_get_only_returns_handle`
+`tests/unit/capture/test_glossary.py:449::test_subscript_get_only_returns_handle`
 
 - **given** a glossary with one declared «term»
 - **when** the name is looked up by subscript
 - **then** the returned «term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:438::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
+`tests/unit/capture/test_glossary.py:462::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
 
 - **given** a glossary with one declared «term»
 - **when** a near-miss name is subscripted

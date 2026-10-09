@@ -30,7 +30,7 @@ A **term ref** is a glossary term used in a step or a scenario title. To create 
 A term ref has three forms. Use the simplest one that fits your sentence:
 
 - **`{guest}`** shows the term as declared: *Guest*.
-- **`{guest.low}`** shows the term in lowercase: *guest*. This is the usual form in the middle of a sentence.
+- **`{guest.low}`** shows the term in lowercase: *guest*. This is the usual form in the middle of a sentence. Only capitalized words are lowercased, so acronyms keep their case: `LLM Call` reads *LLM call*.
 - **`guest('Alice')`** shows any other text: a verb form (`book('books')`), a plural (`room('rooms')`), or a specific instance (`guest('Alice')`). Don't write `guest('Guest')` or `guest('guest')`; use `{guest}` or `{guest.low}` instead.
 
 All three forms work on every handle, including handles you look up by name.
