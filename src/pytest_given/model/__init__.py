@@ -29,6 +29,7 @@ from .runtime import (
 from .schema import (
     CONTENT_TYPES,
     PHASES,
+    STATUSES,
     Attachment,
     AttachmentLabel,
     AttachmentRef,
@@ -90,6 +91,7 @@ __all__ = [
     'CONTENT_TYPES',
     'EMPHASIS',
     'PHASES',
+    'STATUSES',
     'Attachment',
     'AttachmentLabel',
     'AttachmentRef',
