@@ -82,7 +82,7 @@ def run_report(args: argparse.Namespace) -> int:
         config = _sink_config(
             args.output, args.source_link, args.format, args.theme, args.lines
         )
-        rendered = emit_sinks(_load_report(json_file), config, str(json_file))
+        rendered = emit_sinks(load_report_json(json_file), config, str(json_file))
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
         # A file that is not UTF-8 at all never reaches the JSON parser, and
         # `UnicodeDecodeError` is a `ValueError` — neither clause below sees
@@ -99,7 +99,7 @@ def run_report(args: argparse.Namespace) -> int:
     return 0
 
 
-def _load_report(json_file: Path) -> dict[str, Any]:
+def load_report_json(json_file: Path) -> dict[str, Any]:
     """The input file as a dict. `report_from_dict` downstream is what rejects
     a dict that is not a report.
 

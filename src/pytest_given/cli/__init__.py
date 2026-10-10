@@ -13,6 +13,7 @@ stderr.
 import argparse
 from collections.abc import Callable
 
+from .citations import add_citations_parser
 from .report import add_report_parser
 from .skills import add_skills_parser
 
@@ -26,6 +27,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     subparsers = parser.add_subparsers(required=True)
     add_report_parser(subparsers)
+    add_citations_parser(subparsers)
     add_skills_parser(subparsers)
     args = parser.parse_args(argv)
     handler: Callable[[argparse.Namespace], int] = args.handler

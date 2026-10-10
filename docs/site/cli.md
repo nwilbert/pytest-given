@@ -19,5 +19,19 @@ Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md
 
 With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no `<!-- pytest-given:md:start -->` markers; the plugin only adds them to separate the report from pytest's own output.
 
+## Citations
+
+`pytest-given citations check` verifies every link into the report in a set of Markdown files against a JSON report, and `citations update` rewrites the [citations](guide/citations.md) among them to match it:
+
+```bash
+pytest-given citations check docs/specs/ README.md --report report.json \
+    [--report-url URL] [--report-path PATH]
+pytest-given citations update …   # same arguments
+```
+
+A directory is searched recursively for `*.md`. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (`pytest -m pytest_given --given-json=report.json`). `--report-url` defaults to the URL stored in the report (`--given-report-url`); `--report-path` names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.
+
+`check` writes nothing and exits 1 on any finding; `update` exits 1 when a finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, or when neither a report URL nor a report path is known.
+
 The same command also installs the agent skills with `pytest-given skills install`; see [Agent skills](ai-agents.md#agent-skills).
 
