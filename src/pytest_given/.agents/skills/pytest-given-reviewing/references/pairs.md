@@ -1,6 +1,6 @@
 # Narration/body pairs from the JSON report
 
-Layer 2 needs each step's text and the code under it side by side. Every scenario in the JSON sink carries its `source` (`relpath` + `line`), so one pass pairs each narration with the whole test function carrying it, grouped by test file.
+Layer 2 needs each step's text next to the code under it. Every scenario in the JSON report has its `source` (`relpath` and `line`). So one pass can pair each scenario's narration with its whole test function, grouped by test file.
 
 ```bash
 pytest <selection> --given-json=report.json
@@ -57,9 +57,9 @@ for relpath, group in sorted(by_file.items()):
 
 ## Reading the dump
 
-- Each entry is the report's title over the test's source, decorators included, with real line numbers — cite `file:line` straight from the dump.
-- A parametrized scenario appears once, anchored where the report anchors it; its parameter table stays in the JSON.
+- Each entry shows the report's title above the test's source, including decorators, with real line numbers. Cite `file:line` straight from the dump.
+- A parametrized scenario appears once, at the line the report points to. Its parameter table is only in the JSON.
 - Only decorated tests are in the report, so only they are in the dump.
-- The dump holds the test function alone: a module-level constant or helper its body names (a suite string, a record builder) is in the test file, so open it before judging a value.
-- One file per test file is the fan-out unit: hand a reviewer that file and the layer-2 rubric, nothing else.
-- `--given-json` is a plain pytest flag, so this needs no project wiring and no other sink.
+- The dump holds only the test function. A module-level constant or helper that the body uses (a suite string, a record builder) is elsewhere in the test file, so open the file before you judge a value.
+- When you split the audit, one dump file is one reviewer's share: hand a reviewer that file and the layer-2 rubric, nothing else.
+- `--given-json` is a plain pytest flag, so this needs no project setup and no other report format.

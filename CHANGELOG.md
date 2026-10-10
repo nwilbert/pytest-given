@@ -23,6 +23,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A handle's `.l` form lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*).
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
 - The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.
+- The bundled `pytest-given-authoring` skill covers scenario titles and narrates each rule once, where its test proves it, and the `pytest-given-reviewing` skill reviews titles as a list and flags a rule narrated at the wrong layer or a `then` that checks nothing.
+- The bundled skills are reworded in plainer language.
 
 ## [0.4.1] - 2026-10-04
 

@@ -14,52 +14,52 @@ coverage[]    one entry per story sentence — which scenarios cover it
 
 | Field | Meaning |
 |---|---|
-| `id` | The pytest node id. A grouped parametrized scenario **keeps the first collected case's suffix** (`tests/test_x.py::test_y[1-False]`) — it is not stripped, so match on a prefix rather than on equality |
-| `narration.text` | The scenario name (grouped template for parametrized scenarios) — for a *step* in a grouped parametrized scenario this is the template too (`the drink costs {price} euros`), not the first case's rendering |
-| `module` | Python module the test lives in |
-| `tags[]` | `tags=` from `@scenario` — report metadata, **not** pytest marks |
-| `status` | `passed` / `failed` / `skipped` / `xfailed` (failed as expected: an `xfail` mark or `pytest.xfail()`) |
-| `skip_reason` | `null`, or the reason a skipped scenario carries instead of a traceback |
-| `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail; it keeps its steps and error as well |
-| `duration_ms` | Wall-clock time for the test |
-| `steps[]` | Recursive step tree (see below) |
-| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for parametrized scenarios. `kind` is `param` / `derived` / `attachment`; a case's `values` is positionally aligned with `columns`, and an `attachment` cell is an `{label, content, content_type}` object (or `null` for a case with no value). A scenario opted out of grouping with `group_parametrized=False` has `parameters: null` like any unparametrized one |
-| `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}` — `is_internal` marks a `pluggy` / `_pytest` / pytest-given frame, kept only under `--given-all-frames`. **Always `null` on a parametrized scenario**, even a failed one: its errors are per case in `parameters.cases[].error`, same shape |
-| `source` | `{relpath, line}` — the test function's definition site |
-| `story_ids` / `pins` | The stories `@scenario(stories=...)` narration-matches against, and the scenario pins as `[{story_id, sentence_id}]` — `null` when not pinned, `[]` when opted out of matching. A step's `pins` reads the same way |
+| `id` | The pytest node id. A grouped parametrized scenario **keeps the suffix of its first collected case** (`tests/test_x.py::test_y[1-False]`). The suffix is not removed, so match on a prefix, not on equality. |
+| `narration.text` | The scenario name. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
+| `module` | The Python module the test lives in. |
+| `tags[]` | `tags=` from `@scenario`. These are report metadata, **not** pytest marks. |
+| `status` | `passed`, `failed`, `skipped` or `xfailed`. `xfailed` means it failed as expected, through an `xfail` mark or `pytest.xfail()`. |
+| `skip_reason` | `null`, or the reason a skipped scenario shows instead of a traceback. |
+| `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail. Such a scenario keeps its steps and error too. |
+| `duration_ms` | The wall-clock time of the test. |
+| `steps[]` | The tree of steps (see below). |
+| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{values, status, error}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `values` are in the same order as `columns`. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
+| `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}`. `is_internal` marks a frame from `pluggy`, `_pytest` or pytest-given; such frames are kept only with `--given-all-frames`. **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`, with the same shape. |
+| `source` | `{relpath, line}`: where the test function is defined. |
+| `story_ids` / `pins` | `story_ids` lists the stories `@scenario(stories=...)` matches against. `pins` lists the scenario's pins as `[{story_id, sentence_id}]`: `null` when the scenario isn't pinned, `[]` when it turned matching off. A step's `pins` works the same way. |
 
-In a grouped scenario `id`, `module`, `tags` and `source` come from the first
-*collected* case, while `steps` are templatized from the first case that
-*passed* — so a run whose first case was skipped has an `id` and a step tree
-from two different cases. Neither identifies a case: read `parameters.cases[]`
-for per-case status.
+In a grouped scenario, `id`, `module`, `tags` and `source` come from the first
+*collected* case, while `steps` are built from the first case that *passed*.
+So when the first case was skipped, the `id` and the step tree come from two
+different cases. Neither identifies a case: read `parameters.cases[]` for the
+status of each case.
 
 ## Step
 
-`{phase, narration, children[], attachments[], pins, fixture_name}` — `phase` is `given`/`when`/`then`; `children` nests sub-steps; `fixture_name` is set when the step came from a `@given`-decorated fixture. A step carries no status or error of its own: failure lives on the scenario, and per case in `parameters.cases[]`. An entry in `attachments[]` is either `{label, content, content_type}` or, when the payload varies across parametrize cases, `{label, content_type, column_id}` — a content-less pointer at the column that holds every case's payload.
+A step is `{phase, narration, children[], attachments[], pins, fixture_name}`. `phase` is `given`, `when` or `then`. `children` holds nested steps. `fixture_name` is set when the step came from a fixture decorated with `@given`. A step has no status or error of its own: a failure is recorded on the scenario, and for each case in `parameters.cases[]`. An entry in `attachments[]` is either `{label, content, content_type}` or, when the content varies between parametrize cases, `{label, content_type, column_id}`. The second form has no content; it points at the column that holds each case's content.
 
-`narration.parts[]` is the structured step text; each part is one of:
+`narration.parts[]` holds the step text in structured form. Each part is one of:
 
-- `{value: "literal text"}` — plain text
-- `{rendered, expression, format_spec, conversion}` — a t-string interpolation whose value is constant across cases; `rendered` is the text shown, `expression` the source it came from
-- `{term_id, display, expression}` — a term ref
-- `{name, column_id, format_spec, conversion}` — a placeholder for the column `column_id` in a grouped parametrized scenario
+- `{value: "literal text"}`: plain text.
+- `{rendered, expression, format_spec, conversion}`: a t-string interpolation whose value is the same in every case. `rendered` is the text shown, and `expression` the source code it came from.
+- `{term_id, display, expression}`: a term ref.
+- `{name, column_id, format_spec, conversion}`: a placeholder for the column `column_id` in a grouped parametrized scenario.
 
-Match on the keys, not on position: a step's text is the concatenation of `value` / `rendered` / `display` / `{name}` across its parts.
+Match parts by their keys, not by position. A step's text is `value`, `rendered`, `display` or `{name}` of each part, joined in order.
 
-Term ids and story ids are slugs: lowercased, non-alphanumeric runs → `-` (`Late fee` → `late-fee`).
+Term ids and story ids are slugs: the name in lowercase, with each run of non-alphanumeric characters replaced by `-` (`Late fee` becomes `late-fee`).
 
 ## Glossary term
 
-`{id, kind, canonical, definition, source}` — `kind` is `actor` / `activity` / `object`, or `null` for kindless terms.
+A term is `{id, kind, canonical, definition, source}`. `kind` is `actor`, `activity` or `object`, or `null` for a kindless term.
 
 ## Story
 
-`{id, title, sentences: [{id, name, clauses: [{parts: [...]}]}], source}` — sentence ids are what `pins[].sentence_id` on scenarios and steps point at; `name` is `null` for an unnamed sentence. A clause part is either `{term_id, display}` (a glossary term) or `{text}` (a bare connective word, which carries no id and never counts for coverage), so filter parts on `term_id` rather than assuming every one has it.
+A story is `{id, title, sentences: [{id, name, clauses: [{parts: [...]}]}], source}`. The sentence ids are what `pins[].sentence_id` on scenarios and steps refers to. `name` is `null` for a sentence without a name. A clause part is either `{term_id, display}`, a glossary term, or `{text}`, a bare connective word. A bare word has no id and never counts for coverage, so filter parts on `term_id` instead of assuming every part has one.
 
 ## Coverage
 
-`{story_id, sentence_id, tracked, scenario_ids: [...]}` — the same per-sentence coverage the Stories tab renders, one record per sentence of every story, in story then sentence order. `scenario_ids` are the node ids of the scenarios covering the sentence; `tracked: false` marks a sentence the report can say nothing about (fewer than two glossary terms and no pin reaching it — the Stories tab's "not coverage-tracked"), which is a gap in vocabulary, not in tests. **Read coverage from here rather than recomputing it from `steps[]`**: the rule is per step, gated by the two-term eligibility, with pins replacing narration — reimplementing it gets the answer wrong.
+A coverage record is `{story_id, sentence_id, tracked, scenario_ids: [...]}`. It is the same coverage per sentence that the Stories tab shows, with one record for every sentence of every story, ordered by story and then by sentence. `scenario_ids` are the node ids of the scenarios that cover the sentence. `tracked: false` marks a sentence the report can't say anything about: it has fewer than two glossary terms, and no pin covers it. That is the Stories tab's "not coverage-tracked", and it points to a gap in the vocabulary, not in the tests. **Read coverage from here instead of recomputing it from `steps[]`.** The rule works step by step, needs at least two terms per sentence, and lets pins replace narration matching. Reimplementing it gives wrong answers.
 
 ## Recipes
 
