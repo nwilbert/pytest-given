@@ -26,6 +26,18 @@ If an output flag has no `=PATH`, pytest reads the next word on the command line
 
 If that path can't be a report file, like a `.py` test file, pytest-given stops before running the tests, so it never overwrites your test.
 
+## Selecting scenarios
+
+pytest-given marks every `@scenario` test, each case of a parametrized one included, with the `pytest_given` marker. You don't apply it yourself: a hand-written `@pytest.mark.pytest_given` on a plain test makes it selectable, but records nothing. The marker is registered, so `--strict-markers` accepts it. Select with pytest's own `-m`:
+
+- **A report without running the plain tests.** The report holds only scenarios, so `pytest -m pytest_given --given-html` writes the same report as a full run, faster.
+- **Code coverage of the scenarios.** `pytest -m pytest_given --cov=mypkg` (with pytest-cov), or `coverage run -m pytest -m pytest_given`. It counts the lines the scenarios *run*, not the lines a step *describes*, so it is an upper bound on what the report documents. Compare it with a full run's coverage: lines the suite covers but the scenarios don't are behavior only plain tests reach, and the report doesn't show.
+- **The plain tests alone**, with `pytest -m "not pytest_given"`.
+
+A `-m` on the command line replaces one in your `addopts`, so combine them yourself: `-m "pytest_given and not slow"`. In a suite with no scenarios, `-m pytest_given` deselects every test and pytest exits with code 5.
+
+Mind `-k`: it matches any part of a test's keywords, and a scenario's include `pytest_given` and `_scenario`, so `-k given` or `-k scenario` selects every scenario too.
+
 ## pytest-xdist
 
 **pytest-given doesn't work with `pytest-xdist`.** With `-n`, tests run in worker processes, and their steps never reach the main process. The run passes, but the report is empty. Generate reports from a run without `-n`.

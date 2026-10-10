@@ -55,14 +55,15 @@ Layers 1 and 2 start from the narration and ask whether it is true. Neither catc
   Start with the undecorated tests in test files that hold a scenario. They are where most gaps sit, next to the narrated tests of the same code:
 
   ```bash
-  pytest <selection> --given-json=report.json
-  pytest <selection> --collect-only -q > collected.txt
-  jq -r --rawfile collected collected.txt '
-    [.scenarios[].id | sub("[[].*"; "")] as $narrated
-    | ($narrated | map(split("::")[0]) | unique) as $files
-    | $collected | split("\n") | map(select(contains("::")) | sub("[[].*"; "")) | unique[]
-    | select((split("::")[0] | IN($files[])) and (IN($narrated[]) | not))' report.json
+  pytest <selection> -m pytest_given --given-json=report.json
+  pytest <selection> -m "not pytest_given" --collect-only -q > plain.txt
+  jq -r --rawfile plain plain.txt '
+    [.scenarios[].id | split("::")[0]] as $files
+    | $plain | split("\n") | map(select(contains("::")) | sub("[[].*"; "")) | unique[]
+    | select(split("::")[0] | IN($files[]))' report.json
   ```
+
+  For the code itself, compare the code coverage of `pytest -m pytest_given` with a full run's. Lines only the full run covers are behavior only plain tests reach.
 - **Parameter tables that can't show what decides.** For each input that decides a parametrized scenario's outcome, some row should change only that input and flip the outcome. Without such a row, the table only lists examples, and the rule that decides between them stays unnarrated. Ask for the contrast row, at the boundary if there is one, instead of splitting the table into one scenario per row. A refusal can be a contrast row too, and a sibling scenario with the flipped outcome doesn't make up for a missing row.
 - **Glossary rows that state behavior.** A definition that makes a claim ("X takes precedence over Y", "must be unique") is part of the spec. When no scenario demonstrates the claim, the glossary documents something nothing checks. Flag the row and the missing scenario, and prefer adding a scenario to weakening the definition. When a scenario contradicts the row, the row is a false claim.
 - **Rules the release notes announce.** If the project keeps a changelog, check that a scenario names each rule its unreleased entries state. That is the project promising a behavior in its own words. For a review of the whole suite, the changelog limits the scope the way a diff does for a change. A rule narrated only in part, such as the fix without the way to opt out, is a finding too.
@@ -73,7 +74,7 @@ Layers 1 and 2 start from the narration and ask whether it is true. Neither catc
 - **Dilution** is the opposite finding: a row nobody would miss. Examples are a generic verb added to fill a story slot (a bare word belongs there), a concept listed twice under two names, or a term added only to render as a term ref. A small, precise glossary is better than one that just looks impressive.
 - An **oversized glossary** is a structural finding. A glossary only works when it is read as a whole, so one too long to read comfortably in one sitting probably covers more than one bounded context. Raise it as a design question: a suite supports only one glossary, so splitting by context means splitting the suite. Don't reduce the size by removing good terms.
 - The lint checks `tag-shadows-term`. The fix is to remove the tag, **not to add more tags**. Tags stay separate from the glossary (behavior, mechanism), so having few tags is usually right; don't report it as a finding. A tag missing from some of the scenarios it describes is a finding, because filtering by it then misses those scenarios.
-- An **uncovered story sentence** is a gap worth noting, unless the place that declares it marks it as deliberate; a story maps the whole flow, including human work. Read coverage from the JSON report. The queries, including one for scenarios that name a story but cover none of it, and how to explain *why* a sentence is uncovered, are in [references/story-coverage.md](references/story-coverage.md).
+- An **uncovered story sentence** is a gap in the story's telling, not in the tests (untested behavior is layer 3). Note it, unless the place that declares it marks it as deliberate; a story maps the whole flow, including human work. Read coverage from the JSON report. The queries, including one for scenarios that name a story but cover none of it, and how to explain *why* a sentence is uncovered, are in [references/story-coverage.md](references/story-coverage.md).
 
 ## Findings are advisory review comments
 

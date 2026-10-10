@@ -11,7 +11,7 @@ pytest belongs in this package — the rest is the subpackages', and this layer
 resolves options into the pytest-free shapes they take.
 """
 
-from .collection import pytest_collection_modifyitems
+from .collection import pytest_collection_modifyitems, pytest_itemcollected
 from .fixtures import pytest_fixture_setup
 from .options import pytest_addoption, pytest_configure
 from .runtest import (
@@ -32,6 +32,7 @@ __all__ = [
     'pytest_collection_modifyitems',
     'pytest_configure',
     'pytest_fixture_setup',
+    'pytest_itemcollected',
     'pytest_load_initial_conftests',
     'pytest_runtest_logreport',
     'pytest_runtest_makereport',

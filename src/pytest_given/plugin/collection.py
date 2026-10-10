@@ -1,4 +1,5 @@
-"""Collection-time validation of what `@scenario` declared.
+"""Collection-time validation of what `@scenario` declared, and the
+`pytest_given` mark that makes it selectable with `-m`.
 
 Only the checks that need the item's `callspec`: `@scenario` and
 `@pytest.mark.parametrize` can appear in either order, and decoration-time
@@ -17,6 +18,24 @@ from ..model import (
     placeholder_mismatch,
 )
 from .state import scenario_marker
+
+_PYTEST_GIVEN_MARK = 'pytest_given'
+
+
+def register_pytest_given_mark(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        'markers',
+        f'{_PYTEST_GIVEN_MARK}: applied by pytest-given to every @scenario '
+        f"test, so '-m {_PYTEST_GIVEN_MARK}' runs the scenarios alone.",
+    )
+
+
+def pytest_itemcollected(item: pytest.Item) -> None:
+    """Translate `@scenario` into the marker. Here rather than in `capture`,
+    which stays free of pytest; and early enough, since `-m` deselects in
+    `pytest_collection_modifyitems`."""
+    if scenario_marker(item) is not None:
+        item.add_marker(_PYTEST_GIVEN_MARK)
 
 
 @pytest.hookimpl(trylast=True)

@@ -4,7 +4,9 @@
 suite runs — the lint rules even when the lint is off — so a typo in a rule
 name, a theme or, on an HTML run, a source-link preset is a `UsageError` up
 front rather than a surprise after the last test. The preset is resolved only
-for an HTML run because the `github` one shells out to `git remote`.
+for an HTML run because the `github` one shells out to `git remote`. It also
+registers the `pytest_given` mark, since the package exports one
+`pytest_configure`.
 """
 
 import argparse
@@ -25,6 +27,7 @@ from ..report import (
     resolve_source_link_template,
     resolve_theme,
 )
+from .collection import register_pytest_given_mark
 from .state import GivenConfig, store_given_config
 
 
@@ -141,6 +144,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_configure(config: pytest.Config) -> None:
+    register_pytest_given_mark(config)
     try:
         lint = parse_lint_config(
             config.getini('given_lint_rules'), config.getini('given_lint_ignore')

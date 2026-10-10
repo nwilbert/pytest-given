@@ -44,4 +44,6 @@ pytest --given-html
 
 This produces `given-report/report.html` — one file you can open directly in a browser.
 
+To write the report without running your plain tests, see [Selecting scenarios](configuration/pytest-options.md#selecting-scenarios).
+
 Next: [Scenarios & steps](guide/scenarios.md) for the full API, or the [Coffeeshop report](examples/coffeeshop.html) to see what a finished report looks like.

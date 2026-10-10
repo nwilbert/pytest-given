@@ -64,7 +64,7 @@ A step can also **pin** sentences: `given(text, pins=book_a_group_trip['confirm'
 
 **Pin by name, not by number.** Sentence numbers are positions. Inserting a sentence renumbers every sentence after it, and `the_story[5]` then silently points at a different sentence. Name each sentence you pin (`sentence(..., name='confirm')`) and pin `the_story['confirm']`.
 
-An uncovered sentence is a signal, not an error. It marks vocabulary and behavior that no test exercises yet.
+An uncovered sentence is a signal, not an error: no scenario narrates it yet. Story coverage is for finding the scenarios behind a part of the flow, not for measuring how completely the suite tests it; a covered sentence only means a step talks about it. For that, measure the code coverage of `pytest -m pytest_given`.
 
 ## When a story is worth writing
 

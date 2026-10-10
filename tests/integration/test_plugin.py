@@ -3647,3 +3647,106 @@ def test_bare_run_still_enforces_the_grouping_rules(pytester):
     with then('the run still fails, naming the offending form'):
         assert result.ret != 0
         result.stdout.fnmatch_lines(['*records no parts*'])
+
+
+# --- Selecting scenarios with the pytest_given marker ---
+
+
+_MIXED_SUITE = """
+    import pytest
+    from pytest_given import scenario, then
+
+    @scenario("Brew")
+    def test_brew():
+        with then("it brews"):
+            assert True
+
+    @scenario("Pour")
+    @pytest.mark.parametrize('cup_size', [200, 350])
+    def test_pour(cup_size):
+        with then(t"it pours {cup_size} ml"):
+            assert cup_size
+
+    def test_plain():
+        assert True
+"""
+
+
+@scenario(t'Every {pg["Scenario"].l} carries the `pytest_given` marker')
+def test_the_marker_selects_the_scenarios_alone(pytester: pytest.Pytester) -> None:
+    with given(
+        t'a suite with a {pg["Scenario"].l}, a {pg["Parametrized scenario"].l} '
+        t'and a plain test'
+    ):
+        pytester.makepyfile(_MIXED_SUITE)
+        attach('suite', textwrap.dedent(_MIXED_SUITE).strip())
+    with when('the suite runs with -m pytest_given'):
+        result = pytester.runpytest('-m', 'pytest_given', '-v')
+    with then(t'the {pg["Scenario"].l} and every {pg["Case"].l} run'):
+        assert result.parseoutcomes()['passed'] == 3
+        result.stdout.fnmatch_lines(
+            [
+                '*::test_brew PASSED*',
+                '*::test_pour?200? PASSED*',
+                '*::test_pour?350? PASSED*',
+            ]
+        )
+    with then('the plain test is deselected'):
+        assert result.parseoutcomes()['deselected'] == 1
+        assert 'test_plain' not in result.stdout.str()
+
+
+def test_not_the_marker_selects_the_plain_tests_alone(
+    pytester: pytest.Pytester,
+) -> None:
+    pytester.makepyfile(_MIXED_SUITE)
+    result = pytester.runpytest('-m', 'not pytest_given', '-v')
+    result.assert_outcomes(passed=1, deselected=3)
+    result.stdout.fnmatch_lines(['*::test_plain PASSED*'])
+
+
+def test_the_marker_is_registered(pytester: pytest.Pytester) -> None:
+    pytester.makepyfile(_MIXED_SUITE)
+    assert pytester.runpytest('--strict-markers', '--collect-only').ret == 0
+    pytester.runpytest('--markers').stdout.fnmatch_lines(
+        ['@pytest.mark.pytest_given:*']
+    )
+
+
+def test_a_scenario_only_run_writes_the_same_report(
+    pytester: pytest.Pytester, tmp_path: Path
+) -> None:
+    pytester.makepyfile(
+        """
+        from pytest_given import Glossary, scenario, sentence, story, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+        book = g.activity('book')
+        room = g.work_object('Room')
+        booking = story('Booking', [sentence(guest, book, room)])
+
+        @scenario('Book a room', stories=booking)
+        def test_book():
+            with when(t'the {guest} {book.s} a {room}'):
+                pass
+
+        def test_plain():
+            assert True
+        """
+    )
+    full_path = tmp_path / 'full.json'
+    selected_path = tmp_path / 'selected.json'
+    pytester.runpytest(f'--given-json={full_path}')
+    pytester.runpytest('-m', 'pytest_given', f'--given-json={selected_path}')
+
+    def normalized(path):
+        data = json.loads(path.read_text(encoding='utf-8'))
+        data['metadata']['timestamp'] = ''
+        for recorded in data['scenarios']:
+            recorded['duration_ms'] = 0
+        return data
+
+    full = normalized(full_path)
+    assert full['coverage'][0]['scenario_ids']
+    assert normalized(selected_path) == full

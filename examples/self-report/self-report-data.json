@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-10T09:04:39.936624+00:00",
+    "timestamp": "2026-10-10T11:06:03.994724+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "30eb98d2bfdef34fe94aed79ab1b95a30cc59b5d",
+    "commit_sha": "0dd13f5995173d86023a7a7e10056c48f0b64417",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 102,
       "steps": [
         {
           "phase": "given",
@@ -111,7 +111,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -220,7 +220,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -364,7 +364,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -608,7 +608,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -817,7 +817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -887,7 +887,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -1007,7 +1007,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1142,7 +1142,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 74,
+      "duration_ms": 71,
       "steps": [
         {
           "phase": "given",
@@ -1266,7 +1266,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 81,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -1430,7 +1430,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -1547,7 +1547,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 157,
+      "duration_ms": 165,
       "steps": [
         {
           "phase": "given",
@@ -1620,7 +1620,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -1931,7 +1931,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2076,7 +2076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2229,7 +2229,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -2486,7 +2486,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 138,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -2670,7 +2670,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
@@ -2766,7 +2766,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 128,
+      "duration_ms": 131,
       "steps": [
         {
           "phase": "given",
@@ -2927,7 +2927,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -3021,7 +3021,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -3177,7 +3177,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -3460,7 +3460,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 158,
+      "duration_ms": 159,
       "steps": [
         {
           "phase": "given",
@@ -3673,7 +3673,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -3817,7 +3817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -3871,6 +3871,131 @@
       "pins": null
     },
     {
+      "id": "tests/integration/test_plugin.py::test_the_marker_selects_the_scenarios_alone",
+      "narration": {
+        "text": "Every scenario carries the `pytest_given` marker",
+        "parts": [
+          {
+            "value": "Every "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].l"
+          },
+          {
+            "value": " carries the `pytest_given` marker"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 26,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite with a scenario, a parametrized scenario and a plain test",
+            "parts": [
+              {
+                "value": "a suite with a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": ", a "
+              },
+              {
+                "term_id": "parametrized-scenario",
+                "display": "parametrized scenario",
+                "expression": "pg[\"Parametrized scenario\"].l"
+              },
+              {
+                "value": " and a plain test"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "import pytest\nfrom pytest_given import scenario, then\n\n@scenario(\"Brew\")\ndef test_brew():\n    with then(\"it brews\"):\n        assert True\n\n@scenario(\"Pour\")\n@pytest.mark.parametrize('cup_size', [200, 350])\ndef test_pour(cup_size):\n    with then(t\"it pours {cup_size} ml\"):\n        assert cup_size\n\ndef test_plain():\n    assert True",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with -m pytest_given",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the scenario and every case run",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " and every "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].l"
+              },
+              {
+                "value": " run"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the plain test is deselected",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 3675
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/integration/test_plugin_file_glossary.py::test_file_glossary_kinds_resolved_in_report",
       "narration": {
         "text": "A run gives each kindless term the kind of the slot it fills",
@@ -3907,7 +4032,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 329,
+      "duration_ms": 344,
       "steps": [
         {
           "phase": "given",
@@ -4066,7 +4191,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -4168,7 +4293,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 81,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -4273,7 +4398,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -4401,7 +4526,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -4513,7 +4638,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -6040,7 +6165,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -6126,7 +6251,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6229,7 +6354,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6533,7 +6658,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6640,7 +6765,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7356,7 +7481,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -7636,7 +7761,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -21434,7 +21559,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 141,
+      "duration_ms": 144,
       "steps": [
         {
           "phase": "given",

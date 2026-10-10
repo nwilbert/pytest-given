@@ -16,6 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - A handle's `.s` form reads the term's S-form, its regular plural or verb -s (`room.s` reads *Rooms*), and `.l` and `.s` chain and apply to a called form (`room.l.s` reads *rooms*).
+- Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` runs the scenarios alone.
 - The narration lint's `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 
 ### Changed
@@ -28,6 +29,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-authoring` skill covers scenario titles and narrates each rule once, where its test proves it, and the `pytest-given-reviewing` skill reviews titles as a list and flags a rule narrated at the wrong layer or a `then` that checks nothing.
 - The bundled skills are reworded in plainer language.
 - The bundled `pytest-given-authoring` skill shows how to narrate a call that returns normally and to check "never called" with recorded calls instead of a stub that raises, which the `pytest-given-reviewing` skill flags.
+- The documentation and bundled skills present story coverage as a way to find scenarios, not a measure of test completeness, and point to code coverage of `-m pytest_given` for that.
 - The bundled `pytest-given-authoring` skill interpolates values taken from constants instead of copying them, and the `pytest-given-reviewing` skill starts its completeness audit from the undecorated tests in narrated test files.
 
 ## [0.4.1] - 2026-10-04

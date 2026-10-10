@@ -87,6 +87,8 @@ The Stories tab shows each story as a timeline of its sentences. Each sentence h
 
 The JSON report contains the same data under the top-level `coverage` key.
 
+Story coverage helps a reader find the scenarios behind a part of the flow, and see the flow behind a scenario. It is not a measure of how completely the suite tests the system: a covered sentence means a step talks about it, not that its behavior is tested. To ask what the scenarios exercise, measure the code coverage of [`-m pytest_given`](../configuration/pytest-options.md#selecting-scenarios).
+
 ### Sentence handles
 
 To refer to one sentence, get a **sentence handle** from the story, by name or by number:

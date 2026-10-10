@@ -695,6 +695,33 @@
 - **when** the suite runs with no sink configured
 - **then** the run still fails, naming the offending form
 
+## ✓ Every «scenario» carries the `pytest_given` marker
+`tests/integration/test_plugin.py:3675::test_the_marker_selects_the_scenarios_alone`
+
+- **given** a suite with a «scenario», a «parametrized scenario» and a plain test
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, then
+    
+    @scenario("Brew")
+    def test_brew():
+        with then("it brews"):
+            assert True
+    
+    @scenario("Pour")
+    @pytest.mark.parametrize('cup_size', [200, 350])
+    def test_pour(cup_size):
+        with then(t"it pours {cup_size} ml"):
+            assert cup_size
+    
+    def test_plain():
+        assert True
+    ```
+- **when** the suite runs with -m pytest_given
+- **then** the «scenario» and every «case» run
+- **then** the plain test is deselected
+
 ## ✓ A run gives each «kindless» «term» the kind of the «slot» it fills
 `tests/integration/test_plugin_file_glossary.py:35::test_file_glossary_kinds_resolved_in_report`
 
