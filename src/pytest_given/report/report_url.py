@@ -1,0 +1,39 @@
+"""The public URL a report is served from."""
+
+from urllib.parse import urlsplit
+
+from ..model import PytestGivenError
+
+REPORT_URL_HELP = (
+    'The public URL the HTML report will be served from. The report then shows '
+    'copy-citation buttons linking there, and `pytest-given citations` reads '
+    'links to it.'
+)
+
+
+def resolve_report_url(value: str, setting: str) -> str | None:
+    """`value` as a report URL, or None when it is empty.
+
+    A citation appends `#<fragment>` to it and writes it as a bare Markdown
+    link destination, so only an absolute http(s) URL without a fragment of its
+    own, and without a character that would end or escape within that
+    destination, can be one.
+    """
+    if not value:
+        return None
+    parts = urlsplit(value)
+    if (
+        parts.scheme not in ('http', 'https')
+        or not parts.netloc
+        or '#' in value
+        or any(_breaks_destination(char) for char in value)
+    ):
+        raise PytestGivenError(
+            f'{setting} must be an absolute http(s) URL without a #fragment, '
+            f'whitespace, control characters, <, >, (, ) or \\, but got {value!r}.'
+        )
+    return value
+
+
+def _breaks_destination(char: str) -> bool:
+    return char.isspace() or not char.isprintable() or char in '<>()\\'

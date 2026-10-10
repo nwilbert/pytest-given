@@ -19,6 +19,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` runs the scenarios alone.
 - `--given-md-lines` / `--no-given-md-lines` and the `given_md_lines` ini, with `pytest-given report --no-lines`, leave the line out of each Markdown scenario anchor.
 - The narration lint's `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
+- `--given-report-url` and the `given_report_url` ini store the public URL the HTML report is served from as `report_url` in the report metadata.
 
 ### Changed
 

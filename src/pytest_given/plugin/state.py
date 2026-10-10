@@ -36,6 +36,7 @@ class GivenConfig:
     lint_enabled: bool
     sinks: SinkConfig
     title: str | None
+    report_url: str | None
     all_frames: bool
 
 

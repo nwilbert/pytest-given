@@ -113,6 +113,7 @@ def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
         plugin_version=d['plugin_version'],
         commit_sha=d.get('commit_sha'),
         title=d.get('title'),
+        report_url=d.get('report_url'),
     )
 
 

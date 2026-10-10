@@ -1007,3 +1007,30 @@ def test_a_fully_populated_report_survives_the_round_trip() -> None:
     """
     once = report_to_dict(_every_field_populated())
     assert report_to_dict(report_from_dict(once)) == once
+
+
+def test_report_url_round_trips() -> None:
+    report = ReportData(
+        metadata=Metadata(
+            project='p',
+            timestamp='t',
+            pytest_version='9',
+            plugin_version='0',
+            report_url='https://example.org/report.html',
+        )
+    )
+    rebuilt = report_from_dict(report_to_dict(report))
+    assert rebuilt.metadata.report_url == 'https://example.org/report.html'
+
+
+def test_a_report_without_report_url_reads_as_none() -> None:
+    data = {
+        'metadata': {
+            'project': 'p',
+            'timestamp': 't',
+            'pytest_version': '9',
+            'plugin_version': '0',
+        },
+        'scenarios': [],
+    }
+    assert report_from_dict(data).metadata.report_url is None

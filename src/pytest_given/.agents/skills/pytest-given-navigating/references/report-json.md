@@ -3,7 +3,7 @@
 `pytest <selection> --given-json=report.json` writes one file with five top-level keys:
 
 ```
-metadata      project, title, timestamp, pytest_version, plugin_version, commit_sha
+metadata      project, title, report_url, timestamp, pytest_version, plugin_version, commit_sha
 scenarios[]   one entry per @scenario (parametrized cases grouped into one)
 glossary      {terms: [...]} — every declared term, referenced or not; null on a suite with no glossary
 stories[]     one entry per story(...)

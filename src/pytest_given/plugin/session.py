@@ -188,6 +188,7 @@ def _build_report(session: pytest.Session) -> _SessionReport:
                 plugin_version=version('pytest-given'),
                 commit_sha=detect_commit_sha(),
                 title=given.title,
+                report_url=given.report_url,
             ),
             scenarios=scenarios,
             stories=stories,

@@ -20,10 +20,12 @@ from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     DEFAULT_THEME,
+    REPORT_URL_HELP,
     SOURCE_LINK_HELP,
     THEME_HELP,
     SinkConfig,
     Theme,
+    resolve_report_url,
     resolve_source_link_template,
     resolve_theme,
 )
@@ -98,6 +100,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        '--given-report-url',
+        default=None,
+        help=REPORT_URL_HELP + ' Overrides the given_report_url ini for one run.',
+    )
+    group.addoption(
         '--given-lint',
         action=argparse.BooleanOptionalAction,
         default=None,
@@ -122,6 +129,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         type='string',
         default='',
         help='Name the report (CLI flag overrides this).',
+    )
+    parser.addini(
+        'given_report_url',
+        type='string',
+        default='',
+        help='The public URL the HTML report is served from (CLI flag overrides this).',
     )
     parser.addini(
         'given_md_lines',
@@ -179,6 +192,10 @@ def pytest_configure(config: pytest.Config) -> None:
             _cli_over_ini(config, 'given_theme', str),
             setting=_setting_spelling(config, 'given_theme'),
         )
+        report_url = resolve_report_url(
+            _cli_over_ini(config, 'given_report_url', str),
+            setting=_setting_spelling(config, 'given_report_url'),
+        )
         sinks = _resolve_sinks(
             config,
             source_link_template,
@@ -197,6 +214,7 @@ def pytest_configure(config: pytest.Config) -> None:
             lint_enabled=_cli_over_ini(config, 'given_lint', bool),
             sinks=sinks,
             title=_resolve_title(config),
+            report_url=report_url,
             all_frames=bool(config.getoption('given_all_frames')),
         ),
     )

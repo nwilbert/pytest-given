@@ -54,6 +54,7 @@ def _given_config() -> state.GivenConfig:
         lint_enabled=False,
         sinks=SinkConfig(),
         title=None,
+        report_url=None,
         all_frames=False,
     )
 

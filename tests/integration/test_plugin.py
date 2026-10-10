@@ -3476,6 +3476,44 @@ def test_given_title_cli_overrides_ini(pytester, tmp_path):
     assert data['metadata']['title'] == 'From CLI'
 
 
+_REPORT_URL = 'https://example.org/pytest-given/report.html'
+_ONE_SCENARIO = """
+from pytest_given import scenario, then
+
+@scenario("Recorded")
+def test_it():
+    with then("it passes"):
+        assert True
+"""
+
+
+def test_given_report_url_reaches_the_json_metadata(pytester, tmp_path):
+    pytester.makepyfile(_ONE_SCENARIO)
+    json_path = tmp_path / 'report.json'
+    result = pytester.runpytest(
+        f'--given-report-url={_REPORT_URL}', f'--given-json={json_path}'
+    )
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text(encoding='utf-8'))
+    assert data['metadata']['report_url'] == _REPORT_URL
+
+
+def test_given_report_url_ini_value(pytester, tmp_path):
+    pytester.makeini(f'[pytest]\ngiven_report_url = {_REPORT_URL}\n')
+    pytester.makepyfile(_ONE_SCENARIO)
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text(encoding='utf-8'))
+    assert data['metadata']['report_url'] == _REPORT_URL
+
+
+def test_a_relative_given_report_url_is_a_usage_error(pytester):
+    pytester.makepyfile('def test_it():\n    pass\n')
+    result = pytester.runpytest('--given-report-url=examples/report.html')
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*--given-report-url*absolute*'])
+
+
 # --- The theme the HTML report opens in ---
 
 
