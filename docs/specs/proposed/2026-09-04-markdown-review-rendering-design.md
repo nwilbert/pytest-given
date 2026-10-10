@@ -2,8 +2,9 @@
 
 ## Goal
 
-Make the Markdown sink complete enough to *review* a suite from, and retire the two scripts the
-reviewing skill ships to work around it:
+Make the Markdown sink complete enough to *review* a suite from, so the reviewing skill no longer
+depends on the two scripts it ships to work around it (the story-coverage queries retire, and the
+pairs script stays only as a fallback):
 
 1. **`--given-md-source`** (opt-in) inlines each scenario's test body under its steps, so the
    narration and the code it claims to describe sit side by side.
