@@ -1619,8 +1619,12 @@ span.param-highlight {
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
-<div class="main">
-  <svg class="svg-sprite" aria-hidden="true"><symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol></svg>
+<div class="main"><svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></symbol>
+      <symbol id="icon-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
+      <symbol id="icon-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g></symbol>
+      <symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol>
+    </svg>
   <header class="topbar"><div class="topbar-title" title="File Glossary Example">File Glossary Example</div>
     <nav class="frame-nav" role="tablist" aria-label="Report views">
       <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
@@ -1765,7 +1769,7 @@ span.param-highlight {
         <span class="scenario-title">A Guest booking an available room receives a Confirmation</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=file_glossary_booking/book_available_room"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current."
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current."
             data-citation-kind="scenario" data-citation-key="examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room"
             @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)"
             aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
@@ -1800,7 +1804,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/test_file_glossary_booking.py#L60">examples/file-glossary-booking/test_file_glossary_booking.py:60</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/test_file_glossary_booking.py#L60">examples/file-glossary-booking/test_file_glossary_booking.py:60</a></div>
       
     </div>
     </div>
@@ -1815,7 +1819,7 @@ span.param-highlight {
         <span class="scenario-title">A Guest cannot book an unavailable room</span>
         <button type="button" class="anchor-link" title="Copy link"
             data-anchor="scenario=file_glossary_booking/book_unavailable_room"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current."
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current."
             data-citation-kind="scenario" data-citation-key="examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room"
             @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)"
             aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
@@ -1848,7 +1852,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/test_file_glossary_booking.py#L77">examples/file-glossary-booking/test_file_glossary_booking.py:77</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/test_file_glossary_booking.py#L77">examples/file-glossary-booking/test_file_glossary_booking.py:77</a></div>
       
     </div>
     </div>
@@ -1893,7 +1897,7 @@ span.param-highlight {
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
             <div class="header-title">Book a Room<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=stories&amp;story=book-a-room"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current."
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current."
             data-citation-kind="story" data-citation-key="book-a-room"
             @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)"
             aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button></div>
@@ -2029,7 +2033,7 @@ span.param-highlight {
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -2145,7 +2149,7 @@ span.param-highlight {
             <span class="entry-name">
               <span class="term-name">Guest<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=guest"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></span>
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A person making a room reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2174,7 +2178,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -2211,7 +2215,7 @@ span.param-highlight {
             <span class="entry-name">
               <span class="term-name">Room<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=room"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></span>
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2240,7 +2244,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -2264,7 +2268,7 @@ span.param-highlight {
             <span class="entry-name">
               <span class="term-name">Confirmation<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=confirmation"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></span>
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A notification acknowledging a successful reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2293,7 +2297,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -2330,7 +2334,7 @@ span.param-highlight {
             <span class="entry-name">
               <span class="term-name">book<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=book"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></span>
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2359,7 +2363,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -2396,7 +2400,7 @@ span.param-highlight {
             <span class="entry-name">
               <span class="term-name">Cancellation Policy<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=cancellation-policy"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></span>
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">The rules governing <strong>how</strong> and <strong>when</strong> a booking may be cancelled.<br>Applies to every <code>Room</code> rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2418,7 +2422,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2442,7 +2446,7 @@ span.param-highlight {
             <span class="entry-name">
               <span class="term-name">Overbooking<button type="button" class="anchor-link" title="Copy link"
             data-anchor="view=glossary&amp;term=overbooking"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button></span>
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2457,7 +2461,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/091115399ea659a0aa10bce9a91d8c0356c75eb5/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/83d83304ea514fb2f33903269b0aa59dbe202b10/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2484,7 +2488,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-10T17:58:55.207589+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"A Guest booking an available room receives a Confirmation\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"A Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"scenario\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"glyph\":\"\\u2705\",\"text\":\"A Guest booking an available room receives a Confirmation\",\"fragment\":\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"summary\":null},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"glyph\":\"\\u2705\",\"text\":\"A Guest cannot book an unavailable room\",\"fragment\":\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"summary\":null}},\"tag\":{},\"story\":{\"book-a-room\":{\"glyph\":\"\\u2705\",\"text\":\"Book a Room\",\"fragment\":\"view=stories&story=book-a-room\",\"summary\":\"(2 \\u2705)\"}}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-10T17:59:13.242043+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"A Guest booking an available room receives a Confirmation\"}},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"A Guest cannot book an unavailable room\"}}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"scenario\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"glyph\":\"\\u2705\",\"text\":\"A Guest booking an available room receives a Confirmation\",\"fragment\":\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"summary\":null},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"glyph\":\"\\u2705\",\"text\":\"A Guest cannot book an unavailable room\",\"fragment\":\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"summary\":null}},\"tag\":{},\"story\":{\"book-a-room\":{\"glyph\":\"\\u2705\",\"text\":\"Book a Room\",\"fragment\":\"view=stories&story=book-a-room\",\"summary\":\"(2 \\u2705)\"}}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));

@@ -61,10 +61,8 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, citation_button, citation_icon, citation_icon_symbol, citation_title, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
-  {%- if citations %}
-  {{ citation_icon_symbol() }}
-  {%- endif %}
+  {%- from '_macros.html.j2' import source_link, anchor_link, citation_button, citation_title, icon, icon_sprite, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
+  {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
       exists to belong to. -#}
@@ -193,7 +191,7 @@
             <button type="button" class="anchor-link citation-copy nav-group-citation"
                     title="{{ citation_title }}" aria-label="Copy Markdown citation"
                     x-show="view === 'tags' && hasCitation('tag', group.id)"
-                    @click.stop="copyCitation('tag', group.id, $event)">{{ citation_icon() }}</button>
+                    @click.stop="copyCitation('tag', group.id, $event)">{{ icon('citation') }}</button>
             <span class="nav-group-citation-spacer" x-show="view === 'tags' && !hasCitation('tag', group.id)"></span>
             {% endif %}
           </div>

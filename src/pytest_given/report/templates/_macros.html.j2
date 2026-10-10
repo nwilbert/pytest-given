@@ -48,24 +48,32 @@
     {%- endif -%}
   {%- endmacro -%}
 
-  {%- macro anchor_link(hash) -%}
-    <button type="button" class="anchor-link" title="Copy link"
-            data-anchor="{{ hash }}"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-  {%- endmacro -%}
-
-  {#- The Markdown mark's "M↓" without its box, which leaves too little room
-      for the letters at 14px: the button copies a line of Markdown, not a URL,
-      and sits right beside the link icon. Defined once per page and
-      referenced by every button, which can number in the hundreds. -#}
-  {%- macro citation_icon_symbol() -%}
-    <svg class="svg-sprite" aria-hidden="true"><symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol></svg>
+  {#- The icons that repeat once per card, header or attachment — hundreds of
+      times in a large report — are defined once per page and drawn by
+      `icon`. The citation icon is the Markdown mark's "M↓" without its box,
+      which leaves too little room for the letters at 14px: the button copies
+      a line of Markdown, not a URL, and sits right beside the link icon. -#}
+  {%- macro icon_sprite() -%}
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></symbol>
+      <symbol id="icon-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
+      <symbol id="icon-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g></symbol>
+      {%- if citations %}
+      <symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol>
+      {%- endif %}
+    </svg>
   {%- endmacro -%}
 
   {%- set citation_title = 'Copy Markdown citation. pytest-given citations check and update keep it current.' -%}
 
-  {%- macro citation_icon() -%}
-    <svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>
+  {%- macro icon(name, class=none) -%}
+    <svg{% if class %} class="{{ class }}"{% else %} width="14" height="14"{% endif %} aria-hidden="true"><use href="#icon-{{ name }}"/></svg>
+  {%- endmacro -%}
+
+  {%- macro anchor_link(hash) -%}
+    <button type="button" class="anchor-link" title="Copy link"
+            data-anchor="{{ hash }}"
+            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link">{{ icon('link') }}</button>
   {%- endmacro -%}
 
   {#- Keys travel as data-* and are read back from the dataset: Alpine compiles
@@ -76,7 +84,7 @@
     <button type="button" class="anchor-link citation-copy" title="{{ citation_title }}"
             data-citation-kind="{{ kind }}" data-citation-key="{{ key }}"
             @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)"
-            aria-label="Copy Markdown citation">{{ citation_icon() }}</button>
+            aria-label="Copy Markdown citation">{{ icon('citation') }}</button>
     {%- endif -%}
   {%- endmacro -%}
 
@@ -126,11 +134,7 @@
       a content type this template has not met reads as text, which is what
       an unrecognized payload is displayed as anyway. -#}
   {%- macro attachment_icon(content_type) -%}
-    {%- if content_type == 'json' -%}
-    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
-    {%- else -%}
-    <svg class="attachment-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-    {%- endif -%}
+    {{- icon('json' if content_type == 'json' else 'text', 'attachment-badge-icon') -}}
   {%- endmacro -%}
 
   {#- Badge plus the payload it expands, keyed on `cell_id`; a promoted
