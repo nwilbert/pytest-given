@@ -2228,6 +2228,54 @@
 - **when** the runtime «rules» run over that story
 - **then** dead-term flags none of its terms
 
+## ✓ `citations update` rewrites a stale «citation» to its target's glyph, text and summary
+`tests/unit/report/test_citations.py::test_update_rewrites_a_stale_citation` · spec/citations
+
+- **given** a «report» where the tag `checkout` has a passed and an xfailed «scenario»
+- **given** a document citing the tag under another name, as all passed
+  - 📎 document:
+    ```
+    ✅ [Checkout](https://example.org/report.html#tag=checkout) (1 ✅)
+    ```
+- **when** the document is updated
+- **then** its glyph, text and summary read what the report says
+  - 📎 updated document:
+    ```
+    🔵 [checkout](https://example.org/report.html#tag=checkout) (1 ✅ · 1 🔵)
+    ```
+- **then** no finding remains
+
+## ✓ A plain «report link» claims only that its target exists
+`tests/unit/report/test_citations.py::test_a_plain_report_link_claims_only_that_its_target_exists` · spec/citations
+
+- **given** a «report» whose one «scenario» fails
+- **given** a document linking it, and a deleted test, in its own words
+  - 📎 document:
+    ```
+    See [how paying works](https://example.org/report.html#scenario=t.py::test_pay) and [refunds](https://example.org/report.html#scenario=t.py::test_refund).
+    ```
+- **when** the document is updated
+- **then** only the link to the deleted test is a finding
+- **then** the document is left as written
+
+## ✓ A «citation» whose target left the «report» is marked ❓ and recovers once it is back
+`tests/unit/report/test_citations.py::test_a_citation_to_a_gone_target_is_marked_and_recovers` · spec/citations
+
+- **given** a «citation» of a passing «scenario»
+  - 📎 document:
+    ```
+    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+    ```
+- **when** it is updated against a «report» that lacks the scenario
+- **then** it is marked ❓, keeping its target and text
+  - 📎 marked document:
+    ```
+    ❓ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+    ```
+- **then** it stays a finding
+- **when** it is updated once the «report» holds the scenario again
+- **then** it reads as current again
+
 ## ✓ A «sentence» is referenced by its «terms», whatever their surface form
 `tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display`
 
@@ -2350,7 +2398,8 @@
         "pytest_version": "8",
         "plugin_version": "0",
         "commit_sha": null,
-        "title": null
+        "title": null,
+        "report_url": null
       },
       "scenarios": [
         {

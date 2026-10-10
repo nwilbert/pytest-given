@@ -1,5 +1,7 @@
 # Citations — Design Spec
 
+✅ [spec/citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/citations) (3 ✅)
+
 ## Goal
 
 Let a Markdown document — a design spec first of all — cite a scenario, a tag or a story by a link
@@ -199,8 +201,9 @@ completeness.
 | Tag | on the tag's row in the Tags sidebar, at every level of the tree `app.js` builds |
 | Story | in the story header, beside its copy-link button |
 
-Each is titled "Copy Markdown citation" and has an icon of its own, so it cannot be mistaken for the
-link icon beside it; the `frontend-design` skill shapes the icon and the button's place in the
+Each is labelled "Copy Markdown citation", with a tooltip adding that `pytest-given citations check`
+and `update` keep the citation current. It has an icon of its own, the Markdown mark's "M↓", so it
+cannot be mistaken for the link icon beside it; the `frontend-design` skill shapes the icon and the button's place in the
 card, header and sidebar row. The tick on success and the `navigator.clipboard` → `execCommand`
 fallback are `copyAnchor`'s, through the shared `_copyText`.
 
@@ -474,6 +477,12 @@ area tag.
   tagged `spec/citations` and cited from this spec once they exist.
 - **Playwright** — each button, including a Stories-view card clone and a tag below the top level;
   no buttons in a report without `given_report_url`; a `#scenario=<node id>` link opening its card.
+
+## Acceptance criteria
+
+- ✅ [`citations update` rewrites a stale citation to its target's glyph, text and summary](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/report/test_citations.py::test_update_rewrites_a_stale_citation)
+- ✅ [A plain report link claims only that its target exists](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/report/test_citations.py::test_a_plain_report_link_claims_only_that_its_target_exists)
+- ✅ [A citation whose target left the report is marked ❓ and recovers once it is back](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/report/test_citations.py::test_a_citation_to_a_gone_target_is_marked_and_recovers)
 
 ## Out of scope
 

@@ -36,6 +36,7 @@ nox.options.sessions = [
     'mypy',
     'test',
     'coverage',
+    'citations',
     'audit',
 ]
 
@@ -357,6 +358,49 @@ def check_release(session: nox.Session) -> None:
     session.log(f'the {target} release of pytest-given passed a live smoke run')
 
 
+_PAGES_EXAMPLES_URL = 'https://nwilbert.github.io/pytest-given/dev/examples'
+_EXAMPLE_REPORTS = (
+    'coffeeshop',
+    'hotel-booking',
+    'file-glossary-booking',
+    'self-report',
+)
+
+
+def _citation_runs(slug: str) -> list[list[str]]:
+    """The `pytest-given citations` arguments one report's citations take: the
+    site's pages, which link it relatively, and for the self-report the specs,
+    which link the hosted one."""
+    data = f'examples/{slug}/{slug}-data.json'
+    runs = [
+        [
+            'docs/site/',
+            '--report',
+            data,
+            '--report-path',
+            f'docs/site/examples/{slug}.html',
+        ]
+    ]
+    if slug == 'self-report':
+        runs.append(['docs/specs/', '--report', data])
+    return runs
+
+
+def _refresh_citations(session: nox.Session, slug: str) -> None:
+    for args in _citation_runs(slug):
+        session.run('pytest-given', 'citations', 'update', *args)
+
+
+@nox.session
+def citations(session: nox.Session) -> None:
+    """Hold the documents' citations to the committed reports. A cited failure
+    fails it, so a site page cites nothing an example fails on purpose."""
+    _sync(session, include_project=True)
+    for slug in _EXAMPLE_REPORTS:
+        for args in _citation_runs(slug):
+            session.run('pytest-given', 'citations', 'check', *args)
+
+
 @nox.session
 def examples(session: nox.Session) -> None:
     """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
@@ -392,6 +436,7 @@ def examples(session: nox.Session) -> None:
             f'--given-md=examples/{slug}/{slug}.md',
             f'--given-title={title}',
             '--given-source-link=github',
+            f'--given-report-url={_PAGES_EXAMPLES_URL}/{slug}.html',
             # These suites have intentional failures, so the run already
             # returns a tolerated exit 1 (success_codes below), which masks
             # error-level lint findings. The printed summary is the signal
@@ -410,6 +455,7 @@ def examples(session: nox.Session) -> None:
             *extra,
             success_codes=[0, 1],
         )
+        _refresh_citations(session, slug)
     session.log(
         'Note: coffeeshop and hotel-booking have intentional failures for failure '
         'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
@@ -599,6 +645,7 @@ def self_report(session: nox.Session) -> None:
         '--given-md=examples/self-report/self-report.md',
         '--given-title=pytest-given Self-Report',
         '--given-source-link=github',
+        f'--given-report-url={_PAGES_EXAMPLES_URL}/self-report.html',
         # The backend suite has no intentional failures, so an error-level
         # lint finding turns this session red — a real gate.
         '--given-lint',
@@ -606,6 +653,7 @@ def self_report(session: nox.Session) -> None:
         '--no-header',
         '-q',
     )
+    _refresh_citations(session, 'self-report')
 
 
 @nox.session

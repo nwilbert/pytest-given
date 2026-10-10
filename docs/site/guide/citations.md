@@ -9,8 +9,8 @@ A design spec, a README or any other Markdown document can cite a scenario, a ta
 
 Live, against this site's example reports:
 
-- ? [](../examples/hotel-booking.html#view=stories&story=cancel-a-booking)
-- ? [](../examples/self-report.html#tag=spec/citations)
+- 🔵 [Cancel a Booking](../examples/hotel-booking.html#view=stories&story=cancel-a-booking) (2 ✅ · 1 🔵)
+- ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (3 ✅)
 
 `pytest-given citations check` holds every such link to a JSON report, and `pytest-given citations update` rewrites a citation to what the report now says.
 
