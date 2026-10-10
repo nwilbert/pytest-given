@@ -1,17 +1,17 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-09T20:30:18.782212+00:00",
+    "timestamp": "2026-10-10T07:04:16.240082+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "a500df92752af9a4ffb562738aa2ba7e5897c3ee",
+    "commit_sha": "173a130452a3dfd4b6b677c082deedda8faac7d2",
     "title": "Hotel Booking Example"
   },
   "scenarios": [
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_pick_suite",
       "narration": {
-        "text": "Carol picks a suite for the group",
+        "text": "A search offers only the available rooms",
         "parts": []
       },
       "module": "test_hotel_booking",
@@ -93,6 +93,29 @@
           "fixture_name": null
         },
         {
+          "phase": "then",
+          "narration": {
+            "text": "only the Deluxe Suite is offered",
+            "parts": [
+              {
+                "value": "only the "
+              },
+              {
+                "term_id": "room",
+                "display": "Deluxe Suite",
+                "expression": "room(\"Deluxe Suite\")"
+              },
+              {
+                "value": " is offered"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
           "phase": "when",
           "narration": {
             "text": "Carol selects the Deluxe Suite",
@@ -125,7 +148,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the Deluxe Suite is held for the group",
+            "text": "the Deluxe Suite is selected for the group",
             "parts": [
               {
                 "value": "the "
@@ -136,7 +159,7 @@
                 "expression": "room(\"Deluxe Suite\")"
               },
               {
-                "value": " is held for the group"
+                "value": " is selected for the group"
               }
             ]
           },
@@ -152,7 +175,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 180
+        "line": 197
       },
       "story_ids": [
         "book-a-group-trip"
@@ -162,7 +185,7 @@
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_complete_booking",
       "narration": {
-        "text": "Carol completes the booking for both guests",
+        "text": "A paid booking is confirmed to every guest",
         "parts": []
       },
       "module": "test_hotel_booking",
@@ -465,7 +488,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 200
+        "line": 219
       },
       "story_ids": [
         "book-a-group-trip"
@@ -475,7 +498,7 @@
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]",
       "narration": {
-        "text": "Payment is declined \u2014 the booking is not finalized",
+        "text": "A declined payment leaves the booking pending",
         "parts": []
       },
       "module": "test_hotel_booking",
@@ -768,9 +791,9 @@
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 283,
+                  "lineno": 293,
                   "func": "test_payment_declined",
-                  "code": "    assert processor_response == decline_reason",
+                  "code": "    assert response == decline_reason",
                   "is_internal": false
                 }
               ],
@@ -784,7 +807,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 244
+        "line": 258
       },
       "story_ids": [
         "book-a-group-trip"
@@ -794,7 +817,7 @@
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_cancel_booking",
       "narration": {
-        "text": "Alice cancels her booking and is refunded",
+        "text": "Cancelling a paid booking refunds it and notifies the guest",
         "parts": []
       },
       "module": "test_hotel_booking",
@@ -970,7 +993,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 292
+        "line": 312
       },
       "story_ids": [
         "cancel-a-booking"
@@ -980,13 +1003,13 @@
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking",
       "narration": {
-        "text": "Alice rebooks her cancelled booking (planned feature)",
+        "text": "Rebooking restores a cancelled booking",
         "parts": []
       },
       "module": "test_hotel_booking",
       "tags": [],
       "status": "xfailed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -1073,14 +1096,14 @@
         "frames": [
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 327,
+            "lineno": 340,
             "func": "test_rebook_cancelled_booking",
             "code": "    rebook_cancelled_booking(stay)",
             "is_internal": false
           },
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 313,
+            "lineno": 328,
             "func": "rebook_cancelled_booking",
             "code": "    raise NotImplementedError('rebooking a cancelled booking is not supported yet')",
             "is_internal": false
@@ -1092,7 +1115,7 @@
       "xfail_reason": "rebooking is not implemented yet",
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 316
+        "line": 331
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1102,7 +1125,7 @@
     {
       "id": "examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel",
       "narration": {
-        "text": "Alice checks in, then cancels a later booking",
+        "text": "A booking can be cancelled only before its guest checks in",
         "parts": []
       },
       "module": "test_hotel_booking",
@@ -1269,7 +1292,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 344
+        "line": 351
       },
       "story_ids": [
         "cancel-a-booking",

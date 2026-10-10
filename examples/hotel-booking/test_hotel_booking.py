@@ -177,7 +177,24 @@ def bob():
     return {'name': 'Bob', 'email': 'bob@example.com'}
 
 
-@scenario('Carol picks a suite for the group', stories=book_a_group_trip)
+SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
+
+
+def submit_payment(booking, method, decline_reason=None):
+    """Confirm the booking and notify its guests, unless the payment is declined.
+
+    `decline_reason` stands in for the payment processor's answer.
+    """
+    if method not in SUPPORTED_PAYMENT_METHODS:
+        return 'unsupported payment method'
+    if decline_reason:
+        return decline_reason
+    booking['paid'] = booking['confirmed'] = True
+    booking['notified'] = list(booking['guests'])
+    return None
+
+
+@scenario('A search offers only the available rooms', stories=book_a_group_trip)
 def test_pick_suite(carol):
     with given(t'the {room("Deluxe Suite")} is listed as available'):
         catalog = {
@@ -188,16 +205,18 @@ def test_pick_suite(carol):
         t'{organizer("Carol")} searches for a {room}', pins=book_a_group_trip['search']
     ):
         offered = [name for name, r in catalog.items() if r['available']]
+    with then(t'only the {room("Deluxe Suite")} is offered'):
+        assert offered == ['Deluxe Suite']
     with when(
         t'{organizer("Carol")} selects the {room("Deluxe Suite")}',
         pins=book_a_group_trip['select'],
     ):
         carol['selection'] = offered[0]
-    with then(t'the {room("Deluxe Suite")} is held for the group'):
+    with then(t'the {room("Deluxe Suite")} is selected for the group'):
         assert carol['selection'] == 'Deluxe Suite'
 
 
-@scenario('Carol completes the booking for both guests', stories=book_a_group_trip)
+@scenario('A paid booking is confirmed to every guest', stories=book_a_group_trip)
 def test_complete_booking(carol, alice, bob):
     with given(
         t'{organizer("Carol")} has selected the {room("Deluxe Suite")}',
@@ -216,15 +235,13 @@ def test_complete_booking(carol, alice, bob):
     ):
         booking_state['guests'] = [alice['name'], bob['name']]
     with when(t'{organizer("Carol")} submits the {payment} for the {booking}'):
-        booking_state['paid'] = True
+        submit_payment(booking_state, 'credit card')
     with then(t'the {booking_system} {confirm.s} the {booking}'):
-        booking_state['confirmed'] = booking_state['paid']
         assert booking_state['confirmed']
     with then(
         t'the {booking_system} sends the {confirmation} '
         t'to {guest("Alice")} and {guest("Bob")}'
     ):
-        booking_state['notified'] = list(booking_state['guests'])
         assert set(booking_state['notified']) == {'Alice', 'Bob'}
     with when(
         t'{guest("Alice")} and {guest("Bob")} check in to the {room("Deluxe Suite")}'
@@ -238,11 +255,8 @@ def test_complete_booking(carol, alice, bob):
         assert checked_in == ['Alice', 'Bob']
 
 
-SUPPORTED_PAYMENT_METHODS = {'credit card', 'debit card', 'bank transfer'}
-
-
 @scenario(
-    'Payment is declined — the booking is not finalized',
+    'A declined payment leaves the booking pending',
     stories=book_a_group_trip,
     tags=['error-handling', 'ticket/HB-17'],
 )
@@ -266,56 +280,55 @@ def test_payment_declined(carol, alice, bob, payment_method, decline_reason):
             'guests': [alice['name'], bob['name']],
             'paid': False,
             'confirmed': False,
+            'notified': [],
         }
     with when(
         t'{organizer("Carol")} submits the {payment} '
         t'by {payment_method} for the {booking}'
     ):
-        # The processor declines a supported method for the parametrized
-        # reason, and rejects an unsupported one outright.
-        if payment_method in SUPPORTED_PAYMENT_METHODS:
-            processor_response = decline_reason
-        else:
-            processor_response = 'unsupported payment method'
+        response = submit_payment(booking_state, payment_method, decline_reason)
     with then(
         t'the {booking_system} {decline.s} the {payment} because of {decline_reason}'
     ):
-        assert processor_response == decline_reason
+        assert response == decline_reason
         assert not booking_state['paid']
     with then(
         t'the {booking} stays pending and no {confirmation} is sent '
         t'to {guest("Alice")} or {guest("Bob")}'
     ):
         assert not booking_state['confirmed']
+        assert booking_state['notified'] == []
 
 
-@scenario('Alice cancels her booking and is refunded', stories=cancel_a_booking)
+def cancel_before_arrival(stay):
+    if stay['status'] == 'checked in':
+        raise ValueError('cannot cancel a booking after arrival')
+    stay['status'] = 'cancelled'
+    if stay.get('paid'):
+        stay['refunded'] = True
+        stay['notified'] = [stay['guest']]
+
+
+@scenario(
+    'Cancelling a paid booking refunds it and notifies the guest',
+    stories=cancel_a_booking,
+)
 def test_cancel_booking(alice):
     with given(t'{guest("Alice")} has a confirmed {booking} she paid for'):
-        booking_state = {
-            'guest': alice['name'],
-            'paid': True,
-            'cancelled': False,
-            'refunded': False,
-            'notified': [],
-        }
+        stay = {'guest': alice['name'], 'status': 'confirmed', 'paid': True}
     with when(t'{guest("Alice")} {cancel.s} the {booking}'):
-        booking_state['cancelled'] = True
+        cancel_before_arrival(stay)
     with then(t'the {booking_system} {refund.s} the {payment} for the {booking}'):
-        booking_state['refunded'] = booking_state['cancelled'] and booking_state['paid']
-        assert booking_state['refunded']
+        assert stay['refunded']
     with then(t'the {booking_system} sends a {confirmation} to {guest("Alice")}'):
-        booking_state['notified'] = [alice['name']]
-        assert booking_state['notified'] == ['Alice']
+        assert stay['notified'] == ['Alice']
 
 
 def rebook_cancelled_booking(stay):
     raise NotImplementedError('rebooking a cancelled booking is not supported yet')
 
 
-@scenario(
-    'Alice rebooks her cancelled booking (planned feature)', stories=cancel_a_booking
-)
+@scenario('Rebooking restores a cancelled booking', stories=cancel_a_booking)
 @pytest.mark.xfail(strict=True, reason='rebooking is not implemented yet')
 def test_rebook_cancelled_booking(alice):
     with given(t'{guest("Alice")} has cancelled her stay'):
@@ -335,14 +348,8 @@ def check_in(stay):
     stay['status'] = 'checked in'
 
 
-def cancel_before_arrival(stay):
-    if stay['status'] == 'checked in':
-        raise ValueError('cannot cancel a booking after arrival')
-    stay['status'] = 'cancelled'
-
-
 @scenario(
-    'Alice checks in, then cancels a later booking',
+    'A booking can be cancelled only before its guest checks in',
     stories=[cancel_a_booking, book_a_group_trip],
     tags=['error-handling'],
 )

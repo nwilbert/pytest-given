@@ -1,17 +1,17 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-09T19:15:21.130848+00:00",
+    "timestamp": "2026-10-10T07:04:16.636598+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "0aa01004c7cbd01d13f0b18428c128f31f343c30",
+    "commit_sha": "173a130452a3dfd4b6b677c082deedda8faac7d2",
     "title": "File Glossary Example"
   },
   "scenarios": [
     {
       "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room",
       "narration": {
-        "text": "Guest books an available room",
+        "text": "A Guest booking an available room receives a Confirmation",
         "parts": []
       },
       "module": "test_file_glossary_booking",
@@ -138,7 +138,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 52
+        "line": 60
       },
       "story_ids": [
         "book-a-room"
@@ -148,7 +148,7 @@
     {
       "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room",
       "narration": {
-        "text": "Guest cannot book an unavailable room",
+        "text": "A Guest cannot book an unavailable room",
         "parts": []
       },
       "module": "test_file_glossary_booking",
@@ -234,29 +234,6 @@
           "attachments": [],
           "pins": null,
           "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Cancellation Policy does not apply",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "cancellation-policy",
-                "display": "Cancellation Policy",
-                "expression": "g[\"Cancellation Policy\"]"
-              },
-              {
-                "value": " does not apply"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
         }
       ],
       "parameters": null,
@@ -265,7 +242,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 67
+        "line": 77
       },
       "story_ids": [
         "book-a-room"

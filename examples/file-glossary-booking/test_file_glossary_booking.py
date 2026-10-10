@@ -49,31 +49,36 @@ book_a_room = story(
 )
 
 
-@scenario('Guest books an available room', stories=book_a_room)
+def book(catalog):
+    """Book the first available room, or return None when every room is taken."""
+    room = next((name for name, available in catalog.items() if available), None)
+    if room is None:
+        return None
+    return {'room': room, 'cancellation_policy': 'free until 24 hours before arrival'}
+
+
+@scenario(
+    'A Guest booking an available room receives a Confirmation', stories=book_a_room
+)
 def test_book_available_room():
     with given(t'the {g["Room"]} is available'):
         catalog = {'Standard': True, 'Suite': False}
     with when(t'{g["Guest"]} {g["book"].s} the {g["Room"]}'):
-        booked_room = next(name for name, avail in catalog.items() if avail)
+        confirmation = book(catalog)
     with then(t'the {g["Guest"]} receives a {g["Confirmation"]}'):
-        assert booked_room == 'Standard'
+        assert confirmation['room'] == 'Standard'
     # Deliberately use the kindless term only here in a t-string step:
     with then(  # 'Cancellation Policy' is kindless — neutral pill expected
         t'the {g["Cancellation Policy"]} applies to the {g["Room"]}'
     ):
-        assert booked_room is not None
+        assert confirmation['cancellation_policy']
 
 
-@scenario('Guest cannot book an unavailable room', stories=book_a_room)
+@scenario('A Guest cannot book an unavailable room', stories=book_a_room)
 def test_book_unavailable_room():
     with given(t'no {g["Room"]} is available'):
         catalog = {'Suite': False}
     with when(t'{g["Guest"]} {g["book"].s} a {g["Room"]}'):
-        available_rooms = [name for name, avail in catalog.items() if avail]
+        confirmation = book(catalog)
     with then(t'no {g["Confirmation"]} is issued'):
-        assert available_rooms == []
-    # Deliberately use the kindless term only here in a t-string step:
-    with then(  # 'Cancellation Policy' is kindless — neutral pill expected
-        t'the {g["Cancellation Policy"]} does not apply'
-    ):
-        assert True
+        assert confirmation is None
