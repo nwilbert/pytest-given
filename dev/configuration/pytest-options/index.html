@@ -833,6 +833,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#selecting-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Selecting scenarios
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pytest-xdist" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1062,6 +1073,15 @@
 <li>use the <code>=PATH</code> form: <code>--given-html=out.html</code>, not <code>--given-html out.html</code>.</li>
 </ul>
 <p>If that path can't be a report file, like a <code>.py</code> test file, pytest-given stops before running the tests, so it never overwrites your test.</p>
+<h2 id="selecting-scenarios">Selecting scenarios<a class="headerlink" href="#selecting-scenarios" title="Permanent link">&para;</a></h2>
+<p>pytest-given marks every <code>@scenario</code> test, each case of a parametrized one included, with the <code>pytest_given</code> marker. You don't apply it yourself: a hand-written <code>@pytest.mark.pytest_given</code> on a plain test makes it selectable, but records nothing. The marker is registered, so <code>--strict-markers</code> accepts it. Select with pytest's own <code>-m</code>:</p>
+<ul>
+<li><strong>A report without running the plain tests.</strong> The report holds only scenarios, so <code>pytest -m pytest_given --given-html</code> writes the same report as a full run, faster.</li>
+<li><strong>Code coverage of the scenarios.</strong> <code>pytest -m pytest_given --cov=mypkg</code> (with pytest-cov), or <code>coverage run -m pytest -m pytest_given</code>. It counts the lines the scenarios <em>run</em>, not the lines a step <em>describes</em>, so it is an upper bound on what the report documents. Compare it with a full run's coverage: lines the suite covers but the scenarios don't are behavior only plain tests reach, and the report doesn't show.</li>
+<li><strong>The plain tests alone</strong>, with <code>pytest -m "not pytest_given"</code>.</li>
+</ul>
+<p>A <code>-m</code> on the command line replaces one in your <code>addopts</code>, so combine them yourself: <code>-m "pytest_given and not slow"</code>. In a suite with no scenarios, <code>-m pytest_given</code> deselects every test and pytest exits with code 5.</p>
+<p>Mind <code>-k</code>: it matches any part of a test's keywords, and a scenario's include <code>pytest_given</code> and <code>_scenario</code>, so <code>-k given</code> or <code>-k scenario</code> selects every scenario too.</p>
 <h2 id="pytest-xdist">pytest-xdist<a class="headerlink" href="#pytest-xdist" title="Permanent link">&para;</a></h2>
 <p><strong>pytest-given doesn't work with <code>pytest-xdist</code>.</strong> With <code>-n</code>, tests run in worker processes, and their steps never reach the main process. The run passes, but the report is empty. Generate reports from a run without <code>-n</code>.</p>
 <h2 id="ini-settings">Ini settings<a class="headerlink" href="#ini-settings" title="Permanent link">&para;</a></h2>
