@@ -1022,6 +1022,7 @@
 <ul>
 <li>A handle's <code>.s</code> form reads the term's S-form, its regular plural or verb -s (<code>room.s</code> reads <em>Rooms</em>), and <code>.l</code> and <code>.s</code> chain and apply to a called form (<code>room.l.s</code> reads <em>rooms</em>).</li>
 <li>Every <code>@scenario</code> test carries the registered <code>pytest_given</code> marker, so <code>pytest -m pytest_given</code> runs the scenarios alone.</li>
+<li><code>--given-md-lines</code> / <code>--no-given-md-lines</code> and the <code>given_md_lines</code> ini, with <code>pytest-given report --no-lines</code>, leave the line out of each Markdown scenario anchor.</li>
 <li>The narration lint's <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>

@@ -1040,6 +1040,11 @@
 <td>Write the Markdown report. <strong>Without a path, it prints to stdout</strong>, between <code>&lt;!-- pytest-given:md:start --&gt;</code> and <code>&lt;!-- pytest-given:md:end --&gt;</code> markers.</td>
 </tr>
 <tr>
+<td><code>--given-md-lines</code> / <code>--no-given-md-lines</code></td>
+<td><code>true</code></td>
+<td>Show the line in the <code>file.py:line::test_name</code> anchor under each Markdown heading. Off, the anchor is the node id, so a Markdown diff doesn't show every anchor below an inserted test. Ini setting: <code>given_md_lines</code>; both flags override it.</td>
+</tr>
+<tr>
 <td><code>--given-title=TEXT</code></td>
 <td>rootdir name</td>
 <td>The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: <code>given_title</code>.</td>
