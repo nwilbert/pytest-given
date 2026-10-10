@@ -18,6 +18,7 @@ from pytest_given.model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NodeId,
+    ParameterCase,
     ParameterColumn,
     ParameterTable,
     Phase,
@@ -29,6 +30,7 @@ from pytest_given.model import (
     Story,
     StoryId,
     TermId,
+    param_id,
     report_from_dict,
     report_to_dict,
 )
@@ -2369,3 +2371,53 @@ def test_render_emits_the_configured_theme_as_the_document_default() -> None:
     assert 'data-theme-default="auto"' in render_html_string(
         report, source_link_template=None
     )
+
+
+def _citable_report(report_url: str | None) -> ReportData:
+    return ReportData(
+        metadata=Metadata(
+            project='p',
+            timestamp='t',
+            pytest_version='9',
+            plugin_version='0',
+            report_url=report_url,
+        ),
+        scenarios=[
+            Scenario(
+                id=NodeId('t.py::test_pour[water]'),
+                narration=Narration(text='Pour'),
+                module='m',
+                tags=['spec/x'],
+                parameters=ParameterTable(
+                    columns=[ParameterColumn(id=param_id('x'), name='x', kind='param')],
+                    cases=[ParameterCase(values=[1])],
+                ),
+            )
+        ],
+    )
+
+
+def test_a_report_url_puts_every_citations_parts_in_the_page_data() -> None:
+    url = 'https://example.org/report.html'
+    data = _embedded_app_data(render_html_string(_citable_report(url), None))
+    citations = data['citations']
+    assert citations['report_url'] == url
+    assert citations['scenario']['t.py::test_pour[water]'] == {
+        'glyph': '✅',
+        'text': 'Pour',
+        'fragment': 'scenario=t.py::test_pour',
+        'summary': None,
+    }
+    assert set(citations['tag']) == {'spec', 'spec/x'}
+    assert citations['tag']['spec']['summary'] == '(1 ✅)'
+    assert citations['story'] == {}
+
+
+def test_a_report_without_a_url_carries_no_citations() -> None:
+    data = _embedded_app_data(render_html_string(_citable_report(None), None))
+    assert data['citations'] is None
+
+
+def test_a_grouped_scenarios_base_node_id_opens_it() -> None:
+    data = _embedded_app_data(render_html_string(_citable_report(None), None))
+    assert data['cited_scenario_ids'] == {'t.py::test_pour': 't.py::test_pour[water]'}

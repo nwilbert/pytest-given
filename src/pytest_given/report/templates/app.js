@@ -50,6 +50,15 @@ function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
+// `#scenario=` takes the slug the copy-link button writes or the node id a
+// citation writes — a grouped scenario's without its first case's `[…]`.
+function scenarioFromParam(value) {
+  const data = window.__REPORT_DATA__;
+  return lookup(data.scenario_slugs || {}, value, null)
+    ?? lookup(data.cited_scenario_ids || {}, value, null)
+    ?? (data.scenarios.some(s => s.id === value) ? value : null);
+}
+
 // --- Alpine app ---
 // Buckets for scenarios with nothing on an axis. Both are selectable filters,
 // so the tokens have to survive a URL: a leading '!' cannot start a term id
@@ -678,11 +687,28 @@ function reportApp() {
     // Copies the link without visiting it: writing it into the address bar
     // would overwrite the history entry holding the current filters.
     copyAnchor(hashString, event) {
-      const url = window.location.href.split('#')[0] + '#' + hashString;
-      const btn = event.currentTarget;
-      // Only flip to the "copied" state once the URL is actually on the
-      // clipboard, or the icon would claim a success that never happened.
-      this._copyText(url).then((ok) => {
+      this._copyAndFlash(window.location.href.split('#')[0] + '#' + hashString, event.currentTarget);
+    },
+    hasCitation(kind, key) {
+      const citations = window.__REPORT_DATA__.citations;
+      return !!citations && Object.hasOwn(citations[kind], key);
+    },
+    // Python renders every part; this only joins them with the report's
+    // public URL, which is the setting's and never `window.location`.
+    copyCitation(kind, key, event) {
+      const citations = window.__REPORT_DATA__.citations;
+      const parts = citations && lookup(citations[kind], key, null);
+      if (!parts) return;
+      const summary = parts.summary ? ' ' + parts.summary : '';
+      this._copyAndFlash(
+        `${parts.glyph} [${parts.text}](${citations.report_url}#${parts.fragment})${summary}`,
+        event.currentTarget,
+      );
+    },
+    // Only flip to the "copied" state once the text is actually on the
+    // clipboard, or the icon would claim a success that never happened.
+    _copyAndFlash(text, btn) {
+      this._copyText(text).then((ok) => {
         if (!ok) return;
         btn.classList.add('anchor-copied');
         setTimeout(() => btn.classList.remove('anchor-copied'), 1200);
@@ -1003,9 +1029,7 @@ function reportApp() {
       else if (this.tagFilters.length) this.view = 'tags';
       else if (this.moduleFilter) this.view = 'modules';
       const targetSlug = params.get('scenario');
-      const targetScenario = targetSlug
-        ? lookup(window.__REPORT_DATA__.scenario_slugs || {}, targetSlug, null)
-        : null;
+      const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       const targetTerm = params.get('term');
       if (targetTerm) {
         this.goToTerm(targetTerm);

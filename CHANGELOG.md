@@ -21,6 +21,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The narration lint's `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 - `--given-report-url` and the `given_report_url` ini store the public URL the HTML report is served from as `report_url` in the report metadata.
 - `pytest-given citations check` verifies the report links in Markdown documents against a JSON report, and `pytest-given citations update` rewrites their citations to match it.
+- An HTML report written with `given_report_url` has copy buttons on scenario cards, story headers and Tags sidebar rows that put a one-line Markdown citation on the clipboard.
+- A `#scenario=` link opens a scenario by its node id as well as its slug.
 
 ### Changed
 

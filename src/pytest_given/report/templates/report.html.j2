@@ -61,7 +61,10 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, citation_button, citation_icon, citation_icon_symbol, citation_title, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
+  {%- if citations %}
+  {{ citation_icon_symbol() }}
+  {%- endif %}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
       exists to belong to. -#}
@@ -184,6 +187,15 @@
               <span class="nav-group-name" x-text="group.name"></span>
               <span class="nav-group-count" x-text="group.count"></span>
             </button>
+            {% if citations %}
+            {#- The spacer holds the button's place on the untagged row, which
+                has nothing to cite, so every count stays in one column. -#}
+            <button type="button" class="anchor-link citation-copy nav-group-citation"
+                    title="{{ citation_title }}" aria-label="Copy Markdown citation"
+                    x-show="view === 'tags' && hasCitation('tag', group.id)"
+                    @click.stop="copyCitation('tag', group.id, $event)">{{ citation_icon() }}</button>
+            <span class="nav-group-citation-spacer" x-show="view === 'tags' && !hasCitation('tag', group.id)"></span>
+            {% endif %}
           </div>
         </template>
       </div>
@@ -237,7 +249,7 @@
       <div style="display:flex; align-items:center;">
         {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ loop.index0 }}" :aria-expanded="!!expandedScenarios[{{ loop.index0 }}]" :aria-label="(expandedScenarios[{{ loop.index0 }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ loop.index0 }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="scenario-title">{{ scenario.narration | narration }}</span>
-        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}
+        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}{{ citation_button('scenario', scenario.id) }}
       </div>
       <span class="scenario-meta">
         {#- Cap visible tags so a long tag list can't crowd out the title:
@@ -411,7 +423,7 @@
         {% set total_scns = story_scns | length %}
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}</div>
+            <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}{{ citation_button('story', story.id) }}</div>
             <div class="header-context meta-list"><span>{{ story.sentences | length | plural('sentence') }}</span><span>{{ total_scns | plural('scenario') }}</span></div>
             <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
                     @click="clearSentenceHighlights()">Deselect</button>

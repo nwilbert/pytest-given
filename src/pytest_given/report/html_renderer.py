@@ -40,6 +40,7 @@ from ..model import (
     placeholder_token,
     plural,
 )
+from .citation_index import CitationIndex, Target, copy_parts
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
 from .inline_markdown import render_inline_markdown
@@ -221,6 +222,7 @@ def _render_context(
     state is seeded from."""
     glossary_view = build_glossary_view(report)
     coverage = build_coverage_map(report)
+    citation_index = CitationIndex(report, coverage)
     scn_covers = build_scenario_sentence_index(coverage)
     sentence_labels = build_sentence_labels(report)
     scenario_slugs = build_scenario_slug_index(report)
@@ -237,6 +239,7 @@ def _render_context(
         'scn_covers': scn_covers,
         'scenario_index': {scn.id: index for index, scn in enumerate(report.scenarios)},
         'scenario_slugs': scenario_slugs,
+        'citations': report.metadata.report_url is not None,
         # The colors themselves, one (light, dark) pair per column, emitted as
         # `--param-color-N` tokens beside the stylesheet. They are generated
         # per report rather than sitting in styles.css, because how many a
@@ -258,6 +261,12 @@ def _render_context(
                 'sentence_labels': sentence_labels,
                 'scenario_slugs': {
                     slug: node_id for node_id, slug in scenario_slugs.items()
+                },
+                'citations': _citation_data(report, citation_index),
+                'cited_scenario_ids': {
+                    cited: scenario.id
+                    for cited, scenario in citation_index.scenarios.items()
+                    if cited != scenario.id
                 },
             }
         ),
@@ -334,6 +343,31 @@ def _app_data(report: ReportData) -> dict[str, object]:
             }
             for scenario in report.scenarios
         ],
+    }
+
+
+def _citation_data(
+    report: ReportData, index: CitationIndex
+) -> dict[str, object] | None:
+    """Each citation's parts for the copy buttons, keyed as the page finds
+    them: a scenario by its `id`, a tag at every level of the tree `app.js`
+    builds, a story by id. Only a report with a public URL shows the buttons,
+    so only it carries the weight."""
+    if report.metadata.report_url is None:
+        return None
+    return {
+        'report_url': report.metadata.report_url,
+        'scenario': {
+            scenario.id: copy_parts(index.citation(Target('scenario', cited)))
+            for cited, scenario in index.scenarios.items()
+        },
+        'tag': {
+            tag: copy_parts(index.citation(Target('tag', tag))) for tag in index.tags
+        },
+        'story': {
+            story_id: copy_parts(index.citation(Target('story', story_id)))
+            for story_id in index.story_ids
+        },
     }
 
 

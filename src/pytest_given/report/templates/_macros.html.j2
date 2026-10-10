@@ -54,6 +54,32 @@
             @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
   {%- endmacro -%}
 
+  {#- The Markdown mark's "M↓" without its box, which leaves too little room
+      for the letters at 14px: the button copies a line of Markdown, not a URL,
+      and sits right beside the link icon. Defined once per page and
+      referenced by every button, which can number in the hundreds. -#}
+  {%- macro citation_icon_symbol() -%}
+    <svg class="svg-sprite" aria-hidden="true"><symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol></svg>
+  {%- endmacro -%}
+
+  {%- set citation_title = 'Copy Markdown citation. pytest-given citations check and update keep it current.' -%}
+
+  {%- macro citation_icon() -%}
+    <svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>
+  {%- endmacro -%}
+
+  {#- Keys travel as data-* and are read back from the dataset: Alpine compiles
+      a directive's decoded attribute text as JS, so interpolating a node id
+      into one would be an injection. -#}
+  {%- macro citation_button(kind, key) -%}
+    {%- if citations -%}
+    <button type="button" class="anchor-link citation-copy" title="{{ citation_title }}"
+            data-citation-kind="{{ kind }}" data-citation-key="{{ key }}"
+            @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)"
+            aria-label="Copy Markdown citation">{{ citation_icon() }}</button>
+    {%- endif -%}
+  {%- endmacro -%}
+
   {#- Why a scenario was skipped or expected to fail, in its status colour. -#}
   {%- macro reason_box(status, label, reason) -%}
     <div class="reason-box {{ status }}">
