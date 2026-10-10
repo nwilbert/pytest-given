@@ -81,6 +81,7 @@ A parametrized scenario renders as one narrated tree above a parameter table. A 
 - **Keep tags separate from the glossary.** A tag that repeats a term is redundant; filter by the term instead. `tag-shadows-term` catches exact collisions. It doesn't catch a tag that names a feature area the glossary covers under another word (`markdown` on scenarios that reference `File glossary`).
 - **Expect few tags.** Tags carry only what the glossary can't: behavior (`validation`) and mechanism (`parametrization`). A tag must cut across modules, because a tag used in only one test file repeats the module grouping. It must also stay on a minority of the suite: `happy-path` on most scenarios filters nothing. Once you use a tag, put it on every scenario it describes, or filtering by it will miss some.
 - **A `/` nests a tag.** The Tags sidebar files `ticket/ABC-123` under a `ticket` heading, which filters like a package, so a family of tags takes one row. Ticket tags are the family worth having: each one shows exactly one ticket's work in the report.
+- **A work-item tag marks one piece of work.** `ticket/ABC-123` or `spec/<slug>` means "added by this piece of work", not "describes this behavior": it need not cut across modules, and other scenarios of the same behavior need not carry it.
 - **Keep step text short.** A t-string with two or three term refs reaches your line-length limit fast. Move detail into nested steps instead of one long sentence.
 
 ## Keeping it truthful

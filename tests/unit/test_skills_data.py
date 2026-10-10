@@ -23,6 +23,7 @@ def _frontmatter(skill_md: Traversable) -> dict[str, str]:
 
 BUNDLED_SKILLS = [
     'pytest-given-authoring',
+    'pytest-given-citing',
     'pytest-given-navigating',
     'pytest-given-reviewing',
 ]
