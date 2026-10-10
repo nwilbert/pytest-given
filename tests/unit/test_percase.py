@@ -185,7 +185,9 @@ def test_a_placeholder_naming_no_parameter_raises() -> None:
         group_parametrized(scenarios, param_info)
 
 
-def test_a_declined_scenario_name_slot_resolves_a_term_instance_to_a_term_ref() -> None:
+def test_a_declined_scenario_title_slot_resolves_a_term_instance_to_a_term_ref() -> (
+    None
+):
     """`group_parametrized=False` is what rule 4 tells an author to reach for
     when a term ref has to vary per case, so the slot it substitutes has to
     resolve a term instance the way the grouped path's cell does — to the

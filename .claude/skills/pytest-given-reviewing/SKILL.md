@@ -37,7 +37,7 @@ Judge each scenario's step texts against their bodies with the rubric below. [re
 **Step text may abstract, but it must never overstate.**
 
 - **Values:** a quantity, date or amount in the text must match the body. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes. A literal copied from a constant goes stale when the constant changes; ask for the interpolation (`{BATCH_SIZE}`) instead.
-- **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario name is a claim about every item it covers. Assertions on a sample overstate it, like "each slot becomes a term ref" backed by checks on two of three slots. Fix it by asserting the rest or by narrowing the text.
+- **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title is a claim about every item it covers. Assertions on a sample overstate it, like "each slot becomes a term ref" backed by checks on two of three slots. Fix it by asserting the rest or by narrowing the text.
 - **Outcomes:** everything a `then` claims must be asserted in it. "…and recorded in the ledger" without such an assertion describes behavior nobody checked. So does a `then` that sets the value it asserts, or asserts a constant. The lint doesn't catch these, because the step contains an `assert`. Nor does it catch "never called" backed by a stub that raises: if the code catches the error, nothing checks the claim. Ask for recorded calls asserted in the `then`.
 - **Raises:** the `then` of an expected raise may restate the message that `match=` pins in domain terms, but it must not claim more than the pin checks. Say the `then` promises that the message names the offender, offers a hint or includes a file:line. If the regex also passes without that detail, the pin is too weak, and the claim is unchecked even if the code delivers it today. For example, `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. A pin with alternatives (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch: sibling scenarios that narrate *different* refusals then all pass on one generic message. Pin what tells this refusal apart from the others.
 - **Expected failures:** an `xfail` mark without `strict=True` (and without the `xfail_strict` ini) stays on a scenario quietly once the behavior works. A later regression then shows up as an expected failure. Ask for `strict=True`.
@@ -94,7 +94,7 @@ Parameter tables are part of the document too. Flag these:
 - A column that no step narrates.
 - A label column that the body turns back into data, with no attachment showing the data.
 - An outcome that varies but has no column of its own.
-- Sibling scenarios that should be one table: the same steps with one arrangement varied, or names that negate each other.
+- Sibling scenarios that should be one table: the same steps with one arrangement varied, or titles that negate each other.
 
 The fixes are in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) under "Parameter tables". Report all legibility problems as one combined finding, not one per instance. A wording you would simply have chosen differently is out of scope.
 

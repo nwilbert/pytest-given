@@ -75,17 +75,17 @@ def _validate_scenario_marker(item: pytest.Item) -> None:
             f'nothing to opt out of; the test is not parametrized. Drop '
             f'the argument, or add @pytest.mark.parametrize.'
         )
-    if not isinstance(marker.name, Template):
+    if not isinstance(marker.title, Template):
         return
     if callspec is None:
         raise PytestGivenError(
             f'@scenario(Template(...)) on {item.nodeid!r} requires '
             f'@pytest.mark.parametrize; the substitution source is '
             f'callspec.params only. Use a plain string for static '
-            f'scenario names, or add @pytest.mark.parametrize.'
+            f'scenario titles, or add @pytest.mark.parametrize.'
         )
     param_names = list(callspec.params.keys())
-    for placeholder in marker.name.get_identifiers():
+    for placeholder in marker.title.get_identifiers():
         if placeholder not in param_names:
             raise placeholder_mismatch(
                 placeholder,

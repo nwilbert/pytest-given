@@ -2,7 +2,7 @@
 anything that varies becomes a column plus a pointer at it.
 
 A varying narrated value leaves a `{name}` placeholder behind, a varying
-attachment payload a content-less badge. The scenario name is templatized
+attachment payload a content-less badge. The scenario title is templatized
 separately — evaluated once at decoration time, it cannot vary across cases and
 so has nothing to be compared against.
 """
@@ -98,7 +98,7 @@ def _templatize_part(
                 raise placeholder_mismatch(name, builder.group.param_names)
             # A `Template` slot in a step body (an `Annotated[..., given(...)]`
             # label). It records no per-case rendering, so it reconciles the
-            # way the scenario name's slots do rather than the way a
+            # way the scenario title's slots do rather than the way a
             # `NarrationValue` does.
             return _reconciled_slot(part, builder)
         case NarrationTermRef():
@@ -177,11 +177,13 @@ def _slot(part: NarrationValue, column: ParameterColumn) -> NarrationPlaceholder
     )
 
 
-def templatize_scenario_name(narration: Narration, builder: ColumnBuilder) -> Narration:
-    """The scenario name as a template, its slots pointed at columns that
+def templatize_scenario_title(
+    narration: Narration, builder: ColumnBuilder
+) -> Narration:
+    """The scenario title as a template, its slots pointed at columns that
     read the way they do.
 
-    A name is evaluated once at decoration time, so it cannot vary and has
+    A title is evaluated once at decoration time, so it cannot vary and has
     nothing to be compared against: every part stays verbatim but the one a
     parametrize column binds. That slot is then reconciled like any step's —
     a `{price:.2f}` slot over a cell holding `1.5` would read `charge 1.5
@@ -191,23 +193,23 @@ def templatize_scenario_name(narration: Narration, builder: ColumnBuilder) -> Na
     return rebuilt(
         narration,
         lambda _index, part: _reconciled_slot(
-            _name_part(part, builder.group.param_names), builder
+            _title_part(part, builder.group.param_names), builder
         ),
     )
 
 
-def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
-    """One part of a scenario name: a value a column binds becomes that column's
+def _title_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
+    """One part of a scenario title: a value a column binds becomes that column's
     slot, a placeholder has to name a column, everything else stands."""
     match part:
         case NarrationValue(expression=expression) if expression in param_names:
             return _param_slot(part)
         case NarrationPlaceholder(name=name):
-            # Collection already validated a scenario name's placeholders
+            # Collection already validated a scenario title's placeholders
             # against this same list, and reported them with a locator this
             # far-downstream raise could not produce.
             assert name in param_names, (
-                f'scenario-name placeholder {name!r} is not one of {param_names}'
+                f'scenario-title placeholder {name!r} is not one of {param_names}'
             )
     return part
 
@@ -215,11 +217,11 @@ def _name_part(part: NarrationPart, param_names: list[str]) -> NarrationPart:
 def _reconciled_slot(part: NarrationPart, builder: ColumnBuilder) -> NarrationPart:
     """One `Template` slot re-pointed at a column that reads the way it does.
 
-    Shared by the scenario name and by a step's `Template` slots: neither
+    Shared by the scenario title and by a step's `Template` slots: neither
     records a per-case rendering to compare against, so both recompute what
     the slot renders from each case's raw parameter.
     """
-    # Every placeholder that survives `_name_part` names a known column: both
+    # Every placeholder that survives `_title_part` names a known column: both
     # callers reject a name absent from `param_names`, and a column exists for
     # each of those.
     if not isinstance(part, NarrationPlaceholder):

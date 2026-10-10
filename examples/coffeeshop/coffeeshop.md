@@ -75,7 +75,7 @@
 - **when** I insert $5
 - **then** the machine has 9 coffees left
 
-## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
+## ✓ Brew {cup_size} ml (templated scenario title) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py::test_brew`
 
 - **given** a coffee machine

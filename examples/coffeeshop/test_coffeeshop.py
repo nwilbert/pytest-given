@@ -110,7 +110,7 @@ def test_neutral_highlight(machine):
         assert machine['coffees'] == 9
 
 
-@scenario(Template('Brew {cup_size} ml (templated scenario name)'))
+@scenario(Template('Brew {cup_size} ml (templated scenario title)'))
 @pytest.mark.parametrize('cup_size', [200, 300])
 def test_brew(machine, cup_size):
     with when(t'I brew a {cup_size} ml cup'):

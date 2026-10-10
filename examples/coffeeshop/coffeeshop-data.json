@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-10T11:19:40.389762+00:00",
+    "timestamp": "2026-10-10T12:33:40.141439+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "ae9242cf04c0d5c9c7bb477392098759b67719df",
+    "commit_sha": "f373adc6af420501e0745368565b8bc36ef51d38",
     "title": "Coffee Shop Example"
   },
   "scenarios": [
@@ -212,7 +212,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 77,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -619,7 +619,7 @@
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
       "narration": {
-        "text": "Brew {cup_size} ml (templated scenario name)",
+        "text": "Brew {cup_size} ml (templated scenario title)",
         "parts": [
           {
             "value": "Brew "
@@ -631,7 +631,7 @@
             "conversion": null
           },
           {
-            "value": " ml (templated scenario name)"
+            "value": " ml (templated scenario title)"
           }
         ]
       },
@@ -1578,7 +1578,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 48,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1743,7 +1743,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 47,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",

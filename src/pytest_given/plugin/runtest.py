@@ -54,7 +54,7 @@ def pytest_runtest_setup(item: pytest.Item) -> Generator[None]:
     source = item_source(relpath_raw, (lineno0 or 0) + 1)
     collector.start_scenario(
         scenario_id=node_id,
-        name=marker.name,
+        title=marker.title,
         module=module,
         tags=marker.tags,
         source=source,

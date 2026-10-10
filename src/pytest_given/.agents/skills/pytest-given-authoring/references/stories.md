@@ -44,7 +44,7 @@ Name a story in `stories=` only when a step can match or pin one of its sentence
 
 What this means when you write:
 
-- **Only step narration counts.** Term refs in the `@scenario` name never count. A scenario whose title names both actors stays uncovered until the same term refs appear in a `given`, `when` or `then`.
+- **Only step narration counts.** Term refs in the `@scenario` title never count. A scenario whose title names both actors stays uncovered until the same term refs appear in a `given`, `when` or `then`.
 - **Only the term counts, not its wording.** `room`, `room.l.s` and `room('Deluxe Suite')` are the same term ref, and so are `select` and `select.s`. The instance in the step above is narration, not a condition. To matching, two sentences that differ only by instance are the same sentence. Give one of them a term the other lacks, or pin (see below).
 - **Two sentences are covered together when one's terms are a subset of the other's.** The test is "sentence terms ⊆ step terms". So a step that covers `organizer · adds · guest · booking` also covers an `organizer · adds · guest` sentence, whatever that sentence meant. Narration can never tell the two apart. When two sentences turn out nested like this, you have three options: give the narrower one a term the wider one lacks (a different activity usually works), merge them, or accept the shared chip. A pin on the covering step also separates them, because it reaches only the sentences it names.
 - **Adding a term to a sentence makes it harder to cover.** Every covering step then has to carry that term too. So editing a story can silently uncover a scenario that used to cover it. A pinned step is not affected.

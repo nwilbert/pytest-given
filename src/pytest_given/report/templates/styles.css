@@ -658,7 +658,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 
 /* 600, not 500: the title shares the narration's size and nearly its ink. */
-.scenario-name { font-size: var(--font-size-md); font-weight: 600; }
+.scenario-title { font-size: var(--font-size-md); font-weight: 600; }
 /* Neutral at rest: a tag is a label until it is the filter, and only then
    does it take the accent. */
 .scenario-tag {

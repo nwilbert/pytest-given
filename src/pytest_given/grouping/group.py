@@ -21,7 +21,7 @@ from .checks import check_rebound_params, check_same_template
 from .columns import ColumnBuilder, narrated_column_order, param_cell_formats
 from .context import build_group
 from .percase import per_case_scenarios
-from .templatize import templatize_scenario_name, templatize_steps
+from .templatize import templatize_scenario_title, templatize_steps
 
 # What cases group on: one test function, one name.
 type GroupKey = tuple[str, str]
@@ -66,7 +66,7 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     check_same_template(group)
     check_rebound_params(group)
     anchor, baseline = group.anchor, group.baseline
-    # The scenario name is scanned alongside the steps — a `Template` name's
+    # The scenario title is scanned alongside the steps — a `Template` title's
     # spec is a slot's spec, and often the only one in play.
     formats = param_cell_formats(
         [anchor.narration, *(s.narration for s in iter_steps(baseline.steps))],
@@ -74,7 +74,7 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     )
     builder = ColumnBuilder.for_params(group, formats)
     template_steps = templatize_steps(baseline.steps, (), builder)
-    grouped_narration = templatize_scenario_name(anchor.narration, builder)
+    grouped_narration = templatize_scenario_title(anchor.narration, builder)
 
     table = builder.table(
         group.cases, narrated_column_order(grouped_narration, template_steps)

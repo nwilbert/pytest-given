@@ -133,7 +133,7 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
 
 
 def _dead_term_findings(context: _Context) -> list[RawFinding]:
-    """Rule `dead-term`: a glossary term is referenced by no scenario name, no
+    """Rule `dead-term`: a glossary term is referenced by no scenario title, no
     step and no story. Default `off`: for a file-backed glossary, unreferenced
     terms are often intentionally present (documented behavior)."""
     if context.glossary is None:
@@ -157,7 +157,7 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
             subject=term.id,
             location=term.source,
             message=(
-                f'term {term.canonical!r} is referenced by no scenario name, '
+                f'term {term.canonical!r} is referenced by no scenario title, '
                 f'no step and no story sentence'
             ),
         )

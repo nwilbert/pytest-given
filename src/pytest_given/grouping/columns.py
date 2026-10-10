@@ -183,7 +183,7 @@ class ColumnBuilder:
 
 
 def narrated_column_order(narration: Narration, steps: list[Step]) -> list[ColumnId]:
-    """Column ids in the order a reader meets them: the scenario name, then
+    """Column ids in the order a reader meets them: the scenario title, then
     each step's narration and attachments, depth-first."""
     order: dict[ColumnId, None] = {}
     for step_narration, attachments in [

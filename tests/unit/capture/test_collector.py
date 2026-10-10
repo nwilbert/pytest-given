@@ -61,7 +61,7 @@ def test_duration_excludes_fixture_setup(monkeypatch: pytest.MonkeyPatch) -> Non
     with given(t'a {pg["Collector"].l} whose clock reads 100.3s once setup is done'):
         readings = iter([100.3, 100.5])
         collector = Collector()
-        collector.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
+        collector.start_scenario(NodeId('t::x'), title='x', module='m', tags=[])
     with when('the clock is started past setup and the body runs 0.2s'):
         monkeypatch.setattr(
             collector_mod, 'time', SimpleNamespace(monotonic=lambda: next(readings))
@@ -443,14 +443,14 @@ def test_start_scenario_with_plain_str_has_empty_parts() -> None:
 
 def test_finish_scenario_records_skip_reason() -> None:
     c = Collector()
-    c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
+    c.start_scenario(NodeId('t::x'), title='x', module='m', tags=[])
     s = c.finish_scenario(status='skipped', skip_reason='because')
     assert s.skip_reason == 'because'
 
 
 def test_finish_scenario_skip_reason_defaults_to_none() -> None:
     c = Collector()
-    c.start_scenario(NodeId('t::x'), name='x', module='m', tags=[])
+    c.start_scenario(NodeId('t::x'), title='x', module='m', tags=[])
     s = c.finish_scenario(status='passed')
     assert s.skip_reason is None
 
@@ -460,7 +460,7 @@ def test_start_scenario_stores_source() -> None:
     src = SourceLocation(relpath='tests/test_x.py', line=5)
     collector.start_scenario(
         scenario_id=NodeId('tests/test_x.py::test_y'),
-        name='S',
+        title='S',
         module='m',
         tags=[],
         source=src,
@@ -473,7 +473,7 @@ def test_start_scenario_source_defaults_to_none() -> None:
     collector = Collector()
     collector.start_scenario(
         scenario_id=NodeId('t::y'),
-        name='S',
+        title='S',
         module='m',
         tags=[],
     )

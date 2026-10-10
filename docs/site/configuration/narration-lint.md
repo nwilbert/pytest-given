@@ -18,7 +18,7 @@ Each rule has a default severity. A `warn` finding is printed in the terminal su
 | `action-in-then` | `warn` | A scenario where no `when` performs an action, and a `then` performs it inside its assertion instead. |
 | `unused-interpolation` | `warn` | A `with` step whose text contains a `{name}` (a t-string value or a parameter-table placeholder) that the step's body doesn't use. |
 | `tag-shadows-term` | `warn` | A scenario tag that matches a glossary term, so the same concept has two names. |
-| `dead-term` | `off` | A glossary term that no step, scenario name, or story sentence uses. Turn this on if every glossary term should be used. |
+| `dead-term` | `off` | A glossary term that no step, scenario title, or story sentence uses. Turn this on if every glossary term should be used. |
 
 ## Configuration
 

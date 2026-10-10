@@ -185,7 +185,7 @@ class Collector:
     def start_scenario(
         self,
         scenario_id: NodeId,
-        name: str | Template | Narration,
+        title: str | Template | Narration,
         module: str,
         tags: list[str],
         source: SourceLocation | None = None,
@@ -195,7 +195,7 @@ class Collector:
     ) -> None:
         self._current_scenario = Scenario(
             id=scenario_id,
-            narration=narration_from(name),
+            narration=narration_from(title),
             module=module,
             tags=tags,
             source=source,

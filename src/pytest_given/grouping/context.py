@@ -53,7 +53,7 @@ class Group:
     # records no steps and a failed one may abort mid-tree.
     comparable: list[Scenario]
     # Each case's raw parametrize arguments by name. A `Template` slot — in a
-    # step or in the scenario name — records no per-case rendering to compare
+    # step or in the scenario title — records no per-case rendering to compare
     # against, so what it renders has to be recomputed from these; see
     # `templatize._reconciled_slot`.
     case_params: dict[NodeId, dict[str, RawParamValue]]

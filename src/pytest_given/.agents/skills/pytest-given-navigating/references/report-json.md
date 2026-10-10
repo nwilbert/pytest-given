@@ -15,7 +15,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | Field | Meaning |
 |---|---|
 | `id` | The pytest node id. A grouped parametrized scenario **keeps the suffix of its first collected case** (`tests/test_x.py::test_y[1-False]`). The suffix is not removed, so match on a prefix, not on equality. |
-| `narration.text` | The scenario name. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
+| `narration.text` | The scenario title. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
 | `module` | The Python module the test lives in. |
 | `tags[]` | `tags=` from `@scenario`. These are report metadata, **not** pytest marks. |
 | `status` | `passed`, `failed`, `skipped` or `xfailed`. `xfailed` means it failed as expected, through an `xfail` mark or `pytest.xfail()`. |
@@ -64,7 +64,7 @@ A coverage record is `{story_id, sentence_id, tracked, scenario_ids: [...]}`. It
 ## Recipes
 
 ```bash
-# All scenario names with status and location
+# All scenario titles with status and location
 jq -r '.scenarios[] | .status + "  " + .narration.text
        + " — " + .source.relpath + ":" + (.source.line|tostring)' report.json
 

@@ -91,10 +91,10 @@ Step text may abstract, but it must never overstate.
 - **Everything a `then` claims must be asserted in it.** A `then` that says "…and recorded in the ledger" without such an assertion describes behavior nobody checked. Assert it, or drop the clause. A `then` that sets the value it asserts, or asserts a constant, checks nothing. The asserted value must come from the code under test.
 - **A stub that raises when called checks nothing in the `then`.** The code under test may catch its `AssertionError` and fall back to the very outcome the `then` expects. To show a collaborator is never called, record its calls and assert `calls == []` (or `mock.assert_not_called()`) in the `then`.
 - **What the `when` names must be what the body calls.** Narrate the action the step performs, not the one the scenario is loosely about. A common mistake: the `when` text reads like more arrangement, but its body arranges *and* makes the call the `then` reports. The action then appears nowhere in the report. Move the setup into a `given`.
-- **"Each", "every", "both" and "all" are claims about every item.** A `then` or scenario name with one of these words must assert every item it covers. "Each slot becomes a term ref", backed by assertions on two of three slots, overstates. Assert them all, or narrow the text to what is checked.
+- **"Each", "every", "both" and "all" are claims about every item.** A `then` or scenario title with one of these words must assert every item it covers. "Each slot becomes a term ref", backed by assertions on two of three slots, overstates. Assert them all, or narrow the text to what is checked.
 - **Mark a scenario written before its implementation `xfail(strict=True)`** (or set `xfail_strict`). It reports as an expected failure, with its reason, steps and error. Once it passes, it fails the run, so you remember to remove the mark. A non-strict mark stays on working behavior and turns a later regression into an expected failure. An `xfail` on one `pytest.param` row is fine too.
-- **Stale narration is a stale assertion.** When a change touches a step's *body*, re-read the step's *text* (and the scenario name) in the same edit, and update it if the behavior changed.
-- **When narration and body disagree, the narration isn't automatically wrong.** The name may state the intended behavior while the body checks something weaker, or passes for a different reason. Then you have found a broken test: fix the body and keep the words. Weakening the narration to match turns a bad test into a spec that only looks truthful. Ask whether the body would fail if the name's promise were broken.
+- **Stale narration is a stale assertion.** When a change touches a step's *body*, re-read the step's *text* (and the scenario title) in the same edit, and update it if the behavior changed.
+- **When narration and body disagree, the narration isn't automatically wrong.** The text may state the intended behavior while the body checks something weaker, or passes for a different reason. Then you have found a broken test: fix the body and keep the words. Weakening the narration to match turns a bad test into a spec that only looks truthful. Ask whether the body would fail if the name's promise were broken.
 
 ## Mechanical counterparts
 
@@ -110,7 +110,7 @@ The narration lint enforces the structural part of these rules. Turn it on with 
 | `action-in-then` | warn | No `when` performs an action, and a `then` folds the action into its assertion. |
 | `unused-interpolation` | warn | A `with` step whose narration interpolates a `{name}` that its body never uses: a t-string interpolation, or a parametrize placeholder in a grouped scenario. |
 | `tag-shadows-term` | warn | A scenario tag whose slug duplicates a glossary term. |
-| `dead-term` | off | A glossary term that no scenario name, no step and no story sentence references. Off by default, because an unreferenced term is normal. Turn it on where every glossary term is meant to be used. |
+| `dead-term` | off | A glossary term that no scenario title, no step and no story sentence references. Off by default, because an unreferenced term is normal. Turn it on where every glossary term is meant to be used. |
 
 You can override each rule's severity with the `given_lint_rules` ini. That and the rest of the setup are in the project documentation at <https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/>.
 

@@ -23,6 +23,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - **Breaking.** A handle's `.low` form is now `.l`: replace `.low` with `.l`.
+- **Breaking.** `@scenario`'s first parameter is now `title`: replace `@scenario(name=...)` with `@scenario(title=...)`; a positional title is unaffected.
 - A handle's `.l` form lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*).
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
 - The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.

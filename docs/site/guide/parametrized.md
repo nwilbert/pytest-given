@@ -10,7 +10,7 @@ pytest-given groups all cases of a parametrized test into one scenario with a pa
 
 The group fails if any case failed. Otherwise it is an expected failure (`xfailed`) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.
 
-The columns appear in the order the narration first shows them: the scenario name, then the steps from top to bottom. Inputs narrated in a `given` come before outcomes narrated in a `then`. A parametrize argument that no step narrates stays next to the argument before it.
+The columns appear in the order the narration first shows them: the scenario title, then the steps from top to bottom. Inputs narrated in a `given` come before outcomes narrated in a `then`. A parametrize argument that no step narrates stays next to the argument before it.
 
 ```python
 @scenario('Pricing')
@@ -22,9 +22,9 @@ def test_pricing(machine, euros, expect):
         assert can_buy == expect
 ```
 
-## Scenario names
+## Scenario titles
 
-To put parameter values into the scenario name, use `pytest_given.Template`. Its placeholders are filled in from the parametrize arguments:
+To put parameter values into the scenario title, use `pytest_given.Template`. Its placeholders are filled in from the parametrize arguments:
 
 ```python
 from pytest_given import Template, scenario
@@ -35,13 +35,13 @@ def test_brew(cup_size):
     ...
 ```
 
-A name can't contain both a parameter value and a glossary term ref. A `Template` name has no term refs, and a t-string name (see [Step text](step-text.md)) can only contain glossary handles.
+A title can't contain both a parameter value and a glossary term ref. A `Template` title has no term refs, and a t-string title (see [Step text](step-text.md)) can only contain glossary handles.
 
 ## Declining the merge
 
 Grouping only works when all cases have the same steps, with different values. If the steps really differ from case to case, add `group_parametrized=False` to `@scenario`.
 
-Each case then becomes its own scenario, without a parameter table. Its name ends with the parametrize id, like `Brew 200 ml [200]` for the example above. A `Template` name gets its placeholders filled in first; a plain string name gets the id added the same way. Every case gets the id, even if its name already shows its values.
+Each case then becomes its own scenario, without a parameter table. Its title ends with the parametrize id, like `Brew 200 ml [200]` for the example above. A `Template` title gets its placeholders filled in first; a plain-string title gets the id added the same way. Every case gets the id, even if its title already shows its values.
 
 `group_parametrized=False` on a test that isn't parametrized raises an error at collection.
 

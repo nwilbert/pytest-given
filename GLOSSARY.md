@@ -11,11 +11,12 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Scenario** | A test function decorated with `@scenario(...)`. Not every pytest test is a scenario — undecorated tests are tolerated but not collected. |
+| **Scenario title** | The text `@scenario` takes first: the statement of the rule a *Scenario* demonstrates, shown as its heading in the report. A plain string, a t-string of glossary handles, or a `Template` filled per *Case*; recorded as the scenario's *Narration*. Not the test function's name, which the node id carries. |
 | **Step** | A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest, and each carries a phase, narration, attachments and children — but no status or error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*, which is where both renderers read it. |
-| **Narration** | The human-readable text on a step or scenario name. A `Narration` bundles the flat rendered `text` with `parts` — empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces. The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks. |
+| **Narration** | The human-readable text on a step or scenario title. A `Narration` bundles the flat rendered `text` with `parts` — empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces. The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks. |
 | **Phase** | The category of a step: `given`, `when`, or `then`. A step has exactly one phase. |
 | **when_then** | A step-authoring helper that emits a `when` action and its `then` outcome as two sibling steps from a single `with` block. Used mainly to narrate an expected raise (`with when_then('the action', 'the error is raised'), pytest.raises(...)`), so the action and its outcome stay distinct steps. |
-| **Tag** | Free-form string label attached via `@scenario(name, tags=[...])`. Used by the report's filter UI, where a `/` nests it (`ticket/ABC-123` under `ticket`) and selecting a prefix filters to every tag beneath it. |
+| **Tag** | Free-form string label attached via `@scenario(title, tags=[...])`. Used by the report's filter UI, where a `/` nests it (`ticket/ABC-123` under `ticket`) and selecting a prefix filters to every tag beneath it. |
 | **Attachment** | A labeled blob (text or JSON) bound to the currently-active step via `attach(label, content)`. |
 
 ## Parametrization

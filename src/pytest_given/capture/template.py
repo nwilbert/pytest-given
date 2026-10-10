@@ -24,7 +24,7 @@ _FORMATTER = Formatter()
 # What an author may write as step or scenario text.
 type StepText = str | templatelib.Template | Template
 # What `@scenario` hands on once a decorator-time t-string has been rendered.
-type ResolvedName = str | Template | Narration
+type ResolvedTitle = str | Template | Narration
 
 
 def reject_baked_values(
@@ -38,7 +38,7 @@ def reject_baked_values(
 
     Detection and the two remedies both forms share are stated here; *remedy*
     is the caller's own third, because what a step's text can fall back to and
-    what a scenario *name* can are not the same thing.
+    what a scenario *title* can are not the same thing.
     """
     for part in narration.parts:
         if not isinstance(part, NarrationValue):
@@ -57,7 +57,7 @@ def reject_baked_values(
 def narration_from(value: StepText | Narration) -> Narration:
     """Build a Narration from a plain string, a Template, a t-string, or an
     already-rendered Narration (which passes through unchanged — used for eager
-    glossary-t-string scenario names)."""
+    glossary-t-string scenario titles)."""
     if isinstance(value, Narration):
         return value
     if isinstance(value, templatelib.Template):

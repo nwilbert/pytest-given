@@ -2919,25 +2919,25 @@
 - **then** the grouping is refused
 - **then** the error quotes the expression and shows the bind-a-local fix
 
-## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+## ✓ A «parameter table» cell reads the way the «scenario title» formats it
+`tests/unit/test_grouping.py::test_a_scenario_title_format_spec_reaches_its_cell` · parametrization
 
-- **given** a Template scenario name formatting its parameter
+- **given** a Template scenario title formatting its parameter
 - **when** the «cases» are «grouped»
-- **then** the cells carry the formatting the name declared
+- **then** the cells carry the formatting the title declared
 
-## ✓ A scenario name formatting a parameter unlike a «step» gets its own column
-`tests/unit/test_grouping.py::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+## ✓ A «scenario title» formatting a parameter unlike a «step» gets its own column
+`tests/unit/test_grouping.py::test_a_scenario_title_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
-- **given** a name formatting the parameter and a step reading it plainly
+- **given** a title formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
-- **then** the name points at a column holding what it renders
-- **then** the name renders the disambiguated token, text and parts agreeing
+- **then** the title points at a column holding what it renders
+- **then** the title renders the disambiguated token, text and parts agreeing
 
-## ✓ A «step» formatting a parameter unlike the scenario name gets its own column
-`tests/unit/test_grouping.py::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+## ✓ A «step» formatting a parameter unlike the «scenario title» gets its own column
+`tests/unit/test_grouping.py::test_a_step_slot_disagreeing_with_the_title_gets_its_own_column` · parametrization
 
-- **given** a step formatting the parameter and a name reading it plainly
+- **given** a step formatting the parameter and a title reading it plainly
 - **when** the «cases» are «grouped»
 - **then** the step points at a column holding what it renders
 - **then** the step renders the disambiguated token, text and parts agreeing

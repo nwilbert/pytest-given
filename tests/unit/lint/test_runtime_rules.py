@@ -252,7 +252,7 @@ def test_dead_term_flags_unreferenced_term() -> None:
         [finding] = findings
         assert finding.subject == 'ghost-term'
         assert finding.message == (
-            "term 'Ghost term' is referenced by no scenario name, "
+            "term 'Ghost term' is referenced by no scenario title, "
             'no step and no story sentence'
         )
     with then(t'its {pg["Severity"].l} is off — the rule is opt-in'):
@@ -270,7 +270,7 @@ def test_dead_term_passes_term_referenced_by_a_step() -> None:
     assert _dead_term_findings(_glossary('Ghost term'), grouped=[scenario]) == []
 
 
-def test_dead_term_passes_term_referenced_by_a_scenario_name() -> None:
+def test_dead_term_passes_term_referenced_by_a_scenario_title() -> None:
     scenario = _phases_scenario('test_x.py::test_a', ['given', 'when', 'then'])
     scenario = dataclasses.replace(
         scenario,

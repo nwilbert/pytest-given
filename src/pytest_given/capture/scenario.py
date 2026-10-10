@@ -19,7 +19,7 @@ from ..model import (
 from .steps import StepDescriptor
 from .story import Pins, argument_text, one_or_sequence, pins_of
 from .template import (
-    ResolvedName,
+    ResolvedTitle,
     StepText,
     narration_from,
     reject_baked_values,
@@ -31,14 +31,14 @@ class ScenarioDecorator:
 
     def __init__(
         self,
-        name: ResolvedName,
+        title: ResolvedTitle,
         tags: list[str],
         *,
         story_ids: tuple[StoryId, ...] = (),
         pins: tuple[Pin, ...] | None = None,
         group_parametrized: bool = True,
     ) -> None:
-        self.name: ResolvedName = name
+        self.title: ResolvedTitle = title
         self.tags = tags
         self.story_ids = story_ids
         self.pins = pins
@@ -66,7 +66,7 @@ def scenario_marker(func: object) -> ScenarioDecorator | None:
 
 
 def scenario(
-    name: StepText,
+    title: StepText,
     tags: list[str] | None = None,
     *,
     stories: Story | Sequence[Story] | None = None,
@@ -74,21 +74,21 @@ def scenario(
     group_parametrized: bool = True,
 ) -> ScenarioDecorator:
     """Mark a test for inclusion in the report."""
-    resolved_name: ResolvedName
-    if isinstance(name, templatelib.Template):
+    resolved_title: ResolvedTitle
+    if isinstance(title, templatelib.Template):
         # Glossary handles are in scope at import time and render eagerly to
         # term refs; a parametrize value is not, so it would be baked in.
-        resolved_name = narration_from(name)
+        resolved_title = narration_from(title)
         reject_baked_values(
-            resolved_name,
+            resolved_title,
             '@scenario',
             'module import',
-            'a plain string for a static name',
+            'a plain string for a static title',
         )
     else:
-        resolved_name = name
+        resolved_title = title
     return ScenarioDecorator(
-        resolved_name,
+        resolved_title,
         tags or [],
         story_ids=_story_ids(stories),
         pins=pins_of(pins),

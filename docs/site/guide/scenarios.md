@@ -4,7 +4,7 @@ A narrated test uses two things: the `@scenario` decorator, which puts the test 
 
 ## `@scenario`
 
-`@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)`
+`@scenario(title, tags=None, *, stories=None, pins=None, group_parametrized=True)`
 
 Only tests with `@scenario` appear in the report. The decorator returns your function unchanged.
 

@@ -9,7 +9,7 @@ pytest-given turns pytest tests into a narrated behavioral spec. Tests decorated
 
 ## Core principle
 
-**The narration is the spec.** Write the `@scenario` name and the Given/When/Then step texts before the step bodies, then write the code to match them. When the text comes before the code, the two can't drift apart from the start.
+**The narration is the spec.** Write the `@scenario` title and the Given/When/Then step texts before the step bodies, then write the code to match them. When the text comes before the code, the two can't drift apart from the start.
 
 ## What to read when
 

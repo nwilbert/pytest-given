@@ -26,7 +26,7 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def test_narration_from_passes_through_narration() -> None:
-    """A pre-rendered Narration (an eager glossary-t-string scenario name)
+    """A pre-rendered Narration (an eager glossary-t-string scenario title)
     flows through unchanged, without a second parse."""
     narration = Narration(text='hi', parts=(NarrationLiteral(value='hi'),))
     assert narration_from(narration) is narration

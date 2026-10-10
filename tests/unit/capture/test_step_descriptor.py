@@ -435,10 +435,10 @@ def test_when_then_exported_from_package() -> None:
     assert pytest_given.when_then is not None
 
 
-def test_scenario_with_plain_str_keeps_name() -> None:
+def test_scenario_with_plain_str_keeps_title() -> None:
     deco = scenario('Brew coffee')
-    assert deco.name == 'Brew coffee'
-    assert isinstance(deco.name, str)
+    assert deco.title == 'Brew coffee'
+    assert isinstance(deco.title, str)
 
 
 @scenario(t'`@scenario` marks the test function without wrapping it')
@@ -461,7 +461,7 @@ def test_scenario_marks_the_function_without_wrapping_it() -> None:
         assert marked is brew
         assert list(inspect.signature(marked).parameters) == ['machine']
     with then(t'it carries the {pg["Scenario"].l} marker, and a plain one does not'):
-        assert brew._scenario.name == 'Brew coffee'  # type: ignore[attr-defined]
+        assert brew._scenario.title == 'Brew coffee'  # type: ignore[attr-defined]
 
         def plain() -> None:
             pass
@@ -472,7 +472,7 @@ def test_scenario_marks_the_function_without_wrapping_it() -> None:
 def test_scenario_with_template_keeps_template() -> None:
     tmpl = Template('Brew {cup_size} ml')
     deco = scenario(tmpl)
-    assert deco.name is tmpl
+    assert deco.title is tmpl
 
 
 def test_scenario_with_value_tstring_raises() -> None:
@@ -485,9 +485,9 @@ def test_scenario_with_glossary_tstring_stores_narration() -> None:
     g = Glossary()
     guest = g.actor('Guest', definition='')
     deco = scenario(t'{guest} checks in')
-    assert isinstance(deco.name, Narration)
-    assert deco.name.text == 'Guest checks in'
-    ref = next(p for p in deco.name.parts if isinstance(p, NarrationTermRef))
+    assert isinstance(deco.title, Narration)
+    assert deco.title.text == 'Guest checks in'
+    ref = next(p for p in deco.title.parts if isinstance(p, NarrationTermRef))
     assert ref.term_id == guest.id
 
 
@@ -497,8 +497,8 @@ def test_scenario_with_glossary_tstring_preserves_surface_text() -> None:
     g = Glossary()
     guest = g.actor('Guest', definition='')
     deco = scenario(t'{guest("guests")} arrive')
-    assert isinstance(deco.name, Narration)
-    assert deco.name.text == 'guests arrive'
+    assert isinstance(deco.title, Narration)
+    assert deco.title.text == 'guests arrive'
 
 
 # Parametrized over a *description* rather than the label object itself: the

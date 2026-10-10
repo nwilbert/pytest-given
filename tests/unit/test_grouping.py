@@ -44,7 +44,7 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def _promotion(param_names: list[str]) -> columns.ColumnBuilder:
-    """A filled builder over a one-case group — enough for the scenario-name
+    """A filled builder over a one-case group — enough for the scenario-title
     pass, which reads only `param_names` and each case's bindings."""
     case = Scenario(id=NodeId('t.py::t[1]'), narration=Narration(text='x'), module='m')
     spec = ParamSpec(names=param_names, values=[0] * len(param_names))
@@ -52,7 +52,7 @@ def _promotion(param_names: list[str]) -> columns.ColumnBuilder:
     return columns.ColumnBuilder.for_params(group, {})
 
 
-def test_templatize_scenario_name_asserts_on_unknown_placeholder() -> None:
+def test_templatize_scenario_title_asserts_on_unknown_placeholder() -> None:
     """An invariant, not a user error: collection validated these placeholders
     already, and does it with a locator this code path cannot reproduce. A
     future path that built parts directly should fail loudly here."""
@@ -60,7 +60,7 @@ def test_templatize_scenario_name_asserts_on_unknown_placeholder() -> None:
         text='', parts=(NarrationPlaceholder(name='cup_zize', column_id='cup_zize'),)
     )
     with pytest.raises(AssertionError, match='cup_zize'):
-        templatize.templatize_scenario_name(narration, _promotion(['cup_size']))
+        templatize.templatize_scenario_title(narration, _promotion(['cup_size']))
 
 
 def test_group_parametrized_all_skipped_groups_as_skipped() -> None:
@@ -367,10 +367,10 @@ def test_a_non_finite_float_reaches_the_cell_as_a_string() -> None:
     ]
 
 
-def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
+def test_templatize_keeps_a_scenario_title_term_ref_verbatim() -> None:
     """Whether or not the ref's expression names a parametrize argument.
 
-    A scenario name is evaluated once at decoration time, so nothing in it can
+    A scenario title is evaluated once at decoration time, so nothing in it can
     vary per case — and a term ref in a *step* no longer varies either, so a
     parametrize name matching its expression means nothing here.
     """
@@ -386,7 +386,7 @@ def test_templatize_keeps_a_scenario_name_term_ref_verbatim() -> None:
         ),
     )
     for param_names in (['guest'], ['euros']):
-        out = templatize.templatize_scenario_name(narration, _promotion(param_names))
+        out = templatize.templatize_scenario_title(narration, _promotion(param_names))
         ref = next(p for p in out.parts if isinstance(p, NarrationTermRef))
         assert ref == narration.parts[0]
 
@@ -1077,7 +1077,7 @@ def test_a_skipped_case_gets_blank_derived_cells() -> None:
 
 def test_a_step_placeholder_naming_an_unknown_column_raises() -> None:
     """Defense in depth for the step-level walk, mirroring
-    test_templatize_scenario_name_rejects_unknown_placeholder for the scenario-name
+    test_templatize_scenario_title_rejects_unknown_placeholder for the scenario-title
     walk: a Template placeholder in a step's own narration that doesn't match
     any parametrize column must still raise, not silently pass through."""
     step = Step(
@@ -1158,8 +1158,8 @@ def test_a_grouped_steps_text_rebuild_covers_every_part_kind() -> None:
     assert step_out.narration.parts[7] == step('2.0').narration.parts[7]
 
 
-def test_templatize_scenario_name_converts_a_matching_value_to_a_placeholder() -> None:
-    """The scenario-name counterpart to the step-level NarrationValue
+def test_templatize_scenario_title_converts_a_matching_value_to_a_placeholder() -> None:
+    """The scenario-title counterpart to the step-level NarrationValue
     promotion: a bare-name interpolation matching a parametrize column becomes
     a placeholder; one that doesn't match stays an inline value."""
     narration = Narration(
@@ -1171,7 +1171,7 @@ def test_templatize_scenario_name_converts_a_matching_value_to_a_placeholder() -
             NarrationValue(rendered='12.5', expression='price'),
         ),
     )
-    out = templatize.templatize_scenario_name(narration, _promotion(['cup_size']))
+    out = templatize.templatize_scenario_title(narration, _promotion(['cup_size']))
     placeholder = out.parts[1]
     assert isinstance(placeholder, NarrationPlaceholder)
     assert (placeholder.name, placeholder.column_id) == ('cup_size', 'cup_size')
@@ -1199,17 +1199,17 @@ def _param_value_step(
     )
 
 
-def _named_group(
-    name: Narration, steps1: list[Step], steps2: list[Step]
+def _titled_group(
+    title: Narration, steps1: list[Step], steps2: list[Step]
 ) -> tuple[list[Scenario], ParamInfo]:
-    """`_two_case_group` with a `Template`-style scenario name carrying parts."""
+    """`_two_case_group` with a `Template`-style scenario title carrying parts."""
     scenarios, info = _two_case_group(steps1, steps2)
     for case in scenarios:
-        case.narration = name
+        case.narration = title
     return scenarios, info
 
 
-def _price_name(spec: str) -> Narration:
+def _price_title(spec: str) -> Narration:
     parts: list[NarrationPart] = [
         NarrationLiteral(value='charge '),
         NarrationPlaceholder(name='cup_size', column_id='cup_size', format_spec=spec),
@@ -1219,33 +1219,34 @@ def _price_name(spec: str) -> Narration:
 
 
 @scenario(
-    t'A {pg["Parameter table"].l} cell reads the way the scenario name formats it',
+    t'A {pg["Parameter table"].l} cell reads the way the '
+    t'{pg["Scenario title"].l} formats it',
     tags=['parametrization'],
 )
-def test_a_scenario_name_format_spec_reaches_its_cell() -> None:
-    with given('a Template scenario name formatting its parameter'):
-        scenarios, info = _named_group(_price_name('.2f'), [], [])
+def test_a_scenario_title_format_spec_reaches_its_cell() -> None:
+    with given('a Template scenario title formatting its parameter'):
+        scenarios, info = _titled_group(_price_title('.2f'), [], [])
     with when(t'the {pg["Case"].l.s} are {pg["Group"]("grouped")}'):
         grouped = group_parametrized(scenarios, info)
-    with then('the cells carry the formatting the name declared'):
+    with then('the cells carry the formatting the title declared'):
         table = grouped[0].parameters
         assert table is not None
         assert [c.values for c in table.cases] == [['200.00'], ['350.00']]
 
 
 @scenario(
-    t'A scenario name formatting a parameter unlike a {pg["Step"].l} gets its '
-    t'own column',
+    t'A {pg["Scenario title"].l} formatting a parameter unlike a '
+    t'{pg["Step"].l} gets its own column',
     tags=['parametrization'],
 )
-def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
-    with given('a name formatting the parameter and a step reading it plainly'):
-        scenarios, info = _named_group(
-            _price_name('.2f'), [_param_value_step('200')], [_param_value_step('350')]
+def test_a_scenario_title_disagreeing_with_a_step_gets_its_own_column() -> None:
+    with given('a title formatting the parameter and a step reading it plainly'):
+        scenarios, info = _titled_group(
+            _price_title('.2f'), [_param_value_step('200')], [_param_value_step('350')]
         )
     with when(t'the {pg["Case"].l.s} are {pg["Group"]("grouped")}'):
         grouped = group_parametrized(scenarios, info)
-    with then('the name points at a column holding what it renders'):
+    with then('the title points at a column holding what it renders'):
         table = grouped[0].parameters
         assert table is not None
         assert [(c.id, c.name) for c in table.columns] == [
@@ -1256,7 +1257,7 @@ def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
             ['200.00', 200],
             ['350.00', 350],
         ]
-    with then('the name renders the disambiguated token, text and parts agreeing'):
+    with then('the title renders the disambiguated token, text and parts agreeing'):
         slot = grouped[0].narration.parts[1]
         assert isinstance(slot, NarrationPlaceholder)
         assert (slot.name, slot.column_id) == ('cup_size #2', 'derived:0')
@@ -1277,19 +1278,19 @@ def _placeholder_step(spec: str) -> Step:
 
 
 @scenario(
-    t'A {pg["Step"].l} formatting a parameter unlike the scenario name gets its '
-    t'own column',
+    t'A {pg["Step"].l} formatting a parameter unlike the '
+    t'{pg["Scenario title"].l} gets its own column',
     tags=['parametrization'],
 )
-def test_a_step_slot_disagreeing_with_the_name_gets_its_own_column() -> None:
-    """The mirror of the scenario-name case: a `Template` slot in a *step* is a
+def test_a_step_slot_disagreeing_with_the_title_gets_its_own_column() -> None:
+    """The mirror of the scenario-title case: a `Template` slot in a *step* is a
     hover-substitution slot too, so a cell it cannot serve has to become a
     column of its own rather than leave the slot reading a value no case
     narrated.
     """
-    with given('a step formatting the parameter and a name reading it plainly'):
-        scenarios, info = _named_group(
-            _price_name(''),
+    with given('a step formatting the parameter and a title reading it plainly'):
+        scenarios, info = _titled_group(
+            _price_title(''),
             [_placeholder_step('.2f')],
             [_placeholder_step('.2f')],
         )
@@ -1316,8 +1317,8 @@ def test_a_step_slot_disagreeing_with_the_name_gets_its_own_column() -> None:
 def test_a_step_slot_agreeing_with_its_cell_keeps_pointing_at_it() -> None:
     """The ordinary case: the column already carries the one formatting every
     slot agreed on, so no second column is made."""
-    scenarios, info = _named_group(
-        _price_name('.2f'), [_placeholder_step('.2f')], [_placeholder_step('.2f')]
+    scenarios, info = _titled_group(
+        _price_title('.2f'), [_placeholder_step('.2f')], [_placeholder_step('.2f')]
     )
     grouped = group_parametrized(scenarios, info)[0]
     table = grouped.parameters
@@ -1342,10 +1343,10 @@ class _SpecRefusing:
         return 'cup'
 
 
-def test_a_name_slot_a_value_cannot_render_keeps_the_shared_column() -> None:
+def test_a_title_slot_a_value_cannot_render_keeps_the_shared_column() -> None:
     """A value whose own `__format__` refuses the spec never rendered that way
-    in the name either, so there is no better column to point the slot at."""
-    scenarios, info = _named_group(_price_name('.2f'), [], [])
+    in the title either, so there is no better column to point the slot at."""
+    scenarios, info = _titled_group(_price_title('.2f'), [], [])
     for spec in info.values():
         spec.values[0] = _SpecRefusing()
     grouped = group_parametrized(scenarios, info)
@@ -2900,7 +2901,9 @@ def test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell() -> None:
         assert slot.column_id == 'who'
 
 
-def test_a_scenario_name_slot_over_a_term_instance_keeps_pointing_at_its_cell() -> None:
+def test_a_scenario_title_slot_over_a_term_instance_keeps_pointing_at_its_cell() -> (
+    None
+):
     """The name half of the same rule."""
     scenarios, info = _term_group([], [])
     for case in scenarios:
