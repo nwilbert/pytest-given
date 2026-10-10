@@ -2055,7 +2055,7 @@
 - **then** the step carries a single «term ref»
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
-`tests/unit/lint/test_ast_rules.py:101::test_empty_step_fires_on_pass_only_body`
+`tests/unit/lint/test_ast_rules.py:102::test_empty_step_fires_on_pass_only_body`
 
 - **given** a given «step» whose body is only `pass`
   - 📎 step body:
@@ -2069,7 +2069,7 @@
 - **then** its «severity» is error
 
 ## ✓ «Narration lint» flags a then «step» that checks nothing
-`tests/unit/lint/test_ast_rules.py:265::test_then_without_check_fires`
+`tests/unit/lint/test_ast_rules.py:266::test_then_without_check_fires`
 
 - **given** a then «step» whose body only calls
   - 📎 step body:
@@ -2082,8 +2082,23 @@
 - **when** the AST «rules» parse that source
 - **then** a then-without-check «finding» reports the unchecked then
 
+## ✓ «Narration lint» flags a then «step» that checks only on some runs
+`tests/unit/lint/test_ast_rules.py:354::test_conditional_check_fires_on_assert_only_under_an_if`
+
+- **given** a then «step» whose only assert sits under an `if`
+  - 📎 step body:
+    ```
+    def test_a():
+        with then('a cached entry points at its record'):
+            if 'index' in entry:
+                assert records[entry['index']] == expected
+    ```
+- **when** the AST «rules» parse that source
+- **then** a conditional-check «finding» reports the guarded then
+- **then** its «severity» is warn
+
 ## ✓ «Narration lint» flags an assert outside a then «step» · 3 cases
-`tests/unit/lint/test_ast_rules.py:432::test_check_outside_then_flags_an_assert_only_outside_a_then`
+`tests/unit/lint/test_ast_rules.py:603::test_check_outside_then_flags_an_assert_only_outside_a_then`
 
 - **given** a {phase} «step» whose body asserts
   - 📎 step body — *see parameter table*
@@ -2121,7 +2136,7 @@
   ```
 
 ## ✓ «Narration lint» flags a then «step» that folds in the action
-`tests/unit/lint/test_ast_rules.py:578::test_action_in_then_fires_when_no_when_exists`
+`tests/unit/lint/test_ast_rules.py:749::test_action_in_then_fires_when_no_when_exists`
 
 - **given** a «scenario» with no when, acting inside its then
   - 📎 step body:
@@ -2136,7 +2151,7 @@
 - **then** a warn «finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
-`tests/unit/lint/test_ast_rules.py:758::test_unused_interpolation_fires_on_unused_bare_identifier`
+`tests/unit/lint/test_ast_rules.py:929::test_unused_interpolation_fires_on_unused_bare_identifier`
 
 - **given** a given «step» whose body never loads the name
   - 📎 step body:

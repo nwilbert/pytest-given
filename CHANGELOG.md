@@ -16,6 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - A handle's `.s` form reads the term's S-form, its regular plural or verb -s (`room.s` reads *Rooms*), and `.l` and `.s` chain and apply to a called form (`room.l.s` reads *rooms*).
+- The narration lint's `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 
 ### Changed
 

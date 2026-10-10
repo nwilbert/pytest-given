@@ -18,6 +18,7 @@ RuleId = NewType('RuleId', str)
 MISSING_PHASE = RuleId('missing-phase')
 EMPTY_STEP = RuleId('empty-step')
 THEN_WITHOUT_CHECK = RuleId('then-without-check')
+CONDITIONAL_CHECK = RuleId('conditional-check')
 CHECK_OUTSIDE_THEN = RuleId('check-outside-then')
 ACTION_IN_THEN = RuleId('action-in-then')
 UNUSED_INTERPOLATION = RuleId('unused-interpolation')
@@ -34,6 +35,7 @@ DEFAULTS: dict[RuleId, Level] = {
     MISSING_PHASE: 'warn',
     EMPTY_STEP: 'error',
     THEN_WITHOUT_CHECK: 'error',
+    CONDITIONAL_CHECK: 'warn',
     CHECK_OUTSIDE_THEN: 'warn',
     ACTION_IN_THEN: 'warn',
     UNUSED_INTERPOLATION: 'warn',

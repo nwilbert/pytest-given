@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-10T07:04:51.886921+00:00",
+    "timestamp": "2026-10-10T09:04:39.936624+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "173a130452a3dfd4b6b677c082deedda8faac7d2",
+    "commit_sha": "30eb98d2bfdef34fe94aed79ab1b95a30cc59b5d",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -111,7 +111,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -220,7 +220,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -364,7 +364,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -541,7 +541,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -718,7 +718,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -817,7 +817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -1007,7 +1007,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1142,7 +1142,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -1266,7 +1266,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -1430,7 +1430,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -1547,7 +1547,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 152,
+      "duration_ms": 157,
       "steps": [
         {
           "phase": "given",
@@ -1620,7 +1620,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1792,7 +1792,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2076,7 +2076,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -2229,7 +2229,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -2363,7 +2363,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2486,7 +2486,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 133,
+      "duration_ms": 138,
       "steps": [
         {
           "phase": "given",
@@ -2670,7 +2670,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 87,
+      "duration_ms": 95,
       "steps": [
         {
           "phase": "given",
@@ -2766,7 +2766,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 127,
+      "duration_ms": 128,
       "steps": [
         {
           "phase": "given",
@@ -2927,7 +2927,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -3021,7 +3021,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -3095,7 +3095,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 74,
+      "duration_ms": 78,
       "steps": [
         {
           "phase": "given",
@@ -3268,7 +3268,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -3353,7 +3353,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -3460,7 +3460,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 154,
+      "duration_ms": 158,
       "steps": [
         {
           "phase": "given",
@@ -3559,7 +3559,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -3673,7 +3673,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -3817,7 +3817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -3907,7 +3907,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 320,
+      "duration_ms": 329,
       "steps": [
         {
           "phase": "given",
@@ -4066,7 +4066,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4168,7 +4168,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -4401,7 +4401,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -4513,7 +4513,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4589,7 +4589,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -6040,7 +6040,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -6346,7 +6346,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6441,7 +6441,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6640,7 +6640,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -7356,7 +7356,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -7745,7 +7745,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -17099,7 +17099,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 101
+        "line": 102
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -17221,7 +17221,152 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 265
+        "line": 266
+      },
+      "story_ids": [
+        "adopt-pytest-given"
+      ],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if",
+      "narration": {
+        "text": "Narration lint flags a then step that checks only on some runs",
+        "parts": [
+          {
+            "term_id": "narration-lint",
+            "display": "Narration lint",
+            "expression": "pg[\"Narration lint\"]"
+          },
+          {
+            "value": " flags a then "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].l"
+          },
+          {
+            "value": " that checks only on some runs"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_ast_rules",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 1,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a then step whose only assert sits under an `if`",
+            "parts": [
+              {
+                "value": "a then "
+              },
+              {
+                "term_id": "step",
+                "display": "step",
+                "expression": "pg[\"Step\"].l"
+              },
+              {
+                "value": " whose only assert sits under an `if`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "step body",
+              "content": "def test_a():\n    with then('a cached entry points at its record'):\n        if 'index' in entry:\n            assert records[entry['index']] == expected\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the AST rules parse that source",
+            "parts": [
+              {
+                "value": "the AST "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "rules",
+                "expression": "pg[\"Lint rule\"](\"rules\")"
+              },
+              {
+                "value": " parse that source"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": [
+            {
+              "story_id": "adopt-pytest-given",
+              "sentence_id": 11
+            }
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a conditional-check finding reports the guarded then",
+            "parts": [
+              {
+                "value": "a conditional-check "
+              },
+              {
+                "term_id": "finding",
+                "display": "finding",
+                "expression": "pg[\"Finding\"].l"
+              },
+              {
+                "value": " reports the guarded then"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its severity is warn",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "severity",
+                "display": "severity",
+                "expression": "pg[\"Severity\"].l"
+              },
+              {
+                "value": " is warn"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_ast_rules.py",
+        "line": 354
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -17423,7 +17568,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 432
+        "line": 603
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -17545,7 +17690,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 578
+        "line": 749
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -17667,7 +17812,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 758
+        "line": 929
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -21289,7 +21434,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 137,
+      "duration_ms": 141,
       "steps": [
         {
           "phase": "given",
@@ -27033,6 +27178,7 @@
         "tests/integration/test_plugin_lint.py::test_the_flag_overrides_the_ini_in_both_directions",
         "tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body",
         "tests/unit/lint/test_ast_rules.py::test_then_without_check_fires",
+        "tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if",
         "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-True]",
         "tests/unit/lint/test_ast_rules.py::test_action_in_then_fires_when_no_when_exists",
         "tests/unit/lint/test_ast_rules.py::test_unused_interpolation_fires_on_unused_bare_identifier",

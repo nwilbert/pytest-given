@@ -1,5 +1,6 @@
 """Unit tests for the AST-surface lint rules (`lint/ast_rules.py`)."""
 
+import ast
 import dataclasses
 import textwrap
 from collections.abc import Container
@@ -348,6 +349,176 @@ def test_then_parent_with_checked_nested_child_passes(tmp_path) -> None:
     inner = _step('then', 'inner', _line(src, "with then('inner')"))
     outer = _step('then', 'outer', _line(src, "with then('outer')"), [inner])
     assert _ast_rules([_scenario([outer])], tmp_path) == []
+
+
+@scenario(
+    t'{pg["Narration lint"]} flags a then {pg["Step"].l} that checks only on some runs',
+    stories=adopt_pytest_given,
+)
+def test_conditional_check_fires_on_assert_only_under_an_if(tmp_path) -> None:
+    with given(t'a then {pg["Step"].l} whose only assert sits under an `if`'):
+        src = _write(
+            tmp_path,
+            """\
+            def test_a():
+                with then('a cached entry points at its record'):
+                    if 'index' in entry:
+                        assert records[entry['index']] == expected
+            """,
+        )
+        attach('step body', src)
+        with_line = _line(src, 'with then')
+        guarded = _scenario(
+            [_step('then', 'a cached entry points at its record', with_line)]
+        )
+    with when(
+        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        pins=adopt_pytest_given['flag'],
+    ):
+        findings = _ast_rules([guarded], tmp_path)
+    with then(t'a conditional-check {pg["Finding"].l} reports the guarded then'):
+        [finding] = findings
+        assert finding.rule == RuleId('conditional-check')
+        assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
+        assert finding.message == (
+            "then 'a cached entry points at its record' checks only under a "
+            'branch or loop'
+        )
+    with then(t'its {pg["Severity"].l} is warn'):
+        assert DEFAULTS[finding.rule] == 'warn'
+
+
+@pytest.mark.parametrize(
+    'body',
+    [
+        'for row in rows:\n    assert row',
+        # `[*rows]` may be empty, just like `rows`.
+        'for row in [*rows]:\n    assert row',
+        'while pending():\n    assert step()',
+        'try:\n    f()\nexcept E as error:\n    assert error.code',
+        'match x:\n    case 1:\n        assert y',
+        'for row in rows:\n    assert_valid(row)',
+        'if x:\n    with pytest.raises(E):\n        f()',
+    ],
+    ids=['for', 'all-starred-literal', 'while', 'except', 'match', 'helper', 'raises'],
+)
+def test_conditional_check_fires_on_every_kind_of_guard(tmp_path, body) -> None:
+    scenario = _then_holds_scenario(tmp_path, body)
+    assert (
+        len(_rule_findings(_ast_rules([scenario], tmp_path), 'conditional-check')) == 1
+    )
+
+
+@pytest.mark.parametrize(
+    'body',
+    [
+        'if x:\n    assert y\nassert z',
+        'for story in (a, b):\n    assert story',
+        'for story in [*more, a]:\n    assert story',
+        'with open(p) as f:\n    assert f.read()',
+        'with pytest.raises(E):\n    f()',
+        'try:\n    assert f()\nfinally:\n    close()',
+        'try:\n    f()\nexcept E:\n    pass\nelse:\n    assert g()',
+        'if x:\n    pytest.fail("nope")',
+        'result = assert_valid(x)',
+    ],
+    ids=[
+        'beside-if',
+        'literal-tuple',
+        'literal-with-starred',
+        'with',
+        'raises',
+        'try-finally',
+        'try-else',
+        'conditional-fail',
+        'assigned-helper',
+    ],
+)
+def test_conditional_check_passes_an_unconditional_check(tmp_path, body) -> None:
+    scenario = _then_holds_scenario(tmp_path, body)
+    assert _rule_findings(_ast_rules([scenario], tmp_path), 'conditional-check') == []
+
+
+def _then_holds_scenario(tmp_path, body: str) -> Scenario:
+    """One `then('it holds')` over *body*, which must parse: the lint skips an
+    unparseable source, so a case expecting no finding would pass vacuously."""
+    src = (
+        f"def test_a():\n    with then('it holds'):\n{textwrap.indent(body, ' ' * 8)}\n"
+    )
+    ast.parse(src)
+    (tmp_path / 'test_x.py').write_text(src, encoding='utf-8')
+    return _scenario([_step('then', 'it holds', _line(src, 'with then'))])
+
+
+def test_conditional_check_reports_a_guarded_nested_child_only(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then('outer'):
+                with then('inner'):
+                    if x:
+                        assert y
+        """,
+    )
+    inner_line = _line(src, "with then('inner')")
+    inner = _step('then', 'inner', inner_line)
+    outer = _step('then', 'outer', _line(src, "with then('outer')"), [inner])
+    findings = _ast_rules([_scenario([outer])], tmp_path)
+    assert [(f.rule, f.location.line) for f in findings if f.location] == [
+        (RuleId('conditional-check'), inner_line)
+    ]
+
+
+def test_conditional_check_passes_a_parent_whose_child_always_checks(
+    tmp_path,
+) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then('outer'):
+                if x:
+                    assert y
+                with then('inner'):
+                    assert z
+        """,
+    )
+    inner = _step('then', 'inner', _line(src, "with then('inner')"))
+    outer = _step('then', 'outer', _line(src, "with then('outer')"), [inner])
+    assert _ast_rules([_scenario([outer])], tmp_path) == []
+
+
+def test_conditional_check_leaves_an_unchecked_then_to_then_without_check(
+    tmp_path,
+) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with then('it holds'):
+                if x:
+                    f()
+        """,
+    )
+    scenario = _scenario([_step('then', 'it holds', _line(src, 'with then'))])
+    findings = _ast_rules([scenario], tmp_path)
+    assert [f.rule for f in findings] == [RuleId('then-without-check')]
+
+
+def test_conditional_check_fires_on_a_guarded_helper_body(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        @then('it holds')
+        def check(x):
+            if x:
+                assert x.ok
+        """,
+    )
+    scenario = _scenario([_step('then', 'it holds', _line(src, '@then'))])
+    findings = _ast_rules([scenario], tmp_path)
+    assert [f.rule for f in findings] == [RuleId('conditional-check')]
 
 
 def test_plain_siblings_on_separate_lines_are_not_a_pair(tmp_path) -> None:

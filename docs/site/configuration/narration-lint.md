@@ -12,6 +12,7 @@ Each rule has a default severity. A `warn` finding is printed in the terminal su
 |------|---------|---------|
 | `empty-step` | `error` | A step whose body does nothing: it only contains constants or `pass`, or, for `when` and `then`, only an `attach(...)` call. |
 | `then-without-check` | `error` | A `then` without an `assert` or a checking call. Checking calls are calls whose name starts with `assert`, and `pytest.raises`, `pytest.warns` and `pytest.fail`. Nothing else counts, not even `pytest.approx`. |
+| `conditional-check` | `warn` | A `then` whose checks all sit under an `if`, a loop, a `match` or an `except`, so a run can pass it without checking anything. An `if` that calls `pytest.fail` counts as a check, and so does a loop over a literal such as `(a, b)`. |
 | `missing-phase` | `warn` | A passed scenario that is missing one of the phases Given, When or Then. `@given` fixtures and `Annotated[..., given(...)]` parameters count as `given` steps. A parametrized scenario is checked once, not once per case. |
 | `check-outside-then` | `warn` | An `assert` inside a `given` or `when`. The `when` part of a `when_then` is allowed to contain one. |
 | `action-in-then` | `warn` | A scenario where no `when` performs an action, and a `then` performs it inside its assertion instead. |

@@ -21,6 +21,7 @@ from ..model import (
 from .base import (
     ACTION_IN_THEN,
     CHECK_OUTSIDE_THEN,
+    CONDITIONAL_CHECK,
     EMPTY_STEP,
     THEN_WITHOUT_CHECK,
     UNUSED_INTERPOLATION,
@@ -218,6 +219,27 @@ def _then_without_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding
         yield _step_finding(THEN_WITHOUT_CHECK, scan, resolved, 'contains no assertion')
 
 
+def _conditional_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
+    """Rule `conditional-check`: a `then` checks, but only under a branch or
+    loop, so a run can pass it having checked nothing.
+
+    A `then` with no check at all is `then-without-check`'s finding, and one
+    whose only checks sit in nested child steps leaves them to those steps'
+    own scans; but a child that checks on every run backs its parent too.
+    """
+    node = resolved.node
+    if resolved.step.phase != 'then':
+        return
+    children = _child_nodes(resolved, scan)
+    own = _walk_pruned(node.body, skip=lambda n: id(n) in children)
+    # A `with` statement's own items may check (`when_then`'s pytest.raises).
+    whole = [node] if isinstance(node, ast.With) else node.body
+    if any(_is_check(sub) for sub in own) and not _checks_unconditionally(whole):
+        yield _step_finding(
+            CONDITIONAL_CHECK, scan, resolved, 'checks only under a branch or loop'
+        )
+
+
 def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
     """Rule `check-outside-then`: an `assert` sits in a `given` or `when` body.
 
@@ -228,12 +250,7 @@ def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding
     """
     if resolved.step.phase == 'then' or (resolved.pair_role == 'when'):
         return
-    child_nodes = {
-        id(child.node)
-        for index in range(len(resolved.step.children))
-        if (child := scan.by_path.get((*resolved.path, index))) is not None
-    }
-    if _contains_assert_outside(resolved.node.body, child_nodes):
+    if _contains_assert_outside(resolved.node.body, _child_nodes(resolved, scan)):
         yield _anchored_finding(
             CHECK_OUTSIDE_THEN,
             scan,
@@ -329,6 +346,7 @@ type _ScenarioRule = Callable[[_Scan], Iterable[RawFinding]]
 _STEP_RULES: dict[RuleId, _StepRule] = {
     EMPTY_STEP: _empty_step,
     THEN_WITHOUT_CHECK: _then_without_check,
+    CONDITIONAL_CHECK: _conditional_check,
     CHECK_OUTSIDE_THEN: _check_outside_then,
     UNUSED_INTERPOLATION: _unused_interpolation,
 }
@@ -360,6 +378,16 @@ def _anchored_finding(
         location=resolved.source,
         message=text,
     )
+
+
+def _child_nodes(resolved: _Resolved, scan: _Scan) -> set[int]:
+    """Ids of the AST nodes of `resolved`'s nested child steps, whose blocks
+    each child's own scan judges."""
+    return {
+        id(child.node)
+        for index in range(len(resolved.step.children))
+        if (child := scan.by_path.get((*resolved.path, index))) is not None
+    }
 
 
 def _is_constant_stmt(stmt: ast.stmt) -> bool:
@@ -439,10 +467,72 @@ def _contains_assert_outside(stmts: list[ast.stmt], excluded: set[int]) -> bool:
 
 def _contains_check(node: _BodyNode) -> bool:
     """Whether the node's subtree (body and with-items) checks anything."""
-    return any(
-        isinstance(sub, ast.Assert)
-        or (isinstance(sub, ast.Call) and _is_check_call(sub))
-        for sub in ast.walk(node)
+    return any(_is_check(sub) for sub in ast.walk(node))
+
+
+def _checks_unconditionally(stmts: Iterable[ast.stmt]) -> bool:
+    """Whether every run through *stmts* reaches a check.
+
+    An `if` that calls `pytest.fail` counts: the `if` is the check. A loop
+    over a literal with an unstarred item runs at least once.
+    """
+    for stmt in stmts:
+        match stmt:
+            case ast.With() | ast.AsyncWith():
+                if any(
+                    _is_check(sub) for item in stmt.items for sub in ast.walk(item)
+                ) or _checks_unconditionally(stmt.body):
+                    return True
+            case ast.Try() | ast.TryStar():
+                if any(
+                    _checks_unconditionally(block)
+                    for block in (stmt.body, stmt.orelse, stmt.finalbody)
+                ):
+                    return True
+            case ast.For() | ast.AsyncFor():
+                if _runs_at_least_once(stmt.iter) and _checks_unconditionally(
+                    stmt.body
+                ):
+                    return True
+            case ast.If():
+                if any(
+                    isinstance(sub, ast.Call) and _is_pytest_call(sub.func, ('fail',))
+                    for sub in ast.walk(stmt)
+                ):
+                    return True
+            case _ if not isinstance(stmt, _COMPOUND_STMTS):
+                if any(_is_check(sub) for sub in ast.walk(stmt)):
+                    return True
+    return False
+
+
+# Statements with a nested block; a check inside one runs only on some paths,
+# unless `_checks_unconditionally` knows the block always runs.
+_COMPOUND_STMTS = (
+    ast.If,
+    ast.For,
+    ast.AsyncFor,
+    ast.While,
+    ast.With,
+    ast.AsyncWith,
+    ast.Try,
+    ast.TryStar,
+    ast.Match,
+    ast.FunctionDef,
+    ast.AsyncFunctionDef,
+    ast.ClassDef,
+)
+
+
+def _runs_at_least_once(iterable: ast.expr) -> bool:
+    return isinstance(iterable, (ast.List, ast.Tuple, ast.Set)) and any(
+        not isinstance(element, ast.Starred) for element in iterable.elts
+    )
+
+
+def _is_check(node: ast.AST) -> bool:
+    return isinstance(node, ast.Assert) or (
+        isinstance(node, ast.Call) and _is_check_call(node)
     )
 
 
@@ -452,14 +542,19 @@ def _is_check_call(call: ast.Call) -> bool:
     if isinstance(func, ast.Name):
         return func.id.startswith('assert')
     if isinstance(func, ast.Attribute):
-        if func.attr.startswith('assert'):
-            return True
-        return (
-            isinstance(func.value, ast.Name)
-            and func.value.id == 'pytest'
-            and func.attr in ('raises', 'warns', 'fail')
+        return func.attr.startswith('assert') or _is_pytest_call(
+            func, ('raises', 'warns', 'fail')
         )
     return False
+
+
+def _is_pytest_call(func: ast.expr, names: tuple[str, ...]) -> bool:
+    return (
+        isinstance(func, ast.Attribute)
+        and isinstance(func.value, ast.Name)
+        and func.value.id == 'pytest'
+        and func.attr in names
+    )
 
 
 def _walk_pruned(
