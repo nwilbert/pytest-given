@@ -28,10 +28,7 @@ def test_compile_source_link_rejects_empty_positional_field() -> None:
 _RAW_TEMPLATE = 'https://github.com/o/r/blob/{sha}/{relpath}#L{line}'
 
 
-@scenario(
-    t'A {pg["Source link"].l} config value resolves to its template: a preset '
-    t'name, a raw template, or `none`'
-)
+@scenario(t'A {pg["Source link"].l} config value resolves to its template')
 @pytest.mark.parametrize(
     ('value', 'template'),
     [

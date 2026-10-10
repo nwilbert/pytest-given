@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-09T20:30:17.257935+00:00",
+    "timestamp": "2026-10-10T07:04:51.886921+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "a500df92752af9a4ffb562738aa2ba7e5897c3ee",
+    "commit_sha": "173a130452a3dfd4b6b677c082deedda8faac7d2",
     "title": "pytest-given Self-Report"
   },
   "scenarios": [
@@ -29,7 +29,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -111,7 +111,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -220,7 +220,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -364,7 +364,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -608,7 +608,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -817,7 +817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1007,7 +1007,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -1142,7 +1142,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -1266,7 +1266,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 74,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -1430,7 +1430,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -1547,7 +1547,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 151,
+      "duration_ms": 152,
       "steps": [
         {
           "phase": "given",
@@ -1620,7 +1620,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -1766,7 +1766,7 @@
     {
       "id": "tests/integration/test_plugin.py::test_a_declared_story_no_scenario_covers_appears",
       "narration": {
-        "text": "A declared story no scenario covers appears in the report",
+        "text": "A declared story appears in the report even when no scenario covers it",
         "parts": [
           {
             "value": "A declared "
@@ -1777,7 +1777,7 @@
             "expression": "pg[\"Story\"].l"
           },
           {
-            "value": " no "
+            "value": " appears in the report even when no "
           },
           {
             "term_id": "scenario",
@@ -1785,14 +1785,14 @@
             "expression": "pg[\"Scenario\"].l"
           },
           {
-            "value": " covers appears in the report"
+            "value": " covers it"
           }
         ]
       },
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1931,7 +1931,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -2032,7 +2032,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2401
+        "line": 2402
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2185,7 +2185,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2447
+        "line": 2448
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2330,7 +2330,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2488
+        "line": 2489
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2363,7 +2363,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -2458,7 +2458,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2550
+        "line": 2551
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2486,7 +2486,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 151,
+      "duration_ms": 133,
       "steps": [
         {
           "phase": "given",
@@ -2637,7 +2637,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2590
+        "line": 2591
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2750,7 +2750,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3076
+        "line": 3077
       },
       "story_ids": [],
       "pins": null
@@ -2758,27 +2758,15 @@
     {
       "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[column]",
       "narration": {
-        "text": "An Annotated Template label fails its scenario unless its placeholder is a bare parametrize column",
-        "parts": [
-          {
-            "value": "An Annotated Template label fails its "
-          },
-          {
-            "term_id": "scenario",
-            "display": "scenario",
-            "expression": "pg[\"Scenario\"].l"
-          },
-          {
-            "value": " unless its placeholder is a bare parametrize column"
-          }
-        ]
+        "text": "An Annotated Template label may only hold a bare parametrize column",
+        "parts": []
       },
       "module": "tests.integration.test_plugin",
       "tags": [
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 129,
+      "duration_ms": 127,
       "steps": [
         {
           "phase": "given",
@@ -2913,7 +2901,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3114
+        "line": 3115
       },
       "story_ids": [],
       "pins": null
@@ -2939,7 +2927,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -3033,7 +3021,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -3107,7 +3095,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 75,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -3280,7 +3268,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -3642,6 +3630,171 @@
       "pins": null
     },
     {
+      "id": "tests/integration/test_plugin.py::test_group_parametrized_false_emits_one_scenario_per_case",
+      "narration": {
+        "text": "A parametrized scenario can decline the grouping and keep one scenario per case",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "parametrized-scenario",
+            "display": "parametrized scenario",
+            "expression": "pg[\"Parametrized scenario\"].l"
+          },
+          {
+            "value": " can decline the "
+          },
+          {
+            "term_id": "group",
+            "display": "grouping",
+            "expression": "pg[\"Group\"](\"grouping\")"
+          },
+          {
+            "value": " and keep one "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].l"
+          },
+          {
+            "value": " per "
+          },
+          {
+            "term_id": "case",
+            "display": "case",
+            "expression": "pg[\"Case\"].l"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "parametrization"
+      ],
+      "status": "passed",
+      "duration_ms": 43,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a parametrized scenario over two cases that declines the grouping",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "parametrized-scenario",
+                "display": "parametrized scenario",
+                "expression": "pg[\"Parametrized scenario\"].l"
+              },
+              {
+                "value": " over two "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"].l.s"
+              },
+              {
+                "value": " that declines the "
+              },
+              {
+                "term_id": "group",
+                "display": "grouping",
+                "expression": "pg[\"Group\"](\"grouping\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "suite",
+              "content": "import pytest\nfrom pytest_given import scenario, then, Template\n\n@scenario(Template('Brew {cup_size} ml'), group_parametrized=False)\n@pytest.mark.parametrize('cup_size', [200, 300])\ndef test_brew(cup_size):\n    with then('it brews'):\n        assert cup_size",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-json",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": [
+            {
+              "story_id": "adopt-pytest-given",
+              "sentence_id": 9
+            }
+          ],
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "both cases pass",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each case is its own scenario, titled with its id, with no parameter table",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "case",
+                "display": "case",
+                "expression": "pg[\"Case\"].l"
+              },
+              {
+                "value": " is its own "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": ", titled with its id, with no "
+              },
+              {
+                "term_id": "parameter-table",
+                "display": "parameter table",
+                "expression": "pg[\"Parameter table\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 3544
+      },
+      "story_ids": [
+        "adopt-pytest-given"
+      ],
+      "pins": null
+    },
+    {
       "id": "tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules",
       "narration": {
         "text": "A run with no sink still enforces the grouping rules",
@@ -3712,7 +3865,185 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3608
+        "line": 3626
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_plugin_file_glossary.py::test_file_glossary_kinds_resolved_in_report",
+      "narration": {
+        "text": "A run gives each kindless term the kind of the slot it fills",
+        "parts": [
+          {
+            "value": "A run gives each "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].l"
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " the kind of the "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].l"
+          },
+          {
+            "value": " it fills"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin_file_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 320,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a file glossary of kindless terms and a story whose sentence uses them",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "file-glossary",
+                "display": "file glossary",
+                "expression": "pg[\"File glossary\"].l"
+              },
+              {
+                "value": " of "
+              },
+              {
+                "term_id": "kindless",
+                "display": "kindless",
+                "expression": "pg[\"Kindless\"].l"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "term",
+                "display": "terms",
+                "expression": "pg[\"Term\"].l.s"
+              },
+              {
+                "value": " and a "
+              },
+              {
+                "term_id": "story",
+                "display": "story",
+                "expression": "pg[\"Story\"].l"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "sentence",
+                "display": "sentence",
+                "expression": "pg[\"Sentence\"].l"
+              },
+              {
+                "value": " uses them"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "GLOSSARY.md",
+              "content": "# Glossary\n\n| Term | Meaning |\n|------|---------|\n| Guest  | A person booking. |\n| Room   | A bookable room. |\n| search | Look up options. |",
+              "content_type": "text"
+            },
+            {
+              "label": "test_file.py",
+              "content": "from pytest_given import scenario, when, story, sentence\nfrom conftest import g\n\nbook = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])\n\n\n@scenario('Guest searches', stories=book)\ndef test_guest_searches():\n    with when(t'{g[\"Guest\"]} {g[\"search\"](\"searches for\")} a {g[\"Room\"]}'):\n        pass",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite runs with --given-json",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the scenario passes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each term in the report takes the kind of its slot: actor, activity, object",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " in the "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " takes the kind of its "
+              },
+              {
+                "term_id": "slot",
+                "display": "slot",
+                "expression": "pg[\"Slot\"].l"
+              },
+              {
+                "value": ": actor, activity, object"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin_file_glossary.py",
+        "line": 35
       },
       "story_ids": [],
       "pins": null
@@ -3735,7 +4066,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -3837,7 +4168,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -3942,7 +4273,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4070,7 +4401,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -4258,7 +4589,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 78,
       "steps": [
         {
           "phase": "given",
@@ -4526,20 +4857,31 @@
     {
       "id": "tests/unit/capture/test_collector.py::test_collect_steps",
       "narration": {
-        "text": "Steps record with their phases",
+        "text": "The collector records each step with its phase",
         "parts": [
           {
-            "term_id": "step",
-            "display": "Steps",
-            "expression": "pg[\"Step\"].s"
+            "value": "The "
           },
           {
-            "value": " record with their "
+            "term_id": "collector",
+            "display": "collector",
+            "expression": "pg[\"Collector\"].l"
+          },
+          {
+            "value": " records each "
+          },
+          {
+            "term_id": "step",
+            "display": "step",
+            "expression": "pg[\"Step\"].l"
+          },
+          {
+            "value": " with its "
           },
           {
             "term_id": "phase",
-            "display": "phases",
-            "expression": "pg[\"Phase\"].l.s"
+            "display": "phase",
+            "expression": "pg[\"Phase\"].l"
           }
         ]
       },
@@ -5092,23 +5434,23 @@
     {
       "id": "tests/unit/capture/test_collector.py::test_graft_recording_deep_copies_into_scenario",
       "narration": {
-        "text": "A fixture recording is deep-copied when grafted",
+        "text": "Each graft gets its own copy of the fixture recording",
         "parts": [
           {
-            "value": "A "
+            "value": "Each "
+          },
+          {
+            "term_id": "graft",
+            "display": "graft",
+            "expression": "pg[\"Graft\"].l"
+          },
+          {
+            "value": " gets its own copy of the "
           },
           {
             "term_id": "fixture-recording",
             "display": "fixture recording",
             "expression": "pg[\"Fixture recording\"].l"
-          },
-          {
-            "value": " is deep-copied when "
-          },
-          {
-            "term_id": "graft",
-            "display": "grafted",
-            "expression": "pg[\"Graft\"](\"grafted\")"
           }
         ]
       },
@@ -5204,118 +5546,6 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_collector.py::test_fail_marks_a_finished_scenario_failed",
-      "narration": {
-        "text": "The collector fails a scenario that already finished",
-        "parts": [
-          {
-            "value": "The "
-          },
-          {
-            "term_id": "collector",
-            "display": "collector",
-            "expression": "pg[\"Collector\"].l"
-          },
-          {
-            "value": " fails a "
-          },
-          {
-            "term_id": "scenario",
-            "display": "scenario",
-            "expression": "pg[\"Scenario\"].l"
-          },
-          {
-            "value": " that already finished"
-          }
-        ]
-      },
-      "module": "tests.unit.capture.test_collector",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a scenario that already finished as passed",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              },
-              {
-                "value": " that already finished as passed"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the collector is told of a failure after that",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "collector",
-                "display": "collector",
-                "expression": "pg[\"Collector\"].l"
-              },
-              {
-                "value": " is told of a failure after that"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the recorded scenario carries the failure",
-            "parts": [
-              {
-                "value": "the recorded "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              },
-              {
-                "value": " carries the failure"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/capture/test_collector.py",
-        "line": 484
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
       "id": "tests/unit/capture/test_collector.py::test_fail_keeps_an_existing_error",
       "narration": {
         "text": "A teardown failure keeps the error the scenario already carries",
@@ -5390,7 +5620,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 500
+        "line": 494
       },
       "story_ids": [],
       "pins": null
@@ -5483,7 +5713,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 579
+        "line": 573
       },
       "story_ids": [],
       "pins": null
@@ -5590,7 +5820,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 597
+        "line": 591
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5691,7 +5921,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 618
+        "line": 612
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5787,7 +6017,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 648
+        "line": 642
       },
       "story_ids": [],
       "pins": null
@@ -5810,7 +6040,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -6095,8 +6325,20 @@
     {
       "id": "tests/unit/capture/test_file_glossary.py::test_unknown_name_raises_with_suggestion",
       "narration": {
-        "text": "An unknown name raises with a suggestion",
-        "parts": []
+        "text": "A misspelt name looked up in a file glossary gets a spelling hint",
+        "parts": [
+          {
+            "value": "A misspelt name looked up in a "
+          },
+          {
+            "term_id": "file-glossary",
+            "display": "file glossary",
+            "expression": "pg[\"File glossary\"].l"
+          },
+          {
+            "value": " gets a spelling hint"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [
@@ -6104,7 +6346,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6199,7 +6441,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6291,7 +6533,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6936,7 +7178,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -7114,7 +7356,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -8611,7 +8853,7 @@
     {
       "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[Booking Request-booking request]",
       "narration": {
-        "text": "The lowercase handle form lowercases only capitalized words, so acronyms and standalone letters keep their case",
+        "text": "The lowercase handle form lowercases only capitalized words",
         "parts": [
           {
             "value": "The lowercase "
@@ -8622,7 +8864,7 @@
             "expression": "pg[\"Handle\"].l"
           },
           {
-            "value": " form lowercases only capitalized words, so acronyms and standalone letters keep their case"
+            "value": " form lowercases only capitalized words"
           }
         ]
       },
@@ -9020,7 +9262,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 404
+        "line": 403
       },
       "story_ids": [],
       "pins": null
@@ -9121,7 +9363,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 431
+        "line": 430
       },
       "story_ids": [],
       "pins": null
@@ -9207,7 +9449,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 445
+        "line": 444
       },
       "story_ids": [],
       "pins": null
@@ -9275,7 +9517,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 458
+        "line": 457
       },
       "story_ids": [],
       "pins": null
@@ -13696,8 +13938,25 @@
     {
       "id": "tests/unit/capture/test_story.py::test_clause_allows_node_edge_alternation_with_connective",
       "narration": {
-        "text": "Node/edge alternation allows a trailing connective node",
-        "parts": []
+        "text": "A connective word may join a second actor onto a clause",
+        "parts": [
+          {
+            "value": "A connective word may join a second "
+          },
+          {
+            "term_id": "actor",
+            "display": "actor",
+            "expression": "pg[\"Actor\"].l"
+          },
+          {
+            "value": " onto a "
+          },
+          {
+            "term_id": "clause",
+            "display": "clause",
+            "expression": "pg[\"Clause\"].l"
+          }
+        ]
       },
       "module": "tests.unit.capture.test_story",
       "tags": [],
@@ -14898,10 +15157,10 @@
     {
       "id": "tests/unit/capture/test_story.py::test_story_lookup_miss_lists_the_sentences",
       "narration": {
-        "text": "Looking up a sentence the story lacks lists the ones it has",
+        "text": "Looking up a missing sentence lists the ones the story has",
         "parts": [
           {
-            "value": "Looking up a "
+            "value": "Looking up a missing "
           },
           {
             "term_id": "sentence",
@@ -14909,7 +15168,7 @@
             "expression": "pg[\"Sentence\"].l"
           },
           {
-            "value": " the "
+            "value": " lists the ones the "
           },
           {
             "term_id": "story",
@@ -14917,7 +15176,7 @@
             "expression": "pg[\"Story\"].l"
           },
           {
-            "value": " lacks lists the ones it has"
+            "value": " has"
           }
         ]
       },
@@ -16142,7 +16401,7 @@
     {
       "id": "tests/unit/capture/test_template.py::test_parse_tstring_single_interpolation",
       "narration": {
-        "text": "A t-string interpolation becomes a value part",
+        "text": "A t-string interpolation records its rendered value and its expression",
         "parts": []
       },
       "module": "tests.unit.capture.test_template",
@@ -16278,18 +16537,18 @@
     {
       "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[Guest-None-guest-Guest]",
       "narration": {
-        "text": "A glossary handle in a t-string emits a term ref showing what the handle was called with, else the canonical name",
+        "text": "A handle in a t-string becomes a term ref showing what it was called with",
         "parts": [
           {
             "value": "A "
           },
           {
-            "term_id": "glossary",
-            "display": "glossary",
-            "expression": "pg[\"Glossary\"].l"
+            "term_id": "handle",
+            "display": "handle",
+            "expression": "pg[\"Handle\"].l"
           },
           {
-            "value": " handle in a t-string emits a "
+            "value": " in a t-string becomes a "
           },
           {
             "term_id": "term-ref",
@@ -16297,7 +16556,7 @@
             "expression": "pg[\"Term ref\"].l"
           },
           {
-            "value": " showing what the handle was called with, else the canonical name"
+            "value": " showing what it was called with"
           }
         ]
       },
@@ -16720,7 +16979,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -19129,10 +19388,18 @@
     {
       "id": "tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins[nothing-pinned]",
       "narration": {
-        "text": "A step is narration-matched only where neither it nor its scenario pins",
+        "text": "A pin on a step or its scenario replaces narration matching",
         "parts": [
           {
             "value": "A "
+          },
+          {
+            "term_id": "pin",
+            "display": "pin",
+            "expression": "pg[\"Pin\"].l"
+          },
+          {
+            "value": " on a "
           },
           {
             "term_id": "step",
@@ -19140,7 +19407,7 @@
             "expression": "pg[\"Step\"].l"
           },
           {
-            "value": " is narration-matched only where neither it nor its "
+            "value": " or its "
           },
           {
             "term_id": "scenario",
@@ -19148,12 +19415,7 @@
             "expression": "pg[\"Scenario\"].l"
           },
           {
-            "value": " "
-          },
-          {
-            "term_id": "pin",
-            "display": "pins",
-            "expression": "pg[\"Pin\"].l.s"
+            "value": " replaces narration matching"
           }
         ]
       },
@@ -21027,7 +21289,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 138,
+      "duration_ms": 137,
       "steps": [
         {
           "phase": "given",
@@ -22401,7 +22663,7 @@
     {
       "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[vscode-vscode://file/{path}:{line}]",
       "narration": {
-        "text": "A source link config value resolves to its template: a preset name, a raw template, or `none`",
+        "text": "A source link config value resolves to its template",
         "parts": [
           {
             "value": "A "
@@ -22412,7 +22674,7 @@
             "expression": "pg[\"Source link\"].l"
           },
           {
-            "value": " config value resolves to its template: a preset name, a raw template, or `none`"
+            "value": " config value resolves to its template"
           }
         ]
       },
@@ -22622,7 +22884,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 63
+        "line": 60
       },
       "story_ids": [],
       "pins": null
@@ -22689,7 +22951,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 100
+        "line": 97
       },
       "story_ids": [],
       "pins": null
@@ -22745,7 +23007,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 123
+        "line": 120
       },
       "story_ids": [],
       "pins": null
@@ -22814,7 +23076,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_source_link.py",
-        "line": 176
+        "line": 173
       },
       "story_ids": [],
       "pins": null
@@ -23071,7 +23333,7 @@
     {
       "id": "tests/unit/report/test_story_view.py::test_build_story_rollups_lists_a_scenario_under_each_bound_story",
       "narration": {
-        "text": "A scenario bound to two stories is matched against each",
+        "text": "A scenario bound to two stories is listed under each",
         "parts": [
           {
             "value": "A "
@@ -23090,7 +23352,7 @@
             "expression": "pg[\"Story\"].l.s"
           },
           {
-            "value": " is matched against each"
+            "value": " is listed under each"
           }
         ]
       },
@@ -23334,7 +23596,7 @@
     {
       "id": "tests/unit/test_grouping.py::test_one_xfailed_case_makes_the_group_xfailed",
       "narration": {
-        "text": "One xfailed case makes its parametrized scenario an expected failure, with that case's reason",
+        "text": "One xfailed case makes its parametrized scenario an expected failure",
         "parts": [
           {
             "value": "One xfailed "
@@ -23353,7 +23615,7 @@
             "expression": "pg[\"Parametrized scenario\"].l"
           },
           {
-            "value": " an expected failure, with that case's reason"
+            "value": " an expected failure"
           }
         ]
       },
@@ -23456,28 +23718,23 @@
     {
       "id": "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
       "narration": {
-        "text": "Grouping collapses parametrize cases into one scenario",
+        "text": "Any failed case fails its parametrized scenario",
         "parts": [
           {
-            "term_id": "group",
-            "display": "Grouping",
-            "expression": "pg[\"Group\"](\"Grouping\")"
-          },
-          {
-            "value": " collapses parametrize "
+            "value": "Any failed "
           },
           {
             "term_id": "case",
-            "display": "cases",
-            "expression": "pg[\"Case\"].l.s"
+            "display": "case",
+            "expression": "pg[\"Case\"].l"
           },
           {
-            "value": " into one "
+            "value": " fails its "
           },
           {
-            "term_id": "scenario",
-            "display": "scenario",
-            "expression": "pg[\"Scenario\"].l"
+            "term_id": "parametrized-scenario",
+            "display": "parametrized scenario",
+            "expression": "pg[\"Parametrized scenario\"].l"
           }
         ]
       },
@@ -23695,7 +23952,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 263
+        "line": 262
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -23808,7 +24065,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 289
+        "line": 288
       },
       "story_ids": [],
       "pins": null
@@ -23916,7 +24173,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 395
+        "line": 394
       },
       "story_ids": [],
       "pins": null
@@ -24058,7 +24315,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 622
+        "line": 621
       },
       "story_ids": [],
       "pins": null
@@ -24188,7 +24445,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 744
+        "line": 743
       },
       "story_ids": [],
       "pins": null
@@ -24292,7 +24549,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 856
+        "line": 855
       },
       "story_ids": [],
       "pins": null
@@ -24379,7 +24636,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1222
+        "line": 1221
       },
       "story_ids": [],
       "pins": null
@@ -24387,10 +24644,10 @@
     {
       "id": "tests/unit/test_grouping.py::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column",
       "narration": {
-        "text": "A scenario name formatting a parameter a step reads plainly gets its own column",
+        "text": "A scenario name formatting a parameter unlike a step gets its own column",
         "parts": [
           {
-            "value": "A scenario name formatting a parameter a "
+            "value": "A scenario name formatting a parameter unlike a "
           },
           {
             "term_id": "step",
@@ -24398,7 +24655,7 @@
             "expression": "pg[\"Step\"].l"
           },
           {
-            "value": " reads plainly gets its own column"
+            "value": " gets its own column"
           }
         ]
       },
@@ -24477,7 +24734,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1237
+        "line": 1236
       },
       "story_ids": [],
       "pins": null
@@ -24485,7 +24742,7 @@
     {
       "id": "tests/unit/test_grouping.py::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column",
       "narration": {
-        "text": "A step formatting a parameter the scenario name reads plainly gets its own column",
+        "text": "A step formatting a parameter unlike the scenario name gets its own column",
         "parts": [
           {
             "value": "A "
@@ -24496,7 +24753,7 @@
             "expression": "pg[\"Step\"].l"
           },
           {
-            "value": " formatting a parameter the scenario name reads plainly gets its own column"
+            "value": " formatting a parameter unlike the scenario name gets its own column"
           }
         ]
       },
@@ -24575,7 +24832,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1280
+        "line": 1279
       },
       "story_ids": [],
       "pins": null
@@ -24583,7 +24840,7 @@
     {
       "id": "tests/unit/test_grouping.py::test_a_rebound_parametrize_name_raises_rule_three",
       "narration": {
-        "text": "A step narrating a parameter its column no longer holds is refused",
+        "text": "A step whose narrated value differs from its parameter column is refused",
         "parts": [
           {
             "value": "A "
@@ -24594,7 +24851,7 @@
             "expression": "pg[\"Step\"].l"
           },
           {
-            "value": " narrating a parameter its column no longer holds is refused"
+            "value": " whose narrated value differs from its parameter column is refused"
           }
         ]
       },
@@ -24686,7 +24943,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1362
+        "line": 1361
       },
       "story_ids": [],
       "pins": null
@@ -25742,145 +25999,6 @@
       },
       "story_ids": [],
       "pins": null
-    },
-    {
-      "id": "tests/unit/test_percase.py::test_opted_out_group_emits_one_scenario_per_case",
-      "narration": {
-        "text": "A parametrized scenario can decline the grouping and keep one scenario per case",
-        "parts": [
-          {
-            "value": "A "
-          },
-          {
-            "term_id": "parametrized-scenario",
-            "display": "parametrized scenario",
-            "expression": "pg[\"Parametrized scenario\"].l"
-          },
-          {
-            "value": " can decline the "
-          },
-          {
-            "term_id": "group",
-            "display": "grouping",
-            "expression": "pg[\"Group\"](\"grouping\")"
-          },
-          {
-            "value": " and keep one "
-          },
-          {
-            "term_id": "scenario",
-            "display": "scenario",
-            "expression": "pg[\"Scenario\"].l"
-          },
-          {
-            "value": " per "
-          },
-          {
-            "term_id": "case",
-            "display": "case",
-            "expression": "pg[\"Case\"].l"
-          }
-        ]
-      },
-      "module": "tests.unit.test_percase",
-      "tags": [
-        "parametrization"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "two cases of a scenario that opted out",
-            "parts": [
-              {
-                "value": "two "
-              },
-              {
-                "term_id": "case",
-                "display": "cases",
-                "expression": "pg[\"Case\"].l.s"
-              },
-              {
-                "value": " of a scenario that opted out"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the grouping pass runs",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "group",
-                "display": "grouping",
-                "expression": "pg[\"Group\"](\"grouping\")"
-              },
-              {
-                "value": " pass runs"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": [
-            {
-              "story_id": "adopt-pytest-given",
-              "sentence_id": 9
-            }
-          ],
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "each case stands alone, with no parameter table",
-            "parts": [
-              {
-                "value": "each "
-              },
-              {
-                "term_id": "case",
-                "display": "case",
-                "expression": "pg[\"Case\"].l"
-              },
-              {
-                "value": " stands alone, with no "
-              },
-              {
-                "term_id": "parameter-table",
-                "display": "parameter table",
-                "expression": "pg[\"Parameter table\"].l"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/test_percase.py",
-        "line": 59
-      },
-      "story_ids": [
-        "adopt-pytest-given"
-      ],
-      "pins": null
     }
   ],
   "glossary": {
@@ -26891,10 +27009,10 @@
       "tracked": true,
       "scenario_ids": [
         "tests/integration/test_plugin.py::test_parametrized_test_as_table",
+        "tests/integration/test_plugin.py::test_group_parametrized_false_emits_one_scenario_per_case",
         "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
         "tests/unit/test_grouping.py::test_group_parametrized_keeps_source_order",
-        "tests/unit/test_grouping.py::test_a_formatted_param_cell_holds_the_text_the_step_narrated",
-        "tests/unit/test_percase.py::test_opted_out_group_emits_one_scenario_per_case"
+        "tests/unit/test_grouping.py::test_a_formatted_param_cell_holds_the_text_the_step_narrated"
       ]
     },
     {

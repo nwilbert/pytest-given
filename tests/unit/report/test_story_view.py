@@ -324,7 +324,7 @@ def test_build_story_rollups_counts_each_status_apart() -> None:
 
 
 @scenario(
-    t'A {pg["Scenario"].l} bound to two {pg["Story"].l.s} is matched against each',
+    t'A {pg["Scenario"].l} bound to two {pg["Story"].l.s} is listed under each',
 )
 def test_build_story_rollups_lists_a_scenario_under_each_bound_story() -> None:
     with given(

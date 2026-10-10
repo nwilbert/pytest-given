@@ -376,8 +376,7 @@ def test_a_lookup_equals_the_registration_of_the_same_term():
 
 
 @scenario(
-    t'The lowercase {pg["Handle"].l} form lowercases only capitalized words, '
-    t'so acronyms and standalone letters keep their case',
+    t'The lowercase {pg["Handle"].l} form lowercases only capitalized words',
 )
 @pytest.mark.parametrize(
     ('canonical', 'lowered'),

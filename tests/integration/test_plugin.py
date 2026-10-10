@@ -2362,7 +2362,8 @@ def test_scenario_pin_missing_from_its_story_raises_at_import(pytester):
 
 
 @scenario(
-    t'A declared {pg["Story"].l} no {pg["Scenario"].l} covers appears in the report',
+    t'A declared {pg["Story"].l} appears in the report even when no '
+    t'{pg["Scenario"].l} covers it',
     stories=adopt_pytest_given,
 )
 def test_a_declared_story_no_scenario_covers_appears(pytester, tmp_path):
@@ -3112,8 +3113,7 @@ _ANNOTATED_TEMPLATE_SUITE = """
 
 
 @scenario(
-    t'An Annotated Template label fails its {pg["Scenario"].l} unless its '
-    t'placeholder is a bare parametrize column',
+    'An Annotated Template label may only hold a bare parametrize column',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -3541,27 +3541,45 @@ def test_group_parametrized_false_without_parametrize_raises_at_collection(
     assert 'INTERNALERROR' not in result.stdout.str()
 
 
+@scenario(
+    t'A {pg["Parametrized scenario"].l} can decline the '
+    t'{pg["Group"]("grouping")} and keep one {pg["Scenario"].l} per '
+    t'{pg["Case"].l}',
+    tags=['parametrization'],
+    stories=adopt_pytest_given,
+)
 def test_group_parametrized_false_emits_one_scenario_per_case(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        import pytest
-        from pytest_given import scenario, then, Template
+    with given(
+        t'a {pg["Parametrized scenario"].l} over two {pg["Case"].l.s} that '
+        t'declines the {pg["Group"]("grouping")}'
+    ):
+        suite = """
+            import pytest
+            from pytest_given import scenario, then, Template
 
-        @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
-        @pytest.mark.parametrize('cup_size', [200, 300])
-        def test_brew(cup_size):
-            with then('it brews'):
-                assert cup_size
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=2)
-    data = json.loads(json_path.read_text())
-    assert [s['narration']['text'] for s in data['scenarios']] == [
-        'Brew 200 ml [200]',
-        'Brew 300 ml [300]',
-    ]
-    assert all(s['parameters'] is None for s in data['scenarios'])
+            @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
+            @pytest.mark.parametrize('cup_size', [200, 300])
+            def test_brew(cup_size):
+                with then('it brews'):
+                    assert cup_size
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['group']):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('both cases pass'):
+        result.assert_outcomes(passed=2)
+    with then(
+        t'each {pg["Case"].l} is its own {pg["Scenario"].l}, titled with its id, '
+        t'with no {pg["Parameter table"].l}'
+    ):
+        data = json.loads(json_path.read_text())
+        assert [s['narration']['text'] for s in data['scenarios']] == [
+            'Brew 200 ml [200]',
+            'Brew 300 ml [300]',
+        ]
+        assert all(s['parameters'] is None for s in data['scenarios'])
 
 
 _SIMPLE_SCENARIO = """

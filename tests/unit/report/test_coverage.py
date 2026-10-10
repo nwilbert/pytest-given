@@ -390,8 +390,8 @@ def _search_and_book_story():
 
 
 @scenario(
-    t'A {pg["Step"].l} is narration-matched only where neither it nor its '
-    t'{pg["Scenario"].l} {pg["Pin"].l.s}',
+    t'A {pg["Pin"].l} on a {pg["Step"].l} or its {pg["Scenario"].l} replaces '
+    t'narration matching',
 )
 @pytest.mark.parametrize(
     ('scenario_pins', 'step_pins', 'covered'),

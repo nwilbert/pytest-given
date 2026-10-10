@@ -239,7 +239,7 @@ def test_clause_allows_fully_bare_words():
 
 
 @scenario(
-    'Node/edge alternation allows a trailing connective node',
+    t'A connective word may join a second {pg["Actor"].l} onto a {pg["Clause"].l}',
 )
 def test_clause_allows_node_edge_alternation_with_connective():
     with given(
@@ -481,7 +481,7 @@ def test_the_registry_lists_declared_stories_in_order(guest, search, room):
 
 
 @scenario(
-    t'Looking up a {pg["Sentence"].l} the {pg["Story"].l} lacks lists the ones it has',
+    t'Looking up a missing {pg["Sentence"].l} lists the ones the {pg["Story"].l} has',
 )
 def test_story_lookup_miss_lists_the_sentences(guest, search, room):
     with given(t'a {pg["Story"].l} with an unnamed and a named {pg["Sentence"].l}'):

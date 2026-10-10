@@ -77,7 +77,7 @@ def test_duration_excludes_fixture_setup(monkeypatch: pytest.MonkeyPatch) -> Non
 
 
 @scenario(
-    t'{pg["Step"].s} record with their {pg["Phase"].l.s}',
+    t'The {pg["Collector"].l} records each {pg["Step"].l} with its {pg["Phase"].l}',
     stories=adopt_pytest_given,
 )
 def test_collect_steps() -> None:
@@ -340,7 +340,7 @@ def test_attach_outside_any_step_raises() -> None:
 
 
 @scenario(
-    t'A {pg["Fixture recording"].l} is deep-copied when {pg["Graft"]("grafted")}',
+    t'Each {pg["Graft"].l} gets its own copy of the {pg["Fixture recording"].l}',
     stories=adopt_pytest_given,
 )
 def test_graft_recording_deep_copies_into_scenario() -> None:
@@ -481,20 +481,14 @@ def test_start_scenario_source_defaults_to_none() -> None:
     assert scenario.source is None
 
 
-@scenario(
-    t'The {pg["Collector"].l} fails a {pg["Scenario"].l} that already finished',
-)
 def test_fail_marks_a_finished_scenario_failed() -> None:
-    with given(t'a {pg["Scenario"].l} that already finished as passed'):
-        collector = Collector()
-        collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
-        recorded = collector.finish_scenario(status='passed')
-    with when(t'the {pg["Collector"].l} is told of a failure after that'):
-        collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
-    with then(t'the recorded {pg["Scenario"].l} carries the failure'):
-        assert recorded.status == 'failed'
-        assert recorded.error is not None
-        assert recorded.error.message == 'teardown boom'
+    collector = Collector()
+    collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
+    recorded = collector.finish_scenario(status='passed')
+    collector.fail(NodeId('test.py::test_x'), _error('teardown boom'))
+    assert recorded.status == 'failed'
+    assert recorded.error is not None
+    assert recorded.error.message == 'teardown boom'
 
 
 @scenario(

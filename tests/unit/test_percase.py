@@ -2,7 +2,7 @@
 
 import pytest
 
-from pytest_given import Glossary, Template, given, scenario, then, when
+from pytest_given import Glossary, Template
 from pytest_given.capture.template import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
@@ -19,7 +19,6 @@ from pytest_given.model import (
     TermId,
     narration_text,
 )
-from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 def _opted_out_group(
@@ -56,23 +55,11 @@ def _opted_out_group(
     return scenarios, param_info
 
 
-@scenario(
-    t'A {pg["Parametrized scenario"].l} can decline the '
-    t'{pg["Group"]("grouping")} and keep one {pg["Scenario"].l} per '
-    t'{pg["Case"].l}',
-    tags=['parametrization'],
-    stories=adopt_pytest_given,
-)
 def test_opted_out_group_emits_one_scenario_per_case() -> None:
-    with given(t'two {pg["Case"].l.s} of a scenario that opted out'):
-        scenarios, param_info = _opted_out_group('Brew coffee')
-    with when(
-        t'the {pg["Group"]("grouping")} pass runs', pins=adopt_pytest_given['group']
-    ):
-        result = group_parametrized(scenarios, param_info)
-    with then(t'each {pg["Case"].l} stands alone, with no {pg["Parameter table"].l}'):
-        assert [s.id for s in result] == [s.id for s in scenarios]
-        assert all(s.parameters is None for s in result)
+    scenarios, param_info = _opted_out_group('Brew coffee')
+    result = group_parametrized(scenarios, param_info)
+    assert [s.id for s in result] == [s.id for s in scenarios]
+    assert all(s.parameters is None for s in result)
 
 
 def test_str_name_takes_the_parametrize_id() -> None:

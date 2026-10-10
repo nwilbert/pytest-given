@@ -71,7 +71,7 @@ def test_terms_start_kindless(glossary_file):
 
 
 @scenario(
-    'An unknown name raises with a suggestion',
+    t'A misspelt name looked up in a {pg["File glossary"].l} gets a spelling hint',
     tags=['diagnostics', 'validation'],
 )
 def test_unknown_name_raises_with_suggestion(glossary_file):

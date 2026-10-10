@@ -329,7 +329,7 @@
 - **then** the test passes
 - **then** the «scenario» «binds» both «stories» and covers the «sentence» of each
 
-## ✓ A declared «story» no «scenario» covers appears in the report
+## ✓ A declared «story» appears in the report even when no «scenario» covers it
 `tests/integration/test_plugin.py:2364::test_a_declared_story_no_scenario_covers_appears`
 
 - **given** a suite declaring a «story» that no «scenario» names or «pins»
@@ -352,7 +352,7 @@
 - **then** the report lists the «story», its «sentence» covered by nothing
 
 ## ✓ A pinned «scenario» still counts its «step» «pins»
-`tests/integration/test_plugin.py:2401::test_a_pinned_scenario_still_counts_its_step_pins`
+`tests/integration/test_plugin.py:2402::test_a_pinned_scenario_still_counts_its_step_pins`
 
 - **given** a «scenario» pinning one «sentence», whose «steps» pin a second and narrate a third
   - 📎 suite:
@@ -379,7 +379,7 @@
 - **then** the «scenario» covers both pinned «sentences» and not the one its narration would match
 
 ## ✓ A «step» «pin» into a «story» outside stories= covers it
-`tests/integration/test_plugin.py:2447::test_a_step_pin_into_a_story_outside_stories_covers_it`
+`tests/integration/test_plugin.py:2448::test_a_step_pin_into_a_story_outside_stories_covers_it`
 
 - **given** a «step» pinning a «story» its «scenario» does not name
   - 📎 suite:
@@ -402,7 +402,7 @@
 - **then** the «scenario» passes and covers the pinned «sentence», in the «story» it did not name
 
 ## ✓ A wide «fixture recording» keeps its «pins» in every «scenario» it is grafted into
-`tests/integration/test_plugin.py:2488::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
+`tests/integration/test_plugin.py:2489::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
 
 - **given** a module-scoped «step fixture» pinning a «sentence», set up first by an unannotated test
   - 📎 suite:
@@ -439,7 +439,7 @@
 - **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
 ## ✓ An Annotated label carrying a «pin» pins its «step»
-`tests/integration/test_plugin.py:2550::test_annotated_label_carrying_a_pin_pins_its_step`
+`tests/integration/test_plugin.py:2551::test_annotated_label_carrying_a_pin_pins_its_step`
 
 - **given** a «scenario» whose Annotated given(...) label on a «plain fixture» carries a «pin»
   - 📎 suite:
@@ -466,7 +466,7 @@
 - **then** the label's «step» carries the «pin»
 
 ## ✓ An Annotated label retells the «pins» of the fixture label it replaces · 3 cases
-`tests/integration/test_plugin.py:2590::test_annotated_label_pins_retell_the_fixture_root`
+`tests/integration/test_plugin.py:2591::test_annotated_label_pins_retell_the_fixture_root`
 
 - **given** a label with pins={label_pins} over a fixture pinning a[1]
 - **when** the suite runs
@@ -480,7 +480,7 @@
 | [a[2]] | [2] |
 
 ## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
-`tests/integration/test_plugin.py:3076::test_annotated_template_label_without_parametrize_fails_scenario`
+`tests/integration/test_plugin.py:3077::test_annotated_template_label_without_parametrize_fails_scenario`
 
 - **given** a Template label on a plain fixture parameter
   - 📎 suite:
@@ -502,8 +502,8 @@
 - **then** the scenario errors, naming the parameter and the fix
 - **then** the HTML «report» is still written
 
-## ✓ An Annotated Template label fails its «scenario» unless its placeholder is a bare parametrize column · 3 cases
-`tests/integration/test_plugin.py:3114::test_an_annotated_template_label_needs_a_bare_parametrize_column` · validation
+## ✓ An Annotated Template label may only hold a bare parametrize column · 3 cases
+`tests/integration/test_plugin.py:3115::test_an_annotated_template_label_needs_a_bare_parametrize_column` · validation
 
 - **given** a «parametrized scenario» whose Template label on a plain fixture holds {placeholder}
   - 📎 suite — *see parameter table*
@@ -658,8 +658,27 @@
 - **then** the run ends as a usage error, naming the flag the user typed
 - **then** no test ran
 
+## ✓ A «parametrized scenario» can decline the «grouping» and keep one «scenario» per «case»
+`tests/integration/test_plugin.py:3544::test_group_parametrized_false_emits_one_scenario_per_case` · parametrization
+
+- **given** a «parametrized scenario» over two «cases» that declines the «grouping»
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, then, Template
+    
+    @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
+    @pytest.mark.parametrize('cup_size', [200, 300])
+    def test_brew(cup_size):
+        with then('it brews'):
+            assert cup_size
+    ```
+- **when** the suite runs with --given-json
+- **then** both cases pass
+- **then** each «case» is its own «scenario», titled with its id, with no «parameter table»
+
 ## ✓ A run with no sink still enforces the «grouping» rules
-`tests/integration/test_plugin.py:3608::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py:3626::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -675,6 +694,37 @@
     ```
 - **when** the suite runs with no sink configured
 - **then** the run still fails, naming the offending form
+
+## ✓ A run gives each «kindless» «term» the kind of the «slot» it fills
+`tests/integration/test_plugin_file_glossary.py:35::test_file_glossary_kinds_resolved_in_report`
+
+- **given** a «file glossary» of «kindless» «terms» and a «story» whose «sentence» uses them
+  - 📎 GLOSSARY.md:
+    ```
+    # Glossary
+    
+    | Term | Meaning |
+    |------|---------|
+    | Guest  | A person booking. |
+    | Room   | A bookable room. |
+    | search | Look up options. |
+    ```
+  - 📎 test_file.py:
+    ```
+    from pytest_given import scenario, when, story, sentence
+    from conftest import g
+    
+    book = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])
+    
+    
+    @scenario('Guest searches', stories=book)
+    def test_guest_searches():
+        with when(t'{g["Guest"]} {g["search"]("searches for")} a {g["Room"]}'):
+            pass
+    ```
+- **when** the suite runs with --given-json
+- **then** the scenario passes
+- **then** each «term» in the «report» takes the kind of its «slot»: actor, activity, object
 
 ## ✓ «Narration lint» is off unless it is asked for
 `tests/integration/test_plugin_lint.py:89::test_disabled_by_default_records_no_sources_and_reports_nothing`
@@ -807,7 +857,7 @@
 - **when** the clock is started past setup and the body runs 0.2s
 - **then** the recorded duration is the body alone, not the setup before it
 
-## ✓ «Steps» record with their «phases»
+## ✓ The «collector» records each «step» with its «phase»
 `tests/unit/capture/test_collector.py:79::test_collect_steps`
 
 - **given** an «active scenario» in a fresh «collector»
@@ -842,50 +892,43 @@
 - **when** an «attachment» is made from the test body
 - **then** it is refused rather than dropped
 
-## ✓ A «fixture recording» is deep-copied when «grafted»
+## ✓ Each «graft» gets its own copy of the «fixture recording»
 `tests/unit/capture/test_collector.py:342::test_graft_recording_deep_copies_into_scenario`
 
 - **given** a «fixture recording» with a nested child «step»
 - **when** a «graft» copies it into the «active scenario»
 - **then** the scenario gains a deep copy of the recorded steps
 
-## ✓ The «collector» fails a «scenario» that already finished
-`tests/unit/capture/test_collector.py:484::test_fail_marks_a_finished_scenario_failed`
-
-- **given** a «scenario» that already finished as passed
-- **when** the «collector» is told of a failure after that
-- **then** the recorded «scenario» carries the failure
-
 ## ✓ A teardown failure keeps the error the «scenario» already carries
-`tests/unit/capture/test_collector.py:500::test_fail_keeps_an_existing_error`
+`tests/unit/capture/test_collector.py:494::test_fail_keeps_an_existing_error`
 
 - **given** a «scenario» that already failed in its body
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
 ## ✓ A «collector» reports which «node ids» it recorded
-`tests/unit/capture/test_collector.py:579::test_records_reports_only_recorded_node_ids`
+`tests/unit/capture/test_collector.py:573::test_records_reports_only_recorded_node_ids`
 
 - **given** a «collector» that recorded one «scenario»
 - **when** the recorded and an unrecorded node id are both asked about
 - **then** only the recorded node id is claimed
 
 ## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py:597::test_graft_leaf_given_appends_childless_given_step`
+`tests/unit/capture/test_collector.py:591::test_graft_leaf_given_appends_childless_given_step`
 
 - **given** an «active scenario» is being recorded
 - **when** a leaf «graft» appends a childless «step»
 - **then** the step is a given with no children
 
 ## ✓ «Grafting» with an override replaces the root label but keeps children
-`tests/unit/capture/test_collector.py:618::test_graft_recording_override_replaces_root_narration_keeps_children`
+`tests/unit/capture/test_collector.py:612::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «fixture recording» whose root has a label and a child
 - **when** a «graft» supplies an override «narration»
 - **then** the grafted root shows the override text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py:648::test_graft_leaf_given_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py:642::test_graft_leaf_given_without_scenario_is_refused`
 
 - **given** a collector with no «active scenario»
 - **when** a leaf «graft» runs
@@ -942,7 +985,7 @@
 - **when** a «file glossary» loads it
 - **then** each «term» is «kindless» until «kind inference» runs
 
-## ✓ An unknown name raises with a suggestion
+## ✓ A misspelt name looked up in a «file glossary» gets a spelling hint
 `tests/unit/capture/test_file_glossary.py:73::test_unknown_name_raises_with_suggestion` · diagnostics, validation
 
 - **given** a «file glossary» loaded from a Markdown file
@@ -1258,7 +1301,7 @@
 - **when** a «term» is declared by call, without a kind
 - **then** the «term» is registered as «kindless»
 
-## ✓ The lowercase «handle» form lowercases only capitalized words, so acronyms and standalone letters keep their case · 8 cases
+## ✓ The lowercase «handle» form lowercases only capitalized words · 8 cases
 `tests/unit/capture/test_glossary.py:378::test_lowercase_form_keeps_acronyms_and_mixed_case_words`
 
 - **given** a «term» named {canonical}
@@ -1277,7 +1320,7 @@
 | 'McDonald' | 'McDonald' |
 
 ## ✓ The «S-form» and lowercase «handle» forms chain, and every reading stays the same «term» · 8 cases
-`tests/unit/capture/test_glossary.py:404::test_s_form_chains_with_lowercase_form`
+`tests/unit/capture/test_glossary.py:403::test_s_form_chains_with_lowercase_form`
 
 - **given** a «term» named {canonical}
 - **when** the «handle» forms {forms} are applied in order
@@ -1295,21 +1338,21 @@
 | 'book' | 's' | 'books' |
 
 ## ✓ The «S-form» and lowercase «handle» forms also apply to a called form
-`tests/unit/capture/test_glossary.py:431::test_s_form_and_lowercase_form_apply_to_a_called_form`
+`tests/unit/capture/test_glossary.py:430::test_s_form_and_lowercase_form_apply_to_a_called_form`
 
 - **given** a «term» named "Room"
 - **when** it is called as "Deluxe Suite" and both forms are applied
 - **then** it reads "deluxe suites" and refers to the same «term»
 
 ## ✓ Subscript looks up an already-declared «term»
-`tests/unit/capture/test_glossary.py:445::test_subscript_get_only_returns_handle`
+`tests/unit/capture/test_glossary.py:444::test_subscript_get_only_returns_handle`
 
 - **given** a glossary with one declared «term»
 - **when** the name is looked up by subscript
 - **then** the returned «term» is the declared one
 
 ## ✓ Subscripting an unknown name raises with a hint
-`tests/unit/capture/test_glossary.py:458::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
+`tests/unit/capture/test_glossary.py:457::test_subscript_unknown_name_raises_with_hint` · diagnostics, validation
 
 - **given** a glossary with one declared «term»
 - **when** a near-miss name is subscripted
@@ -1771,7 +1814,7 @@
 - **when** a «clause» is built from them
 - **then** every part is a «clause part» word
 
-## ✓ Node/edge alternation allows a trailing connective node
+## ✓ A connective word may join a second «actor» onto a «clause»
 `tests/unit/capture/test_story.py:241::test_clause_allows_node_edge_alternation_with_connective`
 
 - **given** an «actor», an «activity», a «work object» and a second actor
@@ -1860,7 +1903,7 @@
 - **when** the «story» is iterated
 - **then** it yields each «sentence» handle in order
 
-## ✓ Looking up a «sentence» the «story» lacks lists the ones it has
+## ✓ Looking up a missing «sentence» lists the ones the «story» has
 `tests/unit/capture/test_story.py:483::test_story_lookup_miss_lists_the_sentences`
 
 - **given** a Guest actor
@@ -1966,7 +2009,7 @@
 | {d[key]} | refused |
 | {x + 1} | refused |
 
-## ✓ A t-string interpolation becomes a value part
+## ✓ A t-string interpolation records its rendered value and its expression
 `tests/unit/capture/test_template.py:160::test_parse_tstring_single_interpolation`
 
 - **given** a t-string step with one interpolated value
@@ -1980,7 +2023,7 @@
 - **when** the t-string is parsed
 - **then** the «value highlight» part records the full expression
 
-## ✓ A «glossary» handle in a t-string emits a «term ref» showing what the handle was called with, else the canonical name · 6 cases
+## ✓ A «handle» in a t-string becomes a «term ref» showing what it was called with · 6 cases
 `tests/unit/capture/test_template.py:267::test_a_tstring_term_ref_shows_what_its_handle_was_called_with`
 
 - **given** the {name} handle from the glossary, called with {called_with}
@@ -2192,7 +2235,7 @@
 - **when** «coverage» is computed against the «story»
 - **then** only the pinned «sentence» is covered, matching never ran
 
-## ✓ A «step» is narration-matched only where neither it nor its «scenario» «pins» · 5 cases
+## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 5 cases
 `tests/unit/report/test_coverage.py:392::test_narration_matching_runs_only_where_nothing_pins`
 
 - **given** a scenario with pins={scenario_pins}
@@ -2689,7 +2732,7 @@
 - **when** `pytest-given report` re-renders it to JSON
 - **then** the «coverage» is the one the «steps» actually earn
 
-## ✓ A «source link» config value resolves to its template: a preset name, a raw template, or `none` · 6 cases
+## ✓ A «source link» config value resolves to its template · 6 cases
 `tests/unit/report/test_source_link.py:31::test_a_source_link_config_value_resolves_to_its_template`
 
 - **given** the «source link» config set to {value}
@@ -2706,7 +2749,7 @@
 | none | None |
 
 ## ✓ An unknown preset name is refused, with the valid ones listed
-`tests/unit/report/test_source_link.py:63::test_resolve_template_unknown_preset_raises` · diagnostics, validation
+`tests/unit/report/test_source_link.py:60::test_resolve_template_unknown_preset_raises` · diagnostics, validation
 
 - **given** a bareword that is neither a known preset nor a template
 - **when** the config value is resolved
@@ -2714,7 +2757,7 @@
 - **then** the error names the offender and lists every valid preset
 
 ## ✓ The github preset prefers GITHUB_REPOSITORY over the git remote
-`tests/unit/report/test_source_link.py:100::test_resolve_github_preset_env_beats_remote`
+`tests/unit/report/test_source_link.py:97::test_resolve_github_preset_env_beats_remote`
 
 - **given** GITHUB_REPOSITORY naming one repository
 - **given** an origin remote naming a different one
@@ -2722,14 +2765,14 @@
 - **then** the template points at the environment's repository
 
 ## ✓ The github preset derives org and repo from the git origin remote
-`tests/unit/report/test_source_link.py:123::test_resolve_github_preset_from_https_remote`
+`tests/unit/report/test_source_link.py:120::test_resolve_github_preset_from_https_remote`
 
 - **given** no GITHUB_REPOSITORY, and an https origin remote
 - **when** the github preset is resolved
 - **then** the blob-URL template names the remote's org and repo
 
 ## ✓ The github preset refuses a remote that is not on GitHub
-`tests/unit/report/test_source_link.py:176::test_resolve_github_preset_non_github_remote_raises` · diagnostics
+`tests/unit/report/test_source_link.py:173::test_resolve_github_preset_non_github_remote_raises` · diagnostics
 
 - **given** no GITHUB_REPOSITORY, and an origin remote on another host
 - **when** the github preset is resolved
@@ -2751,7 +2794,7 @@
 | False | False | False | True |
 | False | True | False | False |
 
-## ✓ A «scenario» bound to two «stories» is matched against each
+## ✓ A «scenario» bound to two «stories» is listed under each
 `tests/unit/report/test_story_view.py:326::test_build_story_rollups_lists_a_scenario_under_each_bound_story`
 
 - **given** two «stories» each with a guest-search-room «sentence»
@@ -2766,14 +2809,14 @@
 - **when** the «sentence» labels are built
 - **then** the label gives the number, then reads as prose under a story-scoped key, with the «clause» texts joined
 
-## ✓ One xfailed «case» makes its «parametrized scenario» an expected failure, with that case's reason
+## ✓ One xfailed «case» makes its «parametrized scenario» an expected failure
 `tests/unit/test_grouping.py:123::test_one_xfailed_case_makes_the_group_xfailed` · parametrization
 
 - **given** a passed «case» and an xfailed one with the reason "planned"
 - **when** the «grouping» pass collapses them
 - **then** the «scenario» is xfailed and carries the xfailed «case»'s reason
 
-## ✓ «Grouping» collapses parametrize «cases» into one «scenario»
+## ✓ Any failed «case» fails its «parametrized scenario»
 `tests/unit/test_grouping.py:228::test_group_parametrized_any_failed_groups_as_failed` · parametrization
 
 - **given** three «case» records of one «parametrized scenario»
@@ -2781,28 +2824,28 @@
 - **then** one scenario remains and any failed «case» fails it
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py:263::test_group_parametrized_keeps_source_order` · parametrization
+`tests/unit/test_grouping.py:262::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
 - **when** the «grouping» pass runs
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ Same-named «parametrized scenarios» on different test functions stay apart
-`tests/unit/test_grouping.py:289::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
+`tests/unit/test_grouping.py:288::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
 
 - **given** two test functions whose «cases» share one name
 - **when** the «grouping» pass runs
 - **then** each function keeps its own «scenario» and «parameter table»
 
 ## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py:395::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+`tests/unit/test_grouping.py:394::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
 
 - **given** a skipped first «case» and a second one that ran
 - **when** the «cases» are «grouped»
 - **then** the tree is the one the passed «case» recorded
 
 ## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py:622::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+`tests/unit/test_grouping.py:621::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
 
 - **given** two «cases» whose text differs but records no parts
 - **when** the «cases» are «grouped»
@@ -2811,7 +2854,7 @@
 - **then** it names the «case» whose values were baked in, and the per-case opt-out
 
 ## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py:744::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+`tests/unit/test_grouping.py:743::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
 
 - **given** two «cases» narrating a value that differs
 - **when** «templatizing» walks the «cases»
@@ -2820,7 +2863,7 @@
 - **then** the placeholder keeps the format spec and conversion it narrated
 
 ## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py:856::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+`tests/unit/test_grouping.py:855::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
 - **given** two «cases» narrating a computed expression
 - **when** the «cases» are «grouped»
@@ -2828,30 +2871,30 @@
 - **then** the error quotes the expression and shows the bind-a-local fix
 
 ## ✓ A «parameter table» cell reads the way the scenario name formats it
-`tests/unit/test_grouping.py:1222::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
+`tests/unit/test_grouping.py:1221::test_a_scenario_name_format_spec_reaches_its_cell` · parametrization
 
 - **given** a Template scenario name formatting its parameter
 - **when** the «cases» are «grouped»
 - **then** the cells carry the formatting the name declared
 
-## ✓ A scenario name formatting a parameter a «step» reads plainly gets its own column
-`tests/unit/test_grouping.py:1237::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
+## ✓ A scenario name formatting a parameter unlike a «step» gets its own column
+`tests/unit/test_grouping.py:1236::test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column` · parametrization
 
 - **given** a name formatting the parameter and a step reading it plainly
 - **when** the «cases» are «grouped»
 - **then** the name points at a column holding what it renders
 - **then** the name renders the disambiguated token, text and parts agreeing
 
-## ✓ A «step» formatting a parameter the scenario name reads plainly gets its own column
-`tests/unit/test_grouping.py:1280::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
+## ✓ A «step» formatting a parameter unlike the scenario name gets its own column
+`tests/unit/test_grouping.py:1279::test_a_step_slot_disagreeing_with_the_name_gets_its_own_column` · parametrization
 
 - **given** a step formatting the parameter and a name reading it plainly
 - **when** the «cases» are «grouped»
 - **then** the step points at a column holding what it renders
 - **then** the step renders the disambiguated token, text and parts agreeing
 
-## ✓ A «step» narrating a parameter its column no longer holds is refused
-`tests/unit/test_grouping.py:1362::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+## ✓ A «step» whose narrated value differs from its parameter column is refused
+`tests/unit/test_grouping.py:1361::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
 
 - **given** two «cases» narrating a value their column lacks
 - **when** the «cases» are «grouped»
@@ -2921,10 +2964,3 @@
 - **when** the «cases» are «grouped»
 - **then** the «parameter table» holds the term displays alone
 - **then** the step still points at that column
-
-## ✓ A «parametrized scenario» can decline the «grouping» and keep one «scenario» per «case»
-`tests/unit/test_percase.py:59::test_opted_out_group_emits_one_scenario_per_case` · parametrization
-
-- **given** two «cases» of a scenario that opted out
-- **when** the «grouping» pass runs
-- **then** each «case» stands alone, with no «parameter table»

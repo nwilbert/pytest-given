@@ -122,7 +122,7 @@ def _cases(*specs: tuple[Status, str | None]) -> tuple[list[Scenario], ParamInfo
 
 @scenario(
     t'One xfailed {pg["Case"].l} makes its {pg["Parametrized scenario"].l} '
-    t"an expected failure, with that case's reason",
+    t'an expected failure',
     tags=['parametrization'],
 )
 def test_one_xfailed_case_makes_the_group_xfailed() -> None:
@@ -226,8 +226,7 @@ def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:
 
 
 @scenario(
-    t'{pg["Group"]("Grouping")} collapses parametrize {pg["Case"].l.s} into one '
-    t'{pg["Scenario"].l}',
+    t'Any failed {pg["Case"].l} fails its {pg["Parametrized scenario"].l}',
     tags=['parametrization'],
     stories=adopt_pytest_given,
 )
@@ -1235,8 +1234,8 @@ def test_a_scenario_name_format_spec_reaches_its_cell() -> None:
 
 
 @scenario(
-    t'A scenario name formatting a parameter a {pg["Step"].l} reads plainly '
-    t'gets its own column',
+    t'A scenario name formatting a parameter unlike a {pg["Step"].l} gets its '
+    t'own column',
     tags=['parametrization'],
 )
 def test_a_scenario_name_disagreeing_with_a_step_gets_its_own_column() -> None:
@@ -1278,8 +1277,8 @@ def _placeholder_step(spec: str) -> Step:
 
 
 @scenario(
-    t'A {pg["Step"].l} formatting a parameter the scenario name reads plainly '
-    t'gets its own column',
+    t'A {pg["Step"].l} formatting a parameter unlike the scenario name gets its '
+    t'own column',
     tags=['parametrization'],
 )
 def test_a_step_slot_disagreeing_with_the_name_gets_its_own_column() -> None:
@@ -1360,7 +1359,8 @@ def test_a_name_slot_a_value_cannot_render_keeps_the_shared_column() -> None:
 
 
 @scenario(
-    t'A {pg["Step"].l} narrating a parameter its column no longer holds is refused',
+    t'A {pg["Step"].l} whose narrated value differs from its parameter column '
+    t'is refused',
     tags=['parametrization', 'validation'],
 )
 def test_a_rebound_parametrize_name_raises_rule_three() -> None:

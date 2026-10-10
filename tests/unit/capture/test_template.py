@@ -158,7 +158,7 @@ def test_parse_tstring_literal_only() -> None:
 
 
 @scenario(
-    'A t-string interpolation becomes a value part',
+    'A t-string interpolation records its rendered value and its expression',
 )
 def test_parse_tstring_single_interpolation() -> None:
     with given('a t-string step with one interpolated value'):
@@ -265,8 +265,8 @@ def glossary() -> Glossary:
 
 
 @scenario(
-    t'A {pg["Glossary"].l} handle in a t-string emits a {pg["Term ref"].l} '
-    t'showing what the handle was called with, else the canonical name',
+    t'A {pg["Handle"].l} in a t-string becomes a {pg["Term ref"].l} showing what '
+    t'it was called with',
 )
 @pytest.mark.parametrize(
     ('name', 'called_with', 'term_id', 'display'),
