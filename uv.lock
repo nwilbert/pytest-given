@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -900,10 +900,12 @@ build = [
 ]
 coverage = [
     { name = "coverage" },
+    { name = "markdown-it-py" },
 ]
 dev = [
     { name = "coverage" },
     { name = "library-skills" },
+    { name = "markdown-it-py" },
     { name = "mike" },
     { name = "mypy" },
     { name = "nox" },
@@ -920,6 +922,9 @@ lint = [
 ]
 nox = [
     { name = "nox" },
+]
+test = [
+    { name = "markdown-it-py" },
 ]
 typecheck = [
     { name = "mypy" },
@@ -938,10 +943,14 @@ build = [
     { name = "library-skills", specifier = ">=0.0.19" },
     { name = "nox", specifier = ">=2026.4.10" },
 ]
-coverage = [{ name = "coverage", specifier = ">=7.14.0" }]
+coverage = [
+    { name = "coverage", specifier = ">=7.14.0" },
+    { name = "markdown-it-py", specifier = ">=4.2.0" },
+]
 dev = [
     { name = "coverage", specifier = ">=7.14.0" },
     { name = "library-skills", specifier = ">=0.0.19" },
+    { name = "markdown-it-py", specifier = ">=4.2.0" },
     { name = "mike", git = "https://github.com/squidfunk/mike.git?rev=2d4ad799442f4592db8ad53b179bfb33db8c69ac" },
     { name = "mypy", specifier = ">=2.1.0" },
     { name = "nox", specifier = ">=2026.4.10" },
@@ -955,7 +964,7 @@ docs = [
 ]
 lint = [{ name = "ruff", specifier = ">=0.15.13" }]
 nox = [{ name = "nox", specifier = ">=2026.4.10" }]
-test = []
+test = [{ name = "markdown-it-py", specifier = ">=4.2.0" }]
 typecheck = [
     { name = "mypy", specifier = ">=2.1.0" },
     { name = "nox", specifier = ">=2026.4.10" },

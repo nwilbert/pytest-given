@@ -54,7 +54,7 @@ pytest-given = "pytest_given.cli:main"
 lint = ["ruff>=0.15.13"]
 nox = ["nox>=2026.4.10"]
 typecheck = ["mypy>=2.1.0", { include-group = "nox" }]
-test = []
+test = ["markdown-it-py>=4.2.0"]
 coverage = [{ include-group = "test" }, "coverage>=7.14.0"]
 audit = ["pip-audit>=2.10.0"]
 build = ["library-skills>=0.0.19", { include-group = "nox" }]
