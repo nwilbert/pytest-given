@@ -82,6 +82,9 @@ One note, in each place that presents story coverage:
 - The authoring skill's `references/api.md` — the marker; the navigating skill's `SKILL.md` —
   render the spec with `-m pytest_given` when a full run is slow.
 - The story-coverage note in the three places above.
+- The reviewing skill's undecorated-tests query (layer 3) collects with `-m "not pytest_given"`, so
+  the plain tests come straight from pytest and the jq only keeps the test files that hold a
+  scenario.
 - `noxfile.py` — `self_report` runs `pytest tests -m pytest_given`.
 - Self-report: decorate the test that states "every scenario carries the `pytest_given` marker".
 - `CHANGELOG.md` — Added: the `pytest_given` marker on every scenario test.
