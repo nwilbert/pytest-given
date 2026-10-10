@@ -39,19 +39,7 @@ A parametrized scenario renders as one narrated tree above a parameter table. A 
 - **A column must make sense on its own.** Sometimes the outcome depends on how a varied input relates to a fixed one. Then the column holds the relation (`hours_later`, `same_room`), not the varied input's raw value. `existing_start=50` or `existing_room='B'` only make sense next to a new booking that another step fixes in room A at hours 10 to 20. Merged tables fall into this too: parametrizing the value an old step text happened to name produces such columns. Arrange the fixed side first, so the relation has something to refer to. Whole objects as columns fail the same way, because a reader can't compare two `Booking(...)` reprs at a glance.
 - **Never turn a label back into data.** The body may unpack a relation column the way its narration says (`'A' if same_room else 'B'` under "same room: {same_room}"). It never maps a descriptive label to the input (`{'40 hours later': 40}[shift]`), and no label column sits next to the data it describes. In both cases, the report shows a claim that nothing checks against the input. A document is the exception, because it can't be shown as a column: parametrize a label, look the document up, and `attach` it, so the row shows both.
 - **Contrast rows show what decides.** For each input that decides the outcome, include a row that changes only that input and flips the outcome. Put it at the boundary if there is one: moved 10 hours later, a booking still shares an hour; 11 hours later, it doesn't. A table whose rows all have the same outcome can't show which column matters, even when another scenario has the flipped case. Two exceptions need no flip: a column that lists forms the rule treats alike, and a flip that would need other steps, which stays in its own scenario.
-- **A refusal is a row too.** `when_then` can't narrate a raise per row. When accepted and refused inputs share the steps, catch the refusal in the `when` and assert it like any other outcome:
-  ```python
-  with when(t'the {g["Guest"].l} books {nights} nights'):
-      try:
-          booking, refusal = book(room, nights), ''
-      except BookingRefused as error:
-          booking, refusal = None, str(error)
-  with then(t'the booking is accepted: {accepted}'):
-      assert (booking is not None) == accepted
-  with then('a refusal names the minimum stay'):
-      assert ('minimum stay' in refusal) == (not accepted)
-  ```
-  Keep `when_then` for a scenario where every row is refused.
+- **A refusal is a row too.** When accepted and refused inputs share the steps, catch the refusal in the `when` (see [Expected raises](#expected-raises)).
 - **Outcomes are columns, and the `then` asserts against them.** An outcome that varies gets a column. A `then` names it and holds for every row (`assert (0 in result.clashes) == clashes` under "it clashes: {clashes}"); don't put an `if` on the column inside the step. The main outcome gets its own column even when another column implies it: `settled_by=None` implies "no clash", but a reader looks for the clash. Columns follow the order in which the narration first shows them, so an input narrated in a `given` comes before an outcome in a `then`.
 
 ## Arrangement
@@ -72,6 +60,19 @@ A parametrized scenario renders as one narrated tree above a parameter table. A 
   - **Write the `then` as a real outcome.** Name the exception type. When `match=` pins a specific message, say what it reports in domain terms (`'the shortfall amount is reported'`). Never write a bare `'it raises'`.
   - **Check a message with several details in its own `then`.** Use `pytest.raises(E) as excinfo` under the `when_then`, then `with then('the error names …'): assert '…' in str(excinfo.value)`.
   - **The pin must be as specific as the `then`.** A `then` that promises details in the message (the offender, a suggestion, a file:line) needs a `match=` that only a message with that detail passes. With `match='column'` under "names the missing column", the detail can break unnoticed. An alternation (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch, so pin the detail that tells sibling refusals apart.
+- **When whether it raises is the outcome, catch the error in the `when`.** This covers a table whose rows are partly refused (`when_then` can't narrate a raise per row) and a scenario showing that a call returns normally. Assert the caught error like any other outcome:
+  ```python
+  with when(t'the {g["Guest"].l} books {nights} nights'):
+      try:
+          booking, refusal = book(room, nights), ''
+      except BookingRefused as error:
+          booking, refusal = None, str(error)
+  with then(t'the booking is accepted: {accepted}'):
+      assert (booking is not None) == accepted
+  with then('a refusal names the minimum stay'):
+      assert ('minimum stay' in refusal) == (not accepted)
+  ```
+  Keep `when_then` for a scenario where every row is refused. "It returns normally" is usually the weak half of a rule: when the code does something instead, such as logging a warning or writing an empty output, assert that.
 
 ## Vocabulary and tags
 
@@ -88,6 +89,7 @@ Step text may abstract, but it must never overstate.
 
 - **A value in the text must match the body.** A quantity, date or amount you narrate is a claim about the data the step actually holds. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes.
 - **Everything a `then` claims must be asserted in it.** A `then` that says "…and recorded in the ledger" without such an assertion describes behavior nobody checked. Assert it, or drop the clause. A `then` that sets the value it asserts, or asserts a constant, checks nothing. The asserted value must come from the code under test.
+- **A stub that raises when called checks nothing in the `then`.** The code under test may catch its `AssertionError` and fall back to the very outcome the `then` expects. To show a collaborator is never called, record its calls and assert `calls == []` (or `mock.assert_not_called()`) in the `then`.
 - **What the `when` names must be what the body calls.** Narrate the action the step performs, not the one the scenario is loosely about. A common mistake: the `when` text reads like more arrangement, but its body arranges *and* makes the call the `then` reports. The action then appears nowhere in the report. Move the setup into a `given`.
 - **"Each", "every", "both" and "all" are claims about every item.** A `then` or scenario name with one of these words must assert every item it covers. "Each slot becomes a term ref", backed by assertions on two of three slots, overstates. Assert them all, or narrow the text to what is checked.
 - **Mark a scenario written before its implementation `xfail(strict=True)`** (or set `xfail_strict`). It reports as an expected failure, with its reason, steps and error. Once it passes, it fails the run, so you remember to remove the mark. A non-strict mark stays on working behavior and turns a later regression into an expected failure. An `xfail` on one `pytest.param` row is fine too.
