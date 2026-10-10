@@ -9,8 +9,10 @@ reviewing skill ships to work around it:
    narration and the code it claims to describe sit side by side.
 2. **A Stories section** (default on) renders story coverage from the production rollups, so the
    report says which sentences are covered without opening the HTML.
+3. **`--no-given-md-lines`** (opt-out) drops the line number from each scenario's anchor, so a
+   Markdown diff shows behavior changes instead of every anchor below an inserted test.
 
-Both are reachable post-hoc through `pytest-given report`, so a reviewer re-renders an existing
+All three are reachable post-hoc through `pytest-given report`, so a reviewer re-renders an existing
 JSON report instead of re-running the suite.
 
 ## Background
@@ -28,7 +30,14 @@ Markdown sink supports neither, so the skill ships two scripts as references:
 `tests/unit/test_skills_scripts.py` runs both against a report built from the model, so neither can
 drift from the *schema* silently. Nothing pins the coverage query to the *algorithm*: it can stay
 green while disagreeing with the report a reviewer is auditing. That asymmetry is what makes part 2
-worth more than part 1.
+worth more than part 1. The query's "names a story yet covers none of it" variant is not a
+rendering at all but a rule, and moves to the [`unused-story` lint](2026-10-10-unused-story-lint-design.md).
+
+The reviewing skill tells a reviewer to diff the Markdown at base and head as "the behavioral delta
+in prose". Every scenario's anchor carries `relpath:line`, so one inserted test shifts the anchor of
+every scenario below it in the same file; in practice anchor moves can make up half a diff. The
+JSON keeps the line regardless, so the Markdown can drop it without losing anything a reviewer
+cannot recover.
 
 Supersedes the `pytest-given audit` entry that stood under TODO "Later" (a subcommand emitting
 (step text, body source) pairs; see the [lint spec](../2026-07-05-narration-lint-design.md)
@@ -69,6 +78,23 @@ suites see no change.
 
 Default on: coverage is report data, not a review-only extra, and a coverage change *should* show
 up in the `.md` delta that [AGENTS.md](../../../AGENTS.md) tells contributors to read first.
+
+### Part 3 — `--no-given-md-lines`
+
+The subtitle anchor is `relpath:line::test_name` today, a terminal-clickable `file:line`. With the
+setting off it renders `relpath::test_name`, still unique within the report and greppable. The
+setting changes only the Markdown sink: the JSON keeps `Scenario.source.line`, and the HTML keeps
+its source links. `render_md` takes it as a parameter like `sources`, so `render_md` stays a total
+function of its inputs.
+
+It is a switch, not a template like `given_source_link`. A source link adds navigation; this
+setting exists for diff stability, which is a matter of showing *less*, and any template that
+links to the code would bring the line back through the URL.
+
+Default on, so the anchor stays clickable in a terminal. A reviewer diffing two renders turns it off
+for both; because the JSON keeps the line, `pytest-given report --format md --no-lines` re-renders
+a saved base without re-running it. This repository sets the ini off for its committed reports, so
+a test inserted above a decorated one no longer counts as a self-report change.
 
 ## Markdown format
 
@@ -114,32 +140,45 @@ wrapper proves awkward in a diff — see Open Questions.
 | pytest flag | `--given-md-source` / `--no-given-md-source` |
 | ini | `given_md_source` |
 | CLI | `pytest-given report data.json --format md --with-source` |
+| pytest flag | `--given-md-lines` / `--no-given-md-lines` |
+| ini | `given_md_lines` (default `true`) |
+| CLI | `pytest-given report data.json --format md --no-lines` |
 
-Tri-state flag over ini, matching `--given-lint`. The flag is meaningful only alongside a Markdown
-sink; like an unused `--given-source-link` on a Markdown run today, it is inert rather than an
-error.
+Each is a tri-state flag over its ini, matching `--given-lint`. Both are meaningful only alongside a
+Markdown sink; like an unused `--given-source-link` on a Markdown run today, they are inert rather
+than an error.
 
 ## Implementation touch points
 
-- `report/md_renderer.py` — `sources` parameter, source block, Stories section.
-- `report/sinks.py` — `SinkConfig.md_source: bool`, resolution hook, pass-through to `render_md`.
+- `report/md_renderer.py` — `sources` and `lines` parameters, source block, line-free anchor,
+  Stories section.
+- `report/sinks.py` — `SinkConfig.md_source: bool`, `SinkConfig.md_lines: bool`, resolution hook,
+  pass-through to `render_md`.
 - `report/sources.py` (new) — read + AST span; no imports beyond `model/`, filesystem access
   injected by the caller.
-- `plugin/options.py` — flag + ini, `SinkConfig` wiring.
-- `cli/report.py` — `--with-source`.
-- `README.md`, the authoring skill's `references/api.md` — flag tables.
-- Reviewing skill `SKILL.md` — layer 2 renders with the flag; layer 4 reads the Stories section.
-- `references/story-coverage.md` — retire the query, keep the matching rules as documentation.
+- `plugin/options.py` — flags + inis, `SinkConfig` wiring.
+- `cli/report.py` — `--with-source`, `--lines` / `--no-lines`.
+- `README.md`, `docs/site/configuration/pytest-options.md`, `docs/site/cli.md`, the authoring
+  skill's `references/api.md` — flag tables.
+- Reviewing skill `SKILL.md` — layer 2 renders with `--given-md-source` and diffs base and head
+  under `--no-given-md-lines`; layer 4 reads the Stories section.
+- `references/story-coverage.md` — retire the queries, keep the matching rules as documentation.
 - `references/pairs.md` — demoted to the fallback for a JSON-only workflow or an older version.
-- `CHANGELOG.md` — Added (flag, CLI option), Changed (Markdown gains a Stories section).
+- `pyproject.toml` — `given_md_lines = false` for this repository's committed reports.
+- `AGENTS.md` — Quality gates: a shifted source line no longer shows in the `.md`, so drop the
+  advice that it marks a real self-report change.
+- `CHANGELOG.md` — Added (flags, CLI options), Changed (Markdown gains a Stories section).
 - Regenerate `examples/` and `examples/self-report/`.
 
 ## Test coverage
 
 - Renderer units: bodies present, absent, unreadable file, line with no enclosing function; a
-  grouped parametrized scenario; a report with no stories; covered / uncovered / untracked rows.
-- Integration: off by default; on, the body reaches the file; the flag alone writes nothing new.
-- CLI: `--with-source` against a saved report, resolving from the working directory.
+  grouped parametrized scenario; a report with no stories; covered / uncovered / untracked rows;
+  the anchor with and without its line.
+- Integration: `--given-md-source` off by default, and on, the body reaches the file;
+  `--no-given-md-lines` reaches the file; neither flag alone writes anything new.
+- CLI: `--with-source` against a saved report, resolving from the working directory; `--no-lines`
+  against a saved report.
 - `tests/unit/test_skills_scripts.py` drops the story-coverage case with the query, keeps pairs.
 
 ## Out of scope
