@@ -1014,6 +1014,11 @@
 <td>A <code>then</code> without an <code>assert</code> or a checking call. Checking calls are calls whose name starts with <code>assert</code>, and <code>pytest.raises</code>, <code>pytest.warns</code> and <code>pytest.fail</code>. Nothing else counts, not even <code>pytest.approx</code>.</td>
 </tr>
 <tr>
+<td><code>conditional-check</code></td>
+<td><code>warn</code></td>
+<td>A <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>, so a run can pass it without checking anything. An <code>if</code> that calls <code>pytest.fail</code> counts as a check, and so does a loop over a literal such as <code>(a, b)</code>.</td>
+</tr>
+<tr>
 <td><code>missing-phase</code></td>
 <td><code>warn</code></td>
 <td>A passed scenario that is missing one of the phases Given, When or Then. <code>@given</code> fixtures and <code>Annotated[..., given(...)]</code> parameters count as <code>given</code> steps. A parametrized scenario is checked once, not once per case.</td>

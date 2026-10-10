@@ -1021,6 +1021,7 @@
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A handle's <code>.s</code> form reads the term's S-form, its regular plural or verb -s (<code>room.s</code> reads <em>Rooms</em>), and <code>.l</code> and <code>.s</code> chain and apply to a called form (<code>room.l.s</code> reads <em>rooms</em>).</li>
+<li>The narration lint's <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1030,6 +1031,7 @@
 <li>The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.</li>
 <li>The bundled <code>pytest-given-authoring</code> skill covers scenario titles and narrates each rule once, where its test proves it, and the <code>pytest-given-reviewing</code> skill reviews titles as a list and flags a rule narrated at the wrong layer or a <code>then</code> that checks nothing.</li>
 <li>The bundled skills are reworded in plainer language.</li>
+<li>The bundled <code>pytest-given-authoring</code> skill shows how to narrate a call that returns normally and to check "never called" with recorded calls instead of a stub that raises, which the <code>pytest-given-reviewing</code> skill flags.</li>
 </ul>
 <h2 id="041-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1">0.4.1</a> - 2026-10-04<a class="headerlink" href="#041-2026-10-04" title="Permanent link">&para;</a></h2>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
