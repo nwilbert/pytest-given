@@ -17,6 +17,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A handle's `.s` form reads the term's S-form, its regular plural or verb -s (`room.s` reads *Rooms*), and `.l` and `.s` chain and apply to a called form (`room.l.s` reads *rooms*).
 - Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` runs the scenarios alone.
+- `--given-md-lines` / `--no-given-md-lines` and the `given_md_lines` ini, with `pytest-given report --no-lines`, leave the line out of each Markdown scenario anchor.
 - The narration lint's `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 
 ### Changed

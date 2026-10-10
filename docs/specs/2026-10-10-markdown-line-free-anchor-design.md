@@ -13,7 +13,7 @@ given_md_lines = false
 ## Background
 
 The reviewing skill tells a reviewer to diff the Markdown at base and head as "the behavioral delta
-in prose", and [AGENTS.md](../../../AGENTS.md) tells contributors to read the `.md` diff of a
+in prose", and [AGENTS.md](../../AGENTS.md) tells contributors to read the `.md` diff of a
 regenerated report first. Every scenario's anchor is `relpath:line::test_name`, so one inserted
 test shifts the anchor of every scenario below it in the same file; in practice anchor moves can
 make up half a diff. In this repository they also turn an unrelated test edit into a self-report
@@ -44,12 +44,16 @@ Markdown-only run.
   setting exists for diff stability, which is a matter of showing *less*, and any template that
   links to the code would bring the line back through the URL.
 
-This repository sets `given_md_lines = false`, so the committed example and self-report Markdown
-change only when narration does.
+This repository sets `given_md_lines = false`, so a test that moves doesn't shift the anchors in
+the committed example and self-report Markdown.
+
+The setting covers the anchor only. A failure's error line keeps its `file:line`: it points at the
+failing check rather than at the scenario, a failure in a diff is news anyway, and the only
+failures in a committed report are the examples' intentional ones.
 
 ## Implementation touch points
 
-- `report/md_renderer.py` — a `lines: bool = True` parameter on `render_md`, threaded to the
+- `report/md_renderer.py` — a keyword-only `with_lines: bool = True` parameter on `render_md`, threaded to the
   anchor.
 - `report/sinks.py` — `SinkConfig.md_lines`, passed to `render_md`.
 - `plugin/options.py` — `--given-md-lines` / `--no-given-md-lines`

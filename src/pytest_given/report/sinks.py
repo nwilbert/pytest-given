@@ -52,6 +52,7 @@ class SinkConfig:
     html_path: Path | None = None
     md_path: Path | None = None
     md_to_stdout: bool = False
+    md_lines: bool = True
     source_link_template: str | None = None
     source_root: Path | None = None
     theme: Theme = DEFAULT_THEME
@@ -162,7 +163,7 @@ def render_sinks(
         )
     md_stdout: str | None = None
     if config.md_path is not None or config.md_to_stdout:
-        md = render_md(report)
+        md = render_md(report, with_lines=config.md_lines)
         if config.md_to_stdout:
             md_stdout = md
         if config.md_path is not None:

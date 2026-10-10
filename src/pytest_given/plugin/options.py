@@ -65,6 +65,16 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        '--given-md-lines',
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help=(
+            'Show the line in each Markdown scenario anchor. '
+            '--no-given-md-lines leaves it out, so a Markdown diff shows no '
+            'shifted lines. Overrides the given_md_lines ini for one run.'
+        ),
+    )
+    group.addoption(
         '--given-all-frames',
         action='store_true',
         default=False,
@@ -114,6 +124,14 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help='Name the report (CLI flag overrides this).',
     )
     parser.addini(
+        'given_md_lines',
+        type='bool',
+        default=True,
+        help=(
+            'Show the line in each Markdown scenario anchor (CLI flag overrides this).'
+        ),
+    )
+    parser.addini(
         'given_lint',
         type='bool',
         default=False,
@@ -161,7 +179,12 @@ def pytest_configure(config: pytest.Config) -> None:
             _cli_over_ini(config, 'given_theme', str),
             setting=_setting_spelling(config, 'given_theme'),
         )
-        sinks = _resolve_sinks(config, source_link_template, theme)
+        sinks = _resolve_sinks(
+            config,
+            source_link_template,
+            theme,
+            md_lines=_cli_over_ini(config, 'given_md_lines', bool),
+        )
     except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
     store_given_config(
@@ -218,7 +241,10 @@ def _resolve_title(config: pytest.Config) -> str | None:
 
 
 def _resolve_sinks(
-    config: pytest.Config, source_link_template: str | None, theme: Theme
+    config: pytest.Config,
+    source_link_template: str | None,
+    theme: Theme,
+    md_lines: bool,
 ) -> SinkConfig:
     """The three sink flags, resolved into the pytest-free shape `report/`
     reads. CLI-only, so there is no ini precedence to settle here.
@@ -235,6 +261,7 @@ def _resolve_sinks(
             html_path=Path(html_opt) if html_opt is not None else None,
             md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
             md_to_stdout=md_opt == '-',
+            md_lines=md_lines,
             source_link_template=source_link_template,
             source_root=config.rootpath,
             theme=theme,

@@ -36,6 +36,6 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 
 ## When to go to the code
 
-Go to the code to change behavior, or to check one scenario's narration against its body. Jump straight to the scenario's `source.relpath` and `source.line` from the JSON, or to the ``file.py:line::test_name`` line under each Markdown heading, instead of searching for it.
+Go to the code to change behavior, or to check one scenario's narration against its body. Jump straight to the scenario's `source.relpath` and `source.line` from the JSON, or to the ``file.py:line::test_name`` line under each Markdown heading (``file.py::test_name`` in a project that sets `given_md_lines = false`; add `--given-md-lines` for the line), instead of searching for it.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

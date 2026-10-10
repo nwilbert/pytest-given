@@ -173,6 +173,9 @@ select = [
 testpaths = ["tests"]
 # A warning fails the run, so deprecations surface on the upgrade that adds them.
 max_warnings = "0"
+# A test that moves doesn't shift every scenario anchor below it in the
+# committed Markdown reports.
+given_md_lines = false
 given_lint_ignore = [
     # Honestly two-phase: constructing the descriptor is the action under
     # test and there is no input to arrange (see the authoring skill's

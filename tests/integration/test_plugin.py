@@ -3248,8 +3248,47 @@ def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
     pytester.makepyfile(_SUITE)
     md_path = pytester.path / 'out.md'
     result = pytester.runpytest(f'--given-md={md_path}')
-    assert '## ✓ Buy coffee' in md_path.read_text(encoding='utf-8')
+    md = md_path.read_text(encoding='utf-8')
+    assert '## ✓ Buy coffee' in md
+    assert '.py:4::test_buy`' in md
     assert 'pytest-given:md:start' not in result.stdout.str()
+
+
+@scenario(
+    t'The Markdown {pg["Report"].l} leaves the line out of each '
+    t'{pg["Scenario"].l} anchor under `given_md_lines = false`'
+)
+def test_given_md_lines_ini_drops_the_anchor_line(pytester: pytest.Pytester) -> None:
+    with given(t'a suite with one {pg["Scenario"].l}, and `given_md_lines = false`'):
+        pytester.makepyfile(_SUITE)
+        pytester.makeini(
+            """
+            [pytest]
+            given_md_lines = false
+            """
+        )
+        md_path = pytester.path / 'out.md'
+    with when('the suite runs with --given-md'):
+        pytester.runpytest(f'--given-md={md_path}')
+    with then('the anchor is the node id, without a line number'):
+        md = md_path.read_text(encoding='utf-8')
+        assert '`test_given_md_lines_ini_drops_the_anchor_line.py::test_buy`' in md
+
+
+@pytest.mark.parametrize(
+    ('ini', 'flag', 'anchor_end'),
+    [
+        ('false', '--given-md-lines', '.py:4::test_buy`'),
+        ('true', '--no-given-md-lines', '.py::test_buy`'),
+    ],
+)
+def test_given_md_lines_flag_wins_over_the_ini(
+    pytester: pytest.Pytester, ini: str, flag: str, anchor_end: str
+) -> None:
+    pytester.makepyfile(_SUITE)
+    md_path = pytester.path / 'out.md'
+    pytester.runpytest('-o', f'given_md_lines={ini}', f'--given-md={md_path}', flag)
+    assert anchor_end in md_path.read_text(encoding='utf-8')
 
 
 @scenario(t'`--given-html` alone writes no JSON {pg["Report"].l}')

@@ -44,9 +44,11 @@ def test_cli_no_command(capsys) -> None:
     assert 'report' in capsys.readouterr().err
 
 
-def _scenario_with_source(relpath: str = 'tests/x.py', line: int = 2) -> dict:
+def _scenario_with_source(
+    relpath: str = 'tests/x.py', line: int = 2, node_id: str = 'i'
+) -> dict:
     return {
-        'id': 'i',
+        'id': node_id,
         'narration': {'text': 'S', 'parts': []},
         'module': 'm',
         'tags': [],
@@ -377,6 +379,20 @@ def test_report_theme_flag_sets_the_report_default(tmp_path: Path) -> None:
     rc = main(['report', str(json_path), '-o', str(html_path), '--theme', 'dark'])
     assert rc == 0
     assert 'data-theme-default="dark"' in html_path.read_text(encoding='utf-8')
+
+
+def test_report_no_lines_drops_the_markdown_anchor_line(tmp_path: Path, capsys) -> None:
+    report = {
+        **_minimal_report(),
+        'scenarios': [
+            _scenario_with_source('tests/t.py', 7, node_id='tests/t.py::test_a')
+        ],
+    }
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(report), encoding='utf-8')
+    rc = main(['report', str(json_path), '--format', 'md', '--no-lines'])
+    assert rc == 0
+    assert '`tests/t.py::test_a`' in capsys.readouterr().out
 
 
 def test_cli_refuses_an_unknown_theme_with_the_plugin_wording(

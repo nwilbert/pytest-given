@@ -1,7 +1,7 @@
 # pytest-given — Hotel Booking Example
 
 ## ✓ A search offers only the available rooms
-`examples/hotel-booking/test_hotel_booking.py:197::test_pick_suite`
+`examples/hotel-booking/test_hotel_booking.py::test_pick_suite`
 
 - **given** our organizer «Carol»
 - **given** the «Deluxe Suite» is listed as available
@@ -11,7 +11,7 @@
 - **then** the «Deluxe Suite» is selected for the group
 
 ## ✓ A paid booking is confirmed to every guest
-`examples/hotel-booking/test_hotel_booking.py:219::test_complete_booking`
+`examples/hotel-booking/test_hotel_booking.py::test_complete_booking`
 
 - **given** our organizer «Carol»
 - **given** our guest «Alice»
@@ -25,7 +25,7 @@
 - **then** both guests are checked in
 
 ## ✗ A declined payment leaves the booking pending · 4 cases
-`examples/hotel-booking/test_hotel_booking.py:258::test_payment_declined` · error-handling, ticket/HB-17
+`examples/hotel-booking/test_hotel_booking.py::test_payment_declined` · error-handling, ticket/HB-17
 
 - **given** our organizer «Carol»
 - **given** our guest «Alice»
@@ -47,7 +47,7 @@
   > test_hotel_booking.py:293 in test_payment_declined
 
 ## ✓ Cancelling a paid booking refunds it and notifies the guest
-`examples/hotel-booking/test_hotel_booking.py:312::test_cancel_booking`
+`examples/hotel-booking/test_hotel_booking.py::test_cancel_booking`
 
 - **given** our guest «Alice»
 - **given** «Alice» has a confirmed «Booking» she paid for
@@ -56,7 +56,7 @@
 - **then** the «Booking System» sends a «Confirmation» to «Alice»
 
 ## ⊗ Rebooking restores a cancelled booking · expected failure
-`examples/hotel-booking/test_hotel_booking.py:331::test_rebook_cancelled_booking` — expected to fail: rebooking is not implemented yet
+`examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking` — expected to fail: rebooking is not implemented yet
 
 - **given** our guest «Alice»
 - **given** «Alice» has cancelled her stay
@@ -66,7 +66,7 @@
 > test_hotel_booking.py:328 in rebook_cancelled_booking
 
 ## ✓ A booking can be cancelled only before its guest checks in
-`examples/hotel-booking/test_hotel_booking.py:351::test_check_in_then_cancel` · error-handling
+`examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel` · error-handling
 
 - **given** our guest «Alice»
 - **given** «Alice» has a confirmed «Booking» now and one next month

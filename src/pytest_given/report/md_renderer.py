@@ -28,15 +28,15 @@ from ..model import (
 from .text import STATUS_GLYPH, STATUS_LABEL
 
 
-def render_md(report: ReportData) -> str:
+def render_md(report: ReportData, *, with_lines: bool = True) -> str:
     """Render the report model to an agent-facing Markdown string."""
     name = report.metadata.title or report.metadata.project
     blocks = [f'# pytest-given — {name}']
-    blocks.extend(_scenario_md(scenario) for scenario in report.scenarios)
+    blocks.extend(_scenario_md(scenario, with_lines) for scenario in report.scenarios)
     return '\n\n'.join(blocks) + '\n'
 
 
-def _scenario_md(scenario: Scenario) -> str:
+def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
     glyph = STATUS_GLYPH[scenario.status]
     suffix = ''
     # A grouped scenario counts its cases instead: an all-skipped group has
@@ -48,7 +48,7 @@ def _scenario_md(scenario: Scenario) -> str:
     elif scenario.parameters is not None:
         suffix = f' · {plural(len(scenario.parameters.cases), "case")}'
     lines = [f'## {glyph} {_narration_md(scenario.narration)}{suffix}']
-    subtitle = f'`{_source_md(scenario)}`'
+    subtitle = f'`{_source_md(scenario, with_lines)}`'
     if scenario.tags:
         subtitle += ' · ' + ', '.join(scenario.tags)
     if scenario.skip_reason:
@@ -70,17 +70,15 @@ def _scenario_md(scenario: Scenario) -> str:
     return '\n'.join(lines)
 
 
-def _source_md(scenario: Scenario) -> str:
-    """The subtitle source pointer: `relpath:line::test_name`.
+def _source_md(scenario: Scenario, with_lines: bool) -> str:
+    """The subtitle source pointer: `relpath:line::test_name`, or the node id
+    when there is no source or no line is wanted.
 
     The parametrize suffix (`[case-id]`) is dropped — the grouped scenario
-    narrates every case, so the representative case id is noise. When a
-    SourceLocation is present its `line` is spliced in after the file path
-    (a terminal-clickable `file:line`); the test-name segment comes from the
-    node id.
+    narrates every case, so the representative case id is noise.
     """
     node = node_base(scenario.id)
-    if scenario.source is None:
+    if scenario.source is None or not with_lines:
         return node
     _path, path_sep, name = node.partition('::')
     located = f'{scenario.source.relpath}:{scenario.source.line}'

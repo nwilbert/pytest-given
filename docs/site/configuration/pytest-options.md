@@ -11,6 +11,7 @@ The checks, however, always run. Every run builds the report, even if it doesn't
 | `--given-json[=PATH]` | off | Write the JSON report data. Without a path: `given-report/report-data.json`. |
 | `--given-html[=PATH]` | off | Write the HTML report. Without a path: `given-report/report.html`. |
 | `--given-md[=PATH]` | off | Write the Markdown report. **Without a path, it prints to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
+| `--given-md-lines` / `--no-given-md-lines` | `true` | Show the line in the `file.py:line::test_name` anchor under each Markdown heading. Off, the anchor is the node id, so a Markdown diff doesn't show every anchor below an inserted test. Ini setting: `given_md_lines`; both flags override it. |
 | `--given-title=TEXT` | rootdir name | The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: `given_title`. |
 | `--given-source-link=PRESET` | `none` | An editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or a URL template. **HTML only.** Adds a clickable file:line link to each scenario card, story panel, and expanded glossary term. Ini setting: `given_source_link`. See [Source links](source-links.md). |
 | `--given-all-frames` | off | Keep pytest's and pytest-given's internal frames (`pluggy`, `_pytest`, pytest-given) in failure tracebacks. See [Traceback frames](source-links.md#traceback-frames). |

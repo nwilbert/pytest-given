@@ -28,7 +28,7 @@ Lint the whole suite, not just the tests a change touches. A `given_lint_ignore`
 
 ## 2. Semantic audit: step text against step body
 
-**Reviewing a change? Diff the Markdown report first.** Render `pytest <selection> --given-md=<file>` at the base and at the head of the change, or use a committed report, and diff the two. The Markdown has no timestamps or commit SHAs, so the diff shows exactly how the described behavior changed, and it tells you what to audit. Read it in both directions. Changed narration means its body needs another check. Changed step *bodies* with no change in the narration are the typical sign of drift: the behavior changed, but the spec didn't.
+**Reviewing a change? Diff the Markdown report first.** Render `pytest <selection> --no-given-md-lines --given-md=<file>` at the base and at the head of the change, or use a committed report, and diff the two. For a saved JSON report, `pytest-given report <file> --format md --no-lines` does the same. The Markdown has no timestamps or commit SHAs, so the diff shows exactly how the described behavior changed, and it tells you what to audit. Read it in both directions. Changed narration means its body needs another check. Changed step *bodies* with no change in the narration are the typical sign of drift: the behavior changed, but the spec didn't.
 
 **No base to compare with**, as on a branch that adopts pytest-given? Audit the whole suite. Start with the scenarios whose bodies the branch changed, then go through the rest file by file. `--given-md` needs no project setup, so run it yourself even when CI only writes other formats.
 

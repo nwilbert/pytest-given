@@ -123,7 +123,13 @@ def test_no_tags_omits_the_separator() -> None:
     assert '·' not in md.split('## ✓ X')[1].split('\n')[1]
 
 
-def test_source_splices_line_and_drops_parametrize_suffix() -> None:
+@pytest.mark.parametrize(
+    ('with_lines', 'anchor'),
+    [(True, 'tests/t.py:42::test_slug'), (False, 'tests/t.py::test_slug')],
+)
+def test_source_drops_parametrize_suffix_and_splices_line_on_request(
+    with_lines: bool, anchor: str
+) -> None:
     scn = Scenario(
         id='tests/t.py::test_slug[Guest-guest]',
         narration=Narration(text='Slug'),
@@ -131,19 +137,22 @@ def test_source_splices_line_and_drops_parametrize_suffix() -> None:
         source=SourceLocation(relpath='tests/t.py', line=42),
         steps=[Step(phase='when', narration=Narration(text='act'))],
     )
-    md = render_md(_report(scn))
-    assert '`tests/t.py:42::test_slug`\n' in md
+    md = render_md(_report(scn), with_lines=with_lines)
+    assert f'`{anchor}`\n' in md
     assert 'Guest-guest' not in md
 
 
-def test_source_without_location_still_drops_parametrize_suffix() -> None:
+@pytest.mark.parametrize('with_lines', [True, False])
+def test_source_without_location_still_drops_parametrize_suffix(
+    with_lines: bool,
+) -> None:
     scn = Scenario(
         id='tests/t.py::test_slug[case]',
         narration=Narration(text='Slug'),
         module='tests/t.py',
         steps=[Step(phase='when', narration=Narration(text='act'))],
     )
-    md = render_md(_report(scn))
+    md = render_md(_report(scn), with_lines=with_lines)
     assert '`tests/t.py::test_slug`\n' in md
 
 

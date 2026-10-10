@@ -1,7 +1,7 @@
 # pytest-given — Coffee Shop Example
 
 ## ✓ Basic scenario with when/then and a JSON attachment
-`examples/coffeeshop/test_coffeeshop.py:32::test_buy_coffee` · checkout
+`examples/coffeeshop/test_coffeeshop.py::test_buy_coffee` · checkout
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -16,7 +16,7 @@
     ```
 
 ## ✓ Plain text attachment
-`examples/coffeeshop/test_coffeeshop.py:44::test_text_attachment`
+`examples/coffeeshop/test_coffeeshop.py::test_text_attachment`
 
 - **given** a coffee machine
 - **given** a printed receipt
@@ -30,14 +30,14 @@
 - **then** it shows the $2.00 total
 
 ## ✓ Generator fixture with teardown
-`examples/coffeeshop/test_coffeeshop.py:55::test_generator_fixture`
+`examples/coffeeshop/test_coffeeshop.py::test_generator_fixture`
 
 - **given** a database connection
 - **when** I run a query
 - **then** the connection is open and the query was logged
 
 ## ⊗ Parametrized test (renders as a parameter table) · 4 cases
-`examples/coffeeshop/test_coffeeshop.py:64::test_pricing` · pricing — expected to fail: happy-hour pricing not implemented yet
+`examples/coffeeshop/test_coffeeshop.py::test_pricing` · pricing — expected to fail: happy-hour pricing not implemented yet
 
 - **given** a coffee machine
 - **when** I insert ${euros}
@@ -55,7 +55,7 @@
   > test_coffeeshop.py:87 in test_pricing
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:90::test_annotated_given_label`
+`examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label`
 
 - **given** a coffee machine
 - **given** an order for a {cup_size} ml cup
@@ -68,7 +68,7 @@
 | 350 |
 
 ## ✓ T-string with a non-parametrize value (neutral highlight)
-`examples/coffeeshop/test_coffeeshop.py:102::test_neutral_highlight`
+`examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight`
 
 - **given** a coffee machine
 - **given** I have some coins in hand
@@ -76,7 +76,7 @@
 - **then** the machine has 9 coffees left
 
 ## ✓ Brew {cup_size} ml (templated scenario name) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:113::test_brew`
+`examples/coffeeshop/test_coffeeshop.py::test_brew`
 
 - **given** a coffee machine
 - **when** I brew a {cup_size} ml cup
@@ -88,14 +88,14 @@
 | 300 |
 
 ## ✓ Serve a 200 ml cup (one scenario per case) [200]
-`examples/coffeeshop/test_coffeeshop.py:123::test_serve`
+`examples/coffeeshop/test_coffeeshop.py::test_serve`
 
 - **given** a coffee machine
 - **when** I order a 200 ml cup
 - **then** the tank is down 200 ml and the machine has one fewer coffee
 
 ## ✓ Serve a 400 ml cup (one scenario per case) [400]
-`examples/coffeeshop/test_coffeeshop.py:123::test_serve`
+`examples/coffeeshop/test_coffeeshop.py::test_serve`
 
 - **given** a coffee machine
 - **given** the barista reaches for a takeaway cup
@@ -103,7 +103,7 @@
 - **then** the tank is down 400 ml and the machine has one fewer coffee
 
 ## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
-`examples/coffeeshop/test_coffeeshop.py:141::test_flavor_columns` · pricing
+`examples/coffeeshop/test_coffeeshop.py::test_flavor_columns` · pricing
 
 - **given** a coffee machine
 - **given** the machine is primed for {flavor}
@@ -137,7 +137,7 @@
   ```
 
 ## ✓ Helper functions can record their own steps
-`examples/coffeeshop/test_coffeeshop.py:188::test_buy_with_validation` · checkout, validation, ticket/CS-42
+`examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **when** I insert $2
@@ -156,7 +156,7 @@
       ```
 
 ## ✓ Top-level `given` block and deeply nested steps
-`examples/coffeeshop/test_coffeeshop.py:204::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
+`examples/coffeeshop/test_coffeeshop.py::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
 
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
@@ -186,7 +186,7 @@
     ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
-`examples/coffeeshop/test_coffeeshop.py:241::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42
+`examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **given** a machine that has sold its last coffee
@@ -194,7 +194,7 @@
 - **then** the machine reports it is sold out
 
 ## ✓ Many tags (the report collapses them behind a +N pill)
-`examples/coffeeshop/test_coffeeshop.py:258::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
+`examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
 
 - **given** a coffee machine
 - **given** a loyalty card good for a $1 discount
@@ -203,7 +203,7 @@
 - **then** a coffee is dispensed
 
 ## ✗ Failure rendering (intentionally failing)
-`examples/coffeeshop/test_coffeeshop.py:274::test_failing`
+`examples/coffeeshop/test_coffeeshop.py::test_failing`
 
 - **given** a coffee machine
 - **then** the machine has 20 coffees
@@ -212,11 +212,11 @@
 > test_coffeeshop.py:277 in test_failing
 
 ## ○ Skipped scenario rendering · skipped
-`examples/coffeeshop/test_coffeeshop.py:280::test_skipped` — reason: demonstrates skipped status
+`examples/coffeeshop/test_coffeeshop.py::test_skipped` — reason: demonstrates skipped status
 
 
 ## ⊗ Loyalty card earns a free coffee (planned feature) · expected failure
-`examples/coffeeshop/test_coffeeshop.py:291::test_loyalty_card_free_coffee` · loyalty — expected to fail: loyalty cards not implemented yet
+`examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee` · loyalty — expected to fail: loyalty cards not implemented yet
 
 - **given** a coffee machine
 - **given** a loyalty card with nine stamps
@@ -226,7 +226,7 @@
 > test_coffeeshop.py:288 in pay_with_loyalty_card
 
 ## ○ All cases skipped · skipped
-`examples/coffeeshop/test_coffeeshop.py:302::test_parametrized_all_skipped` — reason: awaiting fixture
+`examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped` — reason: awaiting fixture
 
 
 | n |
