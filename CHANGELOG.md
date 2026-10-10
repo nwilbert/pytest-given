@@ -27,6 +27,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-authoring` skill covers scenario titles and narrates each rule once, where its test proves it, and the `pytest-given-reviewing` skill reviews titles as a list and flags a rule narrated at the wrong layer or a `then` that checks nothing.
 - The bundled skills are reworded in plainer language.
 - The bundled `pytest-given-authoring` skill shows how to narrate a call that returns normally and to check "never called" with recorded calls instead of a stub that raises, which the `pytest-given-reviewing` skill flags.
+- The bundled `pytest-given-authoring` skill interpolates values taken from constants instead of copying them, and the `pytest-given-reviewing` skill starts its completeness audit from the undecorated tests in narrated test files.
 
 ## [0.4.1] - 2026-10-04
 

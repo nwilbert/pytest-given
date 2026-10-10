@@ -87,7 +87,7 @@ A parametrized scenario renders as one narrated tree above a parameter table. A 
 
 Step text may abstract, but it must never overstate.
 
-- **A value in the text must match the body.** A quantity, date or amount you narrate is a claim about the data the step actually holds. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes.
+- **A value in the text must match the body.** A quantity, date or amount you narrate is a claim about the data the step actually holds. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes. Interpolate a value the body takes from a constant (`t'a batch of {BATCH_SIZE} rows'`), so the text can't go stale when the constant changes.
 - **Everything a `then` claims must be asserted in it.** A `then` that says "…and recorded in the ledger" without such an assertion describes behavior nobody checked. Assert it, or drop the clause. A `then` that sets the value it asserts, or asserts a constant, checks nothing. The asserted value must come from the code under test.
 - **A stub that raises when called checks nothing in the `then`.** The code under test may catch its `AssertionError` and fall back to the very outcome the `then` expects. To show a collaborator is never called, record its calls and assert `calls == []` (or `mock.assert_not_called()`) in the `then`.
 - **What the `when` names must be what the body calls.** Narrate the action the step performs, not the one the scenario is loosely about. A common mistake: the `when` text reads like more arrangement, but its body arranges *and* makes the call the `then` reports. The action then appears nowhere in the report. Move the setup into a `given`.

@@ -36,7 +36,7 @@ Judge each scenario's step texts against their bodies with the rubric below. [re
 
 **Step text may abstract, but it must never overstate.**
 
-- **Values:** a quantity, date or amount in the text must match the body. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes.
+- **Values:** a quantity, date or amount in the text must match the body. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes. A literal copied from a constant goes stale when the constant changes; ask for the interpolation (`{BATCH_SIZE}`) instead.
 - **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario name is a claim about every item it covers. Assertions on a sample overstate it, like "each slot becomes a term ref" backed by checks on two of three slots. Fix it by asserting the rest or by narrowing the text.
 - **Outcomes:** everything a `then` claims must be asserted in it. "…and recorded in the ledger" without such an assertion describes behavior nobody checked. So does a `then` that sets the value it asserts, or asserts a constant. The lint doesn't catch these, because the step contains an `assert`. Nor does it catch "never called" backed by a stub that raises: if the code catches the error, nothing checks the claim. Ask for recorded calls asserted in the `then`.
 - **Raises:** the `then` of an expected raise may restate the message that `match=` pins in domain terms, but it must not claim more than the pin checks. Say the `then` promises that the message names the offender, offers a hint or includes a file:line. If the regex also passes without that detail, the pin is too weak, and the claim is unchecked even if the code delivers it today. For example, `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. A pin with alternatives (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch: sibling scenarios that narrate *different* refusals then all pass on one generic message. Pin what tells this refusal apart from the others.
@@ -51,6 +51,18 @@ For a large suite, split the audit: one reviewer per test file, each returning f
 Layers 1 and 2 start from the narration and ask whether it is true. Neither catches a report that is true line by line but still misrepresents the system by leaving things out. When the question is "does this capture the essentials?", for example on a branch adopting pytest-given or for a feature's first scenarios, reverse the direction. Start from the implementation and ask what the report fails to say. Limit the search to the code the change touches.
 
 - **Behavior without a scenario.** Go through the branches of the code under review that carry behavior: a scoping rule, a precedence decision, a fallback path. Check that each has a scenario that names it. A branch that only an undecorated test covers is invisible in the report. A branch with no test at all rates higher, because the spec looks complete while hiding it. A rule narrated at the wrong layer is also a finding. There are two cases. In one, several callers each repeat a rule that a shared function decides. In the other, a unit scenario's title claims what the system does, but its body only calls internal code, and no other scenario shows a run reaching that code. The second case is a false claim: decorate a test that proves the title instead. Look among the undecorated tests first; the right one often exists already.
+
+  Start with the undecorated tests in test files that hold a scenario. They are where most gaps sit, next to the narrated tests of the same code:
+
+  ```bash
+  pytest <selection> --given-json=report.json
+  pytest <selection> --collect-only -q > collected.txt
+  jq -r --rawfile collected collected.txt '
+    [.scenarios[].id | sub("[[].*"; "")] as $narrated
+    | ($narrated | map(split("::")[0]) | unique) as $files
+    | $collected | split("\n") | map(select(contains("::")) | sub("[[].*"; "")) | unique[]
+    | select((split("::")[0] | IN($files[])) and (IN($narrated[]) | not))' report.json
+  ```
 - **Parameter tables that can't show what decides.** For each input that decides a parametrized scenario's outcome, some row should change only that input and flip the outcome. Without such a row, the table only lists examples, and the rule that decides between them stays unnarrated. Ask for the contrast row, at the boundary if there is one, instead of splitting the table into one scenario per row. A refusal can be a contrast row too, and a sibling scenario with the flipped outcome doesn't make up for a missing row.
 - **Glossary rows that state behavior.** A definition that makes a claim ("X takes precedence over Y", "must be unique") is part of the spec. When no scenario demonstrates the claim, the glossary documents something nothing checks. Flag the row and the missing scenario, and prefer adding a scenario to weakening the definition. When a scenario contradicts the row, the row is a false claim.
 - **Rules the release notes announce.** If the project keeps a changelog, check that a scenario names each rule its unreleased entries state. That is the project promising a behavior in its own words. For a review of the whole suite, the changelog limits the scope the way a diff does for a change. A rule narrated only in part, such as the fix without the way to opt out, is a finding too.
