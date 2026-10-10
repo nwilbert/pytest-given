@@ -19,6 +19,7 @@ nav = [
     { "Glossary" = "guide/glossary.md" },
     { "Domain Storytelling" = "guide/domain-storytelling.md" },
     { "Narration lint" = "configuration/narration-lint.md" },
+    { "Citations" = "guide/citations.md" },
     { "Working with AI agents" = "ai-agents.md" },
   ] },
   { "Reports" = [
