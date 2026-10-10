@@ -18,7 +18,7 @@ uv sync --group dev
 
 `uv run nox` runs the default gate — `format`, `lint`, `mypy`, `test`, `coverage` (a 100% target), `audit` (a `pip-audit` of the locked dependencies). **Run it (or at minimum `uv run nox -s format lint mypy test`) before every commit.** The sessions below are on-demand; list them all with `uv run nox -l`.
 
-- `uv run nox -s examples` regenerates the JSON, HTML, and Markdown files under `examples/coffeeshop/`, `examples/hotel-booking/`, and `examples/file-glossary-booking/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
+- `uv run nox -s examples` regenerates the example reports under `examples/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
 - `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests (see [Writing self-report scenarios](#writing-self-report-scenarios)). Run after decorating more tests or changing decorated ones, and after renderer or template changes (its HTML is one of the site's example reports), and commit the updated outputs.
 - **Only commit a regenerated report when its *content* actually changed.**
   - Every regeneration rewrites `commit_sha` (to current HEAD, including the SHA-pinned source-link URLs), `timestamp`, and `duration_ms` in the JSON and HTML, so a report your change didn't really touch still shows a diff — `git checkout` those files rather than committing the noise.
@@ -26,11 +26,11 @@ uv sync --group dev
   - Regenerate only the reports a change can affect — `examples` narrates `examples/**`, `self_report` narrates `tests/**`, and a renderer or template change affects all of them.
 - Both regeneration sessions run the narration lint (`--given-lint`; see [Narration lint](docs/site/configuration/narration-lint.md) and the [design spec](docs/specs/2026-07-05-narration-lint-design.md)). `self_report` fails on any lint error — a real gate, keep the backend suite lint-clean. `examples` tolerates exit 1 for its intentional failures, which masks the lint exit code, so read the printed "narration lint" summary there. A step the lint mis-flags goes on the `given_lint_ignore` list (stale entries fail the run); the rule catalog and ignore mechanics are in the [authoring skill](src/pytest_given/.agents/skills/pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts", and the honest-two-phase test an ignored `missing-phase` has to pass under "Phase structure".
 - `uv run nox -s benchmark` generates the large-scenarios suite and renders its JSON + HTML into `benchmarks/` (outputs gitignored). Run it when a change could move report-generation cost; `benchmarks/bench.py` does size sweeps and cProfile runs directly.
-- `uv run nox -s compat` runs the suite on Python 3.14 and 3.15, each against pytest 9.0.x (the dependency floor) and the newest pytest. The default gate tests only the locked pytest on 3.14, so this is the only check of the floor and of 3.15. The manually dispatched [Compat workflow](.github/workflows/compat.yml) runs it on Linux and Windows before every release (see [docs/releasing.md](docs/releasing.md)).
-- `uv run nox -s build` builds the wheel + sdist and verifies them as a consumer would — `py.typed`, templates and bundled skills present, a real scenario run from a throwaway install, and [library-skills](https://library-skills.io) discovery of every bundled skill. The in-repo suite imports from `src/`, so this session is the only thing that catches a packaging regression. CI and the release workflow both run it.
+- `uv run nox -s compat` runs the suite against the oldest supported pytest and the newest, on every supported Python. The default gate tests only the locked pytest on one Python, so this is the only check of the rest. The manually dispatched [Compat workflow](.github/workflows/compat.yml) runs it on Linux and Windows before every release (see [docs/releasing.md](docs/releasing.md)).
+- `uv run nox -s build` builds the wheel + sdist and verifies them as a consumer would. The in-repo suite imports from `src/`, so this session is the only thing that catches a packaging regression. CI and the release workflow both run it.
 - `uv run nox -s docs_build` builds the documentation site under `site/` with `zensical build --strict`; run it after changing anything under `docs/site/` (a broken cross-page link fails it) and preview with `uv run --group docs zensical serve`. `docs_deploy` is the CI-only counterpart that publishes with mike — see [docs/releasing.md](docs/releasing.md#documentation-site).
-  - Zensical builds every file in `docs/site/` and cannot exclude any, so single-sourced files get in by copy or include: the build copies the four example reports, the full-size diagram, and the report package's upright fonts and logo into gitignored spots there; `CHANGELOG.md` (between its `site` markers) and the Home-page diagram (`docs/site/assets/pytest-given-diagram.svg`, inlined so page CSS can theme it) are `pymdownx.snippets` includes.
-  - `docs/pytest-given-diagram.svg`, the README's diagram and the Home page's full-size view, is derived with the font embedded and the colour tokens resolved: after editing the source SVG or its tokens, run `uv run nox -s diagram` and commit the result.
+  - Zensical builds every file in `docs/site/` and cannot exclude any, so a file single-sourced elsewhere gets in by a copy the build stages into a gitignored spot (listed in `_build_docs`) or by a `pymdownx.snippets` include — never by a committed second copy.
+  - `docs/pytest-given-diagram.svg`, the README's diagram and the Home page's full-size view, is derived with the font embedded and the colour tokens resolved: after editing the source SVG (`docs/site/assets/pytest-given-diagram.svg`) or its tokens, run `uv run nox -s diagram` and commit the result.
   - The site self-hosts its fonts so a visitor's browser contacts no third party — keep `font = false` in `zensical.toml` and don't `@import` a font CDN. Only the italics live in `docs/site/assets/fonts/` (latin subsets from Fontsource); a new face gets its `.woff2` there and its copyright line in that folder's `LICENSES.txt`.
 
 ## Releasing
@@ -56,17 +56,8 @@ What no filename tells you:
   narrated tree plus a parameter table, refusing the authoring forms that would
   make that tree lie. Runs at session finish *before* the sinks are written, so
   a bare `pytest` failing on one is the point, not a side effect.
-- `plugin/__init__.py` is the hook surface pluggy registers — the `pytest11`
-  entry point is the package, and pluggy scans a module's attributes for
-  `pytest_*` names, so the re-exports there *are* the registration.
 - `capture/` imports pytest nowhere, so all of it is unit-testable without a
   session; a stray step warns with `model.PytestGivenWarning`, not pytest's.
-- `Glossary` exists twice on purpose: `model/schema.py` holds the storage the
-  report carries and serde rebuilds, and `capture/glossary.py` subclasses it
-  with the registration API, which needs a caller source location that the leaf
-  may not reach for. `pytest_given.Glossary` is the subclass; everything
-  internal annotates the base. `LookupGlossary` sits between them and owns the
-  `g['Guest']` read-back both user-facing glossaries share.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
   report) and `lint.run_lint`. Both entry points reach the sinks through
@@ -90,7 +81,6 @@ Any change to `report/templates/` (Jinja, CSS, `app.js`) or the `narration` filt
 - **No TDD for frontend changes**: apply the change, regenerate `examples/`, drive it in Playwright, capture the result.
 - Open e.g. `examples/coffeeshop/coffeeshop.html` (regenerate via `uv run nox -s examples`) with the Playwright MCP server, check `browser_console_messages` for errors after init, then drive the changed surface (hover, click, URL hash). Use `browser_snapshot` (not screenshots) to read page content and interact with elements.
 - Desktop only — assume a minimum viewport width of ~900px.
-- Traceback display and header metadata formatting are known limitations, not current priorities.
 - Never save Playwright screenshots into the project directory — use the session scratchpad or omit the `filename` parameter.
 
 **Setup and known traps** (`.mcp.json`, the `file://` page cache, browser installs) live in [docs/playwright-setup.md](docs/playwright-setup.md). `.mcp.json` is read at **session start**, so check that the `browser_*` tools exist before planning a task that ends in Playwright verification.
