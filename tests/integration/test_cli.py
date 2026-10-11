@@ -42,6 +42,27 @@ def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
     assert app_data['citations']['report_url'] == 'https://example.org/report.html'
 
 
+def test_cli_report_url_replaces_the_saved_one(tmp_path: Path) -> None:
+    report = _minimal_report()
+    report['metadata']['report_url'] = 'https://example.org/dev/report.html'
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(report))
+    html_path = tmp_path / 'out.html'
+    url = 'https://example.org/1.0/report.html'
+    assert (
+        main(['report', str(json_path), '-o', str(html_path), '--report-url', url]) == 0
+    )
+    app_data = _embedded_app_data(html_path.read_text(encoding='utf-8'))
+    assert app_data['citations']['report_url'] == url
+
+
+def test_cli_refuses_a_report_url_no_citation_can_link(tmp_path: Path, capsys) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()))
+    assert main(['report', str(json_path), '--report-url', 'docs/report.html']) == 1
+    assert '--report-url must be an absolute http(s) URL' in capsys.readouterr().err
+
+
 def test_cli_missing_input_file(tmp_path: Path) -> None:
     rc = main(['report', str(tmp_path / 'nonexistent.json')])
     assert rc == 1

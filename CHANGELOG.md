@@ -19,6 +19,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.
 - A [term ref](https://nwilbert.github.io/pytest-given/dev/guide/glossary/#term-refs) can show a noun's plural or a verb's -s form with `.s`: `room.s` reads *Rooms*, `room.l.s` reads *rooms*, and `room('suite').s` reads *suites*.
 - Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` [runs the scenarios alone](https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/#selecting-scenarios), for example to measure their code coverage.
+- `pytest-given report --report-url` re-renders a saved report for a URL other than the one stored in it.
 - Each case in the JSON report's `parameters.cases[]` carries its node id as `id`.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
 - The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.

@@ -361,8 +361,14 @@ def check_release(session: nox.Session) -> None:
 
 
 _ZENSICAL_CONFIG = tomllib.loads(Path('zensical.toml').read_text(encoding='utf-8'))
+
+
+def _examples_url(docs_version: str) -> str:
+    return f'{_ZENSICAL_CONFIG["project"]["site_url"]}{docs_version}/examples'
+
+
 # The `/dev/` docs, which every push to `main` publishes.
-_PAGES_EXAMPLES_URL = f'{_ZENSICAL_CONFIG["project"]["site_url"]}dev/examples'
+_PAGES_EXAMPLES_URL = _examples_url('dev')
 
 
 class _Example(NamedTuple):
@@ -492,12 +498,13 @@ _REPORT_FONTS = _REPORT_TEMPLATES / 'fonts'
 _REPORT_LOGO = _REPORT_TEMPLATES / 'logo.svg'
 
 
-def _build_docs(session: nox.Session) -> None:
+def _build_docs(session: nox.Session, docs_version: str) -> None:
     """Stage the files the site embeds, then build it strictly.
 
     The staged files are single-sourced elsewhere in the repo: the full-size
     diagram the Home page links to (the README copy, see `diagram`), every
-    example's rendered report (one `<name>/<name>.html` per example directory),
+    example's report — rendered from its JSON, so its copy buttons link the
+    `docs_version` being built rather than the committed HTML's `/dev/` —
     the two upright font faces the report package embeds (the site's italic
     faces have no other home and stay committed), and the report's logo, which
     is the site's logo and favicon alike. Each copy lands under
@@ -505,13 +512,9 @@ def _build_docs(session: nox.Session) -> None:
     every target is gitignored. CHANGELOG.md needs no copy:
     docs/site/changelog.md embeds it with a pymdownx.snippets include.
     """
-    _sync(session, 'docs')
+    _sync(session, 'docs', include_project=True)
     staged = [
         (_DIAGRAM_README_COPY, _DOCS_SITE / 'assets' / 'pytest-given-diagram-full.svg'),
-        *(
-            (report, _DOCS_SITE / 'examples' / report.name)
-            for report in sorted(Path('examples').glob('*/*.html'))
-        ),
         *(
             (font, _DOCS_SITE / 'assets' / 'fonts' / font.name)
             for font in sorted(_REPORT_FONTS.glob('*.woff2'))
@@ -522,6 +525,16 @@ def _build_docs(session: nox.Session) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
         session.log(f'staged {source} -> {target}')
+    for slug in _EXAMPLE_REPORTS:
+        session.run(
+            'pytest-given',
+            'report',
+            f'examples/{slug}/{slug}-data.json',
+            '-o',
+            (_DOCS_SITE / 'examples' / f'{slug}.html').as_posix(),
+            '--source-link=github',
+            f'--report-url={_examples_url(docs_version)}/{slug}.html',
+        )
     # --clean: the page cache is keyed on the Markdown source alone, so an edited
     # snippet include (the diagram SVG, CHANGELOG.md) would otherwise go stale.
     session.run('zensical', 'build', '--strict', '--clean')
@@ -530,7 +543,7 @@ def _build_docs(session: nox.Session) -> None:
 @nox.session
 def docs_build(session: nox.Session) -> None:
     """Stage the embedded reports and full-size diagram, then build the site."""
-    _build_docs(session)
+    _build_docs(session, 'dev')
 
 
 _DIAGRAM_SOURCE = _DOCS_SITE / 'assets' / 'pytest-given-diagram.svg'
@@ -631,7 +644,7 @@ def docs_deploy(session: nox.Session) -> None:
         session.error('usage: nox -s docs_deploy -- <version> [alias]')
     version, *aliases = session.posargs
     # mike runs its own (non-strict) build; this one is the gate.
-    _build_docs(session)
+    _build_docs(session, version)
     session.run('mike', 'deploy', '--push', '--update-aliases', version, *aliases)
     # The site root follows `latest` once a release exists; before that, `dev`.
     if 'latest' in aliases:

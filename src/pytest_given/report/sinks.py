@@ -17,11 +17,11 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 """
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from ..model import PytestGivenError, ReportData, report_from_dict
+from ..model import PytestGivenError, ReportData, ReportUrl, report_from_dict
 from .html_renderer import render_html_string
 from .md_renderer import render_md
 from .story_view import build_coverage_records
@@ -45,7 +45,8 @@ class SinkConfig:
     `md_to_stdout` is its own flag rather than a sentinel path, so nothing
     downstream has to know that a bare `--given-md` means `-`. `source_root`
     is the rootdir a live run's source paths are relative to; None for a saved
-    report, which does not carry it.
+    report, which does not carry it. `report_url` replaces the report's own in
+    the HTML, for a saved report re-rendered to be served elsewhere.
     """
 
     json_path: Path | None = None
@@ -56,6 +57,7 @@ class SinkConfig:
     source_link_template: str | None = None
     source_root: Path | None = None
     theme: Theme = DEFAULT_THEME
+    report_url: ReportUrl | None = None
 
     def __post_init__(self) -> None:
         _require_suffix('JSON', self.json_path, ('.json',))
@@ -150,11 +152,16 @@ def render_sinks(
     if config.json_path is not None:
         files.append(RenderedFile(config.json_path, render_json(report_dict, report)))
     if config.html_path is not None:
+        html_report = report
+        if config.report_url is not None:
+            html_report = replace(
+                report, metadata=replace(report.metadata, report_url=config.report_url)
+            )
         files.append(
             RenderedFile(
                 config.html_path,
                 render_html_string(
-                    report,
+                    html_report,
                     source_link_template=config.source_link_template,
                     theme=config.theme,
                     source_root=config.source_root,

@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from ..model import PytestGivenError, read_report_json
+from ..model import PytestGivenError, ReportUrl, read_report_json, resolve_report_url
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_THEME,
@@ -47,6 +47,14 @@ def add_report_parser(
         help=THEME_HELP,
     )
     report_parser.add_argument(
+        '--report-url',
+        default='',
+        help=(
+            "The report's public URL, for its copy-citation buttons (default: "
+            'the one stored in the report)'
+        ),
+    )
+    report_parser.add_argument(
         '--no-lines',
         dest='lines',
         action='store_false',
@@ -75,7 +83,12 @@ def run_report(args: argparse.Namespace) -> int:
     json_file: Path = args.json_file
     try:
         config = _sink_config(
-            args.output, args.source_link, args.format, args.theme, args.lines
+            args.output,
+            args.source_link,
+            args.format,
+            args.theme,
+            args.lines,
+            resolve_report_url(args.report_url, '--report-url'),
         )
         rendered = emit_sinks(read_report_json(json_file), config, json_file.as_posix())
     except (PytestGivenError, OSError) as error:
@@ -89,7 +102,12 @@ def run_report(args: argparse.Namespace) -> int:
 
 
 def _sink_config(
-    output: Path | None, source_link: str, fmt: str | None, theme: str, lines: bool
+    output: Path | None,
+    source_link: str,
+    fmt: str | None,
+    theme: str,
+    lines: bool,
+    report_url: ReportUrl | None,
 ) -> SinkConfig:
     """The one sink this invocation writes.
 
@@ -109,6 +127,7 @@ def _sink_config(
         html_path=output or DEFAULT_HTML_PATH,
         source_link_template=source_link_template,
         theme=resolved_theme,
+        report_url=report_url,
     )
 
 
