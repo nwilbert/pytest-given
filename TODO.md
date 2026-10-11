@@ -2,6 +2,7 @@
 
 ## Now
 
+- [ ] Implement the inline Markdown spec, then the case ids spec on top of it (see `docs/specs/proposed/2026-10-11-inline-markdown-design.md` and `docs/specs/proposed/2026-10-10-parameter-table-case-ids-design.md`)
 
 ## Next
 
@@ -10,7 +11,7 @@
 ## Later
 
 - [ ] continue work on the story-diagrams branch
-- [ ] Enable term descriptions referencing other terms (in MD glossaries maybe via *italics*)
+- [ ] Enable term descriptions referencing other terms (in MD glossaries maybe via *italics*; resolve any conflict with the inline Markdown definitions already render, where `*italic*` is plain italics)
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] enable free text stories / sentences with glossary term references
 - [ ] Glossary: Optionally hide kind? Group / filter by story?

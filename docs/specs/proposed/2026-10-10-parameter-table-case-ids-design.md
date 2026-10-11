@@ -15,6 +15,9 @@ its values spelled out. Each `ParameterCase` carries its node id, so the JSON ha
 neither renderer prints them. Generated ids like `10-20-15-25-True` can be matched against the
 value columns; nothing a reader sees connects `touching-edges` to its row.
 
+This spec is implemented after [Inline Markdown in Titles, Steps and
+Definitions](2026-10-11-inline-markdown-design.md) and uses its Markdown writer for the id column.
+
 ## Approach
 
 ### Capture
@@ -58,19 +61,21 @@ When `named_cases` holds, both renderers lead the table with a column headed `id
 the one `ids=` and `-k` use). Every row shows its id, generated ones included, so each row reads as
 the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
 
-- **HTML:** a `<th scope="row">` per row, in code style and uncoloured, with no `data-param`. For
+- **HTML:** a `<th scope="row">` per row, in plain text and uncoloured, with no `data-param`: the
+  id reads as a value reads in a table, as a per-case title's suffix reads as a value in prose. For
   phase hover it shares one `data-block` with the status column, so pointing at either outlines
   both; without a status column it is a block of its own. The two sit at opposite ends of the row,
   so `_outlinePhase` draws one box per run of adjacent cells instead of one per row.
-- **Markdown:** a leading `id` column, the id in backticks. The notes below the table (a case's
-  error, an attachment too long to inline) are keyed by the id instead of the joined values,
-  falling back to the values for an empty id.
+- **Markdown:** a leading `id` column, the id escaped whole by the inline Markdown writer, like
+  every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). The notes below the
+  table (a case's error, an attachment too long to inline) are keyed by the
+  id instead of the joined values, falling back to the values for an empty id.
 
 ````markdown
 | id | existing booking | hours later | it clashes |
 |---|---|---|---|
-| `touching-edges` | 10–20 | 10 | True |
-| `one-hour-apart` | 10–20 | 11 | False |
+| touching-edges | 10–20 | 10 | True |
+| one-hour-apart | 10–20 | 11 | False |
 ````
 
 ## Authoring and review
@@ -108,7 +113,7 @@ misname its row.
 - Grouping and model: `named_cases` false for generated ids, true for any explicit case; `case_id`
   for a plain, stacked and hidden id.
 - Markdown renderer: the leading column only under `named_cases`, generated ids beside explicit
-  ones, notes keyed by id.
+  ones, notes keyed by id, an id holding `*` and `|` escaped.
 - HTML: data-shaped only; the markup, the shared block and the outline are Playwright's.
 
 ## Out of scope
