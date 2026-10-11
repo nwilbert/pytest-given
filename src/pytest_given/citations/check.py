@@ -59,20 +59,22 @@ class CitationsResult:
 
 
 def markdown_documents(paths: list[Path]) -> list[Path]:
-    """The documents `paths` name: a file as given, a directory searched
-    recursively for `*.md` — the shell cannot be trusted to expand a glob, as
-    PowerShell does not for native commands."""
-    documents: list[Path] = []
+    """The documents `paths` name, each once: a file as given, a directory
+    searched recursively for `*.md` files — the shell cannot be trusted to
+    expand a glob, as PowerShell does not for native commands."""
+    documents: dict[Path, Path] = {}
     for path in paths:
         if path.is_dir():
-            documents.extend(sorted(path.rglob('*.md')))
+            found = sorted(match for match in path.rglob('*.md') if match.is_file())
         elif path.is_file():
-            documents.append(path)
+            found = [path]
         else:
             raise PytestGivenError(
                 f'{path.as_posix()} is neither a Markdown file nor a directory.'
             )
-    return documents
+        for document in found:
+            documents.setdefault(document.resolve(), document)
+    return list(documents.values())
 
 
 def check_citations(

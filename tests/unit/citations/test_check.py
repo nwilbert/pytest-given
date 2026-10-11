@@ -599,6 +599,17 @@ def test_markdown_documents_searches_directories_for_md(tmp_path: Path) -> None:
     ]
 
 
+def test_markdown_documents_names_each_file_once_and_no_directory(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / 'a' / 'notes.md').mkdir(parents=True)
+    one = tmp_path / 'a' / 'one.md'
+    one.write_text('x', encoding='utf-8')
+    assert markdown_documents([tmp_path / 'a', one, tmp_path / 'a' / '..' / 'a']) == [
+        one
+    ]
+
+
 def test_a_missing_document_is_an_error(tmp_path: Path) -> None:
     path = tmp_path / 'nowhere.md'
     with pytest.raises(PytestGivenError, match=re.escape(f'{path.as_posix()} is')):
