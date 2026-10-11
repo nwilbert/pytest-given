@@ -10,6 +10,7 @@ from urllib.parse import quote
 
 from ..model import (
     STATUSES,
+    Narration,
     NodeId,
     ReportData,
     Scenario,
@@ -43,13 +44,19 @@ class Target:
 @dataclass(frozen=True, kw_only=True)
 class Citation:
     state: CitationState
-    title: str
+    # A scenario's title keeps its pieces, so its link text keeps the spans
+    # each plain-text piece renders; a tag or story title is literal.
+    title: Narration | str
     fragment: str
     summary: str | None
 
     @property
     def glyph(self) -> str:
         return CITATION_GLYPH[self.state]
+
+    @property
+    def title_text(self) -> str:
+        return self.title if isinstance(self.title, str) else self.title.text
 
     def markdown_halves(self) -> tuple[str, str]:
         """The one-line citation a copy button puts on the clipboard, either
@@ -118,7 +125,7 @@ class CitationIndex:
                 scenario = self.scenarios[NodeId(target.key)]
                 return Citation(
                     state=scenario.status,
-                    title=scenario.narration.text,
+                    title=scenario.narration,
                     fragment=fragment,
                     summary=None,
                 )

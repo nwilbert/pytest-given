@@ -1,63 +1,109 @@
-"""A citation's link text, written so it renders as the title it stands for,
-and read back as the title it renders."""
+"""The Markdown writer — text written so a Markdown viewer shows what the HTML
+report shows — and a citation's link text read back as the title it renders."""
 
-from ..model import EMPHASIS
+from collections.abc import Callable
+
+from ..model import (
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    Narration,
+    NarrationLiteral,
+    NarrationPart,
+    NarrationPlaceholder,
+    NarrationTermRef,
+    NarrationValue,
+    PlainSpan,
+    placeholder_token,
+    read_spans,
+)
 from .text import NEWLINE
 
 # What a backslash escapes in CommonMark.
 ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
 
-# Outside a code span, what CommonMark or GFM give inline meaning, beside `_`,
-# which has a rule of its own: closing the link early, emphasis,
-# strikethrough, opening a code span, raw HTML, an entity, a table cell,
-# GitHub math.
+# What CommonMark or GFM give inline meaning, beside `_`, which has a rule of
+# its own: a link, emphasis, strikethrough, a code span, raw HTML, an entity,
+# a table cell, GitHub math.
 _ALWAYS_ESCAPED = frozenset('\\[]*~`<&|$')
-# The markers of `EMPHASIS`'s groups past the code span, in order.
-_EMPHASIS_MARKERS = ('**', '__', '*')
 
 
-def link_text(title: str, *, in_table_row: bool = False) -> str:
-    """`title` as link text that renders as it does in the report.
+def link_text(title: Narration | str, *, in_table_row: bool = False) -> str:
+    """A citation's link text: a scenario title as the Markdown report writes
+    it, a tag or story title literal."""
+    if isinstance(title, str):
+        return literal_markdown(_one_line(title))
+    return narration_markdown(title, in_table_row=in_table_row)
 
-    Code spans and the emphasis `EMPHASIS` matches are markup, as both sinks
-    render them, so their markers stay. Nothing inside a code span is escaped
-    — a backslash there would render — except a table row's `|`, which GFM
-    lets an escape keep from splitting the cell.
-    """
-    text = NEWLINE.sub(' ', title)
-    out: list[str] = []
-    index = 0
-    while index < len(text):
-        char = text[index]
-        emphasis = EMPHASIS.match(text, index) if char in '*_' else None
-        if emphasis is not None:
-            _, *spans = emphasis.groups()
-            marker, inner = next(
-                (marker, span)
-                for marker, span in zip(_EMPHASIS_MARKERS, spans, strict=True)
-                if span is not None
-            )
-            inner = link_text(inner, in_table_row=in_table_row)
-            out.append(f'{marker}{inner}{marker}')
-            index = emphasis.end()
-            continue
-        if char == '`':
-            end, closed = code_span_at(text, index)
-            run = text[index:end]
-            if not closed:
-                # Literal, so escaped, or it would pair with a run later on
-                # the line and swallow the link.
-                run = run.replace('`', '\\`')
-            elif in_table_row:
-                run = run.replace('|', '\\|')
-            out.append(run)
-            index = end
-            continue
-        if char in _ALWAYS_ESCAPED or (char == '_' and not _intraword(text, index)):
-            out.append('\\')
-        out.append(char)
-        index += 1
-    return ''.join(out)
+
+def narration_markdown(
+    narration: Narration,
+    *,
+    in_table_row: bool = False,
+    term_ref: Callable[[str], str] = lambda display: display,
+) -> str:
+    """A title or step on one line, piece by piece: each plain-text piece keeps
+    the reader's spans, every other piece is literal — so a span never crosses
+    a term ref or a value. `term_ref` frames a term ref's written display."""
+    if not narration.parts:
+        return spans_markdown(_one_line(narration.text), in_table_row=in_table_row)
+    return ''.join(
+        _piece_markdown(part, in_table_row, term_ref) for part in narration.parts
+    )
+
+
+def spans_markdown(text: str, *, in_table_row: bool = False) -> str:
+    """`text` with the reader's spans kept as markup and everything else
+    literal. Nothing inside a code span is escaped — a backslash there would
+    show — except a table row's `|`, which GFM lets an escape keep from
+    splitting the cell."""
+    return ''.join(_span_markdown(span, in_table_row) for span in read_spans(text))
+
+
+def literal_markdown(text: str) -> str:
+    """`text` with every character of inline meaning backslash-escaped, so it
+    shows as written."""
+    return ''.join(
+        f'\\{char}'
+        if char in _ALWAYS_ESCAPED or (char == '_' and not _intraword(text, index))
+        else char
+        for index, char in enumerate(text)
+    )
+
+
+def _piece_markdown(
+    part: NarrationPart, in_table_row: bool, term_ref: Callable[[str], str]
+) -> str:
+    match part:
+        case NarrationLiteral(value=value):
+            return spans_markdown(_one_line(value), in_table_row=in_table_row)
+        case NarrationValue(rendered=rendered):
+            return literal_markdown(_one_line(rendered))
+        case NarrationPlaceholder():
+            return literal_markdown(placeholder_token(part))
+        case NarrationTermRef(display=display):
+            return term_ref(literal_markdown(_one_line(display)))
+
+
+def _span_markdown(span: InlineSpan, in_table_row: bool) -> str:
+    match span:
+        case PlainSpan(text=text):
+            return literal_markdown(text)
+        case CodeSpan(text=text):
+            if in_table_row:
+                text = text.replace('|', '\\|')
+            # CommonMark strips one space off each end of such a span.
+            if text.startswith(' ') and text.endswith(' ') and text.strip(' '):
+                text = f' {text} '
+            return f'`{text}`'
+        case EmphasisSpan(strong=strong, content=content):
+            marker = '**' if strong else '*'
+            inner = ''.join(_span_markdown(part, in_table_row) for part in content)
+            return f'{marker}{inner}{marker}'
+
+
+def _one_line(text: str) -> str:
+    return NEWLINE.sub(' ', text)
 
 
 def plain_link_text(written: str, *, in_table_row: bool = False) -> str:

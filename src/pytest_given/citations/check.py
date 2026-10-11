@@ -260,11 +260,11 @@ class _LinkCheck:
                 fixed=True,
             )
             self.edits.append(_Edit(*link.glyph.span, citation.glyph))
-        if written_title != fold_whitespace(citation.title):
+        if written_title != fold_whitespace(citation.title_text):
             self._find(
                 'stale',
                 'stale link text',
-                f'{written_title} → {citation.title}',
+                f'{written_title} → {citation.title_text}',
                 fixed=True,
             )
             self.edits.append(
@@ -294,7 +294,7 @@ class _LinkCheck:
                 _Edit(*link.trailing_span(*summary.span(1)), citation.summary)
             )
         if citation.state == 'failed':
-            self._find('failed', f'cited {target.kind} fails: {citation.title}')
+            self._find('failed', f'cited {target.kind} fails: {citation.title_text}')
 
     def _mark_missing(self) -> None:
         link = self.link

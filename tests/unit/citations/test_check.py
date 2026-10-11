@@ -9,9 +9,17 @@ import pytest
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.citations import CitationsResult, check_citations, markdown_documents
 from pytest_given.model import (
+    NarrationLiteral,
+    NarrationTermRef,
     PytestGivenError,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
+    Story,
+    StoryId,
+    TermId,
+    narration_of,
 )
 from tests.ubiquitous_language import pg
 from tests.unit.citation_reports import URL, report_, scenario_
@@ -219,6 +227,61 @@ def test_stale_glyph_text_and_summary_and_a_missing_summary_are_rewritten(
         f'- 🔵 [x]({URL}#tag=x) (1 🔵)\n'
         f'- 🔵 [x]({URL}#tag=x) (1 🔵)\n'
     )
+
+
+def _crossed_span() -> Scenario:
+    scenario = scenario_('t.py::test_book')
+    scenario.narration = narration_of(
+        [
+            NarrationLiteral(value='**'),
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+            NarrationLiteral(value=' books** a *suite*'),
+        ]
+    )
+    return scenario
+
+
+@pytest.mark.parametrize(
+    ('report', 'fragment', 'text'),
+    [
+        (
+            report_(scenario_('t.py::test_book', 'Books a **suite**')),
+            'scenario=t.py::test_book',
+            'Books a **suite**',
+        ),
+        (
+            report_(_crossed_span()),
+            'scenario=t.py::test_book',
+            '\\*\\*Guest books\\*\\* a *suite*',
+        ),
+        (
+            report_(scenario_('t.py::test_a', tags=('a*b*',))),
+            'tag=a*b*',
+            'a\\*b\\*',
+        ),
+        (
+            report_(
+                scenario_('t.py::test_a', stories=('s',)),
+                stories=(
+                    Story(
+                        id=StoryId('s'),
+                        title='Book a *suite*',
+                        sentences=(Sentence(id=SentenceId(1), clauses=()),),
+                    ),
+                ),
+            ),
+            'view=stories&story=s',
+            'Book a \\*suite\\*',
+        ),
+    ],
+)
+def test_written_link_text_reads_back_as_current(
+    tmp_path: Path, report: ReportData, fragment: str, text: str
+) -> None:
+    _, written = _run(tmp_path, f'? []({URL}#{fragment})\n', report, update=True)
+    assert f'[{text}]({URL}#{fragment})' in written
+    rechecked, _ = _run(tmp_path, written, report)
+    assert rechecked.findings == []
 
 
 @pytest.mark.parametrize(

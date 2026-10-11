@@ -32,6 +32,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** Glossary definitions no longer render `__bold__`, and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
 - Glossary definitions render code inside bold and no longer italicize between spaced asterisks.
+- The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.
 - The HTML report's top bar and term ref underlines are visually tidied.
 - The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
 - The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.

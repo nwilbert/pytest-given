@@ -75,23 +75,32 @@ def test_passed_scenario_heading_and_steps() -> None:
         assert '## ✓ Buy coffee' in md
         assert '`tests/t.py::test_buy` · billing, happy-path' in md
         assert '- **given** a machine' in md
-        assert '- **when** I insert $2' in md
+        assert '- **when** I insert \\$2' in md
         assert '- **then** I get a coffee' in md
 
 
-def test_newlines_in_narration_do_not_break_heading_or_bullet() -> None:
+def test_a_newline_in_a_title_or_step_reads_as_a_space() -> None:
     scn = Scenario(
         id='tests/t.py::test_x',
         narration=Narration(text='line one\nline two'),
         module='tests/t.py',
         status='passed',
-        steps=[Step(phase='when', narration=Narration(text='act one\nact two'))],
+        steps=[
+            Step(
+                phase='when',
+                narration=Narration(
+                    text='act one\nact two',
+                    parts=(
+                        NarrationLiteral(value='act one\n'),
+                        NarrationValue(rendered='act\r\ntwo', expression='x'),
+                    ),
+                ),
+            )
+        ],
     )
     md = render_md(_report(scn))
-    # Every heading and bullet line stays a single physical line.
-    assert '## ✓ line one<br>line two' in md
-    assert '- **when** act one<br>act two' in md
-    assert 'line two' not in md.replace('line one<br>line two', '')
+    assert '## ✓ line one line two' in md
+    assert '- **when** act one act two' in md
 
 
 def test_newline_in_attachment_label_stays_inline() -> None:
@@ -881,3 +890,108 @@ def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
 def test_header_prefers_the_title_over_the_project() -> None:
     md = render_md(_report(project='pytest-given', title='Coffee Shop Example'))
     assert md.startswith('# pytest-given — Coffee Shop Example')
+
+
+def test_a_title_and_a_step_keep_their_spans() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='Books a **suite** for 2 * 3'),
+        module='tests/t.py',
+        steps=[Step(phase='when', narration=Narration(text='the `book` call'))],
+    )
+    md = render_md(_report(scn))
+    assert '## ✓ Books a **suite** for 2 \\* 3' in md
+    assert '- **when** the `book` call' in md
+
+
+def test_a_span_crossed_by_a_term_ref_stays_literal() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(
+            text='**Guest books**',
+            parts=(
+                NarrationLiteral(value='**'),
+                NarrationTermRef(term_id='guest', display='Guest'),
+                NarrationLiteral(value=' books**'),
+            ),
+        ),
+        module='tests/t.py',
+    )
+    md = render_md(_report(scn))
+    assert '## ✓ \\*\\*«Guest» books\\*\\*' in md
+
+
+def test_a_value_holding_a_marker_is_literal() -> None:
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='split *',
+            parts=(
+                NarrationLiteral(value='split '),
+                NarrationValue(rendered='*', expression='sep'),
+            ),
+        ),
+    )
+    md = render_md(_report_with_step(step))
+    assert '- **when** split \\*' in md
+
+
+def test_every_other_text_is_literal() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='X'),
+        module='tests/t.py',
+        tags=['a*b*', 'snake_case'],
+        status='skipped',
+        skip_reason='needs <b>data</b>',
+        steps=[
+            Step(
+                phase='given',
+                narration=Narration(text='a thing'),
+                attachments=[Attachment(label='**raw**', content='*v*')],
+            )
+        ],
+        error=ErrorInfo(
+            message='AssertionError: assert *x* == [1]\nsecond line',
+            frames=[
+                TracebackFrame(
+                    path='/x/tests/t.py',
+                    lineno=3,
+                    func='<module>',
+                    code='',
+                    is_internal=False,
+                )
+            ],
+        ),
+    )
+    md = render_md(_report(scn, project='**proj**'))
+    assert md.startswith('# pytest-given — \\*\\*proj\\*\\*')
+    assert '· a\\*b\\*, snake_case — reason: needs \\<b>data\\</b>' in md
+    assert '📎 \\*\\*raw\\*\\* — `*v*`' in md
+    assert '> AssertionError: assert \\*x\\* == \\[1\\]' in md
+    assert '> t.py:3 in \\<module>' in md
+
+
+def test_a_parameter_table_writes_its_names_and_values_literally() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='X'),
+        module='tests/t.py',
+        status='failed',
+        steps=[Step(phase='when', narration=Narration(text='act'))],
+        parameters=ParameterTable(
+            columns=[ParameterColumn(id='a_b', name='*a*', kind='param')],
+            cases=[
+                ParameterCase(
+                    id=NodeId('t.py::test_x[1]'),
+                    values=['**v**'],
+                    status='failed',
+                    error=ErrorInfo(message='boom', frames=[]),
+                )
+            ],
+        ),
+    )
+    md = render_md(_report(scn))
+    assert '| \\*a\\* |' in md
+    assert '| \\*\\*v\\*\\* |' in md
+    assert '- **\\*\\*v\\*\\*** — failed:' in md

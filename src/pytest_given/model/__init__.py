@@ -88,7 +88,6 @@ from .steps import (
     walk_steps,
 )
 from .text import (
-    EMPHASIS,
     CodeSpan,
     EmphasisSpan,
     InlineSpan,
@@ -103,7 +102,6 @@ from .text import (
 
 __all__ = [
     'CONTENT_TYPES',
-    'EMPHASIS',
     'PHASES',
     'STATUSES',
     'Attachment',

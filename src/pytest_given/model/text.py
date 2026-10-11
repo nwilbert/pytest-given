@@ -22,17 +22,6 @@ from dataclasses import dataclass
 
 from .errors import PytestGivenError
 
-# Code span first, so nothing inside `code` is treated as markup — neither a
-# `*` nor, on the render side, an escaped `<br>`. Callers get that only by
-# routing every other substitution through this one pass; `render_inline_markdown`
-# says what happens when they don't. The group order is part of the contract
-# every substitution function reads: code span, **bold**, __bold__, *italic*.
-# Only paired markers match, so a lone underscore inside an identifier
-# (`work_object`) is left untouched — a paired dunder (`__init__`) is strong
-# emphasis, which is what CommonMark makes it too.
-EMPHASIS = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
-
-
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
 _SIBILANT_ENDINGS = ('s', 'x', 'z', 'ch', 'sh')
 _CONSONANT_Y = re.compile(r'[b-df-hj-np-tv-z]y$')

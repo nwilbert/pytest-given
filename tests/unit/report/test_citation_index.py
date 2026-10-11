@@ -40,7 +40,11 @@ def test_a_scenario_citation_carries_its_status_glyph_and_no_summary(
 ) -> None:
     index = _index(scenario_('t.py::test_a', 'Pay', status=status))
     citation = index.citation(Target('scenario', 't.py::test_a'))
-    assert (citation.glyph, citation.title, citation.summary) == (glyph, 'Pay', None)
+    assert (citation.glyph, citation.title_text, citation.summary) == (
+        glyph,
+        'Pay',
+        None,
+    )
     assert citation.fragment == 'scenario=t.py::test_a'
 
 
@@ -63,7 +67,7 @@ def test_a_tag_sums_up_its_scenarios(
         )
     )
     citation = index.citation(Target('tag', 'spec/x'))
-    assert (citation.glyph, citation.title, citation.summary) == (
+    assert (citation.glyph, citation.title_text, citation.summary) == (
         glyph,
         'spec/x',
         summary,
@@ -89,7 +93,7 @@ def test_a_story_sums_up_its_scenarios_and_reads_no_scenarios_when_empty() -> No
         stories=(told, empty),
     )
     citation = index.citation(Target('story', 'cancel'))
-    assert (citation.glyph, citation.title, citation.summary) == (
+    assert (citation.glyph, citation.title_text, citation.summary) == (
         '🔵',
         'Cancel a Booking',
         '(1 ✅ · 1 🔵)',
@@ -112,7 +116,8 @@ def test_a_grouped_scenario_is_cited_by_its_base_node_id_and_templated_title() -
     index = _index(grouped, per_case)
     assert set(index.scenarios) == {'t.py::test_pour', 't.py::test_case[a]'}
     assert (
-        index.citation(Target('scenario', 't.py::test_pour')).title == 'Pour {liquid}'
+        index.citation(Target('scenario', 't.py::test_pour')).title_text
+        == 'Pour {liquid}'
     )
 
 
@@ -126,7 +131,33 @@ def test_a_term_ref_title_reads_as_its_display_text() -> None:
         ]
     )
     citation = _index(scenario).citation(Target('scenario', 't.py::test_a'))
-    assert citation.title == 'A guest books'
+    assert citation.title_text == 'A guest books'
+
+
+def test_a_scenario_title_is_written_piece_by_piece() -> None:
+    scenario = scenario_('t.py::test_a')
+    scenario.narration = narration_of(
+        [
+            NarrationLiteral(value='**'),
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+            NarrationLiteral(value=' books** a *suite*'),
+        ]
+    )
+    citation = _index(scenario).citation(Target('scenario', 't.py::test_a'))
+    before, _ = citation.markdown_halves()
+    assert before == '✅ [\\*\\*Guest books\\*\\* a *suite*]('
+
+
+def test_a_tag_and_a_story_title_are_written_literally() -> None:
+    sentence = Sentence(id=SentenceId(1), clauses=())
+    story = Story(id=StoryId('s'), title='Book a *suite*', sentences=(sentence,))
+    index = _index(
+        scenario_('t.py::test_a', tags=('a*b*',), stories=('s',)), stories=(story,)
+    )
+    tag_before, _ = index.citation(Target('tag', 'a*b*')).markdown_halves()
+    story_before, _ = index.citation(Target('story', 's')).markdown_halves()
+    assert tag_before == '✅ [a\\*b\\*]('
+    assert story_before == '✅ [Book a \\*suite\\*]('
 
 
 def test_two_groups_of_one_function_are_each_cited_by_their_own_node_id() -> None:

@@ -9,11 +9,6 @@ from ..model import (
     CellValue,
     ErrorInfo,
     Narration,
-    NarrationLiteral,
-    NarrationPart,
-    NarrationPlaceholder,
-    NarrationTermRef,
-    NarrationValue,
     ParameterCase,
     ParameterColumn,
     ParameterTable,
@@ -22,16 +17,16 @@ from ..model import (
     Step,
     StepAttachment,
     node_base,
-    placeholder_token,
     plural,
 )
+from .link_text import literal_markdown, narration_markdown
 from .text import NEWLINE, STATUS_GLYPH, STATUS_LABEL
 
 
 def render_md(report: ReportData, *, with_lines: bool = True) -> str:
     """Render the report model to an agent-facing Markdown string."""
     name = report.metadata.title or report.metadata.project
-    blocks = [f'# pytest-given — {name}']
+    blocks = [f'# pytest-given — {_text(name)}']
     blocks.extend(_scenario_md(scenario, with_lines) for scenario in report.scenarios)
     return '\n\n'.join(blocks) + '\n'
 
@@ -50,11 +45,11 @@ def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
     lines = [f'## {glyph} {_narration_md(scenario.narration)}{suffix}']
     subtitle = f'`{_source_md(scenario, with_lines)}`'
     if scenario.tags:
-        subtitle += ' · ' + ', '.join(scenario.tags)
+        subtitle += ' · ' + ', '.join(_text(tag) for tag in scenario.tags)
     if scenario.skip_reason:
-        subtitle += f' — reason: {scenario.skip_reason}'
+        subtitle += f' — reason: {_text(scenario.skip_reason)}'
     if scenario.xfail_reason:
-        subtitle += f' — expected to fail: {scenario.xfail_reason}'
+        subtitle += f' — expected to fail: {_text(scenario.xfail_reason)}'
     lines.append(subtitle)
     lines.append('')
     lines.extend(_step_md(step, depth=0) for step in scenario.steps)
@@ -148,7 +143,9 @@ def _case_cell(column: ParameterColumn, value: CellValue) -> str:
     if not isinstance(value, Attachment):
         return _cell(value)
     if _fits_inline(value.content):
-        return f'`{_cell(value.content)}`'
+        # A code span shows its content as written; only a `|` is escaped,
+        # which GFM would otherwise read as the end of the cell.
+        return f'`{value.content.replace("|", "\\|")}`'
     return _cell(column.name)
 
 
@@ -166,7 +163,7 @@ def _case_attachment_blocks(
         if not isinstance(value, Attachment) or _fits_inline(value.content):
             continue
         lines.append('')
-        lines.append(f'- **{key}** — {_inline(column.name)}:')
+        lines.append(f'- **{key}** — {_text(column.name)}:')
         lines.extend(f'  {line}' for line in _fenced(value.content))
     return lines
 
@@ -212,18 +209,19 @@ def _fenced(content: str) -> list[str]:
     return [fence, *content.splitlines(), fence]
 
 
-def _inline(text: str) -> str:
-    """Keep *text* on a single Markdown line by folding newlines to ``<br>``.
+def _text(text: str) -> str:
+    """*text* shown literally, on a single Markdown line: newlines fold to
+    ``<br>`` after the escaping, which would otherwise show it as text.
 
-    A raw newline in a heading, list bullet, or attachment label would break
-    out of the block (the tail dedents into a stray paragraph); ``<br>`` renders
+    A raw newline in a bullet, table cell or attachment label would break out
+    of the block (the tail dedents into a stray paragraph); ``<br>`` renders
     the break in place without corrupting the surrounding structure.
     """
-    return NEWLINE.sub('<br>', text)
+    return NEWLINE.sub('<br>', literal_markdown(text))
 
 
 def _cell(value: object) -> str:
-    return _inline(str(value).replace('|', '\\|'))
+    return _text(str(value))
 
 
 def _step_md(step: Step, depth: int) -> str:
@@ -236,7 +234,7 @@ def _step_md(step: Step, depth: int) -> str:
 
 
 def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
-    label = _inline(attachment.label)
+    label = _text(attachment.label)
     if isinstance(attachment, AttachmentRef):
         # A promoted attachment carries no content — the payload is in the
         # column its badge points at.
@@ -258,29 +256,14 @@ def _error_lines(error: ErrorInfo, prefix: str = '') -> list[str]:
     lines = []
     first = error.message.splitlines()[0] if error.message else ''
     if first:
-        lines.append(f'{prefix}> {first}')
+        lines.append(f'{prefix}> {literal_markdown(first)}')
     for frame in reversed(error.frames):
         if not frame.is_internal:
-            lines.append(
-                f'{prefix}> {Path(frame.path).name}:{frame.lineno} in {frame.func}'
-            )
+            where = f'{Path(frame.path).name}:{frame.lineno} in {frame.func}'
+            lines.append(f'{prefix}> {literal_markdown(where)}')
             break
     return lines
 
 
 def _narration_md(narration: Narration) -> str:
-    if not narration.parts:
-        return _inline(narration.text)
-    return _inline(''.join(_part_md(part) for part in narration.parts))
-
-
-def _part_md(part: NarrationPart) -> str:
-    match part:
-        case NarrationLiteral(value=value):
-            return value
-        case NarrationValue(rendered=rendered):
-            return rendered
-        case NarrationPlaceholder():
-            return placeholder_token(part)
-        case NarrationTermRef(display=display):
-            return f'«{display}»'
+    return narration_markdown(narration, term_ref=lambda display: f'«{display}»')
