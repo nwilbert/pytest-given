@@ -239,11 +239,12 @@ def test_only_the_three_shapes_are_report_link_fragments(
     assert parse_fragment(fragment) == target
 
 
-def test_a_citation_renders_as_one_markdown_line() -> None:
+def test_a_citation_renders_as_one_markdown_line_around_the_report_url() -> None:
     citation = Citation(
         state='xfailed', title='spec/x', fragment='tag=spec/x', summary='(1 🔵)'
     )
-    assert citation.markdown(URL) == f'🔵 [spec/x]({URL}#tag=spec/x) (1 🔵)'
+    before, after = citation.markdown_halves()
+    assert before + URL + after == f'🔵 [spec/x]({URL}#tag=spec/x) (1 🔵)'
 
 
 def under_prefix(key: str, prefix: str) -> bool:

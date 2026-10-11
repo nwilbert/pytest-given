@@ -51,7 +51,7 @@ def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
     html_path = tmp_path / 'out.html'
     assert main(['report', str(json_path), '-o', str(html_path)]) == 0
     html = html_path.read_text(encoding='utf-8').replace('\\"', '"').replace('\\/', '/')
-    assert '(https://example.org/report.html#scenario=t.py::test_a)' in html
+    assert '"report_url":"https://example.org/report.html"' in html
 
 
 def test_cli_missing_input_file(tmp_path: Path) -> None:

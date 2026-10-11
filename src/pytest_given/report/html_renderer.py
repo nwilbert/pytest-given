@@ -11,6 +11,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypedDict
 
 import jinja2
 from markupsafe import Markup, escape
@@ -51,6 +52,7 @@ from .story_view import (
     build_scenario_sentence_index,
     build_sentence_labels,
     build_story_rollups,
+    scenarios_by_story,
     sentence_key,
 )
 from .text import STATUS_GLYPH, STATUS_LABEL
@@ -61,6 +63,14 @@ _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 # Maps parameter name to its color index. The index resolves to a color via
 # `palette.param_column_colors`, which never runs out.
 type ParamColorMap = dict[str, int]
+type CitationHalves = dict[str, tuple[str, str]]
+
+
+class CitationData(TypedDict):
+    report_url: str
+    scenario: CitationHalves
+    tag: CitationHalves
+    story: CitationHalves
 
 
 @dataclass(frozen=True)
@@ -226,7 +236,9 @@ def _render_context(
     sentence_labels = build_sentence_labels(report)
     scenario_slugs = build_scenario_slug_index(report)
     story_rollups = build_story_rollups(report, coverage)
-    citation_index = CitationIndex(report, scenario_slugs, story_rollups)
+    citation_index = CitationIndex(
+        report, scenario_slugs, scenarios_by_story(report, coverage)
+    )
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
         'metadata': report.metadata,
@@ -347,27 +359,26 @@ def _app_data(report: ReportData) -> dict[str, object]:
     }
 
 
-def _citation_data(
-    report: ReportData, index: CitationIndex
-) -> dict[str, dict[str, str]] | None:
-    """Each copy button's citation line, keyed as the page finds it: a scenario
-    by its `id`, a tag at every level of the tree `app.js` builds, a story by
-    id. Only a report with a public URL shows the buttons, so only it carries
-    the weight."""
+def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | None:
+    """Each copy button's citation line, either side of the report URL, keyed
+    as the page finds it: a scenario by its `id`, a tag at every level of the
+    tree `app.js` builds, a story by id. Only a report with a public URL shows
+    the buttons, so only it carries the weight."""
     report_url = report.metadata.report_url
     if report_url is None:
         return None
 
-    def line(kind: TargetKind, key: str) -> str:
-        return index.citation(Target(kind, key)).markdown(report_url)
+    def halves(kind: TargetKind, key: str) -> tuple[str, str]:
+        return index.citation(Target(kind, key)).markdown_halves()
 
     return {
+        'report_url': report_url,
         'scenario': {
-            scenario.id: line('scenario', cited)
+            scenario.id: halves('scenario', cited)
             for cited, scenario in index.scenarios.items()
         },
-        'tag': {tag: line('tag', tag) for tag in index.tags},
-        'story': {story_id: line('story', story_id) for story_id in index.story_ids},
+        'tag': {tag: halves('tag', tag) for tag in index.tags},
+        'story': {story_id: halves('story', story_id) for story_id in index.story_ids},
     }
 
 

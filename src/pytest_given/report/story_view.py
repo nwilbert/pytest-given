@@ -70,16 +70,12 @@ class StoryRollup:
 def build_story_rollups(
     report: ReportData, coverage_maps: CoverageMap
 ) -> dict[StoryId, StoryRollup]:
-    """Per-story view-data: the scenarios listed under the story, the ones
-    `coverage_maps` keys it for, + per-sentence coverage rollup."""
-    scenarios_by_story: dict[StoryId, list[Scenario]] = {}
-    for scn in report.scenarios:
-        for story_id in coverage_maps[scn.id]:
-            scenarios_by_story.setdefault(story_id, []).append(scn)
-
+    """Per-story view-data: the scenarios listed under the story + per-sentence
+    coverage rollup."""
+    listed = scenarios_by_story(report, coverage_maps)
     rollups: dict[StoryId, StoryRollup] = {}
     for story in report.stories:
-        scenarios = scenarios_by_story.get(story.id, [])
+        scenarios = listed[story.id]
         per_sentence: dict[SentenceId, SentenceCoverage] = {}
         for sentence in story.sentences:
             covered_by: list[NodeId] = []
@@ -105,6 +101,18 @@ def build_story_rollups(
             )
         rollups[story.id] = StoryRollup(scenarios=scenarios, per_sentence=per_sentence)
     return rollups
+
+
+def scenarios_by_story(
+    report: ReportData, coverage_maps: CoverageMap
+) -> dict[StoryId, list[Scenario]]:
+    """The scenarios listed under each story: the ones `coverage_maps` keys it
+    for."""
+    listed: dict[StoryId, list[Scenario]] = {story.id: [] for story in report.stories}
+    for scn in report.scenarios:
+        for story_id in coverage_maps[scn.id]:
+            listed[story_id].append(scn)
+    return listed
 
 
 class CoverageRecord(TypedDict):

@@ -2,7 +2,6 @@
 file the repository tracks: both must find the same inline links, with the
 same destination and the same text once escapes are resolved."""
 
-import re
 import subprocess
 from pathlib import Path
 from urllib.parse import unquote
@@ -17,7 +16,6 @@ from pytest_given.report.markdown_links import scan_links
 _ROOT = Path(__file__).parents[3]
 _FIXTURE = 'tests/unit/report/fixtures/citation-forms.md'
 _MARKDOWN = MarkdownIt('commonmark').enable(['table', 'strikethrough'])
-_URL_ESCAPE = re.compile(r'\\([!-/:-@\[-`{-~])')
 
 type FoundLink = tuple[str, str]
 
@@ -63,7 +61,7 @@ def test_the_scanner_finds_the_links_markdown_it_finds(document: str) -> None:
 def _scanned(source: str) -> list[FoundLink]:
     return [
         (
-            unquote(_URL_ESCAPE.sub(r'\1', link.url)),
+            unquote(link.destination),
             plain_link_text(link.text, in_table_row=link.in_table_row),
         )
         for link in scan_links(source)

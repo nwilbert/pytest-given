@@ -100,3 +100,7 @@ p
 
 > > h
     ``` [Indented fence opener](https://example.org/edge/13)
+
+### Escapes and entity references in a destination
+
+[Escaped destination](https://example.org/edge/14?a\_b&amp;c=\&amp;&#35;d)

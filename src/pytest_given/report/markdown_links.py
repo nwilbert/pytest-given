@@ -9,10 +9,12 @@ markdown-it-py over every Markdown file the repository tracks.
 """
 
 import bisect
+import html
 import itertools
 import re
 from collections.abc import Collection, Iterator, Sequence
 from dataclasses import dataclass
+from html.entities import html5
 from typing import NamedTuple
 
 type Span = tuple[int, int]
@@ -60,6 +62,23 @@ class MarkdownLink:
 
     def trailing_span(self, start: int, end: int) -> Span:
         return _span(self.trailing_offsets, start, end)
+
+    @property
+    def destination(self) -> str:
+        """`url` as a renderer reads it: backslash escapes and entity
+        references resolved, percent-encoding left alone."""
+        return ''.join(
+            _unescaped(token) for token in _DESTINATION_TOKEN.findall(self.url)
+        )
+
+    @property
+    def fragment_span(self) -> Span | None:
+        """Where the fragment sits in the source: past the first `#` that
+        `destination` reads, written as `#`, `\\#` or `&#35;`."""
+        for token in _DESTINATION_TOKEN.finditer(self.url):
+            if _unescaped(token.group()) == '#':
+                return (self.url_span[0] + token.end(), self.url_span[1])
+        return None
 
 
 def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
@@ -135,6 +154,24 @@ def _span(offsets: Sequence[int], start: int, end: int) -> Span:
     if end == start:
         return (offsets[start], offsets[start])
     return (offsets[start], offsets[end - 1] + 1)
+
+
+# One character of a destination as written, or the escape or entity
+# reference that reads as one.
+_DESTINATION_TOKEN = re.compile(
+    r'\\[!-/:-@\[-`{-~]|&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});|.',
+    re.DOTALL,
+)
+
+
+def _unescaped(token: str) -> str:
+    if token.startswith('\\') and len(token) == 2:
+        return token[1]
+    if token.startswith('&#'):
+        return html.unescape(token)
+    # Not `html.unescape`, which also reads `&notit;` as `¬it;`: CommonMark
+    # resolves only a whole entity name.
+    return html5.get(token[1:], token) if token.startswith('&') else token
 
 
 @dataclass(frozen=True)

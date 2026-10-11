@@ -337,6 +337,33 @@ def test_a_link_with_a_title_and_an_angle_destination(source: str) -> None:
     assert _one(source).url == 'a b.html'
 
 
+@pytest.mark.parametrize(
+    ('url', 'destination'),
+    [
+        ('a\\_b', 'a_b'),
+        ('a&amp;b', 'a&b'),
+        ('a&#35;b&#x23;c', 'a#b#c'),
+        ('a\\&amp;b', 'a&amp;b'),
+        ('a&nosuch;b', 'a&nosuch;b'),
+        ('a\\b', 'a\\b'),
+    ],
+)
+def test_the_destination_resolves_escapes_and_entity_references(
+    url: str, destination: str
+) -> None:
+    assert _one(f'[t]({url})\n').destination == destination
+
+
+@pytest.mark.parametrize('url', ['u#tag=a', 'u\\#tag=a', 'u&#35;tag=a', 'u&num;tag=a'])
+def test_the_fragment_span_starts_past_the_hash_as_rendered(url: str) -> None:
+    source = f'[t]({url})\n'
+    assert _at(source, _one(source).fragment_span) == 'tag=a'
+
+
+def test_a_link_without_a_fragment_has_no_fragment_span() -> None:
+    assert _one('[t](u)\n').fragment_span is None
+
+
 def test_an_inner_link_deactivates_the_outer_bracket() -> None:
     assert [link.url for link in scan_links('[a [b](u) c](v)\n')] == ['u']
 

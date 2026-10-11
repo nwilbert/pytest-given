@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from ..model import PytestGivenError, plural, resolve_report_url
+from ..model import PytestGivenError, plural, report_from_dict, resolve_report_url
 from ..report import CitationsResult, check_citations, markdown_documents
 from .report import load_report_json
 
@@ -56,12 +56,11 @@ def run_citations(args: argparse.Namespace) -> int:
     report_file: Path = args.report
     try:
         result = check_citations(
-            load_report_json(report_file),
+            report_from_dict(load_report_json(report_file), report_file.as_posix()),
             markdown_documents(args.documents),
             report_url=resolve_report_url(args.report_url, '--report-url'),
             report_path=args.report_path,
             update=args.update,
-            source=report_file.as_posix(),
         )
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)

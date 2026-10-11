@@ -20,7 +20,7 @@ from ..model import (
 from .coverage import build_coverage_map
 from .link_text import fold_whitespace, link_text
 from .slugs import build_scenario_slug_index
-from .story_view import StoryRollup, build_story_rollups
+from .story_view import scenarios_by_story
 from .text import CITATION_GLYPH, CitationState
 
 type TargetKind = Literal['scenario', 'tag', 'story']
@@ -48,12 +48,14 @@ class Citation:
     def glyph(self) -> str:
         return CITATION_GLYPH[self.state]
 
-    def markdown(self, report_url: str) -> str:
-        """The one-line citation a copy button puts on the clipboard."""
+    def markdown_halves(self) -> tuple[str, str]:
+        """The one-line citation a copy button puts on the clipboard, either
+        side of the report URL — which a page citing thousands of targets
+        carries once."""
         summary = f' {self.summary}' if self.summary else ''
         return (
-            f'{self.glyph} [{link_text(self.title)}]'
-            f'({report_url}#{self.fragment}){summary}'
+            f'{self.glyph} [{link_text(self.title)}](',
+            f'#{self.fragment}){summary}',
         )
 
 
@@ -92,7 +94,7 @@ class CitationIndex:
         self,
         report: ReportData,
         scenario_slugs: Mapping[NodeId, str],
-        story_rollups: Mapping[StoryId, StoryRollup],
+        story_scenarios: Mapping[StoryId, list[Scenario]],
     ) -> None:
         self.scenarios = _citable_scenarios(report)
         cited_as = {scenario.id: cited for cited, scenario in self.scenarios.items()}
@@ -108,18 +110,18 @@ class CitationIndex:
                 self._tagged.setdefault(tag, []).append(scenario)
         self.tags = sorted(self._tagged)
         self._stories = {
-            story.id: (story.title, story_rollups[story.id].scenarios)
+            story.id: (story.title, story_scenarios[story.id])
             for story in report.stories
         }
         self.story_ids = list(self._stories)
 
     @classmethod
     def of(cls, report: ReportData) -> Self:
-        """For a caller that has not built the slugs and rollups already."""
+        """For a caller that has not built the slugs and coverage already."""
         return cls(
             report,
             build_scenario_slug_index(report),
-            build_story_rollups(report, build_coverage_map(report)),
+            scenarios_by_story(report, build_coverage_map(report)),
         )
 
     def resolve(self, target: Target) -> Target | None:

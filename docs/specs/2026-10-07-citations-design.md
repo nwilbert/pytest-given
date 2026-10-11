@@ -56,9 +56,9 @@ citation, and nothing else on the line:
   check also reads the Markdown sink's text glyphs (`✓ ✗ ○ ⊗`) and a typed `?`, and
   `citations update` rewrites them as stale, so a hand-typed placeholder works either way.
 - **Link text** — what the target is called: a scenario title, a tag, a story's title.
-- **Summary** — a parenthesized suffix one space after the link. Only text of a summary's shape
-  counts as one — status counts or `(no scenarios)` — so a parenthetical of the author's own after
-  a citation stays theirs. A scenario citation has no summary, so one after it is a finding that
+- **Summary** — a parenthesized suffix one space after the link; more spaces, or a hard wrap,
+  still read as one. Only text of a summary's shape counts as one — status counts or
+  `(no scenarios)` — so a parenthetical of the author's own after a citation stays theirs. A scenario citation has no summary, so one after it is a finding that
   `update` leaves to the author rather than delete text it cannot be sure it wrote. A citation
   takes no `attr_list` block (`{ target=_blank }`), since the summary has to follow the link
   directly.
@@ -136,8 +136,9 @@ where the document sits; shortening the base to a relative path is a one-time ed
 - **Summary** — none.
 
 `#scenario=` accepts a node id as well as a slug. A grouped scenario's `id` is its first case's, so
-the report data gains a map from each cited node id to the scenario's `id`. The existing copy-link
-button keeps copying slugs: it serves a reader passing a link around today, not a document.
+the report data gains a map from each cited node id to the scenario's `id`; any case's node id opens
+the group too, in the page as in the check. The existing copy-link button keeps copying slugs: it
+serves a reader passing a link around today, not a document.
 
 #### Why the node id
 
@@ -207,10 +208,11 @@ cannot be mistaken for the link icon beside it; the `frontend-design` skill shap
 card, header and sidebar row. The tick on success and the `navigator.clipboard` → `execCommand`
 fallback are `copyAnchor`'s, through the shared `_copyText`.
 
-The renderer writes each citation's whole line into the report data — for tags, one per level of
-every tag, since the tree is built client-side — and only in a report that shows the buttons, so
-the others carry no extra weight. JS only copies it, so Python stays the one place a citation is
-rendered, and the check recomputes exactly what a button copied.
+The renderer writes each citation's line into the report data, split either side of the report
+URL so the data carries the URL once — for tags, one per level of every tag, since the tree is
+built client-side — and only in a report that shows the buttons, so the others carry no extra
+weight. JS only joins and copies it, so Python stays the one place a citation is rendered, and the
+check recomputes exactly what a button copied.
 
 ### When the buttons show
 
@@ -255,7 +257,8 @@ scenarios, so a CI job writes it from all of them without running the plain test
 
 ### Which links it reads
 
-An inline link `[text](url)` is a report link when:
+An inline link `[text](url)` is a report link when — its URL read as it renders, backslash escapes
+and entity references resolved —
 
 - its URL without the fragment is the report's — an absolute URL equal to the report URL
   (`--report-url` if given, otherwise the one stored in the report), or a relative URL that
@@ -266,8 +269,8 @@ An inline link `[text](url)` is a report link when:
 
 `--report-path` names where the report sits in the repository once the docs build has placed it.
 The file need not exist, since only paths are compared; without the flag, relative links are
-ordinary links. With neither a report URL nor a report path, the check cannot tell report links
-from others and exits 2.
+ordinary links, as is a URL no URL parser reads. With neither a report URL nor a report path, the
+check cannot tell report links from others and exits 2.
 
 Whether a report link is a citation, and where its summary is, follow the rules under
 [Citations and report links](#citations-and-report-links).
@@ -410,7 +413,7 @@ area tag.
   where a report is read back from JSON, and nowhere downstream.
 - `plugin/` — the `--given-report-url` option and `given_report_url` ini.
 - `report/citation_index.py` (new) — renders the citation of each kind from the scenarios, tags
-  and stories a report holds. A story's scenarios come from `build_story_rollups`; tag matching
+  and stories a report holds. A story's scenarios come from `scenarios_by_story`; tag matching
   has no Python counterpart yet, so the index files each scenario under every prefix of its tags,
   and a unit test counts each tag citation against `app.js`'s `underPrefix` rule.
 - `report/citations.py` (new) — reads report links out of Markdown, computes findings and

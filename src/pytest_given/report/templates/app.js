@@ -51,12 +51,19 @@ function lookup(map, key, fallback) {
 }
 
 // `#scenario=` takes the slug the copy-link button writes or the node id a
-// citation writes — a grouped scenario's without its first case's `[…]`.
+// citation writes — a grouped scenario's without its first case's `[…]`. Any
+// case's node id opens its group too, as `citations check` reads it.
 function scenarioFromParam(value) {
   const data = window.__REPORT_DATA__;
   return lookup(data.scenario_slugs || {}, value, null)
-    ?? lookup(data.cited_scenario_ids || {}, value, null)
-    ?? (data.scenarios.some(s => s.id === value) ? value : null);
+    ?? citedScenario(value)
+    ?? citedScenario(value.split('[')[0]);
+}
+
+function citedScenario(nodeId) {
+  const data = window.__REPORT_DATA__;
+  return lookup(data.cited_scenario_ids || {}, nodeId, null)
+    ?? (data.scenarios.some(s => s.id === nodeId) ? nodeId : null);
 }
 
 // --- Alpine app ---
@@ -698,11 +705,12 @@ function reportApp() {
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
-    // Python renders the whole line, with the report's public URL — the
+    // Python renders the line either side of the report's public URL — the
     // setting's, never `window.location`.
     copyCitation(kind, key, event) {
-      const line = lookup(window.__REPORT_DATA__.citations[kind], key, null);
-      if (line) this._copyAndFlash(line, event.currentTarget);
+      const citations = window.__REPORT_DATA__.citations;
+      const halves = lookup(citations[kind], key, null);
+      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], event.currentTarget);
     },
     // Only flip to the "copied" state once the text is actually on the
     // clipboard, or the icon would claim a success that never happened.

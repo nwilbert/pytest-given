@@ -10,10 +10,10 @@ import itertools
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal, NamedTuple
+from typing import Literal, NamedTuple
 from urllib.parse import unquote, urlsplit
 
-from ..model import STATUSES, PytestGivenError, ReportUrl, report_from_dict
+from ..model import STATUSES, PytestGivenError, ReportData, ReportUrl
 from .citation_index import CitationIndex, Target, parse_fragment, report_fragment
 from .link_text import fold_whitespace, link_text, plain_link_text
 from .markdown_links import VARIATION_SELECTOR, MarkdownLink, scan_links
@@ -42,8 +42,7 @@ class CitationFinding:
 
 @dataclass(frozen=True)
 class CitationsResult:
-    """Every finding, and the documents an update rewrote — or, for a check,
-    would rewrite."""
+    """Every finding, and the documents an update rewrote."""
 
     findings: list[CitationFinding]
     updated: list[Path]
@@ -71,16 +70,17 @@ def markdown_documents(paths: list[Path]) -> list[Path]:
 
 
 def check_citations(
-    report_dict: dict[str, Any],
+    report: ReportData,
     documents: list[Path],
     *,
     report_url: ReportUrl | None,
     report_path: Path | None,
     update: bool,
-    source: str | None = None,
 ) -> CitationsResult:
-    report = report_from_dict(report_dict, source)
-    location = _ReportLocation(report_url or report.metadata.report_url, report_path)
+    location = _ReportLocation(
+        report_url or report.metadata.report_url,
+        None if report_path is None else report_path.resolve(),
+    )
     if location.url is None and location.path is None:
         raise PytestGivenError(
             'No report URL is known — the report stores none and --report-url is '
@@ -94,12 +94,11 @@ def check_citations(
     for path, text in texts.items():
         document_findings, edits = _check_document(path, text, index, location)
         findings.extend(document_findings)
-        if edits:
+        if update and edits:
             edited[path] = _apply(text, edits)
     updated = [path for path, text in edited.items() if text != texts[path]]
-    if update:
-        for path in updated:
-            path.write_bytes(edited[path].encode('utf-8'))
+    for path in updated:
+        path.write_bytes(edited[path].encode('utf-8'))
     return CitationsResult(findings=findings, updated=updated)
 
 
@@ -107,6 +106,7 @@ def check_citations(
 class _ReportLocation:
     url: str | None
     path: Path | None
+    """Resolved, as each relative link's path is before it is compared."""
 
 
 class _Edit(NamedTuple):
@@ -123,7 +123,7 @@ _SUMMARY_GLYPH = (
 # author's own after a citation stays theirs. A hard wrap may put it on the
 # next line.
 _SUMMARY = re.compile(
-    r'(?: |[ \t]*\n[ \t]*)'
+    r'(?:[ \t]+|[ \t]*\n[ \t]*)'
     rf'(\((?:no scenarios|\d+ {_SUMMARY_GLYPH}(?: · \d+ {_SUMMARY_GLYPH})*)\))'
 )
 
@@ -143,23 +143,32 @@ def _check_document(
     findings: list[CitationFinding] = []
     edits: list[_Edit] = []
     for link in scan_links(text, _READ_GLYPHS):
-        fragment = _report_fragment(link.url, path, location)
+        fragment = _report_fragment(link.destination, path, location)
         if fragment is not None:
             _LinkCheck(path, link, index, findings, edits).run(fragment)
     return findings, edits
 
 
 def _report_fragment(url: str, document: Path, location: _ReportLocation) -> str | None:
-    """The fragment of a link to the report, or None for a link elsewhere."""
+    """The fragment of a link to the report, or None for a link elsewhere —
+    as it is for a URL no parser reads, which no reader can open either."""
     base, _, fragment = url.partition('#')
     if not base:
         return None
-    if urlsplit(base).scheme or base.startswith('//'):
+    try:
+        absolute = bool(urlsplit(base).scheme) or base.startswith('//')
+    except ValueError:
+        return None
+    if absolute:
         return fragment if base == location.url else None
     if location.path is None:
         return None
-    resolved = (document.parent / unquote(base)).resolve()
-    return fragment if resolved == location.path.resolve() else None
+    relative = unquote(base)
+    # No file is named so, and resolving the name raises on POSIX alone.
+    if '\0' in relative:
+        return None
+    resolved = (document.parent / relative).resolve()
+    return fragment if resolved == location.path else None
 
 
 @dataclass
@@ -280,10 +289,9 @@ class _LinkCheck:
         self._find(
             kind, message, f'#{report_fragment(old)} → #{new_fragment}', fixed=True
         )
-        start, end = self.link.url_span
-        self.edits.append(
-            _Edit(start + self.link.url.index('#') + 1, end, new_fragment)
-        )
+        span = self.link.fragment_span
+        assert span is not None
+        self.edits.append(_Edit(*span, new_fragment))
 
     def _find(
         self, kind: FindingKind, message: str, *details: str, fixed: bool = False

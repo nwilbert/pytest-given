@@ -2401,14 +2401,22 @@ def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
     url = 'https://example.org/report.html'
     data = _embedded_app_data(render_html_string(_citable_report(url), None))
     citations = data['citations']
-    assert citations['scenario'] == {
+
+    def lines(kind: str) -> dict[str, str]:
+        return {
+            key: before + citations['report_url'] + after
+            for key, (before, after) in citations[kind].items()
+        }
+
+    assert citations['report_url'] == url
+    assert lines('scenario') == {
         't.py::test_pour[water]': f'✅ [Pour]({url}#scenario=t.py::test_pour)'
     }
-    assert citations['tag'] == {
+    assert lines('tag') == {
         'spec': f'✅ [spec]({url}#tag=spec) (1 ✅)',
         'spec/x': f'✅ [spec/x]({url}#tag=spec/x) (1 ✅)',
     }
-    assert citations['story'] == {}
+    assert lines('story') == {}
 
 
 def test_a_report_without_a_url_carries_no_citations() -> None:

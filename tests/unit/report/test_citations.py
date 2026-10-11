@@ -19,7 +19,6 @@ from pytest_given.model import (
     Scenario,
     Status,
     param_id,
-    report_to_dict,
 )
 from pytest_given.report import CitationsResult, check_citations, markdown_documents
 from tests.ubiquitous_language import pg
@@ -53,25 +52,23 @@ def _scenario(
     )
 
 
-def _report(*scenarios: Scenario, report_url: str | None = URL) -> dict:
-    return report_to_dict(
-        ReportData(
-            metadata=Metadata(
-                project='p',
-                timestamp='t',
-                pytest_version='9',
-                plugin_version='0',
-                report_url=report_url,
-            ),
-            scenarios=list(scenarios),
-        )
+def _report(*scenarios: Scenario, report_url: str | None = URL) -> ReportData:
+    return ReportData(
+        metadata=Metadata(
+            project='p',
+            timestamp='t',
+            pytest_version='9',
+            plugin_version='0',
+            report_url=report_url,
+        ),
+        scenarios=list(scenarios),
     )
 
 
 def _run(
     tmp_path: Path,
     document: str,
-    report: dict,
+    report: ReportData,
     *,
     update: bool = False,
     name: str = 'doc.md',
@@ -316,6 +313,43 @@ def test_a_glyph_led_link_with_another_fragment_is_a_mistyped_citation(
     assert [(f.kind, f.line) for f in result.findings] == [('mistyped', 1)]
 
 
+def test_a_summary_after_several_spaces_is_rewritten_in_place(
+    tmp_path: Path,
+) -> None:
+    report = _report(_scenario('t.py::test_a', 'A', tags=('checkout',)))
+    document = f'✅ [checkout]({URL}#tag=checkout)  (3 ✅)\n'
+    _, written = _run(tmp_path, document, report, update=True)
+    assert written == f'✅ [checkout]({URL}#tag=checkout)  (1 ✅)\n'
+
+
+@pytest.mark.parametrize('url', ['http://[oops/r.html#scenario=a', 'r%00.html#tag=a'])
+def test_a_link_no_url_parser_reads_is_no_report_link(tmp_path: Path, url: str) -> None:
+    result, _ = _run(
+        tmp_path, f'✅ [x]({url})\n', _report(PAY), report_path=tmp_path / 'r.html'
+    )
+    assert result.findings == []
+
+
+def test_a_link_is_read_as_rendered_escapes_and_entity_references_resolved(
+    tmp_path: Path,
+) -> None:
+    report = _report(_scenario('t.py::test_a', 'A', tags=('spec_x',)))
+    document = (
+        f'✅ [spec_x]({URL}#tag=spec\\_x) (1 ✅)\n'
+        f'[see]({URL}#view=stories&amp;story=gone)\n'
+    )
+    result, _ = _run(tmp_path, document, report)
+    assert [(f.kind, f.line) for f in result.findings] == [('missing', 2)]
+
+
+def test_a_fragment_after_an_entity_reference_hash_is_repointed(
+    tmp_path: Path,
+) -> None:
+    document = f'✅ [Pay by card]({URL}&#35;scenario=t.py::test_pay[1])\n'
+    _, written = _run(tmp_path, document, _report(PAY), update=True)
+    assert written == f'✅ [Pay by card]({URL}&#35;scenario=t.py::test_pay)\n'
+
+
 def test_a_summary_after_a_scenario_citation_is_left_to_the_author(
     tmp_path: Path,
 ) -> None:
@@ -532,7 +566,7 @@ def test_check_writes_nothing(tmp_path: Path) -> None:
     document = f'✓ [old]({URL}#scenario=t.py::test_pay)\n'
     result, written = _run(tmp_path, document, _report(PAY))
     assert written == document
-    assert result.updated == [tmp_path / 'doc.md']
+    assert result.updated == []
 
 
 def test_crlf_line_endings_survive_an_update(tmp_path: Path) -> None:
