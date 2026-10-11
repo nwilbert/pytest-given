@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/ai-agents/">
       
       
-        <link rel="prev" href="../configuration/narration-lint/">
+        <link rel="prev" href="../guide/citations/">
       
       
         <link rel="next" href="../configuration/pytest-options/">
@@ -663,6 +663,33 @@
                   
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/citations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Citations
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
     
   
   
@@ -979,9 +1006,10 @@
 </ul>
 <p>Adopt selectively: decorate the tests that assert behavior, and leave plumbing (trivial getters, constructors, round-trips) as plain tests — they add report noise, not signal. pytest-given's own suite decorates about a fifth of its tests. Codify your narration conventions where agents will read them; the bundled <a href="https://github.com/nwilbert/pytest-given/blob/main/src/pytest_given/.agents/skills/pytest-given-authoring/SKILL.md">authoring skill</a> ships a battle-tested set of rules for keeping narration truthful.</p>
 <h2 id="agent-skills">Agent skills<a class="headerlink" href="#agent-skills" title="Permanent link">&para;</a></h2>
-<p>Three <a href="https://agentskills.io">Agent Skills</a> ship in the wheel, under <code>pytest_given/.agents/skills/</code>:</p>
+<p>Four <a href="https://agentskills.io">Agent Skills</a> ship in the wheel, under <code>pytest_given/.agents/skills/</code>:</p>
 <ul>
 <li><strong><code>pytest-given-authoring</code></strong> — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories.</li>
+<li><strong><code>pytest-given-citing</code></strong> — keeping the scenario, tag and story citations in Markdown documents current: triaging <code>pytest-given citations check</code> findings, repairing a citation whose target is gone, and writing new ones.</li>
 <li><strong><code>pytest-given-navigating</code></strong> — exploring a codebase through its rendered reports instead of grepping test bodies.</li>
 <li><strong><code>pytest-given-reviewing</code></strong> — a layered review of narrated tests: the narration lint as the structural gate, a semantic audit of step text against step bodies, a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories.</li>
 </ul>
