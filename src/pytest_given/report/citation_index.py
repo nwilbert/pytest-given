@@ -5,7 +5,7 @@ import difflib
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Self
 from urllib.parse import parse_qsl, quote
 
 from ..model import (
@@ -17,10 +17,10 @@ from ..model import (
     node_base,
     rolled_up_status,
 )
-from .coverage import CoverageMap, build_coverage_map
+from .coverage import build_coverage_map
 from .link_text import fold_whitespace, link_text
 from .slugs import build_scenario_slug_index
-from .story_view import build_story_rollups
+from .story_view import StoryRollup, build_story_rollups
 from .text import CITATION_GLYPH, CitationState
 
 type TargetKind = Literal['scenario', 'tag', 'story']
@@ -88,12 +88,16 @@ def parse_fragment(fragment: str) -> Target | None:
 class CitationIndex:
     """The scenarios, tags and stories a report lets a document cite."""
 
-    def __init__(self, report: ReportData, coverage: CoverageMap | None = None) -> None:
+    def __init__(
+        self,
+        report: ReportData,
+        scenario_slugs: Mapping[NodeId, str],
+        story_rollups: Mapping[StoryId, StoryRollup],
+    ) -> None:
         self.scenarios = _citable_scenarios(report)
         cited_as = {scenario.id: cited for cited, scenario in self.scenarios.items()}
         self._by_slug = {
-            slug: cited_as[node_id]
-            for node_id, slug in build_scenario_slug_index(report).items()
+            slug: cited_as[node_id] for node_id, slug in scenario_slugs.items()
         }
         # Under a tag and each of its prefixes, as `app.js`'s `underPrefix`
         # matches a `#tag=` link to the scenarios it opens.
@@ -103,12 +107,20 @@ class CitationIndex:
             for tag in tags:
                 self._tagged.setdefault(tag, []).append(scenario)
         self.tags = sorted(self._tagged)
-        rollups = build_story_rollups(report, coverage or build_coverage_map(report))
         self._stories = {
-            story.id: (story.title, rollups[story.id].scenarios)
+            story.id: (story.title, story_rollups[story.id].scenarios)
             for story in report.stories
         }
         self.story_ids = list(self._stories)
+
+    @classmethod
+    def of(cls, report: ReportData) -> Self:
+        """For a caller that has not built the slugs and rollups already."""
+        return cls(
+            report,
+            build_scenario_slug_index(report),
+            build_story_rollups(report, build_coverage_map(report)),
+        )
 
     def resolve(self, target: Target) -> Target | None:
         """The target as a current citation names it, or None when the report

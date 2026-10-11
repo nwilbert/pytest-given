@@ -75,9 +75,6 @@ def run_report(args: argparse.Namespace) -> int:
     rather than tracebacks.
     """
     json_file: Path = args.json_file
-    if not json_file.exists():
-        print(f'Error: {json_file.as_posix()} not found', file=sys.stderr)
-        return 1
     try:
         config = _sink_config(
             args.output, args.source_link, args.format, args.theme, args.lines
@@ -94,13 +91,10 @@ def run_report(args: argparse.Namespace) -> int:
 
 
 def load_report_json(json_file: Path) -> dict[str, Any]:
-    """The input file as a dict. `report_from_dict` downstream is what rejects
-    a dict that is not a report.
-
-    An `OSError` here is the caller's problem, not a bug: `exists()` is true
-    for a directory. A file that is not UTF-8 at all never reaches the JSON
-    parser, so its `UnicodeDecodeError` is invalid JSON too.
-    """
+    """The input file as a dict; `report_from_dict` rejects one that is not a
+    report. Any other `OSError` (a directory, say) is left to the caller."""
+    if not json_file.exists():
+        raise PytestGivenError(f'{json_file.as_posix()} not found')
     try:
         report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
     except (json.JSONDecodeError, UnicodeDecodeError) as error:

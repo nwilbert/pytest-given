@@ -20,18 +20,25 @@ def resolve_report_url(value: str, setting: str) -> ReportUrl | None:
     """
     if not value:
         return None
-    parts = urlsplit(value)
-    if (
-        parts.scheme not in ('http', 'https')
-        or not parts.netloc
-        or '#' in value
-        or any(_breaks_destination(char) for char in value)
-    ):
+    if not _is_citable(value):
         raise PytestGivenError(
             f'{setting} must be an absolute http(s) URL without a #fragment, '
             f'whitespace, control characters, <, >, (, ) or \\, but got {value!r}.'
         )
     return ReportUrl(value)
+
+
+def _is_citable(value: str) -> bool:
+    try:
+        parts = urlsplit(value)
+    except ValueError:  # a malformed IPv6 host, say
+        return False
+    return (
+        parts.scheme in ('http', 'https')
+        and bool(parts.netloc)
+        and '#' not in value
+        and not any(_breaks_destination(char) for char in value)
+    )
 
 
 def _breaks_destination(char: str) -> bool:

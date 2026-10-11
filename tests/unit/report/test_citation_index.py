@@ -67,7 +67,7 @@ def _scenario(
 
 
 def _index(*scenarios: Scenario, stories: tuple[Story, ...] = ()) -> CitationIndex:
-    return CitationIndex(
+    return CitationIndex.of(
         ReportData(
             metadata=Metadata(
                 project='p', timestamp='t', pytest_version='9', plugin_version='0'

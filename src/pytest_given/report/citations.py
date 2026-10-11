@@ -87,7 +87,7 @@ def check_citations(
             'not given — and no --report-path either, so no link can be told to '
             'point at the report.'
         )
-    index = CitationIndex(report)
+    index = CitationIndex.of(report)
     texts = {path: _read(path) for path in documents}
     findings: list[CitationFinding] = []
     edited: dict[Path, str] = {}

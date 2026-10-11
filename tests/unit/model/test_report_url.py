@@ -30,6 +30,7 @@ def test_an_empty_setting_means_no_report_url() -> None:
         'https://example.org/<report>.html',
         'https://example.org/report(1).html',
         'https://example.org/re\\port.html',
+        'https://[::1/report.html',
     ],
 )
 def test_a_url_a_citation_cannot_link_is_refused(value: str) -> None:

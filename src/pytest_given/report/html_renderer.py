@@ -222,10 +222,11 @@ def _render_context(
     state is seeded from."""
     glossary_view = build_glossary_view(report)
     coverage = build_coverage_map(report)
-    citation_index = CitationIndex(report, coverage)
     scn_covers = build_scenario_sentence_index(coverage)
     sentence_labels = build_sentence_labels(report)
     scenario_slugs = build_scenario_slug_index(report)
+    story_rollups = build_story_rollups(report, coverage)
+    citation_index = CitationIndex(report, scenario_slugs, story_rollups)
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
         'metadata': report.metadata,
@@ -235,7 +236,7 @@ def _render_context(
         'glossary': report.glossary,
         'glossary_view': glossary_view,
         'tab_visibility': tab_visibility(report),
-        'story_rollups': build_story_rollups(report, coverage),
+        'story_rollups': story_rollups,
         'scn_covers': scn_covers,
         'scenario_index': {scn.id: index for index, scn in enumerate(report.scenarios)},
         'scenario_slugs': scenario_slugs,

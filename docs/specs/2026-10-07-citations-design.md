@@ -409,11 +409,13 @@ area tag.
   `ReportUrl`: only `resolve_report_url` mints one, so the URL is checked where it is configured and
   where a report is read back from JSON, and nowhere downstream.
 - `plugin/` — the `--given-report-url` option and `given_report_url` ini.
-- `report/citations.py` (new) — renders the citation of each kind, reads report links out of
-  Markdown, computes findings and updates. `report.check_citations` exposes the whole job, the way
-  `emit_sinks` does. A story's scenarios come from `build_story_rollups`; tag matching has no
-  Python counterpart yet, so it ports `underPrefix` from `app.js`, and a unit test holds the two to
-  the same one-line rule. Reading is a hand-written scanner — fences, indented code, backtick runs,
+- `report/citation_index.py` (new) — renders the citation of each kind from the scenarios, tags
+  and stories a report holds. A story's scenarios come from `build_story_rollups`; tag matching
+  has no Python counterpart yet, so the index files each scenario under every prefix of its tags,
+  and a unit test counts each tag citation against `app.js`'s `underPrefix` rule.
+- `report/citations.py` (new) — reads report links out of Markdown, computes findings and
+  updates. `report.check_citations` exposes the whole job, the way `emit_sinks` does. Reading is a
+  hand-written scanner — fences, indented code, backtick runs,
   glyph, link, summary, table rows — because `update` needs each part's exact source position,
   which no Markdown parser's inline tokens carry; a parser would only take over block structure, at
   the cost of a runtime dependency.

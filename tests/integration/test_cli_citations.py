@@ -105,6 +105,13 @@ def test_an_unreadable_report_is_named_by_its_posix_path(
     assert f'Error: {report.as_posix()} is not valid JSON' in capsys.readouterr().err
 
 
+def test_a_missing_report_is_named_by_its_posix_path(tmp_path: Path, capsys) -> None:
+    report = tmp_path / 'reports' / 'missing.json'
+    doc = _doc(tmp_path, 'text\n')
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 2
+    assert f'Error: {report.as_posix()} not found' in capsys.readouterr().err
+
+
 def test_a_report_that_is_not_utf8_exits_2(tmp_path: Path) -> None:
     report = tmp_path / 'report.json'
     report.write_bytes(b'\xff\xfe')
