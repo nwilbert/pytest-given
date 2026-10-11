@@ -116,6 +116,17 @@ def test_a_citation_in_a_table_cell() -> None:
     assert link.line == 3
 
 
+def test_a_table_opens_a_sibling_list_item() -> None:
+    assert _one('- a\n- | x | b |\n  |---|---|\n  | [y](v) | c |\n').in_table_row
+
+
+@pytest.mark.parametrize(
+    'source', ['- p\n| [a](u) | b |\n|---|---|\n', '> p\n| [a](u) | b |\n|---|---|\n']
+)
+def test_a_lazy_line_starts_no_table(source: str) -> None:
+    assert not _one(source).in_table_row
+
+
 def test_an_escaped_pipe_stays_inside_the_cell() -> None:
     assert _one('| A |\n|---|\n| [a \\| b](u) |\n').text == 'a \\| b'
 
@@ -180,6 +191,75 @@ def test_a_fence_ends_with_its_container(source: str) -> None:
     ['- item\nlazy\n\n  [t](u)\n', '1. one\n| a | b |\n|---|---|\n\n    [t](u)\n'],
 )
 def test_a_lazy_line_keeps_the_list_item_open(source: str) -> None:
+    assert _one(source).url == 'u'
+
+
+@pytest.mark.parametrize(
+    'source',
+    [
+        '- a\n-\n    four [l](u)\n',
+        '- a\n- \n    four [l](u)\n',
+        '- a\n- \n\tTab [l](u)\n',
+        '- a\n===\n    four [l](u)\n',
+        '> p\n===\n    four [l](u)\n',
+    ],
+)
+def test_a_lazy_line_is_no_setext_underline(
+    source: str,
+) -> None:
+    assert _one(source).url == 'u'
+
+
+@pytest.mark.parametrize(
+    ('source', 'urls'),
+    [
+        ('p\n2) d\n\n    four [l](u)\n', []),
+        ('p\n0. d\n\n    four [l](u)\n', []),
+        ('p\n10. > j\n===\n      six [s](s)\n', []),
+        ('p\n*\n        eight [e](e)\n', ['e']),
+        ('- a\n  2. b\n\n      six [s](s)\n', []),
+        ('p\n01. d\n\n     five [l](u)\n', ['u']),
+        ('> p\n2) d\n\n    four [l](u)\n', ['u']),
+    ],
+)
+def test_only_a_nonempty_item_from_one_interrupts_a_paragraph(
+    source: str, urls: list[str]
+) -> None:
+    assert [link.url for link in scan_links(source)] == urls
+
+
+@pytest.mark.parametrize(
+    'source',
+    [
+        '-\n\n    four [l](u)\n',
+        '- \n   \n    four [l](u)\n',
+        '1. c\n- \n\n    four [l](u)\n',
+        '> -\n>\n>     four [l](u)\n',
+    ],
+)
+def test_a_list_item_opened_on_an_empty_line_ends_at_a_blank_line(source: str) -> None:
+    assert scan_links(source) == []
+
+
+@pytest.mark.parametrize(
+    ('source', 'urls'),
+    [
+        ('- item\n>\n    code [x](u)\n', []),
+        ('- > h [a](a)\n>\n  ```\n> q [b](b)\n', ['a']),
+        ('2) two\n    ```\n>\n\n\tTab [x](u)\n', []),
+        ('> - a\n\n>     code [x](u)\n', []),
+    ],
+)
+def test_a_blank_line_outside_a_list_items_quote_ends_the_item(
+    source: str, urls: list[str]
+) -> None:
+    assert [link.url for link in scan_links(source)] == urls
+
+
+@pytest.mark.parametrize(
+    'source', ['> - a\n>\n>     b [x](u)\n', '- > a\n  >\n  > b [x](u)\n']
+)
+def test_a_blank_line_inside_a_list_items_quote_keeps_the_item(source: str) -> None:
     assert _one(source).url == 'u'
 
 

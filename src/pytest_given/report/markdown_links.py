@@ -169,6 +169,8 @@ def _inline_runs(source: str) -> Iterator[_Run]:
     in_table = False
     skip_delimiter = False
     list_items: list[_ListItem] = []
+    # An item whose marker line held nothing else, until the line after it.
+    empty_item: _ListItem | None = None
     for index, (line_start, raw) in enumerate(raw_lines):
         if skip_delimiter:
             skip_delimiter = False
@@ -190,17 +192,21 @@ def _inline_runs(source: str) -> Iterator[_Run]:
         if html_end == '' and content.strip():
             continue
         html_end = None
-        if not content.strip():
-            yield from _paragraph_run(paragraph)
-            paragraph = []
-            in_table = False
-            continue
-        chars, columns = _leading(content)
         # A line ends the list items it is not indented into, or whose quote
         # it leaves — unless it continues a paragraph lazily, which keeps them.
         # A quote marker outside an item it ends opens a new quote instead.
         open_items = list_items
         list_items = [o for o in open_items if _holds(o, raw, depth)]
+        if not content.strip():
+            # An item can begin with at most one blank line: its marker line.
+            list_items = [o for o in list_items if o is not empty_item]
+            empty_item = None
+            yield from _paragraph_run(paragraph)
+            paragraph = []
+            in_table = False
+            continue
+        empty_item = None
+        chars, columns = _leading(content)
         ended = [o for o in open_items if o not in list_items]
         may_be_lazy = all(o.quote_depth >= depth for o in ended)
         base = max((o.column for o in list_items if o.quote_depth == depth), default=0)
@@ -210,24 +216,33 @@ def _inline_runs(source: str) -> Iterator[_Run]:
             yield from _paragraph_run(paragraph)
             paragraph = []
         block_start = relative <= 3
+        # A line outside the paragraph's item or quote continues it only
+        # lazily: it is no setext underline, starts no table, and any list
+        # item may interrupt it.
+        lazy = bool(ended) or depth < paragraph_depth
         # A list item, or a blockquote opened inside one, holds blocks of its
         # own: open each container, then read what follows it as a line.
+        opened_item: _ListItem | None = None
         while block_start:
-            if item := _list_item(rest, after_paragraph=bool(paragraph)):
+            interrupts = bool(paragraph) and not lazy
+            if item := _list_item(rest, interrupts_paragraph=interrupts):
                 gap = len(item.group(2))
                 taken = gap if gap <= 4 else 1
                 width = len(item.group(1)) + taken
                 base = columns + len(item.group(1)) + (taken or 1)
+                opened_item = _ListItem(depth, base)
                 list_items = [
                     *(
                         o
                         for o in list_items
                         if o.quote_depth < depth or o.column <= columns
                     ),
-                    _ListItem(depth, base),
+                    opened_item,
                 ]
             elif quote := _BLOCKQUOTE_MARKER.match(rest):
                 width, base, depth = quote.end(), 0, depth + 1
+                lazy = bool(ended) or depth < paragraph_depth
+                opened_item = None
             else:
                 break
             # A quote marker under a list item continues that quote's paragraph.
@@ -241,7 +256,10 @@ def _inline_runs(source: str) -> Iterator[_Run]:
             columns = base + relative
             rest = content[chars:]
             block_start = relative <= 3
-        if not rest or (relative >= 4 and not paragraph and not in_table):
+        if not rest:
+            empty_item = opened_item
+            continue
+        if relative >= 4 and not paragraph and not in_table:
             continue
         if block_start and (opening := _FENCE_OPEN.match(rest)):
             yield from _paragraph_run(paragraph)
@@ -265,7 +283,7 @@ def _inline_runs(source: str) -> Iterator[_Run]:
             paragraph, in_table = [], False
             yield _Run.of_lines([line])
             continue
-        if block_start and paragraph and _SETEXT_UNDERLINE.match(rest):
+        if block_start and paragraph and not lazy and _SETEXT_UNDERLINE.match(rest):
             yield from _paragraph_run(paragraph)
             paragraph = []
             continue
@@ -276,9 +294,11 @@ def _inline_runs(source: str) -> Iterator[_Run]:
         if in_table:
             yield from _cell_runs(line)
             continue
-        # A table cannot start on a lazy line: the line stays paragraph text.
-        lazy = bool(paragraph and ended)
-        if block_start and not lazy and _starts_table(content, raw_lines, index):
+        if (
+            block_start
+            and not (paragraph and lazy)
+            and _starts_table(content, raw_lines, index)
+        ):
             yield from _paragraph_run(paragraph)
             paragraph, in_table, skip_delimiter = [], True, True
             yield from _cell_runs(line)
@@ -294,23 +314,32 @@ def _inline_runs(source: str) -> Iterator[_Run]:
     yield from _paragraph_run(paragraph)
 
 
-def _list_item(rest: str, *, after_paragraph: bool) -> re.Match[str] | None:
+def _list_item(rest: str, *, interrupts_paragraph: bool) -> re.Match[str] | None:
     """A list marker opening `rest`, unless the line is a thematic break or a
-    setext underline, which win over it."""
-    if _THEMATIC_BREAK.match(rest) or (
-        after_paragraph and _SETEXT_UNDERLINE.match(rest)
+    setext underline, which win over it. Only an item that holds text, and an
+    ordered one only from 1, interrupts a paragraph."""
+    item = _LIST_ITEM.match(rest)
+    if item is None or _THEMATIC_BREAK.match(rest):
+        return None
+    number = item.group(1)[:-1]
+    if interrupts_paragraph and (
+        _SETEXT_UNDERLINE.match(rest)
+        or not rest[item.end() :].strip()
+        or (number and int(number) != 1)
     ):
         return None
-    return _LIST_ITEM.match(rest)
+    return item
 
 
 def _holds(item: _ListItem, raw: str, depth: int) -> bool:
     """Whether the line stays in the list item: inside the item's quote, and
-    indented into it there — a quote opened in the item counts as indent."""
+    blank or indented into it there — a quote opened in the item counts as
+    indent, so a bare `>` outside the item ends it."""
     if item.quote_depth > depth:
         return False
     _, prefix = _quote_prefix(raw, item.quote_depth)
-    return _leading(raw[prefix:])[1] >= item.column
+    inside = raw[prefix:]
+    return not inside.strip() or _leading(inside)[1] >= item.column
 
 
 def _raw_lines(source: str) -> Iterator[tuple[int, str]]:
