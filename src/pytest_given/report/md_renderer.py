@@ -26,7 +26,7 @@ from .text import NEWLINE, STATUS_GLYPH, STATUS_LABEL
 def render_md(report: ReportData, *, with_lines: bool = True) -> str:
     """Render the report model to an agent-facing Markdown string."""
     name = report.metadata.title or report.metadata.project
-    blocks = [f'# pytest-given — {_text(name)}']
+    blocks = [_heading(1, f'pytest-given — {_text(name)}')]
     blocks.extend(_scenario_md(scenario, with_lines) for scenario in report.scenarios)
     return '\n\n'.join(blocks) + '\n'
 
@@ -42,7 +42,7 @@ def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
         suffix = f' · {STATUS_LABEL[scenario.status]}'
     elif scenario.parameters is not None:
         suffix = f' · {plural(len(scenario.parameters.cases), "case")}'
-    lines = [f'## {glyph} {_narration_md(scenario.narration)}{suffix}']
+    lines = [_heading(2, f'{glyph} {_narration_md(scenario.narration)}{suffix}')]
     subtitle = f'`{_source_md(scenario, with_lines)}`'
     if scenario.tags:
         subtitle += ' · ' + ', '.join(_text(tag) for tag in scenario.tags)
@@ -285,3 +285,11 @@ def _quoted(text: str) -> str:
 
 def _narration_md(narration: Narration) -> str:
     return narration_markdown(narration, term_ref=lambda display: f'«{display}»')
+
+
+# A heading's trailing run of `#` after a space, which would close it unseen.
+_CLOSING_SEQUENCE = re.compile(r'(?<=[ \t])#+[ \t]*$')
+
+
+def _heading(level: int, text: str) -> str:
+    return f'{"#" * level} {_CLOSING_SEQUENCE.sub(r"\\\g<0>", text)}'

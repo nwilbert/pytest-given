@@ -116,7 +116,8 @@ backtick run inside. Only the label changes: the Markdown report escapes it like
   nesting logic for emphasis goes, and `plain_link_text` keeps its own for reading documents back.
 - `report/md_renderer.py` — every text through the writer: the heading, titles and steps piece by
   piece, tags, skip and xfail reasons, column names, case keys, cells, attachment labels and error
-  lines; `_narration_md` folds newlines to spaces.
+  lines; `_narration_md` folds newlines to spaces. A heading's trailing ` #` run is escaped, or it
+  would close the heading unseen.
 - `report/citation_index.py`, `citations/check.py` — a scenario citation carries the title's
   pieces, so `link_text` writes each one on its own; story titles and tags are escaped whole.
 - `grouping/percase.py` — the suffix as a value piece.

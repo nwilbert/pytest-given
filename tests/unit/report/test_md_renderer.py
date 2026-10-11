@@ -895,6 +895,17 @@ def test_header_prefers_the_title_over_the_project() -> None:
     assert md.startswith('# pytest-given — Coffee Shop Example')
 
 
+def test_a_heading_ending_in_a_hash_keeps_it() -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='fix issue ##'),
+        module='tests/t.py',
+    )
+    rendered = MarkdownIt('commonmark').render(render_md(_report(scn, title='C #')))
+    assert '<h1>pytest-given — C #</h1>' in rendered
+    assert '<h2>✓ fix issue ##</h2>' in rendered
+
+
 def test_a_title_and_a_step_keep_their_spans() -> None:
     scn = Scenario(
         id='tests/t.py::test_x',
