@@ -1,6 +1,7 @@
 """A citation's link text, written so it renders as the title it stands for,
 and read back as the title it renders."""
 
+from ..model import EMPHASIS
 from .text import NEWLINE
 
 # What a backslash escapes in CommonMark.
@@ -11,20 +12,35 @@ ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
 # strikethrough, opening a code span, raw HTML, an entity, a table cell,
 # GitHub math.
 _ALWAYS_ESCAPED = frozenset('\\[]*~`<&|$')
+# The markers of `EMPHASIS`'s groups past the code span, in order.
+_EMPHASIS_MARKERS = ('**', '__', '*')
 
 
 def link_text(title: str, *, in_table_row: bool = False) -> str:
-    """`title` as link text that renders as it, character for character.
+    """`title` as link text that renders as it does in the report.
 
-    Code spans are meant as code, as the Markdown sink renders them, so
-    nothing inside one is escaped — a backslash there would render — except a
-    table row's `|`, which GFM lets an escape keep from splitting the cell.
+    Code spans and the emphasis `EMPHASIS` matches are markup, as both sinks
+    render them, so their markers stay. Nothing inside a code span is escaped
+    — a backslash there would render — except a table row's `|`, which GFM
+    lets an escape keep from splitting the cell.
     """
     text = NEWLINE.sub(' ', title)
     out: list[str] = []
     index = 0
     while index < len(text):
         char = text[index]
+        emphasis = EMPHASIS.match(text, index) if char in '*_' else None
+        if emphasis is not None:
+            _, *spans = emphasis.groups()
+            marker, inner = next(
+                (marker, span)
+                for marker, span in zip(_EMPHASIS_MARKERS, spans, strict=True)
+                if span is not None
+            )
+            inner = link_text(inner, in_table_row=in_table_row)
+            out.append(f'{marker}{inner}{marker}')
+            index = emphasis.end()
+            continue
         if char == '`':
             end, closed = code_span_at(text, index)
             run = text[index:end]

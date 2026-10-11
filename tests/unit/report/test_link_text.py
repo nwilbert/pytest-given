@@ -10,7 +10,7 @@ from pytest_given.report.link_text import fold_whitespace, link_text, plain_link
     ('title', 'written'),
     [
         ('a [b] c', 'a \\[b\\] c'),
-        ('*bold*', '\\*bold\\*'),
+        ('2 * 3', '2 \\* 3'),
         ('~~gone~~', '\\~\\~gone\\~\\~'),
         ('<title> tag', '\\<title> tag'),
         ('&amp;', '\\&amp;'),
@@ -20,7 +20,6 @@ from pytest_given.report.link_text import fold_whitespace, link_text, plain_link
         ('_lead and trail_', '\\_lead and trail\\_'),
         ('snake_case and 2_3', 'snake_case and 2_3'),
         ('a `--given-md` flag', 'a `--given-md` flag'),
-        ('a `x*y` and *z*', 'a `x*y` and \\*z\\*'),
         ('one ` tick', 'one \\` tick'),
         ('two\nlines', 'two lines'),
     ],
@@ -28,6 +27,19 @@ from pytest_given.report.link_text import fold_whitespace, link_text, plain_link
 def test_link_text_escapes_what_would_not_render_literally(
     title: str, written: str
 ) -> None:
+    assert link_text(title) == written
+
+
+@pytest.mark.parametrize(
+    ('title', 'written'),
+    [
+        ('Books a **suite**', 'Books a **suite**'),
+        ('a `x*y` and *z*', 'a `x*y` and *z*'),
+        ('__init__ runs', '__init__ runs'),
+        ('**a [b] | c**', '**a \\[b\\] \\| c**'),
+    ],
+)
+def test_emphasis_the_report_renders_stays_emphasis(title: str, written: str) -> None:
     assert link_text(title) == written
 
 
