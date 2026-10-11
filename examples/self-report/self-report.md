@@ -1,5 +1,13 @@
 # pytest-given — pytest-given Self-Report
 
+## ✓ `pytest-given report --report-url` re-renders a saved «report» for another URL
+`tests/integration/test_cli.py::test_cli_report_url_replaces_the_saved_one` · spec/citations
+
+- **given** a saved «report» served from `/dev/`
+- **when** it is re-rendered with `--report-url` set to `/1.0/`
+- **then** the command succeeds
+- **then** the copy buttons' «citations» link the `/1.0/` URL
+
 ## ✓ A «scenario» failing on a pytest-given refusal points at the test, not at pytest-given
 `tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test`
 
@@ -2135,6 +2143,39 @@
 - **then** it stays a finding
 - **when** it is updated once the «report» holds the scenario again
 - **then** it reads as current again
+
+## ✓ A «citation» of any «case» cites the grouped «scenario» holding it
+`tests/unit/citations/test_check.py::test_a_citation_of_any_case_cites_its_grouped_scenario` · spec/citations
+
+- **given** a «report» where one test function groups into two «scenarios», the first with the «cases» `[a]` and `[c]`
+- **given** a document citing the «case» `[c]`
+  - 📎 document:
+    ```
+    ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour%5Bc%5D)
+    ```
+- **when** the document is updated
+- **then** the «citation» names its «scenario» by the first «case»
+  - 📎 updated document:
+    ```
+    ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour%5Ba%5D)
+    ```
+- **then** no finding remains
+
+## ✓ A «citation» keeps the emphasis its «scenario title» renders with
+`tests/unit/citations/test_check.py::test_a_citation_keeps_the_emphasis_of_its_title` · spec/citations
+
+- **given** a «report» whose «scenario title» sets a word in bold
+- **given** a document with a placeholder «citation» of it
+  - 📎 document:
+    ```
+    ? [](https://example.org/report.html#scenario=t.py::test_book)
+    ```
+- **when** the document is updated
+- **then** its link text sets the word in bold too
+  - 📎 updated document:
+    ```
+    ✅ [Books a **suite**](https://example.org/report.html#scenario=t.py::test_book)
+    ```
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`

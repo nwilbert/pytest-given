@@ -115,6 +115,60 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
         assert recovered == document
 
 
+@scenario(
+    t'A {pg["Citation"].l} of any {pg["Case"].l} cites the grouped '
+    t'{pg["Scenario"].l} holding it',
+    tags=['spec/citations'],
+)
+def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> None:
+    with given(
+        t'a {pg["Report"].l} where one test function groups into two '
+        t'{pg["Scenario"].l.s}, the first with the {pg["Case"].l.s} `[a]` and `[c]`'
+    ):
+        report = report_(
+            scenario_(
+                't.py::test_pour[a]',
+                'Pour',
+                grouped=True,
+                other_cases=('t.py::test_pour[c]',),
+            ),
+            scenario_('t.py::test_pour[b]', 'Pour twice', grouped=True),
+        )
+    with given(t'a document citing the {pg["Case"].l} `[c]`'):
+        document = f'✅ [Pour]({URL}#scenario=t.py::test_pour%5Bc%5D)\n'
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then(
+        t'the {pg["Citation"].l} names its {pg["Scenario"].l} by the first '
+        t'{pg["Case"].l}'
+    ):
+        attach('updated document', written)
+        assert written == f'✅ [Pour]({URL}#scenario=t.py::test_pour%5Ba%5D)\n'
+    with then('no finding remains'):
+        assert result.remaining == []
+
+
+@scenario(
+    t'A {pg["Citation"].l} keeps the emphasis its {pg["Scenario title"].l} '
+    t'renders with',
+    tags=['spec/citations'],
+)
+def test_a_citation_keeps_the_emphasis_of_its_title(tmp_path: Path) -> None:
+    with given(
+        t'a {pg["Report"].l} whose {pg["Scenario title"].l} sets a word in bold'
+    ):
+        report = report_(scenario_('t.py::test_book', 'Books a **suite**'))
+    with given(t'a document with a placeholder {pg["Citation"].l} of it'):
+        document = f'? []({URL}#scenario=t.py::test_book)\n'
+        attach('document', document)
+    with when('the document is updated'):
+        _, written = _run(tmp_path, document, report, update=True)
+    with then('its link text sets the word in bold too'):
+        attach('updated document', written)
+        assert written == f'✅ [Books a **suite**]({URL}#scenario=t.py::test_book)\n'
+
+
 # --- One test per row of the findings table ---
 
 

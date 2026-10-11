@@ -15,7 +15,7 @@ It reads two kinds of report link:
 Live, against this site's example reports:
 
 - 🔵 [Cancel a Booking](../examples/hotel-booking.html#view=stories&story=cancel-a-booking) (2 ✅ · 1 🔵)
-- ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (3 ✅)
+- ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (6 ✅)
 
 ## How it fits together
 

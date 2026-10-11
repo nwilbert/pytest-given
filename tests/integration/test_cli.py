@@ -3,9 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import PytestGivenError
+from pytest_given import PytestGivenError, given, scenario, then, when
 from pytest_given.cli import main
 from pytest_given.report import sinks
+from tests.ubiquitous_language import pg
 from tests.unit.report.test_html_renderer import _embedded_app_data
 
 
@@ -42,18 +43,26 @@ def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
     assert app_data['citations']['report_url'] == 'https://example.org/report.html'
 
 
+@scenario(
+    t'`pytest-given report --report-url` re-renders a saved {pg["Report"].l} '
+    t'for another URL',
+    tags=['spec/citations'],
+)
 def test_cli_report_url_replaces_the_saved_one(tmp_path: Path) -> None:
-    report = _minimal_report()
-    report['metadata']['report_url'] = 'https://example.org/dev/report.html'
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(json.dumps(report))
-    html_path = tmp_path / 'out.html'
-    url = 'https://example.org/1.0/report.html'
-    assert (
-        main(['report', str(json_path), '-o', str(html_path), '--report-url', url]) == 0
-    )
-    app_data = _embedded_app_data(html_path.read_text(encoding='utf-8'))
-    assert app_data['citations']['report_url'] == url
+    with given(t'a saved {pg["Report"].l} served from `/dev/`'):
+        report = _minimal_report()
+        report['metadata']['report_url'] = 'https://example.org/dev/report.html'
+        json_path = tmp_path / 'data.json'
+        json_path.write_text(json.dumps(report))
+    with when('it is re-rendered with `--report-url` set to `/1.0/`'):
+        html_path = tmp_path / 'out.html'
+        url = 'https://example.org/1.0/report.html'
+        rc = main(['report', str(json_path), '-o', str(html_path), '--report-url', url])
+    with then('the command succeeds'):
+        assert rc == 0
+    with then(t"the copy buttons' {pg['Citation'].l.s} link the `/1.0/` URL"):
+        app_data = _embedded_app_data(html_path.read_text(encoding='utf-8'))
+        assert app_data['citations']['report_url'] == url
 
 
 def test_cli_refuses_a_report_url_no_citation_can_link(tmp_path: Path, capsys) -> None:
