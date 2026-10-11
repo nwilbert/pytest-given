@@ -85,7 +85,8 @@ a value. A plain-string title gets parts too, so title and suffix are never read
 - **HTML** (`report/inline_markdown.py`): renders the reader's spans as `<strong>`, `<em>` and
   `<code>`, escaping everything else. The narration filter renders each plain-text piece this way,
   and so does the parts-less path for a plain-string title or step. Definitions additionally turn
-  `<br>` and newlines into breaks. Everything else is escaped as it is today.
+  `<br>` and newlines into breaks. Everything else is escaped as it is today. The search box
+  matches a title as it shows, its markers left out.
 - **Markdown** (`report/markdown_writer.py`): one writer backslash-escapes every character
   CommonMark or GFM give inline meaning — the set `link_text` already escapes
   (``\ [ ] * ~ ` < & | $``) and an `_` not intraword in the written line, its neighbouring
@@ -122,8 +123,8 @@ backtick run inside. Only the label changes: the Markdown report escapes it like
   pieces, so `link_text` writes each one on its own; story titles and tags are escaped whole.
 - `grouping/percase.py` — the suffix as a value piece.
 - `capture/markdown_glossary.py` — unwraps through the reader.
-- `report/templates/` — no change; the per-case value highlight and rendered spans are
-  Playwright-verified per AGENTS.md.
+- `report/templates/` — `app.js` searches the shown title `html_renderer.py` passes it; the
+  search, the per-case value highlight and rendered spans are Playwright-verified per AGENTS.md.
 - Docs: the [table](#supported-markdown) and the span rules in a "Formatting" section of
   `docs/site/guide/step-text.md`, linked from `docs/site/guide/glossary.md`; the authoring skill's
   `references/scenarios.md` and `references/glossaries.md` in step; the navigating skill's
@@ -162,5 +163,3 @@ backtick run inside. Only the label changes: the Markdown report escapes it like
   the link reads as the same text.
 - **A Markdown attachment type**, whose content would render a limited set of Markdown; text and
   JSON attachments stay literal.
-- **Search:** the HTML search box matches the raw text, markers included; a query rarely contains
-  them.

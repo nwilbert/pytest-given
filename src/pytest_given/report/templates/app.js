@@ -143,7 +143,7 @@ function reportApp() {
   // Filtering is the hot path: six Alpine effects rescan every scenario per
   // filter change, so anything derivable once is derived here.
   const searchHaystacks = data.scenarios.map(
-    s => (s.narration.text + ' ' + s.tags.join(' ')).toLowerCase(),
+    s => (s.search_text + ' ' + s.tags.join(' ')).toLowerCase(),
   );
   // Every status in filter order, labelled as the Markdown report words them.
   const STATUS_LABELS = data.status_labels;

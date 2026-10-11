@@ -354,11 +354,31 @@ def _app_data(report: ReportData) -> dict[str, object]:
                 'module': scenario.module,
                 'tags': scenario.tags,
                 'status': scenario.status,
-                'narration': {'text': scenario.narration.text},
+                'search_text': _shown_text(scenario.narration),
             }
             for scenario in report.scenarios
         ],
     }
+
+
+def _shown_text(narration: Narration) -> str:
+    """A title as the page shows it, its markers rendered away."""
+    return ''.join(_piece_text(piece) for piece in read_narration(narration))
+
+
+def _piece_text(piece: NarrationPiece) -> str:
+    match piece:
+        case (
+            PlainSpan(text=text)
+            | CodeSpan(text=text)
+            | NarrationValue(rendered=text)
+            | NarrationTermRef(display=text)
+        ):
+            return text
+        case EmphasisSpan(content=content):
+            return ''.join(span.text for span in content)
+        case NarrationPlaceholder():
+            return placeholder_token(piece)
 
 
 def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | None:

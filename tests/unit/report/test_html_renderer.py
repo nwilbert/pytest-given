@@ -2521,3 +2521,26 @@ def test_any_case_of_one_of_two_groups_opens_its_group() -> None:
     )
     data = _embedded_app_data(render_html_string(report, None))
     assert data['cited_scenario_ids'] == {'t.py::test_pour[c]': 't.py::test_pour[a]'}
+
+
+def test_the_search_box_matches_a_title_as_it_shows() -> None:
+    narration = Narration(
+        text='a **paid** `pay` for Guest in {room}',
+        parts=(
+            NarrationLiteral(value='a **paid** `pay` for '),
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+            NarrationLiteral(value=' in '),
+            NarrationPlaceholder(name='room', column_id=param_id('room')),
+        ),
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0'
+        ),
+        scenarios=[
+            Scenario(id=NodeId('t.py::test_x'), narration=narration, module='m')
+        ],
+    )
+    scenarios = _app_data(report)['scenarios']
+    assert isinstance(scenarios, list)
+    assert scenarios[0]['search_text'] == 'a paid pay for Guest in {room}'
