@@ -85,6 +85,12 @@ def case_suffix(node_id: str) -> str:
     return f'{bracket}{rest}'
 
 
+def case_id(node_id: str) -> str:
+    """A case's pytest id, as the terminal prints it: the parametrize tail
+    without its brackets, ``''`` where every part of it is hidden."""
+    return case_suffix(node_id)[1:-1]
+
+
 TermId = NewType('TermId', str)
 SentenceId = NewType('SentenceId', int)
 # What an author may call a sentence, so a pin survives a sentence inserted
@@ -406,8 +412,12 @@ class ParameterCase:
 
 @dataclass(frozen=True)
 class ParameterTable:
+    """`named_cases` is whether any case's id was written by hand, which is
+    what earns the table its leading id column."""
+
     columns: list[ParameterColumn]
     cases: list[ParameterCase] = field(default_factory=list)
+    named_cases: bool = False
 
     def cells(self, case: ParameterCase) -> list[tuple[ParameterColumn, CellValue]]:
         """A case's cells paired with the columns they sit under.

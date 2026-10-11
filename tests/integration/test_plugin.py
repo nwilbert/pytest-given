@@ -332,6 +332,63 @@ def test_parametrized_test_as_table(pytester, tmp_path):
         assert [p['name'] for p in then_parts if 'name' in p] == ['expected']
 
 
+@scenario(
+    t'A {pg["Parameter table"].l} names its rows by their {pg["Case id"].l.s} '
+    t'when any was written by hand',
+    tags=['parametrization', 'spec/parameter-table-case-ids'],
+)
+def test_a_parameter_table_names_its_rows_by_their_case_ids(pytester, tmp_path):
+    with given(
+        t'a {pg["Parametrized scenario"].l} naming one {pg["Case"].l} with '
+        t'`pytest.param(..., id=...)` and leaving the other to pytest'
+    ):
+        suite = """
+            import pytest
+            from pytest_given import scenario, then
+
+            @scenario("Bookings clash")
+            @pytest.mark.parametrize(
+                "start, clashes",
+                [pytest.param(20, False, id="touching-edges"), (19, True)],
+            )
+            def test_overlap(start, clashes):
+                with then(t"a booking from {start} clashes: {clashes}"):
+                    assert (start < 20) == clashes
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        md_path = tmp_path / 'report.md'
+    with when('the suite runs with --given-md'):
+        result = pytester.runpytest(f'--given-md={md_path}')
+        md = md_path.read_text(encoding='utf-8')
+        attach('report.md', md)
+    with then('both cases pass'):
+        result.assert_outcomes(passed=2)
+    with then(
+        t'the {pg["Parameter table"].l} leads with an id column, '
+        t'the generated {pg["Case id"].l} shown beside the written one'
+    ):
+        assert '| id | start | clashes |' in md
+        assert '| touching-edges | 20 | False |' in md
+        assert '| 19-True | 19 | True |' in md
+
+
+def test_generated_case_ids_leave_the_table_without_an_id_column(pytester, tmp_path):
+    result, scenario_json = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario("Bookings clash")
+        @pytest.mark.parametrize("start", [19, 20], ids=[None, None])
+        def test_overlap(start):
+            with then(t"a booking from {start}"):
+                pass
+        """,
+    )
+    result.assert_outcomes(passed=2)
+    assert scenario_json['parameters']['named_cases'] is False
+
+
 def test_parametrized_non_json_values_are_captured_as_str(pytester, tmp_path):
     """Non-JSON-primitive parametrize values (dates, objects) must not crash
     the JSON sink; they are captured as their str() while primitives keep

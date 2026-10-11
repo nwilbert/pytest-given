@@ -2,6 +2,7 @@
 in integration tests; tested here directly so coverage hits 100%."""
 
 import inspect
+import textwrap
 import tomllib
 from importlib.metadata import version
 from pathlib import Path
@@ -31,9 +32,10 @@ from pytest_given.model import (
     NodeId,
     PytestGivenError,
     Step,
+    case_id,
     snapshot_param_value,
 )
-from pytest_given.plugin import collection, fixtures, runtest, session, state
+from pytest_given.plugin import case_ids, collection, fixtures, runtest, session, state
 from pytest_given.report import SinkConfig
 
 
@@ -630,3 +632,163 @@ def test_a_value_rendering_by_identity_under_repr_only_is_kept_as_it_is() -> Non
     """Both renderings are checked: an interpolation may ask for either."""
     value = _StrByValueReprByIdentity()
     assert snapshot_param_value(value) is value
+
+
+# --- Whether a case's id was written by hand ---
+
+
+def _explicit_ids(pytester: pytest.Pytester, source: str) -> dict[str, bool]:
+    """Each collected case's id suffix, mapped to whether it reads as explicit."""
+    items = pytester.getitems(
+        'import pytest\nfrom pytest import HIDDEN_PARAM\n' + textwrap.dedent(source)
+    )
+    cache: case_ids.MarkIdsCache = {}
+    return {
+        case_id(item.nodeid): case_ids.explicit_case_id(
+            item, cast(pytest.Function, item).callspec.params, cache
+        )
+        for item in items
+    }
+
+
+def test_generated_ids_are_not_explicit(pytester: pytest.Pytester) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a, b', [(1, 2), pytest.param(3, 4)])
+        def test_x(a, b): pass
+        """,
+    ) == {'1-2': False, '3-4': False}
+
+
+def test_a_param_id_is_explicit_for_its_case_only(pytester: pytest.Pytester) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1, pytest.param(2, id='two')])
+        def test_x(a): pass
+        """,
+    ) == {'1': False, 'two': True}
+
+
+def test_a_hidden_param_id_is_not_explicit(pytester: pytest.Pytester) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [pytest.param(1, id=HIDDEN_PARAM)])
+        def test_x(a): pass
+        """,
+    ) == {'': False}
+
+
+def test_an_ids_entry_is_explicit_unless_none(pytester: pytest.Pytester) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1, 2], ids=['one', None])
+        def test_x(a): pass
+        """,
+    ) == {'one': True, '2': False}
+
+
+def test_positional_ids_count_like_the_keyword(pytester: pytest.Pytester) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1], False, ['one'])
+        def test_x(a): pass
+        """,
+    ) == {'one': True}
+
+
+def test_an_ids_callable_is_explicit_even_returning_none(
+    pytester: pytest.Pytester,
+) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1, 2], ids=lambda v: None if v == 1 else 'two')
+        def test_x(a): pass
+        """,
+    ) == {'1': True, 'two': True}
+
+
+def test_an_ids_iterator_counts_as_explicit(pytester: pytest.Pytester) -> None:
+    """pytest has consumed it by now, so its entries cannot be read again."""
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1], ids=iter(['one']))
+        def test_x(a): pass
+        """,
+    ) == {'one': True}
+
+
+def test_one_explicit_part_of_stacked_marks_makes_the_case_explicit(
+    pytester: pytest.Pytester,
+) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1, 2])
+        class TestX:
+            @pytest.mark.parametrize(
+                argnames=['b'], argvalues=[(3,), pytest.param(4, id='four')]
+            )
+            def test_x(self, a, b): pass
+        """,
+    ) == {'3-1': False, 'four-1': True, '3-2': False, 'four-2': True}
+
+
+def test_a_value_repeated_at_an_explicit_position_reads_as_explicit(
+    pytester: pytest.Pytester,
+) -> None:
+    """A repeated object matches every position it sits at; the table shows
+    its ids for the explicit one either way."""
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [None, 2, pytest.param(None, id='again')])
+        def test_x(a): pass
+        """,
+    ) == {'None': True, '2': False, 'again': True}
+
+
+def test_a_hidden_param_wins_over_its_ids_entry(pytester: pytest.Pytester) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [pytest.param(1, id=HIDDEN_PARAM)], ids=['one'])
+        def test_x(a): pass
+        """,
+    ) == {'': False}
+
+
+def test_parametrization_without_a_mark_reads_as_generated(
+    pytester: pytest.Pytester,
+) -> None:
+    assert _explicit_ids(
+        pytester,
+        """
+        @pytest.fixture(params=[1], ids=['one'])
+        def a(request): return request.param
+
+        def test_x(a): pass
+        """,
+    ) == {'one': False}
+
+
+@pytest.mark.parametrize(
+    'argnames', [pytest.param("['a']", id='list'), pytest.param("'a,'", id='comma')]
+)
+def test_one_argname_outside_a_bare_string_takes_tuples(
+    pytester: pytest.Pytester, argnames: str
+) -> None:
+    """pytest takes each value whole only for a bare string naming one argument."""
+    assert _explicit_ids(
+        pytester,
+        f"""
+        @pytest.mark.parametrize({argnames}, [(1,), (2,)], ids=['one', None])
+        def test_x(a): pass
+        """,
+    ) == {'one': True, '2': False}

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T16:09:10.786698+00:00",
+    "timestamp": "2026-10-11T18:25:13.858759+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "ed077363928c2831dc5ae4db53407a5562eaed0c",
+    "commit_sha": "9b4a42975804b52516618ccb531a9e1a997c110c",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 50,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -805,7 +805,8 @@
               "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     - partial balance\nE     + unsupported payment method"
             }
           }
-        ]
+        ],
+        "named_cases": false
       },
       "error": null,
       "skip_reason": null,
@@ -1014,7 +1015,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "xfailed",
-      "duration_ms": 5,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",

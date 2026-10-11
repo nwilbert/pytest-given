@@ -73,6 +73,7 @@ Parameter tables are part of the document too. Flag these:
 - A column that only makes sense next to a value another step fixes, like `existing_start=50` next to a new booking that another step fixes at hours 10 to 20.
 - A column that no step narrates.
 - A label column that the body turns back into data, with no attachment showing the data.
+- A case id that misnames its row, or only repeats a column's value.
 - An outcome that varies but has no column of its own.
 - Sibling scenarios that should be one table: the same steps with one arrangement varied, or titles that negate each other.
 

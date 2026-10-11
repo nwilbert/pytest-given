@@ -39,6 +39,7 @@ from ..model import (
     Step,
     TermId,
     TermKind,
+    case_id,
     iter_steps,
     placeholder_token,
     plural,
@@ -170,6 +171,7 @@ def _build_env(
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     env.filters['phase_blocks'] = _phase_blocks
     env.filters['column_phase_blocks'] = _column_phase_blocks
+    env.filters['case_id'] = case_id
     env.globals['data_url'] = _data_url
     return env
 

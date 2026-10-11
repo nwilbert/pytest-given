@@ -16,6 +16,7 @@ from ..model import (
     Scenario,
     Step,
     StepAttachment,
+    case_id,
     node_base,
     plural,
 )
@@ -86,30 +87,36 @@ def _param_table_md(table: ParameterTable) -> str:
     Long cells follow the split `_attachment_lines` uses: short single-line
     content sits inline in backticks; multiline or backtick-bearing content
     shows the label in the cell and renders fenced below the table, keyed by
-    the case's parametrize values.
+    the row (see `_case_key`).
 
-    The trailing status column only appears when the cases differ in status:
-    a column of one glyph says nothing the heading's glyph hasn't.
+    The leading id column only appears when some case id was written by hand,
+    and the trailing status column only when the cases differ in status: a
+    column of one glyph says nothing the heading's glyph hasn't.
     """
     show_status = table.has_mixed_statuses
-    names = ' | '.join(_cell(column.name) for column in table.columns)
-    header = '| ' + names + ' |' + ' |' * show_status
-    separator = '|' + '---|' * (len(table.columns) + show_status)
+    names = [_cell(column.name) for column in table.columns]
+    if table.named_cases:
+        names.insert(0, 'id')
+    header = '| ' + ' | '.join(names) + ' |' + ' |' * show_status
+    separator = '|' + '---|' * (len(names) + show_status)
     rows: list[str] = []
     blocks: list[str] = []
     for row, case in enumerate(table.cases, start=1):
-        cells = [_case_cell(column, value) for column, value in table.cells(case)]
+        pytest_id = _cell(case_id(case.id))
+        cells = [pytest_id] if table.named_cases else []
+        cells.extend(_case_cell(column, value) for column, value in table.cells(case))
         if show_status:
             cells.append(STATUS_GLYPH[case.status])
         rows.append('| ' + ' | '.join(cells) + ' |')
-        key = _case_key(table, case, row)
+        # The id the row leads with names it best, when it has one.
+        key = (table.named_cases and pytest_id) or _case_key(table, case, row)
         blocks.extend(_case_error_block(key, case))
         blocks.extend(_case_attachment_blocks(table, case, key))
     return '\n'.join([header, separator, *rows, *blocks])
 
 
 def _case_error_block(key: str, case: ParameterCase) -> list[str]:
-    """A failing or xfailed case's error, keyed by its parametrize values.
+    """A failing or xfailed case's error, keyed by its row.
 
     Below the table rather than in the row: Markdown cannot nest a block inside
     a table cell. A grouped scenario carries no error of its own, so without
@@ -151,7 +158,7 @@ def _case_attachment_blocks(
     table: ParameterTable, case: ParameterCase, key: str
 ) -> list[str]:
     """Fenced blocks for this case's attachment cells that did not fit inline,
-    keyed by the case's parametrize values and headed by the column name.
+    keyed by the case's row and headed by the column name.
 
     The column name, not the attachment label: two columns can share a label,
     which would head both blocks identically.
@@ -168,7 +175,7 @@ def _case_attachment_blocks(
 
 def _case_key(table: ParameterTable, case: ParameterCase, row: int) -> str:
     """A case's parametrize values, joined — how a note below the table names
-    the row it belongs to.
+    the row it belongs to when no id does.
 
     A value too long to inline is left out: the key points into the table, and
     a document in it would repeat the table instead. With none left, the row

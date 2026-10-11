@@ -43,16 +43,16 @@
 - **when** I insert \${euros}
 - **then** the purchase is allowed: {expect}
 
-| euros | expect | |
-|---|---|---|
-| 1 | False | ✓ |
-| 2 | True | ✓ |
-| 3 | True | ✓ |
-| 1.5 | True | ⊗ |
+| id | euros | expect | |
+|---|---|---|---|
+| a-euro-short | 1 | False | ✓ |
+| 2-True | 2 | True | ✓ |
+| 3-True | 3 | True | ✓ |
+| happy-hour | 1.5 | True | ⊗ |
 
-- **1.5, True** — expected failure:
+- **happy-hour** — expected failure:
   > assert False == True
-  > test_coffeeshop.py:87 in test_pricing
+  > test_coffeeshop.py:90 in test_pricing
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label`
@@ -209,7 +209,7 @@
 - **then** the machine has 20 coffees
 
 > assert 10 == 20
-> test_coffeeshop.py:277 in test_failing
+> test_coffeeshop.py:280 in test_failing
 
 ## ○ Skipped scenario rendering · skipped
 `examples/coffeeshop/test_coffeeshop.py::test_skipped` — reason: demonstrates skipped status
@@ -223,7 +223,7 @@
 - **when** I buy a coffee with the card
 
 > the machine does not read loyalty cards yet
-> test_coffeeshop.py:288 in pay_with_loyalty_card
+> test_coffeeshop.py:291 in pay_with_loyalty_card
 
 ## ○ All cases skipped · skipped
 `examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped` — reason: awaiting fixture

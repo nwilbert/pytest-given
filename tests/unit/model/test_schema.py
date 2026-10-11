@@ -35,6 +35,7 @@ from pytest_given.model import (
     StoryId,
     TermId,
     TracebackFrame,
+    case_id,
     case_suffix,
     node_base,
 )
@@ -130,6 +131,21 @@ def test_parameter_table() -> None:
     assert [c.name for c in table.columns] == ['euros', 'coffees']
     assert len(table.cases) == 2
     assert table.cases[1].error is not None
+
+
+@pytest.mark.parametrize(
+    ('node_id', 'expected'),
+    [
+        pytest.param('t.py::test_x[touching-edges]', 'touching-edges', id='plain'),
+        pytest.param('t.py::C::test_x[edge-1]', 'edge-1', id='stacked'),
+        pytest.param('t.py::test_x[a[0]]', 'a[0]', id='bracketed'),
+        pytest.param('t.py::test_x', '', id='hidden'),
+    ],
+)
+def test_case_id_is_the_node_ids_suffix_unbracketed(
+    node_id: str, expected: str
+) -> None:
+    assert case_id(node_id) == expected
 
 
 def test_metadata() -> None:

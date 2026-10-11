@@ -25,6 +25,7 @@ from ..model import (
     Status,
     snapshot_param_value,
 )
+from .case_ids import explicit_case_id
 from .fixtures import graft_fixture_recordings
 from .state import given_config, scenario_marker, session_collector, session_state
 
@@ -104,13 +105,15 @@ def _capture_param_spec(item: pytest.Item, node_id: NodeId, *, group: bool) -> N
         return
     funcargs = getattr(item, 'funcargs', {})
     names = list(callspec.params.keys())
-    session_state(item.config).param_info[node_id] = ParamSpec(
+    state = session_state(item.config)
+    state.param_info[node_id] = ParamSpec(
         names=names,
         values=[
             snapshot_param_value(funcargs.get(name, callspec.params[name]))
             for name in names
         ],
         group=group,
+        explicit_id=explicit_case_id(item, callspec.params, state.mark_ids),
     )
 
 

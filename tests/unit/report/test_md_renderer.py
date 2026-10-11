@@ -1034,3 +1034,59 @@ def test_an_error_line_never_opens_a_block_inside_its_quote(message: str) -> Non
     rendered = MarkdownIt('commonmark').render(quote)
     text = html.escape(message.strip(), quote=False)
     assert rendered == f'<blockquote>\n<p>{text}\n1. a.py:3 in f</p>\n</blockquote>\n'
+
+
+def _named_table(*cases: ParameterCase) -> ParameterTable:
+    return ParameterTable(
+        columns=[ParameterColumn(id='hours', name='hours', kind='param')],
+        cases=list(cases),
+        named_cases=True,
+    )
+
+
+def test_a_named_table_leads_with_every_cases_id() -> None:
+    """A generated id shows beside a written one, as the terminal printed it."""
+    table = _named_table(
+        ParameterCase(id=NodeId('t.py::test_x[touching-edges]'), values=[10]),
+        ParameterCase(id=NodeId('t.py::test_x[11]'), values=[11], status='failed'),
+    )
+    md = render_md(_report_with(table))
+    assert '| id | hours | |\n|---|---|---|' in md
+    assert '| touching-edges | 10 | ✓ |' in md
+    assert '| 11 | 11 | ✗ |' in md
+
+
+def test_a_hidden_id_leaves_its_cell_empty() -> None:
+    table = _named_table(
+        ParameterCase(id=NodeId('t.py::test_x[one]'), values=[1]),
+        ParameterCase(id=NodeId('t.py::test_x'), values=[2]),
+    )
+    assert '|  | 2 |' in render_md(_report_with(table))
+
+
+def test_a_named_tables_notes_are_keyed_by_the_id() -> None:
+    """An empty id falls back to the values."""
+    table = _named_table(
+        ParameterCase(
+            id=NodeId('t.py::test_x[touching-edges]'),
+            values=[10],
+            status='failed',
+            error=ErrorInfo(message='clash'),
+        ),
+        ParameterCase(
+            id=NodeId('t.py::test_x'),
+            values=[11],
+            status='failed',
+            error=ErrorInfo(message='clash'),
+        ),
+    )
+    md = render_md(_report_with(table))
+    assert '- **touching-edges** — failed:' in md
+    assert '- **11** — failed:' in md
+
+
+def test_an_id_is_written_literally() -> None:
+    table = _named_table(
+        ParameterCase(id=NodeId('t.py::test_x[a*b*c|d]'), values=[1]),
+    )
+    assert r'| a\*b\*c\|d | 1 |' in render_md(_report_with(table))

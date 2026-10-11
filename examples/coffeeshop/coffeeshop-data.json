@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T16:09:09.935281+00:00",
+    "timestamp": "2026-10-11T18:25:13.209332+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "ed077363928c2831dc5ae4db53407a5562eaed0c",
+    "commit_sha": "9b4a42975804b52516618ccb531a9e1a997c110c",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -203,7 +203,7 @@
       "pins": null
     },
     {
-      "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
+      "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]",
       "narration": {
         "text": "Parametrized test (renders as a parameter table)",
         "parts": []
@@ -213,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 116,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -284,7 +284,7 @@
         ],
         "cases": [
           {
-            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]",
             "values": [
               1,
               false
@@ -311,7 +311,7 @@
             "error": null
           },
           {
-            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1.5-True]",
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[happy-hour]",
             "values": [
               1.5,
               true
@@ -406,7 +406,7 @@
                 },
                 {
                   "path": "examples/coffeeshop/test_coffeeshop.py",
-                  "lineno": 87,
+                  "lineno": 90,
                   "func": "test_pricing",
                   "code": "    assert purchase_allowed == expect",
                   "is_internal": false
@@ -415,7 +415,8 @@
               "error_tail": "E   assert False == True"
             }
           }
-        ]
+        ],
+        "named_cases": true
       },
       "error": null,
       "skip_reason": null,
@@ -521,14 +522,15 @@
             "status": "passed",
             "error": null
           }
-        ]
+        ],
+        "named_cases": false
       },
       "error": null,
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 90
+        "line": 93
       },
       "story_ids": [],
       "pins": null
@@ -618,7 +620,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 102
+        "line": 105
       },
       "story_ids": [],
       "pins": null
@@ -732,14 +734,15 @@
             "status": "passed",
             "error": null
           }
-        ]
+        ],
+        "named_cases": false
       },
       "error": null,
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 113
+        "line": 116
       },
       "story_ids": [],
       "pins": null
@@ -846,7 +849,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 123
+        "line": 126
       },
       "story_ids": [],
       "pins": null
@@ -964,7 +967,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 123
+        "line": 126
       },
       "story_ids": [],
       "pins": null
@@ -1129,14 +1132,15 @@
             "status": "passed",
             "error": null
           }
-        ]
+        ],
+        "named_cases": false
       },
       "error": null,
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 141
+        "line": 144
       },
       "story_ids": [],
       "pins": null
@@ -1262,7 +1266,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 188
+        "line": 191
       },
       "story_ids": [],
       "pins": null
@@ -1438,7 +1442,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 204
+        "line": 207
       },
       "story_ids": [],
       "pins": null
@@ -1509,7 +1513,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 241
+        "line": 244
       },
       "story_ids": [],
       "pins": null
@@ -1593,7 +1597,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 258
+        "line": 261
       },
       "story_ids": [],
       "pins": null
@@ -1607,7 +1611,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 69,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -1722,7 +1726,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 277,
+            "lineno": 280,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -1734,7 +1738,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 274
+        "line": 277
       },
       "story_ids": [],
       "pins": null
@@ -1756,7 +1760,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 280
+        "line": 283
       },
       "story_ids": [],
       "pins": null
@@ -1772,7 +1776,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 71,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1898,14 +1902,14 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 297,
+            "lineno": 300,
             "func": "test_loyalty_card_free_coffee",
             "code": "    price_paid = pay_with_loyalty_card(machine, card)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": false
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 288,
+            "lineno": 291,
             "func": "pay_with_loyalty_card",
             "code": "    raise NotImplementedError('the machine does not read loyalty cards yet')",
             "is_internal": false
@@ -1917,7 +1921,7 @@
       "xfail_reason": "loyalty cards not implemented yet",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 291
+        "line": 294
       },
       "story_ids": [],
       "pins": null
@@ -1958,14 +1962,15 @@
             "status": "skipped",
             "error": null
           }
-        ]
+        ],
+        "named_cases": false
       },
       "error": null,
       "skip_reason": "awaiting fixture",
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 302
+        "line": 305
       },
       "story_ids": [],
       "pins": null

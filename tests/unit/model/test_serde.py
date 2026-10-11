@@ -829,6 +829,7 @@ def test_round_trip_preserves_column_kinds_and_cell_shapes() -> None:
                 id=NodeId('t.py::test_x[4]'), values=[350, None, None], status='skipped'
             ),
         ],
+        named_cases=True,
     )
     scenario = Scenario(
         id=NodeId('t.py::test_brew'),

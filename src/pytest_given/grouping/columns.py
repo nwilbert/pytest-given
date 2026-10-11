@@ -88,6 +88,7 @@ class ColumnBuilder:
                 )
                 for case in cases
             ],
+            named_cases=self.group.named_cases,
         )
 
     def derived(self, name: str, rendered: dict[NodeId, str]) -> ParameterColumn:

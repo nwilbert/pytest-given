@@ -296,25 +296,30 @@
       {#- Only when the cases differ in status: a column of one glyph repeats
           the header's status badge on every row. -#}
       {%- set show_status = scenario.parameters.has_mixed_statuses -%}
-      {%- set table_width = scenario.parameters.columns | length + show_status %}
-      {#- Each column carries its phase block, the status column one of its
-          own, so a phase hover can outline the narration and its columns
-          together. -#}
+      {#- Only when some case id was written by hand: generated ids restate
+          the value columns. -#}
+      {%- set show_ids = scenario.parameters.named_cases -%}
+      {%- set table_width = scenario.parameters.columns | length + show_status + show_ids %}
+      {#- Each column carries its phase block, so a phase hover can outline the
+          narration and its columns together. The id and status columns share
+          one of their own: they frame the row, at its two ends. -#}
       {%- set col_blocks = scenario | column_phase_blocks %}
       <div class="param-table-scroll">
       <table class="param-table">
         <thead>
           <tr>
+            {% if show_ids %}<th class="param-id" data-block="frame">id</th>{% endif %}
             {% for col in scenario.parameters.columns %}
             <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>{{ col.name }}</th>
             {% endfor %}
-            {% if show_status %}<th class="param-status" data-block="status">status</th>{% endif %}
+            {% if show_status %}<th class="param-status" data-block="frame">status</th>{% endif %}
           </tr>
         </thead>
         <tbody>
           {% for case in scenario.parameters.cases %}
           {%- set case_idx = loop.index0 -%}
           <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
+            {% if show_ids %}<th scope="row" class="param-id" data-block="frame">{{ case.id | case_id }}</th>{% endif %}
             {% for col, val in scenario.parameters.cells(case) %}
             {% if col.kind == 'attachment' %}
             <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>
@@ -332,7 +337,7 @@
             <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
             {% endfor %}
-            {% if show_status %}<td class="param-status" data-block="status">{{ status_dot(case.status) }}</td>{% endif %}
+            {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
           </tr>
           {% if case.error %}
           <tr>

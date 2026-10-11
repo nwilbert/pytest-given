@@ -68,12 +68,15 @@ def test_generator_fixture(db):
 @pytest.mark.parametrize(
     ('euros', 'expect'),
     [
-        (1, False),
+        # Ids written for two cases lead the table with every case's id; the
+        # other two keep the ids pytest generated.
+        pytest.param(1, False, id='a-euro-short'),
         (2, True),
         (3, True),
         pytest.param(
             1.5,
             True,
+            id='happy-hour',
             marks=pytest.mark.xfail(
                 strict=True, reason='happy-hour pricing not implemented yet'
             ),

@@ -888,9 +888,10 @@ function reportApp() {
     },
     // Phase hover, delegated the same way: a phase block in the narration and
     // the table columns it narrates carry one `data-block`, and pointing at
-    // either outlines both. The status column is a block of its own. The
-    // boxes are measured, so they are redrawn whenever the table resizes
-    // under a still pointer — a payload opened from its own badge, mid-hover.
+    // either outlines both. The id and status columns share a block of their
+    // own. The boxes are measured, so they are redrawn whenever the table
+    // resizes under a still pointer — a payload opened from its own badge,
+    // mid-hover.
     _initPhaseHover() {
       let hovered = null;
       const redraw = new ResizeObserver(() => {
@@ -919,9 +920,10 @@ function reportApp() {
         if (!event.relatedTarget) leave();
       });
     },
-    // One box per run of rows: a visible row without the block's cells (an
-    // error, an open payload) ends a box rather than being drawn through. A
-    // collapsed payload row has no height and does not.
+    // One box per run of adjacent columns and run of rows: the id and status
+    // columns sit at opposite ends of a row. A visible row without the block's
+    // cells (an error, an open payload) ends a run of rows rather than being
+    // drawn through. A collapsed payload row has no height and does not.
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
@@ -929,22 +931,26 @@ function reportApp() {
       if (!table) return;
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
-      const boxes = [];
-      let box = null;
+      const columns = [];
+      for (const cell of table.tHead.rows[0].querySelectorAll(`[data-block="${safe}"]`)) {
+        const { left, right } = cell.getBoundingClientRect();
+        const run = columns[columns.length - 1];
+        if (run && cell.previousElementSibling === run.cell) Object.assign(run, { cell, right });
+        else columns.push({ cell, left, right });
+      }
+      const rows = [];
+      let run = null;
       for (const row of table.rows) {
-        const cells = row.querySelectorAll(`[data-block="${safe}"]`);
-        if (!cells.length) {
-          if (row.getBoundingClientRect().height > 1) box = null;
+        const cell = row.querySelector(`[data-block="${safe}"]`);
+        if (!cell) {
+          if (row.getBoundingClientRect().height > 1) run = null;
           continue;
         }
-        const first = cells[0].getBoundingClientRect();
-        const last = cells[cells.length - 1].getBoundingClientRect();
-        if (!box) {
-          box = { left: first.left, right: last.right, top: first.top };
-          boxes.push(box);
-        }
-        box.bottom = first.bottom;
+        const { top, bottom } = cell.getBoundingClientRect();
+        if (!run) rows.push(run = { top });
+        run.bottom = bottom;
       }
+      const boxes = rows.flatMap(({ top, bottom }) => columns.map(({ left, right }) => ({ left, right, top, bottom })));
       for (const { left, right, top, bottom } of boxes) {
         const outline = document.createElement('div');
         outline.className = 'phase-outline';

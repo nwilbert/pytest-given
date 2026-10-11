@@ -310,6 +310,7 @@ def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
     return ParameterTable(
         columns=[_param_column_from_dict(c) for c in d['columns']],
         cases=[_param_case_from_dict(c) for c in d.get('cases', [])],
+        named_cases=d.get('named_cases', False),
     )
 
 

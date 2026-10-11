@@ -28,6 +28,7 @@ from ..capture import (
 from ..lint import Finding, LintConfig
 from ..model import NodeId, ParamInfo, ReportUrl
 from ..report import SinkConfig
+from .case_ids import MarkIdsCache
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -64,7 +65,8 @@ class SessionState:
     def, so that is the one its cached value came from — and is
     insertion-ordered by setup time, which is what lets the graft take them in
     dependency order: `item.fixturenames` can list a dependent before its
-    dependency.
+    dependency. `mark_ids` indexes a parametrize mark's hand-named cases once
+    for every case that shares the mark.
     """
 
     param_info: ParamInfo = field(default_factory=dict)
@@ -72,6 +74,7 @@ class SessionState:
     fixture_recordings: dict[pytest.FixtureDef[object], FixtureRecording] = field(
         default_factory=dict
     )
+    mark_ids: MarkIdsCache = field(default_factory=dict)
 
 
 # Private, so "one writer each" is a property of this module rather than a

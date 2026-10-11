@@ -819,6 +819,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 /* No width here — a percentage width on a cell stretches an auto-width table
    to the full card. */
 .param-table .param-status { text-align: center; }
+/* A row's id reads as a value does: a row header in name only. */
+.param-table tbody th.param-id {
+  font-weight: normal;
+  color: var(--text-secondary);
+  background: none;
+  border-bottom: none;
+  border-top: 1px solid var(--border);
+}
 .param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tr.xfailed-row { background: var(--color-xfailed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }

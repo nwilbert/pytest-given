@@ -90,6 +90,42 @@
 - **then** it holds one row per «case», with that row's values
 - **then** the grouped steps carry a placeholder per matching name
 
+## ✓ A «parameter table» names its rows by their «case ids» when any was written by hand
+`tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids` · parametrization, spec/parameter-table-case-ids
+
+- **given** a «parametrized scenario» naming one «case» with `pytest.param(..., id=...)` and leaving the other to pytest
+  - 📎 suite:
+    ```
+    import pytest
+    from pytest_given import scenario, then
+    
+    @scenario("Bookings clash")
+    @pytest.mark.parametrize(
+        "start, clashes",
+        [pytest.param(20, False, id="touching-edges"), (19, True)],
+    )
+    def test_overlap(start, clashes):
+        with then(t"a booking from {start} clashes: {clashes}"):
+            assert (start < 20) == clashes
+    ```
+- **when** the suite runs with --given-md
+  - 📎 report.md:
+    ```
+    # pytest-given — test_a_parameter_table_names_its_rows_by_their_case_ids0
+    
+    ## ✓ Bookings clash · 2 cases
+    `test_a_parameter_table_names_its_rows_by_their_case_ids.py:4::test_overlap`
+    
+    - **then** a booking from {start} clashes: {clashes}
+    
+    | id | start | clashes |
+    |---|---|---|
+    | touching-edges | 20 | False |
+    | 19-True | 19 | True |
+    ```
+- **then** both cases pass
+- **then** the «parameter table» leads with an id column, the generated «case id» shown beside the written one
+
 ## ✓ A refusal on a run with no sink does not claim a «report» was skipped
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
 
@@ -481,11 +517,11 @@
 - **then** the grafted root «pins» the sentences {root_sentences} of a
 - **then** the inner «step» keeps its own «pin», a\[3\]
 
-| label_pins | root_sentences |
-|---|---|
-| None | \[1\] |
-| \[\] | \[\] |
-| \[a\[2\]\] | \[2\] |
+| id | label_pins | root_sentences |
+|---|---|---|
+| none-keeps | None | \[1\] |
+| empty-clears | \[\] | \[\] |
+| list-replaces | \[a\[2\]\] | \[2\] |
 
 ## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
 `tests/integration/test_plugin.py::test_annotated_template_label_without_parametrize_fails_scenario`
@@ -518,13 +554,13 @@
 - **when** the suite runs
 - **then** the scenario errors, saying {error}
 
-| placeholder | suite | error |
-|---|---|---|
-| {x} | suite | None |
-| {room} | suite | '{room}' in the Annotated label on parameter 'room' does not match |
-| {room.number} | suite | bare identifiers |
+| id | placeholder | suite | error |
+|---|---|---|---|
+| column | {x} | suite | None |
+| plain-fixture | {room} | suite | '{room}' in the Annotated label on parameter 'room' does not match |
+| attribute | {room.number} | suite | bare identifiers |
 
-- **{x}, None** — suite:
+- **column** — suite:
   ```
   from typing import Annotated
   import pytest
@@ -541,7 +577,7 @@
           pass
   ```
 
-- **{room}, '{room}' in the Annotated label on parameter 'room' does not match** — suite:
+- **plain-fixture** — suite:
   ```
   from typing import Annotated
   import pytest
@@ -558,7 +594,7 @@
           pass
   ```
 
-- **{room.number}, bare identifiers** — suite:
+- **attribute** — suite:
   ```
   from typing import Annotated
   import pytest
@@ -2045,12 +2081,12 @@
 - **then** the placeholder is {outcome}
 - **then** a refusal says bare identifiers only
 
-| text | outcome |
-|---|---|
-| count={count} | accepted |
-| count={obj.attr} | refused |
-| {d\[key\]} | refused |
-| {x + 1} | refused |
+| id | text | outcome |
+|---|---|---|
+| bare-identifier | count={count} | accepted |
+| attribute | count={obj.attr} | refused |
+| indexing | {d\[key\]} | refused |
+| expression | {x + 1} | refused |
 
 ## ✓ A t-string interpolation records its rendered value and its expression
 `tests/unit/capture/test_template.py::test_parse_tstring_single_interpolation`
@@ -2382,13 +2418,13 @@
 - **when** «coverage» is computed against the «story»
 - **then** the «scenario» covers the «sentences» {covered}
 
-| scenario_pins | step_pins | covered |
-|---|---|---|
-| None | None | \[1\] |
-| None | \[2\] | \[2\] |
-| \[\] | None | \[\] |
-| \[\] | \[2\] | \[2\] |
-| \[1\] | \[2\] | \[1, 2\] |
+| id | scenario_pins | step_pins | covered |
+|---|---|---|---|
+| nothing-pinned | None | None | \[1\] |
+| step-pinned | None | \[2\] | \[2\] |
+| scenario-pinned | \[\] | None | \[\] |
+| both-pinned | \[\] | \[2\] | \[2\] |
+| scenario-and-step-pinned | \[1\] | \[2\] | \[1, 2\] |
 
 ## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
 `tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms`

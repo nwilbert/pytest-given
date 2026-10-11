@@ -1,5 +1,7 @@
 # Case Ids in Parameter Tables — Design Spec
 
+✅ [spec/parameter-table-case-ids](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/parameter-table-case-ids) (1 ✅)
+
 ## Goal
 
 Name each row of a parameter table by its pytest case id when the author wrote ids for readers,
@@ -16,7 +18,7 @@ neither renderer prints them. Generated ids like `10-20-15-25-True` can be match
 value columns; nothing a reader sees connects `touching-edges` to its row.
 
 This spec is implemented after [Inline Markdown in Titles, Steps and
-Definitions](../2026-10-11-inline-markdown-design.md) and uses its Markdown writer for the id column.
+Definitions](2026-10-11-inline-markdown-design.md) and uses its Markdown writer for the id column.
 
 ## Approach
 
@@ -25,15 +27,23 @@ Definitions](../2026-10-11-inline-markdown-design.md) and uses its Markdown writ
 `ParamSpec` gains `explicit_id: bool = False`: whether any part of the case's id was written by
 hand. pytest records only the final id parts, so it is read from the item's `parametrize` marks
 (`item.iter_markers('parametrize')`, class- and module-level ones included). For each mark, the
-argnames are split the way pytest splits them, and the case's position in its `argvalues` is
-`callspec.indices[argnames[0]]`. The part is explicit when:
+argnames are split and each argvalue unpacked the way pytest does it (a lone name in a bare string
+takes each value whole), and the case's position in its `argvalues` is found by identity: pytest
+passes each argvalue through unchanged into `callspec.params`. `callspec.indices` cannot say it,
+since pytest renumbers a direct argument's index to the case's place among all cases. Each mark is
+indexed once, by its argvalues' identities, for every case that shares it; where one object sits
+at several positions, each of them is matched. The part is explicit when:
 
-- the argvalue is a `pytest.param` with an `id` other than `pytest.HIDDEN_PARAM`, or
-- the mark's `ids` (keyword or fourth positional argument) is a callable, or a sequence whose entry
-  at that position is not `None` — pytest generates the id for a `None` entry.
+- the argvalue is a `pytest.param` with an `id` other than `pytest.HIDDEN_PARAM` (such an id wins
+  over `ids=`, as in pytest), or, without one,
+- the mark's `ids` (keyword or fourth positional argument) is a callable or an iterator, or a
+  sequence whose entry at that position is neither `None` nor `HIDDEN_PARAM` — pytest generates
+  the id for a `None` entry.
 
-A callable counts even where it returns `None`: telling would mean calling it again. One explicit
-part makes the case explicit, since one named part makes the id worth reading. Parametrization
+A callable counts even where it returns `None`: telling would mean calling it again. An iterator
+counts too, as pytest has consumed it. One explicit part makes the case explicit, since one named
+part makes the id worth reading, and so does one explicit position among several an object
+matches: the table shows its ids for that position's own case anyway. Parametrization
 that never becomes a mark (`metafunc.parametrize`, fixture `params=`) reads as generated.
 
 ### Model
@@ -45,12 +55,14 @@ class ParameterTable:
     cases: list[ParameterCase] = field(default_factory=list)
     named_cases: bool = False
 
-    def case_id(self, case: ParameterCase) -> str: ...
+
+def case_id(node_id: str) -> str: ...
 ```
 
 `named_cases` is true when any case is explicit, and it is the only thing the renderers consult
-to show the column. `case_id` is `case_suffix(case.id)` unbracketed, the text the
-terminal printed and the suffix a per-case scenario's title already carries.
+to show the column. `case_id` is `case_suffix(node_id)` unbracketed, the text the terminal
+printed and the suffix a per-case scenario's title already carries, which takes it from the same
+function.
 
 The id is not a `ParameterColumn`: it has no slot, nothing narrates it, row hover has nothing to
 substitute, and the column order rules don't sort it. It is the row's header.
@@ -64,8 +76,8 @@ the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
 - **HTML:** a `<th scope="row">` per row, in plain text and uncoloured, with no `data-param`: the
   id reads as a value reads in a table, as a per-case title's suffix reads as a value in prose. For
   phase hover it shares one `data-block` with the status column, so pointing at either outlines
-  both; without a status column it is a block of its own. The two sit at opposite ends of the row,
-  so `_outlinePhase` draws one box per run of adjacent cells instead of one per row.
+  both. The two sit at opposite ends of the row, so `_outlinePhase` draws one box per run of
+  adjacent columns and run of rows instead of one per run of rows.
 - **Markdown:** a leading `id` column, the id escaped whole by the inline Markdown writer, like
   every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). The notes below the
   table (a case's error, an attachment too long to inline) are keyed by the
@@ -94,7 +106,7 @@ misname its row.
 ## Implementation touch points
 
 - `model/runtime.py`, `model/schema.py` — the fields and `case_id` above; serde follows.
-- `plugin/runtest.py` — `explicit_id`; `grouping/columns.py` — `named_cases`.
+- `plugin/case_ids.py` — `explicit_id`; `grouping/columns.py` — `named_cases`.
 - `report/md_renderer.py` — the column; `_case_key` prefers the id.
 - `report/templates/` — the row header, the shared block, per-run outline boxes;
   Playwright-verified per AGENTS.md.

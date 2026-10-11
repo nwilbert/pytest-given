@@ -21,7 +21,7 @@ from ..model import (
     RawParamValue,
     Scenario,
     Step,
-    case_suffix,
+    case_id,
     narration_of,
     placeholder_mismatch,
     rebuilt,
@@ -88,12 +88,11 @@ def _suffixed(narration: Narration, node_id: NodeId) -> Narration:
     """The parametrize id appended as a value, since it is generated from
     values: never read for Markdown."""
     parts = narration.parts or (NarrationLiteral(value=narration.text),)
-    case_id = case_suffix(node_id).removeprefix('[').removesuffix(']')
     return narration_of(
         (
             *parts,
             NarrationLiteral(value=' ['),
-            NarrationValue(rendered=case_id, expression=''),
+            NarrationValue(rendered=case_id(node_id), expression=''),
             NarrationLiteral(value=']'),
         )
     )
