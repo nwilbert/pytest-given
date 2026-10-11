@@ -266,8 +266,11 @@ def _error_lines(error: ErrorInfo, prefix: str = '') -> list[str]:
 
 
 # What opens a block at the start of a line: a heading, a list item — the
-# group holding an ordered one's delimiter — or a nested quote.
-_BLOCK_MARKER = re.compile(r'(?:#{1,6}|[-+])(?=\s|$)|>|[0-9]{1,9}(?=([.)])(?:\s|$))')
+# group holding an ordered one's delimiter — a `-` thematic break or a nested
+# quote. `literal_markdown` already escapes a `*` or `_` one.
+_BLOCK_MARKER = re.compile(
+    r'(?:#{1,6}|[-+])(?=\s|$)|-(?=[ \t-]*$)|>|[0-9]{1,9}(?=([.)])(?:\s|$))'
+)
 
 
 def _quoted(text: str) -> str:

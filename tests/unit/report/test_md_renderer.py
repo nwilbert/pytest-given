@@ -1010,6 +1010,8 @@ def test_a_parameter_table_writes_its_names_and_values_literally() -> None:
         '1. first',
         '2) second',
         '> nested',
+        '---',
+        '-- - -',
         '    indented',
         '#hashtag and -1 and 3.14',
     ],
