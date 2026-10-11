@@ -8,6 +8,7 @@ from pytest_given.model import (
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
+    NarrationValue,
     Scenario,
     Sentence,
     SentenceId,
@@ -146,6 +147,21 @@ def test_a_scenario_title_is_written_piece_by_piece() -> None:
     citation = _index(scenario).citation(Target('scenario', 't.py::test_a'))
     before, _ = citation.markdown_halves()
     assert before == '✅ [\\*\\*Guest books\\*\\* a *suite*]('
+
+
+def test_a_per_case_title_writes_its_case_id_literally() -> None:
+    scenario = scenario_('t.py::test_split[a*b*c]')
+    scenario.narration = narration_of(
+        [
+            NarrationLiteral(value='Split *it*'),
+            NarrationLiteral(value=' ['),
+            NarrationValue(rendered='a*b*c', expression=''),
+            NarrationLiteral(value=']'),
+        ]
+    )
+    citation = _index(scenario).citation(Target('scenario', 't.py::test_split[a*b*c]'))
+    before, _ = citation.markdown_halves()
+    assert before == '✅ [Split *it* \\[a\\*b\\*c\\]]('
 
 
 def test_a_tag_and_a_story_title_are_written_literally() -> None:

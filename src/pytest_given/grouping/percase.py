@@ -14,12 +14,15 @@ from ..model import (
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
+    NarrationValue,
+    NodeId,
     ParamInfo,
     ParamSpec,
     RawParamValue,
     Scenario,
     Step,
     case_suffix,
+    narration_of,
     placeholder_mismatch,
     rebuilt,
 )
@@ -35,7 +38,7 @@ def per_case_scenarios(cases: list[Scenario], param_info: ParamInfo) -> list[Sce
     carries.
     """
     return [
-        replace(case, narration=_suffixed(case.narration, case_suffix(case.id)))
+        replace(case, narration=_suffixed(case.narration, case.id))
         for case in (_substituted(s, param_info[s.id]) for s in cases)
     ]
 
@@ -81,11 +84,19 @@ def _substituted_part(
     return resolved_placeholder_part(part, params[part.name])
 
 
-def _suffixed(narration: Narration, suffix: str) -> Narration:
-    """The parametrize id appended as text and, when the narration is built
-    from parts, as one more literal — so a term ref survives the suffixing and
-    the text still reads as what the parts render."""
-    parts = narration.parts
-    if parts:
-        parts = (*parts, NarrationLiteral(value=f' {suffix}'))
-    return Narration(text=f'{narration.text} {suffix}', parts=parts)
+def _suffixed(narration: Narration, node_id: NodeId) -> Narration:
+    """The parametrize id appended as a value between bracket literals, like
+    the placeholder values a per-case title fills in: it is generated from
+    values, so it is never read for Markdown. A plain-string title becomes a
+    literal part, so title and id are never read as one string. No source
+    wrote the id, so its value has no expression."""
+    parts = narration.parts or (NarrationLiteral(value=narration.text),)
+    case_id = case_suffix(node_id).removeprefix('[').removesuffix(']')
+    return narration_of(
+        (
+            *parts,
+            NarrationLiteral(value=' ['),
+            NarrationValue(rendered=case_id, expression=''),
+            NarrationLiteral(value=']'),
+        )
+    )

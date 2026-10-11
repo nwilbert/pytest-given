@@ -10,6 +10,7 @@ from pytest_given.model import (
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
+    NarrationValue,
     NodeId,
     ParamInfo,
     ParamSpec,
@@ -148,6 +149,40 @@ def test_suffixed_glossary_name_keeps_its_term_ref_and_carries_the_suffix() -> N
     assert narration.text == 'Barista brews [200]'
     assert isinstance(narration.parts[0], NarrationTermRef)
     assert narration_text(narration.parts) == narration.text
+
+
+def test_a_plain_string_title_carries_its_case_id_as_a_value() -> None:
+    """The id is generated from values, not written as prose, so no span is
+    read in it — and the title becomes a literal part, so title and id are
+    never read as one string."""
+    scenarios, param_info = _opted_out_group(
+        'Split', values=('a*b*c',), statuses=('passed',)
+    )
+
+    narration = group_parametrized(scenarios, param_info)[0].narration
+
+    assert narration.text == 'Split [a*b*c]'
+    assert narration.parts == (
+        NarrationLiteral(value='Split'),
+        NarrationLiteral(value=' ['),
+        NarrationValue(rendered='a*b*c', expression=''),
+        NarrationLiteral(value=']'),
+    )
+
+
+def test_a_template_title_ends_with_its_case_id_as_a_value() -> None:
+    scenarios, param_info = _opted_out_group(
+        Template('Brew {cup_size} ml'), values=(200,), statuses=('passed',)
+    )
+
+    narration = group_parametrized(scenarios, param_info)[0].narration
+
+    assert narration.text == 'Brew 200 ml [200]'
+    assert narration.parts[-3:] == (
+        NarrationLiteral(value=' ['),
+        NarrationValue(rendered='200', expression=''),
+        NarrationLiteral(value=']'),
+    )
 
 
 def test_substitution_applies_format_spec_and_conversion() -> None:
