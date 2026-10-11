@@ -1055,12 +1055,17 @@
 <li>Each case in the JSON report's <code>parameters.cases[]</code> carries its node id as <code>id</code>.</li>
 <li>The <code>given_md_lines = false</code> setting, or <code>--no-given-md-lines</code> (<code>--no-lines</code> on <code>pytest-given report</code>), leaves the line number out of each Markdown scenario anchor.</li>
 <li>The <a href="https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules">narration lint</a>'s <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
+<li>Scenario titles and step text render <code>**bold**</code>, <code>*italic*</code> and <code>`code`</code> in the HTML report.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Breaking.</strong> <code>@scenario</code>'s first parameter is now <code>title</code>: replace <code>@scenario(name=...)</code> with <code>@scenario(title=...)</code>; a positional title is unaffected.</li>
 <li><strong>Breaking.</strong> A handle's <code>.low</code> form is now <code>.l</code>, and lowercases only capitalized words, so an acronym keeps its case (<code>LLM Call</code> reads <em>LLM call</em>): replace <code>.low</code> with <code>.l</code>.</li>
+<li><strong>Breaking.</strong> Glossary definitions no longer render <code>__bold__</code>, and <code>FileGlossary</code> no longer unwraps it in term and kind cells: write <code>**bold**</code>.</li>
 <li>The Glossary view counts a term ref reading as the term's S-form as the term itself, so <code>room('rooms')</code> and <code>book('books')</code> no longer appear under Instances or "Also used as".</li>
+<li>Glossary definitions render code inside bold and no longer italicize between spaced asterisks.</li>
+<li>The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.</li>
+<li>A per-case scenario title highlights its case id as a value, and the JSON report records it as a value part.</li>
 <li>The HTML report's top bar and term ref underlines are visually tidied.</li>
 <li>The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.</li>
 <li>The bundled <code>pytest-given-authoring</code> skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.</li>
