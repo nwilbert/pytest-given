@@ -1,17 +1,16 @@
 """The public URL a report is served from."""
 
+from typing import NewType
 from urllib.parse import urlsplit
 
-from ..model import PytestGivenError
+from .errors import PytestGivenError
 
-REPORT_URL_HELP = (
-    'The public URL the HTML report will be served from. The report then shows '
-    'copy-citation buttons linking there, and `pytest-given citations` reads '
-    'links to it.'
-)
+# A URL `resolve_report_url` accepted — the only way to get one, so a function
+# taking it never has to validate it again.
+ReportUrl = NewType('ReportUrl', str)
 
 
-def resolve_report_url(value: str, setting: str) -> str | None:
+def resolve_report_url(value: str, setting: str) -> ReportUrl | None:
     """`value` as a report URL, or None when it is empty.
 
     A citation appends `#<fragment>` to it and writes it as a bare Markdown
@@ -32,7 +31,7 @@ def resolve_report_url(value: str, setting: str) -> str | None:
             f'{setting} must be an absolute http(s) URL without a #fragment, '
             f'whitespace, control characters, <, >, (, ) or \\, but got {value!r}.'
         )
-    return value
+    return ReportUrl(value)
 
 
 def _breaks_destination(char: str) -> bool:

@@ -10,12 +10,11 @@ baseline, comparable cases, cells, cases — happens here; the promoting is
 from dataclasses import replace
 
 from ..model import (
-    ParameterCase,
     ParamInfo,
     Scenario,
-    Status,
     iter_steps,
     node_base,
+    rolled_up_status,
 )
 from .checks import check_rebound_params, check_same_template
 from .columns import ColumnBuilder, narrated_column_order, param_cell_formats
@@ -87,7 +86,7 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     # `skip_reason` is then the anchor's, the one every case shares when they
     # all skipped; `xfail_reason` cannot be, as the one xfailed row of a table
     # is seldom the anchor.
-    status = _grouped_status(table.cases)
+    status = rolled_up_status(case.status for case in table.cases)
     return replace(
         anchor,
         narration=grouped_narration,
@@ -99,16 +98,6 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
         skip_reason=anchor.skip_reason if status == 'skipped' else None,
         xfail_reason=_shared_xfail_reason(group.cases) if status == 'xfailed' else None,
     )
-
-
-def _grouped_status(cases: list[ParameterCase]) -> Status:
-    if any(c.status == 'failed' for c in cases):
-        return 'failed'
-    if any(c.status == 'xfailed' for c in cases):
-        return 'xfailed'
-    if all(c.status == 'skipped' for c in cases):
-        return 'skipped'
-    return 'passed'
 
 
 def _shared_xfail_reason(cases: list[Scenario]) -> str | None:

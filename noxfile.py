@@ -8,6 +8,7 @@ import zipfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Literal, NamedTuple
 
 import nox
 
@@ -359,12 +360,37 @@ def check_release(session: nox.Session) -> None:
 
 
 _PAGES_EXAMPLES_URL = 'https://nwilbert.github.io/pytest-given/dev/examples'
-_EXAMPLE_REPORTS = (
-    'coffeeshop',
-    'hotel-booking',
-    'file-glossary-booking',
-    'self-report',
+
+
+class _Example(NamedTuple):
+    test_file: str
+    slug: str
+    title: str
+    extra: tuple[str, ...] = ()
+
+
+# coffeeshop runs with --given-all-frames so it demonstrates the "show internal
+# frames" toggle on a real failure; the others use the default filter so they
+# show the clean user-only frames most users see.
+_EXAMPLES = (
+    _Example(
+        'examples/coffeeshop/test_coffeeshop.py',
+        'coffeeshop',
+        'Coffee Shop Example',
+        ('--given-all-frames',),
+    ),
+    _Example(
+        'examples/hotel-booking/test_hotel_booking.py',
+        'hotel-booking',
+        'Hotel Booking Example',
+    ),
+    _Example(
+        'examples/file-glossary-booking/test_file_glossary_booking.py',
+        'file-glossary-booking',
+        'File Glossary Example',
+    ),
 )
+_EXAMPLE_REPORTS = (*(example.slug for example in _EXAMPLES), 'self-report')
 
 
 def _citation_runs(slug: str) -> list[list[str]]:
@@ -386,9 +412,11 @@ def _citation_runs(slug: str) -> list[list[str]]:
     return runs
 
 
-def _refresh_citations(session: nox.Session, slug: str) -> None:
+def _run_citations(
+    session: nox.Session, verb: Literal['check', 'update'], slug: str
+) -> None:
     for args in _citation_runs(slug):
-        session.run('pytest-given', 'citations', 'update', *args)
+        session.run('pytest-given', 'citations', verb, *args)
 
 
 @nox.session
@@ -397,37 +425,14 @@ def citations(session: nox.Session) -> None:
     fails it, so a site page cites nothing an example fails on purpose."""
     _sync(session, include_project=True)
     for slug in _EXAMPLE_REPORTS:
-        for args in _citation_runs(slug):
-            session.run('pytest-given', 'citations', 'check', *args)
+        _run_citations(session, 'check', slug)
 
 
 @nox.session
 def examples(session: nox.Session) -> None:
     """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
     _sync(session, 'test', include_project=True)
-    # coffeeshop runs with --given-all-frames so it demonstrates the "show
-    # internal frames" toggle on a real failure; the others use the default
-    # filter so they show the clean user-only frames most users see.
-    for test_file, slug, title, extra in [
-        (
-            'examples/coffeeshop/test_coffeeshop.py',
-            'coffeeshop',
-            'Coffee Shop Example',
-            ['--given-all-frames'],
-        ),
-        (
-            'examples/hotel-booking/test_hotel_booking.py',
-            'hotel-booking',
-            'Hotel Booking Example',
-            [],
-        ),
-        (
-            'examples/file-glossary-booking/test_file_glossary_booking.py',
-            'file-glossary-booking',
-            'File Glossary Example',
-            [],
-        ),
-    ]:
+    for test_file, slug, title, extra in _EXAMPLES:
         session.run(
             'pytest',
             test_file,
@@ -455,7 +460,7 @@ def examples(session: nox.Session) -> None:
             *extra,
             success_codes=[0, 1],
         )
-        _refresh_citations(session, slug)
+        _run_citations(session, 'update', slug)
     session.log(
         'Note: coffeeshop and hotel-booking have intentional failures for failure '
         'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
@@ -653,7 +658,7 @@ def self_report(session: nox.Session) -> None:
         '--no-header',
         '-q',
     )
-    _refresh_citations(session, 'self-report')
+    _run_citations(session, 'update', 'self-report')
 
 
 @nox.session

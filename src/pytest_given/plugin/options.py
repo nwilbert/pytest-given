@@ -15,17 +15,15 @@ from pathlib import Path
 import pytest
 
 from ..lint import parse_lint_config
-from ..model import PytestGivenError
+from ..model import PytestGivenError, resolve_report_url
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     DEFAULT_THEME,
-    REPORT_URL_HELP,
     SOURCE_LINK_HELP,
     THEME_HELP,
     SinkConfig,
     Theme,
-    resolve_report_url,
     resolve_source_link_template,
     resolve_theme,
 )
@@ -102,7 +100,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption(
         '--given-report-url',
         default=None,
-        help=REPORT_URL_HELP + ' Overrides the given_report_url ini for one run.',
+        help=(
+            'The public URL the HTML report will be served from. The report then '
+            'shows copy-citation buttons linking there, and `pytest-given '
+            'citations` reads links to it. Overrides the given_report_url ini for '
+            'one run.'
+        ),
     )
     group.addoption(
         '--given-lint',

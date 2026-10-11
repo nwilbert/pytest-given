@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from ..model import PytestGivenError, plural
+from ..model import PytestGivenError, plural, resolve_report_url
 from ..report import CitationsResult, check_citations, markdown_documents
 from .report import load_report_json
 
@@ -39,7 +39,7 @@ def add_citations_parser(
         )
         verb_parser.add_argument(
             '--report-url',
-            default=None,
+            default='',
             help="The report's public URL (default: the one stored in the report)",
         )
         verb_parser.add_argument(
@@ -59,7 +59,7 @@ def run_citations(args: argparse.Namespace) -> int:
         result = check_citations(
             load_report_json(report_file),
             markdown_documents(args.documents),
-            report_url=args.report_url,
+            report_url=resolve_report_url(args.report_url, '--report-url'),
             report_path=args.report_path,
             update=args.update,
             source=report_file.as_posix(),

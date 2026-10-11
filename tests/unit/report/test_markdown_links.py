@@ -14,6 +14,10 @@ def _one(source: str) -> MarkdownLink:
     return links[0]
 
 
+def _glyph(link: MarkdownLink) -> str | None:
+    return None if link.glyph is None else link.glyph.text
+
+
 def _at(source: str, span: tuple[int, int] | None) -> str:
     assert span is not None
     return source[span[0] : span[1]]
@@ -37,12 +41,14 @@ def test_a_link_reports_its_text_url_and_spans() -> None:
 def test_a_glyph_leading_the_line_is_read() -> None:
     source = '✅ [t](u)\n'
     link = _one(source)
-    assert link.glyph == '✅'
-    assert _at(source, link.glyph_span) == '✅'
+    assert link.glyph is not None
+    assert link.glyph.text == _at(source, link.glyph.span) == '✅'
 
 
 def test_a_variation_selector_is_part_of_the_glyph() -> None:
-    assert _one('✅\ufe0f [t](u)\n').glyph == '✅\ufe0f'
+    glyph = _one('✅\ufe0f [t](u)\n').glyph
+    assert glyph is not None
+    assert (glyph.text, glyph.bare) == ('✅\ufe0f', '✅')
 
 
 @pytest.mark.parametrize(
@@ -61,7 +67,7 @@ def test_a_glyph_after_a_marker_whitespace_or_paren_is_read(source: str) -> None
 
 def test_a_line_break_between_glyph_and_link_is_whitespace() -> None:
     link = _one('the work is done ✅\n[t](u)\n')
-    assert link.glyph == '✅'
+    assert _glyph(link) == '✅'
     assert link.line == 2
 
 
@@ -76,7 +82,7 @@ def test_a_formatted_or_glued_glyph_is_not_read(source: str) -> None:
 
 @pytest.mark.parametrize('glyph', ['✓', '✗', '○', '⊗', '?'])
 def test_text_glyphs_and_a_typed_question_mark_are_read(glyph: str) -> None:
-    assert _one(f'{glyph} [](u)\n').glyph == glyph
+    assert _glyph(_one(f'{glyph} [](u)\n')) == glyph
 
 
 def test_link_text_wrapped_in_a_blockquote_leaves_out_the_markers() -> None:
@@ -111,7 +117,7 @@ def test_trailing_text_runs_on_across_one_line_break(
 def test_a_citation_in_a_table_cell() -> None:
     link = _one('| Kind | Link |\n|---|---|\n| tag | 🔵 [a](u) (1 ✅) |\n')
     assert link.in_table_row
-    assert link.glyph == '🔵'
+    assert _glyph(link) == '🔵'
     assert link.trailing == ' (1 ✅) '
     assert link.line == 3
 

@@ -696,20 +696,13 @@ function reportApp() {
       this._copyAndFlash(window.location.href.split('#')[0] + '#' + hashString, event.currentTarget);
     },
     hasCitation(kind, key) {
-      const citations = window.__REPORT_DATA__.citations;
-      return !!citations && Object.hasOwn(citations[kind], key);
+      return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
-    // Python renders every part; this only joins them with the report's
-    // public URL, which is the setting's and never `window.location`.
+    // Python renders the whole line, with the report's public URL — the
+    // setting's, never `window.location`.
     copyCitation(kind, key, event) {
-      const citations = window.__REPORT_DATA__.citations;
-      const parts = citations && lookup(citations[kind], key, null);
-      if (!parts) return;
-      const summary = parts.summary ? ' ' + parts.summary : '';
-      this._copyAndFlash(
-        `${parts.glyph} [${parts.text}](${citations.report_url}#${parts.fragment})${summary}`,
-        event.currentTarget,
-      );
+      const line = lookup(window.__REPORT_DATA__.citations[kind], key, null);
+      if (line) this._copyAndFlash(line, event.currentTarget);
     },
     // Only flip to the "copied" state once the text is actually on the
     // clipboard, or the icon would claim a success that never happened.

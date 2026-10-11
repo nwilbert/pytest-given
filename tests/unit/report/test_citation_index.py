@@ -33,9 +33,7 @@ from pytest_given.report.citation_index import (
     Target,
     parse_fragment,
     report_fragment,
-    under_prefix,
 )
-from pytest_given.report.link_text import link_text
 
 URL = 'https://example.org/report.html'
 
@@ -248,18 +246,10 @@ def test_a_citation_renders_as_one_markdown_line() -> None:
     assert citation.markdown(URL) == f'🔵 [spec/x]({URL}#tag=spec/x) (1 🔵)'
 
 
-@pytest.mark.parametrize(
-    ('key', 'prefix', 'expected'),
-    [
-        ('a', 'a', True),
-        ('a/b', 'a', True),
-        ('a/b/c', 'a/b', True),
-        ('ab', 'a', False),
-        ('a', 'a/b', False),
-    ],
-)
-def test_under_prefix(key: str, prefix: str, expected: bool) -> None:
-    assert under_prefix(key, prefix) is expected
+def under_prefix(key: str, prefix: str) -> bool:
+    """A port of `app.js`'s `underPrefix`: a `#tag=` link opens the scenarios
+    carrying the tag or one below it, so its citation counts them."""
+    return key == prefix or key.startswith(prefix + '/')
 
 
 def test_a_tag_citation_counts_what_under_prefix_matches() -> None:
@@ -280,8 +270,8 @@ def test_a_tag_citation_counts_what_under_prefix_matches() -> None:
 
 def test_under_prefix_ports_the_report_script_rule() -> None:
     """A `#tag=` link opens what `app.js`'s `underPrefix` matches, and a tag
-    citation counts what `under_prefix` matches; the cases above hold the
-    port, this holds the original to the same one-line rule."""
+    citation counts what `under_prefix` matches; this holds the original to
+    the port's one-line rule."""
     app_js = Path(citation_index.__file__).parent / 'templates' / 'app.js'
     assert 'return key === filter || key.startsWith(filter + sep);' in app_js.read_text(
         encoding='utf-8'
@@ -329,18 +319,6 @@ def test_scenarios_titled_matches_exactly_after_folding() -> None:
         't.py::test_a',
         't.py::test_b',
     ]
-
-
-def test_a_citation_is_passed_to_the_report_page_in_parts() -> None:
-    citation = Citation(
-        state='failed', title='a|b', fragment='tag=spec', summary='(1 ❌)'
-    )
-    assert citation_index.copy_parts(citation) == {
-        'glyph': '❌',
-        'text': link_text('a|b'),
-        'fragment': 'tag=spec',
-        'summary': '(1 ❌)',
-    }
 
 
 def test_a_tag_fragment_and_the_current_keys_resolve_as_they_are() -> None:

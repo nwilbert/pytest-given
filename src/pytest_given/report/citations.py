@@ -13,11 +13,10 @@ from pathlib import Path
 from typing import Any, Literal, NamedTuple
 from urllib.parse import unquote, urlsplit
 
-from ..model import STATUSES, PytestGivenError, report_from_dict
+from ..model import STATUSES, PytestGivenError, ReportUrl, report_from_dict
 from .citation_index import CitationIndex, Target, parse_fragment, report_fragment
 from .link_text import fold_whitespace, link_text, plain_link_text
 from .markdown_links import VARIATION_SELECTOR, MarkdownLink, scan_links
-from .report_url import resolve_report_url
 from .text import CITATION_GLYPH, CITATION_GLYPH_PLACEHOLDERS
 
 type FindingKind = Literal[
@@ -75,14 +74,12 @@ def check_citations(
     report_dict: dict[str, Any],
     documents: list[Path],
     *,
-    report_url: str | None,
+    report_url: ReportUrl | None,
     report_path: Path | None,
     update: bool,
     source: str | None = None,
 ) -> CitationsResult:
     report = report_from_dict(report_dict, source)
-    if report_url is not None:
-        report_url = resolve_report_url(report_url, '--report-url')
     location = _ReportLocation(report_url or report.metadata.report_url, report_path)
     if location.url is None and location.path is None:
         raise PytestGivenError(
@@ -223,12 +220,14 @@ class _LinkCheck:
         citation = self.index.citation(target)
         link = self.link
         assert link.glyph is not None
-        assert link.glyph_span is not None
-        if link.glyph.removesuffix(VARIATION_SELECTOR) != citation.glyph:
+        if link.glyph.bare != citation.glyph:
             self._find(
-                'stale', 'stale glyph', f'{link.glyph} → {citation.glyph}', fixed=True
+                'stale',
+                'stale glyph',
+                f'{link.glyph.text} → {citation.glyph}',
+                fixed=True,
             )
-            self.edits.append(_Edit(*link.glyph_span, citation.glyph))
+            self.edits.append(_Edit(*link.glyph.span, citation.glyph))
         if written_title != fold_whitespace(citation.title):
             self._find(
                 'stale',
@@ -268,10 +267,9 @@ class _LinkCheck:
     def _mark_missing(self) -> None:
         link = self.link
         assert link.glyph is not None
-        assert link.glyph_span is not None
         missing = CITATION_GLYPH['missing']
-        if link.glyph.removesuffix(VARIATION_SELECTOR) != missing:
-            self.edits.append(_Edit(*link.glyph_span, missing))
+        if link.glyph.bare != missing:
+            self.edits.append(_Edit(*link.glyph.span, missing))
         if summary := _SUMMARY.match(link.trailing):
             self.edits.append(_Edit(*link.trailing_span(0, summary.end()), ''))
 

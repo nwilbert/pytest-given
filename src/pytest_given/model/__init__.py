@@ -20,6 +20,7 @@ from .narration import (
     rebuilt,
     render_interpolation,
 )
+from .report_url import ReportUrl, resolve_report_url
 from .runtime import (
     ParamInfo,
     ParamSpec,
@@ -76,6 +77,7 @@ from .schema import (
     location_suffix,
     node_base,
     param_id,
+    rolled_up_status,
 )
 from .serde import report_from_dict, report_to_dict
 from .steps import (
@@ -128,6 +130,7 @@ __all__ = [
     'PytestGivenWarning',
     'RawParamValue',
     'ReportData',
+    'ReportUrl',
     'Scenario',
     'Sentence',
     'SentenceId',
@@ -160,6 +163,8 @@ __all__ = [
     'render_interpolation',
     'report_from_dict',
     'report_to_dict',
+    'resolve_report_url',
+    'rolled_up_status',
     's_form',
     'snapshot_param_value',
     'walk_steps',

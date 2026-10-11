@@ -1034,3 +1034,37 @@ def test_a_report_without_report_url_reads_as_none() -> None:
         'scenarios': [],
     }
     assert report_from_dict(data).metadata.report_url is None
+
+
+def test_an_empty_stored_report_url_reads_as_none() -> None:
+    data = {
+        'metadata': {
+            'project': 'p',
+            'timestamp': 't',
+            'pytest_version': '9',
+            'plugin_version': '0',
+            'report_url': '',
+        },
+        'scenarios': [],
+    }
+    assert report_from_dict(data).metadata.report_url is None
+
+
+@pytest.mark.parametrize(
+    'stored', ['report.html', 'https://example.org/report.html#tag=x']
+)
+def test_a_stored_report_url_a_citation_cannot_link_is_refused(stored: str) -> None:
+    data = {
+        'metadata': {
+            'project': 'p',
+            'timestamp': 't',
+            'pytest_version': '9',
+            'plugin_version': '0',
+            'report_url': stored,
+        },
+        'scenarios': [],
+    }
+    with pytest.raises(
+        PytestGivenError, match=r'metadata\.report_url in reports/x\.json must be'
+    ):
+        report_from_dict(data, 'reports/x.json')

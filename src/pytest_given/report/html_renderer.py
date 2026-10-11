@@ -40,7 +40,7 @@ from ..model import (
     placeholder_token,
     plural,
 )
-from .citation_index import CitationIndex, Target, copy_parts
+from .citation_index import CitationIndex, Target, TargetKind
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
 from .inline_markdown import render_inline_markdown
@@ -348,26 +348,25 @@ def _app_data(report: ReportData) -> dict[str, object]:
 
 def _citation_data(
     report: ReportData, index: CitationIndex
-) -> dict[str, object] | None:
-    """Each citation's parts for the copy buttons, keyed as the page finds
-    them: a scenario by its `id`, a tag at every level of the tree `app.js`
-    builds, a story by id. Only a report with a public URL shows the buttons,
-    so only it carries the weight."""
-    if report.metadata.report_url is None:
+) -> dict[str, dict[str, str]] | None:
+    """Each copy button's citation line, keyed as the page finds it: a scenario
+    by its `id`, a tag at every level of the tree `app.js` builds, a story by
+    id. Only a report with a public URL shows the buttons, so only it carries
+    the weight."""
+    report_url = report.metadata.report_url
+    if report_url is None:
         return None
+
+    def line(kind: TargetKind, key: str) -> str:
+        return index.citation(Target(kind, key)).markdown(report_url)
+
     return {
-        'report_url': report.metadata.report_url,
         'scenario': {
-            scenario.id: copy_parts(index.citation(Target('scenario', cited)))
+            scenario.id: line('scenario', cited)
             for cited, scenario in index.scenarios.items()
         },
-        'tag': {
-            tag: copy_parts(index.citation(Target('tag', tag))) for tag in index.tags
-        },
-        'story': {
-            story_id: copy_parts(index.citation(Target('story', story_id)))
-            for story_id in index.story_ids
-        },
+        'tag': {tag: line('tag', tag) for tag in index.tags},
+        'story': {story_id: line('story', story_id) for story_id in index.story_ids},
     }
 
 

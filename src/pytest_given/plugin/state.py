@@ -26,7 +26,7 @@ from ..capture import (
     scenario_marker as capture_scenario_marker,
 )
 from ..lint import Finding, LintConfig
-from ..model import NodeId, ParamInfo
+from ..model import NodeId, ParamInfo, ReportUrl
 from ..report import SinkConfig
 
 
@@ -36,7 +36,7 @@ class GivenConfig:
     lint_enabled: bool
     sinks: SinkConfig
     title: str | None
-    report_url: str | None
+    report_url: ReportUrl | None
     all_frames: bool
 
 

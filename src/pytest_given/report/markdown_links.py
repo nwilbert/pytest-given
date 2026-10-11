@@ -21,6 +21,17 @@ ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
 VARIATION_SELECTOR = '\ufe0f'
 
 
+class Glyph(NamedTuple):
+    """A citation glyph as written, variation selector and all."""
+
+    text: str
+    span: Span
+
+    @property
+    def bare(self) -> str:
+        return self.text.removesuffix(VARIATION_SELECTOR)
+
+
 @dataclass(frozen=True, kw_only=True)
 class MarkdownLink:
     """One inline link; spans are offsets into the document's source.
@@ -41,8 +52,7 @@ class MarkdownLink:
     trailing: str
     trailing_offsets: tuple[int, ...]
     in_table_row: bool
-    glyph: str | None = None
-    glyph_span: Span | None = None
+    glyph: Glyph | None = None
 
     def trailing_span(self, start: int, end: int) -> Span:
         return _span(self.trailing_offsets, start, end)
@@ -578,7 +588,6 @@ def _link(
     line_end = text.find('\n', after)
     next_line_end = -1 if line_end == -1 else text.find('\n', line_end + 1)
     trailing_end = len(text) if next_line_end == -1 else next_line_end
-    glyph, glyph_span = _glyph_before(run, open_index, glyphs)
     return MarkdownLink(
         line=bisect.bisect_right(line_starts, run.offsets[open_index]),
         text=text[open_index + 1 : close_index],
@@ -589,14 +598,11 @@ def _link(
         trailing=text[after:trailing_end],
         trailing_offsets=tuple(run.offsets[after : trailing_end + 1]),
         in_table_row=run.in_table_row,
-        glyph=glyph,
-        glyph_span=glyph_span,
+        glyph=_glyph_before(run, open_index, glyphs),
     )
 
 
-def _glyph_before(
-    run: _Run, open_index: int, glyphs: list[str]
-) -> tuple[str | None, Span | None]:
+def _glyph_before(run: _Run, open_index: int, glyphs: list[str]) -> Glyph | None:
     """The glyph leading the link at `open_index`: across any whitespace, and
     itself at the start of the content or after whitespace or `(` — so a
     question mark ending a sentence is never read as one."""
@@ -612,5 +618,5 @@ def _glyph_before(
             and text[start:stop] == glyph
             and (start == 0 or text[start - 1] in ' \t\n(')
         ):
-            return text[start:end], run.span(start, end)
-    return None, None
+            return Glyph(text[start:end], run.span(start, end))
+    return None

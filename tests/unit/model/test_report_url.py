@@ -2,8 +2,7 @@
 
 import pytest
 
-from pytest_given.model import PytestGivenError
-from pytest_given.report import resolve_report_url
+from pytest_given.model import PytestGivenError, resolve_report_url
 
 
 def test_an_absolute_https_url_is_the_report_url() -> None:

@@ -3,12 +3,20 @@ and which scenarios, tags and stories a report holds to cite."""
 
 import difflib
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Literal, TypedDict
+from typing import Literal
 from urllib.parse import parse_qsl, quote
 
-from ..model import STATUSES, NodeId, ReportData, Scenario, StoryId, node_base
+from ..model import (
+    STATUSES,
+    NodeId,
+    ReportData,
+    Scenario,
+    StoryId,
+    node_base,
+    rolled_up_status,
+)
 from .coverage import CoverageMap, build_coverage_map
 from .link_text import fold_whitespace, link_text
 from .slugs import build_scenario_slug_index
@@ -49,26 +57,6 @@ class Citation:
         )
 
 
-class CopyParts(TypedDict):
-    """A citation as the report page carries it: `app.js` only joins these
-    with the report URL, so Python stays the one place a citation is
-    rendered."""
-
-    glyph: str
-    text: str
-    fragment: str
-    summary: str | None
-
-
-def copy_parts(citation: Citation) -> CopyParts:
-    return CopyParts(
-        glyph=citation.glyph,
-        text=link_text(citation.title),
-        fragment=citation.fragment,
-        summary=citation.summary,
-    )
-
-
 def report_fragment(target: Target) -> str:
     """The fragment naming `target`, readable for a typical node id or tag:
     only what `URLSearchParams` and `parse_qs` could misread is encoded."""
@@ -97,12 +85,6 @@ def parse_fragment(fragment: str) -> Target | None:
     return None
 
 
-def under_prefix(key: str, prefix: str) -> bool:
-    """A port of `app.js`'s `underPrefix` for tags: a `#tag=` link opens the
-    scenarios carrying the tag or one below it, so its citation counts them."""
-    return key == prefix or key.startswith(prefix + TAG_SEPARATOR)
-
-
 class CitationIndex:
     """The scenarios, tags and stories a report lets a document cite."""
 
@@ -113,7 +95,8 @@ class CitationIndex:
             slug: cited_as[node_id]
             for node_id, slug in build_scenario_slug_index(report).items()
         }
-        # A tag's prefixes are exactly the keys `under_prefix` matches it to.
+        # Under a tag and each of its prefixes, as `app.js`'s `underPrefix`
+        # matches a `#tag=` link to the scenarios it opens.
         self._tagged: dict[str, list[Scenario]] = {}
         for scenario in report.scenarios:
             tags = {prefix for tag in scenario.tags for prefix in _prefixes(tag)}
@@ -168,21 +151,16 @@ class CitationIndex:
         suggestions only: `citations update` never writes one."""
         match target.kind:
             case 'scenario':
-                node_by_title = {
-                    fold_whitespace(scenario.narration.text): cited
-                    for cited, scenario in self.scenarios.items()
-                }
-                return _labelled(
-                    'closest by node id',
-                    difflib.get_close_matches(target.key, list(self.scenarios), n=3),
-                ) + _labelled(
-                    'closest by scenario title',
-                    [
-                        f'{node_by_title[title]} ("{title}")'
-                        for title in difflib.get_close_matches(
-                            link_title, list(node_by_title), n=3
-                        )
-                    ],
+                return _closest(
+                    id_label='node id',
+                    key=target.key,
+                    ids=self.scenarios,
+                    title_label='scenario title',
+                    title=link_title,
+                    id_by_title={
+                        fold_whitespace(scenario.narration.text): cited
+                        for cited, scenario in self.scenarios.items()
+                    },
                 )
             case 'tag':
                 return _labelled(
@@ -190,20 +168,16 @@ class CitationIndex:
                     difflib.get_close_matches(target.key, self.tags, n=3),
                 )
             case 'story':
-                story_by_title = {
-                    title: story_id for story_id, (title, _) in self._stories.items()
-                }
-                return _labelled(
-                    'closest by story id',
-                    difflib.get_close_matches(target.key, list(self._stories), n=3),
-                ) + _labelled(
-                    'closest by story title',
-                    [
-                        f'{story_by_title[title]} ("{title}")'
-                        for title in difflib.get_close_matches(
-                            link_title, list(story_by_title), n=3
-                        )
-                    ],
+                return _closest(
+                    id_label='story id',
+                    key=target.key,
+                    ids=self._stories,
+                    title_label='story title',
+                    title=link_title,
+                    id_by_title={
+                        title: story_id
+                        for story_id, (title, _) in self._stories.items()
+                    },
                 )
 
     def _resolve_scenario(self, key: str) -> Target | None:
@@ -239,22 +213,13 @@ def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
 
 def _rollup(title: str, fragment: str, scenarios: list[Scenario]) -> Citation:
     counts = Counter(scenario.status for scenario in scenarios)
-    state: CitationState
-    if counts['failed']:
-        state = 'failed'
-    elif counts['xfailed']:
-        state = 'xfailed'
-    elif counts['passed']:
-        state = 'passed'
-    else:
-        state = 'skipped'
     summary = ' · '.join(
         f'{counts[status]} {CITATION_GLYPH[status]}'
         for status in STATUSES
         if counts[status]
     )
     return Citation(
-        state=state,
+        state=rolled_up_status(counts),
         title=title,
         fragment=fragment,
         summary=f'({summary})' if summary else '(no scenarios)',
@@ -264,6 +229,27 @@ def _rollup(title: str, fragment: str, scenarios: list[Scenario]) -> Citation:
 def _prefixes(tag: str) -> Iterable[str]:
     parts = tag.split(TAG_SEPARATOR)
     return (TAG_SEPARATOR.join(parts[: depth + 1]) for depth in range(len(parts)))
+
+
+def _closest(
+    *,
+    id_label: str,
+    key: str,
+    ids: Iterable[str],
+    title_label: str,
+    title: str,
+    id_by_title: Mapping[str, str],
+) -> list[str]:
+    return _labelled(
+        f'closest by {id_label}',
+        difflib.get_close_matches(key, ids, n=3),
+    ) + _labelled(
+        f'closest by {title_label}',
+        [
+            f'{id_by_title[matched]} ("{matched}")'
+            for matched in difflib.get_close_matches(title, list(id_by_title), n=3)
+        ],
+    )
 
 
 def _labelled(label: str, items: list[str]) -> list[str]:

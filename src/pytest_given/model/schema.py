@@ -7,9 +7,12 @@ one exception is a field marked `serde_exclude`, which stays in memory and out
 of the JSON; `Step.source` is the only one.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import Literal, NewType
+
+from .report_url import ReportUrl
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -247,6 +250,17 @@ type Status = Literal['passed', 'failed', 'skipped', 'xfailed']
 
 STATUSES: tuple[Status, ...] = ('passed', 'failed', 'skipped', 'xfailed')
 
+_ROLLUP_PRECEDENCE: tuple[Status, ...] = ('failed', 'xfailed', 'passed')
+
+
+def rolled_up_status(statuses: Iterable[Status]) -> Status:
+    """A group whose members are all skipped, or that has none, is skipped."""
+    present = set(statuses)
+    return next(
+        (status for status in _ROLLUP_PRECEDENCE if status in present), 'skipped'
+    )
+
+
 # A @pytest.mark.parametrize value as captured for the report: JSON primitives
 # pass through; anything else (dates, objects) is coerced to its str() when the
 # cell is built, since parametrize values only feed display and the JSON sink
@@ -441,7 +455,7 @@ class Metadata:
     # The public URL the HTML report is served from: where its copy-citation
     # buttons link, and what `pytest-given citations` reads report links
     # against. None leaves the report without the buttons.
-    report_url: str | None = None
+    report_url: ReportUrl | None = None
 
 
 @dataclass(frozen=True)

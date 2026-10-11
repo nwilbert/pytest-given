@@ -42,14 +42,16 @@ def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
                     'plugin_version': '0.1',
                     'report_url': 'https://example.org/report.html',
                 },
-                'scenarios': [],
+                'scenarios': [
+                    {'id': 't.py::test_a', 'narration': {'text': 'Pour'}, 'module': 'm'}
+                ],
             }
         )
     )
     html_path = tmp_path / 'out.html'
     assert main(['report', str(json_path), '-o', str(html_path)]) == 0
     html = html_path.read_text(encoding='utf-8').replace('\\"', '"').replace('\\/', '/')
-    assert '"report_url":"https://example.org/report.html"' in html
+    assert '(https://example.org/report.html#scenario=t.py::test_a)' in html
 
 
 def test_cli_missing_input_file(tmp_path: Path) -> None:

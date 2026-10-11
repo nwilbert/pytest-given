@@ -2397,19 +2397,17 @@ def _citable_report(report_url: str | None) -> ReportData:
     )
 
 
-def test_a_report_url_puts_every_citations_parts_in_the_page_data() -> None:
+def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
     url = 'https://example.org/report.html'
     data = _embedded_app_data(render_html_string(_citable_report(url), None))
     citations = data['citations']
-    assert citations['report_url'] == url
-    assert citations['scenario']['t.py::test_pour[water]'] == {
-        'glyph': '✅',
-        'text': 'Pour',
-        'fragment': 'scenario=t.py::test_pour',
-        'summary': None,
+    assert citations['scenario'] == {
+        't.py::test_pour[water]': f'✅ [Pour]({url}#scenario=t.py::test_pour)'
     }
-    assert set(citations['tag']) == {'spec', 'spec/x'}
-    assert citations['tag']['spec']['summary'] == '(1 ✅)'
+    assert citations['tag'] == {
+        'spec': f'✅ [spec]({url}#tag=spec) (1 ✅)',
+        'spec/x': f'✅ [spec/x]({url}#tag=spec/x) (1 ✅)',
+    }
     assert citations['story'] == {}
 
 

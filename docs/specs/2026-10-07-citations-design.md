@@ -207,11 +207,10 @@ cannot be mistaken for the link icon beside it; the `frontend-design` skill shap
 card, header and sidebar row. The tick on success and the `navigator.clipboard` → `execCommand`
 fallback are `copyAnchor`'s, through the shared `_copyText`.
 
-The renderer writes each citation's glyph, link text, fragment and summary into the report data —
-for tags, one per level of every tag, since the tree is built client-side — and only in a report
-that shows the buttons, so the others carry no extra weight. JS only joins them with the URL, so
-Python stays the one place a citation is rendered, and the check recomputes exactly what a button
-copied.
+The renderer writes each citation's whole line into the report data — for tags, one per level of
+every tag, since the tree is built client-side — and only in a report that shows the buttons, so
+the others carry no extra weight. JS only copies it, so Python stays the one place a citation is
+rendered, and the check recomputes exactly what a button copied.
 
 ### When the buttons show
 
@@ -406,18 +405,20 @@ area tag.
 
 ## Implementation touch points
 
-- `model/schema.py` — `report_url: str | None` on the report metadata.
+- `model/schema.py`, `model/report_url.py` — `report_url` on the report metadata, typed
+  `ReportUrl`: only `resolve_report_url` mints one, so the URL is checked where it is configured and
+  where a report is read back from JSON, and nowhere downstream.
 - `plugin/` — the `--given-report-url` option and `given_report_url` ini.
 - `report/citations.py` (new) — renders the citation of each kind, reads report links out of
   Markdown, computes findings and updates. `report.check_citations` exposes the whole job, the way
   `emit_sinks` does. A story's scenarios come from `build_story_rollups`; tag matching has no
   Python counterpart yet, so it ports `underPrefix` from `app.js`, and a unit test holds the two to
-  the same cases. Reading is a hand-written scanner — fences, indented code, backtick runs, glyph,
-  link, summary, table rows — because `update` needs each part's exact source position, which no
-  Markdown parser's inline tokens carry; a parser would only take over block structure, at the cost
-  of a runtime dependency.
+  the same one-line rule. Reading is a hand-written scanner — fences, indented code, backtick runs,
+  glyph, link, summary, table rows — because `update` needs each part's exact source position,
+  which no Markdown parser's inline tokens carry; a parser would only take over block structure, at
+  the cost of a runtime dependency.
 - `report/text.py` — `CITATION_GLYPH` beside `STATUS_GLYPH`, which the Markdown sink keeps.
-- `report/html_renderer.py` — each citation's parts, and the scenario node ids, in the report data.
+- `report/html_renderer.py` — each citation's line, and the scenario node ids, in the report data.
 - `report/templates/_macros.html.j2`, `report.html.j2`, `app.js` — the three buttons,
   `copyCitation`, and the node-id lookup for `#scenario=`.
 - `cli/citations.py` (new) — argv, output and exit codes; registered in `cli/__init__.py`.

@@ -16,6 +16,7 @@ import dataclasses
 from typing import Any, TypedDict, cast
 
 from .errors import PytestGivenError
+from .report_url import resolve_report_url
 from .schema import (
     COLUMN_KINDS,
     CONTENT_TYPES,
@@ -92,7 +93,7 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
     """
     try:
         return ReportData(
-            metadata=_metadata_from_dict(d['metadata']),
+            metadata=_metadata_from_dict(d['metadata'], source),
             scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
             stories=[_story_from_dict(s) for s in d.get('stories', [])],
             glossary=_glossary_from_dict(d.get('glossary')),
@@ -105,7 +106,7 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
         ) from error
 
 
-def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
+def _metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
     return Metadata(
         project=d['project'],
         timestamp=d['timestamp'],
@@ -113,7 +114,10 @@ def _metadata_from_dict(d: dict[str, Any]) -> Metadata:
         plugin_version=d['plugin_version'],
         commit_sha=d.get('commit_sha'),
         title=d.get('title'),
-        report_url=d.get('report_url'),
+        report_url=resolve_report_url(
+            d.get('report_url') or '',
+            f'metadata.report_url in {source or "the report"}',
+        ),
     )
 
 
