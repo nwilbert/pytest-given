@@ -33,6 +33,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
 - The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.
 - The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing and a stub that raises to prove "never called", and starts its completeness audit from the undecorated tests in narrated test files.
+- The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
 
 ## [0.4.1] - 2026-10-04
 

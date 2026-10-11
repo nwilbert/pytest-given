@@ -9,7 +9,7 @@ from pytest_given import (
 )
 ```
 
-This page covers what you need for authoring, and it matches the installed package version. Installation, the report flags (`--given-html`, `--given-json`, `--given-md`), source-link presets and the lint configuration (`given_lint_rules`, `given_lint_ignore`) are setup topics. For those, see the project documentation at <https://nwilbert.github.io/pytest-given/>.
+Setup (installation, report flags, source links, lint configuration) is in the project documentation at <https://nwilbert.github.io/pytest-given/>.
 
 ## Core
 
@@ -39,7 +39,7 @@ Hard rules (each raises `PytestGivenError`):
 ## Parametrized tests
 
 - All cases are grouped into **one scenario with a parameter table**. T-string interpolations that name a parametrize column render as colored values in each row.
-- **The steps of the first passing case are the template for every row**, but only their *structure*. A narrated value or an attachment content that varies between cases becomes its own column in the parameter table. When an authoring form can't be shown honestly against that template, pytest-given raises `PytestGivenError` instead of writing a wrong report, and each message names its fix. The habits that avoid these errors are in [scenarios.md](scenarios.md) under "Parameter tables".
+- **The steps of the first passing case are the template for every row**, but only their *structure*. A narrated value or an attachment content that varies between cases becomes its own column in the parameter table. When an authoring form can't be shown honestly against that template, pytest-given raises `PytestGivenError` instead of writing a wrong report, and each message names its fix. The habits that avoid these errors are in [parameter-tables.md](parameter-tables.md).
 - **When the narration really differs per case**, use `@scenario(..., group_parametrized=False)`. It declines the merge and records one scenario per case, titled `<title> [<parametrize id>]`, with any `Template` placeholders filled in per case. There is no parameter table. On a test that isn't parametrized, it raises an error at collection.
 - To parametrize the **scenario title**, use `@scenario(Template('Brew {cup_size} ml'))`.
 - To show a parametrize value as a `given`, put `Annotated[int, given(Template('a {cup_size} ml cup'))]` on the parameter.

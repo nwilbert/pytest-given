@@ -18,6 +18,8 @@ Read the guide for the artifact you are about to change, not all of them:
 | Working on | Read |
 |---|---|
 | Decorating tests with `@scenario`, writing or editing steps | `references/scenarios.md` |
+| A parametrized scenario, or merging sibling scenarios into one | `references/parameter-tables.md` |
+| A narration lint finding, or an entry for `given_lint_ignore` | `references/lint.md` |
 | Adding, renaming, or reorganizing glossary terms | `references/glossaries.md` |
 | Writing or extending `story(...)` definitions | `references/stories.md` |
 | Modeling questions (actors vs work objects, granularity), or the project's first story | `references/domain-storytelling.md` |
@@ -32,7 +34,7 @@ Read the guide for the artifact you are about to change, not all of them:
 | Glossary tab is empty | `references/glossaries.md` |
 | Stories tab is empty | `references/stories.md` |
 | A sentence never turns covered | `references/stories.md` |
-| A lint run on one file fails where the whole suite passes | `references/scenarios.md` |
+| A lint run on one file fails where the whole suite passes | `references/lint.md` |
 
 ## Adoption levels
 
@@ -46,6 +48,7 @@ Each kind of artifact works on its own; using scenarios only is a perfectly good
 
 - Render the scenarios you changed and read the output as a spec. Every step text must describe something its body actually does: `pytest <selection> --given-md`
 - If the project uses the narration lint, run it on the whole suite: `pytest --given-lint`. A selection fails on a `given_lint_ignore` entry for a test it skips. The lint catches structural lies, such as empty steps or a `then` that checks nothing. It can't check whether the narration is true; that is the author's job.
+- If Markdown documents cite the report, run `pytest-given citations check`: a renamed test or a reworded title changes their citations. The `pytest-given-citing` skill handles its findings.
 
 Reviewing someone else's narration rather than writing your own? Use the `pytest-given-reviewing` skill. It restates these rules as a review rubric.
 

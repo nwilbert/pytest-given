@@ -195,9 +195,7 @@ def test_the_documented_rule_tables_match_the_catalog() -> None:
         / 'configuration'
         / 'narration-lint.md'
     )
-    skill = (
-        BUNDLED_SKILLS_ROOT / 'pytest-given-authoring' / 'references' / 'scenarios.md'
-    )
+    skill = BUNDLED_SKILLS_ROOT / 'pytest-given-authoring' / 'references' / 'lint.md'
     for doc in (docs_page, skill):
         rows = dict(
             re.findall(

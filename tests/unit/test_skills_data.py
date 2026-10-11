@@ -1,4 +1,6 @@
+import re
 from importlib.resources.abc import Traversable
+from pathlib import Path, PurePosixPath
 
 import pytest
 
@@ -43,22 +45,67 @@ def test_reference_guides_are_bundled(skill: str) -> None:
     assert (BUNDLED_SKILLS_ROOT / skill / 'references').is_dir()
 
 
-def test_reviewing_skill_cross_reference_target_exists() -> None:
-    """The reviewing skill links ../pytest-given-authoring/references/scenarios.md."""
-    root = BUNDLED_SKILLS_ROOT / 'pytest-given-authoring'
-    assert (root / 'references' / 'scenarios.md').is_file()
+@pytest.mark.parametrize('skill', BUNDLED_SKILLS)
+def test_skill_md_says_the_installed_copy_is_overwritten(skill: str) -> None:
+    text = (BUNDLED_SKILLS_ROOT / skill / 'SKILL.md').read_text(encoding='utf-8')
+    assert 'overwritten on reinstall' in text
 
 
-def test_reviewing_skill_story_coverage_reference_is_bundled() -> None:
-    """The reviewing skill links references/story-coverage.md for the JSON query."""
-    root = BUNDLED_SKILLS_ROOT / 'pytest-given-reviewing'
-    assert (root / 'references' / 'story-coverage.md').is_file()
+def test_every_relative_link_resolves_to_a_bundled_file_and_heading() -> None:
+    broken = [
+        f'{document}: {link}'
+        for document in _markdown_documents()
+        for link in _relative_links(_read(document))
+        if not _resolves(document, link)
+    ]
+    assert broken == []
 
 
-def test_reviewing_skill_pairs_reference_is_bundled() -> None:
-    """The reviewing skill links references/pairs.md for the narration/body dump."""
-    root = BUNDLED_SKILLS_ROOT / 'pytest-given-reviewing'
-    assert (root / 'references' / 'pairs.md').is_file()
+_CODE = re.compile(r'```.*?```|`[^`\n]*`', re.DOTALL)
+_LINK = re.compile(r'\[[^\]]*\]\(([^)\s]+)\)')
+_HEADING = re.compile(r'^#+ (.+)$', re.MULTILINE)
+
+
+def _markdown_documents() -> list[PurePosixPath]:
+    return [
+        PurePosixPath(skill, *path.relative_to(skill_root).parts)
+        for skill in BUNDLED_SKILLS
+        for skill_root in [Path(str(BUNDLED_SKILLS_ROOT / skill))]
+        for path in sorted(skill_root.rglob('*.md'))
+    ]
+
+
+def _read(document: PurePosixPath) -> str:
+    return BUNDLED_SKILLS_ROOT.joinpath(*document.parts).read_text(encoding='utf-8')
+
+
+def _relative_links(text: str) -> list[str]:
+    return [
+        link
+        for link in _LINK.findall(_CODE.sub('', text))
+        if '://' not in link and not link.startswith('mailto:')
+    ]
+
+
+def _resolves(document: PurePosixPath, link: str) -> bool:
+    target, _, anchor = link.partition('#')
+    parts: list[str] = list(document.parent.parts)
+    for part in PurePosixPath(target).parts if target else ():
+        if part == '..':
+            parts.pop()
+        else:
+            parts.append(part)
+    resolved = PurePosixPath(*parts) if target else document
+    if not BUNDLED_SKILLS_ROOT.joinpath(*resolved.parts).is_file():
+        return False
+    return not anchor or anchor in _heading_slugs(_read(resolved))
+
+
+def _heading_slugs(text: str) -> set[str]:
+    return {
+        re.sub(r'[^\w\- ]', '', heading.strip().lower()).replace(' ', '-')
+        for heading in _HEADING.findall(_CODE.sub('', text))
+    }
 
 
 def test_skill_frontmatter_names_match_directories() -> None:

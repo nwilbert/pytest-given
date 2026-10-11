@@ -24,7 +24,9 @@ pytest --given-lint -o "given_lint_rules=dead-term=warn"
 
 Lint the whole suite, not just the tests a change touches. A `given_lint_ignore` entry for a test outside the selection fails the run as `stale-ignore`. `-o` replaces the project's `given_lint_rules` list instead of adding to it. If the project sets any rules, repeat them in the same value, one per line.
 
-`warn` findings print in the summary, and an `error` finding fails the run. The rule catalog is in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) under "Mechanical counterparts". Under "Phase structure", the same file has the test an ignored `missing-phase` must pass: two phases must be honest. A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review. Entries that no longer suppress anything fail the run, so the list can't go stale.
+`warn` findings print in the summary, and an `error` finding fails the run. The rule catalog, and when an ignored `missing-phase` is justified, are in the authoring skill's [lint.md](../pytest-given-authoring/references/lint.md). A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review.
+
+If Markdown documents cite the report, run `pytest-given citations check` too, and hand its findings to the `pytest-given-citing` skill. Where a cited scenario's title changed, read the sentence that cites it: the new title may no longer fit.
 
 ## 2. Semantic audit: step text against step body
 
@@ -48,33 +50,11 @@ For a large suite, split the audit: one reviewer per test file, each returning f
 
 ## 3. Completeness audit: what the report doesn't say
 
-Layers 1 and 2 start from the narration and ask whether it is true. Neither catches a report that is true line by line but still misrepresents the system by leaving things out. When the question is "does this capture the essentials?", for example on a branch adopting pytest-given or for a feature's first scenarios, reverse the direction. Start from the implementation and ask what the report fails to say. Limit the search to the code the change touches.
-
-- **Behavior without a scenario.** Go through the branches of the code under review that carry behavior: a scoping rule, a precedence decision, a fallback path. Check that each has a scenario that names it. A branch that only an undecorated test covers is invisible in the report. A branch with no test at all rates higher, because the spec looks complete while hiding it. A rule narrated at the wrong layer is also a finding. There are two cases. In one, several callers each repeat a rule that a shared function decides. In the other, a unit scenario's title claims what the system does, but its body only calls internal code, and no other scenario shows a run reaching that code. The second case is a false claim: decorate a test that proves the title instead. Look among the undecorated tests first; the right one often exists already.
-
-  Start with the undecorated tests in test files that hold a scenario. They are where most gaps sit, next to the narrated tests of the same code:
-
-  ```bash
-  pytest <selection> -m pytest_given --given-json=report.json
-  pytest <selection> -m "not pytest_given" --collect-only -q > plain.txt
-  jq -r --rawfile plain plain.txt '
-    [.scenarios[].id | split("::")[0]] as $files
-    | $plain | split("\n") | map(select(contains("::")) | sub("[[].*"; "")) | unique[]
-    | select(split("::")[0] | IN($files[]))' report.json
-  ```
-
-  For the code itself, compare the code coverage of `pytest -m pytest_given` with a full run's. Lines only the full run covers are behavior only plain tests reach.
-- **Parameter tables that can't show what decides.** For each input that decides a parametrized scenario's outcome, some row should change only that input and flip the outcome. Without such a row, the table only lists examples, and the rule that decides between them stays unnarrated. Ask for the contrast row, at the boundary if there is one, instead of splitting the table into one scenario per row. A refusal can be a contrast row too, and a sibling scenario with the flipped outcome doesn't make up for a missing row.
-- **Glossary rows that state behavior.** A definition that makes a claim ("X takes precedence over Y", "must be unique") is part of the spec. When no scenario demonstrates the claim, the glossary documents something nothing checks. Flag the row and the missing scenario, and prefer adding a scenario to weakening the definition. When a scenario contradicts the row, the row is a false claim.
-- **Rules the release notes announce.** If the project keeps a changelog, check that a scenario names each rule its unreleased entries state. That is the project promising a behavior in its own words. For a review of the whole suite, the changelog limits the scope the way a diff does for a change. A rule narrated only in part, such as the fix without the way to opt out, is a finding too.
+Layers 1 and 2 ask whether the narration is true. Neither catches a report that is true line by line but leaves out what matters. When the question is "does this capture the essentials?", for example on a branch adopting pytest-given or for a feature's first scenarios, start from the implementation instead and follow [references/completeness.md](references/completeness.md).
 
 ## 4. Glossary, tags, stories
 
-- A **dead term** (layer 1, opt-in rule) that describes behavior nobody implemented is misleading domain documentation, so flag it. Deleting the term is as often the fix as adding a reference. Don't accept references invented just to satisfy the rule. First check whether an undecorated test already covers the row's behavior, or a step already uses the term as plain text. Then the fix is to decorate the test or add the term ref, not to delete the term. A term that is real vocabulary, but that no scenario happens to narrate, is **not** a finding. The glossary documents the domain, not the suite's coverage.
-- **Dilution** is the opposite finding: a row nobody would miss. Examples are a generic verb added to fill a story slot (a bare word belongs there), a concept listed twice under two names, or a term added only to render as a term ref. A small, precise glossary is better than one that just looks impressive.
-- An **oversized glossary** is a structural finding. A glossary only works when it is read as a whole, so one too long to read comfortably in one sitting probably covers more than one bounded context. Raise it as a design question: a suite supports only one glossary, so splitting by context means splitting the suite. Don't reduce the size by removing good terms.
-- The lint checks `tag-shadows-term`. The fix is to remove the tag, **not to add more tags**. Tags stay separate from the glossary (behavior, mechanism), so having few tags is usually right; don't report it as a finding. A tag missing from some of the scenarios it describes is a finding, because filtering by it then misses those scenarios — except a work-item tag (`ticket/…`, `spec/…`), which marks what one piece of work added and need not cut across modules.
-- An **uncovered story sentence** is a gap in the story's telling, not in the tests (untested behavior is layer 3). Note it, unless the place that declares it marks it as deliberate; a story maps the whole flow, including human work. Read coverage from the JSON report. The queries, including one for scenarios that name a story but cover none of it, and how to explain *why* a sentence is uncovered, are in [references/story-coverage.md](references/story-coverage.md).
+When the change touches the glossary, tags or stories, or the review audits them, follow [references/hygiene.md](references/hygiene.md).
 
 ## Findings are advisory review comments
 
@@ -86,7 +66,7 @@ For each finding, give the file:line, what the narration claims, what the body a
 4. **Glossary, tag and story hygiene** (layer 4).
 5. **Report legibility** (below).
 
-**Report legibility can be reviewed; taste can't.** The whole point is that the report is documentation, so how it *reads* is in scope. Flag inconsistent casing or wording of the same concept across step texts. Read the scenario titles alone, as a list. Flag a title that can't be understood without its steps, that is a question or a phrase instead of a statement of the rule, that breaks sentence case (a code identifier at the start keeps its case), that ends in a period, or that carries a status note. Also flag two titles that don't tell their scenarios apart. Such twins are often worded differently, so group the titles that state the same rule and compare their test files. The usual pair is a unit test and an integration test. Say which of the two should keep the scenario: the one whose body proves the title. The authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) has the rules under "Scenario titles".
+**Report legibility can be reviewed; taste can't.** The report is documentation, so how it *reads* is in scope. Flag inconsistent casing or wording of the same concept across step texts. Read the scenario titles alone, as a list. Flag a title that can't be understood without its steps, that is a question or a phrase instead of a statement of the rule, that breaks sentence case (a code identifier at the start keeps its case), that ends in a period, or that carries a status note. Also flag two titles that don't tell their scenarios apart. Such twins are often worded differently, so group the titles that state the same rule and compare their test files. The usual pair is a unit test and an integration test. Say which of the two should keep the scenario: the one whose body proves the title. The authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) has the rules under "Scenario titles".
 
 Parameter tables are part of the document too. Flag these:
 
@@ -96,6 +76,6 @@ Parameter tables are part of the document too. Flag these:
 - An outcome that varies but has no column of its own.
 - Sibling scenarios that should be one table: the same steps with one arrangement varied, or titles that negate each other.
 
-The fixes are in the authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) under "Parameter tables". Report all legibility problems as one combined finding, not one per instance. A wording you would simply have chosen differently is out of scope.
+The fixes are in the authoring skill's [parameter-tables.md](../pytest-given-authoring/references/parameter-tables.md). Report all legibility problems as one combined finding, not one per instance. A wording you would simply have chosen differently is out of scope.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

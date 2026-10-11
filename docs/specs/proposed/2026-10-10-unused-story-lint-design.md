@@ -5,7 +5,7 @@
 Flag a scenario that names a story in `stories=` while none of its steps matches or pins any of
 that story's sentences. The authoring skill already states the rule ("name a story only when a
 step can match or pin one of its sentences"); the lint makes it mechanical, the way the other rules
-in "Mechanical counterparts" back theirs.
+in the authoring skill's `references/lint.md` back theirs.
 
 ## Background
 
@@ -56,7 +56,7 @@ rule needs; `build_coverage_map` stays the report's entry point over `ReportData
   `report/html_renderer.py` and `report/story_view.py` import it from `model`.
 - `lint/base.py` — `UNUSED_STORY`, default `warn`.
 - `lint/runtime_rules.py` — `_unused_story_findings`, registered in `_RUNTIME_RULES`.
-- Authoring skill `references/scenarios.md` — the catalog row; `references/stories.md` — the
+- Authoring skill `references/lint.md` — the catalog row; `references/stories.md` — the
   "Binding scenarios to a story" rule points at it, with the remedies.
 - Reviewing skill `references/story-coverage.md` — the "names a story yet covers none" query
   goes; layer 1 already runs the rule.

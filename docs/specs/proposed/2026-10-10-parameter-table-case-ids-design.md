@@ -93,7 +93,7 @@ generated ones included, so the column is the same id the terminal shows for eac
 The id is a claim nothing checks, like a scenario title: the body never reads it, so it cannot be
 turned back into data, but it can misname its row. Both skills treat it that way.
 
-- **Authoring** (`references/scenarios.md`, "Parameter tables"): name rows with ids when a reader
+- **Authoring** (`references/parameter-tables.md`): name rows with ids when a reader
   needs to talk about them, as in a boundary or a named edge case. An id names what the row is
   for (`touching-edges`); it never restates a value the columns already show (`start-10`). The
   "no label column sits next to the data it describes" rule gets a carve-out for ids, since that
@@ -111,7 +111,7 @@ turned back into data, but it can misname its row. Both skills treat it that way
 - `report/md_renderer.py` — the leading `id` column.
 - `report/templates/` — the header cell; Playwright-verified per AGENTS.md.
 - Navigating skill `references/report-json.md` — the two new fields.
-- Authoring skill `references/scenarios.md`, reviewing `SKILL.md` — the guidance above, with
+- Authoring skill `references/parameter-tables.md`, reviewing `SKILL.md` — the guidance above, with
   `docs/site/` kept in step.
 - Self-report: decorate the test that best states "a parameter table names its rows by their
   hand-written ids".
