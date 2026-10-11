@@ -86,13 +86,14 @@ a value. A plain-string title gets parts too, so title and suffix are never read
   `<code>`, escaping everything else. The narration filter renders each plain-text piece this way,
   and so does the parts-less path for a plain-string title or step. Definitions additionally turn
   `<br>` and newlines into breaks. Everything else is escaped as it is today.
-- **Markdown** (`report/link_text.py`): one writer backslash-escapes every character CommonMark or
-  GFM give inline meaning — the set `link_text` already escapes (``\ [ ] * ~ ` < & | $``) and a
-  non-intraword `_` — so a Markdown viewer shows exactly what the HTML shows: an author's `<br>`
-  or `[text](url)` stays text. The Markdown report and citations write every text through it; only
-  the plain-text pieces of titles and steps keep the reader's spans, with their markers, and a
-  scenario's title is written piece by piece. Code spans and fenced blocks the report writes itself
-  stay verbatim. A title's or step's newlines fold to spaces; elsewhere the report's
+- **Markdown** (`report/markdown_writer.py`): one writer backslash-escapes every character
+  CommonMark or GFM give inline meaning — the set `link_text` already escapes
+  (``\ [ ] * ~ ` < & | $``) and an `_` not intraword in the written line, its neighbouring
+  pieces included — so a Markdown viewer shows exactly what the
+  HTML shows: an author's `<br>` or `[text](url)` stays text. The Markdown report and citations
+  write every text through it; only the plain-text pieces of titles and steps keep the reader's
+  spans, with their markers, and a scenario's title is written piece by piece. Code spans and
+  fenced blocks the report writes itself stay verbatim. A title's or step's newlines fold to spaces; elsewhere the report's
   newline-to-`<br>` folding runs after the escaping. Reading a citation back is unchanged.
 - **`FileGlossary`** (`capture/markdown_glossary.py`): unwraps the reader's spans in term and kind
   cells, as before.
@@ -110,9 +111,9 @@ backtick run inside. Only the label changes: the Markdown report escapes it like
   lookarounds, plus a code-span pass over bold and italic contents.
 - `report/inline_markdown.py` — renders the reader's spans; breaks only for definitions.
 - `report/html_renderer.py` — plain-text pieces and parts-less narrations through it.
-- `report/link_text.py` — the writer: spans for a title's or step's plain-text pieces, escaped
-  whole for every other text; its own code-span and nesting logic for emphasis goes, and
-  `plain_link_text` keeps its own for reading documents back.
+- `report/markdown_writer.py` — the writer, moved out of `report/link_text.py`: spans for a
+  title's or step's plain-text pieces, escaped whole for every other text; its own code-span and
+  nesting logic for emphasis goes, and `plain_link_text` keeps its own for reading documents back.
 - `report/md_renderer.py` — every text through the writer: the heading, titles and steps piece by
   piece, tags, skip and xfail reasons, column names, case keys, cells, attachment labels and error
   lines; `_narration_md` folds newlines to spaces.

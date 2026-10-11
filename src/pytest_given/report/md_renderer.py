@@ -19,7 +19,7 @@ from ..model import (
     node_base,
     plural,
 )
-from .link_text import code_span_markdown, literal_markdown, narration_markdown
+from .markdown_writer import code_span_markdown, literal_markdown, narration_markdown
 from .text import NEWLINE, STATUS_GLYPH, STATUS_LABEL
 
 
