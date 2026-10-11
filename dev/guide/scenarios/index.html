@@ -1003,7 +1003,7 @@
 <h1 id="scenarios-steps">Scenarios &amp; steps<a class="headerlink" href="#scenarios-steps" title="Permanent link">&para;</a></h1>
 <p>A narrated test uses two things: the <code>@scenario</code> decorator, which puts the test in the report, and the steps <code>given</code>, <code>when</code> and <code>then</code>, which describe what it does.</p>
 <h2 id="scenario"><code>@scenario</code><a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
-<p><code>@scenario(name, tags=None, *, stories=None, pins=None, group_parametrized=True)</code></p>
+<p><code>@scenario(title, tags=None, *, stories=None, pins=None, group_parametrized=True)</code></p>
 <p>Only tests with <code>@scenario</code> appear in the report. The decorator returns your function unchanged.</p>
 <ul>
 <li><code>stories=</code> takes one story or a list of stories, and <code>pins=</code> one sentence handle or a list. Both link the scenario to domain stories; see <a href="../domain-storytelling/">Domain Storytelling</a>.</li>

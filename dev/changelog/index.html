@@ -1028,6 +1028,7 @@
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Breaking.</strong> A handle's <code>.low</code> form is now <code>.l</code>: replace <code>.low</code> with <code>.l</code>.</li>
+<li><strong>Breaking.</strong> <code>@scenario</code>'s first parameter is now <code>title</code>: replace <code>@scenario(name=...)</code> with <code>@scenario(title=...)</code>; a positional title is unaffected.</li>
 <li>A handle's <code>.l</code> form lowercases only capitalized words, so an acronym keeps its case (<code>LLM Call</code> reads <em>LLM call</em>).</li>
 <li>The Glossary view counts a term ref reading as the term's S-form as the term itself, so <code>room('rooms')</code> and <code>book('books')</code> no longer appear under Instances or "Also used as".</li>
 <li>The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.</li>
