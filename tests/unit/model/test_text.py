@@ -1,10 +1,15 @@
 import pytest
 
 from pytest_given.model import (
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
     PytestGivenError,
     derived_id,
     id_derive,
     plural,
+    read_spans,
     s_form,
     table_cell_spans,
 )
@@ -79,3 +84,61 @@ def test_table_cell_spans_split_a_row_on_its_unescaped_pipes(
     row: str, cells: list[str]
 ) -> None:
     assert [row[start:end] for start, end in table_cell_spans(row)] == cells
+
+
+def _strong(*content: PlainSpan | CodeSpan) -> EmphasisSpan:
+    return EmphasisSpan(strong=True, content=content)
+
+
+def _em(*content: PlainSpan | CodeSpan) -> EmphasisSpan:
+    return EmphasisSpan(strong=False, content=content)
+
+
+@pytest.mark.parametrize(
+    ('text', 'spans'),
+    [
+        ('plain', [PlainSpan('plain')]),
+        ('', []),
+        ('`code`', [CodeSpan('code')]),
+        ('**bold**', [_strong(PlainSpan('bold'))]),
+        ('*italic*', [_em(PlainSpan('italic'))]),
+        (
+            'a **b** and *c* and `d`',
+            [
+                PlainSpan('a '),
+                _strong(PlainSpan('b')),
+                PlainSpan(' and '),
+                _em(PlainSpan('c')),
+                PlainSpan(' and '),
+                CodeSpan('d'),
+            ],
+        ),
+        ('a*b*c', [PlainSpan('a'), _em(PlainSpan('b')), PlainSpan('c')]),
+        # A marker touching a space on its inner side opens or closes nothing.
+        ('2 * 3 * 4', [PlainSpan('2 * 3 * 4')]),
+        ('** b **', [PlainSpan('** b **')]),
+        ('*a *', [PlainSpan('*a *')]),
+        # Underscores never format.
+        ('__init__, _x_ and snake_case', [PlainSpan('__init__, _x_ and snake_case')]),
+        # Code inside bold, and nothing else nests.
+        ('**`.l`**', [_strong(CodeSpan('.l'))]),
+        ('**a *b* c**', [_strong(PlainSpan('a *b* c'))]),
+        ('`a*b*c`', [CodeSpan('a*b*c')]),
+        # The first span to close wins.
+        ('**a`**`', [_strong(PlainSpan('a`')), PlainSpan('`')]),
+        ('`a**`b**', [CodeSpan('a**'), PlainSpan('b**')]),
+        # Unmatched markers and backslashes are literal.
+        ('**open', [PlainSpan('**open')]),
+        ('lone ` tick', [PlainSpan('lone ` tick')]),
+        ('``', [PlainSpan('``')]),
+        ('\\*a*', [PlainSpan('\\'), _em(PlainSpan('a'))]),
+        ('***a***', [PlainSpan('*'), _strong(PlainSpan('a')), PlainSpan('*')]),
+        ('**a*', [PlainSpan('*'), _em(PlainSpan('a'))]),
+        # A span may cross a line break.
+        ('**a\nb**', [_strong(PlainSpan('a\nb'))]),
+    ],
+)
+def test_read_spans_finds_code_bold_and_italic(
+    text: str, spans: list[InlineSpan]
+) -> None:
+    assert read_spans(text) == spans

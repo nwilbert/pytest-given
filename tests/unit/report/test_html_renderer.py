@@ -17,6 +17,7 @@ from pytest_given.model import (
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
+    NarrationValue,
     NodeId,
     ParameterCase,
     ParameterColumn,
@@ -96,6 +97,51 @@ def test_inline_md_filter_blank_is_empty() -> None:
 
 def test_inline_md_filter_renders_markdown() -> None:
     assert _inline_md('**x** and `y`') == '<strong>x</strong> and <code>y</code>'
+
+
+def test_inline_md_filter_breaks_a_definition_line() -> None:
+    assert _inline_md('one\ntwo') == 'one<br>two'
+
+
+def test_narration_filter_renders_the_spans_of_a_plain_string() -> None:
+    render = _make_narration_filter(param_color_map={}, glossary=None)
+    narration = Narration(text='Books a **suite**\nfor *two*')
+    assert render(narration) == 'Books a <strong>suite</strong>\nfor <em>two</em>'
+
+
+def test_narration_filter_renders_the_spans_of_a_literal_part() -> None:
+    render = _make_narration_filter(param_color_map={}, glossary=None)
+    narration = Narration(
+        text='a `cup` costs 2',
+        parts=(
+            NarrationLiteral(value='a `cup` costs '),
+            NarrationValue(rendered='2', expression='price'),
+        ),
+    )
+    assert str(render(narration)).startswith('a <code>cup</code> costs ')
+
+
+def test_narration_filter_reads_no_markdown_in_a_value() -> None:
+    render = _make_narration_filter(param_color_map={}, glossary=None)
+    narration = Narration(
+        text='*x*', parts=(NarrationValue(rendered='*x*', expression='name'),)
+    )
+    out = str(render(narration))
+    assert '*x*' in out
+    assert '<em>' not in out
+
+
+def test_narration_filter_reads_no_span_across_a_term_ref() -> None:
+    render = _make_narration_filter(param_color_map={}, glossary=None)
+    narration = Narration(
+        text='**Guest books**',
+        parts=(
+            NarrationLiteral(value='**'),
+            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+            NarrationLiteral(value=' books**'),
+        ),
+    )
+    assert render(narration) == '**Guest books**'
 
 
 def test_render_produces_html_file(tmp_path: Path) -> None:

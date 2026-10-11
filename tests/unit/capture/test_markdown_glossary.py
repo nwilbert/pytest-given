@@ -196,6 +196,7 @@ def test_data_row_with_fewer_columns_raises():
         ('`given`', 'given'),
         ('work_object', 'work_object'),
         ('`a*b*c`', 'a*b*c'),
+        ('__Scenario__', '__Scenario__'),
     ],
 )
 def test_a_term_cell_is_read_as_its_plain_text(cell, term):

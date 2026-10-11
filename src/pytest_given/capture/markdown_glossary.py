@@ -9,7 +9,15 @@ name (case-insensitive) or a 0-based index.
 import re
 from dataclasses import dataclass
 
-from ..model import EMPHASIS, PytestGivenError, table_cell_spans
+from ..model import (
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
+    PytestGivenError,
+    read_spans,
+    table_cell_spans,
+)
 
 type ColumnSpec = int | str
 
@@ -104,23 +112,18 @@ def parse_glossary_tables(
 
 
 def _strip_emphasis(cell: str) -> str:
-    """Unwrap inline Markdown emphasis (`code`, **bold**, __bold__, *italic*)
-    from a cell, leaving its text content. Applied to term and kind cells so a
-    glossary written with emphasized term names renders clean pills.
-
-    Nesting unwraps by recursing into each match rather than re-running the
-    pattern over the whole string, which would strip markup that is literal
-    inside an already unwrapped code span.
-    """
-    return EMPHASIS.sub(_unwrap_emphasis, cell).strip()
+    """The cell's text with the reader's spans unwrapped. Applied to term and
+    kind cells so a glossary written with emphasized term names renders clean
+    pills."""
+    return ''.join(_span_text(span) for span in read_spans(cell)).strip()
 
 
-def _unwrap_emphasis(match: re.Match[str]) -> str:
-    code, bold_star, bold_underscore, italic = match.groups()
-    if code is not None:
-        return code
-    inner = next(g for g in (bold_star, bold_underscore, italic) if g is not None)
-    return EMPHASIS.sub(_unwrap_emphasis, inner)
+def _span_text(span: InlineSpan) -> str:
+    match span:
+        case PlainSpan(text=text) | CodeSpan(text=text):
+            return text
+        case EmphasisSpan(content=content):
+            return ''.join(_span_text(part) for part in content)
 
 
 def _is_table_row(line: str) -> bool:

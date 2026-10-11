@@ -23,12 +23,15 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Each case in the JSON report's `parameters.cases[]` carries its node id as `id`.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
 - The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
+- Scenario titles and step text render `**bold**`, `*italic*` and `` `code` `` in the HTML report.
 
 ### Changed
 
 - **Breaking.** `@scenario`'s first parameter is now `title`: replace `@scenario(name=...)` with `@scenario(title=...)`; a positional title is unaffected.
 - **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
+- **Breaking.** Glossary definitions no longer render `__bold__`, and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
+- Glossary definitions render code inside bold and no longer italicize between spaced asterisks.
 - The HTML report's top bar and term ref underlines are visually tidied.
 - The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
 - The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.

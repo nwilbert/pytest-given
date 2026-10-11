@@ -44,7 +44,7 @@ from ..model import (
 from .citation_index import CitationIndex, Target, TargetKind
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
-from .inline_markdown import render_inline_markdown
+from .inline_markdown import render_definition, render_spans
 from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
@@ -93,13 +93,13 @@ def tab_visibility(report: ReportData) -> TabVisibility:
 
 
 def _inline_md(text: str | None) -> Markup:
-    """Jinja filter: render a term description's inline Markdown to safe HTML.
+    """Jinja filter: render a term definition's inline Markdown to safe HTML.
 
     The `not text` guard matters: `markupsafe.escape(None)` renders the literal
     string 'None', and `term.definition` is None for undefined terms."""
     if not text:
         return Markup('')
-    return Markup(render_inline_markdown(text))
+    return Markup(render_definition(text))
 
 
 def render_html_string(
@@ -334,12 +334,10 @@ def _app_data(report: ReportData) -> dict[str, object]:
                         'kind': term.kind,
                         'definition': term.definition,
                         # Pre-rendered once per term, for the hover tooltip.
-                        # `render_inline_markdown` escapes the text and
-                        # re-admits only <br>/<code>/<strong>/<em>, which is
-                        # what lets app.js assign it as innerHTML.
-                        'definition_html': render_inline_markdown(
-                            term.definition or ''
-                        ),
+                        # `render_definition` escapes the text and re-admits
+                        # only <br>/<code>/<strong>/<em>, which is what lets
+                        # app.js assign it as innerHTML.
+                        'definition_html': render_definition(term.definition or ''),
                     }
                     for term in report.glossary.terms
                 ]
@@ -482,12 +480,12 @@ def _make_narration_filter(
     """Jinja filter: renders a `Narration` to HTML, part by part.
 
     Usage: `{{ step.narration | narration }}`. A parts-less narration (a plain
-    string label) is escaped and emitted verbatim.
+    string label) is one plain-text piece, its spans rendered like a literal's.
     """
 
     def _render(narration: Narration) -> Markup:
         if not narration.parts:
-            return Markup(str(escape(narration.text)))
+            return Markup(render_spans(narration.text))
         out = [
             _render_narration_part(part, param_color_map, glossary)
             for part in narration.parts
@@ -505,7 +503,7 @@ def _render_narration_part(
     """Render one `NarrationPart` to an HTML fragment."""
     match part:
         case NarrationLiteral(value=value):
-            return str(escape(value))
+            return render_spans(value)
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
