@@ -1,4 +1,7 @@
+import html
+
 import pytest
+from markdown_it import MarkdownIt
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
@@ -995,3 +998,43 @@ def test_a_parameter_table_writes_its_names_and_values_literally() -> None:
     assert '| \\*a\\* |' in md
     assert '| \\*\\*v\\*\\* |' in md
     assert '- **\\*\\*v\\*\\*** — failed:' in md
+
+
+@pytest.mark.parametrize(
+    'message',
+    [
+        '# 1 failed',
+        '###### deep',
+        '- item',
+        '+ item',
+        '1. first',
+        '2) second',
+        '> nested',
+        '    indented',
+        '#hashtag and -1 and 3.14',
+    ],
+)
+def test_an_error_line_never_opens_a_block_inside_its_quote(message: str) -> None:
+    scn = Scenario(
+        id='tests/t.py::test_x',
+        narration=Narration(text='X'),
+        module='tests/t.py',
+        status='failed',
+        error=ErrorInfo(
+            message=message,
+            frames=[
+                TracebackFrame(
+                    path='/x/1. a.py',
+                    lineno=3,
+                    func='f',
+                    code='',
+                    is_internal=False,
+                )
+            ],
+        ),
+    )
+    md = render_md(_report(scn))
+    quote = '\n'.join(line for line in md.splitlines() if line.startswith('>'))
+    rendered = MarkdownIt('commonmark').render(quote)
+    text = html.escape(message.strip(), quote=False)
+    assert rendered == f'<blockquote>\n<p>{text}\n1. a.py:3 in f</p>\n</blockquote>\n'

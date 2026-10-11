@@ -256,13 +256,30 @@ def _error_lines(error: ErrorInfo, prefix: str = '') -> list[str]:
     lines = []
     first = error.message.splitlines()[0] if error.message else ''
     if first:
-        lines.append(f'{prefix}> {literal_markdown(first)}')
+        lines.append(f'{prefix}> {_quoted(first)}')
     for frame in reversed(error.frames):
         if not frame.is_internal:
             where = f'{Path(frame.path).name}:{frame.lineno} in {frame.func}'
-            lines.append(f'{prefix}> {literal_markdown(where)}')
+            lines.append(f'{prefix}> {_quoted(where)}')
             break
     return lines
+
+
+# What opens a block at the start of a line: a heading, a list item — the
+# group holding an ordered one's delimiter — or a nested quote.
+_BLOCK_MARKER = re.compile(r'(?:#{1,6}|[-+])(?=\s|$)|>|[0-9]{1,9}(?=([.)])(?:\s|$))')
+
+
+def _quoted(text: str) -> str:
+    """A line of a quote, shown literally: a block marker at its start is
+    escaped too, and its indent, which would open a code block, dropped."""
+    line = literal_markdown(text.lstrip())
+    marker = _BLOCK_MARKER.match(line)
+    if marker is None:
+        return line
+    if marker.group(1) is not None:
+        return f'{line[: marker.end()]}\\{line[marker.end() :]}'
+    return f'\\{line}'
 
 
 def _narration_md(narration: Narration) -> str:
