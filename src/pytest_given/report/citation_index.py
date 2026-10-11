@@ -4,6 +4,7 @@ and which scenarios, tags and stories a report holds to cite."""
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Literal, Self
 from urllib.parse import quote
 
@@ -75,24 +76,33 @@ def report_fragment(target: Target) -> str:
 
 
 class CitationIndex:
-    """The scenarios, tags and stories a report lets a document cite."""
+    """The scenarios, tags and stories a report lets a document cite. The tags
+    and stories are built on first use: a report without a URL needs neither."""
 
     def __init__(
         self, report: ReportData, story_scenarios: Mapping[StoryId, list[Scenario]]
     ) -> None:
+        self._report = report
+        self._story_scenarios = story_scenarios
         self.scenarios = _citable_scenarios(report)
         self.cited_by_case = _cited_by_case(self.scenarios)
-        # Under a tag and each of its prefixes, as `app.js`'s `underPrefix`
-        # matches a `#tag=` link to the scenarios it opens.
+
+    @cached_property
+    def tags(self) -> dict[str, list[Scenario]]:
+        """Under a tag and each of its prefixes, as `app.js`'s `underPrefix`
+        matches a `#tag=` link to the scenarios it opens."""
         tagged: dict[str, list[Scenario]] = {}
-        for scenario in report.scenarios:
+        for scenario in self._report.scenarios:
             tags = {prefix for tag in scenario.tags for prefix in _prefixes(tag)}
             for tag in tags:
                 tagged.setdefault(tag, []).append(scenario)
-        self.tags = dict(sorted(tagged.items()))
-        self.stories = {
-            story.id: (story.title, story_scenarios[story.id])
-            for story in report.stories
+        return dict(sorted(tagged.items()))
+
+    @cached_property
+    def stories(self) -> dict[StoryId, tuple[str, list[Scenario]]]:
+        return {
+            story.id: (story.title, self._story_scenarios[story.id])
+            for story in self._report.stories
         }
 
     @classmethod
