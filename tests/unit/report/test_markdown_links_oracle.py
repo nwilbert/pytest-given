@@ -23,7 +23,16 @@ type FoundLink = tuple[str, str]
 
 # Constructs the scanner deliberately reads differently, by file: the links
 # to leave out of both sides, each with the reason in a comment.
-KNOWN_DIFFERENCES: dict[str, list[FoundLink]] = {}
+KNOWN_DIFFERENCES: dict[str, list[FoundLink]] = {
+    _FIXTURE: [
+        # markdown-it continues a quote at a `>` indented 4 columns; CommonMark
+        # reads indented code, as the scanner does.
+        ('https://example.org/edge/12', 'Indented quote marker'),
+        # markdown-it ends a nested quote's paragraph at an indented fence
+        # opener; CommonMark continues it lazily, as the scanner does.
+        ('https://example.org/edge/13', 'Indented fence opener'),
+    ]
+}
 
 
 def _documents() -> list[str]:
