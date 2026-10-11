@@ -3,9 +3,10 @@ holds under that name."""
 
 import difflib
 from collections.abc import Iterable, Mapping
+from functools import cached_property
 from urllib.parse import parse_qsl
 
-from ..model import NodeId, ReportData, node_base
+from ..model import NodeId, ReportData, StoryId, node_base
 from ..report import CitationIndex, Target, build_scenario_slug_index, fold_whitespace
 
 
@@ -66,9 +67,7 @@ class TargetResolver:
                     ids=self.index.scenarios,
                     title_label='scenario title',
                     title=link_title,
-                    id_by_title={
-                        title: cited[-1] for title, cited in self._by_title.items()
-                    },
+                    id_by_title=self._scenario_by_title,
                 )
             case 'tag':
                 return _labelled(
@@ -82,11 +81,16 @@ class TargetResolver:
                     ids=self.index.stories,
                     title_label='story title',
                     title=link_title,
-                    id_by_title={
-                        title: story_id
-                        for story_id, (title, _) in self.index.stories.items()
-                    },
+                    id_by_title=self._story_by_title,
                 )
+
+    @cached_property
+    def _scenario_by_title(self) -> dict[str, NodeId]:
+        return {title: cited[-1] for title, cited in self._by_title.items()}
+
+    @cached_property
+    def _story_by_title(self) -> dict[str, StoryId]:
+        return {title: story_id for story_id, (title, _) in self.index.stories.items()}
 
     def _resolve_scenario(self, key: str) -> Target | None:
         if key in self.index.scenarios:
