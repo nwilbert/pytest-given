@@ -9,60 +9,12 @@ import pytest
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.citations import CitationsResult, check_citations, markdown_documents
 from pytest_given.model import (
-    Metadata,
-    Narration,
-    NodeId,
-    ParameterCase,
-    ParameterColumn,
-    ParameterTable,
     PytestGivenError,
     ReportData,
     Scenario,
-    Status,
-    param_id,
 )
 from tests.ubiquitous_language import pg
-
-URL = 'https://example.org/report.html'
-
-
-def _scenario(
-    node_id: str,
-    title: str,
-    *,
-    status: Status = 'passed',
-    tags: tuple[str, ...] = (),
-    grouped: bool = False,
-) -> Scenario:
-    table = (
-        ParameterTable(
-            columns=[ParameterColumn(id=param_id('x'), name='x', kind='param')],
-            cases=[ParameterCase(values=[1], status=status)],
-        )
-        if grouped
-        else None
-    )
-    return Scenario(
-        id=NodeId(node_id),
-        narration=Narration(text=title),
-        module='m',
-        status=status,
-        tags=list(tags),
-        parameters=table,
-    )
-
-
-def _report(*scenarios: Scenario, report_url: str | None = URL) -> ReportData:
-    return ReportData(
-        metadata=Metadata(
-            project='p',
-            timestamp='t',
-            pytest_version='9',
-            plugin_version='0',
-            report_url=report_url,
-        ),
-        scenarios=list(scenarios),
-    )
+from tests.unit.citation_reports import URL, report_, scenario_
 
 
 def _run(
@@ -84,7 +36,7 @@ def _run(
     return result, path.read_bytes().decode('utf-8')
 
 
-PAY = _scenario('t.py::test_pay', 'Pay by card')
+PAY = scenario_('t.py::test_pay', 'Pay by card')
 
 
 # --- The self-report's scenarios ---
@@ -100,9 +52,9 @@ def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
         t'a {pg["Report"].l} where the tag `checkout` has a passed and an '
         t'xfailed {pg["Scenario"].l}'
     ):
-        report = _report(
-            _scenario('t.py::test_a', 'Pay', tags=('checkout',)),
-            _scenario('t.py::test_b', 'Refund', status='xfailed', tags=('checkout',)),
+        report = report_(
+            scenario_('t.py::test_a', 'Pay', tags=('checkout',)),
+            scenario_('t.py::test_b', 'Refund', status='xfailed', tags=('checkout',)),
         )
     with given('a document citing the tag under another name, as all passed'):
         document = f'✅ [Checkout]({URL}#tag=checkout) (1 ✅)\n'
@@ -122,7 +74,7 @@ def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
 )
 def test_a_plain_report_link_claims_only_that_its_target_exists(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose one {pg["Scenario"].l} fails'):
-        report = _report(_scenario('t.py::test_pay', 'Pay by card', status='failed'))
+        report = report_(scenario_('t.py::test_pay', 'Pay by card', status='failed'))
     with given('a document linking it, and a deleted test, in its own words'):
         document = (
             f'See [how paying works]({URL}#scenario=t.py::test_pay) and '
@@ -150,7 +102,7 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
         attach('document', document)
     with when(t'it is updated against a {pg["Report"].l} that lacks the scenario'):
         result, marked = _run(
-            tmp_path, document, _report(_scenario('t.py::test_x', 'Other')), update=True
+            tmp_path, document, report_(scenario_('t.py::test_x', 'Other')), update=True
         )
     with then('it is marked ❓, keeping its target and text'):
         attach('marked document', marked)
@@ -158,7 +110,7 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
     with then('it stays a finding'):
         assert [finding.kind for finding in result.remaining] == ['missing']
     with when(t'it is updated once the {pg["Report"].l} holds the scenario again'):
-        _, recovered = _run(tmp_path, marked, _report(PAY), update=True)
+        _, recovered = _run(tmp_path, marked, report_(PAY), update=True)
     with then('it reads as current again'):
         assert recovered == document
 
@@ -167,7 +119,7 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
 
 
 def test_a_renamed_test_is_repointed_by_its_unchanged_title(tmp_path: Path) -> None:
-    report = _report(_scenario('t.py::test_pay_by_card', 'Pay by card'))
+    report = report_(scenario_('t.py::test_pay_by_card', 'Pay by card'))
     document = f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
     checked, _ = _run(tmp_path, document, report)
     assert [(f.kind, f.fixed_by_update) for f in checked.findings] == [
@@ -180,7 +132,7 @@ def test_a_renamed_test_is_repointed_by_its_unchanged_title(tmp_path: Path) -> N
 
 def test_a_gone_tag_citation_is_marked_and_loses_its_summary(tmp_path: Path) -> None:
     result, written = _run(
-        tmp_path, f'✅ [gone]({URL}#tag=gone) (2 ✅)\n', _report(PAY), update=True
+        tmp_path, f'✅ [gone]({URL}#tag=gone) (2 ✅)\n', report_(PAY), update=True
     )
     assert written == f'❓ [gone]({URL}#tag=gone)\n'
     assert [f.kind for f in result.remaining] == ['missing']
@@ -188,7 +140,7 @@ def test_a_gone_tag_citation_is_marked_and_loses_its_summary(tmp_path: Path) -> 
 
 def test_a_plain_link_to_a_gone_target_is_a_finding_left_alone(tmp_path: Path) -> None:
     document = f'[see]({URL}#view=stories&story=gone)\n'
-    result, written = _run(tmp_path, document, _report(PAY), update=True)
+    result, written = _run(tmp_path, document, report_(PAY), update=True)
     assert [f.kind for f in result.remaining] == ['missing']
     assert written == document
 
@@ -196,8 +148,8 @@ def test_a_plain_link_to_a_gone_target_is_a_finding_left_alone(tmp_path: Path) -
 def test_stale_glyph_text_and_summary_and_a_missing_summary_are_rewritten(
     tmp_path: Path,
 ) -> None:
-    report = _report(
-        _scenario('t.py::test_pay', 'Pay by card', status='xfailed', tags=('x',))
+    report = report_(
+        scenario_('t.py::test_pay', 'Pay by card', status='xfailed', tags=('x',))
     )
     document = (
         f'- ✅ [Pay with card]({URL}#scenario=t.py::test_pay)\n'
@@ -226,7 +178,7 @@ def test_stale_glyph_text_and_summary_and_a_missing_summary_are_rewritten(
 def test_a_summary_wrapped_onto_the_next_line_is_current(
     tmp_path: Path, document: str
 ) -> None:
-    report = _report(_scenario('t.py::test_a', 'A', tags=('x',)))
+    report = report_(scenario_('t.py::test_a', 'A', tags=('x',)))
     result, written = _run(tmp_path, document, report, update=True)
     assert (result.findings, written) == ([], document)
 
@@ -247,7 +199,7 @@ def test_a_summary_wrapped_onto_the_next_line_is_current(
 def test_a_stale_wrapped_summary_is_rewritten_in_place(
     tmp_path: Path, document: str, expected: str
 ) -> None:
-    report = _report(_scenario('t.py::test_a', 'A', status='xfailed', tags=('x',)))
+    report = report_(scenario_('t.py::test_a', 'A', status='xfailed', tags=('x',)))
     result, written = _run(tmp_path, document, report, update=True)
     assert written == expected
     assert [f.message for f in result.findings] == ['stale glyph', 'stale summary']
@@ -269,16 +221,16 @@ def test_a_stale_wrapped_summary_is_rewritten_in_place(
 def test_a_gone_target_loses_its_wrapped_summary(
     tmp_path: Path, document: str, expected: str
 ) -> None:
-    _, written = _run(tmp_path, document, _report(PAY), update=True)
+    _, written = _run(tmp_path, document, report_(PAY), update=True)
     assert written == expected
 
 
 def test_a_slug_or_case_suffix_in_any_report_link_becomes_the_node_id(
     tmp_path: Path,
 ) -> None:
-    report = _report(
-        _scenario('pkg/test_pour.py::test_pour[water]', 'Pour {liquid}', grouped=True),
-        _scenario('pkg/test_shop.py::test_buy', 'Buy'),
+    report = report_(
+        scenario_('pkg/test_pour.py::test_pour[water]', 'Pour {liquid}', grouped=True),
+        scenario_('pkg/test_shop.py::test_buy', 'Buy'),
     )
     document = (
         f'[buying]({URL}#scenario=shop/buy) and '
@@ -293,7 +245,7 @@ def test_a_slug_or_case_suffix_in_any_report_link_becomes_the_node_id(
 
 
 def test_a_cited_failure_stays_a_finding_with_its_glyph_written(tmp_path: Path) -> None:
-    report = _report(_scenario('t.py::test_pay', 'Pay by card', status='failed'))
+    report = report_(scenario_('t.py::test_pay', 'Pay by card', status='failed'))
     result, written = _run(
         tmp_path,
         f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n',
@@ -308,7 +260,7 @@ def test_a_glyph_led_link_with_another_fragment_is_a_mistyped_citation(
     tmp_path: Path,
 ) -> None:
     result, _ = _run(
-        tmp_path, f'✅ [search]({URL}#q=pay)\n[search]({URL}#q=pay)\n', _report(PAY)
+        tmp_path, f'✅ [search]({URL}#q=pay)\n[search]({URL}#q=pay)\n', report_(PAY)
     )
     assert [(f.kind, f.line) for f in result.findings] == [('mistyped', 1)]
 
@@ -316,7 +268,7 @@ def test_a_glyph_led_link_with_another_fragment_is_a_mistyped_citation(
 def test_a_summary_after_several_spaces_is_rewritten_in_place(
     tmp_path: Path,
 ) -> None:
-    report = _report(_scenario('t.py::test_a', 'A', tags=('checkout',)))
+    report = report_(scenario_('t.py::test_a', 'A', tags=('checkout',)))
     document = f'✅ [checkout]({URL}#tag=checkout)  (3 ✅)\n'
     _, written = _run(tmp_path, document, report, update=True)
     assert written == f'✅ [checkout]({URL}#tag=checkout)  (1 ✅)\n'
@@ -325,7 +277,7 @@ def test_a_summary_after_several_spaces_is_rewritten_in_place(
 @pytest.mark.parametrize('url', ['http://[oops/r.html#scenario=a', 'r%00.html#tag=a'])
 def test_a_link_no_url_parser_reads_is_no_report_link(tmp_path: Path, url: str) -> None:
     result, _ = _run(
-        tmp_path, f'✅ [x]({url})\n', _report(PAY), report_path=tmp_path / 'r.html'
+        tmp_path, f'✅ [x]({url})\n', report_(PAY), report_path=tmp_path / 'r.html'
     )
     assert result.findings == []
 
@@ -333,7 +285,7 @@ def test_a_link_no_url_parser_reads_is_no_report_link(tmp_path: Path, url: str) 
 def test_a_link_is_read_as_rendered_escapes_and_entity_references_resolved(
     tmp_path: Path,
 ) -> None:
-    report = _report(_scenario('t.py::test_a', 'A', tags=('spec_x',)))
+    report = report_(scenario_('t.py::test_a', 'A', tags=('spec_x',)))
     document = (
         f'✅ [spec_x]({URL}#tag=spec\\_x) (1 ✅)\n'
         f'[see]({URL}#view=stories&amp;story=gone)\n'
@@ -346,7 +298,7 @@ def test_a_fragment_after_an_entity_reference_hash_is_repointed(
     tmp_path: Path,
 ) -> None:
     document = f'✅ [Pay by card]({URL}&#35;scenario=t.py::test_pay[1])\n'
-    _, written = _run(tmp_path, document, _report(PAY), update=True)
+    _, written = _run(tmp_path, document, report_(PAY), update=True)
     assert written == f'✅ [Pay by card]({URL}&#35;scenario=t.py::test_pay)\n'
 
 
@@ -354,7 +306,7 @@ def test_a_summary_after_a_scenario_citation_is_left_to_the_author(
     tmp_path: Path,
 ) -> None:
     document = f'✅ [Pay by card]({URL}#scenario=t.py::test_pay) (2 ✅)\n'
-    result, written = _run(tmp_path, document, _report(PAY), update=True)
+    result, written = _run(tmp_path, document, report_(PAY), update=True)
     assert [f.kind for f in result.remaining] == ['stray-summary']
     assert written == document
 
@@ -364,7 +316,7 @@ def test_a_summary_after_a_scenario_citation_is_left_to_the_author(
 
 def test_the_placeholder_is_filled(tmp_path: Path) -> None:
     _, written = _run(
-        tmp_path, f'? [](<{URL}#scenario=t.py::test_pay>)\n', _report(PAY), update=True
+        tmp_path, f'? [](<{URL}#scenario=t.py::test_pay>)\n', report_(PAY), update=True
     )
     assert written == f'✅ [Pay by card](<{URL}#scenario=t.py::test_pay>)\n'
 
@@ -376,14 +328,14 @@ def test_a_text_glyph_or_placeholder_is_rewritten_as_emoji(
     _, written = _run(
         tmp_path,
         f'{glyph} [Pay by card]({URL}#scenario=t.py::test_pay)\n',
-        _report(PAY),
+        report_(PAY),
         update=True,
     )
     assert written.startswith('✅ [Pay by card]')
 
 
 def test_a_variation_selector_glyph_and_summary_are_current(tmp_path: Path) -> None:
-    report = _report(_scenario('t.py::test_pay', 'Pay by card', tags=('x',)))
+    report = report_(scenario_('t.py::test_pay', 'Pay by card', tags=('x',)))
     document = (
         f'✅\ufe0f [Pay by card]({URL}#scenario=t.py::test_pay)\n'
         f'✅\ufe0f [x]({URL}#tag=x) (1 ✅\ufe0f)\n'
@@ -396,10 +348,10 @@ def test_a_variation_selector_glyph_and_summary_are_current(tmp_path: Path) -> N
     'scenarios',
     [
         (
-            _scenario('t.py::test_a', 'Pay by card'),
-            _scenario('t.py::test_b', 'Pay by card'),
+            scenario_('t.py::test_a', 'Pay by card'),
+            scenario_('t.py::test_b', 'Pay by card'),
         ),
-        (_scenario('t.py::test_a', 'Pay by cards'),),
+        (scenario_('t.py::test_a', 'Pay by cards'),),
     ],
 )
 def test_repointing_needs_one_exact_title(
@@ -408,7 +360,7 @@ def test_repointing_needs_one_exact_title(
     result, written = _run(
         tmp_path,
         f'✅ [Pay by card]({URL}#scenario=t.py::test_gone)\n',
-        _report(*scenarios),
+        report_(*scenarios),
         update=True,
     )
     assert written.startswith('❓ ')
@@ -416,7 +368,7 @@ def test_repointing_needs_one_exact_title(
 
 
 def test_a_missing_target_lists_the_closest_candidates(tmp_path: Path) -> None:
-    report = _report(_scenario('t.py::test_pay_by_card', 'Paying by card'))
+    report = report_(scenario_('t.py::test_pay_by_card', 'Paying by card'))
     result, _ = _run(
         tmp_path, f'✅ [Pay by card]({URL}#scenario=t.py::test_pay_card)\n', report
     )
@@ -429,14 +381,14 @@ def test_a_missing_target_lists_the_closest_candidates(tmp_path: Path) -> None:
 
 
 def test_an_empty_tag_reads_as_one_in_its_finding(tmp_path: Path) -> None:
-    result, _ = _run(tmp_path, f'[all]({URL}#tag=)\n', _report(PAY))
+    result, _ = _run(tmp_path, f'[all]({URL}#tag=)\n', report_(PAY))
     assert [f.message for f in result.findings] == [
         'a tag with an empty name is not in the report'
     ]
 
 
 def test_an_empty_scenario_key_reads_as_one_when_repointed(tmp_path: Path) -> None:
-    result, _ = _run(tmp_path, f'✅ [Pay by card]({URL}#scenario=)\n', _report(PAY))
+    result, _ = _run(tmp_path, f'✅ [Pay by card]({URL}#scenario=)\n', report_(PAY))
     assert [f.message for f in result.findings] == [
         (
             'a scenario with an empty name is not in the report; its link text '
@@ -449,7 +401,7 @@ def test_an_empty_scenario_key_reads_as_one_when_repointed(tmp_path: Path) -> No
 
 
 def test_relative_links_resolve_from_the_documents_directory(tmp_path: Path) -> None:
-    report = _report(PAY, report_url=None)
+    report = report_(PAY, report_url=None)
     document = '✓ [Pay by card](../examples/r.html#scenario=t.py::test_pay)\n'
     _, written = _run(
         tmp_path,
@@ -464,7 +416,7 @@ def test_relative_links_resolve_from_the_documents_directory(tmp_path: Path) -> 
 
 def test_without_a_report_path_relative_links_are_ordinary(tmp_path: Path) -> None:
     document = '✓ [Pay by card](examples/r.html#scenario=t.py::test_pay)\n'
-    result, _ = _run(tmp_path, document, _report(PAY))
+    result, _ = _run(tmp_path, document, report_(PAY))
     assert result.findings == []
 
 
@@ -475,7 +427,7 @@ def test_links_elsewhere_are_ordinary(tmp_path: Path) -> None:
         '✓ [another file](other.html#scenario=t.py::test_pay)\n'
     )
     result, _ = _run(
-        tmp_path, document, _report(PAY), report_path=tmp_path / 'examples' / 'r.html'
+        tmp_path, document, report_(PAY), report_path=tmp_path / 'examples' / 'r.html'
     )
     assert result.findings == []
 
@@ -483,19 +435,19 @@ def test_links_elsewhere_are_ordinary(tmp_path: Path) -> None:
 def test_the_report_url_flag_overrides_the_stored_one(tmp_path: Path) -> None:
     other = 'https://other.org/report.html'
     document = f'✓ [Pay by card]({other}#scenario=t.py::test_pay)\n'
-    result, _ = _run(tmp_path, document, _report(PAY), report_url=other)
+    result, _ = _run(tmp_path, document, report_(PAY), report_url=other)
     assert [f.kind for f in result.findings] == ['stale']
 
 
 def test_neither_report_url_nor_report_path_is_an_error(tmp_path: Path) -> None:
     with pytest.raises(PytestGivenError, match='report URL'):
-        _run(tmp_path, 'text\n', _report(PAY, report_url=None))
+        _run(tmp_path, 'text\n', report_(PAY, report_url=None))
 
 
 def test_citations_in_a_table_cell_across_a_line_break_and_in_a_quote(
     tmp_path: Path,
 ) -> None:
-    report = _report(_scenario('t.py::test_pay', 'Pay `a|b` by card'))
+    report = report_(scenario_('t.py::test_pay', 'Pay `a|b` by card'))
     document = (
         '| Kind | Citation |\n|---|---|\n'
         f'| scenario | ✓ [old]({URL}#scenario=t.py::test_pay) |\n'
@@ -521,13 +473,13 @@ def test_a_formatted_glyph_or_sentence_question_mark_makes_a_plain_link(
         f'**✅** [old]({URL}#scenario=t.py::test_pay)\n'
         f'Is it done? [old]({URL}#scenario=t.py::test_pay)\n'
     )
-    result, written = _run(tmp_path, document, _report(PAY), update=True)
+    result, written = _run(tmp_path, document, report_(PAY), update=True)
     assert result.findings == []
     assert written == document
 
 
 def test_an_authors_parenthetical_is_not_a_summary(tmp_path: Path) -> None:
-    report = _report(_scenario('t.py::test_a', 'A', tags=('x',)))
+    report = report_(scenario_('t.py::test_a', 'A', tags=('x',)))
     _, written = _run(
         tmp_path, f'✅ [x]({URL}#tag=x) (see below)\n', report, update=True
     )
@@ -539,7 +491,7 @@ def test_code_is_never_read(tmp_path: Path) -> None:
         f'```\n✓ [old]({URL}#scenario=t.py::test_gone)\n```\n'
         f'`✓ [old]({URL}#tag=gone)`\n'
     )
-    result, _ = _run(tmp_path, document, _report(PAY))
+    result, _ = _run(tmp_path, document, report_(PAY))
     assert result.findings == []
 
 
@@ -550,12 +502,12 @@ def test_update_is_idempotent_and_leaves_an_unchanged_file_alone(
     tmp_path: Path,
 ) -> None:
     document = f'✓ [old]({URL}#scenario=t.py::test_pay)\n'
-    first, written = _run(tmp_path, document, _report(PAY), update=True)
+    first, written = _run(tmp_path, document, report_(PAY), update=True)
     path = tmp_path / 'doc.md'
     assert first.updated == [path]
     stamp = path.stat().st_mtime_ns
     second = check_citations(
-        _report(PAY), [path], report_url=None, report_path=None, update=True
+        report_(PAY), [path], report_url=None, report_path=None, update=True
     )
     assert (second.findings, second.updated) == ([], [])
     assert path.stat().st_mtime_ns == stamp
@@ -564,23 +516,23 @@ def test_update_is_idempotent_and_leaves_an_unchanged_file_alone(
 
 def test_check_writes_nothing(tmp_path: Path) -> None:
     document = f'✓ [old]({URL}#scenario=t.py::test_pay)\n'
-    result, written = _run(tmp_path, document, _report(PAY))
+    result, written = _run(tmp_path, document, report_(PAY))
     assert written == document
     assert result.updated == []
 
 
 def test_crlf_line_endings_survive_an_update(tmp_path: Path) -> None:
     document = f'Intro\r\n\r\n✓ [old]({URL}#scenario=t.py::test_pay)\r\nOutro\r\n'
-    _, written = _run(tmp_path, document, _report(PAY), update=True)
+    _, written = _run(tmp_path, document, report_(PAY), update=True)
     assert written == (
         f'Intro\r\n\r\n✅ [Pay by card]({URL}#scenario=t.py::test_pay)\r\nOutro\r\n'
     )
 
 
 def test_several_edits_on_one_line_apply_together(tmp_path: Path) -> None:
-    report = _report(
-        _scenario('t.py::test_pay', 'Pay by card', tags=('x',)),
-        _scenario('pkg/test_shop.py::test_buy', 'Buy'),
+    report = report_(
+        scenario_('t.py::test_pay', 'Pay by card', tags=('x',)),
+        scenario_('pkg/test_shop.py::test_buy', 'Buy'),
     )
     document = (
         f'✓ [a]({URL}#scenario=shop/buy) · ? [b]({URL}#tag=x) (9 ❌) · '
@@ -595,7 +547,7 @@ def test_several_edits_on_one_line_apply_together(tmp_path: Path) -> None:
 
 
 def test_an_unusual_node_id_is_cited_end_to_end(tmp_path: Path) -> None:
-    report = _report(_scenario('t.py::test_y[a b+c&d#e]', 'Odd'))
+    report = report_(scenario_('t.py::test_y[a b+c&d#e]', 'Odd'))
     _, written = _run(
         tmp_path,
         f'? []({URL}#scenario=t.py::test_y%5Ba%20b%2Bc%26d%23e%5D)\n',
@@ -629,5 +581,5 @@ def test_a_document_that_is_not_utf8_is_an_error(tmp_path: Path) -> None:
     path.write_bytes(b'\xff\xfe broken')
     with pytest.raises(PytestGivenError, match=re.escape(f'{path.as_posix()}:')):
         check_citations(
-            _report(PAY), [path], report_url=None, report_path=None, update=False
+            report_(PAY), [path], report_url=None, report_path=None, update=False
         )

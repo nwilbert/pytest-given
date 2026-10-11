@@ -9,13 +9,12 @@ name (case-insensitive) or a 0-based index.
 import re
 from dataclasses import dataclass
 
-from ..model import EMPHASIS, PytestGivenError
+from ..model import EMPHASIS, PytestGivenError, table_cell_spans
 
 type ColumnSpec = int | str
 
 _SEPARATOR_CELL = re.compile(r'^:?-+:?$')
 _FENCE = re.compile(r'^\s*(```|~~~)')
-_SPLIT_ON_UNESCAPED_PIPE = re.compile(r'(?<!\\)\|')
 
 
 @dataclass(frozen=True)
@@ -129,17 +128,15 @@ def _is_table_row(line: str) -> bool:
 
 
 def _is_separator_row(line: str) -> bool:
-    # No emptiness guard: `_split_row` goes through `re.split`, which always
-    # returns at least one element.
-    return all(_SEPARATOR_CELL.match(cell) for cell in _split_row(line))
+    cells = _split_row(line)
+    return bool(cells) and all(_SEPARATOR_CELL.match(cell) for cell in cells)
 
 
 def _split_row(line: str) -> list[str]:
-    stripped = line.strip().removeprefix('|')
-    if stripped.endswith('|') and not stripped.endswith('\\|'):
-        stripped = stripped[:-1]
-    cells = _SPLIT_ON_UNESCAPED_PIPE.split(stripped)
-    return [cell.replace('\\|', '|').strip() for cell in cells]
+    return [
+        line[start:end].replace('\\|', '|').strip()
+        for start, end in table_cell_spans(line)
+    ]
 
 
 def _addresses_another_table(specs: tuple[ColumnSpec, ...], header: list[str]) -> bool:

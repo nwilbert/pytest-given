@@ -186,13 +186,11 @@
               <span class="nav-group-count" x-text="group.count"></span>
             </button>
             {% if citations %}
-            {#- The spacer holds the button's place on the untagged row, which
-                has nothing to cite, so every count stays in one column. -#}
             <button type="button" class="anchor-link citation-copy nav-group-citation"
                     title="{{ citation_title }}" aria-label="Copy Markdown citation"
-                    x-show="view === 'tags' && hasCitation('tag', group.id)"
+                    x-show="view === 'tags'"
+                    :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
                     @click.stop="copyCitation('tag', group.id, $event)">{{ icon('citation') }}</button>
-            <span class="nav-group-citation-spacer" x-show="view === 'tags' && !hasCitation('tag', group.id)"></span>
             {% endif %}
           </div>
         </template>
@@ -247,7 +245,7 @@
       <div style="display:flex; align-items:center;">
         {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ loop.index0 }}" :aria-expanded="!!expandedScenarios[{{ loop.index0 }}]" :aria-label="(expandedScenarios[{{ loop.index0 }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ loop.index0 }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="scenario-title">{{ scenario.narration | narration }}</span>
-        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}{{ citation_button('scenario', scenario.id) }}
+        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}{{ citation_button('scenario', loop.index0) }}
       </div>
       <span class="scenario-meta">
         {#- Cap visible tags so a long tag list can't crowd out the title:

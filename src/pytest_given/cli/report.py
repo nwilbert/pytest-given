@@ -1,12 +1,10 @@
 """The `pytest-given report` subcommand: re-render a saved JSON report."""
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import Any
 
-from ..model import PytestGivenError
+from ..model import PytestGivenError, read_report_json
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_THEME,
@@ -79,7 +77,7 @@ def run_report(args: argparse.Namespace) -> int:
         config = _sink_config(
             args.output, args.source_link, args.format, args.theme, args.lines
         )
-        rendered = emit_sinks(load_report_json(json_file), config, json_file.as_posix())
+        rendered = emit_sinks(read_report_json(json_file), config, json_file.as_posix())
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 1
@@ -88,20 +86,6 @@ def run_report(args: argparse.Namespace) -> int:
     for rendered_file in rendered.files:
         print(f'Report generated: {rendered_file.path}')
     return 0
-
-
-def load_report_json(json_file: Path) -> dict[str, Any]:
-    """The input file as a dict; `report_from_dict` rejects one that is not a
-    report. Any other `OSError` (a directory, say) is left to the caller."""
-    if not json_file.exists():
-        raise PytestGivenError(f'{json_file.as_posix()} not found')
-    try:
-        report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
-    except (json.JSONDecodeError, UnicodeDecodeError) as error:
-        raise PytestGivenError(
-            f'{json_file.as_posix()} is not valid JSON — {error}'
-        ) from error
-    return report_dict
 
 
 def _sink_config(

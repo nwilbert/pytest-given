@@ -7,8 +7,13 @@ import sys
 from pathlib import Path
 
 from ..citations import CitationsResult, check_citations, markdown_documents
-from ..model import PytestGivenError, plural, report_from_dict, resolve_report_url
-from .report import load_report_json
+from ..model import (
+    PytestGivenError,
+    plural,
+    read_report_json,
+    report_from_dict,
+    resolve_report_url,
+)
 
 
 def add_citations_parser(
@@ -56,7 +61,7 @@ def run_citations(args: argparse.Namespace) -> int:
     report_file: Path = args.report
     try:
         result = check_citations(
-            report_from_dict(load_report_json(report_file), report_file.as_posix()),
+            report_from_dict(read_report_json(report_file), report_file.as_posix()),
             markdown_documents(args.documents),
             report_url=resolve_report_url(args.report_url, '--report-url'),
             report_path=args.report_path,

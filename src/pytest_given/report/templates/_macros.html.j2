@@ -71,9 +71,7 @@
   {%- endmacro -%}
 
   {%- macro anchor_link(hash) -%}
-    <button type="button" class="anchor-link" title="Copy link"
-            data-anchor="{{ hash }}"
-            @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link">{{ icon('link') }}</button>
+    <button type="button" class="anchor-link" title="Copy link" data-anchor="{{ hash }}" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link">{{ icon('link') }}</button>
   {%- endmacro -%}
 
   {#- Keys travel as data-* and are read back from the dataset: Alpine compiles
@@ -81,10 +79,7 @@
       into one would be an injection. -#}
   {%- macro citation_button(kind, key) -%}
     {%- if citations -%}
-    <button type="button" class="anchor-link citation-copy" title="{{ citation_title }}"
-            data-citation-kind="{{ kind }}" data-citation-key="{{ key }}"
-            @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)"
-            aria-label="Copy Markdown citation">{{ icon('citation') }}</button>
+    <button type="button" class="anchor-link citation-copy" title="{{ citation_title }}" data-citation-kind="{{ kind }}" data-citation-key="{{ key }}" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation">{{ icon('citation') }}</button>
     {%- endif -%}
   {%- endmacro -%}
 

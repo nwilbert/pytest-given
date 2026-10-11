@@ -90,6 +90,7 @@ def sweep(sizes: list[int]) -> None:
             [
                 '--given-json=/tmp/pg.json',
                 '--given-html=/tmp/pg.html',
+                '--given-report-url=https://example.invalid/pg.html',
             ]
         )
         print(f'{n:>6} {items:>7} {t_none:>10.2f} {t_json:>8.2f} {t_html:>8.2f}')
@@ -110,6 +111,7 @@ def profile_run(count: int) -> None:
             '-q',
             '--given-json=/tmp/pg.json',
             '--given-html=/tmp/pg.html',
+            '--given-report-url=https://example.invalid/pg.html',
         ]
     )
     profiler.disable()

@@ -1,12 +1,11 @@
 """What a citation of each kind says — glyph, link text, fragment, summary —
 and which scenarios, tags and stories a report holds to cite."""
 
-import difflib
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Literal, Self
-from urllib.parse import parse_qsl, quote
+from urllib.parse import quote
 
 from ..model import (
     STATUSES,
@@ -18,14 +17,17 @@ from ..model import (
     rolled_up_status,
 )
 from .coverage import build_coverage_map
-from .link_text import fold_whitespace, link_text
-from .slugs import build_scenario_slug_index
+from .link_text import link_text
 from .story_view import scenarios_by_story
 from .text import CITATION_GLYPH, CitationState
 
 type TargetKind = Literal['scenario', 'tag', 'story']
 
-TAG_SEPARATOR = '/'
+# A tag or story citation's summary is built of these, and read back by them.
+SUMMARY_SEPARATOR = ' · '
+NO_SCENARIOS_SUMMARY = '(no scenarios)'
+
+_TAG_SEPARATOR = '/'
 
 
 @dataclass(frozen=True)
@@ -72,68 +74,30 @@ def report_fragment(target: Target) -> str:
             return f'view=stories&story={value}'
 
 
-def parse_fragment(fragment: str) -> Target | None:
-    """The target a report link's fragment names, in any parameter order; None
-    for any other fragment, which makes the link an ordinary one."""
-    pairs = parse_qsl(fragment, keep_blank_values=True)
-    params = dict(pairs)
-    keys = sorted(key for key, _ in pairs)
-    if keys == ['scenario']:
-        return Target('scenario', params['scenario'])
-    if keys == ['tag']:
-        return Target('tag', params['tag'])
-    if keys == ['story', 'view'] and params['view'] == 'stories':
-        return Target('story', params['story'])
-    return None
-
-
 class CitationIndex:
     """The scenarios, tags and stories a report lets a document cite."""
 
     def __init__(
-        self,
-        report: ReportData,
-        scenario_slugs: Mapping[NodeId, str],
-        story_scenarios: Mapping[StoryId, list[Scenario]],
+        self, report: ReportData, story_scenarios: Mapping[StoryId, list[Scenario]]
     ) -> None:
         self.scenarios = _citable_scenarios(report)
-        cited_as = {scenario.id: cited for cited, scenario in self.scenarios.items()}
-        self._by_slug = {
-            slug: cited_as[node_id] for node_id, slug in scenario_slugs.items()
-        }
         # Under a tag and each of its prefixes, as `app.js`'s `underPrefix`
         # matches a `#tag=` link to the scenarios it opens.
-        self._tagged: dict[str, list[Scenario]] = {}
+        tagged: dict[str, list[Scenario]] = {}
         for scenario in report.scenarios:
             tags = {prefix for tag in scenario.tags for prefix in _prefixes(tag)}
             for tag in tags:
-                self._tagged.setdefault(tag, []).append(scenario)
-        self.tags = sorted(self._tagged)
-        self._stories = {
+                tagged.setdefault(tag, []).append(scenario)
+        self.tags = dict(sorted(tagged.items()))
+        self.stories = {
             story.id: (story.title, story_scenarios[story.id])
             for story in report.stories
         }
-        self.story_ids = list(self._stories)
 
     @classmethod
     def of(cls, report: ReportData) -> Self:
-        """For a caller that has not built the slugs and coverage already."""
-        return cls(
-            report,
-            build_scenario_slug_index(report),
-            scenarios_by_story(report, build_coverage_map(report)),
-        )
-
-    def resolve(self, target: Target) -> Target | None:
-        """The target as a current citation names it, or None when the report
-        holds nothing it names."""
-        match target.kind:
-            case 'scenario':
-                return self._resolve_scenario(target.key)
-            case 'tag':
-                return target if target.key in self._tagged else None
-            case 'story':
-                return target if target.key in self._stories else None
+        """For a caller that has not built the coverage already."""
+        return cls(report, scenarios_by_story(report, build_coverage_map(report)))
 
     def citation(self, target: Target) -> Citation:
         """What a citation of a resolved `target` says."""
@@ -148,61 +112,10 @@ class CitationIndex:
                     summary=None,
                 )
             case 'tag':
-                return _rollup(target.key, fragment, self._tagged[target.key])
+                return _rollup(target.key, fragment, self.tags[target.key])
             case 'story':
-                title, told = self._stories[StoryId(target.key)]
+                title, told = self.stories[StoryId(target.key)]
                 return _rollup(title, fragment, told)
-
-    def scenarios_titled(self, title: str) -> list[NodeId]:
-        return [
-            cited
-            for cited, scenario in self.scenarios.items()
-            if fold_whitespace(scenario.narration.text) == title
-        ]
-
-    def suggestions(self, target: Target, link_title: str) -> list[str]:
-        """The closest targets the report does hold, for a target it lacks —
-        suggestions only: `citations update` never writes one."""
-        match target.kind:
-            case 'scenario':
-                return _closest(
-                    id_label='node id',
-                    key=target.key,
-                    ids=self.scenarios,
-                    title_label='scenario title',
-                    title=link_title,
-                    id_by_title={
-                        fold_whitespace(scenario.narration.text): cited
-                        for cited, scenario in self.scenarios.items()
-                    },
-                )
-            case 'tag':
-                return _labelled(
-                    'closest tags',
-                    difflib.get_close_matches(target.key, self.tags, n=3),
-                )
-            case 'story':
-                return _closest(
-                    id_label='story id',
-                    key=target.key,
-                    ids=self._stories,
-                    title_label='story title',
-                    title=link_title,
-                    id_by_title={
-                        title: story_id
-                        for story_id, (title, _) in self._stories.items()
-                    },
-                )
-
-    def _resolve_scenario(self, key: str) -> Target | None:
-        if key in self.scenarios:
-            return Target('scenario', key)
-        if key in self._by_slug:
-            return Target('scenario', self._by_slug[key])
-        base = node_base(key)
-        if base != key and base in self.scenarios:
-            return Target('scenario', base)
-        return None
 
 
 def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
@@ -227,7 +140,7 @@ def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
 
 def _rollup(title: str, fragment: str, scenarios: list[Scenario]) -> Citation:
     counts = Counter(scenario.status for scenario in scenarios)
-    summary = ' · '.join(
+    summary = SUMMARY_SEPARATOR.join(
         f'{counts[status]} {CITATION_GLYPH[status]}'
         for status in STATUSES
         if counts[status]
@@ -236,35 +149,10 @@ def _rollup(title: str, fragment: str, scenarios: list[Scenario]) -> Citation:
         state=rolled_up_status(counts),
         title=title,
         fragment=fragment,
-        summary=f'({summary})' if summary else '(no scenarios)',
+        summary=f'({summary})' if summary else NO_SCENARIOS_SUMMARY,
     )
 
 
 def _prefixes(tag: str) -> Iterable[str]:
-    parts = tag.split(TAG_SEPARATOR)
-    return (TAG_SEPARATOR.join(parts[: depth + 1]) for depth in range(len(parts)))
-
-
-def _closest(
-    *,
-    id_label: str,
-    key: str,
-    ids: Iterable[str],
-    title_label: str,
-    title: str,
-    id_by_title: Mapping[str, str],
-) -> list[str]:
-    return _labelled(
-        f'closest by {id_label}',
-        difflib.get_close_matches(key, ids, n=3),
-    ) + _labelled(
-        f'closest by {title_label}',
-        [
-            f'{id_by_title[matched]} ("{matched}")'
-            for matched in difflib.get_close_matches(title, list(id_by_title), n=3)
-        ],
-    )
-
-
-def _labelled(label: str, items: list[str]) -> list[str]:
-    return [f'{label}: {", ".join(items)}'] if items else []
+    parts = tag.split(_TAG_SEPARATOR)
+    return (_TAG_SEPARATOR.join(parts[: depth + 1]) for depth in range(len(parts)))

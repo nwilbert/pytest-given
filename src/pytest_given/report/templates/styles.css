@@ -1648,13 +1648,14 @@ span.param-highlight {
 .header:hover .anchor-link { opacity: 0.6; }
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
-/* A tag row reveals its citation button on hover, as a header does. The
-   button sits after the count, so the counts shift left as one column; the
-   spacer stands in for it on the untagged row. Revealed on keyboard focus
-   too, since a button at opacity 0 would otherwise be focused unseen. */
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* A tag row reveals its citation button on hover, as a header does. The
+   button sits after the count, so the counts shift left as one column; on the
+   untagged row, which has nothing to cite, it keeps its place unseen.
+   Revealed on keyboard focus too, since a button at opacity 0 would otherwise
+   be focused unseen. */
 .nav-group:hover .citation-copy { opacity: 0.6; }
 .citation-copy:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 .nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
-.nav-group-citation-spacer { width: 20px; flex-shrink: 0; }
+.nav-group-citation-absent { visibility: hidden; }
 .nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }

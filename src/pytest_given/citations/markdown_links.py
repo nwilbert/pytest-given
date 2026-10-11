@@ -10,14 +10,14 @@ markdown-it-py over every Markdown file the repository tracks.
 
 import bisect
 import html
-import itertools
 import re
 from collections.abc import Collection, Iterator, Sequence
 from dataclasses import dataclass
 from html.entities import html5
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
-from ..model import ASCII_PUNCTUATION, backtick_run_end, code_span_end
+from ..model import table_cell_spans
+from ..report import ASCII_PUNCTUATION, code_span_at
 
 type Span = tuple[int, int]
 
@@ -54,7 +54,7 @@ class MarkdownLink:
     trailing: str
     trailing_offsets: tuple[int, ...]
     in_table_row: bool
-    glyph: Glyph | None = None
+    glyph: Glyph | None
 
     @property
     def end(self) -> int:
@@ -293,35 +293,24 @@ def _inline_runs(source: str) -> Iterator[_Run]:
             continue
         if relative >= 4 and not paragraph and not in_table:
             continue
-        if block_start and (opening := _FENCE_OPEN.match(rest)):
+        opener = (
+            _block_opener(rest, paragraph=bool(paragraph), lazy=lazy)
+            if block_start
+            else None
+        )
+        if opener is not None:
             yield from _paragraph_run(paragraph)
             paragraph, in_table = [], False
-            fence = _Fence(opening.group()[0], len(opening.group()), base, depth)
-            continue
-        if block_start and rest.startswith('<!--'):
-            yield from _paragraph_run(paragraph)
-            paragraph = []
-            html_end = None if '-->' in rest[4:] else '-->'
-            continue
-        if block_start and (
-            _HTML_BLOCK_START.match(rest)
-            or (not paragraph and _HTML_TAG_LINE.match(rest))
-        ):
-            yield from _paragraph_run(paragraph)
-            paragraph, html_end = [], ''
-            continue
-        if block_start and _ATX_HEADING.match(rest):
-            yield from _paragraph_run(paragraph)
-            paragraph, in_table = [], False
-            yield _Run.of_lines([line])
-            continue
-        if block_start and paragraph and not lazy and _SETEXT_UNDERLINE.match(rest):
-            yield from _paragraph_run(paragraph)
-            paragraph = []
-            continue
-        if block_start and _THEMATIC_BREAK.match(rest):
-            yield from _paragraph_run(paragraph)
-            paragraph, in_table = [], False
+            match opener:
+                case 'fence':
+                    run = len(rest) - len(rest.lstrip(rest[0]))
+                    fence = _Fence(rest[0], run, base, depth)
+                case 'html-comment':
+                    html_end = None if '-->' in rest[4:] else '-->'
+                case 'html':
+                    html_end = ''
+                case 'heading':
+                    yield _Run.of_lines([line])
             continue
         if in_table:
             yield from _cell_runs(line)
@@ -344,6 +333,28 @@ def _inline_runs(source: str) -> Iterator[_Run]:
             paragraph_depth = depth
         paragraph.append(line)
     yield from _paragraph_run(paragraph)
+
+
+type _BlockOpener = Literal[
+    'fence', 'html-comment', 'html', 'heading', 'setext-underline', 'thematic-break'
+]
+
+
+def _block_opener(rest: str, *, paragraph: bool, lazy: bool) -> _BlockOpener | None:
+    """The block a line opens that ends the paragraph or table before it."""
+    if _FENCE_OPEN.match(rest):
+        return 'fence'
+    if rest.startswith('<!--'):
+        return 'html-comment'
+    if _HTML_BLOCK_START.match(rest) or (not paragraph and _HTML_TAG_LINE.match(rest)):
+        return 'html'
+    if _ATX_HEADING.match(rest):
+        return 'heading'
+    if paragraph and not lazy and _SETEXT_UNDERLINE.match(rest):
+        return 'setext-underline'
+    if _THEMATIC_BREAK.match(rest):
+        return 'thematic-break'
+    return None
 
 
 def _list_item(rest: str, *, interrupts_paragraph: bool) -> re.Match[str] | None:
@@ -436,9 +447,9 @@ def _starts_table(content: str, raw_lines: list[tuple[int, str]], index: int) ->
     _, next_raw = raw_lines[index + 1]
     _, prefix = _quote_prefix(next_raw, None)
     delimiter = next_raw[prefix:]
-    return bool(_DELIMITER_ROW.match(delimiter)) and len(_cell_bounds(content)) == len(
-        _cell_bounds(delimiter)
-    )
+    return bool(_DELIMITER_ROW.match(delimiter)) and len(
+        table_cell_spans(content)
+    ) == len(table_cell_spans(delimiter))
 
 
 def _paragraph_run(lines: list[_Line]) -> Iterator[_Run]:
@@ -447,34 +458,9 @@ def _paragraph_run(lines: list[_Line]) -> Iterator[_Run]:
 
 
 def _cell_runs(line: _Line) -> Iterator[_Run]:
-    for start, end in _cell_bounds(line.content):
+    for start, end in table_cell_spans(line.content):
         cell = _Line(line.start + start, line.content[start:end], line.start + end)
         yield _Run.of_lines([cell], in_table_row=True)
-
-
-def _cell_bounds(content: str) -> list[Span]:
-    """Each cell's span in a table row: split on the pipes no backslash
-    escapes — GFM applies that inside code spans too — with the row's outer
-    pipes left out."""
-    pipes = [
-        index
-        for index, char in enumerate(content)
-        if char == '|' and _backslashes_before(content, index) % 2 == 0
-    ]
-    edges = [-1, *pipes, len(content)]
-    bounds = [(left + 1, right) for left, right in itertools.pairwise(edges)]
-    if bounds and not content[: bounds[0][1]].strip():
-        bounds = bounds[1:]
-    if bounds and not content[bounds[-1][0] :].strip():
-        bounds = bounds[:-1]
-    return bounds
-
-
-def _backslashes_before(text: str, index: int) -> int:
-    count = 0
-    while index - count > 0 and text[index - count - 1] == '\\':
-        count += 1
-    return count
 
 
 # --- Inline structure ---
@@ -518,7 +504,7 @@ def _links_in(
         if char == '\\' and text[index + 1 : index + 2] in ASCII_PUNCTUATION:
             index += 2
         elif char == '`':
-            index = code_span_end(text, index) or backtick_run_end(text, index)
+            index, _ = code_span_at(text, index)
         elif char == '<' and (
             tag := _AUTOLINK.match(text, index) or _INLINE_HTML.match(text, index)
         ):

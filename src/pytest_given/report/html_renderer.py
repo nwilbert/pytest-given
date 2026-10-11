@@ -52,7 +52,6 @@ from .story_view import (
     build_scenario_sentence_index,
     build_sentence_labels,
     build_story_rollups,
-    scenarios_by_story,
     sentence_key,
 )
 from .text import STATUS_GLYPH, STATUS_LABEL
@@ -63,14 +62,14 @@ _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 # Maps parameter name to its color index. The index resolves to a color via
 # `palette.param_column_colors`, which never runs out.
 type ParamColorMap = dict[str, int]
-type CitationHalves = dict[str, tuple[str, str]]
+type CitationHalves = tuple[str, str]
 
 
 class CitationData(TypedDict):
     report_url: str
-    scenario: CitationHalves
-    tag: CitationHalves
-    story: CitationHalves
+    scenario: list[CitationHalves]
+    tag: dict[str, CitationHalves]
+    story: dict[str, CitationHalves]
 
 
 @dataclass(frozen=True)
@@ -237,7 +236,8 @@ def _render_context(
     scenario_slugs = build_scenario_slug_index(report)
     story_rollups = build_story_rollups(report, coverage)
     citation_index = CitationIndex(
-        report, scenario_slugs, scenarios_by_story(report, coverage)
+        report,
+        {story_id: rollup.scenarios for story_id, rollup in story_rollups.items()},
     )
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
@@ -361,24 +361,22 @@ def _app_data(report: ReportData) -> dict[str, object]:
 
 def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | None:
     """Each copy button's citation line, either side of the report URL, keyed
-    as the page finds it: a scenario by its `id`, a tag at every level of the
-    tree `app.js` builds, a story by id. Only a report with a public URL shows
-    the buttons, so only it carries the weight."""
+    as the page finds it: a scenario by its card's position, a tag at every
+    level of the tree `app.js` builds, a story by id. Only a report with a
+    public URL shows the buttons, so only it carries the weight."""
     report_url = report.metadata.report_url
     if report_url is None:
         return None
 
-    def halves(kind: TargetKind, key: str) -> tuple[str, str]:
+    def halves(kind: TargetKind, key: str) -> CitationHalves:
         return index.citation(Target(kind, key)).markdown_halves()
 
     return {
         'report_url': report_url,
-        'scenario': {
-            scenario.id: halves('scenario', cited)
-            for cited, scenario in index.scenarios.items()
-        },
+        # `index.scenarios` holds every scenario, in the report's order.
+        'scenario': [halves('scenario', cited) for cited in index.scenarios],
         'tag': {tag: halves('tag', tag) for tag in index.tags},
-        'story': {story_id: halves('story', story_id) for story_id in index.story_ids},
+        'story': {story_id: halves('story', story_id) for story_id in index.stories},
     }
 
 

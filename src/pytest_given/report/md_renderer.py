@@ -25,7 +25,7 @@ from ..model import (
     placeholder_token,
     plural,
 )
-from .text import STATUS_GLYPH, STATUS_LABEL
+from .text import NEWLINE, STATUS_GLYPH, STATUS_LABEL
 
 
 def render_md(report: ReportData, *, with_lines: bool = True) -> str:
@@ -219,9 +219,7 @@ def _inline(text: str) -> str:
     out of the block (the tail dedents into a stray paragraph); ``<br>`` renders
     the break in place without corrupting the surrounding structure.
     """
-    for nl in ('\r\n', '\n', '\r'):
-        text = text.replace(nl, '<br>')
-    return text
+    return NEWLINE.sub('<br>', text)
 
 
 def _cell(value: object) -> str:

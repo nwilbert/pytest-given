@@ -79,7 +79,7 @@ from .schema import (
     param_id,
     rolled_up_status,
 )
-from .serde import report_from_dict, report_to_dict
+from .serde import read_report_json, report_from_dict, report_to_dict
 from .steps import (
     PartIndex,
     StepPath,
@@ -88,18 +88,15 @@ from .steps import (
     walk_steps,
 )
 from .text import (
-    ASCII_PUNCTUATION,
     EMPHASIS,
-    backtick_run_end,
-    code_span_end,
     derived_id,
     id_derive,
     plural,
     s_form,
+    table_cell_spans,
 )
 
 __all__ = [
-    'ASCII_PUNCTUATION',
     'CONTENT_TYPES',
     'EMPHASIS',
     'PHASES',
@@ -155,9 +152,7 @@ __all__ = [
     'TermId',
     'TermKind',
     'TracebackFrame',
-    'backtick_run_end',
     'case_suffix',
-    'code_span_end',
     'derived_id',
     'id_derive',
     'iter_narrations',
@@ -171,6 +166,7 @@ __all__ = [
     'placeholder_token',
     'placeholder_value',
     'plural',
+    'read_report_json',
     'rebuilt',
     'render_interpolation',
     'report_from_dict',
@@ -179,5 +175,6 @@ __all__ = [
     'rolled_up_status',
     's_form',
     'snapshot_param_value',
+    'table_cell_spans',
     'walk_steps',
 ]

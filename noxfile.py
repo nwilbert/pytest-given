@@ -3,6 +3,7 @@ import json
 import re
 import shutil
 import tempfile
+import tomllib
 import webbrowser
 import zipfile
 from collections.abc import Iterator
@@ -359,7 +360,9 @@ def check_release(session: nox.Session) -> None:
     session.log(f'the {target} release of pytest-given passed a live smoke run')
 
 
-_PAGES_EXAMPLES_URL = 'https://nwilbert.github.io/pytest-given/dev/examples'
+_ZENSICAL_CONFIG = tomllib.loads(Path('zensical.toml').read_text(encoding='utf-8'))
+# The `/dev/` docs, which every push to `main` publishes.
+_PAGES_EXAMPLES_URL = f'{_ZENSICAL_CONFIG["project"]["site_url"]}dev/examples'
 
 
 class _Example(NamedTuple):
@@ -393,30 +396,27 @@ _EXAMPLES = (
 _EXAMPLE_REPORTS = (*(example.slug for example in _EXAMPLES), 'self-report')
 
 
-def _citation_runs(slug: str) -> list[list[str]]:
-    """The `pytest-given citations` arguments one report's citations take: the
-    site's pages, which link it relatively, and for the self-report the specs,
-    which link the hosted one."""
-    data = f'examples/{slug}/{slug}-data.json'
-    runs = [
-        [
-            'docs/site/',
-            '--report',
-            data,
-            '--report-path',
-            f'docs/site/examples/{slug}.html',
-        ]
-    ]
-    if slug == 'self-report':
-        runs.append(['docs/specs/', '--report', data])
-    return runs
-
-
 def _run_citations(
     session: nox.Session, verb: Literal['check', 'update'], slug: str
 ) -> None:
-    for args in _citation_runs(slug):
-        session.run('pytest-given', 'citations', verb, *args)
+    """Hold the documents citing one report to it: the site's pages, which link
+    it relatively, and for the self-report the specs, which link the hosted
+    one."""
+    report = f'examples/{slug}/{slug}-data.json'
+    session.run(
+        'pytest-given',
+        'citations',
+        verb,
+        _DOCS_SITE.as_posix(),
+        '--report',
+        report,
+        '--report-path',
+        (_DOCS_SITE / 'examples' / f'{slug}.html').as_posix(),
+    )
+    if slug == 'self-report':
+        session.run(
+            'pytest-given', 'citations', verb, 'docs/specs/', '--report', report
+        )
 
 
 @nox.session
@@ -696,6 +696,8 @@ def benchmark(session: nox.Session) -> None:
         '--given-json=benchmarks/large-scenarios-data.json',
         '--given-html=benchmarks/large-scenarios.html',
         '--given-source-link=github',
+        # A report URL turns on the copy buttons and their citation lines.
+        '--given-report-url=https://example.invalid/large-scenarios.html',
         '--tb=no',
         '--no-header',
         '-q',

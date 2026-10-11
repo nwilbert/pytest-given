@@ -7,10 +7,10 @@ import re
 from markupsafe import escape
 
 from ..model import EMPHASIS
+from .text import NEWLINE
 
 # Re-admit an author's escaped <br> / <br/> / <br /> (any case) as a real break.
 _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
-_NEWLINE = re.compile(r'\r\n|[\r\n]')
 
 
 def render_inline_markdown(text: str) -> str:
@@ -48,4 +48,4 @@ def _emphasis(match: re.Match[str]) -> str:
 def _breaks(text: str) -> str:
     """An author's `<br>` (escaped on the way in) and any newline as a real
     break."""
-    return _NEWLINE.sub('<br>', _BR.sub('<br>', text))
+    return NEWLINE.sub('<br>', _BR.sub('<br>', text))

@@ -1,8 +1,12 @@
 """Wording helpers the renderers and view builders share."""
 
+import re
 from typing import Literal
 
 from ..model import Status
+
+# A line break in any of its spellings, which every one-line rendering folds.
+NEWLINE = re.compile(r'\r\n|\r|\n')
 
 # How a status is marked, wherever it is shown.
 STATUS_GLYPH: dict[Status, str] = {
@@ -31,8 +35,3 @@ CITATION_GLYPH: dict[CitationState, str] = {
     'xfailed': '🔵',
     'missing': '❓',
 }
-
-# Also read as a citation's glyph, and rewritten as emoji by `citations
-# update`: the Markdown sink's glyphs and a typed `?`, so a hand-typed
-# placeholder works either way.
-CITATION_GLYPH_PLACEHOLDERS: tuple[str, ...] = (*STATUS_GLYPH.values(), '?')

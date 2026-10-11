@@ -36,10 +36,8 @@ def _is_citable(value: str) -> bool:
     return (
         parts.scheme in ('http', 'https')
         and bool(parts.netloc)
-        and '#' not in value
-        and not any(_breaks_destination(char) for char in value)
+        and not any(
+            char.isspace() or not char.isprintable() or char in '#<>()\\'
+            for char in value
+        )
     )
-
-
-def _breaks_destination(char: str) -> bool:
-    return char.isspace() or not char.isprintable() or char in '<>()\\'

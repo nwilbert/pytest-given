@@ -3,9 +3,10 @@ update rewrites."""
 
 import pytest
 
+from pytest_given.citations.check import _READ_GLYPHS
 from pytest_given.citations.markdown_links import MarkdownLink, scan_links
 
-GLYPHS = ('✅', '❌', '🟠', '🔵', '❓', '✓', '✗', '○', '⊗', '?')
+GLYPHS = _READ_GLYPHS
 
 
 def _one(source: str) -> MarkdownLink:
@@ -130,6 +131,11 @@ def test_a_table_opens_a_sibling_list_item() -> None:
     'source', ['- p\n| [a](u) | b |\n|---|---|\n', '> p\n| [a](u) | b |\n|---|---|\n']
 )
 def test_a_lazy_line_starts_no_table(source: str) -> None:
+    assert not _one(source).in_table_row
+
+
+def test_an_html_comment_ends_a_table() -> None:
+    source = '| x | b |\n|---|---|\n| c | d |\n<!-- e -->\n[a](u) | f\n'
     assert not _one(source).in_table_row
 
 

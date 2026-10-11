@@ -13,6 +13,8 @@ attachment — each discriminated on read by the keys its variants do not share.
 """
 
 import dataclasses
+import json
+from pathlib import Path
 from typing import Any, TypedDict, cast
 
 from .errors import PytestGivenError
@@ -104,6 +106,20 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
             f'report, or was written by an incompatible version '
             f'({type(error).__name__}: {error}).'
         ) from error
+
+
+def read_report_json(json_file: Path) -> dict[str, Any]:
+    """The file as a dict; `report_from_dict` rejects one that is not a
+    report. Any other `OSError` (a directory, say) is left to the caller."""
+    if not json_file.exists():
+        raise PytestGivenError(f'{json_file.as_posix()} not found')
+    try:
+        report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        raise PytestGivenError(
+            f'{json_file.as_posix()} is not valid JSON — {error}'
+        ) from error
+    return report_dict
 
 
 def _metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:

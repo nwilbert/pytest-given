@@ -2402,16 +2402,17 @@ def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
     data = _embedded_app_data(render_html_string(_citable_report(url), None))
     citations = data['citations']
 
+    def line(halves: list[str]) -> str:
+        before, after = halves
+        return before + citations['report_url'] + after
+
     def lines(kind: str) -> dict[str, str]:
-        return {
-            key: before + citations['report_url'] + after
-            for key, (before, after) in citations[kind].items()
-        }
+        return {key: line(halves) for key, halves in citations[kind].items()}
 
     assert citations['report_url'] == url
-    assert lines('scenario') == {
-        't.py::test_pour[water]': f'✅ [Pour]({url}#scenario=t.py::test_pour)'
-    }
+    assert [line(halves) for halves in citations['scenario']] == [
+        f'✅ [Pour]({url}#scenario=t.py::test_pour)'
+    ]
     assert lines('tag') == {
         'spec': f'✅ [spec]({url}#tag=spec) (1 ✅)',
         'spec/x': f'✅ [spec/x]({url}#tag=spec/x) (1 ✅)',

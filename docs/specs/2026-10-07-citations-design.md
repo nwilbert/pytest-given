@@ -389,7 +389,9 @@ area tag.
   `--given-report-url=https://nwilbert.github.io/pytest-given/dev/examples/self-report.html` — the
   `/dev/` docs publish on every push to `main`, so a citation resolves as soon as its scenarios
   merge. A `citations` session in the default gate runs `pytest-given citations check docs/specs/`
-  against the committed `examples/self-report/self-report-data.json`.
+  against the committed `examples/self-report/self-report-data.json`. CI runs `reports_current`
+  instead, which a stale committed report cannot pass: it regenerates every report, with the
+  `citations update` runs below, and fails if a tracked Markdown file changed or a finding remains.
 - **Refresh.** The regeneration sessions run `citations update` right after writing their reports:
   `self_report` over `docs/specs/`, and both `self_report` and `examples` over `docs/site/` for
   each report they write. A commit that regenerates a report then carries its refreshed citations,
@@ -415,21 +417,24 @@ area tag.
 - `report/citation_index.py` (new) — renders the citation of each kind from the scenarios, tags
   and stories a report holds. A story's scenarios come from `scenarios_by_story`; tag matching
   has no Python counterpart yet, so the index files each scenario under every prefix of its tags,
-  and a unit test counts each tag citation against `app.js`'s `underPrefix` rule.
+  and a unit test counts each tag citation against the Tags sidebar's prefix rule, restated in
+  Python. That the page applies the same rule is a frontend behavior, verified in the browser like
+  the rest.
 - `citations/` (new package, on `model/` and `report/`) — reads report links out of Markdown,
-  computes findings and updates. `citations.check_citations` exposes the whole job, the way
-  `emit_sinks` does. Reading is a hand-written scanner — fences, indented code, backtick runs,
-  glyph, link, summary, table rows — because `update` needs each part's exact source position,
-  which no Markdown parser's inline tokens carry; a parser would only take over block structure, at
-  the cost of a runtime dependency.
+  resolves what each names — a slug or case suffix to the cited node id, suggestions for a
+  target the report lacks — and computes findings and updates. `citations.check_citations`
+  exposes the whole job, the way `emit_sinks` does. Reading is a hand-written scanner — fences,
+  indented code, backtick runs, glyph, link, summary, table rows — because `update` needs each
+  part's exact source position, which no Markdown parser's inline tokens carry; a parser would only
+  take over block structure, at the cost of a runtime dependency.
 - `report/text.py` — `CITATION_GLYPH` beside `STATUS_GLYPH`, which the Markdown sink keeps.
 - `report/html_renderer.py` — each citation's line, and the scenario node ids, in the report data.
 - `report/templates/_macros.html.j2`, `report.html.j2`, `app.js` — the three buttons,
   `copyCitation`, and the node-id lookup for `#scenario=`.
 - `cli/citations.py` (new) — argv, output and exit codes; registered in `cli/__init__.py`.
 - `noxfile.py` — `--given-report-url` and the `citations update` runs in `self_report` and
-  `examples`, and a `citations` session in the default gate. `.github/workflows/ci.yml` names its sessions one by one, so it gains a
-  `nox -s citations` step.
+  `examples`, a `citations` session in the default gate, and a `reports_current` session, which
+  `.github/workflows/ci.yml` runs as a job of its own.
 - `AGENTS.md` — the default gate's session list, the spec-moving condition, and under the
   regeneration rules: the sessions also refresh citations, and the changed documents are committed
   with the report.

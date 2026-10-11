@@ -22,7 +22,6 @@ jobs:
       - run: uv tool install --python 3.14 nox
       - run: nox -s lint
       - run: nox -s mypy
-      - run: nox -s citations
 
   test:
     runs-on: ubuntu-latest
@@ -58,9 +57,10 @@ jobs:
       - run: uv tool install --python 3.14 nox
       - run: nox -s audit
 
-  # `citations` checks the documents against the committed reports, so it
-  # passes against a report nobody regenerated. This regenerates every report
-  # and fails if its Markdown, or a document's citations, would change.
+  # Regenerates every report, updating the documents' citations with it, and
+  # fails if a report's Markdown or a document would change. The `citations`
+  # session checks against the committed reports instead, which a report
+  # nobody regenerated passes, so it stays in the local gate alone.
   reports:
     runs-on: ubuntu-latest
     steps:

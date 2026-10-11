@@ -1,7 +1,4 @@
-"""`pytest-given citations check` and `update`: the report links in a set of
-Markdown documents, held to a JSON report.
-
-`check_citations` is the whole job — read every document, compute every
+"""`check_citations` is the whole job — read every document, compute every
 finding and edit, and only then write — so a document that cannot be read
 leaves every file as it was.
 """
@@ -16,16 +13,17 @@ from urllib.parse import unquote, urlsplit
 from ..model import STATUSES, PytestGivenError, ReportData, ReportUrl
 from ..report import (
     CITATION_GLYPH,
-    CITATION_GLYPH_PLACEHOLDERS,
-    CitationIndex,
+    NO_SCENARIOS_SUMMARY,
+    STATUS_GLYPH,
+    SUMMARY_SEPARATOR,
     Target,
     fold_whitespace,
     link_text,
-    parse_fragment,
     plain_link_text,
     report_fragment,
 )
 from .markdown_links import VARIATION_SELECTOR, MarkdownLink, scan_links
+from .targets import TargetResolver, parse_fragment
 
 type FindingKind = Literal[
     'repointed', 'fragment', 'missing', 'stale', 'failed', 'mistyped', 'stray-summary'
@@ -95,12 +93,12 @@ def check_citations(
             'not given — and no --report-path either, so no link can be told to '
             'point at the report.'
         )
-    index = CitationIndex.of(report)
+    resolver = TargetResolver(report)
     texts = {path: _read(path) for path in documents}
     findings: list[CitationFinding] = []
     edited: dict[Path, str] = {}
     for path, text in texts.items():
-        document_findings, edits = _check_document(path, text, index, location)
+        document_findings, edits = _check_document(path, text, resolver, location)
         findings.extend(document_findings)
         if update and edits:
             edited[path] = _apply(text, edits)
@@ -123,16 +121,21 @@ class _Edit(NamedTuple):
     text: str
 
 
-_READ_GLYPHS = (*CITATION_GLYPH.values(), *CITATION_GLYPH_PLACEHOLDERS)
-_SUMMARY_GLYPH = (
-    '(?:' + '|'.join(CITATION_GLYPH[status] for status in STATUSES) + ')\ufe0f?'
+# Also read as a citation's glyph, and rewritten as emoji: the Markdown sink's
+# glyphs and a typed `?`, so a hand-typed placeholder works either way.
+_READ_GLYPHS = (*CITATION_GLYPH.values(), *STATUS_GLYPH.values(), '?')
+_SUMMARY_COUNT = (
+    r'\d+ (?:'
+    + '|'.join(CITATION_GLYPH[status] for status in STATUSES)
+    + f'){VARIATION_SELECTOR}?'
 )
 # Only text of a summary's shape counts as one, so a parenthetical of the
 # author's own after a citation stays theirs. A hard wrap may put it on the
 # next line.
 _SUMMARY = re.compile(
     r'(?:[ \t]+|[ \t]*\n[ \t]*)'
-    rf'(\((?:no scenarios|\d+ {_SUMMARY_GLYPH}(?: · \d+ {_SUMMARY_GLYPH})*)\))'
+    rf'({re.escape(NO_SCENARIOS_SUMMARY)}'
+    rf'|\({_SUMMARY_COUNT}(?:{re.escape(SUMMARY_SEPARATOR)}{_SUMMARY_COUNT})*\))'
 )
 
 
@@ -146,14 +149,14 @@ def _read(path: Path) -> str:
 
 
 def _check_document(
-    path: Path, text: str, index: CitationIndex, location: _ReportLocation
+    path: Path, text: str, resolver: TargetResolver, location: _ReportLocation
 ) -> tuple[list[CitationFinding], list[_Edit]]:
     findings: list[CitationFinding] = []
     edits: list[_Edit] = []
     for link in scan_links(text, _READ_GLYPHS):
         fragment = _report_fragment(link.destination, path, location)
         if fragment is not None:
-            _LinkCheck(path, link, index, findings, edits).run(fragment)
+            _LinkCheck(path, link, resolver, findings, edits).run(fragment)
     return findings, edits
 
 
@@ -183,7 +186,7 @@ def _report_fragment(url: str, document: Path, location: _ReportLocation) -> str
 class _LinkCheck:
     path: Path
     link: MarkdownLink
-    index: CitationIndex
+    resolver: TargetResolver
     findings: list[CitationFinding]
     edits: list[_Edit]
 
@@ -198,7 +201,7 @@ class _LinkCheck:
                     'tag or story',
                 )
             return
-        resolved = self.index.resolve(target)
+        resolved = self.resolver.resolve(target)
         if resolved is not None and resolved != target:
             self._repoint(
                 'fragment',
@@ -211,7 +214,7 @@ class _LinkCheck:
             self.link.text, in_table_row=self.link.in_table_row
         )
         if resolved is None and is_citation and target.kind == 'scenario':
-            titled = self.index.scenarios_titled(written_title)
+            titled = self.resolver.scenarios_titled(written_title)
             if len(titled) == 1:
                 resolved = Target('scenario', titled[0])
                 self._repoint(
@@ -225,7 +228,7 @@ class _LinkCheck:
             self._find(
                 'missing',
                 f'{_named(target)} is not in the report',
-                *self.index.suggestions(target, written_title),
+                *self.resolver.suggestions(target, written_title),
             )
             if is_citation:
                 self._mark_missing()
@@ -234,7 +237,7 @@ class _LinkCheck:
             self._check_citation(resolved, written_title)
 
     def _check_citation(self, target: Target, written_title: str) -> None:
-        citation = self.index.citation(target)
+        citation = self.resolver.index.citation(target)
         link = self.link
         assert link.glyph is not None
         if link.glyph.bare != citation.glyph:

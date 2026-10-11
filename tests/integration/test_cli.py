@@ -6,6 +6,7 @@ import pytest
 from pytest_given import PytestGivenError
 from pytest_given.cli import main
 from pytest_given.report import sinks
+from tests.unit.report.test_html_renderer import _embedded_app_data
 
 
 def test_cli_generates_html(tmp_path: Path) -> None:
@@ -31,27 +32,14 @@ def test_cli_generates_html(tmp_path: Path) -> None:
 
 
 def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
+    report = _minimal_report()
+    report['metadata']['report_url'] = 'https://example.org/report.html'
     json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'cli-test',
-                    'timestamp': '2026-10-10',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                    'report_url': 'https://example.org/report.html',
-                },
-                'scenarios': [
-                    {'id': 't.py::test_a', 'narration': {'text': 'Pour'}, 'module': 'm'}
-                ],
-            }
-        )
-    )
+    json_path.write_text(json.dumps(report))
     html_path = tmp_path / 'out.html'
     assert main(['report', str(json_path), '-o', str(html_path)]) == 0
-    html = html_path.read_text(encoding='utf-8').replace('\\"', '"').replace('\\/', '/')
-    assert '"report_url":"https://example.org/report.html"' in html
+    app_data = _embedded_app_data(html_path.read_text(encoding='utf-8'))
+    assert app_data['citations']['report_url'] == 'https://example.org/report.html'
 
 
 def test_cli_missing_input_file(tmp_path: Path) -> None:
