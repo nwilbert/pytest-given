@@ -79,7 +79,7 @@ from .schema import (
     param_id,
     rolled_up_status,
 )
-from .serde import read_report_json, report_from_dict, report_to_dict
+from .serde import JsonObject, read_report_json, report_from_dict, report_to_dict
 from .steps import (
     PartIndex,
     StepPath,
@@ -115,6 +115,7 @@ __all__ = [
     'ErrorInfo',
     'Glossary',
     'GlossaryTerm',
+    'JsonObject',
     'Metadata',
     'Narration',
     'NarrationLiteral',

@@ -108,18 +108,29 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
         ) from error
 
 
-def read_report_json(json_file: Path) -> dict[str, Any]:
-    """The file as a dict; `report_from_dict` rejects one that is not a
+type JsonValue = (
+    str | int | float | bool | list[JsonValue] | dict[str, JsonValue] | None
+)
+type JsonObject = dict[str, JsonValue]
+
+
+def read_report_json(json_file: Path) -> JsonObject:
+    """The file's JSON object; `report_from_dict` rejects one that is not a
     report. Any other `OSError` (a directory, say) is left to the caller."""
     if not json_file.exists():
         raise PytestGivenError(f'{json_file.as_posix()} not found')
     try:
-        report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
+        loaded = json.loads(json_file.read_text(encoding='utf-8'))
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
         raise PytestGivenError(
             f'{json_file.as_posix()} is not valid JSON — {error}'
         ) from error
-    return report_dict
+    if not isinstance(loaded, dict):
+        raise PytestGivenError(
+            f'{json_file.as_posix()} is not a pytest-given report: it holds no '
+            'JSON object.'
+        )
+    return loaded
 
 
 def _metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
