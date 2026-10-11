@@ -414,6 +414,35 @@ def test_relative_links_resolve_from_the_documents_directory(tmp_path: Path) -> 
     assert written.startswith('✅ ')
 
 
+def test_a_query_leaves_a_link_to_the_report(tmp_path: Path) -> None:
+    document = (
+        '✓ [Pay by card](../examples/r.html?v=2#scenario=t.py::test_pay)\n'
+        f'✓ [Pay by card]({URL}?v=2#scenario=t.py::test_pay)\n'
+    )
+    _, written = _run(
+        tmp_path,
+        document,
+        report_(PAY),
+        update=True,
+        name='guide/doc.md',
+        report_path=tmp_path / 'examples' / 'r.html',
+    )
+    assert [line[0] for line in written.splitlines()] == ['✅', '✅']
+
+
+def test_a_site_root_link_resolves_against_the_report_url(tmp_path: Path) -> None:
+    document = '✓ [Pay by card](/report.html#scenario=t.py::test_pay)\n'
+    result, _ = _run(tmp_path, document, report_(PAY))
+    assert [f.kind for f in result.findings] == ['stale']
+    result, _ = _run(
+        tmp_path,
+        document,
+        report_(PAY, report_url=None),
+        report_path=tmp_path / 'report.html',
+    )
+    assert result.findings == []
+
+
 def test_without_a_report_path_relative_links_are_ordinary(tmp_path: Path) -> None:
     document = '✓ [Pay by card](examples/r.html#scenario=t.py::test_pay)\n'
     result, _ = _run(tmp_path, document, report_(PAY))

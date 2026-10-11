@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, NamedTuple
-from urllib.parse import unquote, urlsplit
+from urllib.parse import SplitResult, unquote, urlsplit
 
 from ..model import STATUSES, PytestGivenError, ReportData, ReportUrl
 from ..report import (
@@ -108,11 +108,30 @@ def check_citations(
     return CitationsResult(findings=findings, updated=updated)
 
 
-@dataclass(frozen=True)
 class _ReportLocation:
-    url: str | None
-    path: Path | None
-    """Resolved, as each relative link's path is before it is compared."""
+    """Where the report is served and where it sits, to tell a link to it from
+    any other. A link's query is no part of it, as a static page ignores one."""
+
+    def __init__(self, url: str | None, path: Path | None) -> None:
+        self.url = None if url is None else urlsplit(url)._replace(query='')
+        # Resolved, as each relative link's path is before it is compared.
+        self.path = path
+        # A document links the report by the same few paths, again and again.
+        self._resolved: dict[Path, Path] = {}
+
+    def names_report(self, link: SplitResult, document: Path) -> bool:
+        if link.scheme or link.netloc:
+            return link._replace(query='') == self.url
+        if link.path.startswith('/'):
+            return self.url is not None and unquote(link.path) == unquote(self.url.path)
+        relative = unquote(link.path)
+        # No file is named so, and resolving the name raises on POSIX alone.
+        if self.path is None or '\0' in relative:
+            return False
+        joined = document.parent / relative
+        if joined not in self._resolved:
+            self._resolved[joined] = joined.resolve()
+        return self._resolved[joined] == self.path
 
 
 class _Edit(NamedTuple):
@@ -167,19 +186,10 @@ def _report_fragment(url: str, document: Path, location: _ReportLocation) -> str
     if not base:
         return None
     try:
-        absolute = bool(urlsplit(base).scheme) or base.startswith('//')
+        link = urlsplit(base)
     except ValueError:
         return None
-    if absolute:
-        return fragment if base == location.url else None
-    if location.path is None:
-        return None
-    relative = unquote(base)
-    # No file is named so, and resolving the name raises on POSIX alone.
-    if '\0' in relative:
-        return None
-    resolved = (document.parent / relative).resolve()
-    return fragment if resolved == location.path else None
+    return fragment if location.names_report(link, document) else None
 
 
 @dataclass
