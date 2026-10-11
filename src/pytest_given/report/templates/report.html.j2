@@ -668,6 +668,27 @@
   <span class="term-tip-def"></span>
 </div>
 
+<!-- Names the parts of an arriving link this report no longer has. The live
+     region stays put so the message inserted into it is announced; the
+     countdown bar's animation is the timer, so hovering or focusing the
+     snackbar pauses both. -->
+<div class="snackbar-region" role="status" aria-live="polite">
+  <template x-if="staleLink">
+    <div class="snackbar">
+      <div class="snackbar-body">
+        <p class="snackbar-title">This link is out of date</p>
+        <ul class="snackbar-list">
+          <template x-for="part in staleLink" :key="part.kind + ':' + part.value">
+            <li>No <span x-text="part.kind"></span> <code x-text="part.value"></code></li>
+          </template>
+        </ul>
+      </div>
+      <button type="button" class="snackbar-close btn-reset" aria-label="Dismiss" @click="staleLink = null"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span class="snackbar-countdown" aria-hidden="true" @animationend="staleLink = null"></span>
+    </div>
+  </template>
+</div>
+
 <script>
 window.__REPORT_DATA__ = {{ app_data_js }};
 {{ app_js }}

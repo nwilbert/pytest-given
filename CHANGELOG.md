@@ -23,6 +23,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given citations check` verifies the report links in Markdown documents against a JSON report, and `pytest-given citations update` rewrites their citations to match it.
 - An HTML report written with `given_report_url` has copy buttons on scenario cards, story headers and Tags sidebar rows that put a one-line Markdown citation on the clipboard.
 - A `#scenario=` link opens a scenario by its node id as well as its slug.
+- The HTML report names the parts of an opened link it no longer has, such as a removed scenario or tag, in a message that closes after 10 seconds, and drops them from the link instead of filtering on them.
 - The bundled `pytest-given-citing` skill repairs the citations `pytest-given citations update` cannot fix, and writes new ones.
 
 ### Changed

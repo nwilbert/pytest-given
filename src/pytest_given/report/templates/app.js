@@ -180,6 +180,9 @@ function reportApp() {
       nests: false,
     },
   };
+  // What a link may still filter on: every key a browse row selects.
+  const knownTags = new Set(axes.tags.reach.flat());
+  const knownModules = new Set(axes.modules.reach.flat());
   // Closure variables, not state: writing one from inside a reactive effect
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
@@ -220,6 +223,9 @@ function reportApp() {
     // never be selected.
     sentenceFilter: null,
     _suppressHashWrite: false,
+    // The parts of an arriving link this report no longer has, as
+    // `{ kind, value }`; null once the snackbar naming them closes.
+    staleLink: null,
     highlightedSentences: {},
     // Presence sets: `delete` rather than `= false` keeps the matching
     // "is anything open?" getters a plain key count.
@@ -998,20 +1004,33 @@ function reportApp() {
       // would create bogus history entries on back/forward).
       this._suppressHashWrite = true;
       const params = parseHash();
+      // A link outlives the report it was copied from. A value this report no
+      // longer has is dropped and named in the snackbar, rather than left to
+      // filter the list down to nothing or fall back without a word.
+      const stale = [];
+      const keep = (kind, values, known) => values.filter((value) => {
+        if (known(value)) return true;
+        stale.push({ kind, value });
+        return false;
+      });
+      const first = key => (params.has(key) ? [params.get(key)] : []);
       // One parameter per selected key, not a joined list: a tag is free text
       // and may itself hold any separator.
-      this.tagFilters = params.getAll('tag').filter(Boolean);
-      if (params.has('module')) this.moduleFilter = params.get('module');
-      else this.moduleFilter = null;
-      this.termFilters = params.getAll('term-filter').filter(Boolean);
-      if (params.has('sentence-filter')) this.sentenceFilter = params.get('sentence-filter');
-      else this.sentenceFilter = null;
+      this.tagFilters = keep('tag', params.getAll('tag').filter(Boolean), tag => knownTags.has(tag));
+      this.moduleFilter = keep('module', first('module'), m => knownModules.has(m))[0] ?? null;
+      this.termFilters = keep('glossary term', params.getAll('term-filter').filter(Boolean),
+        id => id === NO_TERMS || Object.hasOwn(termNames, id));
+      this.sentenceFilter = keep('story sentence', first('sentence-filter'),
+        key => Object.hasOwn(sentenceLabels, key))[0] ?? null;
       if (params.has('status')) {
-        const shown = new Set(params.get('status').split(',').filter(Boolean));
+        const shown = new Set(keep('status', params.get('status').split(',').filter(Boolean),
+          s => STATUSES.includes(s)));
         this.shownStatuses = Object.fromEntries(STATUSES.map(s => [s, shown.has(s)]));
       } else {
         this.shownStatuses = allStatusesShown();
       }
+      keep('view', first('view'), v => v === deserializeView(params));
+      keep('story', first('story'), s => storyIds.includes(s));
       if (params.has('q')) this.search = params.get('q');
       else this.search = '';
       this.mainView = deserializeView(params);
@@ -1030,17 +1049,28 @@ function reportApp() {
       else if (this.moduleFilter) this.view = 'modules';
       const targetSlug = params.get('scenario');
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
+      if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      if (targetTerm) {
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => Object.hasOwn(termNames, id)).length;
+      if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {
         this.goToScenario(targetScenario);
       }
+      this._showStaleLink(stale);
       this.$nextTick(() => {
         this._suppressHashWrite = false;
-        // Drop one-shot target params (scenario=/term=) without adding history.
-        if (targetSlug || targetTerm) this._writeHash('replace');
+        // Drop one-shot target params (scenario=/term=) and stale values
+        // without adding history.
+        if (targetSlug || targetTerm || stale.length) this._writeHash('replace');
       });
+    },
+    // Re-created rather than updated, so a second stale link restarts the
+    // countdown, which is the snackbar's own CSS animation.
+    _showStaleLink(stale) {
+      if (!stale.length) return;
+      this.staleLink = null;
+      this.$nextTick(() => { this.staleLink = stale; });
     },
     _writeHash(mode = 'push') {
       const params = new URLSearchParams();

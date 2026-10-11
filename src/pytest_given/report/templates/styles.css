@@ -1079,6 +1079,80 @@ span.param-highlight {
 .term-tip-name { display: block; font-weight: 700; }
 .term-tip-def { display: block; margin-top: 2px; opacity: 0.82; }
 
+/* The stale-link snackbar, top right under the top bar: an error, so it
+   wears the error block's failed-red rule on the failed tint, lifted off the
+   page by the tooltip's shadow. The countdown bar's animation is the timer:
+   its end closes the snackbar, and a pause while hovered or focused holds it
+   open. */
+.snackbar-region {
+  position: fixed;
+  top: calc(48px + var(--space-md));
+  right: var(--space-xl);
+  z-index: 1001;
+  width: min(400px, calc(100vw - 2 * var(--space-lg)));
+}
+.snackbar {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-md) var(--space-lg) var(--space-lg);
+  border-left: 4px solid var(--color-failed);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  overflow: hidden;
+  background: var(--color-failed-tint);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-tip);
+  font-size: var(--font-size-md);
+  line-height: 1.4;
+  animation: snackbar-in 160ms ease-out;
+}
+.snackbar-body { min-width: 0; }
+.snackbar-title { font-weight: 700; color: var(--color-failed); }
+.snackbar-list { list-style: none; margin-top: var(--space-xs); color: var(--text-narration); }
+.snackbar-list li + li { margin-top: 2px; }
+.snackbar-list code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  overflow-wrap: anywhere;
+}
+.snackbar-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  margin-top: -2px;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+.snackbar-close:hover { color: var(--text-primary); }
+.snackbar-countdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--color-failed);
+  opacity: 0.5;
+  transform-origin: left;
+  animation: snackbar-drain 10s linear forwards;
+}
+.snackbar:hover .snackbar-countdown,
+.snackbar:focus-within .snackbar-countdown { animation-play-state: paused; }
+@keyframes snackbar-in {
+  from { opacity: 0; transform: translateX(12px); }
+}
+@keyframes snackbar-drain {
+  to { transform: scaleX(0); }
+}
+/* Hidden, not stopped: the bar's animation still has to end to close it. */
+@media (prefers-reduced-motion: reduce) {
+  .snackbar { animation: none; }
+  .snackbar-countdown { visibility: hidden; }
+}
+
 /* Inline code in rendered term descriptions (entry body + hover tooltip). */
 .entry-def code,
 .term-tip-def code {
