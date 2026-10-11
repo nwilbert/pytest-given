@@ -135,20 +135,6 @@ def test_a_term_ref_title_reads_as_its_display_text() -> None:
     assert citation.title_text == 'A guest books'
 
 
-def test_a_scenario_title_is_written_piece_by_piece() -> None:
-    scenario = scenario_('t.py::test_a')
-    scenario.narration = narration_of(
-        [
-            NarrationLiteral(value='**'),
-            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
-            NarrationLiteral(value=' books** a *suite*'),
-        ]
-    )
-    citation = _index(scenario).citation(Target('scenario', 't.py::test_a'))
-    before, _ = citation.markdown_halves()
-    assert before == '✅ [\\*\\*Guest books\\*\\* a *suite*]('
-
-
 def test_a_per_case_title_writes_its_case_id_literally() -> None:
     scenario = scenario_('t.py::test_split[a*b*c]')
     scenario.narration = narration_of(

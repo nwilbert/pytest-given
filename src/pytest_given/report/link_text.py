@@ -1,6 +1,7 @@
 """The Markdown writer — text written so a Markdown viewer shows what the HTML
 report shows — and a citation's link text read back as the title it renders."""
 
+import re
 from collections.abc import Callable
 
 from ..model import (
@@ -8,25 +9,23 @@ from ..model import (
     EmphasisSpan,
     InlineSpan,
     Narration,
-    NarrationLiteral,
-    NarrationPart,
+    NarrationPiece,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     PlainSpan,
-    part_neighbours,
     placeholder_token,
-    read_spans,
+    read_narration,
 )
 from .text import NEWLINE
 
 # What a backslash escapes in CommonMark.
 ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
 
-# What CommonMark or GFM give inline meaning, beside `_`, which has a rule of
-# its own: a link, emphasis, strikethrough, a code span, raw HTML, an entity,
-# a table cell, GitHub math.
-_ALWAYS_ESCAPED = frozenset('\\[]*~`<&|$')
+# What CommonMark or GFM give inline meaning: a link, emphasis,
+# strikethrough, a code span, raw HTML, an entity, a table cell, GitHub math —
+# and `_`, except between two letters or digits, where it never emphasizes.
+_ESCAPED = re.compile(r'[\\\[\]*~`<&|$]|(?<![^\W_])_|_(?![^\W_])')
 
 
 def link_text(title: Narration | str, *, in_table_row: bool = False) -> str:
@@ -43,40 +42,30 @@ def narration_markdown(
     in_table_row: bool = False,
     term_ref: Callable[[str], str] = lambda display: display,
 ) -> str:
-    """A title or step on one line, piece by piece: each plain-text piece keeps
-    the reader's spans, every other piece is literal — so a span never crosses
-    a term ref or a value. `term_ref` frames a term ref's written display."""
-    if not narration.parts:
-        return spans_markdown(_one_line(narration.text), in_table_row=in_table_row)
+    """A title or step on one line, its spans kept as markup and everything
+    else literal. `term_ref` frames a term ref's written display."""
     return ''.join(
-        _piece_markdown(
-            part, part_neighbours(narration.parts, index), in_table_row, term_ref
-        )
-        for index, part in enumerate(narration.parts)
+        _piece_markdown(piece, in_table_row, term_ref)
+        for piece in read_narration(narration)
     )
-
-
-def spans_markdown(
-    text: str, *, in_table_row: bool = False, before: str = '', after: str = ''
-) -> str:
-    """`text` with the reader's spans kept as markup and everything else
-    literal. Nothing inside a code span is escaped — a backslash there would
-    show — except a table row's `|`, which GFM lets an escape keep from
-    splitting the cell. `before` and `after` are the text of the parts around
-    it, as `read_spans` takes them."""
-    spans = read_spans(text, before=before, after=after)
-    return ''.join(_span_markdown(span, in_table_row) for span in spans)
 
 
 def literal_markdown(text: str) -> str:
     """`text` with every character of inline meaning backslash-escaped, so it
     shows as written."""
-    return ''.join(
-        f'\\{char}'
-        if char in _ALWAYS_ESCAPED or (char == '_' and not _intraword(text, index))
-        else char
-        for index, char in enumerate(text)
-    )
+    return _ESCAPED.sub(r'\\\g<0>', text)
+
+
+def code_span_markdown(text: str, *, in_table_row: bool = False) -> str:
+    """`text` as a code span. Nothing inside is escaped — a backslash there
+    would show — except a table row's `|`, which GFM lets an escape keep from
+    splitting the cell."""
+    if in_table_row:
+        text = text.replace('|', '\\|')
+    # CommonMark strips one space off each end of such a span.
+    if text.startswith(' ') and text.endswith(' ') and text.strip(' '):
+        text = f' {text} '
+    return f'`{text}`'
 
 
 def plain_link_text(written: str, *, in_table_row: bool = False) -> str:
@@ -120,17 +109,11 @@ def code_span_at(text: str, start: int) -> tuple[int, bool]:
 
 
 def _piece_markdown(
-    part: NarrationPart,
-    neighbours: tuple[str, str],
-    in_table_row: bool,
-    term_ref: Callable[[str], str],
+    part: NarrationPiece, in_table_row: bool, term_ref: Callable[[str], str]
 ) -> str:
     match part:
-        case NarrationLiteral(value=value):
-            before, after = neighbours
-            return spans_markdown(
-                _one_line(value), in_table_row=in_table_row, before=before, after=after
-            )
+        case PlainSpan() | CodeSpan() | EmphasisSpan():
+            return _span_markdown(part, in_table_row)
         case NarrationValue(rendered=rendered):
             return literal_markdown(_one_line(rendered))
         case NarrationPlaceholder():
@@ -142,14 +125,9 @@ def _piece_markdown(
 def _span_markdown(span: InlineSpan, in_table_row: bool) -> str:
     match span:
         case PlainSpan(text=text):
-            return literal_markdown(text)
+            return literal_markdown(_one_line(text))
         case CodeSpan(text=text):
-            if in_table_row:
-                text = text.replace('|', '\\|')
-            # CommonMark strips one space off each end of such a span.
-            if text.startswith(' ') and text.endswith(' ') and text.strip(' '):
-                text = f' {text} '
-            return f'`{text}`'
+            return code_span_markdown(_one_line(text), in_table_row=in_table_row)
         case EmphasisSpan(strong=strong, content=content):
             marker = '**' if strong else '*'
             inner = ''.join(_span_markdown(part, in_table_row) for part in content)
@@ -165,12 +143,3 @@ def _backtick_run_end(text: str, start: int) -> int:
     while end < len(text) and text[end] == '`':
         end += 1
     return end
-
-
-def _intraword(text: str, index: int) -> bool:
-    """An `_` between two letters or digits never emphasizes."""
-    return (
-        0 < index < len(text) - 1
-        and text[index - 1].isalnum()
-        and text[index + 1].isalnum()
-    )

@@ -1,4 +1,4 @@
-"""The pure rules over `Narration` parts, shared by capture and grouping.
+"""The pure rules over `Narration` parts, shared by capture, grouping and report.
 
 `capture/` records narration parts and `grouping/` rewrites them; both have to
 derive the text the same way and resolve a placeholder the same way, or they
@@ -22,6 +22,11 @@ from .schema import (
     NarrationValue,
 )
 from .steps import PartIndex
+from .text import InlineSpan, read_spans
+
+type NarrationPiece = (
+    InlineSpan | NarrationValue | NarrationPlaceholder | NarrationTermRef
+)
 
 _FORMATTER = Formatter()
 
@@ -64,10 +69,22 @@ def narration_text(parts: Sequence[NarrationPart]) -> str:
     return ''.join(out)
 
 
-def part_neighbours(parts: Sequence[NarrationPart], index: int) -> tuple[str, str]:
-    """The text the parts either side of `parts[index]` render: what decides
-    whether a marker at a literal's edge opens or closes a span."""
-    return narration_text(parts[:index]), narration_text(parts[index + 1 :])
+def read_narration(narration: Narration) -> list[NarrationPiece]:
+    """A title or step as every output shows it: each literal read for spans on
+    its own, so a span never crosses a term ref or a value."""
+    parts = narration.parts or (NarrationLiteral(value=narration.text),)
+    texts = [narration_text((part,)) for part in parts]
+    whole = ''.join(texts)
+    pieces: list[NarrationPiece] = []
+    end = 0
+    for part, text in zip(parts, texts, strict=True):
+        start, end = end, end + len(text)
+        if isinstance(part, NarrationLiteral):
+            before, after = whole[max(start - 1, 0) : start], whole[end : end + 1]
+            pieces.extend(read_spans(part.value, before=before, after=after))
+        else:
+            pieces.append(part)
+    return pieces
 
 
 def narration_of(parts: Iterable[NarrationPart]) -> Narration:

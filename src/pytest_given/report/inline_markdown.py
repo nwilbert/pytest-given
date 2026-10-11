@@ -14,12 +14,9 @@ from .text import NEWLINE
 _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
 
 
-def render_spans(text: str, *, before: str = '', after: str = '') -> str:
-    """A title's or step's plain-text piece: its spans as HTML, the rest
-    escaped. A title or step never breaks a line. `before` and `after` are the
-    text of the parts around the piece, as `read_spans` takes them."""
-    spans = read_spans(text, before=before, after=after)
-    return ''.join(_span_html(span, _escaped) for span in spans)
+def render_span(span: InlineSpan) -> str:
+    """A span of a title or step, which never breaks a line."""
+    return _span_html(span, _escaped)
 
 
 def render_definition(text: str) -> str:

@@ -19,7 +19,7 @@ from ..model import (
     node_base,
     plural,
 )
-from .link_text import literal_markdown, narration_markdown
+from .link_text import code_span_markdown, literal_markdown, narration_markdown
 from .text import NEWLINE, STATUS_GLYPH, STATUS_LABEL
 
 
@@ -143,9 +143,7 @@ def _case_cell(column: ParameterColumn, value: CellValue) -> str:
     if not isinstance(value, Attachment):
         return _cell(value)
     if _fits_inline(value.content):
-        # A code span shows its content as written; only a `|` is escaped,
-        # which GFM would otherwise read as the end of the cell.
-        return f'`{value.content.replace("|", "\\|")}`'
+        return code_span_markdown(value.content, in_table_row=True)
     return _cell(column.name)
 
 
@@ -240,7 +238,7 @@ def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
         # column its badge points at.
         return [f'{indent}  - 📎 {label} — *see parameter table*']
     if _fits_inline(attachment.content):
-        return [f'{indent}  - 📎 {label} — `{attachment.content}`']
+        return [f'{indent}  - 📎 {label} — {code_span_markdown(attachment.content)}']
     body_indent = f'{indent}    '
     return [
         f'{indent}  - 📎 {label}:',

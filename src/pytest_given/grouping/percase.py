@@ -85,11 +85,8 @@ def _substituted_part(
 
 
 def _suffixed(narration: Narration, node_id: NodeId) -> Narration:
-    """The parametrize id appended as a value between bracket literals, like
-    the placeholder values a per-case title fills in: it is generated from
-    values, so it is never read for Markdown. A plain-string title becomes a
-    literal part, so title and id are never read as one string. No source
-    wrote the id, so its value has no expression."""
+    """The parametrize id appended as a value, since it is generated from
+    values: never read for Markdown."""
     parts = narration.parts or (NarrationLiteral(value=narration.text),)
     case_id = case_suffix(node_id).removeprefix('[').removesuffix(']')
     return narration_of(

@@ -907,23 +907,6 @@ def test_a_title_and_a_step_keep_their_spans() -> None:
     assert '- **when** the `book` call' in md
 
 
-def test_a_span_crossed_by_a_term_ref_stays_literal() -> None:
-    scn = Scenario(
-        id='tests/t.py::test_x',
-        narration=Narration(
-            text='**Guest books**',
-            parts=(
-                NarrationLiteral(value='**'),
-                NarrationTermRef(term_id='guest', display='Guest'),
-                NarrationLiteral(value=' books**'),
-            ),
-        ),
-        module='tests/t.py',
-    )
-    md = render_md(_report(scn))
-    assert '## ✓ \\*\\*«Guest» books\\*\\*' in md
-
-
 def test_a_value_holding_a_marker_is_literal() -> None:
     step = Step(
         phase='when',

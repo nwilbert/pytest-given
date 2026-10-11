@@ -15,14 +15,14 @@ from pytest_given.model import (
     narration_of,
     param_id,
 )
-from pytest_given.report.inline_markdown import render_spans
+from pytest_given.report.html_renderer import _make_narration_filter
 from pytest_given.report.link_text import (
+    code_span_markdown,
     fold_whitespace,
     link_text,
     literal_markdown,
     narration_markdown,
     plain_link_text,
-    spans_markdown,
 )
 
 _MARKDOWN = MarkdownIt('commonmark').enable(['table', 'strikethrough'])
@@ -66,15 +66,25 @@ def test_literal_markdown_escapes_every_inline_marker(text: str, written: str) -
         ('***a***', '\\*\\*\\*a\\*\\*\\*'),
     ],
 )
-def test_spans_markdown_keeps_the_spans_the_report_renders(
+def test_a_plain_string_keeps_the_spans_the_report_renders(
     text: str, written: str
 ) -> None:
-    assert spans_markdown(text) == written
+    assert narration_markdown(Narration(text=text)) == written
 
 
 def test_a_pipe_in_a_code_span_is_escaped_only_in_a_table_row() -> None:
-    assert spans_markdown('the `a|b` form') == 'the `a|b` form'
-    assert spans_markdown('the `a|b` form', in_table_row=True) == 'the `a\\|b` form'
+    narration = Narration(text='the `a|b` form')
+    assert narration_markdown(narration) == 'the `a|b` form'
+    assert narration_markdown(narration, in_table_row=True) == 'the `a\\|b` form'
+
+
+@pytest.mark.parametrize(
+    ('content', 'written'),
+    [('a|b', '`a|b`'), (' x ', '`  x  `'), ('  ', '`  `')],
+)
+def test_a_code_span_shows_its_content_as_written(content: str, written: str) -> None:
+    assert code_span_markdown(content) == written
+    assert _MARKDOWN.renderInline(written) == f'<code>{content}</code>'
 
 
 @pytest.mark.parametrize(
@@ -104,8 +114,10 @@ def test_a_pipe_in_a_code_span_is_escaped_only_in_a_table_row() -> None:
     ],
 )
 def test_a_markdown_viewer_renders_the_spans_the_report_does(text: str) -> None:
-    rendered = _MARKDOWN.render(spans_markdown(text))
-    assert rendered == f'<p>{render_spans(text)}</p>\n'
+    narration = Narration(text=text)
+    rendered = _MARKDOWN.render(narration_markdown(narration))
+    html = _make_narration_filter(param_color_map={}, glossary=None)(narration)
+    assert rendered == f'<p>{html}</p>\n'
 
 
 def test_a_narration_reads_spans_only_within_one_literal() -> None:

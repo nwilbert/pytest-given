@@ -108,6 +108,8 @@ type InlineSpan = PlainSpan | CodeSpan | EmphasisSpan
 def read_spans(text: str, *, before: str = '', after: str = '') -> list[InlineSpan]:
     """`text` as plain text, code spans, and bold or italic holding only those.
     `before` and `after`, the neighbouring text, flank its edges unread."""
+    if '*' not in text and '`' not in text:
+        return [*_plain(text)]
     # A marker before the text stays one, so no span opens to touch it.
     prefix = before[-1:] if before.endswith(('*', '`')) else _neighbour(before[-1:])
     padded = f'{prefix}{text}{_neighbour(after[:1])}'

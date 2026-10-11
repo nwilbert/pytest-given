@@ -21,16 +21,18 @@ from ..model import (
     ClausePart,
     ClauseTermRef,
     ClauseWord,
+    CodeSpan,
     ColumnId,
+    EmphasisSpan,
     Glossary,
     GlossaryTerm,
     Narration,
-    NarrationLiteral,
-    NarrationPart,
+    NarrationPiece,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     ParameterColumn,
+    PlainSpan,
     ReportData,
     Scenario,
     SourceLocation,
@@ -38,14 +40,14 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
-    part_neighbours,
     placeholder_token,
     plural,
+    read_narration,
 )
 from .citation_index import CitationIndex, Target, TargetKind
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
-from .inline_markdown import render_definition, render_spans
+from .inline_markdown import render_definition, render_span
 from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
@@ -478,40 +480,30 @@ def _make_narration_filter(
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
 ) -> Callable[[Narration], Markup]:
-    """Jinja filter: renders a `Narration` to HTML, part by part.
+    """Jinja filter: renders a `Narration` to HTML, piece by piece.
 
-    Usage: `{{ step.narration | narration }}`. A parts-less narration (a plain
-    string label) is one plain-text piece, its spans rendered like a literal's.
+    Usage: `{{ step.narration | narration }}`.
     """
 
     def _render(narration: Narration) -> Markup:
-        if not narration.parts:
-            return Markup(render_spans(narration.text))
         out = [
-            _render_narration_part(
-                part,
-                part_neighbours(narration.parts, index),
-                param_color_map,
-                glossary,
-            )
-            for index, part in enumerate(narration.parts)
+            _render_narration_piece(piece, param_color_map, glossary)
+            for piece in read_narration(narration)
         ]
         return Markup(''.join(out))
 
     return _render
 
 
-def _render_narration_part(
-    part: NarrationPart,
-    neighbours: tuple[str, str],
+def _render_narration_piece(
+    part: NarrationPiece,
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
 ) -> str:
-    """Render one `NarrationPart` to an HTML fragment."""
+    """Render one `NarrationPiece` to an HTML fragment."""
     match part:
-        case NarrationLiteral(value=value):
-            before, after = neighbours
-            return render_spans(value, before=before, after=after)
+        case PlainSpan() | CodeSpan() | EmphasisSpan():
+            return render_span(part)
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):

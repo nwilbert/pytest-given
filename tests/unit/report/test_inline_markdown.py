@@ -10,7 +10,7 @@ from pytest_given.model import (
 )
 from pytest_given.report import CitationIndex, Target
 from pytest_given.report.html_renderer import _make_narration_filter
-from pytest_given.report.inline_markdown import render_definition, render_spans
+from pytest_given.report.inline_markdown import render_definition
 from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
 from tests.unit.citation_reports import report_, scenario_
@@ -125,5 +125,6 @@ def test_render_definition(text: str, expected: str) -> None:
         ('a\nb', 'a\nb'),
     ],
 )
-def test_render_spans_never_breaks(text: str, expected: str) -> None:
-    assert render_spans(text) == expected
+def test_a_title_s_spans_never_break(text: str, expected: str) -> None:
+    render = _make_narration_filter(param_color_map={}, glossary=None)
+    assert render(Narration(text=text)) == expected
