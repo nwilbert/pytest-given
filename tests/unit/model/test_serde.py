@@ -296,8 +296,14 @@ def test_parameter_table_round_trips() -> None:
                             {'id': 'expect', 'name': 'expect', 'kind': 'param'},
                         ],
                         'cases': [
-                            {'values': [1, False], 'status': 'passed', 'error': None},
                             {
+                                'id': 't.py::test_x[1]',
+                                'values': [1, False],
+                                'status': 'passed',
+                                'error': None,
+                            },
+                            {
+                                'id': 't.py::test_x[2]',
                                 'values': [2, True],
                                 'status': 'failed',
                                 'error': {
@@ -316,8 +322,11 @@ def test_parameter_table_round_trips() -> None:
     assert isinstance(pt, ParameterTable)
     assert [c.name for c in pt.columns] == ['euros', 'expect']
     assert pt.cases == [
-        ParameterCase(values=[1, False], status='passed', error=None),
         ParameterCase(
+            id=NodeId('t.py::test_x[1]'), values=[1, False], status='passed', error=None
+        ),
+        ParameterCase(
+            id=NodeId('t.py::test_x[2]'),
             values=[2, True],
             status='failed',
             error=ErrorInfo(message='boom'),
@@ -806,6 +815,7 @@ def test_round_trip_preserves_column_kinds_and_cell_shapes() -> None:
         ],
         cases=[
             ParameterCase(
+                id=NodeId('t.py::test_x[3]'),
                 values=[
                     200,
                     '2.0',
@@ -815,7 +825,9 @@ def test_round_trip_preserves_column_kinds_and_cell_shapes() -> None:
                 ],
                 status='passed',
             ),
-            ParameterCase(values=[350, None, None], status='skipped'),
+            ParameterCase(
+                id=NodeId('t.py::test_x[4]'), values=[350, None, None], status='skipped'
+            ),
         ],
     )
     scenario = Scenario(
@@ -955,6 +967,7 @@ def _every_field_populated() -> ReportData:
             ],
             cases=[
                 ParameterCase(
+                    id=NodeId('t.py::test_x[5]'),
                     values=[
                         2,
                         'four',

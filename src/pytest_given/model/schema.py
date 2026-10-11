@@ -398,6 +398,7 @@ class ParameterCase:
     """One parametrize case: its cells, positionally aligned with the table's
     columns."""
 
+    id: NodeId
     values: list[CellValue]
     status: Status = 'passed'
     error: ErrorInfo | None = None

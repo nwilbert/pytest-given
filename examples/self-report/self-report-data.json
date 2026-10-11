@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T09:07:18.847134+00:00",
+    "timestamp": "2026-10-11T12:04:03.562451+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "ab610d09ee93d674c8e69ea9ccc95e1adf2756fb",
+    "commit_sha": "effeb484ef740f87b4c38600b23d0f05e4c09fba",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -30,7 +30,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 106,
+      "duration_ms": 112,
       "steps": [
         {
           "phase": "given",
@@ -112,7 +112,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -221,7 +221,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -365,7 +365,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -542,7 +542,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -609,7 +609,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -719,7 +719,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -818,7 +818,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -888,7 +888,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -1008,7 +1008,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -1143,7 +1143,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 139,
       "steps": [
         {
           "phase": "given",
@@ -1221,6 +1221,7 @@
         ],
         "cases": [
           {
+            "id": "tests/integration/test_plugin.py::test_step_fixture_teardown_refuses_steps_and_attachments[step]",
             "values": [
               "step",
               {
@@ -1233,6 +1234,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_step_fixture_teardown_refuses_steps_and_attachments[attachment]",
             "values": [
               "attachment",
               {
@@ -1267,7 +1269,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 155,
       "steps": [
         {
           "phase": "given",
@@ -1360,6 +1362,7 @@
         ],
         "cases": [
           {
+            "id": "tests/integration/test_plugin.py::test_a_fixture_takes_only_given[given-accepted]",
             "values": [
               "given",
               {
@@ -1373,6 +1376,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_a_fixture_takes_only_given[when-refused]",
             "values": [
               "when",
               {
@@ -1386,6 +1390,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_a_fixture_takes_only_given[then-refused]",
             "values": [
               "then",
               {
@@ -1431,7 +1436,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 100,
       "steps": [
         {
           "phase": "given",
@@ -1548,7 +1553,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 166,
+      "duration_ms": 194,
       "steps": [
         {
           "phase": "given",
@@ -1621,7 +1626,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1932,7 +1937,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2077,7 +2082,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -2230,7 +2235,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -2364,7 +2369,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 85,
       "steps": [
         {
           "phase": "given",
@@ -2487,7 +2492,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 138,
+      "duration_ms": 204,
       "steps": [
         {
           "phase": "given",
@@ -2608,6 +2613,7 @@
         ],
         "cases": [
           {
+            "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[none-keeps]",
             "values": [
               "None",
               "[1]"
@@ -2616,6 +2622,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[empty-clears]",
             "values": [
               "[]",
               "[]"
@@ -2624,6 +2631,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[list-replaces]",
             "values": [
               "[a[2]]",
               "[2]"
@@ -2671,7 +2679,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 92,
+      "duration_ms": 103,
       "steps": [
         {
           "phase": "given",
@@ -2767,7 +2775,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 131,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
@@ -2857,6 +2865,7 @@
         ],
         "cases": [
           {
+            "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[column]",
             "values": [
               "{x}",
               {
@@ -2870,6 +2879,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[plain-fixture]",
             "values": [
               "{room}",
               {
@@ -2883,6 +2893,7 @@
             "error": null
           },
           {
+            "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[attribute]",
             "values": [
               "{room.number}",
               {
@@ -2928,7 +2939,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -3022,7 +3033,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -3107,7 +3118,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -3184,7 +3195,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 83,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -3357,7 +3368,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -3442,7 +3453,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -3549,7 +3560,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 162,
+      "duration_ms": 306,
       "steps": [
         {
           "phase": "given",
@@ -3762,7 +3773,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 70,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -3906,7 +3917,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -3980,7 +3991,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -4121,7 +4132,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 342,
+      "duration_ms": 324,
       "steps": [
         {
           "phase": "given",
@@ -4280,7 +4291,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4382,7 +4393,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4487,7 +4498,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4615,7 +4626,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -4727,7 +4738,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -4803,7 +4814,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 85,
+      "duration_ms": 83,
       "steps": [
         {
           "phase": "given",
@@ -6340,7 +6351,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6443,7 +6454,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -6655,7 +6666,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -7291,7 +7302,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -7497,6 +7508,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_file_glossary.py::test_table_errors_name_the_file[no table-bad.md: found no Markdown pipe table]",
             "values": [
               "no table",
               {
@@ -7510,6 +7522,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_file_glossary.py::test_table_errors_name_the_file[a short row-bad.md: data row at line 3]",
             "values": [
               "a short row",
               {
@@ -7523,6 +7536,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_file_glossary.py::test_table_errors_name_the_file[no Term column-bad.md: column 'Term']",
             "values": [
               "no Term column",
               {
@@ -7683,6 +7697,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_file_glossary.py::test_duplicate_rows_collapse_only_when_identical[True-one term]",
             "values": [
               true,
               {
@@ -7696,6 +7711,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_file_glossary.py::test_duplicate_rows_collapse_only_when_identical[False-refused]",
             "values": [
               false,
               {
@@ -7959,7 +7975,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -8176,6 +8192,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest-False-guest]",
             "values": [
               "Guest",
               false,
@@ -8185,6 +8202,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Order received-False-order-received]",
             "values": [
               "Order received",
               false,
@@ -8194,6 +8212,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[  Work Object  -False-work-object]",
             "values": [
               "  Work Object  ",
               false,
@@ -8203,6 +8222,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[do_the_thing-False-do-the-thing]",
             "values": [
               "do_the_thing",
               false,
@@ -8212,6 +8232,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Buy / sell-False-buy-sell]",
             "values": [
               "Buy / sell",
               false,
@@ -8221,6 +8242,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest #1-False-guest-1]",
             "values": [
               "Guest #1",
               false,
@@ -8230,6 +8252,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[caf\\xe9-False-caf]",
             "values": [
               "caf\u00e9",
               false,
@@ -8239,6 +8262,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[booking system-False-booking-system]",
             "values": [
               "booking system",
               false,
@@ -8248,6 +8272,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[----True-None]",
             "values": [
               "---",
               true,
@@ -8257,6 +8282,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[   -True-None]",
             "values": [
               "   ",
               true,
@@ -8266,6 +8292,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[-True-None]",
             "values": [
               "",
               true,
@@ -8275,6 +8302,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[###-True-None]",
             "values": [
               "###",
               true,
@@ -8742,6 +8770,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_glossary.py::test_re_registering_a_term_is_idempotent_only_with_matching_fields[True-one shared term]",
             "values": [
               true,
               "one shared term"
@@ -8750,6 +8779,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_re_registering_a_term_is_idempotent_only_with_matching_fields[False-refused]",
             "values": [
               false,
               "refused"
@@ -9176,6 +9206,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[Booking Request-booking request]",
             "values": [
               "'Booking Request'",
               "'booking request'"
@@ -9184,6 +9215,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[LLM Call-LLM call]",
             "values": [
               "'LLM Call'",
               "'LLM call'"
@@ -9192,6 +9224,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[Check-In-check-in]",
             "values": [
               "'Check-In'",
               "'check-in'"
@@ -9200,6 +9233,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[Plan B-plan B]",
             "values": [
               "'Plan B'",
               "'plan B'"
@@ -9208,6 +9242,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[E-Mail-e-mail]",
             "values": [
               "'E-Mail'",
               "'e-mail'"
@@ -9216,6 +9251,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[LLM-Based Search-LLM-based search]",
             "values": [
               "'LLM-Based Search'",
               "'LLM-based search'"
@@ -9224,6 +9260,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[iPhone-iPhone]",
             "values": [
               "'iPhone'",
               "'iPhone'"
@@ -9232,6 +9269,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_lowercase_form_keeps_acronyms_and_mixed_case_words[McDonald-McDonald]",
             "values": [
               "'McDonald'",
               "'McDonald'"
@@ -9398,6 +9436,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[Room-s-Rooms]",
             "values": [
               "'Room'",
               "'s'",
@@ -9407,6 +9446,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[Room-l.s-rooms]",
             "values": [
               "'Room'",
               "'l.s'",
@@ -9416,6 +9456,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[Room-s.l-rooms]",
             "values": [
               "'Room'",
               "'s.l'",
@@ -9425,6 +9466,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[Box-l.s-boxes]",
             "values": [
               "'Box'",
               "'l.s'",
@@ -9434,6 +9476,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[Category-l.s-categories]",
             "values": [
               "'Category'",
               "'l.s'",
@@ -9443,6 +9486,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[API Key-l.s-API keys]",
             "values": [
               "'API Key'",
               "'l.s'",
@@ -9452,6 +9496,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[API-s-APIs]",
             "values": [
               "'API'",
               "'s'",
@@ -9461,6 +9506,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_glossary.py::test_s_form_chains_with_lowercase_form[book-s-books]",
             "values": [
               "'book'",
               "'s'",
@@ -9930,6 +9976,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots0-False-None]",
             "values": [
               "[]",
               false,
@@ -9939,6 +9986,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots1-False-actor]",
             "values": [
               "['actor']",
               false,
@@ -9948,6 +9996,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots2-False-activity]",
             "values": [
               "['verb']",
               false,
@@ -9957,6 +10006,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots3-False-object]",
             "values": [
               "['noun']",
               false,
@@ -9966,6 +10016,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots4-False-actor]",
             "values": [
               "['actor', 'noun']",
               false,
@@ -9975,6 +10026,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots5-True-None]",
             "values": [
               "['verb', 'actor']",
               true,
@@ -9984,6 +10036,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots6-True-None]",
             "values": [
               "['verb', 'noun']",
               true,
@@ -10182,6 +10235,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[actor-actor-kept]",
             "values": [
               "actor",
               "actor",
@@ -10191,6 +10245,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[activity-actor-refused]",
             "values": [
               "activity",
               "actor",
@@ -10200,6 +10255,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[object-actor-refused]",
             "values": [
               "object",
               "actor",
@@ -10209,6 +10265,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[actor-verb-refused]",
             "values": [
               "actor",
               "verb",
@@ -10218,6 +10275,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[activity-verb-kept]",
             "values": [
               "activity",
               "verb",
@@ -10227,6 +10285,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[object-verb-refused]",
             "values": [
               "object",
               "verb",
@@ -10236,6 +10295,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[actor-noun-kept]",
             "values": [
               "actor",
               "noun",
@@ -10245,6 +10305,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[activity-noun-refused]",
             "values": [
               "activity",
               "noun",
@@ -10254,6 +10315,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot[object-noun-kept]",
             "values": [
               "object",
               "noun",
@@ -11504,6 +11566,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[**Scenario**-Scenario]",
             "values": [
               "**Scenario**",
               "Scenario"
@@ -11512,6 +11575,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[*Step*-Step]",
             "values": [
               "*Step*",
               "Step"
@@ -11520,6 +11584,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[`given`-given]",
             "values": [
               "`given`",
               "given"
@@ -11528,6 +11593,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[work_object-work_object]",
             "values": [
               "work_object",
               "work_object"
@@ -11536,6 +11602,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[`a*b*c`-a*b*c]",
             "values": [
               "`a*b*c`",
               "a*b*c"
@@ -12438,6 +12505,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_only_a_when_may_open_inside_a_when_then_body[when-nested]",
             "values": [
               "when",
               "nested"
@@ -12446,6 +12514,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_only_a_when_may_open_inside_a_when_then_body[given-refused]",
             "values": [
               "given",
               "refused"
@@ -12454,6 +12523,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_only_a_when_may_open_inside_a_when_then_body[then-refused]",
             "values": [
               "then",
               "refused"
@@ -12661,6 +12731,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_attach_rejects_a_non_str_label[deferred-template]",
             "values": [
               "deferred-template"
             ],
@@ -12668,6 +12739,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_attach_rejects_a_non_str_label[t-string]",
             "values": [
               "t-string"
             ],
@@ -12675,6 +12747,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_attach_rejects_a_non_str_label[not-a-string]",
             "values": [
               "not-a-string"
             ],
@@ -12800,6 +12873,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises[given]",
             "values": [
               "given"
             ],
@@ -12807,6 +12881,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises[when]",
             "values": [
               "when"
             ],
@@ -12814,6 +12889,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises[then]",
             "values": [
               "then"
             ],
@@ -12981,6 +13057,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story[2-True-accepted]",
             "values": [
               2,
               true,
@@ -12990,6 +13067,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story[2-False-refused]",
             "values": [
               2,
               false,
@@ -12999,6 +13077,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story[cancel-True-accepted]",
             "values": [
               "cancel",
               true,
@@ -13008,6 +13087,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story[cancel-False-refused]",
             "values": [
               "cancel",
               false,
@@ -13017,6 +13097,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story[written4-True-accepted]",
             "values": [
               "[1, 2]",
               true,
@@ -13026,6 +13107,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story[written5-False-refused]",
             "values": [
               "[1, 2]",
               false,
@@ -13748,6 +13830,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[actor-0-accepted]",
             "values": [
               "actor",
               0,
@@ -13757,6 +13840,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[actor-1-refused]",
             "values": [
               "actor",
               1,
@@ -13766,6 +13850,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[actor-2-accepted]",
             "values": [
               "actor",
               2,
@@ -13775,6 +13860,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[object-0-refused]",
             "values": [
               "object",
               0,
@@ -13784,6 +13870,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[object-1-refused]",
             "values": [
               "object",
               1,
@@ -13793,6 +13880,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[object-2-accepted]",
             "values": [
               "object",
               2,
@@ -13802,6 +13890,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[activity-0-refused]",
             "values": [
               "activity",
               0,
@@ -13811,6 +13900,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[activity-1-accepted]",
             "values": [
               "activity",
               1,
@@ -13820,6 +13910,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[activity-2-refused]",
             "values": [
               "activity",
               2,
@@ -13829,6 +13920,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[None-0-accepted]",
             "values": [
               null,
               0,
@@ -13838,6 +13930,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[None-1-accepted]",
             "values": [
               null,
               1,
@@ -13847,6 +13940,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_clause_position_takes_only_the_kinds_its_slot_accepts[None-2-accepted]",
             "values": [
               null,
               2,
@@ -14025,6 +14119,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_story.py::test_a_bare_string_may_fill_any_slot[0]",
             "values": [
               0
             ],
@@ -14032,6 +14127,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_bare_string_may_fill_any_slot[1]",
             "values": [
               1
             ],
@@ -14039,6 +14135,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_bare_string_may_fill_any_slot[2]",
             "values": [
               2
             ],
@@ -15787,6 +15884,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_story.py::test_a_sentence_name_must_be_non_empty_and_unpadded[cancel-accepted]",
             "values": [
               "'cancel'",
               "accepted"
@@ -15795,6 +15893,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_sentence_name_must_be_non_empty_and_unpadded[-refused]",
             "values": [
               "''",
               "refused"
@@ -15803,6 +15902,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_sentence_name_must_be_non_empty_and_unpadded[ cancel-refused]",
             "values": [
               "' cancel'",
               "refused"
@@ -15811,6 +15911,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_story.py::test_a_sentence_name_must_be_non_empty_and_unpadded[cancel -refused]",
             "values": [
               "'cancel '",
               "refused"
@@ -16569,6 +16670,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only[bare-identifier]",
             "values": [
               "count={count}",
               "accepted"
@@ -16577,6 +16679,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only[attribute]",
             "values": [
               "count={obj.attr}",
               "refused"
@@ -16585,6 +16688,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only[indexing]",
             "values": [
               "{d[key]}",
               "refused"
@@ -16593,6 +16697,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only[expression]",
             "values": [
               "{x + 1}",
               "refused"
@@ -16896,6 +17001,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[Guest-None-guest-Guest]",
             "values": [
               "Guest",
               null,
@@ -16906,6 +17012,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[Guest-Alice-guest-Alice]",
             "values": [
               "Guest",
               "Alice",
@@ -16916,6 +17023,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[Room-None-room-Room]",
             "values": [
               "Room",
               null,
@@ -16926,6 +17034,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[Room-Deluxe Suite-room-Deluxe Suite]",
             "values": [
               "Room",
               "Deluxe Suite",
@@ -16936,6 +17045,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[search-None-search-search]",
             "values": [
               "search",
               null,
@@ -16946,6 +17056,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with[search-searches for-search-searches for]",
             "values": [
               "search",
               "searches for",
@@ -17190,7 +17301,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -17283,7 +17394,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 93
+        "line": 45
       },
       "story_ids": [],
       "pins": null
@@ -17401,7 +17512,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 119
+        "line": 71
       },
       "story_ids": [],
       "pins": null
@@ -17565,7 +17676,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 142
+        "line": 94
       },
       "story_ids": [],
       "pins": null
@@ -18140,6 +18251,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-True]",
             "values": [
               "given",
               {
@@ -18153,6 +18265,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[when-True]",
             "values": [
               "when",
               {
@@ -18166,6 +18279,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[then-False]",
             "values": [
               "then",
               {
@@ -20311,6 +20425,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins[nothing-pinned]",
             "values": [
               null,
               null,
@@ -20320,6 +20435,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins[step-pinned]",
             "values": [
               null,
               "[2]",
@@ -20329,6 +20445,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins[scenario-pinned]",
             "values": [
               "[]",
               null,
@@ -20338,6 +20455,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins[both-pinned]",
             "values": [
               "[]",
               "[2]",
@@ -20347,6 +20465,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins[scenario-and-step-pinned]",
             "values": [
               "[1]",
               "[2]",
@@ -20500,6 +20619,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms[term_ids0-True]",
             "values": [
               "['guest', 'room']",
               true
@@ -20508,6 +20628,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms[term_ids1-False]",
             "values": [
               "['guest', 'guest']",
               false
@@ -20516,6 +20637,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms[term_ids2-False]",
             "values": [
               "['guest']",
               false
@@ -20524,6 +20646,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms[term_ids3-False]",
             "values": [
               "[]",
               false
@@ -20744,6 +20867,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin[term_ids0-False-True]",
             "values": [
               "['guest', 'room']",
               false,
@@ -20753,6 +20877,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin[term_ids1-True-True]",
             "values": [
               "['guest', 'room']",
               true,
@@ -20762,6 +20887,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin[term_ids2-False-False]",
             "values": [
               "['guest']",
               false,
@@ -20771,6 +20897,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin[term_ids3-True-True]",
             "values": [
               "['guest']",
               true,
@@ -22174,7 +22301,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 235
+        "line": 236
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -22302,7 +22429,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 49
+        "line": 50
       },
       "story_ids": [],
       "pins": null
@@ -22408,7 +22535,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 159
+        "line": 160
       },
       "story_ids": [],
       "pins": null
@@ -22542,7 +22669,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 184
+        "line": 185
       },
       "story_ids": [],
       "pins": null
@@ -22672,7 +22799,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 255
+        "line": 258
       },
       "story_ids": [],
       "pins": null
@@ -22824,6 +22951,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-passed-omitted]",
             "values": [
               "passed",
               "passed",
@@ -22838,6 +22966,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[skipped-skipped-omitted]",
             "values": [
               "skipped",
               "skipped",
@@ -22852,6 +22981,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[failed-failed-omitted]",
             "values": [
               "failed",
               "failed",
@@ -22866,6 +22996,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-skipped-shown]",
             "values": [
               "passed",
               "skipped",
@@ -22880,6 +23011,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-failed-shown]",
             "values": [
               "passed",
               "failed",
@@ -22900,7 +23032,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 292
+        "line": 299
       },
       "story_ids": [],
       "pins": null
@@ -23015,7 +23147,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 329
+        "line": 340
       },
       "story_ids": [],
       "pins": null
@@ -23130,7 +23262,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 400
+        "line": 411
       },
       "story_ids": [],
       "pins": null
@@ -23216,7 +23348,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 564
+        "line": 590
       },
       "story_ids": [],
       "pins": null
@@ -23522,6 +23654,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[vscode-vscode://file/{path}:{line}]",
             "values": [
               "vscode",
               "vscode://file/{path}:{line}"
@@ -23530,6 +23663,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[cursor-cursor://file/{path}:{line}]",
             "values": [
               "cursor",
               "cursor://file/{path}:{line}"
@@ -23538,6 +23672,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[zed-zed://file/{path}:{line}]",
             "values": [
               "zed",
               "zed://file/{path}:{line}"
@@ -23546,6 +23681,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[pycharm-pycharm://open?file={path}&line={line}]",
             "values": [
               "pycharm",
               "pycharm://open?file={path}&line={line}"
@@ -23554,6 +23690,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[https://github.com/o/r/blob/{sha}/{relpath}#L{line}-https://github.com/o/r/blob/{sha}/{relpath}#L{line}]",
             "values": [
               "https://github.com/o/r/blob/{sha}/{relpath}#L{line}",
               "https://github.com/o/r/blob/{sha}/{relpath}#L{line}"
@@ -23562,6 +23699,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template[none-None]",
             "values": [
               "none",
               null
@@ -24051,6 +24189,7 @@
         ],
         "cases": [
           {
+            "id": "tests/unit/report/test_story_view.py::test_an_under_anchored_sentence_reads_as_untracked_until_pinned[True-False-True-False]",
             "values": [
               true,
               false,
@@ -24061,6 +24200,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_story_view.py::test_an_under_anchored_sentence_reads_as_untracked_until_pinned[False-False-False-True]",
             "values": [
               false,
               false,
@@ -24071,6 +24211,7 @@
             "error": null
           },
           {
+            "id": "tests/unit/report/test_story_view.py::test_an_under_anchored_sentence_reads_as_untracked_until_pinned[False-True-False-False]",
             "values": [
               false,
               true,
@@ -24935,7 +25076,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 394
+        "line": 409
       },
       "story_ids": [],
       "pins": null
@@ -24972,7 +25113,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -25077,7 +25218,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 621
+        "line": 636
       },
       "story_ids": [],
       "pins": null
@@ -25207,7 +25348,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 743
+        "line": 758
       },
       "story_ids": [],
       "pins": null
@@ -25311,7 +25452,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 855
+        "line": 870
       },
       "story_ids": [],
       "pins": null
@@ -25406,7 +25547,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1221
+        "line": 1236
       },
       "story_ids": [],
       "pins": null
@@ -25512,7 +25653,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1237
+        "line": 1252
       },
       "story_ids": [],
       "pins": null
@@ -25618,7 +25759,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1280
+        "line": 1295
       },
       "story_ids": [],
       "pins": null
@@ -25729,7 +25870,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1362
+        "line": 1377
       },
       "story_ids": [],
       "pins": null
@@ -25868,7 +26009,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1714
+        "line": 1729
       },
       "story_ids": [],
       "pins": null
@@ -25999,7 +26140,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1770
+        "line": 1785
       },
       "story_ids": [],
       "pins": null
@@ -26138,7 +26279,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1934
+        "line": 1949
       },
       "story_ids": [],
       "pins": null
@@ -26277,7 +26418,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1966
+        "line": 1981
       },
       "story_ids": [],
       "pins": null
@@ -26412,7 +26553,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2022
+        "line": 2037
       },
       "story_ids": [],
       "pins": null
@@ -26532,7 +26673,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2568
+        "line": 2583
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -26663,7 +26804,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2728
+        "line": 2743
       },
       "story_ids": [],
       "pins": null
@@ -26781,7 +26922,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2878
+        "line": 2893
       },
       "story_ids": [],
       "pins": null
@@ -26883,7 +27024,7 @@
         "id": "case",
         "kind": null,
         "canonical": "Case",
-        "definition": "One row of a parametrized scenario \u2014 a single tuple of parameter values, its status, and any error.",
+        "definition": "One row of a parametrized scenario \u2014 its node id, a single tuple of parameter values, its status, and any error.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 27

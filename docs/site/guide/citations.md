@@ -90,7 +90,7 @@ The part after `#` names the target:
 
 | Target | Fragment |
 |---|---|
-| Scenario | `#scenario=<node id>` — for a parametrized scenario, without the `[case]` part |
+| Scenario | `#scenario=<node id>` — for a parametrized scenario, any case's node id |
 | Tag | `#tag=<tag>` |
 | Story | `#view=stories&story=<story id>` |
 

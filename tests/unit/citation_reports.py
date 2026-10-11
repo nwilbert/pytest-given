@@ -25,12 +25,16 @@ def scenario_(
     status: Status = 'passed',
     tags: tuple[str, ...] = (),
     grouped: bool = False,
+    other_cases: tuple[str, ...] = (),
     stories: tuple[str, ...] = (),
 ) -> Scenario:
     table = (
         ParameterTable(
             columns=[ParameterColumn(id=param_id('x'), name='x', kind='param')],
-            cases=[ParameterCase(values=[1], status=status)],
+            cases=[
+                ParameterCase(id=NodeId(case_id), values=[1], status=status)
+                for case_id in (node_id, *other_cases)
+            ],
         )
         if grouped
         else None

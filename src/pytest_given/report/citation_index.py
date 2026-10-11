@@ -81,6 +81,7 @@ class CitationIndex:
         self, report: ReportData, story_scenarios: Mapping[StoryId, list[Scenario]]
     ) -> None:
         self.scenarios = _citable_scenarios(report)
+        self.cited_by_case = _cited_by_case(self.scenarios)
         # Under a tag and each of its prefixes, as `app.js`'s `underPrefix`
         # matches a `#tag=` link to the scenarios it opens.
         tagged: dict[str, list[Scenario]] = {}
@@ -136,6 +137,18 @@ def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
         alone = scenario.parameters is not None and grouped_bases[base] == 1
         cited[base if alone else scenario.id] = scenario
     return cited
+
+
+def _cited_by_case(cited: Mapping[NodeId, Scenario]) -> dict[NodeId, NodeId]:
+    """The cited id of each later case of a group cited by its first case's id,
+    which no base node id names."""
+    return {
+        case.id: cited_id
+        for cited_id, scenario in cited.items()
+        if scenario.parameters is not None and cited_id == scenario.id
+        for case in scenario.parameters.cases
+        if case.id != cited_id
+    }
 
 
 def _rollup(title: str, fragment: str, scenarios: list[Scenario]) -> Citation:

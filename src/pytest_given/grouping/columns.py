@@ -81,6 +81,7 @@ class ColumnBuilder:
             columns=columns,
             cases=[
                 ParameterCase(
+                    id=case.id,
                     values=[self.cell(column.id, case.id) for column in columns],
                     status=case.status,
                     error=case.error,

@@ -113,9 +113,12 @@ def test_scenario_defaults() -> None:
 
 
 def test_parameter_table() -> None:
-    case1 = ParameterCase(values=[1, 0], status='passed')
+    case1 = ParameterCase(id=NodeId('t.py::test_x[1]'), values=[1, 0], status='passed')
     case2 = ParameterCase(
-        values=[2, 1], status='failed', error=ErrorInfo(message='fail')
+        id=NodeId('t.py::test_x[2]'),
+        values=[2, 1],
+        status='failed',
+        error=ErrorInfo(message='fail'),
     )
     table = ParameterTable(
         columns=[
@@ -465,6 +468,7 @@ def test_parameter_table_carries_typed_columns() -> None:
         ],
         cases=[
             ParameterCase(
+                id=NodeId('t.py::test_x[3]'),
                 values=[
                     200,
                     '2.0',

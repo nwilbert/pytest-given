@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-10T17:58:54.056164+00:00",
+    "timestamp": "2026-10-11T12:03:58.015802+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "091115399ea659a0aa10bce9a91d8c0356c75eb5",
+    "commit_sha": "effeb484ef740f87b4c38600b23d0f05e4c09fba",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -213,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 79,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -284,6 +284,7 @@
         ],
         "cases": [
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]",
             "values": [
               1,
               false
@@ -292,6 +293,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[2-True]",
             "values": [
               2,
               true
@@ -300,6 +302,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[3-True]",
             "values": [
               3,
               true
@@ -308,6 +311,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[1.5-True]",
             "values": [
               1.5,
               true
@@ -502,6 +506,7 @@
         ],
         "cases": [
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]",
             "values": [
               200
             ],
@@ -509,6 +514,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[350]",
             "values": [
               350
             ],
@@ -711,6 +717,7 @@
         ],
         "cases": [
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[200]",
             "values": [
               200
             ],
@@ -718,6 +725,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[300]",
             "values": [
               300
             ],
@@ -1076,6 +1084,7 @@
         ],
         "cases": [
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]",
             "values": [
               "vanilla",
               {
@@ -1089,6 +1098,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[mocha]",
             "values": [
               "mocha",
               {
@@ -1579,7 +1589,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 47,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1744,7 +1754,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 47,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -1915,6 +1925,7 @@
         ],
         "cases": [
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]",
             "values": [
               1
             ],
@@ -1922,6 +1933,7 @@
             "error": null
           },
           {
+            "id": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[2]",
             "values": [
               2
             ],

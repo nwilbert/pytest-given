@@ -86,6 +86,21 @@ def test_two_groups_of_one_function_resolve_by_no_shared_name() -> None:
     assert resolver.resolve(Target('scenario', 't.py::test_pour')) is None
 
 
+def test_any_case_of_one_of_two_groups_resolves_to_its_group() -> None:
+    resolver = _resolver(
+        scenario_(
+            't.py::test_pour[a]',
+            'Pour',
+            grouped=True,
+            other_cases=('t.py::test_pour[c]',),
+        ),
+        scenario_('t.py::test_pour[b]', 'Pour b', grouped=True),
+    )
+    assert resolver.resolve(Target('scenario', 't.py::test_pour[c]')) == Target(
+        'scenario', 't.py::test_pour[a]'
+    )
+
+
 def test_scenarios_titled_matches_exactly_after_folding() -> None:
     resolver = _resolver(
         scenario_('t.py::test_a', 'Pay  by\ncard'),

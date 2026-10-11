@@ -50,6 +50,7 @@ from pytest_given.report.html_renderer import (
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+from tests.unit.citation_reports import report_, scenario_
 
 
 def _embedded_app_data(content: str) -> dict:
@@ -289,11 +290,13 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
                                 ],
                                 'cases': [
                                     {
+                                        'id': 't.py::test_x[2]',
                                         'values': [1, False],
                                         'status': 'passed',
                                         'error': None,
                                     },
                                     {
+                                        'id': 't.py::test_x[3]',
                                         'values': [2, True],
                                         'status': 'passed',
                                         'error': None,
@@ -383,6 +386,7 @@ def test_render_grouped_placeholder_drops_format_spec_and_conversion(
                             ],
                             'cases': [
                                 {
+                                    'id': 't.py::test_x[4]',
                                     'values': [7, 'hi'],
                                     'status': 'passed',
                                     'error': None,
@@ -1004,8 +1008,18 @@ def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) ->
                         'parameters': {
                             'columns': [{'id': 'n', 'name': 'n', 'kind': 'param'}],
                             'cases': [
-                                {'values': [1], 'status': 'passed', 'error': None},
-                                {'values': [2], 'status': 'skipped', 'error': None},
+                                {
+                                    'id': 't.py::test_x[5]',
+                                    'values': [1],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
+                                {
+                                    'id': 't.py::test_x[6]',
+                                    'values': [2],
+                                    'status': 'skipped',
+                                    'error': None,
+                                },
                             ],
                         },
                         'error': None,
@@ -1232,7 +1246,12 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
                                 {'id': 'euros', 'name': 'euros', 'kind': 'param'}
                             ],
                             'cases': [
-                                {'values': [1], 'status': 'passed', 'error': None},
+                                {
+                                    'id': 't.py::test_x[7]',
+                                    'values': [1],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
                             ],
                         },
                         'error': None,
@@ -1277,11 +1296,13 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
                             ],
                             'cases': [
                                 {
+                                    'id': 't.py::test_x[8]',
                                     'values': [1, False],
                                     'status': 'passed',
                                     'error': None,
                                 },
                                 {
+                                    'id': 't.py::test_x[9]',
                                     'values': [2, True],
                                     'status': 'passed',
                                     'error': None,
@@ -1338,7 +1359,12 @@ def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None
                                 {'id': 'label', 'name': 'label', 'kind': 'param'},
                             ],
                             'cases': [
-                                {'values': [None], 'status': 'passed', 'error': None},
+                                {
+                                    'id': 't.py::test_x[10]',
+                                    'values': [None],
+                                    'status': 'passed',
+                                    'error': None,
+                                },
                             ],
                         },
                         'error': None,
@@ -2093,6 +2119,7 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                         ],
                         'cases': [
                             {
+                                'id': 't.py::test_x[11]',
                                 'values': [
                                     'v',
                                     'd',
@@ -2221,7 +2248,13 @@ def test_a_disambiguated_columns_token_takes_its_own_columns_color(
                             {'id': 'derived:0', 'name': 'price', 'kind': 'derived'},
                             {'id': 'derived:1', 'name': 'price #2', 'kind': 'derived'},
                         ],
-                        'cases': [{'values': [200, '2.0', '9.0'], 'status': 'passed'}],
+                        'cases': [
+                            {
+                                'id': 't.py::test_x[12]',
+                                'values': [200, '2.0', '9.0'],
+                                'status': 'passed',
+                            }
+                        ],
                     },
                 }
             ],
@@ -2390,7 +2423,9 @@ def _citable_report(report_url: str | None) -> ReportData:
                 tags=['spec/x'],
                 parameters=ParameterTable(
                     columns=[ParameterColumn(id=param_id('x'), name='x', kind='param')],
-                    cases=[ParameterCase(values=[1])],
+                    cases=[
+                        ParameterCase(id=NodeId('t.py::test_pour[water]'), values=[1])
+                    ],
                 ),
             )
         ],
@@ -2428,3 +2463,18 @@ def test_a_report_without_a_url_carries_no_citations() -> None:
 def test_a_grouped_scenarios_base_node_id_opens_it() -> None:
     data = _embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['cited_scenario_ids'] == {'t.py::test_pour': 't.py::test_pour[water]'}
+
+
+def test_any_case_of_one_of_two_groups_opens_its_group() -> None:
+    report = report_(
+        scenario_(
+            't.py::test_pour[a]',
+            'Pour',
+            grouped=True,
+            other_cases=('t.py::test_pour[c]',),
+        ),
+        scenario_('t.py::test_pour[b]', 'Pour b', grouped=True),
+        report_url=None,
+    )
+    data = _embedded_app_data(render_html_string(report, None))
+    assert data['cited_scenario_ids'] == {'t.py::test_pour[c]': 't.py::test_pour[a]'}

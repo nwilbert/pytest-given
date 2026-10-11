@@ -317,6 +317,21 @@ def test_group_parametrized_distinct_functions_same_name_do_not_group() -> None:
         }
 
 
+def test_each_case_keeps_its_node_id() -> None:
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(id=nid, narration=Narration(text='x'), module='m', status='passed')
+        for nid in (nid1, nid2)
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    grouped = group_parametrized(scenarios, param_info)
+    assert grouped[0].parameters is not None
+    assert [case.id for case in grouped[0].parameters.cases] == [nid1, nid2]
+
+
 def test_param_cell_unwraps_a_term_instance_to_its_display() -> None:
     glossary = Glossary()
     guest = glossary.actor('Guest')

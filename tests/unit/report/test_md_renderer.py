@@ -11,6 +11,7 @@ from pytest_given.model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    NodeId,
     ParameterCase,
     ParameterColumn,
     ParameterTable,
@@ -246,7 +247,9 @@ def test_single_case_heading_says_one_case_not_one_cases() -> None:
         steps=[Step(phase='when', narration=Narration(text='insert'))],
         parameters=ParameterTable(
             columns=[ParameterColumn(id='euros', name='euros', kind='param')],
-            cases=[ParameterCase(values=[1], status='passed')],
+            cases=[
+                ParameterCase(id=NodeId('t.py::test_x[1]'), values=[1], status='passed')
+            ],
         ),
     )
     assert '## \u2713 Pricing \u00b7 1 case\n' in render_md(_report(scn))
@@ -272,8 +275,12 @@ def test_parametrized_scenario_renders_table() -> None:
                     ParameterColumn(id='expect', name='expect', kind='param'),
                 ],
                 cases=[
-                    ParameterCase(values=[1, False], status='passed'),
-                    ParameterCase(values=[2, True], status='passed'),
+                    ParameterCase(
+                        id=NodeId('t.py::test_x[2]'), values=[1, False], status='passed'
+                    ),
+                    ParameterCase(
+                        id=NodeId('t.py::test_x[3]'), values=[2, True], status='passed'
+                    ),
                 ],
             ),
         )
@@ -314,8 +321,12 @@ def test_param_table_shows_status_column_only_when_case_statuses_differ(
         table = ParameterTable(
             columns=[ParameterColumn(id='coin', name='coin', kind='param')],
             cases=[
-                ParameterCase(values=['euro'], status=first_status),
-                ParameterCase(values=['token'], status=second_status),
+                ParameterCase(
+                    id=NodeId('t.py::test_x[4]'), values=['euro'], status=first_status
+                ),
+                ParameterCase(
+                    id=NodeId('t.py::test_x[5]'), values=['token'], status=second_status
+                ),
             ],
         )
     with when(t'the Markdown {pg["Report"].l} is rendered'):
@@ -480,8 +491,11 @@ def test_failing_case_renders_its_error_below_the_table() -> None:
         parameters=ParameterTable(
             columns=[ParameterColumn(id='coin', name='coin', kind='param')],
             cases=[
-                ParameterCase(values=['euro'], status='passed'),
                 ParameterCase(
+                    id=NodeId('t.py::test_x[6]'), values=['euro'], status='passed'
+                ),
+                ParameterCase(
+                    id=NodeId('t.py::test_x[7]'),
                     values=['token'],
                     status='failed',
                     error=ErrorInfo(
@@ -517,7 +531,11 @@ def test_param_table_escapes_pipe_in_value() -> None:
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
             columns=[ParameterColumn(id='label', name='label', kind='param')],
-            cases=[ParameterCase(values=['a|b'], status='passed')],
+            cases=[
+                ParameterCase(
+                    id=NodeId('t.py::test_x[8]'), values=['a|b'], status='passed'
+                )
+            ],
         ),
     )
     md = render_md(_report(scn))
@@ -533,7 +551,11 @@ def test_param_table_escapes_newline_in_value() -> None:
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
             columns=[ParameterColumn(id='label', name='label', kind='param')],
-            cases=[ParameterCase(values=['a\nb'], status='passed')],
+            cases=[
+                ParameterCase(
+                    id=NodeId('t.py::test_x[9]'), values=['a\nb'], status='passed'
+                )
+            ],
         ),
     )
     md = render_md(_report(scn))
@@ -554,7 +576,11 @@ def test_param_table_renders_none_value_as_text_not_blank() -> None:
         steps=[Step(phase='when', narration=Narration(text='act'))],
         parameters=ParameterTable(
             columns=[ParameterColumn(id='label', name='label', kind='param')],
-            cases=[ParameterCase(values=[None], status='passed')],
+            cases=[
+                ParameterCase(
+                    id=NodeId('t.py::test_x[10]'), values=[None], status='passed'
+                )
+            ],
         ),
     )
     md = render_md(_report(scn))
@@ -605,8 +631,11 @@ def test_a_grouped_xfailed_scenario_keeps_its_case_count_and_labels_the_case() -
         parameters=ParameterTable(
             columns=[ParameterColumn(id='coin', name='coin', kind='param')],
             cases=[
-                ParameterCase(values=['euro'], status='passed'),
                 ParameterCase(
+                    id=NodeId('t.py::test_x[11]'), values=['euro'], status='passed'
+                ),
+                ParameterCase(
+                    id=NodeId('t.py::test_x[12]'),
                     values=['token'],
                     status='xfailed',
                     error=ErrorInfo(message='tokens are planned'),
@@ -637,6 +666,7 @@ def _attachment_table(*, short: str | None, long: str | None) -> ParameterTable:
         ],
         cases=[
             ParameterCase(
+                id=NodeId('t.py::test_x[13]'),
                 values=[350, Attachment(label='state', content=content)],
                 status='passed',
             ),
@@ -707,7 +737,8 @@ def test_a_block_key_leaves_out_a_param_value_too_long_to_inline() -> None:
         ],
         cases=[
             ParameterCase(
-                values=['no table', '# no table\n', Attachment('file', '# no\ntable')]
+                id=NodeId('t.py::test_x[14]'),
+                values=['no table', '# no table\n', Attachment('file', '# no\ntable')],
             ),
         ],
     )
@@ -722,8 +753,14 @@ def test_a_block_key_falls_back_to_the_row_number() -> None:
             ParameterColumn(id='attachment:0', name='file', kind='attachment'),
         ],
         cases=[
-            ParameterCase(values=['a\nb', Attachment('file', 'one\ntwo')]),
-            ParameterCase(values=['c\nd', Attachment('file', 'three\nfour')]),
+            ParameterCase(
+                id=NodeId('t.py::test_x[15]'),
+                values=['a\nb', Attachment('file', 'one\ntwo')],
+            ),
+            ParameterCase(
+                id=NodeId('t.py::test_x[16]'),
+                values=['c\nd', Attachment('file', 'three\nfour')],
+            ),
         ],
     )
     md = render_md(_report_with(table))
@@ -754,6 +791,7 @@ def test_two_columns_sharing_a_label_get_distinct_block_headers() -> None:
         ],
         cases=[
             ParameterCase(
+                id=NodeId('t.py::test_x[17]'),
                 values=[
                     350,
                     Attachment(label='log', content='first\nline'),
@@ -792,7 +830,11 @@ def test_a_generated_column_with_no_value_for_a_case_renders_blank() -> None:
             ParameterColumn(id='cup_size', name='cup_size', kind='param'),
             ParameterColumn(id='attachment:0', name='state', kind='attachment'),
         ],
-        cases=[ParameterCase(values=[350, None], status='passed')],
+        cases=[
+            ParameterCase(
+                id=NodeId('t.py::test_x[18]'), values=[350, None], status='passed'
+            )
+        ],
     )
     md = render_md(_report_with(table))
     assert '| 350 |  |' in md
@@ -806,7 +848,11 @@ def test_a_derived_column_cell_renders_through_the_ordinary_cell_path() -> None:
             ParameterColumn(id='cup_size', name='cup_size', kind='param'),
             ParameterColumn(id='derived:0', name='price', kind='derived'),
         ],
-        cases=[ParameterCase(values=[350, '3.5'], status='passed')],
+        cases=[
+            ParameterCase(
+                id=NodeId('t.py::test_x[19]'), values=[350, '3.5'], status='passed'
+            )
+        ],
     )
     md = render_md(_report_with(table))
     assert '| 350 | 3.5 |' in md

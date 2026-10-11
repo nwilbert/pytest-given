@@ -330,6 +330,7 @@ def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
     status = _literal(d.get('status', 'passed'), STATUSES, 'parameter case status')
     return ParameterCase(
+        id=NodeId(d['id']),
         values=[_cell_from_json(v) for v in d['values']],
         status=status,
         error=_error_from_dict(d.get('error')),
