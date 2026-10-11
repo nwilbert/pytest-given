@@ -3,7 +3,7 @@ and read back as the title it renders."""
 
 import re
 
-from .markdown_links import ASCII_PUNCTUATION, backtick_run_end, code_span_end
+from ..model import ASCII_PUNCTUATION, backtick_run_end, code_span_end
 
 # Outside a code span, what CommonMark or GFM give inline meaning, beside `_`,
 # which has a rule of its own: closing the link early, emphasis,

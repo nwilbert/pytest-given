@@ -6,8 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from ..citations import CitationsResult, check_citations, markdown_documents
 from ..model import PytestGivenError, plural, report_from_dict, resolve_report_url
-from ..report import CitationsResult, check_citations, markdown_documents
 from .report import load_report_json
 
 

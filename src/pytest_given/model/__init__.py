@@ -1,9 +1,9 @@
 """The leaf: the report schema, its serde, and the text rules packages that
 cannot import each other still have to agree on.
 
-Imports nothing else in the package — `capture`, `lint`, `report` and
-`grouping` all depend on this, so anything landing here is reachable from every
-one of them.
+Imports nothing else in the package — `capture`, `lint`, `report`, `grouping`
+and `citations` all depend on this, so anything landing here is reachable from
+every one of them.
 """
 
 from .errors import (
@@ -87,9 +87,19 @@ from .steps import (
     iter_steps,
     walk_steps,
 )
-from .text import EMPHASIS, derived_id, id_derive, plural, s_form
+from .text import (
+    ASCII_PUNCTUATION,
+    EMPHASIS,
+    backtick_run_end,
+    code_span_end,
+    derived_id,
+    id_derive,
+    plural,
+    s_form,
+)
 
 __all__ = [
+    'ASCII_PUNCTUATION',
     'CONTENT_TYPES',
     'EMPHASIS',
     'PHASES',
@@ -145,7 +155,9 @@ __all__ = [
     'TermId',
     'TermKind',
     'TracebackFrame',
+    'backtick_run_end',
     'case_suffix',
+    'code_span_end',
     'derived_id',
     'id_derive',
     'iter_narrations',

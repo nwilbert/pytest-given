@@ -1,4 +1,4 @@
-"""Text rules two packages that cannot import each other have to agree on.
+"""Text rules more than one package has to agree on.
 
 `EMPHASIS` is matched by `capture/markdown_glossary.py`, which *strips* the
 markup, and by `report/inline_markdown.py`, which *renders* it — a term written
@@ -11,6 +11,9 @@ as the same term; `plural` so the lint summary and the report count alike.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
+
+`code_span_end` so the citation link text `report` escapes is read back by
+the `citations` link scanner with the same code spans.
 """
 
 import re
@@ -26,6 +29,9 @@ from .errors import PytestGivenError
 # (`work_object`) is left untouched — a paired dunder (`__init__`) is strong
 # emphasis, which is what CommonMark makes it too.
 EMPHASIS = re.compile(r'`(.+?)`|\*\*(.+?)\*\*|__(.+?)__|\*(.+?)\*')
+
+# What a backslash escapes in CommonMark.
+ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
 
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
 _SIBILANT_ENDINGS = ('s', 'x', 'z', 'ch', 'sh')
@@ -71,3 +77,23 @@ def s_form(text: str) -> str:
     if _CONSONANT_Y.search(text):
         return f'{text[:-1]}ies'
     return f'{text}s'
+
+
+def code_span_end(text: str, start: int) -> int | None:
+    """Where the code span opening at `start` ends, or None when no backtick
+    run of exactly its width closes it."""
+    width = backtick_run_end(text, start) - start
+    position = start + width
+    while (found := text.find('`', position)) != -1:
+        run_end = backtick_run_end(text, found)
+        if run_end - found == width:
+            return run_end
+        position = run_end
+    return None
+
+
+def backtick_run_end(text: str, start: int) -> int:
+    end = start
+    while end < len(text) and text[end] == '`':
+        end += 1
+    return end

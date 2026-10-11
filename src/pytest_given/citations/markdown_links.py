@@ -17,9 +17,10 @@ from dataclasses import dataclass
 from html.entities import html5
 from typing import NamedTuple
 
+from ..model import ASCII_PUNCTUATION, backtick_run_end, code_span_end
+
 type Span = tuple[int, int]
 
-ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
 VARIATION_SELECTOR = '\ufe0f'
 
 
@@ -91,26 +92,6 @@ def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
         for run in _inline_runs(source)
         for link in _links_in(run, line_starts, longest_first)
     ]
-
-
-def code_span_end(text: str, start: int) -> int | None:
-    """Where the code span opening at `start` ends, or None when no backtick
-    run of exactly its width closes it."""
-    width = backtick_run_end(text, start) - start
-    position = start + width
-    while (found := text.find('`', position)) != -1:
-        run_end = backtick_run_end(text, found)
-        if run_end - found == width:
-            return run_end
-        position = run_end
-    return None
-
-
-def backtick_run_end(text: str, start: int) -> int:
-    end = start
-    while end < len(text) and text[end] == '`':
-        end += 1
-    return end
 
 
 # --- Block structure ---

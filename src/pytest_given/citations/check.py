@@ -14,10 +14,18 @@ from typing import Literal, NamedTuple
 from urllib.parse import unquote, urlsplit
 
 from ..model import STATUSES, PytestGivenError, ReportData, ReportUrl
-from .citation_index import CitationIndex, Target, parse_fragment, report_fragment
-from .link_text import fold_whitespace, link_text, plain_link_text
+from ..report import (
+    CITATION_GLYPH,
+    CITATION_GLYPH_PLACEHOLDERS,
+    CitationIndex,
+    Target,
+    fold_whitespace,
+    link_text,
+    parse_fragment,
+    plain_link_text,
+    report_fragment,
+)
 from .markdown_links import VARIATION_SELECTOR, MarkdownLink, scan_links
-from .text import CITATION_GLYPH, CITATION_GLYPH_PLACEHOLDERS
 
 type FindingKind = Literal[
     'repointed', 'fragment', 'missing', 'stale', 'failed', 'mistyped', 'stray-summary'

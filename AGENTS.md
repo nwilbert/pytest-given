@@ -40,15 +40,16 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 
 ## Architecture
 
-`src/pytest_given/` is five library subpackages plus two entry points, with a
+`src/pytest_given/` is six library subpackages plus two entry points, with a
 strict dependency direction (convention, not lint-enforced):
 
 ```
 model/                     the leaf — schema, serde, errors, shared text rules
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
-plugin/   cli/             the entry points; may import all five, and hold
-                           nothing the five could
+citations/                 on model/ + report/
+plugin/   cli/             the entry points; may import all six, and hold
+                           nothing the six could
 ```
 
 What no filename tells you:
@@ -59,9 +60,13 @@ What no filename tells you:
   a bare `pytest` failing on one is the point, not a side effect.
 - `capture/` imports pytest nowhere, so all of it is unit-testable without a
   session; a stray step warns with `model.PytestGivenWarning`, not pytest's.
+- `citations/` reads and edits the user's Markdown documents; what a citation
+  should say is `report`'s `CitationIndex`, since the HTML's copy buttons write
+  the same lines.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
-  report) and `lint.run_lint`. Both entry points reach the sinks through
+  report), `lint.run_lint` and `citations.check_citations` (every document
+  read before any is written). Both entry points reach the sinks through
   `emit_sinks`, which is what keeps `pytest-given report` behaving like the
   plugin; the lint is the plugin's alone, since the CLI re-renders a report
   rather than running a suite.

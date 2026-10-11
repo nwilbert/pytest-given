@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
+from pytest_given.citations import CitationsResult, check_citations, markdown_documents
 from pytest_given.model import (
     Metadata,
     Narration,
@@ -20,7 +21,6 @@ from pytest_given.model import (
     Status,
     param_id,
 )
-from pytest_given.report import CitationsResult, check_citations, markdown_documents
 from tests.ubiquitous_language import pg
 
 URL = 'https://example.org/report.html'

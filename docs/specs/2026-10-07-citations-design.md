@@ -416,9 +416,9 @@ area tag.
   and stories a report holds. A story's scenarios come from `scenarios_by_story`; tag matching
   has no Python counterpart yet, so the index files each scenario under every prefix of its tags,
   and a unit test counts each tag citation against `app.js`'s `underPrefix` rule.
-- `report/citations.py` (new) — reads report links out of Markdown, computes findings and
-  updates. `report.check_citations` exposes the whole job, the way `emit_sinks` does. Reading is a
-  hand-written scanner — fences, indented code, backtick runs,
+- `citations/` (new package, on `model/` and `report/`) — reads report links out of Markdown,
+  computes findings and updates. `citations.check_citations` exposes the whole job, the way
+  `emit_sinks` does. Reading is a hand-written scanner — fences, indented code, backtick runs,
   glyph, link, summary, table rows — because `update` needs each part's exact source position,
   which no Markdown parser's inline tokens carry; a parser would only take over block structure, at
   the cost of a runtime dependency.
@@ -486,9 +486,9 @@ area tag.
 
 ## Acceptance criteria
 
-- ✅ [`citations update` rewrites a stale citation to its target's glyph, text and summary](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/report/test_citations.py::test_update_rewrites_a_stale_citation)
-- ✅ [A plain report link claims only that its target exists](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/report/test_citations.py::test_a_plain_report_link_claims_only_that_its_target_exists)
-- ✅ [A citation whose target left the report is marked ❓ and recovers once it is back](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/report/test_citations.py::test_a_citation_to_a_gone_target_is_marked_and_recovers)
+- ✅ [`citations update` rewrites a stale citation to its target's glyph, text and summary](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/citations/test_check.py::test_update_rewrites_a_stale_citation)
+- ✅ [A plain report link claims only that its target exists](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists)
+- ✅ [A citation whose target left the report is marked ❓ and recovers once it is back](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#scenario=tests/unit/citations/test_check.py::test_a_citation_to_a_gone_target_is_marked_and_recovers)
 
 ## Out of scope
 

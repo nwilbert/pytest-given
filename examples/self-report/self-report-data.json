@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-10T17:58:52.770172+00:00",
+    "timestamp": "2026-10-11T09:07:18.847134+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "091115399ea659a0aa10bce9a91d8c0356c75eb5",
+    "commit_sha": "ab610d09ee93d674c8e69ea9ccc95e1adf2756fb",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -30,7 +30,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 99,
+      "duration_ms": 106,
       "steps": [
         {
           "phase": "given",
@@ -112,7 +112,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -221,7 +221,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -365,7 +365,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -542,7 +542,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -609,7 +609,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -818,7 +818,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -888,7 +888,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -1008,7 +1008,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1143,7 +1143,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 78,
       "steps": [
         {
           "phase": "given",
@@ -1267,7 +1267,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 103,
+      "duration_ms": 78,
       "steps": [
         {
           "phase": "given",
@@ -1431,7 +1431,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -1548,7 +1548,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 157,
+      "duration_ms": 166,
       "steps": [
         {
           "phase": "given",
@@ -1621,7 +1621,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1793,7 +1793,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -1932,7 +1932,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2077,7 +2077,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2230,7 +2230,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2364,7 +2364,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2487,7 +2487,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 136,
+      "duration_ms": 138,
       "steps": [
         {
           "phase": "given",
@@ -2671,7 +2671,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 93,
+      "duration_ms": 92,
       "steps": [
         {
           "phase": "given",
@@ -2767,7 +2767,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 122,
+      "duration_ms": 131,
       "steps": [
         {
           "phase": "given",
@@ -2928,7 +2928,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -3022,7 +3022,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -3107,7 +3107,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -3184,7 +3184,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 83,
       "steps": [
         {
           "phase": "given",
@@ -3357,7 +3357,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -3442,7 +3442,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -3549,7 +3549,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 162,
       "steps": [
         {
           "phase": "given",
@@ -3762,7 +3762,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -3906,7 +3906,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -3980,7 +3980,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -4121,7 +4121,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 323,
+      "duration_ms": 342,
       "steps": [
         {
           "phase": "given",
@@ -4280,7 +4280,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -4382,7 +4382,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -4487,7 +4487,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -4615,7 +4615,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -4727,7 +4727,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -6254,7 +6254,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6560,7 +6560,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -6655,7 +6655,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7291,7 +7291,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -7570,7 +7570,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -7959,7 +7959,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -16063,7 +16063,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -17168,6 +17168,409 @@
       "pins": null
     },
     {
+      "id": "tests/unit/citations/test_check.py::test_update_rewrites_a_stale_citation",
+      "narration": {
+        "text": "`citations update` rewrites a stale citation to its target's glyph, text and summary",
+        "parts": [
+          {
+            "value": "`citations update` rewrites a stale "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg['Citation'].l"
+          },
+          {
+            "value": " to its target's glyph, text and summary"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations"
+      ],
+      "status": "passed",
+      "duration_ms": 6,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report where the tag `checkout` has a passed and an xfailed scenario",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " where the tag `checkout` has a passed and an xfailed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document citing the tag under another name, as all passed",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Checkout](https://example.org/report.html#tag=checkout) (1 \u2705)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its glyph, text and summary read what the report says",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\ud83d\udd35 [checkout](https://example.org/report.html#tag=checkout) (1 \u2705 \u00b7 1 \ud83d\udd35)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no finding remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 93
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists",
+      "narration": {
+        "text": "A plain report link claims only that its target exists",
+        "parts": [
+          {
+            "value": "A plain "
+          },
+          {
+            "term_id": "report-link",
+            "display": "report link",
+            "expression": "pg[\"Report link\"].l"
+          },
+          {
+            "value": " claims only that its target exists"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations"
+      ],
+      "status": "passed",
+      "duration_ms": 4,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report whose one scenario fails",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " whose one "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " fails"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document linking it, and a deleted test, in its own words",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "See [how paying works](https://example.org/report.html#scenario=t.py::test_pay) and [refunds](https://example.org/report.html#scenario=t.py::test_refund).\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the link to the deleted test is a finding",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the document is left as written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 119
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_citation_to_a_gone_target_is_marked_and_recovers",
+      "narration": {
+        "text": "A citation whose target left the report is marked \u2753 and recovers once it is back",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg[\"Citation\"].l"
+          },
+          {
+            "value": " whose target left the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": " is marked \u2753 and recovers once it is back"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations"
+      ],
+      "status": "passed",
+      "duration_ms": 4,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a citation of a passing scenario",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " of a passing "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is updated against a report that lacks the scenario",
+            "parts": [
+              {
+                "value": "it is updated against a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " that lacks the scenario"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it is marked \u2753, keeping its target and text",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "marked document",
+              "content": "\u2753 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it stays a finding",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is updated once the report holds the scenario again",
+            "parts": [
+              {
+                "value": "it is updated once the "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " holds the scenario again"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it reads as current again",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 142
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body",
       "narration": {
         "text": "Narration lint flags a step whose body does nothing",
@@ -17193,7 +17596,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -17610,7 +18013,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -18647,409 +19050,6 @@
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
         "line": 309
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/report/test_citations.py::test_update_rewrites_a_stale_citation",
-      "narration": {
-        "text": "`citations update` rewrites a stale citation to its target's glyph, text and summary",
-        "parts": [
-          {
-            "value": "`citations update` rewrites a stale "
-          },
-          {
-            "term_id": "citation",
-            "display": "citation",
-            "expression": "pg['Citation'].l"
-          },
-          {
-            "value": " to its target's glyph, text and summary"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_citations",
-      "tags": [
-        "spec/citations"
-      ],
-      "status": "passed",
-      "duration_ms": 5,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a report where the tag `checkout` has a passed and an xfailed scenario",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " where the tag `checkout` has a passed and an xfailed "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a document citing the tag under another name, as all passed",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "document",
-              "content": "\u2705 [Checkout](https://example.org/report.html#tag=checkout) (1 \u2705)\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the document is updated",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "its glyph, text and summary read what the report says",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "updated document",
-              "content": "\ud83d\udd35 [checkout](https://example.org/report.html#tag=checkout) (1 \u2705 \u00b7 1 \ud83d\udd35)\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "no finding remains",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_citations.py",
-        "line": 96
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/report/test_citations.py::test_a_plain_report_link_claims_only_that_its_target_exists",
-      "narration": {
-        "text": "A plain report link claims only that its target exists",
-        "parts": [
-          {
-            "value": "A plain "
-          },
-          {
-            "term_id": "report-link",
-            "display": "report link",
-            "expression": "pg[\"Report link\"].l"
-          },
-          {
-            "value": " claims only that its target exists"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_citations",
-      "tags": [
-        "spec/citations"
-      ],
-      "status": "passed",
-      "duration_ms": 1,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a report whose one scenario fails",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " whose one "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              },
-              {
-                "value": " fails"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a document linking it, and a deleted test, in its own words",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "document",
-              "content": "See [how paying works](https://example.org/report.html#scenario=t.py::test_pay) and [refunds](https://example.org/report.html#scenario=t.py::test_refund).\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the document is updated",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "only the link to the deleted test is a finding",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the document is left as written",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_citations.py",
-        "line": 122
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/report/test_citations.py::test_a_citation_to_a_gone_target_is_marked_and_recovers",
-      "narration": {
-        "text": "A citation whose target left the report is marked \u2753 and recovers once it is back",
-        "parts": [
-          {
-            "value": "A "
-          },
-          {
-            "term_id": "citation",
-            "display": "citation",
-            "expression": "pg[\"Citation\"].l"
-          },
-          {
-            "value": " whose target left the "
-          },
-          {
-            "term_id": "report",
-            "display": "report",
-            "expression": "pg[\"Report\"].l"
-          },
-          {
-            "value": " is marked \u2753 and recovers once it is back"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_citations",
-      "tags": [
-        "spec/citations"
-      ],
-      "status": "passed",
-      "duration_ms": 4,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a citation of a passing scenario",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "citation",
-                "display": "citation",
-                "expression": "pg[\"Citation\"].l"
-              },
-              {
-                "value": " of a passing "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "document",
-              "content": "\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "it is updated against a report that lacks the scenario",
-            "parts": [
-              {
-                "value": "it is updated against a "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " that lacks the scenario"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "it is marked \u2753, keeping its target and text",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "marked document",
-              "content": "\u2753 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "it stays a finding",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "it is updated once the report holds the scenario again",
-            "parts": [
-              {
-                "value": "it is updated once the "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " holds the scenario again"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "it reads as current again",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_citations.py",
-        "line": 145
       },
       "story_ids": [],
       "pins": null
@@ -22051,7 +22051,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 147,
       "steps": [
         {
           "phase": "given",
@@ -24972,7 +24972,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",

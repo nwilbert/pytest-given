@@ -3,7 +3,7 @@ update rewrites."""
 
 import pytest
 
-from pytest_given.report.markdown_links import MarkdownLink, scan_links
+from pytest_given.citations.markdown_links import MarkdownLink, scan_links
 
 GLYPHS = ('✅', '❌', '🟠', '🔵', '❓', '✓', '✗', '○', '⊗', '?')
 

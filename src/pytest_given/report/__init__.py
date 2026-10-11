@@ -6,12 +6,8 @@ entry points in `cli/`, which is where the `pytest-given report` subcommand
 lives — importing this package must not drag argparse in behind it.
 """
 
-from .citations import (
-    CitationFinding,
-    CitationsResult,
-    check_citations,
-    markdown_documents,
-)
+from .citation_index import CitationIndex, Target, parse_fragment, report_fragment
+from .link_text import fold_whitespace, link_text, plain_link_text
 from .sinks import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
@@ -27,25 +23,31 @@ from .source_link import (
     detect_commit_sha,
     resolve_source_link_template,
 )
+from .text import CITATION_GLYPH, CITATION_GLYPH_PLACEHOLDERS
 from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [
+    'CITATION_GLYPH',
+    'CITATION_GLYPH_PLACEHOLDERS',
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
     'DEFAULT_THEME',
     'MD_SUFFIXES',
     'SOURCE_LINK_HELP',
     'THEME_HELP',
-    'CitationFinding',
-    'CitationsResult',
+    'CitationIndex',
     'RenderedFile',
     'RenderedSinks',
     'SinkConfig',
+    'Target',
     'Theme',
-    'check_citations',
     'detect_commit_sha',
     'emit_sinks',
-    'markdown_documents',
+    'fold_whitespace',
+    'link_text',
+    'parse_fragment',
+    'plain_link_text',
+    'report_fragment',
     'resolve_source_link_template',
     'resolve_theme',
     'sink_failure',
