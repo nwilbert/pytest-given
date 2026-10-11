@@ -429,9 +429,25 @@ def citations(session: nox.Session) -> None:
 
 
 @nox.session
+def reports_current(session: nox.Session) -> None:
+    """Fail on a stale committed report, which `citations` would check documents
+    against unnoticed: regenerate every report, then diff the tracked Markdown —
+    the reports' `.md` and the documents whose citations that updated. Markdown
+    alone, as it carries no commit SHA, timestamp or duration."""
+    _sync(session, 'test', include_project=True)
+    _regenerate_examples(session)
+    _regenerate_self_report(session)
+    session.run('git', 'diff', '--exit-code', '--', '*.md', external=True)
+
+
+@nox.session
 def examples(session: nox.Session) -> None:
     """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
     _sync(session, 'test', include_project=True)
+    _regenerate_examples(session)
+
+
+def _regenerate_examples(session: nox.Session) -> None:
     for test_file, slug, title, extra in _EXAMPLES:
         session.run(
             'pytest',
@@ -634,6 +650,10 @@ def self_report(session: nox.Session) -> None:
     the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
     """
     _sync(session, 'test', include_project=True)
+    _regenerate_self_report(session)
+
+
+def _regenerate_self_report(session: nox.Session) -> None:
     # The scenarios of the whole backend suite: tests/unit narrates the
     # internals, and tests/integration narrates the plugin's outermost behavior
     # through inner pytester runs. Most of the @scenario text under
