@@ -193,6 +193,30 @@ def test_code_and_html_blocks_hold_no_links(source: str) -> None:
     assert scan_links(source, GLYPHS) == []
 
 
+@pytest.mark.parametrize(
+    'source',
+    [
+        "<script>\n\nvar a = '[x](u)';\n</script>\n[after](v)\n",
+        '<pre>\n\n[x](u)\n</pre>\n[after](v)\n',
+        '<style>\n\n[x](u)\n</STYLE>\n[after](v)\n',
+        '<textarea>\n\n[x](u)\n</textarea>\n[after](v)\n',
+        '<?php\n\n[x](u)\n?>\n[after](v)\n',
+        '<!DOCTYPE html\n\n[x](u)\n>\n[after](v)\n',
+        '<![CDATA[\n\n[x](u)\n]]>\n[after](v)\n',
+        'para\n<pre>\n\n[x](u)\n</pre>\n[after](v)\n',
+    ],
+)
+def test_an_html_block_with_an_end_marker_runs_past_blank_lines(source: str) -> None:
+    assert [link.url for link in scan_links(source)] == ['v']
+
+
+@pytest.mark.parametrize(
+    'source', ['<script>[x](u)</script>\n\n[after](v)\n', '<pre></pre>\n[after](v)\n']
+)
+def test_an_html_block_ends_on_its_opening_line(source: str) -> None:
+    assert [link.url for link in scan_links(source)] == ['v']
+
+
 def test_a_fence_opened_on_a_list_marker_line_closes_in_the_item() -> None:
     assert _one('- ```\n  ✅ [t](u)\n  ```\n\n[after](v)\n').url == 'v'
 

@@ -163,6 +163,11 @@ class _Fence:
     quote_depth: int
 
 
+class _HtmlEnd(NamedTuple):
+    marker: re.Pattern[str]
+    quote_depth: int
+
+
 class _ListItem(NamedTuple):
     quote_depth: int
     column: int
@@ -188,6 +193,18 @@ _HTML_BLOCK_START = re.compile(rf'</?(?:{_BLOCK_TAGS})(?:[ \t>]|/>|$)', re.IGNOR
 _HTML_TAG_LINE = re.compile(
     r'(?:<[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>|</[A-Za-z][A-Za-z0-9-]*\s*>)[ \t]*$'
 )
+# The HTML blocks that run, blank lines and all, to the first line holding
+# their end marker: each one's start, and its end.
+_MARKED_HTML_BLOCKS = (
+    (
+        re.compile(r'<(?:script|pre|style|textarea)(?:[ \t>]|$)', re.IGNORECASE),
+        re.compile(r'</(?:script|pre|style|textarea)>', re.IGNORECASE),
+    ),
+    (re.compile('<!--'), re.compile('-->')),
+    (re.compile(r'<\?'), re.compile(r'\?>')),
+    (re.compile('<![A-Za-z]'), re.compile('>')),
+    (re.compile(r'<!\[CDATA\['), re.compile(r'\]\]>')),
+)
 
 
 def _inline_runs(source: str) -> Iterator[_Run]:
@@ -195,9 +212,10 @@ def _inline_runs(source: str) -> Iterator[_Run]:
     paragraph: list[_Line] = []
     paragraph_depth = 0
     fence: _Fence | None = None
-    # '-->' while inside an HTML comment, '' inside an HTML block that a blank
-    # line ends.
-    html_end: str | None = None
+    # Inside an HTML block: the end marker of one that has its own, else
+    # whether in one that a blank line ends.
+    html_end: _HtmlEnd | None = None
+    in_html_block = False
     in_table = False
     table_depth = 0
     skip_delimiter = False
@@ -218,13 +236,15 @@ def _inline_runs(source: str) -> Iterator[_Run]:
         depth, prefix = _quote_prefix(raw, None)
         content = raw[prefix:]
         line = _Line(line_start + prefix, content, line_start + len(raw))
-        if html_end == '-->':
-            if '-->' in content:
+        if html_end is not None:
+            # Read inside the block's own quote alone: a `>` past it is text.
+            _, inside = _quote_prefix(raw, html_end.quote_depth)
+            if html_end.marker.search(raw, inside):
                 html_end = None
             continue
-        if html_end == '' and content.strip():
+        if in_html_block and content.strip():
             continue
-        html_end = None
+        in_html_block = False
         # A line ends the list items it is not indented into, or whose quote
         # it leaves — unless it continues a paragraph lazily, which keeps them.
         # A quote marker outside an item it ends opens a new quote instead.
@@ -310,10 +330,13 @@ def _inline_runs(source: str) -> Iterator[_Run]:
                 case 'fence':
                     run = len(rest) - len(rest.lstrip(rest[0]))
                     fence = _Fence(rest[0], run, base, depth)
-                case 'html-comment':
-                    html_end = None if '-->' in rest[4:] else '-->'
+                case 'marked-html':
+                    marker = _marked_html_end(rest)
+                    assert marker is not None
+                    if not marker.search(rest):
+                        html_end = _HtmlEnd(marker, depth)
                 case 'html':
-                    html_end = ''
+                    in_html_block = True
                 case 'heading':
                     yield _Run.of_lines([line])
             continue
@@ -342,7 +365,7 @@ def _inline_runs(source: str) -> Iterator[_Run]:
 
 
 type _BlockOpener = Literal[
-    'fence', 'html-comment', 'html', 'heading', 'setext-underline', 'thematic-break'
+    'fence', 'marked-html', 'html', 'heading', 'setext-underline', 'thematic-break'
 ]
 
 
@@ -350,8 +373,8 @@ def _block_opener(rest: str, *, paragraph: bool, lazy: bool) -> _BlockOpener | N
     """The block a line opens that ends the paragraph or table before it."""
     if _FENCE_OPEN.match(rest):
         return 'fence'
-    if rest.startswith('<!--'):
-        return 'html-comment'
+    if _marked_html_end(rest):
+        return 'marked-html'
     if _HTML_BLOCK_START.match(rest) or (not paragraph and _HTML_TAG_LINE.match(rest)):
         return 'html'
     if _ATX_HEADING.match(rest):
@@ -360,6 +383,13 @@ def _block_opener(rest: str, *, paragraph: bool, lazy: bool) -> _BlockOpener | N
         return 'setext-underline'
     if _THEMATIC_BREAK.match(rest):
         return 'thematic-break'
+    return None
+
+
+def _marked_html_end(rest: str) -> re.Pattern[str] | None:
+    for start, end in _MARKED_HTML_BLOCKS:
+        if start.match(rest):
+            return end
     return None
 
 
