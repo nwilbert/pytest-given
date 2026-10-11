@@ -15,30 +15,22 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- A handle's `.s` form reads the term's S-form, its regular plural or verb -s (`room.s` reads *Rooms*), and `.l` and `.s` chain and apply to a called form (`room.l.s` reads *rooms*).
-- Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` runs the scenarios alone.
-- `--given-md-lines` / `--no-given-md-lines` and the `given_md_lines` ini, with `pytest-given report --no-lines`, leave the line out of each Markdown scenario anchor.
-- The narration lint's `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
-- `--given-report-url` and the `given_report_url` ini store the public URL the HTML report is served from as `report_url` in the report metadata.
-- `pytest-given citations check` verifies the report links in Markdown documents against a JSON report, and `pytest-given citations update` rewrites their citations to match it.
-- An HTML report written with `given_report_url` has copy buttons on scenario cards, story headers and Tags sidebar rows that put a one-line Markdown citation on the clipboard.
-- A `#scenario=` link opens a scenario by its node id as well as its slug.
-- The HTML report names the parts of an opened link it no longer has, such as a removed scenario or tag, in a message that closes after 10 seconds, and drops them from the link instead of filtering on them.
-- The bundled `pytest-given-citing` skill repairs the citations `pytest-given citations update` cannot fix, and writes new ones.
+- Markdown documents, such as design specs, can [cite](https://nwilbert.github.io/pytest-given/dev/guide/citations/) scenarios, tags and stories as links into the published HTML report: `--given-report-url` or the `given_report_url` setting sets the report's URL and gives it buttons that copy a citation, `pytest-given citations check` and `pytest-given citations update` keep a document's citations in line with a JSON report, and the bundled `pytest-given-citing` skill writes citations and repairs the ones `update` cannot.
+- When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.
+- A [term ref](https://nwilbert.github.io/pytest-given/dev/guide/glossary/#term-refs) can show a noun's plural or a verb's -s form with `.s`: `room.s` reads *Rooms*, `room.l.s` reads *rooms*, and `room('suite').s` reads *suites*.
+- Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` [runs the scenarios alone](https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/#selecting-scenarios), for example to measure their code coverage.
+- The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
+- The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 
 ### Changed
 
-- **Breaking.** A handle's `.low` form is now `.l`: replace `.low` with `.l`.
 - **Breaking.** `@scenario`'s first parameter is now `title`: replace `@scenario(name=...)` with `@scenario(title=...)`; a positional title is unaffected.
-- A handle's `.l` form lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*).
+- **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
-- The HTML report's top bar sits closer to the top of the page and keeps the same height whether or not it shows view tabs.
-- The HTML report underlines a term ref with a thinner line, which thickens on hover.
-- The bundled `pytest-given-authoring` skill covers scenario titles and narrates each rule once, where its test proves it, and the `pytest-given-reviewing` skill reviews titles as a list and flags a rule narrated at the wrong layer or a `then` that checks nothing.
-- The bundled skills are reworded in plainer language.
-- The bundled `pytest-given-authoring` skill shows how to narrate a call that returns normally and to check "never called" with recorded calls instead of a stub that raises, which the `pytest-given-reviewing` skill flags.
-- The documentation and bundled skills present story coverage as a way to find scenarios, not a measure of test completeness, and point to code coverage of `-m pytest_given` for that.
-- The bundled `pytest-given-authoring` skill interpolates values taken from constants instead of copying them, and the `pytest-given-reviewing` skill starts its completeness audit from the undecorated tests in narrated test files.
+- The HTML report's top bar and term ref underlines are visually tidied.
+- The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
+- The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.
+- The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing and a stub that raises to prove "never called", and starts its completeness audit from the undecorated tests in narrated test files.
 
 ## [0.4.1] - 2026-10-04
 

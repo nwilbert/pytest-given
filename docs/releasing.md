@@ -20,7 +20,8 @@ mistake shipped to PyPI is permanent.
 - [ ] Bump `version` in `pyproject.toml`.
 - [ ] Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md`. The workflow
       extracts this exact section as the GitHub Release body, and fails the build
-      if it is missing.
+      if it is missing. Repoint its documentation links from `/dev/` to the
+      release's `/<major.minor>/`, so they keep showing the pages as released.
 - [ ] Update the link references at the bottom of `CHANGELOG.md`: point
       `[Unreleased]` at the new tag, and add a line for the new version.
 - [ ] Land it on `main` and wait for CI to go green. Releases can only be
