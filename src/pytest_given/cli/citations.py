@@ -3,7 +3,6 @@ writes nothing; `update` rewrites what it can and reports what remains. The
 verb, not a flag, says whether a command line writes files."""
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
@@ -64,12 +63,6 @@ def run_citations(args: argparse.Namespace) -> int:
             update=args.update,
             source=report_file.as_posix(),
         )
-    except (json.JSONDecodeError, UnicodeDecodeError) as error:
-        print(
-            f'Error: {report_file.as_posix()} is not valid JSON — {error}',
-            file=sys.stderr,
-        )
-        return 2
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2

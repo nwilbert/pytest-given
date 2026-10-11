@@ -89,7 +89,7 @@ def test_link_text_wrapped_in_a_blockquote_leaves_out_the_markers() -> None:
     source = '> ✅ [a long\n> title](u) after\n'
     link = _one(source)
     assert link.text == 'a long\ntitle'
-    assert link.trailing_span(0, 0) == (link.end, link.end)
+    assert source[link.end - 1 : link.end + 1] == ') '
     assert _at(source, link.text_span) == 'a long\n> title'
     assert link.trailing == ' after'
 
@@ -108,7 +108,7 @@ def test_trailing_text_runs_on_across_one_line_break(
     link = _one(source)
     assert link.trailing == trailing
     whole = link.trailing_span(0, len(trailing))
-    assert whole[0] == link.end
+    assert source[whole[0] - 1] == ')'
     assert _at(source, whole).endswith(trailing.split('\n')[-1])
     summary = link.trailing_span(trailing.index('('), trailing.index(')') + 1)
     assert _at(source, summary) == '(1 ✅)'

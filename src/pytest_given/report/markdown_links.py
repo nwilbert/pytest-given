@@ -48,11 +48,15 @@ class MarkdownLink:
     text_span: Span
     url: str
     url_span: Span
-    end: int
     trailing: str
     trailing_offsets: tuple[int, ...]
     in_table_row: bool
     glyph: Glyph | None = None
+
+    @property
+    def end(self) -> int:
+        """Just past the link's closing `)`."""
+        return self.trailing_offsets[0]
 
     def trailing_span(self, start: int, end: int) -> Span:
         return _span(self.trailing_offsets, start, end)
@@ -594,7 +598,6 @@ def _link(
         text_span=run.span(open_index + 1, close_index),
         url=text[destination.url_start : destination.url_end],
         url_span=run.span(destination.url_start, destination.url_end),
-        end=run.offsets[destination.close] + 1,
         trailing=text[after:trailing_end],
         trailing_offsets=tuple(run.offsets[after : trailing_end + 1]),
         in_table_row=run.in_table_row,

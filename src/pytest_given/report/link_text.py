@@ -5,10 +5,11 @@ import re
 
 from .markdown_links import ASCII_PUNCTUATION, backtick_run_end, code_span_end
 
-# Outside a code span, what CommonMark or GFM give inline meaning, beside the
-# backtick and `_`, which have rules of their own: closing the link early,
-# emphasis, strikethrough, raw HTML, an entity, a table cell, GitHub math.
-_ALWAYS_ESCAPED = frozenset('\\[]*~<&|$')
+# Outside a code span, what CommonMark or GFM give inline meaning, beside `_`,
+# which has a rule of its own: closing the link early, emphasis,
+# strikethrough, opening a code span, raw HTML, an entity, a table cell,
+# GitHub math.
+_ALWAYS_ESCAPED = frozenset('\\[]*~`<&|$')
 _NEWLINE = re.compile(r'\r\n|\r|\n')
 
 
@@ -25,11 +26,7 @@ def link_text(title: str, *, in_table_row: bool = False) -> str:
     for index, char in enumerate(text):
         if in_code[index]:
             out.append('\\|' if in_table_row and char == '|' else char)
-        elif (
-            char in _ALWAYS_ESCAPED
-            or char == '`'
-            or (char == '_' and not _intraword(text, index))
-        ):
+        elif char in _ALWAYS_ESCAPED or (char == '_' and not _intraword(text, index)):
             out.append('\\' + char)
         else:
             out.append(char)

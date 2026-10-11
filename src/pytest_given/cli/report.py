@@ -76,19 +76,13 @@ def run_report(args: argparse.Namespace) -> int:
     """
     json_file: Path = args.json_file
     if not json_file.exists():
-        print(f'Error: {json_file} not found', file=sys.stderr)
+        print(f'Error: {json_file.as_posix()} not found', file=sys.stderr)
         return 1
     try:
         config = _sink_config(
             args.output, args.source_link, args.format, args.theme, args.lines
         )
-        rendered = emit_sinks(load_report_json(json_file), config, str(json_file))
-    except (json.JSONDecodeError, UnicodeDecodeError) as error:
-        # A file that is not UTF-8 at all never reaches the JSON parser, and
-        # `UnicodeDecodeError` is a `ValueError` — neither clause below sees
-        # it, so it belongs here with the other unreadable-input cases.
-        print(f'Error: {json_file} is not valid JSON — {error}', file=sys.stderr)
-        return 1
+        rendered = emit_sinks(load_report_json(json_file), config, json_file.as_posix())
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 1
@@ -104,9 +98,15 @@ def load_report_json(json_file: Path) -> dict[str, Any]:
     a dict that is not a report.
 
     An `OSError` here is the caller's problem, not a bug: `exists()` is true
-    for a directory.
+    for a directory. A file that is not UTF-8 at all never reaches the JSON
+    parser, so its `UnicodeDecodeError` is invalid JSON too.
     """
-    report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
+    try:
+        report_dict: dict[str, Any] = json.loads(json_file.read_text(encoding='utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        raise PytestGivenError(
+            f'{json_file.as_posix()} is not valid JSON — {error}'
+        ) from error
     return report_dict
 
 
