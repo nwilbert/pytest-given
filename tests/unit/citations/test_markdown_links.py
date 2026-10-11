@@ -139,6 +139,21 @@ def test_an_html_comment_ends_a_table() -> None:
     assert not _one(source).in_table_row
 
 
+@pytest.mark.parametrize(
+    'source',
+    [
+        '> | a | b |\n> |---|---|\n> | 1 | 2 |\nsee [x | y](u)\n',
+        '- | a | b |\n  |---|---|\n  | 1 | 2 |\nsee [x](u) | c\n',
+        '- | a | b |\n  |---|---|\n  | 1 | 2 |\n- [x](u) | c\n',
+        '> - | a | b |\n>   |---|---|\n>   | 1 | 2 |\n> [x](u) | c\n',
+    ],
+)
+def test_a_line_leaving_the_tables_container_ends_the_table(source: str) -> None:
+    link = _one(source)
+    assert link.url == 'u'
+    assert not link.in_table_row
+
+
 def test_an_escaped_pipe_stays_inside_the_cell() -> None:
     assert _one('| A |\n|---|\n| [a \\| b](u) |\n').text == 'a \\| b'
 

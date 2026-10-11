@@ -199,6 +199,7 @@ def _inline_runs(source: str) -> Iterator[_Run]:
     # line ends.
     html_end: str | None = None
     in_table = False
+    table_depth = 0
     skip_delimiter = False
     list_items: list[_ListItem] = []
     # An item whose marker line held nothing else, until the line after it.
@@ -240,6 +241,10 @@ def _inline_runs(source: str) -> Iterator[_Run]:
         empty_item = None
         chars, columns = _leading(content)
         ended = [o for o in open_items if o not in list_items]
+        # A table has no lazy continuation: a line outside its list item or
+        # quote ends it.
+        if in_table and (ended or depth < table_depth):
+            in_table = False
         may_be_lazy = all(o.quote_depth >= depth for o in ended)
         base = max((o.column for o in list_items if o.quote_depth == depth), default=0)
         relative = columns - base
@@ -322,6 +327,7 @@ def _inline_runs(source: str) -> Iterator[_Run]:
         ):
             yield from _paragraph_run(paragraph)
             paragraph, in_table, skip_delimiter = [], True, True
+            table_depth = depth
             yield from _cell_runs(line)
             continue
         if paragraph and not may_be_lazy:
