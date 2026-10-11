@@ -1,5 +1,7 @@
 # Inline Markdown in Titles, Steps and Definitions — Design Spec
 
+✅ [spec/inline-markdown](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/inline-markdown) (2 ✅)
+
 ## Goal
 
 Render bold, italic and code the same way wherever an author's prose shows up: scenario titles
@@ -9,7 +11,7 @@ output. The rules follow CommonMark for the forms authors actually write, and gi
 corner cases.
 
 This spec is implemented before [Case Ids in Parameter
-Tables](2026-10-10-parameter-table-case-ids-design.md), whose id column is written through the
+Tables](proposed/2026-10-10-parameter-table-case-ids-design.md), whose id column is written through the
 Markdown writer below.
 
 ## Background

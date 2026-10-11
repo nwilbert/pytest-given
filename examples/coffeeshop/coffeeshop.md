@@ -4,7 +4,7 @@
 `examples/coffeeshop/test_coffeeshop.py::test_buy_coffee` · checkout
 
 - **given** a coffee machine
-- **when** I insert $2
+- **when** I insert \$2
 - **then** I get a coffee
   - 📎 Machine state:
     ```
@@ -27,20 +27,20 @@
     Total:        $2.00
     ```
 - **when** the total line is read back
-- **then** it shows the $2.00 total
+- **then** it shows the \$2.00 total
 
-## ✓ Generator fixture with teardown
+## ✓ Generator fixture with `yield` and *teardown*
 `examples/coffeeshop/test_coffeeshop.py::test_generator_fixture`
 
 - **given** a database connection
 - **when** I run a query
-- **then** the connection is open and the query was logged
+- **then** the connection is **open** and the query was logged
 
 ## ⊗ Parametrized test (renders as a parameter table) · 4 cases
 `examples/coffeeshop/test_coffeeshop.py::test_pricing` · pricing — expected to fail: happy-hour pricing not implemented yet
 
 - **given** a coffee machine
-- **when** I insert ${euros}
+- **when** I insert \${euros}
 - **then** the purchase is allowed: {expect}
 
 | euros | expect | |
@@ -72,7 +72,7 @@
 
 - **given** a coffee machine
 - **given** I have some coins in hand
-- **when** I insert $5
+- **when** I insert \$5
 - **then** the machine has 9 coffees left
 
 ## ✓ Brew {cup_size} ml (templated scenario title) · 2 cases
@@ -87,14 +87,14 @@
 | 200 |
 | 300 |
 
-## ✓ Serve a 200 ml cup (one scenario per case) [200]
+## ✓ Serve a 200 ml cup (one scenario per case) \[200\]
 `examples/coffeeshop/test_coffeeshop.py::test_serve`
 
 - **given** a coffee machine
 - **when** I order a 200 ml cup
 - **then** the tank is down 200 ml and the machine has one fewer coffee
 
-## ✓ Serve a 400 ml cup (one scenario per case) [400]
+## ✓ Serve a 400 ml cup (one scenario per case) \[400\]
 `examples/coffeeshop/test_coffeeshop.py::test_serve`
 
 - **given** a coffee machine
@@ -140,8 +140,8 @@
 `examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
-- **when** I insert $2
-  - **when** the coin is validated for $2
+- **when** I insert \$2
+  - **when** the coin is validated for \$2
   - **when** the balance is updated
 - **then** the coin is accepted
 - **then** a coffee is dispensed
@@ -197,9 +197,9 @@
 `examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
 
 - **given** a coffee machine
-- **given** a loyalty card good for a $1 discount
+- **given** a loyalty card good for a \$1 discount
 - **when** I buy a coffee with the discount
-- **then** I pay $1
+- **then** I pay \$1
 - **then** a coffee is dispensed
 
 ## ✗ Failure rendering (intentionally failing)

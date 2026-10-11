@@ -94,7 +94,7 @@
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
 
 - **given** a suite whose narration varies across parametrize cases
-- **when** the suite runs with no --given-* sink
+- **when** the suite runs with no --given-\* sink
 - **then** the refusal is reported without claiming a report was skipped
 
 ## ✓ A refused run discards the previous run's «report»
@@ -476,16 +476,16 @@
 ## ✓ An Annotated label retells the «pins» of the fixture label it replaces · 3 cases
 `tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root`
 
-- **given** a label with pins={label_pins} over a fixture pinning a[1]
+- **given** a label with pins={label_pins} over a fixture pinning a\[1\]
 - **when** the suite runs
 - **then** the grafted root «pins» the sentences {root_sentences} of a
-- **then** the inner «step» keeps its own «pin», a[3]
+- **then** the inner «step» keeps its own «pin», a\[3\]
 
 | label_pins | root_sentences |
 |---|---|
-| None | [1] |
-| [] | [] |
-| [a[2]] | [2] |
+| None | \[1\] |
+| \[\] | \[\] |
+| \[a\[2\]\] | \[2\] |
 
 ## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
 `tests/integration/test_plugin.py::test_annotated_template_label_without_parametrize_fails_scenario`
@@ -1410,13 +1410,13 @@
 
 | slots | conflict | kind |
 |---|---|---|
-| [] | False | None |
-| ['actor'] | False | actor |
-| ['verb'] | False | activity |
-| ['noun'] | False | object |
-| ['actor', 'noun'] | False | actor |
-| ['verb', 'actor'] | True | None |
-| ['verb', 'noun'] | True | None |
+| \[\] | False | None |
+| \['actor'\] | False | actor |
+| \['verb'\] | False | activity |
+| \['noun'\] | False | object |
+| \['actor', 'noun'\] | False | actor |
+| \['verb', 'actor'\] | True | None |
+| \['verb', 'noun'\] | True | None |
 
 ## ✓ A declared kind must fit the «slot» its «term» fills · 9 cases
 `tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot` · diagnostics, validation
@@ -1524,7 +1524,7 @@
 ## ✓ Escaped pipes are preserved in cells
 `tests/unit/capture/test_markdown_glossary.py::test_escaped_pipe_in_cell`
 
-- **given** cells containing escaped pipe characters (\|)
+- **given** cells containing escaped pipe characters (\\\|)
   - 📎 Markdown document:
     ```
     | Term | Meaning |
@@ -1612,7 +1612,7 @@
 - **when** the parser reads the short row
 - **then** a PytestGivenError points at the short row
 
-## ✓ A «term» cell is read as its plain text, with emphasis unwrapped · 5 cases
+## ✓ A «term» cell is read as its plain text, with emphasis unwrapped · 6 cases
 `tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text`
 
 - **given** a «term» cell written as {cell}
@@ -1621,11 +1621,12 @@
 
 | cell | term |
 |---|---|
-| **Scenario** | Scenario |
-| *Step* | Step |
-| `given` | given |
+| \*\*Scenario\*\* | Scenario |
+| \*Step\* | Step |
+| \`given\` | given |
 | work_object | work_object |
-| `a*b*c` | a*b*c |
+| \`a\*b\*c\` | a\*b\*c |
+| \_\_Scenario\_\_ | \_\_Scenario\_\_ |
 
 ## ✓ Emphasis is stripped from kind cells too
 `tests/unit/capture/test_markdown_glossary.py::test_strips_emphasis_from_kind_cell`
@@ -1767,8 +1768,8 @@
 | 2 | False | refused |
 | cancel | True | accepted |
 | cancel | False | refused |
-| [1, 2] | True | accepted |
-| [1, 2] | False | refused |
+| \[1, 2\] | True | accepted |
+| \[1, 2\] | False | refused |
 
 ## ✓ An «actor» handle in a «clause» becomes a «term ref»
 `tests/unit/capture/test_story.py::test_clause_dispatches_actor_to_clause_term_ref`
@@ -2048,7 +2049,7 @@
 |---|---|
 | count={count} | accepted |
 | count={obj.attr} | refused |
-| {d[key]} | refused |
+| {d\[key\]} | refused |
 | {x + 1} | refused |
 
 ## ✓ A t-string interpolation records its rendered value and its expression
@@ -2383,11 +2384,11 @@
 
 | scenario_pins | step_pins | covered |
 |---|---|---|
-| None | None | [1] |
-| None | [2] | [2] |
-| [] | None | [] |
-| [] | [2] | [2] |
-| [1] | [2] | [1, 2] |
+| None | None | \[1\] |
+| None | \[2\] | \[2\] |
+| \[\] | None | \[\] |
+| \[\] | \[2\] | \[2\] |
+| \[1\] | \[2\] | \[1, 2\] |
 
 ## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
 `tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms`
@@ -2398,10 +2399,10 @@
 
 | term_ids | eligible |
 |---|---|
-| ['guest', 'room'] | True |
-| ['guest', 'guest'] | False |
-| ['guest'] | False |
-| [] | False |
+| \['guest', 'room'\] | True |
+| \['guest', 'guest'\] | False |
+| \['guest'\] | False |
+| \[\] | False |
 
 ## ✓ An under-anchored «sentence» is covered only through a «pin» · 4 cases
 `tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
@@ -2413,10 +2414,10 @@
 
 | term_ids | pinned | covered |
 |---|---|---|
-| ['guest', 'room'] | False | True |
-| ['guest', 'room'] | True | True |
-| ['guest'] | False | False |
-| ['guest'] | True | True |
+| \['guest', 'room'\] | False | True |
+| \['guest', 'room'\] | True | True |
+| \['guest'\] | False | False |
+| \['guest'\] | True | True |
 
 ## ✓ Nested «steps» are walked for «coverage»
 `tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
@@ -2613,6 +2614,34 @@
 - **then** the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink
 - **then** each column ink is a token set once per theme, so the dark theme only redefines the token
 
+## ✓ A «scenario title»'s emphasis renders the same in every output
+`tests/unit/report/test_inline_markdown.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown
+
+- **given** a «scenario title» with a bold word and a code span
+- **when** the HTML, the Markdown «report» and a «citation» show it
+  - 📎 outputs:
+    ```
+    Books a <strong>suite</strong> with <code>late_checkout</code>
+    ## ✓ Books a **suite** with `late_checkout`
+    ✅ [Books a **suite** with `late_checkout`](
+    ```
+- **then** the HTML renders the word bold and the code as code
+- **then** the Markdown keeps the same markers, so a viewer renders the same
+
+## ✓ A span crossed by a «term ref» stays literal in every output
+`tests/unit/report/test_inline_markdown.py::test_a_span_crossed_by_a_term_ref_stays_literal` · spec/inline-markdown
+
+- **given** a «scenario title» whose `**` markers enclose a «term ref»
+- **when** the HTML, the Markdown «report» and a «citation» show it
+  - 📎 outputs:
+    ```
+    **Guest books**
+    ## ✓ \*\*«Guest» books\*\*
+    ✅ [\*\*Guest books\*\*](
+    ```
+- **then** the HTML shows both markers as written
+- **then** the Markdown escapes them, so a viewer shows them as written
+
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
 `tests/unit/report/test_md_renderer.py::test_passed_scenario_heading_and_steps`
 
@@ -2627,7 +2656,7 @@
     `tests/t.py::test_buy` · billing, happy-path
     
     - **given** a machine
-    - **when** I insert $2
+    - **when** I insert \$2
     - **then** I get a coffee
     ```
 
@@ -2883,7 +2912,7 @@
 | vscode | vscode://file/{path}:{line} |
 | cursor | cursor://file/{path}:{line} |
 | zed | zed://file/{path}:{line} |
-| pycharm | pycharm://open?file={path}&line={line} |
+| pycharm | pycharm://open?file={path}\&line={line} |
 | https://github.com/o/r/blob/{sha}/{relpath}#L{line} | https://github.com/o/r/blob/{sha}/{relpath}#L{line} |
 | none | None |
 

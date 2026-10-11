@@ -21,6 +21,8 @@ g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning'
 
 The kind column takes `actor`, `work object` (or `object`), or `activity`.
 
+A term or kind cell may be emphasized: `**Guest**` reads `Guest`. A description renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
+
 **A code-defined `Glossary`** declares terms where the tests live:
 
 ```python

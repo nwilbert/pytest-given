@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T12:12:12.578536+00:00",
+    "timestamp": "2026-10-11T16:09:16.741846+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "7a7d13e29cfed5b97dd22e82794ca304f99d97bd",
+    "commit_sha": "ed077363928c2831dc5ae4db53407a5562eaed0c",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 120,
+      "duration_ms": 151,
       "steps": [
         {
           "phase": "given",
@@ -135,7 +135,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 112,
+      "duration_ms": 147,
       "steps": [
         {
           "phase": "given",
@@ -217,7 +217,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -326,7 +326,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -647,7 +647,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -714,7 +714,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -824,7 +824,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -993,7 +993,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -1113,7 +1113,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -1248,7 +1248,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
@@ -1374,7 +1374,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 75,
+      "duration_ms": 108,
       "steps": [
         {
           "phase": "given",
@@ -1541,7 +1541,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -1658,7 +1658,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 167,
+      "duration_ms": 202,
       "steps": [
         {
           "phase": "given",
@@ -1731,7 +1731,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -1903,7 +1903,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -2042,7 +2042,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -2187,7 +2187,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -2340,7 +2340,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -2474,7 +2474,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -2597,7 +2597,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 171,
+      "duration_ms": 196,
       "steps": [
         {
           "phase": "given",
@@ -2784,7 +2784,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 96,
+      "duration_ms": 119,
       "steps": [
         {
           "phase": "given",
@@ -2880,7 +2880,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 141,
+      "duration_ms": 168,
       "steps": [
         {
           "phase": "given",
@@ -3044,7 +3044,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -3138,7 +3138,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -3223,7 +3223,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -3300,7 +3300,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 83,
+      "duration_ms": 112,
       "steps": [
         {
           "phase": "given",
@@ -3382,7 +3382,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -3473,7 +3473,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -3558,7 +3558,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -3665,7 +3665,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 199,
       "steps": [
         {
           "phase": "given",
@@ -3764,7 +3764,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3878,7 +3878,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -4022,7 +4022,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -4096,7 +4096,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -4237,7 +4237,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 331,
+      "duration_ms": 440,
       "steps": [
         {
           "phase": "given",
@@ -4396,7 +4396,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -4498,7 +4498,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -4603,7 +4603,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -4731,7 +4731,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -4843,7 +4843,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -4919,7 +4919,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 109,
       "steps": [
         {
           "phase": "given",
@@ -7057,7 +7057,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -7143,7 +7143,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7859,7 +7859,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -7971,7 +7971,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -11714,6 +11714,15 @@
             ],
             "status": "passed",
             "error": null
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[__Scenario__-__Scenario__]",
+            "values": [
+              "__Scenario__",
+              "__Scenario__"
+            ],
+            "status": "passed",
+            "error": null
           }
         ]
       },
@@ -11784,7 +11793,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 214
+        "line": 215
       },
       "story_ids": [],
       "pins": null
@@ -11846,7 +11855,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 229
+        "line": 230
       },
       "story_ids": [],
       "pins": null
@@ -11908,7 +11917,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 247
+        "line": 248
       },
       "story_ids": [],
       "pins": null
@@ -16269,7 +16278,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -17499,7 +17508,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 45
+        "line": 53
       },
       "story_ids": [],
       "pins": null
@@ -17527,7 +17536,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -17617,7 +17626,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 71
+        "line": 79
       },
       "story_ids": [],
       "pins": null
@@ -17781,7 +17790,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 94
+        "line": 102
       },
       "story_ids": [],
       "pins": null
@@ -17966,7 +17975,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 118
+        "line": 126
       },
       "story_ids": [],
       "pins": null
@@ -18099,7 +18108,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 152
+        "line": 160
       },
       "story_ids": [],
       "pins": null
@@ -18755,7 +18764,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -22601,7 +22610,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 152,
+      "duration_ms": 177,
       "steps": [
         {
           "phase": "given",
@@ -22724,11 +22733,254 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 236
+        "line": 282
       },
       "story_ids": [
         "adopt-pytest-given"
       ],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/report/test_inline_markdown.py::test_a_title_s_emphasis_renders_the_same_in_every_output",
+      "narration": {
+        "text": "A scenario title's emphasis renders the same in every output",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "scenario-title",
+            "display": "scenario title",
+            "expression": "pg['Scenario title'].l"
+          },
+          {
+            "value": "'s emphasis renders the same in every output"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_inline_markdown",
+      "tags": [
+        "spec/inline-markdown"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario title with a bold word and a code span",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario-title",
+                "display": "scenario title",
+                "expression": "pg[\"Scenario title\"].l"
+              },
+              {
+                "value": " with a bold word and a code span"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the HTML, the Markdown report and a citation show it",
+            "parts": [
+              {
+                "value": "the HTML, the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " and a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " show it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "outputs",
+              "content": "Books a <strong>suite</strong> with <code>late_checkout</code>\n## \u2713 Books a **suite** with `late_checkout`\n\u2705 [Books a **suite** with `late_checkout`](",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the HTML renders the word bold and the code as code",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Markdown keeps the same markers, so a viewer renders the same",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_inline_markdown.py",
+        "line": 29
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/report/test_inline_markdown.py::test_a_span_crossed_by_a_term_ref_stays_literal",
+      "narration": {
+        "text": "A span crossed by a term ref stays literal in every output",
+        "parts": [
+          {
+            "value": "A span crossed by a "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].l"
+          },
+          {
+            "value": " stays literal in every output"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_inline_markdown",
+      "tags": [
+        "spec/inline-markdown"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario title whose `**` markers enclose a term ref",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario-title",
+                "display": "scenario title",
+                "expression": "pg[\"Scenario title\"].l"
+              },
+              {
+                "value": " whose `**` markers enclose a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "term ref",
+                "expression": "pg[\"Term ref\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the HTML, the Markdown report and a citation show it",
+            "parts": [
+              {
+                "value": "the HTML, the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " and a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " show it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "outputs",
+              "content": "**Guest books**\n## \u2713 \\*\\*\u00abGuest\u00bb books\\*\\*\n\u2705 [\\*\\*Guest books\\*\\*](",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the HTML shows both markers as written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Markdown escapes them, so a viewer shows them as written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_inline_markdown.py",
+        "line": 50
+      },
+      "story_ids": [],
       "pins": null
     },
     {
@@ -22838,7 +23090,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 Buy coffee\n`tests/t.py::test_buy` \u00b7 billing, happy-path\n\n- **given** a machine\n- **when** I insert $2\n- **then** I get a coffee\n",
+              "content": "# pytest-given \u2014 proj\n\n## \u2713 Buy coffee\n`tests/t.py::test_buy` \u00b7 billing, happy-path\n\n- **given** a machine\n- **when** I insert \\$2\n- **then** I get a coffee\n",
               "content_type": "text"
             }
           ],
@@ -22958,7 +23210,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 160
+        "line": 169
       },
       "story_ids": [],
       "pins": null
@@ -23092,7 +23344,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 185
+        "line": 194
       },
       "story_ids": [],
       "pins": null
@@ -23222,7 +23474,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 258
+        "line": 267
       },
       "story_ids": [],
       "pins": null
@@ -23455,7 +23707,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 299
+        "line": 308
       },
       "story_ids": [],
       "pins": null
@@ -23570,7 +23822,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 340
+        "line": 349
       },
       "story_ids": [],
       "pins": null
@@ -23685,7 +23937,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 411
+        "line": 420
       },
       "story_ids": [],
       "pins": null
@@ -23771,7 +24023,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 590
+        "line": 599
       },
       "story_ids": [],
       "pins": null

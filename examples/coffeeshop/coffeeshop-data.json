@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T12:03:58.015802+00:00",
+    "timestamp": "2026-10-11T16:09:09.935281+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "effeb484ef740f87b4c38600b23d0f05e4c09fba",
+    "commit_sha": "ed077363928c2831dc5ae4db53407a5562eaed0c",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -149,7 +149,7 @@
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_generator_fixture",
       "narration": {
-        "text": "Generator fixture with teardown",
+        "text": "Generator fixture with `yield` and *teardown*",
         "parts": []
       },
       "module": "test_coffeeshop",
@@ -182,7 +182,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the connection is open and the query was logged",
+            "text": "the connection is **open** and the query was logged",
             "parts": []
           },
           "children": [],
@@ -213,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 81,
+      "duration_ms": 116,
       "steps": [
         {
           "phase": "given",
@@ -762,7 +762,16 @@
             "value": " ml cup (one scenario per case)"
           },
           {
-            "value": " [200]"
+            "value": " ["
+          },
+          {
+            "rendered": "200",
+            "expression": "",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": "]"
           }
         ]
       },
@@ -860,7 +869,16 @@
             "value": " ml cup (one scenario per case)"
           },
           {
-            "value": " [400]"
+            "value": " ["
+          },
+          {
+            "rendered": "400",
+            "expression": "",
+            "format_spec": "",
+            "conversion": null
+          },
+          {
+            "value": "]"
           }
         ]
       },
@@ -1589,7 +1607,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 48,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -1754,7 +1772,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 50,
+      "duration_ms": 71,
       "steps": [
         {
           "phase": "given",

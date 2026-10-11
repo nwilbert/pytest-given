@@ -1153,15 +1153,20 @@ span.param-highlight {
   .snackbar-countdown { visibility: hidden; }
 }
 
-/* Inline code in rendered term descriptions (entry body + hover tooltip). */
+/* Inline code in rendered term descriptions (entry body + hover tooltip),
+   scenario titles and step text. */
 .entry-def code,
-.term-tip-def code {
+.term-tip-def code,
+.scenario-title code,
+.step-text code {
   font-family: var(--font-mono);
   font-size: 0.9em;
   padding: 0.1em 0.3em;
   border-radius: var(--radius-sm);
 }
-.entry-def code { background: var(--bg-page); }
+.entry-def code,
+.scenario-title code,
+.step-text code { background: var(--bg-page); }
 .term-tip-def code { background: var(--bg-tip-code); }
 
 /* === Topbar ===

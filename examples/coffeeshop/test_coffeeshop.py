@@ -52,11 +52,11 @@ def test_text_attachment(machine):
         assert total_line == 'Total:        $2.00'
 
 
-@scenario('Generator fixture with teardown')
+@scenario('Generator fixture with `yield` and *teardown*')
 def test_generator_fixture(db):
     with when('I run a query'):
         db['queries'].append('SELECT 1')
-    with then('the connection is open and the query was logged'):
+    with then('the connection is **open** and the query was logged'):
         assert db['open']
         assert db['queries'] == ['SELECT 1']
 

@@ -41,7 +41,7 @@ A step is `{phase, narration, children[], attachments[], pins, fixture_name}`. `
 `narration.parts[]` holds the step text in structured form. Each part is one of:
 
 - `{value: "literal text"}`: plain text.
-- `{rendered, expression, format_spec, conversion}`: a t-string interpolation whose value is the same in every case. `rendered` is the text shown, and `expression` the source code it came from.
+- `{rendered, expression, format_spec, conversion}`: a t-string interpolation whose value is the same in every case. `rendered` is the text shown, and `expression` the source code it came from. In the title of a scenario with `group_parametrized=False`, the case id between the trailing brackets is a value too, with an empty `expression`.
 - `{term_id, display, expression}`: a term ref.
 - `{name, column_id, format_spec, conversion}`: a placeholder for the column `column_id` in a grouped parametrized scenario.
 

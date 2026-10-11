@@ -13,6 +13,30 @@ You can write step text in several forms. Which form to use depends on where the
 | `Template` on a helper-function decorator | `@when(Template('I insert {amount}'))` | Placeholders are filled in from the helper's arguments on each call. Each placeholder must be the name of one of the helper's parameters; `*args` and `**kwargs` don't count. Any other name raises `PytestGivenError` when the helper is decorated. |
 | `Annotated[..., given(...)]` on a test parameter | `def test(text: Annotated[str, given(Template('a {text} cup'))])` | Adds a `given` step for a fixture or parametrize value. A plain string is shown as written; a `Template` is filled in from the parametrize arguments. Only `given` is allowed, and t-strings are not. |
 
+## Formatting
+
+Scenario titles, step text and glossary definitions can use a little Markdown. Everything else shows exactly as written, in the HTML report, the Markdown report and citations alike.
+
+| Text | Bold, italic, code | Newline | `<br>` | Where it shows |
+|---|---|---|---|---|
+| Scenario title | rendered | space | literal | HTML, Markdown, citations |
+| Step text | rendered | space | literal | HTML, Markdown |
+| Glossary term definition | rendered | line break | line break | HTML: Glossary tab, term ref tooltip |
+| `FileGlossary` term and kind cells | removed: `**Guest**` reads as `Guest` | | literal | wherever the term shows |
+| Everything else | literal | | literal | |
+
+*Rendered* means `**bold**` shows as bold, `*italic*` as italic and `` `code` `` as code. *Literal* means the characters show as written in every output, the Markdown report included. *Everything else* is the report title, term names and term refs, interpolated values, case ids, story titles and clauses, tags, skip and xfail reasons, parameter column names and values, attachments and error messages.
+
+The rules follow CommonMark for the forms you usually write:
+
+- **Code:** a backtick, at least one character, and the next backtick. What's inside shows as written.
+- **Bold and italic:** `**text**` and `*text*`. The opening marker must be followed by a non-space and the closing marker preceded by one, so `2 * 3 * 4` stays as written.
+- **Underscores never format**, so `__init__`, `_private_` and `snake_case` show as written.
+- **One level:** bold and italic can contain code, but nothing else. Spans never overlap; the first one to close wins.
+- **Everything else is literal**, including unmatched markers and backslashes. There is no escape syntax: to show a marker, put it in a code span.
+
+Markdown is read only in the text you write, never in a value or a term ref. In `t'**{guest} books**'`, neither `**` has a partner in its own text, so both show as written. A value such as `'*'` is always just an asterisk.
+
 ## Template placeholders
 
 `pytest_given.Template` only accepts plain names: `{name}`, `{name:spec}`, `{name!conv}`. Attribute access (`{obj.attr}`), indexing (`{d[key]}`) and other expressions (`{x + 1}`) raise `PytestGivenError` when the `Template` is created.

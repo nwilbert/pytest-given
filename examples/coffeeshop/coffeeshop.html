@@ -1186,14 +1186,19 @@ span.param-highlight {
 }
 
 
+
 .entry-def code,
-.term-tip-def code {
+.term-tip-def code,
+.scenario-title code,
+.step-text code {
   font-family: var(--font-mono);
   font-size: 0.9em;
   padding: 0.1em 0.3em;
   border-radius: var(--radius-sm);
 }
-.entry-def code { background: var(--bg-page); }
+.entry-def code,
+.scenario-title code,
+.step-text code { background: var(--bg-page); }
 .term-tip-def code { background: var(--bg-tip-code); }
 
 
@@ -1889,7 +1894,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
       
     </div>
     </div>
@@ -1945,7 +1950,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L44">examples/coffeeshop/test_coffeeshop.py:44</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L44">examples/coffeeshop/test_coffeeshop.py:44</a></div>
       
     </div>
     </div>
@@ -1957,7 +1962,7 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(2)">
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-2" :aria-expanded="!!expandedScenarios[2]" :aria-label="(expandedScenarios[2] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(2)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span></button>
-        <span class="scenario-title">Generator fixture with teardown</span>
+        <span class="scenario-title">Generator fixture with <code>yield</code> and <em>teardown</em></span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/generator_fixture" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="2" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -1980,7 +1985,7 @@ Total:        $2.00</pre></div>
               <div class="step-text">I run a query</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the connection is open and the query was logged</div>
+              <div class="step-text">the connection is <strong>open</strong> and the query was logged</div>
             </div></div></div>
 
       
@@ -1988,7 +1993,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L55">examples/coffeeshop/test_coffeeshop.py:55</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L55">examples/coffeeshop/test_coffeeshop.py:55</a></div>
       
     </div>
     </div>
@@ -2009,7 +2014,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status xfailed">⊗ expected failure</span>
-        <span class="scenario-duration">81ms</span>
+        <span class="scenario-duration">116ms</span>
       </span>
     </div>
 
@@ -2188,7 +2193,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L64">examples/coffeeshop/test_coffeeshop.py:64</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L64">examples/coffeeshop/test_coffeeshop.py:64</a></div>
       
     </div>
     </div>
@@ -2273,7 +2278,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L90">examples/coffeeshop/test_coffeeshop.py:90</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L90">examples/coffeeshop/test_coffeeshop.py:90</a></div>
       
     </div>
     </div>
@@ -2318,7 +2323,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L102">examples/coffeeshop/test_coffeeshop.py:102</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L102">examples/coffeeshop/test_coffeeshop.py:102</a></div>
       
     </div>
     </div>
@@ -2401,7 +2406,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L113">examples/coffeeshop/test_coffeeshop.py:113</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L113">examples/coffeeshop/test_coffeeshop.py:113</a></div>
       
     </div>
     </div>
@@ -2413,7 +2418,7 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(7)">
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-7" :aria-expanded="!!expandedScenarios[7]" :aria-label="(expandedScenarios[7] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(7)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span></button>
-        <span class="scenario-title">Serve a <span class="value-highlight">200</span> ml cup (one scenario per case) [200]</span>
+        <span class="scenario-title">Serve a <span class="value-highlight">200</span> ml cup (one scenario per case) [<span class="value-highlight">200</span>]</span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/serve[200]" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="7" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -2444,7 +2449,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L123">examples/coffeeshop/test_coffeeshop.py:123</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L123">examples/coffeeshop/test_coffeeshop.py:123</a></div>
       
     </div>
     </div>
@@ -2456,7 +2461,7 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(8)">
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-8" :aria-expanded="!!expandedScenarios[8]" :aria-label="(expandedScenarios[8] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(8)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span></button>
-        <span class="scenario-title">Serve a <span class="value-highlight">400</span> ml cup (one scenario per case) [400]</span>
+        <span class="scenario-title">Serve a <span class="value-highlight">400</span> ml cup (one scenario per case) [<span class="value-highlight">400</span>]</span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/serve[400]" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="8" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -2489,7 +2494,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L123">examples/coffeeshop/test_coffeeshop.py:123</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L123">examples/coffeeshop/test_coffeeshop.py:123</a></div>
       
     </div>
     </div>
@@ -2658,7 +2663,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L141">examples/coffeeshop/test_coffeeshop.py:141</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L141">examples/coffeeshop/test_coffeeshop.py:141</a></div>
       
     </div>
     </div>
@@ -2738,7 +2743,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L188">examples/coffeeshop/test_coffeeshop.py:188</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L188">examples/coffeeshop/test_coffeeshop.py:188</a></div>
       
     </div>
     </div>
@@ -2750,7 +2755,7 @@ Total:        $2.00</pre></div>
     <div class="scenario-header" @click="toggleScenario(11)">
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-11" :aria-expanded="!!expandedScenarios[11]" :aria-label="(expandedScenarios[11] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(11)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[11] }"></span></button>
-        <span class="scenario-title">Top-level `given` block and deeply nested steps</span>
+        <span class="scenario-title">Top-level <code>given</code> block and deeply nested steps</span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/complex_order" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="11" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
       </div>
       <span class="scenario-meta">
@@ -2849,7 +2854,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L204">examples/coffeeshop/test_coffeeshop.py:204</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L204">examples/coffeeshop/test_coffeeshop.py:204</a></div>
       
     </div>
     </div>
@@ -2900,7 +2905,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L241">examples/coffeeshop/test_coffeeshop.py:241</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L241">examples/coffeeshop/test_coffeeshop.py:241</a></div>
       
     </div>
     </div>
@@ -2959,7 +2964,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L258">examples/coffeeshop/test_coffeeshop.py:258</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L258">examples/coffeeshop/test_coffeeshop.py:258</a></div>
       
     </div>
     </div>
@@ -2978,7 +2983,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">48ms</span>
+        <span class="scenario-duration">69ms</span>
       </span>
     </div>
 
@@ -3053,7 +3058,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L274">examples/coffeeshop/test_coffeeshop.py:274</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L274">examples/coffeeshop/test_coffeeshop.py:274</a></div>
       
     </div>
     </div>
@@ -3090,7 +3095,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L280">examples/coffeeshop/test_coffeeshop.py:280</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L280">examples/coffeeshop/test_coffeeshop.py:280</a></div>
       
     </div>
     </div>
@@ -3111,7 +3116,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status xfailed">⊗ expected failure</span>
-        <span class="scenario-duration">50ms</span>
+        <span class="scenario-duration">71ms</span>
       </span>
     </div>
 
@@ -3195,7 +3200,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L291">examples/coffeeshop/test_coffeeshop.py:291</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L291">examples/coffeeshop/test_coffeeshop.py:291</a></div>
       
     </div>
     </div>
@@ -3272,7 +3277,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/effeb484ef740f87b4c38600b23d0f05e4c09fba/examples/coffeeshop/test_coffeeshop.py#L302">examples/coffeeshop/test_coffeeshop.py:302</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/ed077363928c2831dc5ae4db53407a5562eaed0c/examples/coffeeshop/test_coffeeshop.py#L302">examples/coffeeshop/test_coffeeshop.py:302</a></div>
       
     </div>
     </div>
@@ -3322,7 +3327,7 @@ Total:        $2.00</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-11T12:03:58.015802+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Generator fixture with teardown\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"xfailed\",\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario title)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"loyalty\"],\"status\":\"xfailed\",\"narration\":{\"text\":\"Loyalty card earns a free coffee (planned feature)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":{},\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":{},\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":{},\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":{},\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":{},\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":{},\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":{},\"examples/coffeeshop/test_coffeeshop.py::test_failing\":{},\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":{},\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/loyalty_card_free_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html\",\"scenario\":[[\"\\u2705 [Basic scenario with when/then and a JSON attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee)\"],[\"\\u2705 [Plain text attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_text_attachment)\"],[\"\\u2705 [Generator fixture with teardown](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_generator_fixture)\"],[\"\\ud83d\\udd35 [Parametrized test (renders as a parameter table)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_pricing)\"],[\"\\u2705 [Parametrize value surfaced as a given (Annotated)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label)\"],[\"\\u2705 [T-string with a non-parametrize value (neutral highlight)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight)\"],[\"\\u2705 [Brew {cup_size} ml (templated scenario title)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_brew)\"],[\"\\u2705 [Serve a 200 ml cup (one scenario per case) \\\\[200\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B200%5D)\"],[\"\\u2705 [Serve a 400 ml cup (one scenario per case) \\\\[400\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B400%5D)\"],[\"\\u2705 [Brew a {flavor} coffee (per-case columns)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_flavor_columns)\"],[\"\\u2705 [Helper functions can record their own steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation)\"],[\"\\u2705 [Top-level `given` block and deeply nested steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_complex_order)\"],[\"\\u2705 [An expected error, narrated as when + then (when_then)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected)\"],[\"\\u2705 [Many tags (the report collapses them behind a +N pill)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase)\"],[\"\\u274c [Failure rendering (intentionally failing)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_failing)\"],[\"\\ud83d\\udfe0 [Skipped scenario rendering](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_skipped)\"],[\"\\ud83d\\udd35 [Loyalty card earns a free coffee (planned feature)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee)\"],[\"\\ud83d\\udfe0 [All cases skipped](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped)\"]],\"tag\":{\"checkout\":[\"\\u2705 [checkout](\",\"#tag=checkout) (5 \\u2705)\"],\"discounts\":[\"\\u2705 [discounts](\",\"#tag=discounts) (2 \\u2705)\"],\"inventory\":[\"\\u2705 [inventory](\",\"#tag=inventory) (1 \\u2705)\"],\"loyalty\":[\"\\ud83d\\udd35 [loyalty](\",\"#tag=loyalty) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"pricing\":[\"\\ud83d\\udd35 [pricing](\",\"#tag=pricing) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"ticket\":[\"\\u2705 [ticket](\",\"#tag=ticket) (3 \\u2705)\"],\"ticket/CS-42\":[\"\\u2705 [ticket/CS-42](\",\"#tag=ticket/CS-42) (2 \\u2705)\"],\"ticket/CS-7\":[\"\\u2705 [ticket/CS-7](\",\"#tag=ticket/CS-7) (1 \\u2705)\"],\"validation\":[\"\\u2705 [validation](\",\"#tag=validation) (2 \\u2705)\"]},\"story\":{}},\"cited_scenario_ids\":{\"examples/coffeeshop/test_coffeeshop.py::test_pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-11T16:09:09.935281+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"narration\":{\"text\":\"Basic scenario with when/then and a JSON attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Plain text attachment\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Generator fixture with `yield` and *teardown*\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"xfailed\",\"narration\":{\"text\":\"Parametrized test (renders as a parameter table)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Parametrize value surfaced as a given (Annotated)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"T-string with a non-parametrize value (neutral highlight)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Brew {cup_size} ml (templated scenario title)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 200 ml cup (one scenario per case) [200]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"narration\":{\"text\":\"Serve a 400 ml cup (one scenario per case) [400]\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"narration\":{\"text\":\"Brew a {flavor} coffee (per-case columns)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"Helper functions can record their own steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"narration\":{\"text\":\"Top-level `given` block and deeply nested steps\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"narration\":{\"text\":\"An expected error, narrated as when + then (when_then)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"narration\":{\"text\":\"Many tags (the report collapses them behind a +N pill)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"narration\":{\"text\":\"Failure rendering (intentionally failing)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"Skipped scenario rendering\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"loyalty\"],\"status\":\"xfailed\",\"narration\":{\"text\":\"Loyalty card earns a free coffee (planned feature)\"}},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"narration\":{\"text\":\"All cases skipped\"}}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":{},\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":{},\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":{},\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":{},\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":{},\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":{},\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":{},\"examples/coffeeshop/test_coffeeshop.py::test_failing\":{},\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":{},\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/loyalty_card_free_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html\",\"scenario\":[[\"\\u2705 [Basic scenario with when/then and a JSON attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee)\"],[\"\\u2705 [Plain text attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_text_attachment)\"],[\"\\u2705 [Generator fixture with `yield` and *teardown*](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_generator_fixture)\"],[\"\\ud83d\\udd35 [Parametrized test (renders as a parameter table)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_pricing)\"],[\"\\u2705 [Parametrize value surfaced as a given (Annotated)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label)\"],[\"\\u2705 [T-string with a non-parametrize value (neutral highlight)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight)\"],[\"\\u2705 [Brew {cup_size} ml (templated scenario title)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_brew)\"],[\"\\u2705 [Serve a 200 ml cup (one scenario per case) \\\\[200\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B200%5D)\"],[\"\\u2705 [Serve a 400 ml cup (one scenario per case) \\\\[400\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B400%5D)\"],[\"\\u2705 [Brew a {flavor} coffee (per-case columns)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_flavor_columns)\"],[\"\\u2705 [Helper functions can record their own steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation)\"],[\"\\u2705 [Top-level `given` block and deeply nested steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_complex_order)\"],[\"\\u2705 [An expected error, narrated as when + then (when_then)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected)\"],[\"\\u2705 [Many tags (the report collapses them behind a +N pill)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase)\"],[\"\\u274c [Failure rendering (intentionally failing)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_failing)\"],[\"\\ud83d\\udfe0 [Skipped scenario rendering](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_skipped)\"],[\"\\ud83d\\udd35 [Loyalty card earns a free coffee (planned feature)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee)\"],[\"\\ud83d\\udfe0 [All cases skipped](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped)\"]],\"tag\":{\"checkout\":[\"\\u2705 [checkout](\",\"#tag=checkout) (5 \\u2705)\"],\"discounts\":[\"\\u2705 [discounts](\",\"#tag=discounts) (2 \\u2705)\"],\"inventory\":[\"\\u2705 [inventory](\",\"#tag=inventory) (1 \\u2705)\"],\"loyalty\":[\"\\ud83d\\udd35 [loyalty](\",\"#tag=loyalty) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"pricing\":[\"\\ud83d\\udd35 [pricing](\",\"#tag=pricing) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"ticket\":[\"\\u2705 [ticket](\",\"#tag=ticket) (3 \\u2705)\"],\"ticket/CS-42\":[\"\\u2705 [ticket/CS-42](\",\"#tag=ticket/CS-42) (2 \\u2705)\"],\"ticket/CS-7\":[\"\\u2705 [ticket/CS-7](\",\"#tag=ticket/CS-7) (1 \\u2705)\"],\"validation\":[\"\\u2705 [validation](\",\"#tag=validation) (2 \\u2705)\"]},\"story\":{}},\"cited_scenario_ids\":{\"examples/coffeeshop/test_coffeeshop.py::test_pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[1-False]\",\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));

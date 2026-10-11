@@ -16,7 +16,7 @@ neither renderer prints them. Generated ids like `10-20-15-25-True` can be match
 value columns; nothing a reader sees connects `touching-edges` to its row.
 
 This spec is implemented after [Inline Markdown in Titles, Steps and
-Definitions](2026-10-11-inline-markdown-design.md) and uses its Markdown writer for the id column.
+Definitions](../2026-10-11-inline-markdown-design.md) and uses its Markdown writer for the id column.
 
 ## Approach
 

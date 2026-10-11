@@ -21,6 +21,8 @@ room = g('Room', definition='A bookable hotel room.')
 book = g('book', definition='Reserve a room for a stay.')
 ```
 
+A definition can use [bold, italic, code and line breaks](step-text.md#formatting).
+
 Each call returns a **handle**. If the term already exists, `g(...)` returns its handle. To only look up a term, use `g['Guest']`, which raises an error if the term doesn't exist.
 
 ## Term refs
@@ -52,6 +54,8 @@ The file needs at least one Markdown table (a GFM pipe table). By default, the f
 ```python
 g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning', kind_column='Kind')
 ```
+
+A term or kind cell may be formatted: `**Guest**` reads as `Guest`. The description keeps its [formatting](step-text.md#formatting).
 
 Look up a term by name with `g['Guest']` (case-insensitive). The result is a handle like any other:
 
