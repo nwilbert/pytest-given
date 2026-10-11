@@ -71,41 +71,6 @@ def literal_markdown(text: str) -> str:
     )
 
 
-def _piece_markdown(
-    part: NarrationPart, in_table_row: bool, term_ref: Callable[[str], str]
-) -> str:
-    match part:
-        case NarrationLiteral(value=value):
-            return spans_markdown(_one_line(value), in_table_row=in_table_row)
-        case NarrationValue(rendered=rendered):
-            return literal_markdown(_one_line(rendered))
-        case NarrationPlaceholder():
-            return literal_markdown(placeholder_token(part))
-        case NarrationTermRef(display=display):
-            return term_ref(literal_markdown(_one_line(display)))
-
-
-def _span_markdown(span: InlineSpan, in_table_row: bool) -> str:
-    match span:
-        case PlainSpan(text=text):
-            return literal_markdown(text)
-        case CodeSpan(text=text):
-            if in_table_row:
-                text = text.replace('|', '\\|')
-            # CommonMark strips one space off each end of such a span.
-            if text.startswith(' ') and text.endswith(' ') and text.strip(' '):
-                text = f' {text} '
-            return f'`{text}`'
-        case EmphasisSpan(strong=strong, content=content):
-            marker = '**' if strong else '*'
-            inner = ''.join(_span_markdown(part, in_table_row) for part in content)
-            return f'{marker}{inner}{marker}'
-
-
-def _one_line(text: str) -> str:
-    return NEWLINE.sub(' ', text)
-
-
 def plain_link_text(written: str, *, in_table_row: bool = False) -> str:
     """The text a link renders, escapes resolved and whitespace folded: what a
     citation's text is compared as. Code spans keep their backticks, as a
@@ -144,6 +109,41 @@ def code_span_at(text: str, start: int) -> tuple[int, bool]:
             return run_end, True
         position = run_end
     return start + width, False
+
+
+def _piece_markdown(
+    part: NarrationPart, in_table_row: bool, term_ref: Callable[[str], str]
+) -> str:
+    match part:
+        case NarrationLiteral(value=value):
+            return spans_markdown(_one_line(value), in_table_row=in_table_row)
+        case NarrationValue(rendered=rendered):
+            return literal_markdown(_one_line(rendered))
+        case NarrationPlaceholder():
+            return literal_markdown(placeholder_token(part))
+        case NarrationTermRef(display=display):
+            return term_ref(literal_markdown(_one_line(display)))
+
+
+def _span_markdown(span: InlineSpan, in_table_row: bool) -> str:
+    match span:
+        case PlainSpan(text=text):
+            return literal_markdown(text)
+        case CodeSpan(text=text):
+            if in_table_row:
+                text = text.replace('|', '\\|')
+            # CommonMark strips one space off each end of such a span.
+            if text.startswith(' ') and text.endswith(' ') and text.strip(' '):
+                text = f' {text} '
+            return f'`{text}`'
+        case EmphasisSpan(strong=strong, content=content):
+            marker = '**' if strong else '*'
+            inner = ''.join(_span_markdown(part, in_table_row) for part in content)
+            return f'{marker}{inner}{marker}'
+
+
+def _one_line(text: str) -> str:
+    return NEWLINE.sub(' ', text)
 
 
 def _backtick_run_end(text: str, start: int) -> int:
