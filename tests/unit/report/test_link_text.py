@@ -63,7 +63,7 @@ def test_literal_markdown_escapes_every_inline_marker(text: str, written: str) -
         ('__init__ runs', '\\_\\_init\\_\\_ runs'),
         ('**a [b] | c**', '**a \\[b\\] \\| c**'),
         ('one ` tick', 'one \\` tick'),
-        ('***a***', '\\***a**\\*'),
+        ('***a***', '\\*\\*\\*a\\*\\*\\*'),
     ],
 )
 def test_spans_markdown_keeps_the_spans_the_report_renders(
@@ -97,6 +97,10 @@ def test_a_pipe_in_a_code_span_is_escaped_only_in_a_table_row() -> None:
         '`a**`b**',
         '**a`**`',
         'x ~~y~~ $z$ <https://example.org>',
+        'a**(b)** and (**c**) x**.y** and **(d)**e',
+        '*a *b* and *2 * 3* and **a **b** and **c ** d**',
+        'snake**case** and **x.** and **a*b**',
+        '***a*** and **a* and *a**',
     ],
 )
 def test_a_markdown_viewer_renders_the_spans_the_report_does(text: str) -> None:
@@ -130,6 +134,21 @@ def test_a_narration_writes_values_placeholders_and_term_refs_literally() -> Non
     )
     written = narration_markdown(narration, term_ref=lambda display: f'«{display}»')
     assert written == 'a \\*b\\* {c} «d\\_»'
+
+
+def test_a_marker_at_a_literal_s_edge_flanks_by_the_part_beside_it() -> None:
+    narration = Narration(
+        text='a**(b)** and (c)**(d)**',
+        parts=(
+            NarrationValue(rendered='a', expression='a'),
+            NarrationLiteral(value='**(b)** and '),
+            NarrationValue(rendered='(c)', expression='c'),
+            NarrationLiteral(value='**(d)**'),
+        ),
+    )
+    written = narration_markdown(narration)
+    assert written == 'a\\*\\*(b)\\*\\* and (c)**(d)**'
+    assert _MARKDOWN.renderInline(written) == 'a**(b)** and (c)<strong>(d)</strong>'
 
 
 def test_a_narration_reads_on_one_line() -> None:

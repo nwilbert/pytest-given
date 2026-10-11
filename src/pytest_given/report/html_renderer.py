@@ -38,6 +38,7 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
+    part_neighbours,
     placeholder_token,
     plural,
 )
@@ -487,8 +488,13 @@ def _make_narration_filter(
         if not narration.parts:
             return Markup(render_spans(narration.text))
         out = [
-            _render_narration_part(part, param_color_map, glossary)
-            for part in narration.parts
+            _render_narration_part(
+                part,
+                part_neighbours(narration.parts, index),
+                param_color_map,
+                glossary,
+            )
+            for index, part in enumerate(narration.parts)
         ]
         return Markup(''.join(out))
 
@@ -497,13 +503,15 @@ def _make_narration_filter(
 
 def _render_narration_part(
     part: NarrationPart,
+    neighbours: tuple[str, str],
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
 ) -> str:
     """Render one `NarrationPart` to an HTML fragment."""
     match part:
         case NarrationLiteral(value=value):
-            return render_spans(value)
+            before, after = neighbours
+            return render_spans(value, before=before, after=after)
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):

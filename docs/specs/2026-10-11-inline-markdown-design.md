@@ -52,12 +52,18 @@ glossary, which is why definitions show only in the HTML.
 
 One reader decides what a span is, and every output follows it:
 
-- **Code span:** a backtick, at least one character, the next backtick. Its contents are verbatim.
-- **Bold and italic:** `**x**` and `*x*`. The opening marker is followed by a non-space and the
-  closing marker preceded by one, so `2 * 3 * 4` stays literal.
+- **Code span:** a backtick, at least one character, the next backtick, each a lone backtick
+  rather than part of a run. Its contents are verbatim.
+- **Bold and italic:** `**x**` and `*x*`, each marker a whole run of asterisks. The opening marker
+  is followed by a non-space and the closing marker preceded by one, so `2 * 3 * 4` stays
+  literal; beside punctuation, CommonMark's flanking rules decide, so `a**(b)**` stays literal
+  too. At a plain-text piece's edge, the neighbouring piece's text decides, though no span
+  reaches into it, and no span opens right after a marker ending the piece before, which would
+  join the two into one run in the Markdown.
 - **Underscores never format**, so `__init__`, `_private_` and `snake_case` read as written.
-- **One level:** bold and italic may contain code spans and nothing else; spans never overlap, and
-  the first one to close wins.
+- **One level:** bold and italic may contain code spans and nothing else. A code span binds
+  tighter, as in CommonMark: a marker inside one neither opens nor closes bold or italic. Spans
+  never overlap, and otherwise the first one to close wins.
 - **Everything else is literal**, unmatched markers and backslashes included. There is no escape
   syntax; a code span is how to show a marker.
 
@@ -135,7 +141,7 @@ backtick run inside. Only the label changes: the Markdown report escapes it like
 ## Test coverage
 
 - Reader, table-driven: each span form, flanking spaces, underscores literal, code inside bold,
-  unmatched markers, backslashes literal.
+  a marker inside code inside emphasis, backtick runs, unmatched markers, backslashes literal.
 - HTML rendering of a piece and of a definition (breaks in one, not the other), at the level of
   the existing `_inline_md` tests.
 - Markdown writer: spans kept, stray markers escaped, intraword `_` untouched, `<br>`, `&amp;` and

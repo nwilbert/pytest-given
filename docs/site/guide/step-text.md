@@ -29,10 +29,10 @@ Scenario titles, step text and glossary definitions can use a little Markdown. E
 
 The rules follow CommonMark for the forms you usually write:
 
-- **Code:** a backtick, at least one character, and the next backtick. What's inside shows as written.
-- **Bold and italic:** `**text**` and `*text*`. The opening marker must be followed by a non-space and the closing marker preceded by one, so `2 * 3 * 4` stays as written.
+- **Code:** a backtick, at least one character, and the next backtick, neither of them part of a run like ` `` `. What's inside shows as written.
+- **Bold and italic:** `**text**` and `*text*`. The opening marker must be followed by a non-space and the closing marker preceded by one, so `2 * 3 * 4` stays as written. Next to punctuation, a marker follows CommonMark's [flanking rules](https://spec.commonmark.org/0.31.2/#left-flanking-delimiter-run): `**(text)**` is bold after a space, but not directly after a letter. A run of three or more asterisks, as in `***text***`, shows as written.
 - **Underscores never format**, so `__init__`, `_private_` and `snake_case` show as written.
-- **One level:** bold and italic can contain code, but nothing else. Spans never overlap; the first one to close wins.
+- **One level:** bold and italic can contain code, but nothing else. Code comes first, so the `*` in ``*matches `*.py`*`` doesn't end the italic. Otherwise spans never overlap: the first one to close wins.
 - **Everything else is literal**, including unmatched markers and backslashes. There is no escape syntax: to show a marker, put it in a code span.
 
 Markdown is read only in the text you write, never in a value or a term ref. In `t'**{guest} books**'`, neither `**` has a partner in its own text, so both show as written. A value such as `'*'` is always just an asterisk.

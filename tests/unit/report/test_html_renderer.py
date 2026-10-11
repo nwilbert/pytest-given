@@ -131,6 +131,20 @@ def test_narration_filter_reads_no_markdown_in_a_value() -> None:
     assert '<em>' not in out
 
 
+def test_narration_filter_flanks_a_literal_s_edge_by_the_part_beside_it() -> None:
+    render = _make_narration_filter(param_color_map={}, glossary=None)
+    narration = Narration(
+        text='a**(b)**',
+        parts=(
+            NarrationValue(rendered='a', expression='a'),
+            NarrationLiteral(value='**(b)**'),
+        ),
+    )
+    out = str(render(narration))
+    assert out.endswith('**(b)**')
+    assert '<strong>' not in out
+
+
 def test_narration_filter_reads_no_span_across_a_term_ref() -> None:
     render = _make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(

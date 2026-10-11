@@ -64,6 +64,12 @@ def narration_text(parts: Sequence[NarrationPart]) -> str:
     return ''.join(out)
 
 
+def part_neighbours(parts: Sequence[NarrationPart], index: int) -> tuple[str, str]:
+    """The text the parts either side of `parts[index]` render: what decides
+    whether a marker at a literal's edge opens or closes a span."""
+    return narration_text(parts[:index]), narration_text(parts[index + 1 :])
+
+
 def narration_of(parts: Iterable[NarrationPart]) -> Narration:
     """A narration carrying those parts, with `text` derived from them.
 

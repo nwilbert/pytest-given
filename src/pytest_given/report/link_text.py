@@ -14,6 +14,7 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     PlainSpan,
+    part_neighbours,
     placeholder_token,
     read_spans,
 )
@@ -48,16 +49,23 @@ def narration_markdown(
     if not narration.parts:
         return spans_markdown(_one_line(narration.text), in_table_row=in_table_row)
     return ''.join(
-        _piece_markdown(part, in_table_row, term_ref) for part in narration.parts
+        _piece_markdown(
+            part, part_neighbours(narration.parts, index), in_table_row, term_ref
+        )
+        for index, part in enumerate(narration.parts)
     )
 
 
-def spans_markdown(text: str, *, in_table_row: bool = False) -> str:
+def spans_markdown(
+    text: str, *, in_table_row: bool = False, before: str = '', after: str = ''
+) -> str:
     """`text` with the reader's spans kept as markup and everything else
     literal. Nothing inside a code span is escaped — a backslash there would
     show — except a table row's `|`, which GFM lets an escape keep from
-    splitting the cell."""
-    return ''.join(_span_markdown(span, in_table_row) for span in read_spans(text))
+    splitting the cell. `before` and `after` are the text of the parts around
+    it, as `read_spans` takes them."""
+    spans = read_spans(text, before=before, after=after)
+    return ''.join(_span_markdown(span, in_table_row) for span in spans)
 
 
 def literal_markdown(text: str) -> str:
@@ -112,11 +120,17 @@ def code_span_at(text: str, start: int) -> tuple[int, bool]:
 
 
 def _piece_markdown(
-    part: NarrationPart, in_table_row: bool, term_ref: Callable[[str], str]
+    part: NarrationPart,
+    neighbours: tuple[str, str],
+    in_table_row: bool,
+    term_ref: Callable[[str], str],
 ) -> str:
     match part:
         case NarrationLiteral(value=value):
-            return spans_markdown(_one_line(value), in_table_row=in_table_row)
+            before, after = neighbours
+            return spans_markdown(
+                _one_line(value), in_table_row=in_table_row, before=before, after=after
+            )
         case NarrationValue(rendered=rendered):
             return literal_markdown(_one_line(rendered))
         case NarrationPlaceholder():

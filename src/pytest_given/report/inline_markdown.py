@@ -14,20 +14,18 @@ from .text import NEWLINE
 _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
 
 
-def render_spans(text: str) -> str:
+def render_spans(text: str, *, before: str = '', after: str = '') -> str:
     """A title's or step's plain-text piece: its spans as HTML, the rest
-    escaped. A title or step never breaks a line."""
-    return _render(text, _escaped)
+    escaped. A title or step never breaks a line. `before` and `after` are the
+    text of the parts around the piece, as `read_spans` takes them."""
+    spans = read_spans(text, before=before, after=after)
+    return ''.join(_span_html(span, _escaped) for span in spans)
 
 
 def render_definition(text: str) -> str:
     """A glossary definition: its spans, and an author's `<br>` or a newline
     as a break — except in a code span, which is how to show `<br>` as text."""
-    return _render(text, _with_breaks)
-
-
-def _render(text: str, plain: Callable[[str], str]) -> str:
-    return ''.join(_span_html(span, plain) for span in read_spans(text))
+    return ''.join(_span_html(span, _with_breaks) for span in read_spans(text))
 
 
 def _span_html(span: InlineSpan, plain: Callable[[str], str]) -> str:

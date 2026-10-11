@@ -15,6 +15,7 @@ from .errors import (
 from .narration import (
     narration_of,
     narration_text,
+    part_neighbours,
     placeholder_token,
     placeholder_value,
     rebuilt,
@@ -170,6 +171,7 @@ __all__ = [
     'narration_text',
     'node_base',
     'param_id',
+    'part_neighbours',
     'placeholder_mismatch',
     'placeholder_token',
     'placeholder_value',

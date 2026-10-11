@@ -104,37 +104,65 @@ class EmphasisSpan:
 
 type InlineSpan = PlainSpan | CodeSpan | EmphasisSpan
 
-_CODE_SPAN = r'`([^`]+)`'
-# A marker touching whitespace or another `*` on its inner side opens or closes
-# nothing, so `2 * 3 * 4` stays literal; the lazy body lets the first span to
-# close win. Underscores never format.
+
+def read_spans(text: str, *, before: str = '', after: str = '') -> list[InlineSpan]:
+    """`text` as plain text, code spans, and bold or italic holding only those.
+    `before` and `after`, the neighbouring text, flank its edges unread."""
+    # A marker before the text stays one, so no span opens to touch it.
+    prefix = before[-1:] if before.endswith(('*', '`')) else _neighbour(before[-1:])
+    padded = f'{prefix}{text}{_neighbour(after[:1])}'
+    spans: list[InlineSpan] = []
+    end = 0
+    for match in _SPAN.finditer(padded, len(prefix)):
+        start = match.start() - len(prefix)
+        spans.extend(_plain(text[end:start]))
+        code, strong, italic = match.groups()
+        if code is not None:
+            spans.append(CodeSpan(code[1:-1]))
+        else:
+            inner = strong if strong is not None else italic
+            assert inner is not None
+            spans.append(EmphasisSpan(strong is not None, tuple(_code_spans(inner))))
+        end = match.end() - len(prefix)
+    spans.extend(_plain(text[end:]))
+    return spans
+
+
+# A lone backtick, never one of a run, so no two code spans touch.
+_CODE_SPAN = r'(?<!`)`[^`]+`(?!`)'
+# A letter or digit; CommonMark counts `_` as punctuation.
+_ALNUM = r'[^\W_]'
+
+
+def _emphasis(marker: str, content: str) -> str:
+    """Two `marker`s, each a whole run of `*`, flanked as CommonMark flanks
+    them. Content holding no marker that could close keeps the reader linear."""
+    escaped = re.escape(marker)
+    opener = rf'(?<!\*)(?:(?<!{_ALNUM}){escaped}(?=[^\s*])|{escaped}(?={_ALNUM}))'
+    closer = rf'(?:(?<={_ALNUM}){escaped}|(?<=[^\s*]){escaped}(?!{_ALNUM}))(?!\*)'
+    # A code span binds tighter: it is taken whole, and no other backtick opens one.
+    unmarked = rf'{_CODE_SPAN}|[^*`]|(?!{_CODE_SPAN})`'
+    return rf'{opener}((?:{unmarked}|{content})+?){closer}'
+
+
+# Bold content may hold a lone `*`; either may hold a marker between spaces,
+# which opens and closes nothing. Underscores never format.
 _SPAN = re.compile(
-    _CODE_SPAN
-    + r'|\*\*(?=[^\s*])(.+?)(?<=[^\s*])\*\*'
-    + r'|\*(?=[^\s*])(.+?)(?<=[^\s*])\*',
+    f'({_CODE_SPAN})|'
+    + _emphasis('**', r'(?<!\*)\*(?!\*)|(?<=\s)\*\*(?=\s)')
+    + '|'
+    + _emphasis('*', r'(?<=\s)\*(?=\s)'),
     re.DOTALL,
 )
 _CODE = re.compile(_CODE_SPAN)
 
 
-def read_spans(text: str) -> list[InlineSpan]:
-    """`text` as plain text, code spans, and bold or italic holding nothing but
-    plain text and code spans. Everything a span does not take is plain, an
-    unmatched marker and a backslash included."""
-    spans: list[InlineSpan] = []
-    end = 0
-    for match in _SPAN.finditer(text):
-        spans.extend(_plain(text[end : match.start()]))
-        code, strong, italic = match.groups()
-        if code is not None:
-            spans.append(CodeSpan(code))
-        else:
-            inner = strong if strong is not None else italic
-            assert inner is not None
-            spans.append(EmphasisSpan(strong is not None, tuple(_code_spans(inner))))
-        end = match.end()
-    spans.extend(_plain(text[end:]))
-    return spans
+def _neighbour(char: str) -> str:
+    """A neighbouring character as one of its class no span can take:
+    whitespace (or none), a letter or digit, or punctuation."""
+    if not char or char.isspace():
+        return ' '
+    return 'a' if char.isalnum() else '.'
 
 
 def _code_spans(text: str) -> list[PlainSpan | CodeSpan]:
@@ -142,7 +170,7 @@ def _code_spans(text: str) -> list[PlainSpan | CodeSpan]:
     end = 0
     for match in _CODE.finditer(text):
         spans.extend(_plain(text[end : match.start()]))
-        spans.append(CodeSpan(match.group(1)))
+        spans.append(CodeSpan(match.group()[1:-1]))
         end = match.end()
     spans.extend(_plain(text[end:]))
     return spans
