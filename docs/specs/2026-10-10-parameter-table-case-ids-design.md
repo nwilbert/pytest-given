@@ -51,17 +51,26 @@ it says nothing the value columns don't.
 
 ```python
 @dataclass(frozen=True)
+class ParameterCase:
+    ...
+    written_id: bool = False
+
+
+@dataclass(frozen=True)
 class ParameterTable:
-    columns: list[ParameterColumn]
-    cases: list[ParameterCase] = field(default_factory=list)
-    named_cases: bool = False
+    ...
+
+    @property
+    def named_cases(self) -> bool: ...
 
 
 def case_id(node_id: str) -> str: ...
 ```
 
-`named_cases` is true when any case's id is written, and it is the only thing the renderers consult
-to show the column. `case_id` is `case_suffix(node_id)` unbracketed, the text the terminal
+`written_id` is copied from the case's `ParamSpec`, so the JSON says which ids were written.
+`named_cases` is true when any case's is, and it is the only thing the renderers consult to show
+the column. `case_id` is `case_suffix(node_id)` unbracketed, the tail starting at the first `[` past the
+path (a directory may hold one, a class or function name cannot), the text the terminal
 printed and the suffix a per-case scenario's title already carries, which takes it from the same
 function.
 
@@ -80,9 +89,9 @@ the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
   both. The two sit at opposite ends of the row, so `_outlinePhase` draws one box per run of
   adjacent columns and run of rows instead of one per run of rows.
 - **Markdown:** a leading `case id` column, the id escaped whole by the inline Markdown writer,
-  like every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). An id too long to
-  inline leaves its cell empty, by the rule that keeps a long value out of a note's key: pytest
-  generated it from a value the row already shows. The notes below the table (a case's error, an
+  like every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). A generated id too
+  long to inline leaves its cell empty, by the rule that keeps a long value out of a note's key:
+  it only repeats a value the row already shows. A written one shows whole. The notes below the table (a case's error, an
   attachment too long to inline) are keyed by the id instead of the joined values, falling back to
   the values for an empty cell.
 
@@ -109,11 +118,12 @@ misname its row.
 ## Implementation touch points
 
 - `model/runtime.py`, `model/schema.py` — the fields and `case_id` above; serde follows.
-- `plugin/case_ids.py` — `written_id`; `grouping/columns.py` — `named_cases`.
+- `plugin/case_ids.py` — `written_id`, worked out for a grouped case only; `grouping/columns.py`
+  copies it onto the table's cases.
 - `report/md_renderer.py` — the column; `_case_key` prefers the id.
 - `report/templates/` — the row header, the shared block, per-run outline boxes;
   Playwright-verified per AGENTS.md.
-- Skills: navigating `references/report-json.md` (`named_cases`), authoring
+- Skills: navigating `references/report-json.md` (`written_id`), authoring
   `references/parameter-tables.md`, reviewing `SKILL.md`; `docs/site/` in step.
 - Self-report: decorate the test that best states "a parameter table names its rows by their
   hand-written ids".
@@ -125,7 +135,7 @@ misname its row.
 
 - Capture, over pytester-collected items: each token rule above, a duplicate, `HIDDEN_PARAM`,
   stacked marks, and written ids from a mark, a fixture and `metafunc.parametrize`.
-- Grouping and model: `named_cases` true for any written case; `case_id`
+- Grouping and model: each case's `written_id` carried to the table, `named_cases` true for any; `case_id`
   for a plain, stacked and hidden id.
 - Markdown renderer: the leading column only under `named_cases`, generated ids beside explicit
   ones, notes keyed by id, an id holding `*` and `|` escaped, an id too long to inline left out.

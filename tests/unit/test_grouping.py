@@ -332,14 +332,13 @@ def test_each_case_keeps_its_node_id() -> None:
     assert [case.id for case in grouped[0].parameters.cases] == [nid1, nid2]
 
 
-@pytest.mark.parametrize('named', [False, True])
-def test_a_table_names_its_cases_when_the_test_does(named: bool) -> None:
+def test_each_case_keeps_whether_its_id_was_written() -> None:
     scenarios, param_info = _cases(('passed', None), ('passed', None))
-    for case in scenarios:
-        param_info[case.id] = param_info[case.id]._replace(written_id=named)
+    second = scenarios[1].id
+    param_info[second] = param_info[second]._replace(written_id=True)
     [grouped] = group_parametrized(scenarios, param_info)
     assert grouped.parameters is not None
-    assert grouped.parameters.named_cases is named
+    assert [case.written_id for case in grouped.parameters.cases] == [False, True]
 
 
 def test_param_cell_unwraps_a_term_instance_to_its_display() -> None:

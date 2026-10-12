@@ -59,7 +59,7 @@ class ColumnBuilder:
     _taken_names: set[str] = field(default_factory=set)
 
     def table(
-        self, cases: list[Scenario], narrated: list[ColumnId], *, named_cases: bool
+        self, cases: list[Scenario], narrated: list[ColumnId], written: set[NodeId]
     ) -> ParameterTable:
         """The finished table: the columns, and one row per case.
 
@@ -87,10 +87,10 @@ class ColumnBuilder:
                     values=[self.cell(column.id, case.id) for column in columns],
                     status=case.status,
                     error=case.error,
+                    written_id=case.id in written,
                 )
                 for case in cases
             ],
-            named_cases=named_cases,
         )
 
     def derived(self, name: str, rendered: dict[NodeId, str]) -> ParameterColumn:

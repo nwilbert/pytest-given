@@ -75,20 +75,27 @@ def node_base(node_id: str) -> str:
     and neither may import the other. Typed `str` rather than `NodeId`: report
     also applies it to a bare function segment, which is no node id.
     """
-    return node_id.split('[', 1)[0]
+    start = _tail_start(node_id)
+    return node_id if start < 0 else node_id[:start]
 
 
 def case_suffix(node_id: str) -> str:
     """The parametrize tail of a node id, brackets included, or ``''`` when it
     has none: ``'f.py::t[1-2]' -> '[1-2]'``, ``'f.py::t' -> ''``."""
-    _, bracket, rest = node_id.partition('[')
-    return f'{bracket}{rest}'
+    start = _tail_start(node_id)
+    return '' if start < 0 else node_id[start:]
 
 
 def case_id(node_id: str) -> str:
     """A case's pytest id, as the terminal prints it: the parametrize tail
     without its brackets, ``''`` where every part of it is hidden."""
     return case_suffix(node_id)[1:-1]
+
+
+def _tail_start(node_id: str) -> int:
+    """Where the parametrize tail starts, or -1: the first `[` past the path,
+    which may hold one, where a class or function name cannot."""
+    return node_id.find('[', node_id.find('::') + 1)
 
 
 TermId = NewType('TermId', str)
@@ -402,22 +409,19 @@ type CellValue = ParamValue | Attachment
 @dataclass(frozen=True)
 class ParameterCase:
     """One parametrize case: its cells, positionally aligned with the table's
-    columns."""
+    columns. `written_id` is whether its id was written by hand."""
 
     id: NodeId
     values: list[CellValue]
     status: Status = 'passed'
     error: ErrorInfo | None = None
+    written_id: bool = False
 
 
 @dataclass(frozen=True)
 class ParameterTable:
-    """`named_cases` is whether any case's id was written by hand, which is
-    what earns the table its leading id column."""
-
     columns: list[ParameterColumn]
     cases: list[ParameterCase] = field(default_factory=list)
-    named_cases: bool = False
 
     def cells(self, case: ParameterCase) -> list[tuple[ParameterColumn, CellValue]]:
         """A case's cells paired with the columns they sit under.
@@ -432,6 +436,12 @@ class ParameterTable:
     @property
     def has_mixed_statuses(self) -> bool:
         return len({case.status for case in self.cases}) > 1
+
+    @property
+    def named_cases(self) -> bool:
+        """Whether any case's id was written by hand, which is what earns the
+        table its leading case id column."""
+        return any(case.written_id for case in self.cases)
 
 
 @dataclass

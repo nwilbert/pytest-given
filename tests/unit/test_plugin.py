@@ -796,6 +796,26 @@ def test_an_id_from_the_make_parametrize_id_hook_is_not_written(
     ) == {'cup-1': False}
 
 
+def test_a_make_parametrize_id_hook_failing_on_a_written_ids_value_is_no_answer(
+    pytester: pytest.Pytester,
+) -> None:
+    """pytest asks the hook only for a generated part, so it need not handle a
+    value whose id was written."""
+    pytester.makeconftest(
+        """
+        def pytest_make_parametrize_id(config, val, argname):
+            return val['slug'] if argname == 'user' else None
+        """
+    )
+    assert _written_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('user', [pytest.param({}, id='admin')])
+        def test_x(user): pass
+        """,
+    ) == {'admin': True}
+
+
 def test_an_unescaped_id_is_not_written_where_escaping_is_off(
     pytester: pytest.Pytester,
 ) -> None:

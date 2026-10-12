@@ -934,21 +934,21 @@ function reportApp() {
       const columns = [];
       for (const cell of table.tHead.rows[0].querySelectorAll(`[data-block="${safe}"]`)) {
         const { left, right } = cell.getBoundingClientRect();
-        const run = columns[columns.length - 1];
-        if (run && cell.previousElementSibling === run.cell) Object.assign(run, { cell, right });
+        const columnRun = columns[columns.length - 1];
+        if (columnRun && cell.previousElementSibling === columnRun.cell) Object.assign(columnRun, { cell, right });
         else columns.push({ cell, left, right });
       }
       const rows = [];
-      let run = null;
+      let rowRun = null;
       for (const row of table.rows) {
         const cell = row.querySelector(`[data-block="${safe}"]`);
         if (!cell) {
-          if (row.getBoundingClientRect().height > 1) run = null;
+          if (row.getBoundingClientRect().height > 1) rowRun = null;
           continue;
         }
         const { top, bottom } = cell.getBoundingClientRect();
-        if (!run) rows.push(run = { top });
-        run.bottom = bottom;
+        if (!rowRun) rows.push(rowRun = { top });
+        rowRun.bottom = bottom;
       }
       const boxes = rows.flatMap(({ top, bottom }) => columns.map(({ left, right }) => ({ left, right, top, bottom })));
       for (const { left, right, top, bottom } of boxes) {

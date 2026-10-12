@@ -102,9 +102,12 @@ def _param_table_md(table: ParameterTable) -> str:
     rows: list[str] = []
     blocks: list[str] = []
     for row, case in enumerate(table.cases, start=1):
-        # Too long to inline, an id was generated from a value the row shows.
+        # A generated id too long to inline only repeats a value the row shows.
         pytest_id = case_id(case.id)
-        pytest_id = _cell(pytest_id) if _fits_inline(pytest_id) else ''
+        if case.written_id or len(pytest_id) <= _MAX_INLINE:
+            pytest_id = _cell(pytest_id)
+        else:
+            pytest_id = ''
         cells = [pytest_id] if table.named_cases else []
         cells.extend(_case_cell(column, value) for column, value in table.cells(case))
         if show_status:

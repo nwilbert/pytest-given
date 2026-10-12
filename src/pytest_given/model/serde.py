@@ -310,7 +310,6 @@ def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
     return ParameterTable(
         columns=[_param_column_from_dict(c) for c in d['columns']],
         cases=[_param_case_from_dict(c) for c in d.get('cases', [])],
-        named_cases=d.get('named_cases', False),
     )
 
 
@@ -346,6 +345,7 @@ def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
         values=[_cell_from_json(v) for v in d['values']],
         status=status,
         error=_error_from_dict(d.get('error')),
+        written_id=d.get('written_id', False),
     )
 
 

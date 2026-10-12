@@ -85,8 +85,8 @@ def _substituted_part(
 
 
 def _suffixed(narration: Narration, node_id: NodeId) -> Narration:
-    """The parametrize id appended as a value, since it is generated from
-    values: never read for Markdown."""
+    """The parametrize id appended as a value, so it is never read for
+    Markdown."""
     parts = narration.parts or (NarrationLiteral(value=narration.text),)
     return narration_of(
         (

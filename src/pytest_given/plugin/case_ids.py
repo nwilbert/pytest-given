@@ -51,13 +51,23 @@ def _token(config: pytest.Config, value: object, argname: str) -> re.Pattern[str
     position in its parametrize call, is allowed for every value: the position
     is not known here, and the fallback also names an empty parameter set.
     A trailing counter is what pytest appends to tell duplicate ids apart."""
-    text = config.hook.pytest_make_parametrize_id(
-        config=config, val=value, argname=argname
-    )
+    text = _hook_token(config, value, argname)
     if text is None:
         text = _value_token(config, value)
     named = f'{re.escape(text)}|' if text is not None else ''
     return re.compile(f'(?:{named}{re.escape(argname)}\\d+)(?:_?\\d+)?')
+
+
+def _hook_token(config: pytest.Config, value: object, argname: str) -> str | None:
+    """A failure is no answer: pytest asks the hook only for a generated part,
+    so it need not handle a value whose id was written."""
+    try:
+        token: str | None = config.hook.pytest_make_parametrize_id(
+            config=config, val=value, argname=argname
+        )
+    except Exception:  # noqa: BLE001 — user hook code; see the docstring
+        return None
+    return token
 
 
 def _value_token(config: pytest.Config, value: object) -> str | None:

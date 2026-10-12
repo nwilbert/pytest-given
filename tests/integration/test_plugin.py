@@ -386,7 +386,7 @@ def test_generated_case_ids_leave_the_table_without_an_id_column(pytester, tmp_p
         """,
     )
     result.assert_outcomes(passed=2)
-    assert scenario_json['parameters']['named_cases'] is False
+    assert not any(case['written_id'] for case in scenario_json['parameters']['cases'])
 
 
 def test_parametrized_non_json_values_are_captured_as_str(pytester, tmp_path):

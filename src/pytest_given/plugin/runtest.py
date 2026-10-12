@@ -112,7 +112,8 @@ def _capture_param_spec(item: pytest.Item, node_id: NodeId, *, group: bool) -> N
             for name in names
         ],
         group=group,
-        written_id=written_id(item.config, node_id, callspec.params),
+        # Read only by a group's table, so only worked out for one.
+        written_id=group and written_id(item.config, node_id, callspec.params),
     )
 
 

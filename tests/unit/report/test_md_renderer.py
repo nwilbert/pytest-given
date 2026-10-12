@@ -1040,14 +1040,25 @@ def _named_table(*cases: ParameterCase) -> ParameterTable:
     return ParameterTable(
         columns=[ParameterColumn(id='hours', name='hours', kind='param')],
         cases=list(cases),
-        named_cases=True,
+    )
+
+
+def _written(
+    node_id: str,
+    value: int,
+    *,
+    status: Status = 'passed',
+    error: ErrorInfo | None = None,
+) -> ParameterCase:
+    return ParameterCase(
+        id=NodeId(node_id), values=[value], status=status, error=error, written_id=True
     )
 
 
 def test_a_named_table_leads_with_every_cases_id() -> None:
     """A generated id shows beside a written one, as the terminal printed it."""
     table = _named_table(
-        ParameterCase(id=NodeId('t.py::test_x[touching-edges]'), values=[10]),
+        _written('t.py::test_x[touching-edges]', 10),
         ParameterCase(id=NodeId('t.py::test_x[11]'), values=[11], status='failed'),
     )
     md = render_md(_report_with(table))
@@ -1058,7 +1069,7 @@ def test_a_named_table_leads_with_every_cases_id() -> None:
 
 def test_a_hidden_id_leaves_its_cell_empty() -> None:
     table = _named_table(
-        ParameterCase(id=NodeId('t.py::test_x[one]'), values=[1]),
+        _written('t.py::test_x[one]', 1),
         ParameterCase(id=NodeId('t.py::test_x'), values=[2]),
     )
     assert '|  | 2 |' in render_md(_report_with(table))
@@ -1067,9 +1078,9 @@ def test_a_hidden_id_leaves_its_cell_empty() -> None:
 def test_a_named_tables_notes_are_keyed_by_the_id() -> None:
     """An empty id falls back to the values."""
     table = _named_table(
-        ParameterCase(
-            id=NodeId('t.py::test_x[touching-edges]'),
-            values=[10],
+        _written(
+            't.py::test_x[touching-edges]',
+            10,
             status='failed',
             error=ErrorInfo(message='clash'),
         ),
@@ -1086,16 +1097,15 @@ def test_a_named_tables_notes_are_keyed_by_the_id() -> None:
 
 
 def test_an_id_is_written_literally() -> None:
-    table = _named_table(
-        ParameterCase(id=NodeId('t.py::test_x[a*b*c|d]'), values=[1]),
-    )
-    assert r'| a\*b\*c\|d | 1 |' in render_md(_report_with(table))
+    table = _named_table(_written('t.py::test_x[a*b*c|d`e]', 1))
+    assert r'| a\*b\*c\|d\`e | 1 |' in render_md(_report_with(table))
 
 
-def test_an_id_too_long_to_inline_leaves_its_cell_and_notes_to_the_values() -> None:
-    """A generated id that long repeats a value the row already shows."""
+def test_a_long_generated_id_leaves_its_cell_and_notes_to_the_values() -> None:
+    """An id that long repeats a value the row already shows."""
     long_id = 'x' * 73
     table = _named_table(
+        _written('t.py::test_x[edge]', 1),
         ParameterCase(
             id=NodeId(f't.py::test_x[{long_id}]'),
             values=[10],
@@ -1107,3 +1117,18 @@ def test_an_id_too_long_to_inline_leaves_its_cell_and_notes_to_the_values() -> N
     assert long_id not in md
     assert '|  | 10 |' in md
     assert '- **10** — failed:' in md
+
+
+def test_a_written_id_shows_whole_however_long() -> None:
+    long_id = 'touching-' * 10
+    table = _named_table(
+        _written(
+            f't.py::test_x[{long_id}]',
+            10,
+            status='failed',
+            error=ErrorInfo(message='clash'),
+        ),
+    )
+    md = render_md(_report_with(table))
+    assert f'| {long_id} | 10 |' in md
+    assert f'- **{long_id}** — failed:' in md

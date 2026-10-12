@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T18:25:13.858759+00:00",
+    "timestamp": "2026-10-12T18:07:21.767735+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "9b4a42975804b52516618ccb531a9e1a997c110c",
+    "commit_sha": "0c89c35945c845feca71bf8646ea119908d5ad58",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 33,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -764,7 +764,8 @@
               "insufficient funds"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "written_id": false
           },
           {
             "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[debit card-expired card]",
@@ -773,7 +774,8 @@
               "expired card"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "written_id": false
           },
           {
             "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[bank transfer-fraud check failed]",
@@ -782,7 +784,8 @@
               "fraud check failed"
             ],
             "status": "passed",
-            "error": null
+            "error": null,
+            "written_id": false
           },
           {
             "id": "examples/hotel-booking/test_hotel_booking.py::test_payment_declined[gift card-partial balance]",
@@ -803,10 +806,10 @@
                 }
               ],
               "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     - partial balance\nE     + unsupported payment method"
-            }
+            },
+            "written_id": false
           }
-        ],
-        "named_cases": false
+        ]
       },
       "error": null,
       "skip_reason": null,

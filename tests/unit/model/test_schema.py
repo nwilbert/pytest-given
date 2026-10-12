@@ -140,6 +140,7 @@ def test_parameter_table() -> None:
         pytest.param('t.py::C::test_x[edge-1]', 'edge-1', id='stacked'),
         pytest.param('t.py::test_x[a[0]]', 'a[0]', id='bracketed'),
         pytest.param('t.py::test_x', '', id='hidden'),
+        pytest.param('tests/[legacy]/t.py::test_x[1]', '1', id='bracketed-path'),
     ],
 )
 def test_case_id_is_the_node_ids_suffix_unbracketed(
@@ -520,9 +521,35 @@ def test_node_base_applies_to_a_bare_function_segment() -> None:
     assert node_base('test_x[1-2]') == 'test_x'
 
 
+def test_node_base_keeps_a_bracket_in_the_path() -> None:
+    assert node_base('tests/[legacy]/t.py::test_x[1]') == 'tests/[legacy]/t.py::test_x'
+
+
 def test_case_suffix_returns_the_bracketed_tail() -> None:
     assert case_suffix('tests/t.py::test_x[1-2]') == '[1-2]'
 
 
 def test_case_suffix_is_empty_without_a_tail() -> None:
     assert case_suffix('tests/t.py::test_x') == ''
+
+
+def test_case_suffix_is_empty_for_a_bracket_in_the_path_only() -> None:
+    assert case_suffix('tests/[legacy]/t.py::test_x') == ''
+
+
+@pytest.mark.parametrize(
+    ('written', 'named'), [([False, False], False), ([False, True], True)]
+)
+def test_a_table_names_its_cases_when_any_id_is_written(
+    written: list[bool], named: bool
+) -> None:
+    table = ParameterTable(
+        columns=[],
+        cases=[
+            ParameterCase(
+                id=NodeId(f't.py::test_x[{index}]'), values=[], written_id=flag
+            )
+            for index, flag in enumerate(written)
+        ],
+    )
+    assert table.named_cases is named
