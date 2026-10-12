@@ -57,8 +57,6 @@ class Group:
     # against, so what it renders has to be recomputed from these; see
     # `templatize._reconciled_slot`.
     case_params: dict[NodeId, dict[str, RawParamValue]]
-    # Whether any case's id was written by hand.
-    named_cases: bool
     # Each comparable case's tree keyed by position, so "the same position in
     # every other case" is a lookup rather than a parallel descent through
     # several trees.
@@ -86,7 +84,6 @@ def build_group(cases: list[Scenario], param_info: ParamInfo) -> Group:
         baseline=_baseline(cases, comparable),
         comparable=comparable,
         case_params={case.id: param_info[case.id].mapping() for case in cases},
-        named_cases=any(param_info[case.id].explicit_id for case in cases),
         indexed={case.id: dict(walk_steps(case.steps)) for case in comparable},
     )
 

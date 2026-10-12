@@ -365,10 +365,10 @@ def test_a_parameter_table_names_its_rows_by_their_case_ids(pytester, tmp_path):
     with then('both cases pass'):
         result.assert_outcomes(passed=2)
     with then(
-        t'the {pg["Parameter table"].l} leads with an id column, '
+        t'the {pg["Parameter table"].l} leads with a case id column, '
         t'the generated {pg["Case id"].l} shown beside the written one'
     ):
-        assert '| id | start | clashes |' in md
+        assert '| case id | start | clashes |' in md
         assert '| touching-edges | 20 | False |' in md
         assert '| 19-True | 19 | True |' in md
 

@@ -24,27 +24,28 @@ Definitions](2026-10-11-inline-markdown-design.md) and uses its Markdown writer 
 
 ### Capture
 
-`ParamSpec` gains `explicit_id: bool = False`: whether any part of the case's id was written by
-hand. pytest records only the final id parts, so it is read from the item's `parametrize` marks
-(`item.iter_markers('parametrize')`, class- and module-level ones included). For each mark, the
-argnames are split and each argvalue unpacked the way pytest does it (a lone name in a bare string
-takes each value whole), and the case's position in its `argvalues` is found by identity: pytest
-passes each argvalue through unchanged into `callspec.params`. `callspec.indices` cannot say it,
-since pytest renumbers a direct argument's index to the case's place among all cases. Each mark is
-indexed once, by its argvalues' identities, for every case that shares it; where one object sits
-at several positions, each of them is matched. The part is explicit when:
+`ParamSpec` gains `written_id: bool = False`: whether the case's id was written by hand. pytest
+records only the finished id, and its parametrization reaches it from marks, fixture `params=` and
+`metafunc.parametrize` alike, so the id is read off its form rather than its source. A generated id
+is the case's values' tokens joined by `-`, in the order of `callspec.params`, which is the order
+pytest parametrized in. The id is written unless it is such a join, where each token follows
+pytest's `IdMaker`:
 
-- the argvalue is a `pytest.param` with an `id` other than `pytest.HIDDEN_PARAM` (such an id wins
-  over `ids=`, as in pytest), or, without one,
-- the mark's `ids` (keyword or fourth positional argument) is a callable or an iterator, or a
-  sequence whose entry at that position is neither `None` nor `HIDDEN_PARAM` — pytest generates
-  the id for a `None` entry.
+- a `pytest_make_parametrize_id` hook's answer, if any;
+- otherwise from the value: a string or bytes ASCII-escaped (unless the ini option that disables
+  escaping is set), a number, bool or `None` by `str`, a regex by its pattern, an enum member by
+  `str`, anything with a `__name__` by that name;
+- or `argname` and a number, pytest's fallback for any other value, allowed for every value since
+  the number is the case's position in its parametrize call, which is not known;
+- each optionally followed by a counter (`1_0`, `a1`), which pytest appends to tell duplicate ids
+  apart.
 
-A callable counts even where it returns `None`: telling would mean calling it again. An iterator
-counts too, as pytest has consumed it. One explicit part makes the case explicit, since one named
-part makes the id worth reading, and so does one explicit position among several an object
-matches: the table shows its ids for that position's own case anyway. Parametrization
-that never becomes a mark (`metafunc.parametrize`, fixture `params=`) reads as generated.
+Any token may be missing, as `HIDDEN_PARAM` drops a part from the id, and an empty id is not
+written. The rules are copied, as pytest exports none of them; the unit tests pin each, and
+`nox -s compat` runs them against the oldest and newest supported pytest. A drift in pytest's rules
+reads its generated ids as written, which shows the column where it adds nothing. An id written by
+hand that matches its values' tokens (`ids=['1']` for `1`) reads as generated, which is the point:
+it says nothing the value columns don't.
 
 ### Model
 
@@ -59,7 +60,7 @@ class ParameterTable:
 def case_id(node_id: str) -> str: ...
 ```
 
-`named_cases` is true when any case is explicit, and it is the only thing the renderers consult
+`named_cases` is true when any case's id is written, and it is the only thing the renderers consult
 to show the column. `case_id` is `case_suffix(node_id)` unbracketed, the text the terminal
 printed and the suffix a per-case scenario's title already carries, which takes it from the same
 function.
@@ -69,8 +70,8 @@ substitute, and the column order rules don't sort it. It is the row's header.
 
 ### Rendering
 
-When `named_cases` holds, both renderers lead the table with a column headed `id` (pytest's word,
-the one `ids=` and `-k` use). Every row shows its id, generated ones included, so each row reads as
+When `named_cases` holds, both renderers lead the table with a column headed `case id`, the
+glossary's word; a bare `id` would clash with a parametrize argument of that name. Every row shows its id, generated ones included, so each row reads as
 the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
 
 - **HTML:** a `<th scope="row">` per row, in plain text and uncoloured, with no `data-param`: the
@@ -78,13 +79,15 @@ the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
   phase hover it shares one `data-block` with the status column, so pointing at either outlines
   both. The two sit at opposite ends of the row, so `_outlinePhase` draws one box per run of
   adjacent columns and run of rows instead of one per run of rows.
-- **Markdown:** a leading `id` column, the id escaped whole by the inline Markdown writer, like
-  every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). The notes below the
-  table (a case's error, an attachment too long to inline) are keyed by the
-  id instead of the joined values, falling back to the values for an empty id.
+- **Markdown:** a leading `case id` column, the id escaped whole by the inline Markdown writer,
+  like every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). An id too long to
+  inline leaves its cell empty, by the rule that keeps a long value out of a note's key: pytest
+  generated it from a value the row already shows. The notes below the table (a case's error, an
+  attachment too long to inline) are keyed by the id instead of the joined values, falling back to
+  the values for an empty cell.
 
 ````markdown
-| id | existing booking | hours later | it clashes |
+| case id | existing booking | hours later | it clashes |
 |---|---|---|---|
 | touching-edges | 10–20 | 10 | True |
 | one-hour-apart | 10–20 | 11 | False |
@@ -106,7 +109,7 @@ misname its row.
 ## Implementation touch points
 
 - `model/runtime.py`, `model/schema.py` — the fields and `case_id` above; serde follows.
-- `plugin/case_ids.py` — `explicit_id`; `grouping/columns.py` — `named_cases`.
+- `plugin/case_ids.py` — `written_id`; `grouping/columns.py` — `named_cases`.
 - `report/md_renderer.py` — the column; `_case_key` prefers the id.
 - `report/templates/` — the row header, the shared block, per-run outline boxes;
   Playwright-verified per AGENTS.md.
@@ -120,12 +123,12 @@ misname its row.
 
 ## Test coverage
 
-- Capture, over pytester-collected items: each explicit and generated form above, `HIDDEN_PARAM`,
-  and stacked marks with one explicit part.
-- Grouping and model: `named_cases` false for generated ids, true for any explicit case; `case_id`
+- Capture, over pytester-collected items: each token rule above, a duplicate, `HIDDEN_PARAM`,
+  stacked marks, and written ids from a mark, a fixture and `metafunc.parametrize`.
+- Grouping and model: `named_cases` true for any written case; `case_id`
   for a plain, stacked and hidden id.
 - Markdown renderer: the leading column only under `named_cases`, generated ids beside explicit
-  ones, notes keyed by id, an id holding `*` and `|` escaped.
+  ones, notes keyed by id, an id holding `*` and `|` escaped, an id too long to inline left out.
 - HTML: data-shaped only; the markup, the shared block and the outline are Playwright's.
 
 ## Out of scope

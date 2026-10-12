@@ -308,7 +308,7 @@
       <table class="param-table">
         <thead>
           <tr>
-            {% if show_ids %}<th class="param-id" data-block="frame">id</th>{% endif %}
+            {% if show_ids %}<th class="param-id" data-block="frame">case id</th>{% endif %}
             {% for col in scenario.parameters.columns %}
             <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>{{ col.name }}</th>
             {% endfor %}

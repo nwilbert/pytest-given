@@ -118,13 +118,13 @@
     
     - **then** a booking from {start} clashes: {clashes}
     
-    | id | start | clashes |
+    | case id | start | clashes |
     |---|---|---|
     | touching-edges | 20 | False |
     | 19-True | 19 | True |
     ```
 - **then** both cases pass
-- **then** the «parameter table» leads with an id column, the generated «case id» shown beside the written one
+- **then** the «parameter table» leads with a case id column, the generated «case id» shown beside the written one
 
 ## ✓ A refusal on a run with no sink does not claim a «report» was skipped
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
@@ -517,7 +517,7 @@
 - **then** the grafted root «pins» the sentences {root_sentences} of a
 - **then** the inner «step» keeps its own «pin», a\[3\]
 
-| id | label_pins | root_sentences |
+| case id | label_pins | root_sentences |
 |---|---|---|
 | none-keeps | None | \[1\] |
 | empty-clears | \[\] | \[\] |
@@ -554,7 +554,7 @@
 - **when** the suite runs
 - **then** the scenario errors, saying {error}
 
-| id | placeholder | suite | error |
+| case id | placeholder | suite | error |
 |---|---|---|---|
 | column | {x} | suite | None |
 | plain-fixture | {room} | suite | '{room}' in the Annotated label on parameter 'room' does not match |
@@ -2081,7 +2081,7 @@
 - **then** the placeholder is {outcome}
 - **then** a refusal says bare identifiers only
 
-| id | text | outcome |
+| case id | text | outcome |
 |---|---|---|
 | bare-identifier | count={count} | accepted |
 | attribute | count={obj.attr} | refused |
@@ -2418,7 +2418,7 @@
 - **when** «coverage» is computed against the «story»
 - **then** the «scenario» covers the «sentences» {covered}
 
-| id | scenario_pins | step_pins | covered |
+| case id | scenario_pins | step_pins | covered |
 |---|---|---|---|
 | nothing-pinned | None | None | \[1\] |
 | step-pinned | None | \[2\] | \[2\] |

@@ -58,7 +58,9 @@ class ColumnBuilder:
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
 
-    def table(self, cases: list[Scenario], narrated: list[ColumnId]) -> ParameterTable:
+    def table(
+        self, cases: list[Scenario], narrated: list[ColumnId], *, named_cases: bool
+    ) -> ParameterTable:
         """The finished table: the columns, and one row per case.
 
         Columns follow `narrated`, the order a reader meets them in, so a
@@ -88,7 +90,7 @@ class ColumnBuilder:
                 )
                 for case in cases
             ],
-            named_cases=self.group.named_cases,
+            named_cases=named_cases,
         )
 
     def derived(self, name: str, rendered: dict[NodeId, str]) -> ParameterColumn:

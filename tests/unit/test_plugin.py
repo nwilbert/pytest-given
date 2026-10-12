@@ -635,34 +635,75 @@ def test_a_value_rendering_by_identity_under_repr_only_is_kept_as_it_is() -> Non
 
 
 # --- Whether a case's id was written by hand ---
+# Every generated form here pins one of pytest's id rules, which `case_ids`
+# copies; `nox -s compat` runs them against the oldest and newest pytest.
 
 
-def _explicit_ids(pytester: pytest.Pytester, source: str) -> dict[str, bool]:
-    """Each collected case's id suffix, mapped to whether it reads as explicit."""
+def _written_ids(pytester: pytest.Pytester, source: str) -> dict[str, bool]:
+    """Each collected case's id, mapped to whether it reads as written by hand."""
     items = pytester.getitems(
-        'import pytest\nfrom pytest import HIDDEN_PARAM\n' + textwrap.dedent(source)
+        'import enum, re\nimport pytest\nfrom pytest import HIDDEN_PARAM\n'
+        + textwrap.dedent(source)
     )
-    cache: case_ids.MarkIdsCache = {}
     return {
-        case_id(item.nodeid): case_ids.explicit_case_id(
-            item, cast(pytest.Function, item).callspec.params, cache
+        case_id(item.nodeid): case_ids.written_id(
+            item.config, item.nodeid, cast(pytest.Function, item).callspec.params
         )
         for item in items
     }
 
 
-def test_generated_ids_are_not_explicit(pytester: pytest.Pytester) -> None:
-    assert _explicit_ids(
+def test_an_id_generated_from_any_kind_of_value_is_not_written(
+    pytester: pytest.Pytester,
+) -> None:
+    ids = _written_ids(
         pytester,
         """
-        @pytest.mark.parametrize('a, b', [(1, 2), pytest.param(3, 4)])
-        def test_x(a, b): pass
+        class Size(enum.Enum):
+            SMALL = 1
+
+        def brew(): pass
+
+        @pytest.mark.parametrize('v', [
+            'plain', 'naïve' + chr(10), bytes([9, 1, 0xc3]), '', 1, 2.5, True, None, 1j,
+            re.compile('a+'), Size.SMALL, Size, brew, object(), [1],
+        ])
+        def test_x(v): pass
         """,
-    ) == {'1-2': False, '3-4': False}
+    )
+    assert 'v13' in ids
+    assert not any(ids.values())
 
 
-def test_a_param_id_is_explicit_for_its_case_only(pytester: pytest.Pytester) -> None:
-    assert _explicit_ids(
+def test_a_disambiguated_duplicate_id_is_not_written(
+    pytester: pytest.Pytester,
+) -> None:
+    assert _written_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('v', [1, 1, 'a', 'a'])
+        def test_x(v): pass
+        """,
+    ) == {'1_0': False, '1_1': False, 'a0': False, 'a1': False}
+
+
+def test_stacked_generated_ids_are_not_written(pytester: pytest.Pytester) -> None:
+    ids = _written_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a', [1, 2])
+        class TestX:
+            @pytest.mark.parametrize('b, c', [('x-y', None), ('z', 2.5)])
+            def test_x(self, a, b, c): pass
+        """,
+    )
+    assert ids == dict.fromkeys(
+        ['x-y-None-1', 'x-y-None-2', 'z-2.5-1', 'z-2.5-2'], False
+    )
+
+
+def test_a_param_id_is_written_for_its_case_only(pytester: pytest.Pytester) -> None:
+    assert _written_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', [1, pytest.param(2, id='two')])
@@ -671,124 +712,103 @@ def test_a_param_id_is_explicit_for_its_case_only(pytester: pytest.Pytester) -> 
     ) == {'1': False, 'two': True}
 
 
-def test_a_hidden_param_id_is_not_explicit(pytester: pytest.Pytester) -> None:
-    assert _explicit_ids(
+@pytest.mark.parametrize(
+    ('ids', 'written'),
+    [
+        pytest.param("['one', None]", {'one': True, '2': False}, id='list'),
+        pytest.param(
+            "lambda v: f'cup-{v}'", {'cup-1': True, 'cup-2': True}, id='callable'
+        ),
+        pytest.param("['1', '2']", {'1': False, '2': False}, id='repeating-values'),
+    ],
+)
+def test_an_ids_entry_is_written_unless_it_repeats_the_values(
+    pytester: pytest.Pytester, ids: str, written: dict[str, bool]
+) -> None:
+    assert (
+        _written_ids(
+            pytester,
+            f"""
+            @pytest.mark.parametrize('a', [1, 2], ids={ids})
+            def test_x(a): pass
+            """,
+        )
+        == written
+    )
+
+
+def test_a_hidden_part_leaves_the_rest_generated(pytester: pytest.Pytester) -> None:
+    assert _written_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', [pytest.param(1, id=HIDDEN_PARAM)])
-        def test_x(a): pass
+        @pytest.mark.parametrize('b', [3])
+        def test_x(a, b): pass
+
+        @pytest.mark.parametrize('c', [pytest.param(1, id=HIDDEN_PARAM)])
+        def test_y(c): pass
         """,
-    ) == {'': False}
+    ) == {'3': False, '': False}
 
 
-def test_an_ids_entry_is_explicit_unless_none(pytester: pytest.Pytester) -> None:
-    assert _explicit_ids(
+def test_a_fixtures_ids_are_written(pytester: pytest.Pytester) -> None:
+    assert _written_ids(
         pytester,
         """
-        @pytest.mark.parametrize('a', [1, 2], ids=['one', None])
+        @pytest.fixture(params=['sqlite', 'postgres'], ids=['lite', None])
+        def db(request): return request.param
+
+        def test_x(db): pass
+        """,
+    ) == {'lite': True, 'postgres': False}
+
+
+def test_ids_given_to_metafunc_parametrize_are_written(
+    pytester: pytest.Pytester,
+) -> None:
+    assert _written_ids(
+        pytester,
+        """
+        def pytest_generate_tests(metafunc):
+            metafunc.parametrize('a', [1, 2], ids=['one', None])
+
         def test_x(a): pass
         """,
     ) == {'one': True, '2': False}
 
 
-def test_positional_ids_count_like_the_keyword(pytester: pytest.Pytester) -> None:
-    assert _explicit_ids(
-        pytester,
-        """
-        @pytest.mark.parametrize('a', [1], False, ['one'])
-        def test_x(a): pass
-        """,
-    ) == {'one': True}
-
-
-def test_an_ids_callable_is_explicit_even_returning_none(
+def test_an_id_from_the_make_parametrize_id_hook_is_not_written(
     pytester: pytest.Pytester,
 ) -> None:
-    assert _explicit_ids(
+    """The hook names a value wherever it appears, not one case."""
+    pytester.makeconftest(
+        """
+        def pytest_make_parametrize_id(config, val, argname):
+            return f'cup-{val}'
+        """
+    )
+    assert _written_ids(
         pytester,
         """
-        @pytest.mark.parametrize('a', [1, 2], ids=lambda v: None if v == 1 else 'two')
+        @pytest.mark.parametrize('a', [1])
         def test_x(a): pass
         """,
-    ) == {'1': True, 'two': True}
+    ) == {'cup-1': False}
 
 
-def test_an_ids_iterator_counts_as_explicit(pytester: pytest.Pytester) -> None:
-    """pytest has consumed it by now, so its entries cannot be read again."""
-    assert _explicit_ids(
-        pytester,
-        """
-        @pytest.mark.parametrize('a', [1], ids=iter(['one']))
-        def test_x(a): pass
-        """,
-    ) == {'one': True}
-
-
-def test_one_explicit_part_of_stacked_marks_makes_the_case_explicit(
+def test_an_unescaped_id_is_not_written_where_escaping_is_off(
     pytester: pytest.Pytester,
 ) -> None:
-    assert _explicit_ids(
+    pytester.makeini(
+        """
+        [pytest]
+        disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true
+        """
+    )
+    assert _written_ids(
         pytester,
         """
-        @pytest.mark.parametrize('a', [1, 2])
-        class TestX:
-            @pytest.mark.parametrize(
-                argnames=['b'], argvalues=[(3,), pytest.param(4, id='four')]
-            )
-            def test_x(self, a, b): pass
-        """,
-    ) == {'3-1': False, 'four-1': True, '3-2': False, 'four-2': True}
-
-
-def test_a_value_repeated_at_an_explicit_position_reads_as_explicit(
-    pytester: pytest.Pytester,
-) -> None:
-    """A repeated object matches every position it sits at; the table shows
-    its ids for the explicit one either way."""
-    assert _explicit_ids(
-        pytester,
-        """
-        @pytest.mark.parametrize('a', [None, 2, pytest.param(None, id='again')])
+        @pytest.mark.parametrize('a', ['naïve'])
         def test_x(a): pass
         """,
-    ) == {'None': True, '2': False, 'again': True}
-
-
-def test_a_hidden_param_wins_over_its_ids_entry(pytester: pytest.Pytester) -> None:
-    assert _explicit_ids(
-        pytester,
-        """
-        @pytest.mark.parametrize('a', [pytest.param(1, id=HIDDEN_PARAM)], ids=['one'])
-        def test_x(a): pass
-        """,
-    ) == {'': False}
-
-
-def test_parametrization_without_a_mark_reads_as_generated(
-    pytester: pytest.Pytester,
-) -> None:
-    assert _explicit_ids(
-        pytester,
-        """
-        @pytest.fixture(params=[1], ids=['one'])
-        def a(request): return request.param
-
-        def test_x(a): pass
-        """,
-    ) == {'one': False}
-
-
-@pytest.mark.parametrize(
-    'argnames', [pytest.param("['a']", id='list'), pytest.param("'a,'", id='comma')]
-)
-def test_one_argname_outside_a_bare_string_takes_tuples(
-    pytester: pytest.Pytester, argnames: str
-) -> None:
-    """pytest takes each value whole only for a bare string naming one argument."""
-    assert _explicit_ids(
-        pytester,
-        f"""
-        @pytest.mark.parametrize({argnames}, [(1,), (2,)], ids=['one', None])
-        def test_x(a): pass
-        """,
-    ) == {'one': True, '2': False}
+    ) == {'naïve': False}

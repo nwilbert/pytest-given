@@ -89,20 +89,22 @@ def _param_table_md(table: ParameterTable) -> str:
     shows the label in the cell and renders fenced below the table, keyed by
     the row (see `_case_key`).
 
-    The leading id column only appears when some case id was written by hand,
+    The leading case id column only appears when some case id was written by hand,
     and the trailing status column only when the cases differ in status: a
     column of one glyph says nothing the heading's glyph hasn't.
     """
     show_status = table.has_mixed_statuses
     names = [_cell(column.name) for column in table.columns]
     if table.named_cases:
-        names.insert(0, 'id')
+        names.insert(0, 'case id')
     header = '| ' + ' | '.join(names) + ' |' + ' |' * show_status
     separator = '|' + '---|' * (len(names) + show_status)
     rows: list[str] = []
     blocks: list[str] = []
     for row, case in enumerate(table.cases, start=1):
-        pytest_id = _cell(case_id(case.id))
+        # Too long to inline, an id was generated from a value the row shows.
+        pytest_id = case_id(case.id)
+        pytest_id = _cell(pytest_id) if _fits_inline(pytest_id) else ''
         cells = [pytest_id] if table.named_cases else []
         cells.extend(_case_cell(column, value) for column, value in table.cells(case))
         if show_status:

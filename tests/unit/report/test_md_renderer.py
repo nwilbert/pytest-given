@@ -1051,7 +1051,7 @@ def test_a_named_table_leads_with_every_cases_id() -> None:
         ParameterCase(id=NodeId('t.py::test_x[11]'), values=[11], status='failed'),
     )
     md = render_md(_report_with(table))
-    assert '| id | hours | |\n|---|---|---|' in md
+    assert '| case id | hours | |\n|---|---|---|' in md
     assert '| touching-edges | 10 | ✓ |' in md
     assert '| 11 | 11 | ✗ |' in md
 
@@ -1090,3 +1090,20 @@ def test_an_id_is_written_literally() -> None:
         ParameterCase(id=NodeId('t.py::test_x[a*b*c|d]'), values=[1]),
     )
     assert r'| a\*b\*c\|d | 1 |' in render_md(_report_with(table))
+
+
+def test_an_id_too_long_to_inline_leaves_its_cell_and_notes_to_the_values() -> None:
+    """A generated id that long repeats a value the row already shows."""
+    long_id = 'x' * 73
+    table = _named_table(
+        ParameterCase(
+            id=NodeId(f't.py::test_x[{long_id}]'),
+            values=[10],
+            status='failed',
+            error=ErrorInfo(message='clash'),
+        ),
+    )
+    md = render_md(_report_with(table))
+    assert long_id not in md
+    assert '|  | 10 |' in md
+    assert '- **10** — failed:' in md

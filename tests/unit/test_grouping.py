@@ -332,19 +332,11 @@ def test_each_case_keeps_its_node_id() -> None:
     assert [case.id for case in grouped[0].parameters.cases] == [nid1, nid2]
 
 
-@pytest.mark.parametrize(
-    ('explicit', 'named'),
-    [
-        pytest.param([False, False], False, id='all-generated'),
-        pytest.param([False, True], True, id='one-explicit'),
-    ],
-)
-def test_a_table_names_its_cases_when_any_id_is_explicit(
-    explicit: list[bool], named: bool
-) -> None:
+@pytest.mark.parametrize('named', [False, True])
+def test_a_table_names_its_cases_when_the_test_does(named: bool) -> None:
     scenarios, param_info = _cases(('passed', None), ('passed', None))
-    for case, flag in zip(scenarios, explicit, strict=True):
-        param_info[case.id] = param_info[case.id]._replace(explicit_id=flag)
+    for case in scenarios:
+        param_info[case.id] = param_info[case.id]._replace(written_id=named)
     [grouped] = group_parametrized(scenarios, param_info)
     assert grouped.parameters is not None
     assert grouped.parameters.named_cases is named

@@ -76,7 +76,9 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     grouped_narration = templatize_scenario_title(anchor.narration, builder)
 
     table = builder.table(
-        group.cases, narrated_column_order(grouped_narration, template_steps)
+        group.cases,
+        narrated_column_order(grouped_narration, template_steps),
+        named_cases=any(param_info[case.id].written_id for case in cases),
     )
     # `replace` rather than a field-by-field rebuild: the fields a group
     # derives rather than inherits are then the only ones spelled out, and a

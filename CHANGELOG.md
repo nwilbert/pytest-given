@@ -24,7 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
 - The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 - Scenario titles and step text render `**bold**`, `*italic*` and `` `code` `` in the HTML report.
-- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with an `id` column of the case ids when any was written by hand, flagged by `named_cases` in the JSON report.
+- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case id` column when any case id was written by hand, flagged by `named_cases` in the JSON report.
 
 ### Changed
 

@@ -24,14 +24,14 @@ class ParamSpec(NamedTuple):
     """Parameter names and raw values for a single parametrized test run.
 
     `group` carries `@scenario(group_parametrized=...)`: False declines the
-    merge and emits this case as its own scenario. `explicit_id` is whether any
-    part of the case's id was written by hand.
+    merge and emits this case as its own scenario. `written_id` is whether
+    the case's id was written by hand.
     """
 
     names: list[str]
     values: list[RawParamValue]
     group: bool = True
-    explicit_id: bool = False
+    written_id: bool = False
 
     def mapping(self) -> dict[str, RawParamValue]:
         """This case's parameters by name — the pairing of the two lists."""
