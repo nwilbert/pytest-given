@@ -534,18 +534,18 @@ def test_case_suffix_is_empty_for_a_bracket_in_the_path_only() -> None:
 
 
 @pytest.mark.parametrize(
-    ('written', 'named'), [([False, False], False), ([False, True], True)]
+    ('custom', 'expected'), [([False, False], False), ([False, True], True)]
 )
-def test_a_table_names_its_cases_when_any_id_is_written(
-    written: list[bool], named: bool
+def test_a_table_has_custom_ids_when_any_case_has_one(
+    custom: list[bool], expected: bool
 ) -> None:
     table = ParameterTable(
         columns=[],
         cases=[
             ParameterCase(
-                id=NodeId(f't.py::test_x[{index}]'), values=[], written_id=flag
+                id=NodeId(f't.py::test_x[{index}]'), values=[], custom_id=flag
             )
-            for index, flag in enumerate(written)
+            for index, flag in enumerate(custom)
         ],
     )
-    assert table.named_cases is named
+    assert table.has_custom_ids is expected

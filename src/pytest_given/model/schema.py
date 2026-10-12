@@ -409,13 +409,13 @@ type CellValue = ParamValue | Attachment
 @dataclass(frozen=True)
 class ParameterCase:
     """One parametrize case: its cells, positionally aligned with the table's
-    columns. `written_id` is whether its id was written by hand."""
+    columns. `custom_id` is whether its id is custom, written by hand."""
 
     id: NodeId
     values: list[CellValue]
     status: Status = 'passed'
     error: ErrorInfo | None = None
-    written_id: bool = False
+    custom_id: bool = False
 
 
 @dataclass(frozen=True)
@@ -438,10 +438,10 @@ class ParameterTable:
         return len({case.status for case in self.cases}) > 1
 
     @property
-    def named_cases(self) -> bool:
-        """Whether any case's id was written by hand, which is what earns the
+    def has_custom_ids(self) -> bool:
+        """Whether any case's id is custom, which is what earns the
         table its leading case id column."""
-        return any(case.written_id for case in self.cases)
+        return any(case.custom_id for case in self.cases)
 
 
 @dataclass

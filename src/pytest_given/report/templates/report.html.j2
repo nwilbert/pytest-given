@@ -296,9 +296,9 @@
       {#- Only when the cases differ in status: a column of one glyph repeats
           the header's status badge on every row. -#}
       {%- set show_status = scenario.parameters.has_mixed_statuses -%}
-      {#- Only when some case id was written by hand: generated ids restate
+      {#- Only when some case id is custom: generated ids restate
           the value columns. -#}
-      {%- set show_ids = scenario.parameters.named_cases -%}
+      {%- set show_ids = scenario.parameters.has_custom_ids -%}
       {%- set table_width = scenario.parameters.columns | length + show_status + show_ids %}
       {#- Each column carries its phase block, so a phase hover can outline the
           narration and its columns together. The id and status columns share

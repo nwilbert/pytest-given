@@ -1,8 +1,8 @@
-"""Whether a case's id was written by hand, read off the id itself.
+"""Whether a case's id is custom, written by hand, read off the id itself.
 
 pytest builds a generated id from the case's values, so an id made of nothing
 but its values' tokens says nothing a reader could not see in the table. Any
-other id was written: `pytest.param(..., id=...)`, `ids=` on a mark, a fixture
+other id is custom: `pytest.param(..., id=...)`, `ids=` on a mark, a fixture
 or `metafunc.parametrize` alike. The token rules are pytest's own (`IdMaker`),
 copied, as pytest exports none of it; tests pin each rule.
 """
@@ -21,12 +21,12 @@ _NON_PRINTABLE = {
 } | {ord('\t'): '\\t', ord('\r'): '\\r', ord('\n'): '\\n'}
 
 
-def written_id(
+def is_custom_id(
     config: pytest.Config, node_id: str, params: Mapping[str, object]
 ) -> bool:
-    written = case_id(node_id)
+    pytest_id = case_id(node_id)
     tokens = [_token(config, value, name) for name, value in params.items()]
-    return bool(written) and not _joins(written, tokens)
+    return bool(pytest_id) and not _joins(pytest_id, tokens)
 
 
 def _joins(written: str, tokens: list[re.Pattern[str]]) -> bool:
@@ -60,7 +60,7 @@ def _token(config: pytest.Config, value: object, argname: str) -> re.Pattern[str
 
 def _hook_token(config: pytest.Config, value: object, argname: str) -> str | None:
     """A failure is no answer: pytest asks the hook only for a generated part,
-    so it need not handle a value whose id was written."""
+    so it need not handle a value whose id is custom."""
     try:
         token: str | None = config.hook.pytest_make_parametrize_id(
             config=config, val=value, argname=argname

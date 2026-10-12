@@ -1036,14 +1036,14 @@ def test_an_error_line_never_opens_a_block_inside_its_quote(message: str) -> Non
     assert rendered == f'<blockquote>\n<p>{text}\n1. a.py:3 in f</p>\n</blockquote>\n'
 
 
-def _named_table(*cases: ParameterCase) -> ParameterTable:
+def _table_with_custom_ids(*cases: ParameterCase) -> ParameterTable:
     return ParameterTable(
         columns=[ParameterColumn(id='hours', name='hours', kind='param')],
         cases=list(cases),
     )
 
 
-def _written(
+def _custom(
     node_id: str,
     value: int,
     *,
@@ -1051,14 +1051,14 @@ def _written(
     error: ErrorInfo | None = None,
 ) -> ParameterCase:
     return ParameterCase(
-        id=NodeId(node_id), values=[value], status=status, error=error, written_id=True
+        id=NodeId(node_id), values=[value], status=status, error=error, custom_id=True
     )
 
 
-def test_a_named_table_leads_with_every_cases_id() -> None:
-    """A generated id shows beside a written one, as the terminal printed it."""
-    table = _named_table(
-        _written('t.py::test_x[touching-edges]', 10),
+def test_a_table_with_custom_ids_leads_with_every_cases_id() -> None:
+    """A generated id shows beside a custom one, as the terminal printed it."""
+    table = _table_with_custom_ids(
+        _custom('t.py::test_x[touching-edges]', 10),
         ParameterCase(id=NodeId('t.py::test_x[11]'), values=[11], status='failed'),
     )
     md = render_md(_report_with(table))
@@ -1068,17 +1068,17 @@ def test_a_named_table_leads_with_every_cases_id() -> None:
 
 
 def test_a_hidden_id_leaves_its_cell_empty() -> None:
-    table = _named_table(
-        _written('t.py::test_x[one]', 1),
+    table = _table_with_custom_ids(
+        _custom('t.py::test_x[one]', 1),
         ParameterCase(id=NodeId('t.py::test_x'), values=[2]),
     )
     assert '|  | 2 |' in render_md(_report_with(table))
 
 
-def test_a_named_tables_notes_are_keyed_by_the_id() -> None:
+def test_notes_below_a_table_with_custom_ids_are_keyed_by_the_id() -> None:
     """An empty id falls back to the values."""
-    table = _named_table(
-        _written(
+    table = _table_with_custom_ids(
+        _custom(
             't.py::test_x[touching-edges]',
             10,
             status='failed',
@@ -1097,15 +1097,15 @@ def test_a_named_tables_notes_are_keyed_by_the_id() -> None:
 
 
 def test_an_id_is_written_literally() -> None:
-    table = _named_table(_written('t.py::test_x[a*b*c|d`e]', 1))
+    table = _table_with_custom_ids(_custom('t.py::test_x[a*b*c|d`e]', 1))
     assert r'| a\*b\*c\|d\`e | 1 |' in render_md(_report_with(table))
 
 
 def test_a_long_generated_id_leaves_its_cell_and_notes_to_the_values() -> None:
     """An id that long repeats a value the row already shows."""
     long_id = 'x' * 73
-    table = _named_table(
-        _written('t.py::test_x[edge]', 1),
+    table = _table_with_custom_ids(
+        _custom('t.py::test_x[edge]', 1),
         ParameterCase(
             id=NodeId(f't.py::test_x[{long_id}]'),
             values=[10],
@@ -1119,10 +1119,10 @@ def test_a_long_generated_id_leaves_its_cell_and_notes_to_the_values() -> None:
     assert '- **10** — failed:' in md
 
 
-def test_a_written_id_shows_whole_however_long() -> None:
+def test_a_custom_id_shows_whole_however_long() -> None:
     long_id = 'touching-' * 10
-    table = _named_table(
-        _written(
+    table = _table_with_custom_ids(
+        _custom(
             f't.py::test_x[{long_id}]',
             10,
             status='failed',
@@ -1135,10 +1135,10 @@ def test_a_written_id_shows_whole_however_long() -> None:
 
 
 def test_notes_sharing_a_key_add_their_row() -> None:
-    """A hidden id falls back to its values, which a written id may match."""
+    """A hidden id falls back to its values, which a custom id may match."""
     error = ErrorInfo(message='clash')
-    table = _named_table(
-        _written('t.py::test_x[11]', 5, status='failed', error=error),
+    table = _table_with_custom_ids(
+        _custom('t.py::test_x[11]', 5, status='failed', error=error),
         ParameterCase(
             id=NodeId('t.py::test_x'), values=[11], status='failed', error=error
         ),

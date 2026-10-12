@@ -90,7 +90,7 @@
 - **then** it holds one row per «case», with that row's values
 - **then** the grouped steps carry a placeholder per matching name
 
-## ✓ A «parameter table» names its rows by their «case ids» when any was written by hand
+## ✓ A «parameter table» names its rows by their «case ids» when any is custom
 `tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids` · parametrization, spec/parameter-table-case-ids
 
 - **given** a «parametrized scenario» naming one «case» with `pytest.param(..., id=...)` and leaving the other to pytest
@@ -124,7 +124,7 @@
     | 19-True | 19 | True |
     ```
 - **then** both cases pass
-- **then** the «parameter table» leads with a case id column, the generated «case id» shown beside the written one
+- **then** the «parameter table» leads with a case id column, the generated «case id» shown beside the custom one
 
 ## ✓ A refusal on a run with no sink does not claim a «report» was skipped
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation

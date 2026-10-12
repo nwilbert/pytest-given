@@ -6,7 +6,7 @@
 
 Name each row of a parameter table by its pytest case id when the author wrote ids for readers,
 so a failure the terminal reports as `test_overlap[touching-edges]` can be found in the report at
-a glance. The column appears only when some id was written by hand; generated ids restate the value
+a glance. The column appears only when some id is custom, written by hand; generated ids restate the value
 columns and stay hidden.
 
 ## Background
@@ -24,11 +24,11 @@ Definitions](2026-10-11-inline-markdown-design.md) and uses its Markdown writer 
 
 ### Capture
 
-`ParamSpec` gains `written_id: bool = False`: whether the case's id was written by hand. pytest
+`ParamSpec` gains `custom_id: bool = False`: whether the case's id is custom, written by hand. pytest
 records only the finished id, and its parametrization reaches it from marks, fixture `params=` and
 `metafunc.parametrize` alike, so the id is read off its form rather than its source. A generated id
 is the case's values' tokens joined by `-`, in the order of `callspec.params`, which is the order
-pytest parametrized in. The id is written unless it is such a join, where each token follows
+pytest parametrized in. The id is custom unless it is such a join, where each token follows
 pytest's `IdMaker`:
 
 - a `pytest_make_parametrize_id` hook's answer, if any;
@@ -53,7 +53,7 @@ it says nothing the value columns don't.
 @dataclass(frozen=True)
 class ParameterCase:
     ...
-    written_id: bool = False
+    custom_id: bool = False
 
 
 @dataclass(frozen=True)
@@ -61,14 +61,14 @@ class ParameterTable:
     ...
 
     @property
-    def named_cases(self) -> bool: ...
+    def has_custom_ids(self) -> bool: ...
 
 
 def case_id(node_id: str) -> str: ...
 ```
 
-`written_id` is copied from the case's `ParamSpec`, so the JSON says which ids were written.
-`named_cases` is true when any case's is, and it is the only thing the renderers consult to show
+`custom_id` is copied from the case's `ParamSpec`, so the JSON says which ids are custom.
+`has_custom_ids` is true when any case's is, and it is the only thing the renderers consult to show
 the column. `case_id` is `case_suffix(node_id)` unbracketed, the tail starting at the first `[` past the
 path (a directory may hold one, a class or function name cannot), the text the terminal
 printed and the suffix a per-case scenario's title already carries, which takes it from the same
@@ -79,7 +79,7 @@ substitute, and the column order rules don't sort it. It is the row's header.
 
 ### Rendering
 
-When `named_cases` holds, both renderers lead the table with a column headed `case id`, the
+When `has_custom_ids` holds, both renderers lead the table with a column headed `case id`, the
 glossary's word; a bare `id` would clash with a parametrize argument of that name. Every row shows its id, generated ones included, so each row reads as
 the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
 
@@ -91,7 +91,7 @@ the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
 - **Markdown:** a leading `case id` column, the id escaped whole by the inline Markdown writer,
   like every text that is not a title or a step (`a*b*c` is written `a\*b\*c`). A generated id too
   long to inline leaves its cell empty, by the rule that keeps a long value out of a note's key:
-  it only repeats a value the row already shows. A written one shows whole. The notes below the table (a case's error, an
+  it only repeats a value the row already shows. A custom one shows whole. The notes below the table (a case's error, an
   attachment too long to inline) are keyed by the id instead of the joined values, falling back to
   the values for an empty cell; notes that would share a key add their row number.
 
@@ -118,26 +118,26 @@ misname its row.
 ## Implementation touch points
 
 - `model/runtime.py`, `model/schema.py` — the fields and `case_id` above; serde follows.
-- `plugin/case_ids.py` — `written_id`, worked out for a grouped case only; `grouping/columns.py`
+- `plugin/case_ids.py` — `is_custom_id`, worked out for a grouped case only; `grouping/columns.py`
   copies it onto the table's cases.
 - `report/md_renderer.py` — the column; `_case_key` prefers the id.
 - `report/templates/` — the row header, the shared block, per-run outline boxes;
   Playwright-verified per AGENTS.md.
-- Skills: navigating `references/report-json.md` (`written_id`), authoring
+- Skills: navigating `references/report-json.md` (`custom_id`), authoring
   `references/parameter-tables.md`, reviewing `SKILL.md`; `docs/site/` in step.
 - Self-report: decorate the test that best states "a parameter table names its rows by their
-  hand-written ids".
-- `CHANGELOG.md` — Added: parameter tables lead with the case ids when any was written by hand.
+  custom ids".
+- `CHANGELOG.md` — Added: parameter tables lead with the case ids when any is custom.
 - Regenerate `examples/` (one example table with ids and mixed statuses) and
   `examples/self-report/`.
 
 ## Test coverage
 
 - Capture, over pytester-collected items: each token rule above, a duplicate, `HIDDEN_PARAM`,
-  stacked marks, and written ids from a mark, a fixture and `metafunc.parametrize`.
-- Grouping and model: each case's `written_id` carried to the table, `named_cases` true for any; `case_id`
+  stacked marks, and custom ids from a mark, a fixture and `metafunc.parametrize`.
+- Grouping and model: each case's `custom_id` carried to the table, `has_custom_ids` true for any; `case_id`
   for a plain, stacked and hidden id.
-- Markdown renderer: the leading column only under `named_cases`, generated ids beside explicit
+- Markdown renderer: the leading column only under `has_custom_ids`, generated ids beside custom
   ones, notes keyed by id, an id holding `*` and `|` escaped, an id too long to inline left out.
 - HTML: data-shaped only; the markup, the shared block and the outline are Playwright's.
 

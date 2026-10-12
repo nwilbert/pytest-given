@@ -90,13 +90,13 @@ def _param_table_md(table: ParameterTable) -> str:
     shows the label in the cell and renders fenced below the table, keyed by
     the row (see `_case_key`).
 
-    The leading case id column only appears when some case id was written by hand,
+    The leading case id column only appears when some case id is custom,
     and the trailing status column only when the cases differ in status: a
     column of one glyph says nothing the heading's glyph hasn't.
     """
     show_status = table.has_mixed_statuses
     names = [_cell(column.name) for column in table.columns]
-    if table.named_cases:
+    if table.has_custom_ids:
         names.insert(0, 'case id')
     header = '| ' + ' | '.join(names) + ' |' + ' |' * show_status
     separator = '|' + '---|' * (len(names) + show_status)
@@ -105,17 +105,17 @@ def _param_table_md(table: ParameterTable) -> str:
     for row, case in enumerate(table.cases, start=1):
         # A generated id too long to inline only repeats a value the row shows.
         pytest_id = case_id(case.id)
-        if case.written_id or len(pytest_id) <= _MAX_INLINE:
+        if case.custom_id or len(pytest_id) <= _MAX_INLINE:
             pytest_id = _cell(pytest_id)
         else:
             pytest_id = ''
-        cells = [pytest_id] if table.named_cases else []
+        cells = [pytest_id] if table.has_custom_ids else []
         cells.extend(_case_cell(column, value) for column, value in table.cells(case))
         if show_status:
             cells.append(STATUS_GLYPH[case.status])
         rows.append('| ' + ' | '.join(cells) + ' |')
         # The id the row leads with names it best, when it has one.
-        keys.append((table.named_cases and pytest_id) or _case_key(table, case, row))
+        keys.append((table.has_custom_ids and pytest_id) or _case_key(table, case, row))
     # A key two notes share points at neither row, so each adds its own.
     counts = Counter(keys)
     blocks: list[str] = []

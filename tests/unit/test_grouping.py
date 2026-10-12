@@ -332,13 +332,13 @@ def test_each_case_keeps_its_node_id() -> None:
     assert [case.id for case in grouped[0].parameters.cases] == [nid1, nid2]
 
 
-def test_each_case_keeps_whether_its_id_was_written() -> None:
+def test_each_case_keeps_whether_its_id_is_custom() -> None:
     scenarios, param_info = _cases(('passed', None), ('passed', None))
     second = scenarios[1].id
-    param_info[second] = param_info[second]._replace(written_id=True)
+    param_info[second] = param_info[second]._replace(custom_id=True)
     [grouped] = group_parametrized(scenarios, param_info)
     assert grouped.parameters is not None
-    assert [case.written_id for case in grouped.parameters.cases] == [False, True]
+    assert [case.custom_id for case in grouped.parameters.cases] == [False, True]
 
 
 def test_param_cell_unwraps_a_term_instance_to_its_display() -> None:

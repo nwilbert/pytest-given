@@ -634,29 +634,29 @@ def test_a_value_rendering_by_identity_under_repr_only_is_kept_as_it_is() -> Non
     assert snapshot_param_value(value) is value
 
 
-# --- Whether a case's id was written by hand ---
+# --- Whether a case's id is custom ---
 # Every generated form here pins one of pytest's id rules, which `case_ids`
 # copies; `nox -s compat` runs them against the oldest and newest pytest.
 
 
-def _written_ids(pytester: pytest.Pytester, source: str) -> dict[str, bool]:
-    """Each collected case's id, mapped to whether it reads as written by hand."""
+def _custom_ids(pytester: pytest.Pytester, source: str) -> dict[str, bool]:
+    """Each collected case's id, mapped to whether it reads as custom."""
     items = pytester.getitems(
         'import enum, re\nimport pytest\nfrom pytest import HIDDEN_PARAM\n'
         + textwrap.dedent(source)
     )
     return {
-        case_id(item.nodeid): case_ids.written_id(
+        case_id(item.nodeid): case_ids.is_custom_id(
             item.config, item.nodeid, cast(pytest.Function, item).callspec.params
         )
         for item in items
     }
 
 
-def test_an_id_generated_from_any_kind_of_value_is_not_written(
+def test_an_id_generated_from_any_kind_of_value_is_not_custom(
     pytester: pytest.Pytester,
 ) -> None:
-    ids = _written_ids(
+    ids = _custom_ids(
         pytester,
         """
         class Size(enum.Enum):
@@ -675,10 +675,10 @@ def test_an_id_generated_from_any_kind_of_value_is_not_written(
     assert not any(ids.values())
 
 
-def test_a_disambiguated_duplicate_id_is_not_written(
+def test_a_disambiguated_duplicate_id_is_not_custom(
     pytester: pytest.Pytester,
 ) -> None:
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('v', [1, 1, 'a', 'a'])
@@ -687,8 +687,8 @@ def test_a_disambiguated_duplicate_id_is_not_written(
     ) == {'1_0': False, '1_1': False, 'a0': False, 'a1': False}
 
 
-def test_stacked_generated_ids_are_not_written(pytester: pytest.Pytester) -> None:
-    ids = _written_ids(
+def test_stacked_generated_ids_are_not_custom(pytester: pytest.Pytester) -> None:
+    ids = _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', [1, 2])
@@ -703,7 +703,7 @@ def test_stacked_generated_ids_are_not_written(pytester: pytest.Pytester) -> Non
 
 
 def test_a_param_id_is_written_for_its_case_only(pytester: pytest.Pytester) -> None:
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', [1, pytest.param(2, id='two')])
@@ -726,7 +726,7 @@ def test_an_ids_entry_is_written_unless_it_repeats_the_values(
     pytester: pytest.Pytester, ids: str, written: dict[str, bool]
 ) -> None:
     assert (
-        _written_ids(
+        _custom_ids(
             pytester,
             f"""
             @pytest.mark.parametrize('a', [1, 2], ids={ids})
@@ -738,7 +738,7 @@ def test_an_ids_entry_is_written_unless_it_repeats_the_values(
 
 
 def test_a_hidden_part_leaves_the_rest_generated(pytester: pytest.Pytester) -> None:
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', [pytest.param(1, id=HIDDEN_PARAM)])
@@ -751,8 +751,8 @@ def test_a_hidden_part_leaves_the_rest_generated(pytester: pytest.Pytester) -> N
     ) == {'3': False, '': False}
 
 
-def test_a_fixtures_ids_are_written(pytester: pytest.Pytester) -> None:
-    assert _written_ids(
+def test_a_fixtures_ids_are_custom(pytester: pytest.Pytester) -> None:
+    assert _custom_ids(
         pytester,
         """
         @pytest.fixture(params=['sqlite', 'postgres'], ids=['lite', None])
@@ -763,10 +763,10 @@ def test_a_fixtures_ids_are_written(pytester: pytest.Pytester) -> None:
     ) == {'lite': True, 'postgres': False}
 
 
-def test_ids_given_to_metafunc_parametrize_are_written(
+def test_ids_given_to_metafunc_parametrize_are_custom(
     pytester: pytest.Pytester,
 ) -> None:
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         def pytest_generate_tests(metafunc):
@@ -777,7 +777,7 @@ def test_ids_given_to_metafunc_parametrize_are_written(
     ) == {'one': True, '2': False}
 
 
-def test_an_id_from_the_make_parametrize_id_hook_is_not_written(
+def test_an_id_from_the_make_parametrize_id_hook_is_not_custom(
     pytester: pytest.Pytester,
 ) -> None:
     """The hook names a value wherever it appears, not one case."""
@@ -787,7 +787,7 @@ def test_an_id_from_the_make_parametrize_id_hook_is_not_written(
             return f'cup-{val}'
         """
     )
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', [1])
@@ -796,18 +796,18 @@ def test_an_id_from_the_make_parametrize_id_hook_is_not_written(
     ) == {'cup-1': False}
 
 
-def test_a_make_parametrize_id_hook_failing_on_a_written_ids_value_is_no_answer(
+def test_a_make_parametrize_id_hook_failing_on_a_custom_ids_value_is_no_answer(
     pytester: pytest.Pytester,
 ) -> None:
     """pytest asks the hook only for a generated part, so it need not handle a
-    value whose id was written."""
+    value whose id is custom."""
     pytester.makeconftest(
         """
         def pytest_make_parametrize_id(config, val, argname):
             return val['slug'] if argname == 'user' else None
         """
     )
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('user', [pytest.param({}, id='admin')])
@@ -816,7 +816,7 @@ def test_a_make_parametrize_id_hook_failing_on_a_written_ids_value_is_no_answer(
     ) == {'admin': True}
 
 
-def test_an_unescaped_id_is_not_written_where_escaping_is_off(
+def test_an_unescaped_id_is_not_custom_where_escaping_is_off(
     pytester: pytest.Pytester,
 ) -> None:
     pytester.makeini(
@@ -825,7 +825,7 @@ def test_an_unescaped_id_is_not_written_where_escaping_is_off(
         disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true
         """
     )
-    assert _written_ids(
+    assert _custom_ids(
         pytester,
         """
         @pytest.mark.parametrize('a', ['naïve'])

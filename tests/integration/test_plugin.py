@@ -334,7 +334,7 @@ def test_parametrized_test_as_table(pytester, tmp_path):
 
 @scenario(
     t'A {pg["Parameter table"].l} names its rows by their {pg["Case id"].l.s} '
-    t'when any was written by hand',
+    t'when any is custom',
     tags=['parametrization', 'spec/parameter-table-case-ids'],
 )
 def test_a_parameter_table_names_its_rows_by_their_case_ids(pytester, tmp_path):
@@ -366,7 +366,7 @@ def test_a_parameter_table_names_its_rows_by_their_case_ids(pytester, tmp_path):
         result.assert_outcomes(passed=2)
     with then(
         t'the {pg["Parameter table"].l} leads with a case id column, '
-        t'the generated {pg["Case id"].l} shown beside the written one'
+        t'the generated {pg["Case id"].l} shown beside the custom one'
     ):
         assert '| case id | start | clashes |' in md
         assert '| touching-edges | 20 | False |' in md
@@ -386,7 +386,7 @@ def test_generated_case_ids_leave_the_table_without_an_id_column(pytester, tmp_p
         """,
     )
     result.assert_outcomes(passed=2)
-    assert not any(case['written_id'] for case in scenario_json['parameters']['cases'])
+    assert not any(case['custom_id'] for case in scenario_json['parameters']['cases'])
 
 
 def test_parametrized_non_json_values_are_captured_as_str(pytester, tmp_path):

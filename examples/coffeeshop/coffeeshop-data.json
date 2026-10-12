@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-12T18:07:21.134276+00:00",
+    "timestamp": "2026-10-12T18:30:16.425180+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "0c89c35945c845feca71bf8646ea119908d5ad58",
+    "commit_sha": "7269aa74d36ef5f8278b0ac1a01bc3f8107219d3",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -291,7 +291,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": true
+            "custom_id": true
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[2-True]",
@@ -301,7 +301,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[3-True]",
@@ -311,7 +311,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_pricing[happy-hour]",
@@ -417,7 +417,7 @@
               ],
               "error_tail": "E   assert False == True"
             },
-            "written_id": true
+            "custom_id": true
           }
         ]
       },
@@ -516,7 +516,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[350]",
@@ -525,7 +525,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           }
         ]
       },
@@ -729,7 +729,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_brew[300]",
@@ -738,7 +738,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           }
         ]
       },
@@ -1122,7 +1122,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[mocha]",
@@ -1137,7 +1137,7 @@
             ],
             "status": "passed",
             "error": null,
-            "written_id": false
+            "custom_id": false
           }
         ]
       },
@@ -1617,7 +1617,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 52,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -1959,7 +1959,7 @@
             ],
             "status": "skipped",
             "error": null,
-            "written_id": false
+            "custom_id": false
           },
           {
             "id": "examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[2]",
@@ -1968,7 +1968,7 @@
             ],
             "status": "skipped",
             "error": null,
-            "written_id": false
+            "custom_id": false
           }
         ]
       },

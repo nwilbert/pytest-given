@@ -10,7 +10,7 @@ pytest-given groups all cases of a parametrized test into one scenario with a pa
 
 The group fails if any case failed. Otherwise it is an expected failure (`xfailed`) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.
 
-When you write an id for any case, with `pytest.param(..., id=...)` or with `ids=` on a mark or a fixture, the table starts with a `case id` column. It shows each case's id as pytest prints it, so `test_overlap[touching-edges]` in a failure summary points straight at its row. Cases whose ids pytest generated show those ids in the column too. Without any written id, the column is left out, since generated ids only repeat the values. A written id that only repeats them counts as generated.
+When you give any case a custom id, with `pytest.param(..., id=...)` or with `ids=` on a mark or a fixture, the table starts with a `case id` column. It shows each case's id as pytest prints it, so `test_overlap[touching-edges]` in a failure summary points straight at its row. Cases whose ids pytest generated show those ids in the column too. Without any custom id, the column is left out, since generated ids only repeat the values. A custom id that only repeats them counts as generated.
 
 The columns appear in the order the narration first shows them: the scenario title, then the steps from top to bottom. Inputs narrated in a `given` come before outcomes narrated in a `then`. A parametrize argument that no step narrates stays next to the argument before it.
 

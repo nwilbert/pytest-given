@@ -25,7 +25,7 @@ from ..model import (
     Status,
     snapshot_param_value,
 )
-from .case_ids import written_id
+from .case_ids import is_custom_id
 from .fixtures import graft_fixture_recordings
 from .state import given_config, scenario_marker, session_collector, session_state
 
@@ -113,7 +113,7 @@ def _capture_param_spec(item: pytest.Item, node_id: NodeId, *, group: bool) -> N
         ],
         group=group,
         # Read only by a group's table, so only worked out for one.
-        written_id=group and written_id(item.config, node_id, callspec.params),
+        custom_id=group and is_custom_id(item.config, node_id, callspec.params),
     )
 
 

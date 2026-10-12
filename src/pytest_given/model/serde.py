@@ -345,7 +345,7 @@ def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
         values=[_cell_from_json(v) for v in d['values']],
         status=status,
         error=_error_from_dict(d.get('error')),
-        written_id=_bool(d['written_id'], 'written_id'),
+        custom_id=_bool(d['custom_id'], 'custom_id'),
     )
 
 

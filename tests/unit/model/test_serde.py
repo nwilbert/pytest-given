@@ -299,14 +299,14 @@ def test_parameter_table_round_trips() -> None:
                             {
                                 'id': 't.py::test_x[1]',
                                 'values': [1, False],
-                                'written_id': False,
+                                'custom_id': False,
                                 'status': 'passed',
                                 'error': None,
                             },
                             {
                                 'id': 't.py::test_x[2]',
                                 'values': [2, True],
-                                'written_id': False,
+                                'custom_id': False,
                                 'status': 'failed',
                                 'error': {
                                     'message': 'boom',
@@ -626,7 +626,7 @@ def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> N
         report_from_dict(payload)
 
 
-def test_report_from_dict_rejects_a_written_id_that_is_no_bool() -> None:
+def test_report_from_dict_rejects_a_custom_id_that_is_no_bool() -> None:
     """A hand-edited `"false"` would otherwise read as true."""
     table = ParameterTable(
         columns=[ParameterColumn(id='a', name='a', kind='param')],
@@ -639,8 +639,8 @@ def test_report_from_dict_rejects_a_written_id_that_is_no_bool() -> None:
         parameters=table,
     )
     payload = report_to_dict(ReportData(metadata=_meta(), scenarios=[scenario]))
-    payload['scenarios'][0]['parameters']['cases'][0]['written_id'] = 'false'
-    with pytest.raises(PytestGivenError, match="invalid written_id 'false'"):
+    payload['scenarios'][0]['parameters']['cases'][0]['custom_id'] = 'false'
+    with pytest.raises(PytestGivenError, match="invalid custom_id 'false'"):
         report_from_dict(payload)
 
 
@@ -849,7 +849,7 @@ def test_round_trip_preserves_column_kinds_and_cell_shapes() -> None:
                 id=NodeId('t.py::test_x[4]'),
                 values=[350, None, None],
                 status='skipped',
-                written_id=True,
+                custom_id=True,
             ),
         ],
     )
