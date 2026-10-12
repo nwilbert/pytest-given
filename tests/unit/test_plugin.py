@@ -687,6 +687,19 @@ def test_a_disambiguated_duplicate_id_is_not_custom(
     ) == {'1_0': False, '1_1': False, 'a0': False, 'a1': False}
 
 
+def test_digits_after_a_token_ending_in_one_are_custom(
+    pytester: pytest.Pytester,
+) -> None:
+    """pytest separates a counter from a trailing digit with `_`."""
+    assert _custom_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('a, b', [pytest.param(1, 2, id='10-2')])
+        def test_x(a, b): pass
+        """,
+    ) == {'10-2': True}
+
+
 def test_stacked_generated_ids_are_not_custom(pytester: pytest.Pytester) -> None:
     ids = _custom_ids(
         pytester,

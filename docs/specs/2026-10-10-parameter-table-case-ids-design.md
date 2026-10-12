@@ -37,8 +37,8 @@ pytest's `IdMaker`:
   `str`, anything with a `__name__` by that name;
 - or `argname` and a number, pytest's fallback for any other value, allowed for every value since
   the number is the case's position in its parametrize call, which is not known;
-- each optionally followed by a counter (`1_0`, `a1`), which pytest appends to tell duplicate ids
-  apart.
+- each optionally followed by a counter, which pytest appends to tell duplicate ids apart, after a
+  `_` where the token ends in a digit (`1_0`, `a1`).
 
 Any token may be missing, as `HIDDEN_PARAM` drops a part from the id, and an empty id is not
 written. The rules are copied, as pytest exports none of them; the unit tests pin each, and

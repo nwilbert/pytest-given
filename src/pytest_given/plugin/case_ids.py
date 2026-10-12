@@ -50,12 +50,16 @@ def _token(config: pytest.Config, value: object, argname: str) -> re.Pattern[str
     """What pytest generates for `value`. Its fallback, `argname` and the case's
     position in its parametrize call, is allowed for every value: the position
     is not known here, and the fallback also names an empty parameter set.
-    A trailing counter is what pytest appends to tell duplicate ids apart."""
+    A trailing counter is what pytest appends to tell duplicate ids apart,
+    after a `_` where the id ends in a digit."""
     text = _hook_token(config, value, argname)
     if text is None:
         text = _value_token(config, value)
-    named = f'{re.escape(text)}|' if text is not None else ''
-    return re.compile(f'(?:{named}{re.escape(argname)}\\d+)(?:_?\\d+)?')
+    fallback = f'{re.escape(argname)}\\d+(?:_\\d+)?'
+    if text is None:
+        return re.compile(fallback)
+    counter = '_' if text[-1:].isdigit() else ''
+    return re.compile(f'{re.escape(text)}(?:{counter}\\d+)?|{fallback}')
 
 
 def _hook_token(config: pytest.Config, value: object, argname: str) -> str | None:
