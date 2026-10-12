@@ -41,6 +41,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing and a stub that raises to prove "never called", and starts its completeness audit from the undecorated tests in narrated test files.
 - The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
 
+### Fixed
+
+- Notes below a parameter table in the Markdown report that would share a key add their row number.
+
 ## [0.4.1] - 2026-10-04
 
 ### Fixed

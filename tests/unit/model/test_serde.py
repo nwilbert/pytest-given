@@ -299,12 +299,14 @@ def test_parameter_table_round_trips() -> None:
                             {
                                 'id': 't.py::test_x[1]',
                                 'values': [1, False],
+                                'written_id': False,
                                 'status': 'passed',
                                 'error': None,
                             },
                             {
                                 'id': 't.py::test_x[2]',
                                 'values': [2, True],
+                                'written_id': False,
                                 'status': 'failed',
                                 'error': {
                                     'message': 'boom',
@@ -621,6 +623,24 @@ def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> N
     payload = report_to_dict(report)
     mutate(payload)
     with pytest.raises(PytestGivenError, match=f'invalid {expected}'):
+        report_from_dict(payload)
+
+
+def test_report_from_dict_rejects_a_written_id_that_is_no_bool() -> None:
+    """A hand-edited `"false"` would otherwise read as true."""
+    table = ParameterTable(
+        columns=[ParameterColumn(id='a', name='a', kind='param')],
+        cases=[ParameterCase(id=NodeId('t.py::t[1]'), values=[1])],
+    )
+    scenario = Scenario(
+        id=NodeId('t.py::t'),
+        narration=Narration(text='x'),
+        module='m',
+        parameters=table,
+    )
+    payload = report_to_dict(ReportData(metadata=_meta(), scenarios=[scenario]))
+    payload['scenarios'][0]['parameters']['cases'][0]['written_id'] = 'false'
+    with pytest.raises(PytestGivenError, match="invalid written_id 'false'"):
         report_from_dict(payload)
 
 

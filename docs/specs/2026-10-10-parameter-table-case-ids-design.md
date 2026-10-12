@@ -93,7 +93,7 @@ the terminal printed it; an all-`HIDDEN_PARAM` id leaves its cell empty.
   long to inline leaves its cell empty, by the rule that keeps a long value out of a note's key:
   it only repeats a value the row already shows. A written one shows whole. The notes below the table (a case's error, an
   attachment too long to inline) are keyed by the id instead of the joined values, falling back to
-  the values for an empty cell.
+  the values for an empty cell; notes that would share a key add their row number.
 
 ````markdown
 | case id | existing booking | hours later | it clashes |

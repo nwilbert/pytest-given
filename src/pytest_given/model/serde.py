@@ -345,7 +345,16 @@ def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
         values=[_cell_from_json(v) for v in d['values']],
         status=status,
         error=_error_from_dict(d.get('error')),
-        written_id=d.get('written_id', False),
+        written_id=_bool(d['written_id'], 'written_id'),
+    )
+
+
+def _bool(value: object, field: str) -> bool:
+    """`value` as a bool: a hand-edited `"false"` would otherwise read as true."""
+    if isinstance(value, bool):
+        return value
+    raise PytestGivenError(
+        f'invalid {field} {value!r} in JSON report; expected a bool.'
     )
 
 

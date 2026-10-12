@@ -1,6 +1,7 @@
 """Rendering the Markdown report: the deterministic, diffable view of a run."""
 
 import re
+from collections import Counter
 from pathlib import Path
 
 from ..model import (
@@ -100,7 +101,7 @@ def _param_table_md(table: ParameterTable) -> str:
     header = '| ' + ' | '.join(names) + ' |' + ' |' * show_status
     separator = '|' + '---|' * (len(names) + show_status)
     rows: list[str] = []
-    blocks: list[str] = []
+    keys: list[str] = []
     for row, case in enumerate(table.cases, start=1):
         # A generated id too long to inline only repeats a value the row shows.
         pytest_id = case_id(case.id)
@@ -114,7 +115,13 @@ def _param_table_md(table: ParameterTable) -> str:
             cells.append(STATUS_GLYPH[case.status])
         rows.append('| ' + ' | '.join(cells) + ' |')
         # The id the row leads with names it best, when it has one.
-        key = (table.named_cases and pytest_id) or _case_key(table, case, row)
+        keys.append((table.named_cases and pytest_id) or _case_key(table, case, row))
+    # A key two notes share points at neither row, so each adds its own.
+    counts = Counter(keys)
+    blocks: list[str] = []
+    for row, (case, key) in enumerate(zip(table.cases, keys, strict=True), start=1):
+        if counts[key] > 1:
+            key = f'{key} (row {row})'
         blocks.extend(_case_error_block(key, case))
         blocks.extend(_case_attachment_blocks(table, case, key))
     return '\n'.join([header, separator, *rows, *blocks])

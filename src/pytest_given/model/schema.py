@@ -67,13 +67,13 @@ NodeId = NewType('NodeId', str)
 
 
 def node_base(node_id: str) -> str:
-    """A node id (or a bare function segment) without its parametrize tail:
-    ``'f.py::t[1-2]' -> 'f.py::t'``, ``'t[1-2]' -> 't'``. Two cases of one
-    parametrized function share this; two different functions never do.
+    """A node id without its parametrize tail: ``'f.py::t[1-2]' -> 'f.py::t'``.
+    Two cases of one parametrized function share this; two different functions
+    never do.
 
     Lives beside `NodeId` because grouping and report both take node ids apart,
-    and neither may import the other. Typed `str` rather than `NodeId`: report
-    also applies it to a bare function segment, which is no node id.
+    and neither may import the other. The path ends at the first `::`, so a
+    function segment alone, whose tail may hold a `::`, is no input for it.
     """
     start = _tail_start(node_id)
     return node_id if start < 0 else node_id[:start]

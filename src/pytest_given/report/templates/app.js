@@ -57,7 +57,14 @@ function scenarioFromParam(value) {
   const data = window.__REPORT_DATA__;
   return lookup(data.scenario_slugs || {}, value, null)
     ?? citedScenario(value)
-    ?? citedScenario(value.split('[')[0]);
+    ?? citedScenario(nodeBase(value));
+}
+
+// As `node_base` cuts it: the tail starts at the first `[` past the path,
+// which may hold one, where a class or function name cannot.
+function nodeBase(nodeId) {
+  const start = nodeId.indexOf('[', nodeId.indexOf('::') + 1);
+  return start < 0 ? nodeId : nodeId.slice(0, start);
 }
 
 function citedScenario(nodeId) {

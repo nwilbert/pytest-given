@@ -39,6 +39,14 @@ def test_scenario_slug_drops_parametrization_tail_when_unique() -> None:
     assert index[NodeId('pkg/test_pour.py::test_pour[water]')] == 'pour/pour'
 
 
+def test_scenario_slug_drops_a_tail_holding_a_double_colon() -> None:
+    rd = ReportData(
+        metadata=_meta(), scenarios=[_scn('pkg/test_ip.py::test_parse[::1]')]
+    )
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('pkg/test_ip.py::test_parse[::1]')] == 'ip/parse'
+
+
 def test_scenario_slug_keeps_tail_only_for_colliding_scenarios() -> None:
     # Two scenarios from the same parametrized function (narration varies per
     # case, so they don't merge) would share a slug — both keep their tails.

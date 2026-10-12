@@ -335,12 +335,14 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
                                     {
                                         'id': 't.py::test_x[2]',
                                         'values': [1, False],
+                                        'written_id': False,
                                         'status': 'passed',
                                         'error': None,
                                     },
                                     {
                                         'id': 't.py::test_x[3]',
                                         'values': [2, True],
+                                        'written_id': False,
                                         'status': 'passed',
                                         'error': None,
                                     },
@@ -431,6 +433,7 @@ def test_render_grouped_placeholder_drops_format_spec_and_conversion(
                                 {
                                     'id': 't.py::test_x[4]',
                                     'values': [7, 'hi'],
+                                    'written_id': False,
                                     'status': 'passed',
                                     'error': None,
                                 },
@@ -1054,12 +1057,14 @@ def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) ->
                                 {
                                     'id': 't.py::test_x[5]',
                                     'values': [1],
+                                    'written_id': False,
                                     'status': 'passed',
                                     'error': None,
                                 },
                                 {
                                     'id': 't.py::test_x[6]',
                                     'values': [2],
+                                    'written_id': False,
                                     'status': 'skipped',
                                     'error': None,
                                 },
@@ -1292,6 +1297,7 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
                                 {
                                     'id': 't.py::test_x[7]',
                                     'values': [1],
+                                    'written_id': False,
                                     'status': 'passed',
                                     'error': None,
                                 },
@@ -1341,12 +1347,14 @@ def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
                                 {
                                     'id': 't.py::test_x[8]',
                                     'values': [1, False],
+                                    'written_id': False,
                                     'status': 'passed',
                                     'error': None,
                                 },
                                 {
                                     'id': 't.py::test_x[9]',
                                     'values': [2, True],
+                                    'written_id': False,
                                     'status': 'passed',
                                     'error': None,
                                 },
@@ -1405,6 +1413,7 @@ def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None
                                 {
                                     'id': 't.py::test_x[10]',
                                     'values': [None],
+                                    'written_id': False,
                                     'status': 'passed',
                                     'error': None,
                                 },
@@ -2173,6 +2182,7 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                                     },
                                 ],
                                 'status': 'passed',
+                                'written_id': False,
                             }
                         ],
                     },
@@ -2295,6 +2305,7 @@ def test_a_disambiguated_columns_token_takes_its_own_columns_color(
                             {
                                 'id': 't.py::test_x[12]',
                                 'values': [200, '2.0', '9.0'],
+                                'written_id': False,
                                 'status': 'passed',
                             }
                         ],

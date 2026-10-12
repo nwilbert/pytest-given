@@ -517,10 +517,6 @@ def test_node_base_leaves_unparametrized_id_unchanged() -> None:
     assert node_base('tests/t.py::test_x') == 'tests/t.py::test_x'
 
 
-def test_node_base_applies_to_a_bare_function_segment() -> None:
-    assert node_base('test_x[1-2]') == 'test_x'
-
-
 def test_node_base_keeps_a_bracket_in_the_path() -> None:
     assert node_base('tests/[legacy]/t.py::test_x[1]') == 'tests/[legacy]/t.py::test_x'
 

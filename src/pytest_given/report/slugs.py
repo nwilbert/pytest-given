@@ -82,13 +82,14 @@ _UNSAFE_IN_FRAGMENT = re.compile(r'[^A-Za-z0-9._~()\[\]!$\'*,;:@/-]+|[+&=#]')
 
 
 def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
-    file_part, _, func_part = node_id.partition('::')
+    # Cut on the whole node id: a tail may hold a `::` of its own.
+    file_part, _, func_part = (node_id if with_tail else node_base(node_id)).partition(
+        '::'
+    )
     segments = file_part.split('/')
     basename = segments[-1].removesuffix('.py').removeprefix('test_')
     parents = segments[max(len(segments) - 1 - depth, 0) : -1]
     func = func_part.removeprefix('test_')
-    if not with_tail:
-        func = node_base(func)
     return _fragment_safe('/'.join([*parents, basename, func]))
 
 

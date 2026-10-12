@@ -1132,3 +1132,21 @@ def test_a_written_id_shows_whole_however_long() -> None:
     md = render_md(_report_with(table))
     assert f'| {long_id} | 10 |' in md
     assert f'- **{long_id}** — failed:' in md
+
+
+def test_notes_sharing_a_key_add_their_row() -> None:
+    """A hidden id falls back to its values, which a written id may match."""
+    error = ErrorInfo(message='clash')
+    table = _named_table(
+        _written('t.py::test_x[11]', 5, status='failed', error=error),
+        ParameterCase(
+            id=NodeId('t.py::test_x'), values=[11], status='failed', error=error
+        ),
+        ParameterCase(
+            id=NodeId('t.py::test_x[3]'), values=[3], status='failed', error=error
+        ),
+    )
+    md = render_md(_report_with(table))
+    assert '- **11 (row 1)** — failed:' in md
+    assert '- **11 (row 2)** — failed:' in md
+    assert '- **3** — failed:' in md
