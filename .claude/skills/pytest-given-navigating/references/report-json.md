@@ -15,7 +15,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | Field | Meaning |
 |---|---|
 | `id` | The pytest node id. A grouped parametrized scenario **keeps the suffix of its first collected case** (`tests/test_x.py::test_y[1-False]`). The suffix is not removed, so match on a prefix, not on equality. |
-| `narration.text` | The scenario title. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
+| `narration.text` | The scenario title. It keeps its `**`, `*` and `` ` `` markers as written, and so does a step's, so strip them before you search for words. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
 | `module` | The Python module the test lives in. |
 | `tags[]` | `tags=` from `@scenario`. These are report metadata, **not** pytest marks. |
 | `status` | `passed`, `failed`, `skipped` or `xfailed`. `xfailed` means it failed as expected, through an `xfail` mark or `pytest.xfail()`. |
@@ -23,7 +23,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail. Such a scenario keeps its steps and error too. |
 | `duration_ms` | The wall-clock time of the test. |
 | `steps[]` | The tree of steps (see below). |
-| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node id, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`); when any case's is, the report starts the table with the case ids. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
+| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node id, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`, unless it only repeats the case's values); when any case's is, the report starts the table with the case ids. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}`. `is_internal` marks a frame from `pluggy`, `_pytest` or pytest-given; such frames are kept only with `--given-all-frames`. **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`, with the same shape. |
 | `source` | `{relpath, line}`: where the test function is defined. |
 | `story_ids` / `pins` | `story_ids` lists the stories `@scenario(stories=...)` matches against. `pins` lists the scenario's pins as `[{story_id, sentence_id}]`: `null` when the scenario isn't pinned, `[]` when it turned matching off. A step's `pins` works the same way. |
@@ -74,12 +74,17 @@ jq -r '.scenarios[] | select(.status == "failed")
        | .narration.text + ": "
        + (.error.message
           // ([.parameters.cases[] | select(.status == "failed")
-              | "[" + (.values | map(tostring) | join(", ")) + "] " + .error.message]
+              | .id[(.id | index("[")):] + " " + .error.message]
              | join("; ")))' report.json
 
 # Expected failures with their reasons — planned behavior not yet working
 jq -r '.scenarios[] | select(.status == "xfailed")
        | .narration.text + (if .xfail_reason then " — " + .xfail_reason else "" end)' report.json
+
+# Scenarios whose title or step text has some words, Markdown markers stripped
+jq -r '.scenarios[] | select([.. | .narration?.text? // empty | gsub("[*`]"; "") | ascii_downcase]
+       | any(contains("late fee")))
+       | .narration.text' report.json
 
 # Scenarios whose narration references a term (any step depth: use recursion for nested steps)
 jq -r '.scenarios[] | select([.. | .term_id? // empty] | index("waitlist"))
