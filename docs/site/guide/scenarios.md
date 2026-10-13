@@ -6,8 +6,9 @@ A narrated test uses two things: the `@scenario` decorator, which puts the test 
 
 `@scenario(title, tags=None, *, stories=None, pins=None, group_parametrized=True)`
 
-Only tests with `@scenario` appear in the report. The decorator returns your function unchanged.
+Only tests with `@scenario` appear in the report. The decorator returns your function unchanged, and marks it with the [`pytest_given` marker](../configuration/pytest-options.md#selecting-scenarios).
 
+- `title` is a plain string, a `Template` for a [parametrized title](parametrized.md#scenario-titles), or a t-string of glossary handles (see [Step text](step-text.md)). It can use [bold, italic and code](step-text.md#formatting).
 - `stories=` takes one story or a list of stories, and `pins=` one sentence handle or a list. Both link the scenario to domain stories; see [Domain Storytelling](domain-storytelling.md).
 - `group_parametrized=False` turns off grouping for a parametrized test; see [Parametrized scenarios](parametrized.md#declining-the-merge).
 
