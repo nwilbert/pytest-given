@@ -15,12 +15,17 @@ from pathlib import Path
 
 from pytest_given.cli.skills import BUNDLED_SKILLS_ROOT
 from pytest_given.model import (
+    Attachment,
     Metadata,
     Narration,
     NodeId,
+    ParameterCase,
+    ParameterColumn,
+    ParameterTable,
     ReportData,
     Scenario,
     SourceLocation,
+    Step,
     report_to_dict,
 )
 
@@ -84,6 +89,35 @@ def test_pairs_script_dumps_each_narration_beside_its_test(tmp_path: Path) -> No
                     source=SourceLocation(
                         relpath='tests/test_demo.py', line=_DEMO_LINE
                     ),
+                    steps=[
+                        Step(
+                            phase='given',
+                            narration=Narration(text='a prepared value'),
+                            fixture_name='prepared',
+                            children=[
+                                Step(phase='given', narration=Narration(text='a part'))
+                            ],
+                        ),
+                        Step(
+                            phase='then',
+                            narration=Narration(text='it is {size}'),
+                            attachments=[Attachment(label='log', content='...')],
+                        ),
+                    ],
+                    parameters=ParameterTable(
+                        columns=[ParameterColumn(id='size', name='size', kind='param')],
+                        cases=[
+                            ParameterCase(
+                                id=NodeId('tests/test_demo.py::test_demo[1]'),
+                                values=[1],
+                            ),
+                            ParameterCase(
+                                id=NodeId('tests/test_demo.py::test_demo[2]'),
+                                values=[2],
+                                status='failed',
+                            ),
+                        ],
+                    ),
                 )
             ],
         ),
@@ -98,3 +132,10 @@ def test_pairs_script_dumps_each_narration_beside_its_test(tmp_path: Path) -> No
     # The whole test, decorator included, under real line numbers.
     assert f'{_DEMO_LINE - 1}\t@scenario' in dump
     assert "with then('it is one'):" in dump
+    # The recorded steps, a step fixture's included, and the parameter table:
+    # the parts of the report the test function alone doesn't show.
+    assert 'given a prepared value  [fixture: prepared]' in dump
+    assert '  given a part' in dump
+    assert 'then it is {size}  [attachments: log]' in dump
+    assert '| size | status |' in dump
+    assert '| 2 | failed |' in dump

@@ -38,8 +38,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A per-case scenario title highlights its case ID as a value, and the JSON report records it as a value part.
 - The HTML report's top bar and term ref underlines are visually tidied.
 - The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
-- The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.
-- The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing and a stub that raises to prove "never called", and starts its completeness audit from the undecorated tests in narrated test files.
+- The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants, and asks the user before adding a glossary term.
+- The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing or fails a row of its table, a stub that raises to prove "never called" and a missing glossary term, shows each scenario's recorded steps beside its source, and starts its completeness audit from what the project promises.
 - The bundled skills leave bold and italic in titles and steps to the user, keep custom case IDs for complex parameter-table rows, and search the JSON report's narration with its Markdown markers stripped.
 - The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
 - The docs and error messages call `Annotated[..., given(...)]` on a test parameter a given annotation, and write node ID and case ID.
