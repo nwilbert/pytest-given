@@ -140,13 +140,20 @@ def test_enabled_error_finding_fails_the_run(pytester):
         )
 
 
+@scenario(t'A {pg["Narration lint"].l} run that finds nothing says so')
 def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
-    result, steps = _run_observed(pytester, CLEAN, '--given-lint')
-    result.assert_outcomes(passed=1)
-    assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
-    assert steps
-    assert all(step.source is not None for step in steps)
+    with given(t'a suite whose {pg["Step"].l.s} are all sound'):
+        attach('suite', CLEAN)
+    with when('the suite runs with the lint enabled'):
+        result, steps = _run_observed(pytester, CLEAN, '--given-lint')
+    with then('the run passes'):
+        result.assert_outcomes(passed=1)
+        assert result.ret == 0
+    with then('the summary says the lint ran and found nothing'):
+        assert 'pytest-given: narration lint (no findings)' in result.stdout.str()
+    with then(t'every {pg["Step"].l} source is recorded for the AST rules'):
+        assert steps
+        assert all(step.source is not None for step in steps)
 
 
 @scenario(
@@ -187,7 +194,7 @@ def test_off_override_disables_the_rule(pytester):
         'given_lint_rules=empty-step=off',
     )
     assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
+    assert 'narration lint (no findings)' in result.stdout.str()
 
 
 _IGNORE_SUITES = {'a flawed step': EMPTY_GIVEN, 'a clean step': CLEAN}
@@ -387,7 +394,7 @@ def test_missing_phase_honest_two_phase_is_ignorable(pytester):
         'given_lint_ignore=missing-phase: *::test_two_phase',
     )
     assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
+    assert 'narration lint (no findings)' in result.stdout.str()
 
 
 def test_missing_phase_parametrized_scenario_reported_once(pytester):

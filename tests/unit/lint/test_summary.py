@@ -37,6 +37,10 @@ def test_summary_title_pluralizes_each_count_independently() -> None:
     )
 
 
+def test_summary_title_of_a_clean_run_says_no_findings() -> None:
+    assert summary_title([]) == 'pytest-given: narration lint (no findings)'
+
+
 def test_summary_title_singular_finding_reads_singular() -> None:
     assert summary_title([_finding()]) == (
         'pytest-given: narration lint (1 finding, 1 error)'

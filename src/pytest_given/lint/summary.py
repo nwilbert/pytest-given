@@ -15,6 +15,8 @@ def error_count(findings: list[Finding]) -> int:
 
 def summary_title(findings: list[Finding]) -> str:
     """The separator headline: how much was found, and how much of it fails."""
+    if not findings:
+        return 'pytest-given: narration lint (no findings)'
     errors = error_count(findings)
     return (
         f'pytest-given: narration lint '

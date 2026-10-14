@@ -47,7 +47,8 @@ class SessionOutcome:
     report_error: str | None = None
     lint_error: str | None = None
     md_stdout: str | None = None
-    findings: list[Finding] = field(default_factory=list)
+    # None when the lint did not run, so a clean run can still say it ran.
+    findings: list[Finding] | None = None
 
 
 @dataclass(kw_only=True)

@@ -253,8 +253,6 @@ def _run_lint(session: pytest.Session, built: _SessionReport) -> None:
         Path(config.rootpath),
         given.lint,
     )
-    if not findings:
-        return
     session_outcome(config).findings = findings
     if error_count(findings):
         _fail_run(session)
@@ -288,15 +286,21 @@ def _write_error(
 
 
 def _write_lint_findings(
-    terminalreporter: pytest.TerminalReporter, findings: list[Finding]
+    terminalreporter: pytest.TerminalReporter, findings: list[Finding] | None
 ) -> None:
-    if not findings:
+    if findings is None:
         return
     errors = error_count(findings)
     title = summary_title(findings)
     if errors:
         _count_as_error(terminalreporter, title)
-    terminalreporter.write_sep('=', title, red=errors > 0, yellow=errors == 0)
+    terminalreporter.write_sep(
+        '=',
+        title,
+        red=errors > 0,
+        yellow=errors == 0 and bool(findings),
+        green=not findings,
+    )
     for row in summary_rows(findings):
         terminalreporter.line(row)
 

@@ -50,3 +50,5 @@ Each finding is printed on one line, with its severity, rule, test, message, and
 ERROR empty-step     tests/test_shop.py::test_buy   given 'a coin' has no code (test_shop.py:12)
 WARN  missing-phase  tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
 ```
+
+A run with no findings prints only the separator, `pytest-given: narration lint (no findings)`, so a clean run is told apart from one where the lint is off.

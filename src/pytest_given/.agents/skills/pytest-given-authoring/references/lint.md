@@ -1,6 +1,6 @@
 # The narration lint
 
-The narration lint enforces the structural part of the rules in [scenarios.md](scenarios.md). Turn it on with `pytest --given-lint` or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns an ini-enabled lint off for one run. A *warn* finding prints in the terminal summary. Only an *error* finding fails the run.
+The narration lint enforces the structural part of the rules in [scenarios.md](scenarios.md). Turn it on with `pytest --given-lint` or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns an ini-enabled lint off for one run. A *warn* finding prints in the terminal summary. Only an *error* finding fails the run. A run with no findings says so.
 
 | Rule | Default | Catches |
 |---|---|---|

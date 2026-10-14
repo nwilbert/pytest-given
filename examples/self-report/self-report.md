@@ -867,6 +867,29 @@
 - **when** the suite runs with the lint enabled
 - **then** the run exits failed, naming the «lint rule» and the step
 
+## ✓ A «narration lint» run that finds nothing says so
+`tests/integration/test_plugin_lint.py::test_enabled_clean_suite_exits_zero_and_captures_sources`
+
+- **given** a suite whose «steps» are all sound
+  - 📎 suite:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Clean")
+    def test_clean():
+        with given("a value"):
+            x = 1
+        with when("it is doubled"):
+            x = x * 2
+        with then("it is two"):
+            assert x == 2
+    ```
+- **when** the suite runs with the lint enabled
+- **then** the run passes
+- **then** the summary says the lint ran and found nothing
+- **then** every «step» source is recorded for the AST rules
+
 ## ✓ A «lint rule» downgraded to warn reports without failing the run
 `tests/integration/test_plugin_lint.py::test_warn_override_prints_but_does_not_fail`
 

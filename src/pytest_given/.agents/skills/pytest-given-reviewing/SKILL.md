@@ -24,7 +24,7 @@ pytest --given-lint -o "given_lint_rules=dead-term=warn"
 
 Lint the whole suite, not just the tests a change touches. A `given_lint_ignore` entry for a test outside the selection fails the run as `stale-ignore`. `-o` replaces the project's `given_lint_rules` list instead of adding to it. If the project sets any rules, repeat them in the same value, one per line.
 
-`warn` findings print in the summary, and an `error` finding fails the run. The rule catalog, and when an ignored `missing-phase` is justified, are in the authoring skill's [lint.md](../pytest-given-authoring/references/lint.md). A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review.
+`warn` findings print in the summary, an `error` finding fails the run, and a clean run prints `narration lint (no findings)`. The rule catalog, and when an ignored `missing-phase` is justified, are in the authoring skill's [lint.md](../pytest-given-authoring/references/lint.md). A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review.
 
 If Markdown documents cite the report, run `pytest-given citations check` too, and hand its findings to the `pytest-given-citing` skill. Where a cited scenario's title changed, read the sentence that cites it: the new title may no longer fit.
 

@@ -42,6 +42,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing or fails a row of its table, a stub that raises to prove "never called" and a missing glossary term, shows each scenario's recorded steps beside its source, and starts its completeness audit from what the project promises.
 - The bundled skills leave bold and italic in titles and steps to the user, keep custom case IDs for complex parameter-table rows, and search the JSON report's narration with its Markdown markers stripped.
 - The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
+- A `--given-lint` run that finds nothing prints `pytest-given: narration lint (no findings)`.
 - The docs and error messages call `Annotated[..., given(...)]` on a test parameter a given annotation, and write node ID and case ID.
 
 ### Fixed
