@@ -25,5 +25,16 @@ Before you report an uncovered sentence, read where it is declared. A story maps
 
 The matching rule is in the authoring skill's [stories.md](../../pytest-given-authoring/references/stories.md), under "Binding scenarios to a story": one step's term refs must include all of the sentence's terms, and a pin replaces narration matching. Review adds two checks on top:
 
-- **A pin is a claim that no narration backs.** A scenario pin even covers its sentence when the test fails early or is skipped. Check that the test body really exercises each pinned sentence, for scenario pins and step pins alike. Report a pin whose sentence the body never touches. If a sentence is covered mostly by scenarios pinned to it for lack of a better sentence, it has become a catch-all: the story is missing the sentence those scenarios demonstrate.
+- **A pin is a claim that no narration backs.** A scenario pin even covers its sentence when the test fails early or is skipped. Check that the test body really exercises each pinned sentence, for scenario pins and step pins alike. Report a pin whose sentence the body never touches. If a sentence is covered mostly by scenarios pinned to it for lack of a better sentence, it has become a catch-all: the story is missing the sentence those scenarios demonstrate. Coverage is mainly a way to navigate from a sentence to its scenarios, and a catch-all sends the reader to scenarios about something else. To spot one, list each sentence's scenarios with how they cover it, and read the pinned titles against the sentence:
+
+  ```bash
+  jq -r '
+    .scenarios as $all
+    | .coverage[] | . as $c
+    | .scenario_ids[] as $id
+    | ($all[] | select(.id == $id)) as $s
+    | ([($s.pins // [])[], ($s.steps | .. | objects | .pins? // empty | .[])]
+       | any(.story_id == $c.story_id and .sentence_id == $c.sentence_id)) as $pinned
+    | "\($c.story_id)#\($c.sentence_id)\t\(if $pinned then "pin" else "narration" end)\t\($s.narration.text)"' report.json
+  ```
 - **Nested sentences are covered together.** If a sentence's terms are a subset of another sentence's terms, every step that covers the other one covers it too. When a sentence shows as covered only by scenarios clearly written for the other sentence, that is a finding about the story's shape (see "Two sentences are covered together" in `stories.md`), not about test coverage.
