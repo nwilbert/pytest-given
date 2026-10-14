@@ -256,6 +256,38 @@ def test_compute_coverage_matches_instance_and_bare_term_both_ways():
 
 
 @scenario(
+    t'A {pg["Sentence"].l} is covered by one {pg["Step"].l} naming all its '
+    t'{pg["Term"].l.s}, never by several {pg["Step"].l.s} together',
+)
+@pytest.mark.parametrize(
+    ('steps_naming', 'covered'),
+    [
+        ([['guest', 'search', 'room']], True),
+        ([['guest', 'search'], ['room']], False),
+        ([['guest'], ['guest', 'search', 'room']], True),
+    ],
+)
+def test_a_sentence_is_covered_by_one_step_never_by_several_together(
+    steps_naming, covered
+):
+    with given(
+        t'a {pg["Story"].l} whose {pg["Sentence"].l} names guest, search and room'
+    ):
+        index = build_story_index(_guest_search_room_story())
+    with given(t'a {pg["Scenario"].l} whose {pg["Step"].l.s} name {steps_naming}'):
+        scenario_ = _scenario_with_steps(
+            *(
+                _step('when', *(_term_ref(term_id, term_id) for term_id in names))
+                for names in steps_naming
+            )
+        )
+    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
+        coverage = compute_coverage(scenario_, index)
+    with then(t'the {pg["Sentence"].l} is covered: {covered}'):
+        assert (SentenceId(1) in coverage) == covered
+
+
+@scenario(
     t'Promoting a bare word to an {pg["Activity"].l} ref drops '
     t'{pg["Coverage"].l} from a {pg["Step"].l} that matched',
 )

@@ -2,7 +2,7 @@
 
 import pytest
 
-from pytest_given import Glossary, Template
+from pytest_given import Glossary, Template, given, scenario, then, when
 from pytest_given.capture.template import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
@@ -20,6 +20,7 @@ from pytest_given.model import (
     TermId,
     narration_text,
 )
+from tests.ubiquitous_language import pg
 
 
 def _opted_out_group(
@@ -151,23 +152,34 @@ def test_suffixed_glossary_name_keeps_its_term_ref_and_carries_the_suffix() -> N
     assert narration_text(narration.parts) == narration.text
 
 
+@scenario(
+    t'A per-case {pg["Scenario title"].l} ends with its {pg["Case ID"].l} as a value',
+    tags=['parametrization'],
+)
 def test_a_plain_string_title_carries_its_case_id_as_a_value() -> None:
     """The id is generated from values, not written as prose, so no span is
     read in it — and the title becomes a literal part, so title and id are
     never read as one string."""
-    scenarios, param_info = _opted_out_group(
-        'Split', values=('a*b*c',), statuses=('passed',)
-    )
-
-    narration = group_parametrized(scenarios, param_info)[0].narration
-
-    assert narration.text == 'Split [a*b*c]'
-    assert narration.parts == (
-        NarrationLiteral(value='Split'),
-        NarrationLiteral(value=' ['),
-        NarrationValue(rendered='a*b*c', expression=''),
-        NarrationLiteral(value=']'),
-    )
+    with given(
+        t'a {pg["Parametrized scenario"].l} titled "Split" that declines the '
+        t'{pg["Group"]("grouping")}, with the case ID a*b*c'
+    ):
+        scenarios, param_info = _opted_out_group(
+            'Split', values=('a*b*c',), statuses=('passed',)
+        )
+    with when(t'its {pg["Case"].l} becomes a {pg["Scenario"].l} of its own'):
+        narration = group_parametrized(scenarios, param_info)[0].narration
+    with then('the title reads "Split [a*b*c]"'):
+        assert narration.text == 'Split [a*b*c]'
+    with then(
+        'the case ID is a value part, and its asterisks are not read as emphasis'
+    ):
+        assert narration.parts == (
+            NarrationLiteral(value='Split'),
+            NarrationLiteral(value=' ['),
+            NarrationValue(rendered='a*b*c', expression=''),
+            NarrationLiteral(value=']'),
+        )
 
 
 def test_a_template_title_ends_with_its_case_id_as_a_value() -> None:

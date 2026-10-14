@@ -8,6 +8,49 @@
 - **then** the command succeeds
 - **then** the copy buttons' «citations» link the `/1.0/` URL
 
+## ✓ The `citations` exit code says whether a «finding» remains, so CI can gate on it · 5 cases
+`tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations
+
+- **given** a document with a «citation» that is {citation}
+  - 📎 document — *see parameter table*
+- **given** a JSON «report» that is {report_state}
+- **when** \`pytest-given citations {command}\` runs on the document
+- **then** it exits {exit_code}
+- **then** the document was rewritten: {rewritten}
+
+| citation | document | report_state | command | exit_code | rewritten |
+|---|---|---|---|---|---|
+| current | document | readable | check | 0 | False |
+| stale | document | readable | check | 1 | False |
+| stale | document | readable | update | 0 | True |
+| of a gone scenario | document | readable | update | 1 | True |
+| stale | document | unreadable | update | 2 | False |
+
+- **current, readable, check, 0, False** — document:
+  ```
+  ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+  ```
+
+- **stale, readable, check, 1, False** — document:
+  ```
+  ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+  ```
+
+- **stale, readable, update, 0, True** — document:
+  ```
+  ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+  ```
+
+- **of a gone scenario, readable, update, 1, True** — document:
+  ```
+  ✅ [Gone](https://example.org/report.html#scenario=t.py::test_gone)
+  ```
+
+- **stale, unreadable, update, 2, False** — document:
+  ```
+  ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+  ```
+
 ## ✓ A «scenario» reaches the «report» with its «tags» and «term refs»
 `tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
 
@@ -140,41 +183,19 @@
 - **then** it holds one row per «case», with that row's values
 - **then** the grouped steps carry a placeholder per matching name
 
-## ✓ A «parameter table» names its rows by their «case IDs» when any is custom
+## ✓ A «parameter table» names its rows by their «case IDs» when any is custom · 2 cases
 `tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids` · parametrization, spec/parameter-table-case-ids
 
-- **given** a «parametrized scenario» naming one «case» with `pytest.param(..., id=...)` and leaving the other to pytest
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, then
-    
-    @scenario("Bookings clash")
-    @pytest.mark.parametrize(
-        "start, clashes",
-        [pytest.param(20, False, id="touching-edges"), (19, True)],
-    )
-    def test_overlap(start, clashes):
-        with then(t"a booking from {start} clashes: {clashes}"):
-            assert (start < 20) == clashes
-    ```
+- **given** a «parametrized scenario» whose first «case» is written {first_case}, the other left to pytest
 - **when** the suite runs with --given-md
-  - 📎 report.md:
-    ```
-    # pytest-given — test_a_parameter_table_names_its_rows_by_their_case_ids0
-    
-    ## ✓ Bookings clash · 2 cases
-    `test_a_parameter_table_names_its_rows_by_their_case_ids.py:4::test_overlap`
-    
-    - **then** a booking from {start} clashes: {clashes}
-    
-    | case ID | start | clashes |
-    |---|---|---|
-    | touching-edges | 20 | False |
-    | 19-True | 19 | True |
-    ```
 - **then** both cases pass
-- **then** the «parameter table» leads with a case ID column, the generated «case ID» shown beside the custom one
+- **then** the «parameter table» case ID column is {id_column}
+- **then** a shown column puts the custom «case ID» beside the generated one
+
+| first_case | id_column |
+|---|---|
+| pytest.param(20, False, id="touching-edges") | shown |
+| (20, False) | omitted |
 
 ## ✓ A refusal on a run that writes no «report» does not claim one was skipped
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
@@ -919,6 +940,83 @@
 - **when** the suite runs with that «lint rule» set to warn
 - **then** the run still passes
 - **then** the «finding» is printed anyway
+
+## ✓ An ignore entry suppresses the «findings» it matches, and one that matches nothing fails the run · 4 cases
+`tests/integration/test_plugin_lint.py::test_an_ignore_entry_suppresses_what_it_matches` · validation
+
+- **given** a suite with {suite}
+  - 📎 test file — *see parameter table*
+- **when** the suite runs with the lint and given_lint_ignore={entry}
+- **then** the lint outcome is {outcome}, and only a suppressed run passes
+- **then** an unsuppressed «finding» is reported as an error
+- **then** an entry that suppressed nothing is reported as stale
+
+| suite | test file | entry | outcome |
+|---|---|---|---|
+| a flawed step | test file |  | reported |
+| a flawed step | test file | \*::test_empty_given | suppressed |
+| a flawed step | test file | empty-step: \*::test_empty_given | suppressed |
+| a clean step | test file | \*::test_nothing | stale |
+
+- **a flawed step, , reported** — test file:
+  ```
+  
+  from pytest_given import scenario, given, when, then
+  
+  @scenario("Empty given")
+  def test_empty_given():
+      with given("a value"):
+          pass
+      with when("computing"):
+          x = 2
+      with then("it is two"):
+          assert x == 2
+  ```
+
+- **a flawed step, \*::test_empty_given, suppressed** — test file:
+  ```
+  
+  from pytest_given import scenario, given, when, then
+  
+  @scenario("Empty given")
+  def test_empty_given():
+      with given("a value"):
+          pass
+      with when("computing"):
+          x = 2
+      with then("it is two"):
+          assert x == 2
+  ```
+
+- **a flawed step, empty-step: \*::test_empty_given, suppressed** — test file:
+  ```
+  
+  from pytest_given import scenario, given, when, then
+  
+  @scenario("Empty given")
+  def test_empty_given():
+      with given("a value"):
+          pass
+      with when("computing"):
+          x = 2
+      with then("it is two"):
+          assert x == 2
+  ```
+
+- **a clean step, \*::test_nothing, stale** — test file:
+  ```
+  
+  from pytest_given import scenario, given, when, then
+  
+  @scenario("Clean")
+  def test_clean():
+      with given("a value"):
+          x = 1
+      with when("it is doubled"):
+          x = x * 2
+      with then("it is two"):
+          assert x == 2
+  ```
 
 ## ✓ Either «narration lint» flag overrides the ini for one run
 `tests/integration/test_plugin_lint.py::test_the_flag_overrides_the_ini_in_both_directions`
@@ -2438,6 +2536,20 @@
 - **then** the «instance» «step» covers the bare «sentence»
 - **then** the bare «step» covers the «instance» «sentence»
 
+## ✓ A «sentence» is covered by one «step» naming all its «terms», never by several «steps» together · 3 cases
+`tests/unit/report/test_coverage.py::test_a_sentence_is_covered_by_one_step_never_by_several_together`
+
+- **given** a «story» whose «sentence» names guest, search and room
+- **given** a «scenario» whose «steps» name {steps_naming}
+- **when** «coverage» is computed against the «story»
+- **then** the «sentence» is covered: {covered}
+
+| steps_naming | covered |
+|---|---|
+| \[\['guest', 'search', 'room'\]\] | True |
+| \[\['guest', 'search'\], \['room'\]\] | False |
+| \[\['guest'\], \['guest', 'search', 'room'\]\] | True |
+
 ## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
 `tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_sentence_gains_a_term`
 
@@ -2741,6 +2853,23 @@
     - **then** I get a coffee
     ```
 
+## ✓ A line break in a «scenario title» or «step» reads as a space in the Markdown «report»
+`tests/unit/report/test_md_renderer.py::test_a_newline_in_a_title_or_step_reads_as_a_space`
+
+- **given** a «scenario» whose title, and a value in its «step», break across lines
+- **when** the Markdown «report» is rendered
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✓ line one line two
+    `tests/t.py::test_x`
+    
+    - **when** act one act two
+    ```
+- **then** the heading reads on one line
+- **then** so does the «step» bullet
+
 ## ✓ Nested «steps» indent under their parent
 `tests/unit/report/test_md_renderer.py::test_nested_steps_indent`
 
@@ -2966,6 +3095,38 @@
     - **when** act
     ```
 
+## ✓ Failure notes below a «parameter table» that would share a key add their row number
+`tests/unit/report/test_md_renderer.py::test_notes_sharing_a_key_add_their_row`
+
+- **given** three failed «cases»: one with the custom ID 11, one with no ID whose value is 11, and one with the ID 3
+- **when** the Markdown «report» is rendered
+  - 📎 Rendered Markdown:
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Att · 3 cases
+    `tests/t.py::test_att`
+    
+    - **when** act
+    
+    | case ID | hours |
+    |---|---|
+    | 11 | 5 |
+    |  | 11 |
+    | 3 | 3 |
+    
+    - **11 (row 1)** — failed:
+      > clash
+    
+    - **11 (row 2)** — failed:
+      > clash
+    
+    - **3** — failed:
+      > clash
+    ```
+- **then** the two notes keyed 11 each add their row number
+- **then** the note with a key of its own keeps it bare
+
 ## ✓ The JSON report carries each «sentence»'s «coverage»
 `tests/unit/report/test_sinks.py::test_json_sink_carries_per_sentence_coverage`
 
@@ -3111,6 +3272,14 @@
 - **then** the «step» keeps a placeholder pointing at that column
 - **then** the placeholder keeps the format spec and conversion it narrated
 
+## ✓ A narrated value that is the same in every «case» stays inline as a «value highlight»
+`tests/unit/test_grouping.py::test_a_constant_interpolation_stays_inline_and_makes_no_column` · parametrization
+
+- **given** two «cases» narrating the same value
+- **when** «templatizing» walks the «cases»
+- **then** the «parameter table» gains no column for it
+- **then** the «step» keeps the value inline, as a «value highlight»
+
 ## ✓ A varying interpolation that is not a bare name is refused
 `tests/unit/test_grouping.py::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
 
@@ -3213,3 +3382,11 @@
 - **when** the «cases» are «grouped»
 - **then** the «parameter table» holds the term displays alone
 - **then** the step still points at that column
+
+## ✓ A per-case «scenario title» ends with its «case ID» as a value
+`tests/unit/test_percase.py::test_a_plain_string_title_carries_its_case_id_as_a_value` · parametrization
+
+- **given** a «parametrized scenario» titled "Split" that declines the «grouping», with the case ID a*b*c
+- **when** its «case» becomes a «scenario» of its own
+- **then** the title reads "Split \[a*b*c\]"
+- **then** the case ID is a value part, and its asterisks are not read as emphasis

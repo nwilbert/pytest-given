@@ -5,7 +5,9 @@ from pathlib import Path
 
 import pytest
 
+from pytest_given import attach, given, scenario, then, when
 from pytest_given.cli import main
+from tests.ubiquitous_language import pg
 
 URL = 'https://example.org/report.html'
 
@@ -42,6 +44,46 @@ def _doc(tmp_path: Path, text: str) -> Path:
     path = docs / 'spec.md'
     path.write_text(text, encoding='utf-8')
     return path
+
+
+_CITATIONS = {
+    'current': f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n',
+    'stale': f'✓ [old]({URL}#scenario=t.py::test_pay)\n',
+    'of a gone scenario': f'✅ [Gone]({URL}#scenario=t.py::test_gone)\n',
+}
+
+
+@scenario(
+    t'The `citations` exit code says whether a {pg["Finding"].l} remains, so CI '
+    t'can gate on it',
+    tags=['spec/citations'],
+)
+@pytest.mark.parametrize(
+    ('command', 'citation', 'report_state', 'exit_code', 'rewritten'),
+    [
+        ('check', 'current', 'readable', 0, False),
+        ('check', 'stale', 'readable', 1, False),
+        ('update', 'stale', 'readable', 0, True),
+        ('update', 'of a gone scenario', 'readable', 1, True),
+        ('update', 'stale', 'unreadable', 2, False),
+    ],
+)
+def test_the_citations_exit_code_says_whether_a_finding_remains(
+    tmp_path: Path, command, citation, report_state, exit_code, rewritten
+) -> None:
+    with given(t'a document with a {pg["Citation"].l} that is {citation}'):
+        doc = _doc(tmp_path, _CITATIONS[citation])
+        attach('document', _CITATIONS[citation])
+    with given(t'a JSON {pg["Report"].l} that is {report_state}'):
+        report = _write_report(tmp_path)
+        if report_state == 'unreadable':
+            report.write_text('{not json', encoding='utf-8')
+    with when(t'`pytest-given citations {command}` runs on the document'):
+        rc = main(['citations', command, str(doc), '--report', str(report)])
+    with then(t'it exits {exit_code}'):
+        assert rc == exit_code
+    with then(t'the document was rewritten: {rewritten}'):
+        assert (doc.read_text(encoding='utf-8') != _CITATIONS[citation]) == rewritten
 
 
 def test_check_exits_0_when_every_citation_is_current(tmp_path: Path, capsys) -> None:

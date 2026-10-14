@@ -386,40 +386,46 @@ def test_parametrized_test_as_table(pytester, tmp_path):
     t'when any is custom',
     tags=['parametrization', 'spec/parameter-table-case-ids'],
 )
-def test_a_parameter_table_names_its_rows_by_their_case_ids(pytester, tmp_path):
+@pytest.mark.parametrize(
+    ('first_case', 'id_column'),
+    [
+        ('pytest.param(20, False, id="touching-edges")', 'shown'),
+        ('(20, False)', 'omitted'),
+    ],
+)
+def test_a_parameter_table_names_its_rows_by_their_case_ids(
+    pytester, tmp_path, first_case, id_column
+):
     with given(
-        t'a {pg["Parametrized scenario"].l} naming one {pg["Case"].l} with '
-        t'`pytest.param(..., id=...)` and leaving the other to pytest'
+        t'a {pg["Parametrized scenario"].l} whose first {pg["Case"].l} is written '
+        t'{first_case}, the other left to pytest'
     ):
-        suite = """
+        suite = f"""
             import pytest
             from pytest_given import scenario, then
 
             @scenario("Bookings clash")
-            @pytest.mark.parametrize(
-                "start, clashes",
-                [pytest.param(20, False, id="touching-edges"), (19, True)],
-            )
+            @pytest.mark.parametrize("start, clashes", [{first_case}, (19, True)])
             def test_overlap(start, clashes):
-                with then(t"a booking from {start} clashes: {clashes}"):
+                with then(t"a booking from {{start}} clashes: {{clashes}}"):
                     assert (start < 20) == clashes
             """
         pytester.makepyfile(suite)
-        attach('suite', textwrap.dedent(suite).strip())
         md_path = tmp_path / 'report.md'
     with when('the suite runs with --given-md'):
         result = pytester.runpytest(f'--given-md={md_path}')
         md = md_path.read_text(encoding='utf-8')
-        attach('report.md', md)
     with then('both cases pass'):
         result.assert_outcomes(passed=2)
+    with then(t'the {pg["Parameter table"].l} case ID column is {id_column}'):
+        header = next(line for line in md.splitlines() if 'start | clashes' in line)
+        assert header.startswith('| case ID |') == (id_column == 'shown')
     with then(
-        t'the {pg["Parameter table"].l} leads with a case ID column, '
-        t'the generated {pg["Case ID"].l} shown beside the custom one'
+        t'a shown column puts the custom {pg["Case ID"].l} beside the generated one'
     ):
-        assert '| case ID | start | clashes |' in md
-        assert '| touching-edges | 20 | False |' in md
-        assert '| 19-True | 19 | True |' in md
+        assert id_column == 'omitted' or (
+            '| touching-edges | 20 | False |' in md and '| 19-True | 19 | True |' in md
+        )
 
 
 def test_generated_case_ids_leave_the_table_without_an_id_column(pytester, tmp_path):

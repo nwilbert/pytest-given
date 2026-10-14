@@ -190,41 +190,43 @@ def test_off_override_disables_the_rule(pytester):
     assert 'narration lint' not in result.stdout.str()
 
 
-def test_bare_ignore_glob_suppresses_the_finding(pytester):
-    result = _run(
-        pytester,
-        EMPTY_GIVEN,
-        '--given-lint',
-        '-o',
-        'given_lint_ignore=*::test_empty_given',
-    )
-    assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
+_IGNORE_SUITES = {'a flawed step': EMPTY_GIVEN, 'a clean step': CLEAN}
 
 
-def test_rule_scoped_ignore_glob_suppresses_the_finding(pytester):
-    result = _run(
-        pytester,
-        EMPTY_GIVEN,
-        '--given-lint',
-        '-o',
-        'given_lint_ignore=empty-step: *::test_empty_given',
-    )
-    assert result.ret == 0
-    assert 'narration lint' not in result.stdout.str()
-
-
-def test_stale_ignore_entry_fails_the_run(pytester):
-    result = _run(
-        pytester,
-        CLEAN,
-        '--given-lint',
-        '-o',
-        'given_lint_ignore=*::test_nothing',
-    )
-    result.assert_outcomes(passed=1, errors=1)
-    assert result.ret == pytest.ExitCode.TESTS_FAILED
-    result.stdout.fnmatch_lines(['*stale-ignore*suppressed no finding*'])
+@scenario(
+    t'An ignore entry suppresses the {pg["Finding"].l.s} it matches, and one that '
+    t'matches nothing fails the run',
+    tags=['validation'],
+)
+@pytest.mark.parametrize(
+    ('suite', 'entry', 'outcome'),
+    [
+        ('a flawed step', '', 'reported'),
+        ('a flawed step', '*::test_empty_given', 'suppressed'),
+        ('a flawed step', 'empty-step: *::test_empty_given', 'suppressed'),
+        ('a clean step', '*::test_nothing', 'stale'),
+    ],
+)
+def test_an_ignore_entry_suppresses_what_it_matches(pytester, suite, entry, outcome):
+    with given(t'a suite with {suite}'):
+        attach('test file', _IGNORE_SUITES[suite])
+    with when(t'the suite runs with the lint and given_lint_ignore={entry}'):
+        result = _run(
+            pytester,
+            _IGNORE_SUITES[suite],
+            '--given-lint',
+            '-o',
+            f'given_lint_ignore={entry}',
+        )
+        out = result.stdout.str()
+    with then(t'the lint outcome is {outcome}, and only a suppressed run passes'):
+        assert (result.ret == 0) == (outcome == 'suppressed')
+    with then(t'an unsuppressed {pg["Finding"].l} is reported as an error'):
+        assert ('ERROR' in out and 'empty-step' in out) == (outcome == 'reported')
+    with then('an entry that suppressed nothing is reported as stale'):
+        assert ('stale-ignore' in out and 'suppressed no finding' in out) == (
+            outcome == 'stale'
+        )
 
 
 @scenario(

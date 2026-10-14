@@ -82,28 +82,40 @@ def test_passed_scenario_heading_and_steps() -> None:
         assert '- **then** I get a coffee' in md
 
 
+@scenario(
+    t'A line break in a {pg["Scenario title"].l} or {pg["Step"].l} reads as a '
+    t'space in the Markdown {pg["Report"].l}',
+)
 def test_a_newline_in_a_title_or_step_reads_as_a_space() -> None:
-    scn = Scenario(
-        id='tests/t.py::test_x',
-        narration=Narration(text='line one\nline two'),
-        module='tests/t.py',
-        status='passed',
-        steps=[
-            Step(
-                phase='when',
-                narration=Narration(
-                    text='act one\nact two',
-                    parts=(
-                        NarrationLiteral(value='act one\n'),
-                        NarrationValue(rendered='act\r\ntwo', expression='x'),
+    with given(
+        t'a {pg["Scenario"].l} whose title, and a value in its {pg["Step"].l}, '
+        t'break across lines'
+    ):
+        scn = Scenario(
+            id='tests/t.py::test_x',
+            narration=Narration(text='line one\nline two'),
+            module='tests/t.py',
+            status='passed',
+            steps=[
+                Step(
+                    phase='when',
+                    narration=Narration(
+                        text='act one\nact two',
+                        parts=(
+                            NarrationLiteral(value='act one\n'),
+                            NarrationValue(rendered='act\r\ntwo', expression='x'),
+                        ),
                     ),
-                ),
-            )
-        ],
-    )
-    md = render_md(_report(scn))
-    assert '## ✓ line one line two' in md
-    assert '- **when** act one act two' in md
+                )
+            ],
+        )
+    with when(t'the Markdown {pg["Report"].l} is rendered'):
+        md = render_md(_report(scn))
+        attach('Rendered Markdown', md)
+    with then('the heading reads on one line'):
+        assert '## ✓ line one line two' in md
+    with then(t'so does the {pg["Step"].l} bullet'):
+        assert '- **when** act one act two' in md
 
 
 def test_newline_in_attachment_label_stays_inline() -> None:
@@ -1134,19 +1146,31 @@ def test_a_custom_id_shows_whole_however_long() -> None:
     assert f'- **{long_id}** — failed:' in md
 
 
+@scenario(
+    t'Failure notes below a {pg["Parameter table"].l} that would share a key add '
+    t'their row number',
+)
 def test_notes_sharing_a_key_add_their_row() -> None:
     """A hidden id falls back to its values, which a custom ID may match."""
-    error = ErrorInfo(message='clash')
-    table = _table_with_custom_ids(
-        _custom('t.py::test_x[11]', 5, status='failed', error=error),
-        ParameterCase(
-            id=NodeId('t.py::test_x'), values=[11], status='failed', error=error
-        ),
-        ParameterCase(
-            id=NodeId('t.py::test_x[3]'), values=[3], status='failed', error=error
-        ),
-    )
-    md = render_md(_report_with(table))
-    assert '- **11 (row 1)** — failed:' in md
-    assert '- **11 (row 2)** — failed:' in md
-    assert '- **3** — failed:' in md
+    with given(
+        t'three failed {pg["Case"].l.s}: one with the custom ID 11, one with no ID '
+        t'whose value is 11, and one with the ID 3'
+    ):
+        error = ErrorInfo(message='clash')
+        table = _table_with_custom_ids(
+            _custom('t.py::test_x[11]', 5, status='failed', error=error),
+            ParameterCase(
+                id=NodeId('t.py::test_x'), values=[11], status='failed', error=error
+            ),
+            ParameterCase(
+                id=NodeId('t.py::test_x[3]'), values=[3], status='failed', error=error
+            ),
+        )
+    with when(t'the Markdown {pg["Report"].l} is rendered'):
+        md = render_md(_report_with(table))
+        attach('Rendered Markdown', md)
+    with then('the two notes keyed 11 each add their row number'):
+        assert '- **11 (row 1)** — failed:' in md
+        assert '- **11 (row 2)** — failed:' in md
+    with then('the note with a key of its own keeps it bare'):
+        assert '- **3** — failed:' in md

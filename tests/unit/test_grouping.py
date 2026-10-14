@@ -868,12 +868,23 @@ def test_a_param_placeholders_step_text_is_rebuilt_too() -> None:
     assert (placeholder.format_spec, placeholder.conversion) == ('>6', 'r')
 
 
+@scenario(
+    t'A narrated value that is the same in every {pg["Case"].l} stays inline as a '
+    t'{pg["Value highlight"].l}',
+    tags=['parametrization'],
+)
 def test_a_constant_interpolation_stays_inline_and_makes_no_column() -> None:
-    scenarios, info = _two_case_group([_value_step('2.0')], [_value_step('2.0')])
-    grouped = group_parametrized(scenarios, info)[0]
-    assert [c.kind for c in grouped.parameters.columns] == ['param']
-    assert isinstance(grouped.steps[0].narration.parts[1], NarrationValue)
-    assert grouped.steps[0].narration.text == 'the drink costs 2.0 euros'
+    with given(t'two {pg["Case"].l.s} narrating the same value'):
+        scenarios, info = _two_case_group([_value_step('2.0')], [_value_step('2.0')])
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"].l.s}'):
+        grouped = group_parametrized(scenarios, info)[0]
+    with then(t'the {pg["Parameter table"].l} gains no column for it'):
+        assert [c.kind for c in grouped.parameters.columns] == ['param']
+    with then(
+        t'the {pg["Step"].l} keeps the value inline, as a {pg["Value highlight"].l}'
+    ):
+        assert isinstance(grouped.steps[0].narration.parts[1], NarrationValue)
+        assert grouped.steps[0].narration.text == 'the drink costs 2.0 euros'
 
 
 @scenario(
