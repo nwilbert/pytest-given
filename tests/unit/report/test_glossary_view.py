@@ -71,7 +71,8 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
     with given(
         t'a {pg["Report"].l} whose {pg["Story"].l} and {pg["Scenario"].l} '
         t'reference '
-        t'entity {pg["Instance"].l.s} and an {pg["Inflection"].l}'
+        t'{pg["Instance"].l.s} of an actor and a work object, and an '
+        t'{pg["Inflection"].l}'
     ):
         g = _g()
         a = Sentence(
@@ -109,7 +110,7 @@ def test_build_glossary_aggregations_collects_instances_and_forms() -> None:
         attach('Report data', report_to_dict(rd))
     with when(t'the {pg["Glossary"].l} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'the entity terms collect their {pg["Instance"].l.s}'):
+    with then(t'the actor and the work object collect their {pg["Instance"].l.s}'):
         assert 'Alice' in [i.display for i in aggs[TermId('guest')].instances]
         assert 'Deluxe Suite' in [i.display for i in aggs[TermId('room')].instances]
     with then(
@@ -250,11 +251,13 @@ def test_build_glossary_aggregations_activity_in_step_not_collected_as_instance(
 
 
 @scenario(
-    t'A canonical entity reference is not an {pg["Instance"].l}, whatever its case',
+    t'A canonical reference to an actor or work object is not an '
+    t'{pg["Instance"].l}, whatever its case',
 )
-def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -> None:
+def test_build_glossary_aggregations_canonical_ref_is_not_an_instance() -> None:
     with given(
-        t'a {pg["Story"].l} sentence referencing entities by canonical name, '
+        t'a {pg["Story"].l} sentence referencing an actor and a work object by '
+        t'canonical name, '
         t'and a {pg["Step"].l} referencing one in lowercase'
     ):
         g = _g()
@@ -288,7 +291,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
         rd = ReportData(metadata=_meta(), scenarios=[scn], stories=[story], glossary=g)
     with when(t'the {pg["Glossary"].l} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
-    with then(t'neither entity term records an {pg["Instance"].l}'):
+    with then(t'neither the actor nor the work object records an {pg["Instance"].l}'):
         assert aggs[TermId('guest')].instances == []
         assert aggs[TermId('room')].instances == []
 
@@ -299,7 +302,7 @@ def test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance() -
 )
 def test_build_glossary_aggregations_s_form_ref_is_the_term_itself() -> None:
     with given(
-        t'a {pg["Story"].l} {pg["Sentence"].l} referencing an entity and an '
+        t'a {pg["Story"].l} {pg["Sentence"].l} referencing a work object and an '
         t'activity by their {pg["S-form"].l.s}, each lowercase and capitalized'
     ):
         clause = Clause(
@@ -319,7 +322,7 @@ def test_build_glossary_aggregations_s_form_ref_is_the_term_itself() -> None:
     with when(t'the {pg["Glossary"].l} aggregations are built'):
         aggs = build_term_crossrefs(rd).aggregations
     with then(
-        t'the entity records no {pg["Instance"].l} '
+        t'the work object records no {pg["Instance"].l} '
         t'and the activity no {pg["Inflection"].l}'
     ):
         assert aggs[TermId('room')].instances == []

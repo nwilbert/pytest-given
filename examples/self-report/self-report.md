@@ -176,11 +176,11 @@
 - **then** both cases pass
 - **then** the «parameter table» leads with a case ID column, the generated «case ID» shown beside the custom one
 
-## ✓ A refusal on a run with no sink does not claim a «report» was skipped
+## ✓ A refusal on a run that writes no «report» does not claim one was skipped
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
 
 - **given** a suite whose narration varies across parametrize cases
-- **when** the suite runs with no --given-\* sink
+- **when** the suite runs with no --given-\* output flag
 - **then** the refusal is reported without claiming a report was skipped
 
 ## ✓ A refused run discards the previous run's «report»
@@ -199,8 +199,8 @@
             assert cup_size > 0
     ```
 - **given** a «report» on disk from a previous run
-- **when** the suite runs with those sinks configured
-- **then** the run says no report was written, naming the sink
+- **when** the suite runs with those output flags
+- **then** the run says no report was written, naming the file
 - **then** the stale files are gone rather than left reading as current
 
 ## ✓ An unknown «source link» preset stops the run before it collects
@@ -224,7 +224,7 @@
 `tests/integration/test_plugin.py::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
 
 - **given** a suite configured through the ini rather than the flag
-- **when** the suite runs with an HTML sink
+- **when** the suite runs with an HTML report
 - **then** the error names the ini setting, not a flag the user never typed
 
 ## ✓ A «report» that fails to render discards the previous one too
@@ -707,7 +707,7 @@
 - **then** the HTML rendering is written
 - **then** no JSON lands in the default location
 
-## ✓ A sink flag pointed at a source file is refused before the suite runs
+## ✓ An output flag pointed at a source file is refused before the suite runs
 `tests/integration/test_plugin.py::test_a_sink_path_that_is_not_a_report_file_is_refused` · validation
 
 - **given** a suite with one «scenario»
@@ -731,9 +731,9 @@
         with when(f'the machine brews {cup_size} ml'):
             pass
     ```
-- **when** the suite runs with all three sinks configured
+- **when** the suite runs with all three output flags
 - **then** the run fails, naming the offending form
-- **then** not one sink is written, and no traceback escapes
+- **then** not one report file is written, and no traceback escapes
 
 ## ✓ `--given-title` names the «report» instead of the rootdir
 `tests/integration/test_plugin.py::test_given_title_cli_flag_names_the_report`
@@ -756,7 +756,7 @@
 `tests/integration/test_plugin.py::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
-- **when** the suite runs with a misspelled «theme», and no HTML sink
+- **when** the suite runs with a misspelled «theme», and no HTML report
 - **then** the run ends as a usage error, naming the flag the user typed
 - **then** no test ran
 
@@ -779,7 +779,7 @@
 - **then** both cases pass
 - **then** each «case» is its own «scenario», titled with its id, with no «parameter table»
 
-## ✓ A run with no sink still enforces the «grouping» rules
+## ✓ A run that writes no «report» still enforces the «grouping» rules
 `tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules` · validation
 
 - **given** a suite whose f-string narration records no parts
@@ -794,7 +794,7 @@
         with then(f'it brews {cup_size} ml'):
             assert cup_size
     ```
-- **when** the suite runs with no sink configured
+- **when** the suite runs with no output flag
 - **then** the run still fails, naming the offending form
 
 ## ✓ Every «scenario» carries the `pytest_given` marker
@@ -969,7 +969,7 @@
 `tests/integration/test_plugin_lint.py::test_a_lint_failure_is_reported_and_keeps_the_written_report` · validation
 
 - **given** a clean suite and a lint pass that raises
-- **when** the suite runs with an HTML sink
+- **when** the suite runs with an HTML report
 - **then** the failure is summarized as the lint's, rather than raised as a traceback or titled as a report that was not written
 - **then** the report that was already written is still there
 
@@ -1807,7 +1807,7 @@
 - **given** a test function taking one fixture
 - **when** the function is decorated
 - **then** the very same function comes back, keeping its signature
-- **then** it carries the «scenario» marker, and a plain one does not
+- **then** it is recognized as a «scenario», with its title; a plain function is not
 
 ## ✓ An «attachment» label must be plain text · 3 cases
 `tests/unit/capture/test_step_descriptor.py::test_attach_rejects_a_non_str_label` · validation
@@ -2269,7 +2269,7 @@
         with given('a value'):
             pass
     ```
-- **when** the AST «rules» parse that source
+- **when** the AST «lint rules» parse that source
 - **then** an empty-step «finding» points at the «step» line
 - **then** its «severity» is error
 
@@ -2284,7 +2284,7 @@
             x = compute()
             handlers[0](x)
     ```
-- **when** the AST «rules» parse that source
+- **when** the AST «lint rules» parse that source
 - **then** a then-without-check «finding» reports the unchecked then
 
 ## ✓ «Narration lint» flags a then «step» that checks only on some runs
@@ -2298,7 +2298,7 @@
             if 'index' in entry:
                 assert records[entry['index']] == expected
     ```
-- **when** the AST «rules» parse that source
+- **when** the AST «lint rules» parse that source
 - **then** a conditional-check «finding» reports the guarded then
 - **then** its «severity» is warn
 
@@ -2307,7 +2307,7 @@
 
 - **given** a {phase} «step» whose body asserts
   - 📎 step body — *see parameter table*
-- **when** the AST «rules» parse that source
+- **when** the AST «lint rules» parse that source
 - **then** a warn «finding» names the {phase} step holding the assert: {flagged}
 
 | phase | step body | flagged |
@@ -2352,7 +2352,7 @@
         with then('it brews'):
             assert brew(machine) == 'coffee'
     ```
-- **when** the AST «rules» parse that source
+- **when** the AST «lint rules» parse that source
 - **then** a warn «finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
@@ -2365,14 +2365,14 @@
         with given(t'a {size} ml cup'):
             cup = make_cup()
     ```
-- **when** the AST «rules» parse that source
+- **when** the AST «lint rules» parse that source
 - **then** a warn «finding» names the interpolation the body ignores
 
 ## ✓ «Narration lint» flags a passed «scenario» that skips a «phase»
 `tests/unit/lint/test_runtime_rules.py::test_missing_phase_fires_on_passed_two_phase_scenario`
 
 - **given** a passed «scenario» narrating only given and then
-- **when** the runtime «rules» run
+- **when** the runtime «lint rules» run
 - **then** one missing-phase «finding» names the absent when and the «scenario» source
 - **then** its «severity» is the catalog default, warn
 
@@ -2381,14 +2381,14 @@
 
 - **given** a «glossary» defining one «term»
 - **given** two scenarios carrying that word as a «tag»
-- **when** the runtime «rules» run
+- **when** the runtime «lint rules» run
 - **then** a single warn «finding» names the «tag» and the «term» it shadows, counting the scenarios and naming one
 
 ## ✓ «Narration lint» flags a «term» referenced by no «scenario» name, «step» or «story»
 `tests/unit/lint/test_runtime_rules.py::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
-- **when** the runtime «rules» run over no scenarios and no stories
+- **when** the runtime «lint rules» run over no scenarios and no stories
 - **then** the «finding» names the unreferenced «term»
 - **then** its «severity» is off — the rule is opt-in
 
@@ -2396,7 +2396,7 @@
 `tests/unit/lint/test_runtime_rules.py::test_dead_term_passes_term_referenced_only_by_a_second_clause`
 
 - **given** a «story» whose one «sentence» names the «term» only in its second «clause»
-- **when** the runtime «rules» run over that story
+- **when** the runtime «lint rules» run over that story
 - **then** dead-term flags none of its terms
 
 ## ✓ A «sentence» is referenced by its «terms», whatever their surface form
@@ -2511,7 +2511,7 @@
 ## ✓ The «glossary» view aggregates «instances» and «activity» forms
 `tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_collects_instances_and_forms`
 
-- **given** a «report» whose «story» and «scenario» reference entity «instances» and an «inflection»
+- **given** a «report» whose «story» and «scenario» reference «instances» of an actor and a work object, and an «inflection»
   - 📎 Report data:
     ```
     {
@@ -2634,7 +2634,7 @@
     }
     ```
 - **when** the «glossary» aggregations are built
-- **then** the entity terms collect their «instances»
+- **then** the actor and the work object collect their «instances»
 - **then** the activity collects its «inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by a «sentence» record the «story»
@@ -2651,19 +2651,19 @@
 - **when** the «glossary» aggregations are built
 - **then** the «story» and the «inflection» appear once each
 
-## ✓ A canonical entity reference is not an «instance», whatever its case
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance`
+## ✓ A canonical reference to an actor or work object is not an «instance», whatever its case
+`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_ref_is_not_an_instance`
 
-- **given** a «story» sentence referencing entities by canonical name, and a «step» referencing one in lowercase
+- **given** a «story» sentence referencing an actor and a work object by canonical name, and a «step» referencing one in lowercase
 - **when** the «glossary» aggregations are built
-- **then** neither entity term records an «instance»
+- **then** neither the actor nor the work object records an «instance»
 
 ## ✓ An «S-form» reference is the «term» itself, not an «instance» or an «inflection»
 `tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself`
 
-- **given** a «story» «sentence» referencing an entity and an activity by their «s-forms», each lowercase and capitalized
+- **given** a «story» «sentence» referencing a work object and an activity by their «s-forms», each lowercase and capitalized
 - **when** the «glossary» aggregations are built
-- **then** the entity records no «instance» and the activity no «inflection»
+- **then** the work object records no «instance» and the activity no «inflection»
 
 ## ✓ A «kindless» «term» records only its «story» ref
 `tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
@@ -2970,15 +2970,15 @@
 `tests/unit/report/test_sinks.py::test_json_sink_carries_per_sentence_coverage`
 
 - **given** a «story» with a covered, an uncovered, an untracked «sentence»
-- **when** the JSON sink is rendered
+- **when** the JSON report is rendered
 - **then** a top-level `coverage` lists every «sentence» once
 - **then** the rest of the report is the input dict, unchanged
 
-## ✓ The JSON sink computes «coverage» itself rather than carrying the one it is handed
+## ✓ The JSON report carries the «coverage» it computes, not the one it is handed
 `tests/unit/report/test_sinks.py::test_json_sink_replaces_incoming_coverage`
 
 - **given** a report dict whose `coverage` does not match its steps
-- **when** the JSON sink renders it
+- **when** the JSON report is rendered from it
 - **then** the «coverage» is the one the «steps» actually earn
 
 ## ✓ A «source link» config value resolves to its template · 6 cases

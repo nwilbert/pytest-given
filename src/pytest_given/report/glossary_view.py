@@ -128,8 +128,8 @@ _KIND_GROUPS: tuple[_KindRow, ...] = (
     _KindRow('Uncategorized', 'kindless', 'uncategorized'),
 )
 
-# Only an entity has instances worth listing; an activity's surface forms are its
-# own section.
+# Only an actor or work object has instances worth listing; an activity's
+# surface forms are its own section.
 _INSTANCE_KINDS: frozenset[KindKey] = frozenset({'actor', 'object'})
 
 
@@ -232,7 +232,7 @@ class TermCrossRefs:
 def build_term_crossrefs(report: ReportData) -> TermCrossRefs:
     """Per-term aggregations and the term-to-scenarios index.
 
-    Scenario narrations contribute entity instances; story sentence prose
+    Scenario narrations contribute actor and work-object instances; story sentence prose
     contributes story refs, more instances, and activity surface forms. Scenario
     render order is preserved and each scenario appears at most once per term.
     """
@@ -317,7 +317,7 @@ class _GlossaryIndex:
     def record_instance(
         self, term_id: TermId, display: str, fixture_name: str | None = None
     ) -> None:
-        """Note one occurrence of an entity term reading as `display`.
+        """Note one occurrence of an actor or work-object term reading as `display`.
 
         A reading `_is_own_name` accepts is the concept itself, not an
         instance; only specific displays (``Alice`` for ``Guest``) reach the

@@ -160,7 +160,7 @@ class TermHandle(TermHandleBase):
     def __call__(self, display: str) -> TermInstance:
         """This term as one call site reads it (``guest('Alice')``).
 
-        Whether that reads as a distinct entity or as a mere inflection is the
+        Whether that reads as a distinct instance or as a mere inflection is the
         *term's* business, decided from `declared_kind` where it matters — an
         actor's `Alice` is its own identity, an activity's `books` is the same term
         in another form.

@@ -69,7 +69,7 @@ def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
     with given(t'a passed {pg["Scenario"].l} narrating only given and then'):
         two_phase = _phases_scenario('test_x.py::test_a', ['given', 'then'])
     with when(
-        t'the runtime {pg["Lint rule"]("rules")} run', pins=adopt_pytest_given['flag']
+        t'the runtime {pg["Lint rule"].l.s} run', pins=adopt_pytest_given['flag']
     ):
         findings = _runtime(grouped=[two_phase])
     with then(
@@ -148,7 +148,7 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
             ),
         ]
     with when(
-        t'the runtime {pg["Lint rule"]("rules")} run', pins=adopt_pytest_given['flag']
+        t'the runtime {pg["Lint rule"].l.s} run', pins=adopt_pytest_given['flag']
     ):
         findings = _rule_findings(
             _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
@@ -244,7 +244,7 @@ def test_dead_term_flags_unreferenced_term() -> None:
     with given(t'a {pg["Glossary"].l} holding one unreferenced {pg["Term"].l}'):
         glossary = _glossary('Ghost term')
     with when(
-        t'the runtime {pg["Lint rule"]("rules")} run over no scenarios and no stories',
+        t'the runtime {pg["Lint rule"].l.s} run over no scenarios and no stories',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _dead_term_findings(glossary)
@@ -331,7 +331,7 @@ def test_dead_term_passes_term_referenced_only_by_a_second_clause() -> None:
                 ),
             ),
         )
-    with when(t'the runtime {pg["Lint rule"]("rules")} run over that story'):
+    with when(t'the runtime {pg["Lint rule"].l.s} run over that story'):
         findings = _dead_term_findings(
             _glossary('Guest', 'Clerk', 'sign', 'Register'), stories=[story]
         )

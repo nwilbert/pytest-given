@@ -117,7 +117,7 @@ def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
         with_line = _line(src, "with given('a value')")
         empty = _scenario([_step('given', 'a value', with_line)])
     with when(
-        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        t'the AST {pg["Lint rule"].l.s} parse that source',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([empty], tmp_path)
@@ -284,7 +284,7 @@ def test_then_without_check_fires(tmp_path) -> None:
         with_line = _line(src, 'with then')
         unchecked = _scenario([_step('then', 'it is one', with_line)])
     with when(
-        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        t'the AST {pg["Lint rule"].l.s} parse that source',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([unchecked], tmp_path)
@@ -372,7 +372,7 @@ def test_conditional_check_fires_on_assert_only_under_an_if(tmp_path) -> None:
             [_step('then', 'a cached entry points at its record', with_line)]
         )
     with when(
-        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        t'the AST {pg["Lint rule"].l.s} parse that source',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([guarded], tmp_path)
@@ -624,7 +624,7 @@ def test_check_outside_then_flags_an_assert_only_outside_a_then(
         with_line = _line(src, 'with ')
         checking = _scenario([_step(phase, 'a stocked machine', with_line)])
     with when(
-        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        t'the AST {pg["Lint rule"].l.s} parse that source',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _rule_findings(
@@ -771,7 +771,7 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
             ]
         )
     with when(
-        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        t'the AST {pg["Lint rule"].l.s} parse that source',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _rule_findings(_ast_rules([folded], tmp_path), 'action-in-then')
@@ -947,7 +947,7 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         with_line = _line(src, 'with given')
         unused = _scenario([_value_step('given', 'a 200 ml cup', with_line, ['size'])])
     with when(
-        t'the AST {pg["Lint rule"]("rules")} parse that source',
+        t'the AST {pg["Lint rule"].l.s} parse that source',
         pins=adopt_pytest_given['flag'],
     ):
         findings = _rule_findings(

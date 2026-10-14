@@ -180,7 +180,7 @@ def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
         t'{pg["Sentence"].l}'
     ):
         report = _story_report()
-    with when('the JSON sink is rendered'):
+    with when('the JSON report is rendered'):
         rendered = sinks.render_sinks(
             report_to_dict(report), SinkConfig(json_path=tmp_path / 'report.json')
         )
@@ -207,14 +207,14 @@ def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
 
 
 @scenario(
-    t'The JSON sink computes {pg["Coverage"].l} itself rather than carrying '
-    t'the one it is handed',
+    t'The JSON report carries the {pg["Coverage"].l} it computes, not the one '
+    t'it is handed',
 )
 def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
     with given('a report dict whose `coverage` does not match its steps'):
         stale = report_to_dict(_story_report())
         stale['coverage'] = ['stale']
-    with when('the JSON sink renders it'):
+    with when('the JSON report is rendered from it'):
         rendered = sinks.render_sinks(
             stale, SinkConfig(json_path=tmp_path / 'report.json')
         )

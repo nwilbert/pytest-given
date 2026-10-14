@@ -14,7 +14,7 @@ book_a_group_trip = story('Book a Group Trip', [
 ])
 ```
 
-- A sentence reads from left to right: **actor → activity → work object**, with optional connective words (`'for'`, `'to'`) between the parts. Each clause alternates strictly between entities and the words that link them, so it has an odd number of parts, at least three. Even positions hold entities, and position 0 is the actor who acts. Odd positions are the verb slots: an activity or a connective.
+- A sentence reads from left to right: **actor → activity → work object**, with optional connective words (`'for'`, `'to'`) between the parts. Each clause alternates strictly between actors or work objects and the words that link them, so it has an odd number of parts, at least three. Even positions hold actors or work objects, and position 0 is the actor who acts. Odd positions are the verb slots: an activity or a connective.
 - **A bare word takes up a position.** Write a connective as one string in a verb slot (`'to the'`, `'with a'`). Never put a separate article before a noun, because that pushes the noun into a verb slot.
 - Handles come from the glossary. Calling a handle supplies an instance or an inflection: `organizer('Carol')`, or `confirm.s`, which reads *confirms*.
 - Any part may be a **bare string** instead of a glossary handle. That is the right choice for a verb that is just sentence prose (*searches for*, *submits*; see [Authoring workflow](#authoring-workflow)). But narration can only match a sentence with at least two different glossary terms. A sentence with fewer shows as "not coverage-tracked", unless a step pins it (see below).

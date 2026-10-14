@@ -528,7 +528,8 @@ def test_a_mutated_parametrize_value_is_captured_as_it_was_at_setup(pytester, tm
 
 
 @scenario(
-    t'A refusal on a run with no sink does not claim a {pg["Report"].l} was skipped',
+    t'A refusal on a run that writes no {pg["Report"].l} does not claim one was '
+    t'skipped',
     tags=['validation'],
 )
 def test_a_grouping_error_without_sinks_does_not_say_report_not_written(pytester):
@@ -547,7 +548,7 @@ def test_a_grouping_error_without_sinks_does_not_say_report_not_written(pytester
                     assert cup_size > 0
             """
         pytester.makepyfile(suite)
-    with when('the suite runs with no --given-* sink'):
+    with when('the suite runs with no --given-* output flag'):
         result = pytester.runpytest()
     with then('the refusal is reported without claiming a report was skipped'):
         assert 'scenario refused' in result.stdout.str()
@@ -582,11 +583,11 @@ def test_a_grouping_error_discards_the_previous_report(pytester, tmp_path):
         html_path = tmp_path / 'report.html'
         json_path.write_text('{"stale": true}')
         html_path.write_text('<html>stale</html>')
-    with when('the suite runs with those sinks configured'):
+    with when('the suite runs with those output flags'):
         result = pytester.runpytest(
             f'--given-json={json_path}', f'--given-html={html_path}'
         )
-    with then('the run says no report was written, naming the sink'):
+    with then('the run says no report was written, naming the file'):
         assert 'report not written' in result.stdout.str()
         assert 'report.json' in result.stdout.str()
     with then('the stale files are gone rather than left reading as current'):
@@ -674,7 +675,7 @@ def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
             """
         )
         pytester.makepyprojecttoml('[tool.pytest]\ngiven_source_link = "bogus"\n')
-    with when('the suite runs with an HTML sink'):
+    with when('the suite runs with an HTML report'):
         result = pytester.runpytest('--given-html=report.html')
     with then('the error names the ini setting, not a flag the user never typed'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR
@@ -3429,7 +3430,7 @@ def test_given_json_alone_writes_json(pytester: pytest.Pytester) -> None:
 
 
 @scenario(
-    t'A sink flag pointed at a source file is refused before the suite runs',
+    t'An output flag pointed at a source file is refused before the suite runs',
     tags=['validation'],
 )
 def test_a_sink_path_that_is_not_a_report_file_is_refused(pytester) -> None:
@@ -3469,7 +3470,7 @@ def test_a_rejected_form_fails_the_run_and_writes_no_sink(pytester):
     with given('a suite whose narration varies across parametrize cases'):
         pytester.makepyfile(test_brew=_VIOLATING_SUITE)
         attach('suite', _VIOLATING_SUITE)
-    with when('the suite runs with all three sinks configured'):
+    with when('the suite runs with all three output flags'):
         result = pytester.runpytest(
             '--given-json=out/report.json',
             '--given-html=out/report.html',
@@ -3478,7 +3479,7 @@ def test_a_rejected_form_fails_the_run_and_writes_no_sink(pytester):
     with then('the run fails, naming the offending form'):
         assert result.ret != 0
         result.stdout.fnmatch_lines(['*varies across parametrize cases*'])
-    with then('not one sink is written, and no traceback escapes'):
+    with then('not one report file is written, and no traceback escapes'):
         assert not (pytester.path / 'out').exists()
         assert 'Traceback (most recent call last)' not in result.stdout.str()
 
@@ -3691,7 +3692,7 @@ def test_an_unknown_theme_fails_before_the_suite_runs(pytester):
     side effects, so a typo in pyproject.toml fails the next run outright."""
     with given('a suite that would otherwise pass'):
         pytester.makepyfile(_SUITE)
-    with when(t'the suite runs with a misspelled {pg["Theme"].l}, and no HTML sink'):
+    with when(t'the suite runs with a misspelled {pg["Theme"].l}, and no HTML report'):
         result = pytester.runpytest('--given-theme=Dark')
     with then('the run ends as a usage error, naming the flag the user typed'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR
@@ -3818,7 +3819,8 @@ def test_bare_run_does_no_report_rendering_work(pytester, tmp_path, monkeypatch)
 
 
 @scenario(
-    t'A run with no sink still enforces the {pg["Group"]("grouping")} rules',
+    t'A run that writes no {pg["Report"].l} still enforces the '
+    t'{pg["Group"]("grouping")} rules',
     tags=['validation'],
 )
 def test_bare_run_still_enforces_the_grouping_rules(pytester):
@@ -3836,7 +3838,7 @@ def test_bare_run_still_enforces_the_grouping_rules(pytester):
             """
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
-    with when('the suite runs with no sink configured'):
+    with when('the suite runs with no output flag'):
         result = pytester.runpytest()
     with then('the run still fails, naming the offending form'):
         assert result.ret != 0

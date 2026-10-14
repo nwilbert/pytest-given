@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-14T19:57:04.875063+00:00",
+    "timestamp": "2026-10-14T19:58:05.800762+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "a9c52ac342f389e36b41210b33aba3f5affc2770",
+    "commit_sha": "89da5ff28ef648b4c1b19fe9a4aa7b23e8323abb",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 184,
+      "duration_ms": 175,
       "steps": [
         {
           "phase": "given",
@@ -156,7 +156,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 85,
+      "duration_ms": 71,
       "steps": [
         {
           "phase": "given",
@@ -340,7 +340,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 153,
+      "duration_ms": 144,
       "steps": [
         {
           "phase": "given",
@@ -422,7 +422,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -531,7 +531,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 72,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -660,7 +660,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 569,
+      "duration_ms": 567,
       "steps": [
         {
           "phase": "given",
@@ -788,7 +788,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 70,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -974,7 +974,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -1087,10 +1087,10 @@
     {
       "id": "tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written",
       "narration": {
-        "text": "A refusal on a run with no sink does not claim a report was skipped",
+        "text": "A refusal on a run that writes no report does not claim one was skipped",
         "parts": [
           {
-            "value": "A refusal on a run with no sink does not claim a "
+            "value": "A refusal on a run that writes no "
           },
           {
             "term_id": "report",
@@ -1098,7 +1098,7 @@
             "expression": "pg[\"Report\"].l"
           },
           {
-            "value": " was skipped"
+            "value": " does not claim one was skipped"
           }
         ]
       },
@@ -1107,7 +1107,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -1123,7 +1123,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with no --given-* sink",
+            "text": "the suite runs with no --given-* output flag",
             "parts": []
           },
           "children": [],
@@ -1174,7 +1174,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -1219,7 +1219,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with those sinks configured",
+            "text": "the suite runs with those output flags",
             "parts": []
           },
           "children": [],
@@ -1230,7 +1230,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the run says no report was written, naming the sink",
+            "text": "the run says no report was written, naming the file",
             "parts": []
           },
           "children": [],
@@ -1256,7 +1256,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 558
+        "line": 559
       },
       "story_ids": [],
       "pins": null
@@ -1284,7 +1284,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -1355,7 +1355,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 626
+        "line": 627
       },
       "story_ids": [],
       "pins": null
@@ -1383,7 +1383,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -1399,7 +1399,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with an HTML sink",
+            "text": "the suite runs with an HTML report",
             "parts": []
           },
           "children": [],
@@ -1425,7 +1425,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 658
+        "line": 659
       },
       "story_ids": [],
       "pins": null
@@ -1453,7 +1453,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -1550,7 +1550,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 684
+        "line": 685
       },
       "story_ids": [],
       "pins": null
@@ -1664,7 +1664,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 903
+        "line": 904
       },
       "story_ids": [],
       "pins": null
@@ -1708,7 +1708,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 101,
+      "duration_ms": 102,
       "steps": [
         {
           "phase": "given",
@@ -1820,7 +1820,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 1040
+        "line": 1041
       },
       "story_ids": [],
       "pins": null
@@ -1836,7 +1836,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 118,
+      "duration_ms": 112,
       "steps": [
         {
           "phase": "given",
@@ -1980,7 +1980,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 1100
+        "line": 1101
       },
       "story_ids": [],
       "pins": null
@@ -2006,7 +2006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 67,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -2097,7 +2097,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 1619
+        "line": 1620
       },
       "story_ids": [],
       "pins": null
@@ -2123,7 +2123,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 220,
+      "duration_ms": 219,
       "steps": [
         {
           "phase": "given",
@@ -2165,7 +2165,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2230
+        "line": 2231
       },
       "story_ids": [],
       "pins": null
@@ -2196,7 +2196,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -2332,7 +2332,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2398
+        "line": 2399
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2368,7 +2368,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -2466,7 +2466,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2470
+        "line": 2471
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2608,7 +2608,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2508
+        "line": 2509
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2652,7 +2652,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 63,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -2761,7 +2761,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2554
+        "line": 2555
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2805,7 +2805,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -2906,7 +2906,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2595
+        "line": 2596
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -2950,7 +2950,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 63,
       "steps": [
         {
           "phase": "given",
@@ -3053,7 +3053,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2657
+        "line": 2658
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3097,7 +3097,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 194,
+      "duration_ms": 198,
       "steps": [
         {
           "phase": "given",
@@ -3254,7 +3254,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2697
+        "line": 2698
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3395,7 +3395,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3189
+        "line": 3190
       },
       "story_ids": [],
       "pins": null
@@ -3609,7 +3609,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3230
+        "line": 3231
       },
       "story_ids": [],
       "pins": null
@@ -3635,7 +3635,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -3703,7 +3703,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3338
+        "line": 3339
       },
       "story_ids": [],
       "pins": null
@@ -3729,7 +3729,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -3780,7 +3780,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3351
+        "line": 3352
       },
       "story_ids": [],
       "pins": null
@@ -3814,7 +3814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -3868,7 +3868,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3374
+        "line": 3375
       },
       "story_ids": [],
       "pins": null
@@ -3953,7 +3953,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3411
+        "line": 3412
       },
       "story_ids": [],
       "pins": null
@@ -3961,10 +3961,10 @@
     {
       "id": "tests/integration/test_plugin.py::test_a_sink_path_that_is_not_a_report_file_is_refused",
       "narration": {
-        "text": "A sink flag pointed at a source file is refused before the suite runs",
+        "text": "An output flag pointed at a source file is refused before the suite runs",
         "parts": [
           {
-            "value": "A sink flag pointed at a source file is refused before the suite runs"
+            "value": "An output flag pointed at a source file is refused before the suite runs"
           }
         ]
       },
@@ -3973,7 +3973,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -4039,7 +4039,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3431
+        "line": 3432
       },
       "story_ids": [],
       "pins": null
@@ -4064,7 +4064,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -4086,7 +4086,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with all three sinks configured",
+            "text": "the suite runs with all three output flags",
             "parts": []
           },
           "children": [],
@@ -4108,7 +4108,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "not one sink is written, and no traceback escapes",
+            "text": "not one report file is written, and no traceback escapes",
             "parts": []
           },
           "children": [],
@@ -4123,7 +4123,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3464
+        "line": 3465
       },
       "story_ids": [],
       "pins": null
@@ -4149,7 +4149,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 63,
       "steps": [
         {
           "phase": "given",
@@ -4222,7 +4222,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3496
+        "line": 3497
       },
       "story_ids": [],
       "pins": null
@@ -4327,7 +4327,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3637
+        "line": 3638
       },
       "story_ids": [],
       "pins": null
@@ -4355,7 +4355,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -4371,7 +4371,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with a misspelled theme, and no HTML sink",
+            "text": "the suite runs with a misspelled theme, and no HTML report",
             "parts": [
               {
                 "value": "the suite runs with a misspelled "
@@ -4382,7 +4382,7 @@
                 "expression": "pg[\"Theme\"].l"
               },
               {
-                "value": ", and no HTML sink"
+                "value": ", and no HTML report"
               }
             ]
           },
@@ -4420,7 +4420,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3685
+        "line": 3686
       },
       "story_ids": [],
       "pins": null
@@ -4469,7 +4469,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -4583,7 +4583,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3738
+        "line": 3739
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -4593,10 +4593,18 @@
     {
       "id": "tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules",
       "narration": {
-        "text": "A run with no sink still enforces the grouping rules",
+        "text": "A run that writes no report still enforces the grouping rules",
         "parts": [
           {
-            "value": "A run with no sink still enforces the "
+            "value": "A run that writes no "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": " still enforces the "
           },
           {
             "term_id": "group",
@@ -4635,7 +4643,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with no sink configured",
+            "text": "the suite runs with no output flag",
             "parts": []
           },
           "children": [],
@@ -4661,7 +4669,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3820
+        "line": 3821
       },
       "story_ids": [],
       "pins": null
@@ -4786,7 +4794,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3869
+        "line": 3871
       },
       "story_ids": [],
       "pins": null
@@ -4828,7 +4836,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 476,
+      "duration_ms": 471,
       "steps": [
         {
           "phase": "given",
@@ -4987,7 +4995,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -5089,7 +5097,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -5194,7 +5202,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -5434,7 +5442,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -5530,7 +5538,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 122,
+      "duration_ms": 127,
       "steps": [
         {
           "phase": "given",
@@ -5546,7 +5554,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the suite runs with an HTML sink",
+            "text": "the suite runs with an HTML report",
             "parts": []
           },
           "children": [],
@@ -7218,7 +7226,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8234,7 +8242,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -8735,7 +8743,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -13312,10 +13320,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "it carries the scenario marker, and a plain one does not",
+            "text": "it is recognized as a scenario, with its title; a plain function is not",
             "parts": [
               {
-                "value": "it carries the "
+                "value": "it is recognized as a "
               },
               {
                 "term_id": "scenario",
@@ -13323,7 +13331,7 @@
                 "expression": "pg[\"Scenario\"].l"
               },
               {
-                "value": " marker, and a plain one does not"
+                "value": ", with its title; a plain function is not"
               }
             ]
           },
@@ -13480,7 +13488,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 514
+        "line": 517
       },
       "story_ids": [],
       "pins": null
@@ -13625,7 +13633,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 556
+        "line": 559
       },
       "story_ids": [],
       "pins": null
@@ -13851,7 +13859,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_step_descriptor.py",
-        "line": 954
+        "line": 957
       },
       "story_ids": [],
       "pins": null
@@ -18039,7 +18047,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -18797,15 +18805,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the AST rules parse that source",
+            "text": "the AST lint rules parse that source",
             "parts": [
               {
                 "value": "the AST "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " parse that source"
@@ -18916,7 +18924,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -18950,15 +18958,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the AST rules parse that source",
+            "text": "the AST lint rules parse that source",
             "parts": [
               {
                 "value": "the AST "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " parse that source"
@@ -19038,7 +19046,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -19072,15 +19080,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the AST rules parse that source",
+            "text": "the AST lint rules parse that source",
             "parts": [
               {
                 "value": "the AST "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " parse that source"
@@ -19180,7 +19188,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -19223,15 +19231,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the AST rules parse that source",
+            "text": "the AST lint rules parse that source",
             "parts": [
               {
                 "value": "the AST "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " parse that source"
@@ -19425,15 +19433,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the AST rules parse that source",
+            "text": "the AST lint rules parse that source",
             "parts": [
               {
                 "value": "the AST "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " parse that source"
@@ -19547,15 +19555,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the AST rules parse that source",
+            "text": "the AST lint rules parse that source",
             "parts": [
               {
                 "value": "the AST "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " parse that source"
@@ -19668,15 +19676,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the runtime rules run",
+            "text": "the runtime lint rules run",
             "parts": [
               {
                 "value": "the runtime "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " run"
@@ -19845,15 +19853,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the runtime rules run",
+            "text": "the runtime lint rules run",
             "parts": [
               {
                 "value": "the runtime "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " run"
@@ -20003,15 +20011,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the runtime rules run over no scenarios and no stories",
+            "text": "the runtime lint rules run over no scenarios and no stories",
             "parts": [
               {
                 "value": "the runtime "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " run over no scenarios and no stories"
@@ -20184,15 +20192,15 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the runtime rules run over that story",
+            "text": "the runtime lint rules run over that story",
             "parts": [
               {
                 "value": "the runtime "
               },
               {
                 "term_id": "lint-rule",
-                "display": "rules",
-                "expression": "pg[\"Lint rule\"](\"rules\")"
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
               },
               {
                 "value": " run over that story"
@@ -22184,7 +22192,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a report whose story and scenario reference entity instances and an inflection",
+            "text": "a report whose story and scenario reference instances of an actor and a work object, and an inflection",
             "parts": [
               {
                 "value": "a "
@@ -22211,7 +22219,7 @@
                 "expression": "pg[\"Scenario\"].l"
               },
               {
-                "value": " reference entity "
+                "value": " reference "
               },
               {
                 "term_id": "instance",
@@ -22219,7 +22227,7 @@
                 "expression": "pg[\"Instance\"].l.s"
               },
               {
-                "value": " and an "
+                "value": " of an actor and a work object, and an "
               },
               {
                 "term_id": "inflection",
@@ -22265,10 +22273,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the entity terms collect their instances",
+            "text": "the actor and the work object collect their instances",
             "parts": [
               {
-                "value": "the entity terms collect their "
+                "value": "the actor and the work object collect their "
               },
               {
                 "term_id": "instance",
@@ -22431,7 +22439,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 167
+        "line": 168
       },
       "story_ids": [],
       "pins": null
@@ -22572,18 +22580,18 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 197
+        "line": 198
       },
       "story_ids": [],
       "pins": null
     },
     {
-      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_entity_ref_is_not_an_instance",
+      "id": "tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_ref_is_not_an_instance",
       "narration": {
-        "text": "A canonical entity reference is not an instance, whatever its case",
+        "text": "A canonical reference to an actor or work object is not an instance, whatever its case",
         "parts": [
           {
-            "value": "A canonical entity reference is not an "
+            "value": "A canonical reference to an actor or work object is not an "
           },
           {
             "term_id": "instance",
@@ -22603,7 +22611,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a story sentence referencing entities by canonical name, and a step referencing one in lowercase",
+            "text": "a story sentence referencing an actor and a work object by canonical name, and a step referencing one in lowercase",
             "parts": [
               {
                 "value": "a "
@@ -22614,7 +22622,7 @@
                 "expression": "pg[\"Story\"].l"
               },
               {
-                "value": " sentence referencing entities by canonical name, and a "
+                "value": " sentence referencing an actor and a work object by canonical name, and a "
               },
               {
                 "term_id": "step",
@@ -22657,10 +22665,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "neither entity term records an instance",
+            "text": "neither the actor nor the work object records an instance",
             "parts": [
               {
-                "value": "neither entity term records an "
+                "value": "neither the actor nor the work object records an "
               },
               {
                 "term_id": "instance",
@@ -22681,7 +22689,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 252
+        "line": 253
       },
       "story_ids": [],
       "pins": null
@@ -22733,7 +22741,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a story sentence referencing an entity and an activity by their s-forms, each lowercase and capitalized",
+            "text": "a story sentence referencing a work object and an activity by their s-forms, each lowercase and capitalized",
             "parts": [
               {
                 "value": "a "
@@ -22752,7 +22760,7 @@
                 "expression": "pg[\"Sentence\"].l"
               },
               {
-                "value": " referencing an entity and an activity by their "
+                "value": " referencing a work object and an activity by their "
               },
               {
                 "term_id": "s-form",
@@ -22795,10 +22803,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the entity records no instance and the activity no inflection",
+            "text": "the work object records no instance and the activity no inflection",
             "parts": [
               {
-                "value": "the entity records no "
+                "value": "the work object records no "
               },
               {
                 "term_id": "instance",
@@ -22827,7 +22835,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 296
+        "line": 299
       },
       "story_ids": [],
       "pins": null
@@ -22984,7 +22992,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 382
+        "line": 385
       },
       "story_ids": [],
       "pins": null
@@ -23109,7 +23117,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 415
+        "line": 418
       },
       "story_ids": [],
       "pins": null
@@ -23225,7 +23233,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 504
+        "line": 507
       },
       "story_ids": [],
       "pins": null
@@ -23250,7 +23258,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 196,
+      "duration_ms": 194,
       "steps": [
         {
           "phase": "given",
@@ -24732,7 +24740,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the JSON sink is rendered",
+            "text": "the JSON report is rendered",
             "parts": []
           },
           "children": [],
@@ -24789,10 +24797,10 @@
     {
       "id": "tests/unit/report/test_sinks.py::test_json_sink_replaces_incoming_coverage",
       "narration": {
-        "text": "The JSON sink computes coverage itself rather than carrying the one it is handed",
+        "text": "The JSON report carries the coverage it computes, not the one it is handed",
         "parts": [
           {
-            "value": "The JSON sink computes "
+            "value": "The JSON report carries the "
           },
           {
             "term_id": "coverage",
@@ -24800,7 +24808,7 @@
             "expression": "pg[\"Coverage\"].l"
           },
           {
-            "value": " itself rather than carrying the one it is handed"
+            "value": " it computes, not the one it is handed"
           }
         ]
       },
@@ -24823,7 +24831,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the JSON sink renders it",
+            "text": "the JSON report is rendered from it",
             "parts": []
           },
           "children": [],

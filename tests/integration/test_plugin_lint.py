@@ -493,7 +493,7 @@ def test_a_lint_failure_is_reported_and_keeps_the_written_report(pytester):
                     given_session._run_lint = original
             """
         )
-    with when('the suite runs with an HTML sink'):
+    with when('the suite runs with an HTML report'):
         result = pytester.runpytest('--given-html=report.html', '--given-lint')
     with then(
         "the failure is summarized as the lint's, rather than raised as a "

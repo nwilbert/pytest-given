@@ -182,7 +182,7 @@ def carried_glossaries(node: object) -> frozenset[Glossary]:
 
 def clause(*parts: _ClauseArg) -> Clause:
     """Build a Clause as a node/edge alternation, so it maps directly
-    onto a Domain Storytelling graph. Even positions (0, 2, ...) are entity
+    onto a Domain Storytelling graph. Even positions (0, 2, ...) are
     nodes (actor / work object); odd positions (1, 3, ...) are edges — an
     activity handle or a bare-string connective. Position 0 is an actor,
     position 1 an activity — but any position also accepts a bare string (a
@@ -191,10 +191,10 @@ def clause(*parts: _ClauseArg) -> Clause:
     if len(parts) < 3 or len(parts) % 2 == 0:
         raise PytestGivenError(
             f'clause must alternate node / edge / node … with an odd '
-            f'length >= 3 (it must start and end on an entity node); got '
-            f'{len(parts)} part(s): {parts!r}. A trailing arrow with no target '
-            f'is not allowed — split multi-arrow sentences into separate '
-            f'clause(...) calls.'
+            f'length >= 3 (it must start and end on a node: an actor or work '
+            f'object); got {len(parts)} part(s): {parts!r}. A trailing arrow '
+            f'with no target is not allowed — split multi-arrow sentences into '
+            f'separate clause(...) calls.'
         )
     for position, part in enumerate(parts):
         if isinstance(part, str):

@@ -460,7 +460,10 @@ def test_scenario_marks_the_function_without_wrapping_it() -> None:
     with then('the very same function comes back, keeping its signature'):
         assert marked is brew
         assert list(inspect.signature(marked).parameters) == ['machine']
-    with then(t'it carries the {pg["Scenario"].l} marker, and a plain one does not'):
+    with then(
+        t'it is recognized as a {pg["Scenario"].l}, with its title; a plain '
+        t'function is not'
+    ):
         assert brew._scenario.title == 'Brew coffee'  # type: ignore[attr-defined]
 
         def plain() -> None:
