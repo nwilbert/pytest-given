@@ -67,11 +67,11 @@ NodeId = NewType('NodeId', str)
 
 
 def node_base(node_id: str) -> str:
-    """A node id without its parametrize tail: ``'f.py::t[1-2]' -> 'f.py::t'``.
+    """A node ID without its parametrize tail: ``'f.py::t[1-2]' -> 'f.py::t'``.
     Two cases of one parametrized function share this; two different functions
     never do.
 
-    Lives beside `NodeId` because grouping and report both take node ids apart,
+    Lives beside `NodeId` because grouping and report both take node IDs apart,
     and neither may import the other. The path ends at the first `::`, so a
     function segment alone, whose tail may hold a `::`, is no input for it.
     """
@@ -80,7 +80,7 @@ def node_base(node_id: str) -> str:
 
 
 def case_suffix(node_id: str) -> str:
-    """The parametrize tail of a node id, brackets included, or ``''`` when it
+    """The parametrize tail of a node ID, brackets included, or ``''`` when it
     has none: ``'f.py::t[1-2]' -> '[1-2]'``, ``'f.py::t' -> ''``."""
     start = _tail_start(node_id)
     return '' if start < 0 else node_id[start:]
@@ -440,7 +440,7 @@ class ParameterTable:
     @property
     def has_custom_ids(self) -> bool:
         """Whether any case's id is custom, which is what earns the
-        table its leading case id column."""
+        table its leading case ID column."""
         return any(case.custom_id for case in self.cases)
 
 

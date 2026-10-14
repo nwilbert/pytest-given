@@ -75,7 +75,7 @@
   {%- endmacro -%}
 
   {#- Keys travel as data-* and are read back from the dataset: Alpine compiles
-      a directive's decoded attribute text as JS, so interpolating a node id
+      a directive's decoded attribute text as JS, so interpolating a node ID
       into one would be an injection. -#}
   {%- macro citation_button(kind, key) -%}
     {%- if citations -%}

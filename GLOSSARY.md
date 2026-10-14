@@ -11,7 +11,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Scenario** | A test function decorated with `@scenario(...)`. Not every pytest test is a scenario — undecorated tests are tolerated but not collected. |
-| **Scenario title** | The text `@scenario` takes first: the statement of the rule a *Scenario* demonstrates, shown as its heading in the report. A plain string, a t-string of glossary handles, or a `Template` filled per *Case*; recorded as the scenario's *Narration*. Not the test function's name, which the node id carries. |
+| **Scenario title** | The text `@scenario` takes first: the statement of the rule a *Scenario* demonstrates, shown as its heading in the report. A plain string, a t-string of glossary handles, or a `Template` filled per *Case*; recorded as the scenario's *Narration*. Not the test function's name, which the node ID carries. |
 | **Step** | A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest, and each carries a phase, narration, attachments and children — but no status or error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*, which is where both renderers read it. |
 | **Narration** | The human-readable text on a step or scenario title. A `Narration` bundles the flat rendered `text` with `parts` — empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces. The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks. |
 | **Phase** | The category of a step: `given`, `when`, or `then`. A step has exactly one phase. |
@@ -24,8 +24,8 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Parametrized scenario** | A `@scenario`-decorated test that also carries `@pytest.mark.parametrize(...)`. Produces multiple scenario records during a run; pytest-given groups them. |
-| **Case** | One row of a parametrized scenario — its node id, a single tuple of parameter values, its status, and any error. |
-| **Case id** | A *Case*'s pytest id: its *Node ID*'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`; a *Parameter table* leads with its case ids when any one is. |
+| **Case** | One row of a parametrized scenario — its node ID, a single tuple of parameter values, its status, and any error. |
+| **Case ID** | A *Case*'s pytest ID: its *Node ID*'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`; a *Parameter table* leads with its case IDs when any one is. |
 | **Parameter table** | The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). Appears in the report below the grouped-template steps. |
 | **Group** | Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share both the same name and the same *Node ID* without its parametrize tail — one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario. |
 | **Templatize** | Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case, and every other passed case must narrate that same template. |
@@ -35,7 +35,8 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Term | Meaning |
 |---|---|
 | **Step fixture** | A pytest fixture whose function is wrapped with `@given(text)`. Only `@given` is allowed on fixtures; `@when` / `@then` are rejected. |
-| **Plain fixture** | A pytest fixture without a pytest-given decorator. It produces no step in the report unless an `Annotated[..., given(...)]` label on the test's parameter narrates it. |
+| **Plain fixture** | A pytest fixture without a pytest-given decorator. It produces no step in the report unless a *Given annotation* on the test's parameter narrates it. |
+| **Given annotation** | A `given(...)` in a test parameter's `Annotated[...]` type: `def test(room: Annotated[int, given('a room')])`. On a parametrize value or a *Plain fixture* it adds a childless `given` step; on a *Step fixture* it replaces the fixture's root label and its pins. Only `given` is allowed, and a `Template` in it may only hold a bare parametrize column. |
 | **Fixture recording** | A captured subtree of steps + attachments produced while a step fixture is being set up. Stored keyed by fixture-instance identity. A generator fixture's teardown records nothing — it refuses steps and attachments. |
 | **Graft** | Attaching a fixture recording into the active scenario's step tree at the moment its host test starts. |
 
@@ -57,7 +58,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
 | **Source link** | A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card, resolved from the `given_source_link` config — a preset name like `vscode` / `github`, or a raw URL template. Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default. |
-| **Report link** | A Markdown link to a scenario, tag or story in the HTML *Report*: the report's URL with a `#scenario=<node id>`, `#tag=<tag>` or `#view=stories&story=<story id>` fragment. Without a glyph it is a plain one, which claims only that its target exists. |
+| **Report link** | A Markdown link to a scenario, tag or story in the HTML *Report*: the report's URL with a `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<story id>` fragment. Without a glyph it is a plain one, which claims only that its target exists. |
 | **Citation** | A *Report link* led by a status glyph, citing a scenario, tag or story from a Markdown document: `✅ [title](<report URL>#scenario=…)`, and for a tag or story a summary after it, `(5 ✅ · 2 🔵)`. `pytest-given citations check` holds its glyph, link text and summary to a JSON *Report*; `citations update` rewrites them, and marks a target the report lacks `❓`. |
 | **Theme** | The HTML report's colour scheme — `light`, `dark`, or `auto` (follow the viewer's system). The `given_theme` config sets the default a report opens in; a viewer's own choice from the report's theme control, once made, wins over it in that browser. |
 

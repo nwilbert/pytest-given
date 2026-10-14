@@ -296,7 +296,7 @@
       {#- Only when the cases differ in status: a column of one glyph repeats
           the header's status badge on every row. -#}
       {%- set show_status = scenario.parameters.has_mixed_statuses -%}
-      {#- Only when some case id is custom: generated ids restate
+      {#- Only when some case ID is custom: generated ids restate
           the value columns. -#}
       {%- set show_ids = scenario.parameters.has_custom_ids -%}
       {%- set table_width = scenario.parameters.columns | length + show_status + show_ids %}
@@ -308,7 +308,7 @@
       <table class="param-table">
         <thead>
           <tr>
-            {% if show_ids %}<th class="param-id" data-block="frame">case id</th>{% endif %}
+            {% if show_ids %}<th class="param-id" data-block="frame">case ID</th>{% endif %}
             {% for col in scenario.parameters.columns %}
             <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>{{ col.name }}</th>
             {% endfor %}

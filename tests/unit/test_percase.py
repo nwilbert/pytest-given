@@ -33,7 +33,7 @@ def _opted_out_group(
     """A group of cases whose scenario declined the merge.
 
     One entry of `values` per case — a tuple where `names` has more than one
-    column, matching the node id pytest would build from it. `name` goes
+    column, matching the node ID pytest would build from it. `name` goes
     through `narration_from`, so the parts under test are the ones `@scenario`
     actually records rather than a hand-built stand-in.
     """

@@ -458,7 +458,7 @@ def _assert_with_call(node: _BodyNode) -> bool:
 
 def _contains_assert_outside(stmts: list[ast.stmt], excluded: set[int]) -> bool:
     """Whether an `assert` exists under *stmts*, skipping excluded subtrees
-    (child-step blocks, identified by node id)."""
+    (child-step blocks, identified by node ID)."""
     return any(
         isinstance(node, ast.Assert)
         for node in _walk_pruned(stmts, skip=lambda n: id(n) in excluded)

@@ -121,7 +121,7 @@ def test_suggestions_rank_by_node_id_and_by_title() -> None:
     suggestions = resolver.suggestions(
         Target('scenario', 't.py::test_pay_card'), 'Pay with a card'
     )
-    assert suggestions[0].startswith('closest by node id: t.py::test_pay_by_card')
+    assert suggestions[0].startswith('closest by node ID: t.py::test_pay_by_card')
     assert any(
         line.startswith('closest by scenario title:') and 'test_pay_by_card' in line
         for line in suggestions

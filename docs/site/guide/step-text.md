@@ -25,7 +25,7 @@ Scenario titles, step text and glossary definitions can use a little Markdown. E
 | `FileGlossary` term and kind cells | removed: `**Guest**` reads as `Guest` | | literal | wherever the term shows |
 | Everything else | literal | | literal | |
 
-*Rendered* means `**bold**` shows as bold, `*italic*` as italic and `` `code` `` as code. *Literal* means the characters show as written in every output, the Markdown report included. *Everything else* is the report title, term names and term refs, interpolated values, case ids, story titles and clauses, tags, skip and xfail reasons, parameter column names and values, attachments and error messages.
+*Rendered* means `**bold**` shows as bold, `*italic*` as italic and `` `code` `` as code. *Literal* means the characters show as written in every output, the Markdown report included. *Everything else* is the report title, term names and term refs, interpolated values, case IDs, story titles and clauses, tags, skip and xfail reasons, parameter column names and values, attachments and error messages.
 
 The rules follow CommonMark for the forms you usually write:
 

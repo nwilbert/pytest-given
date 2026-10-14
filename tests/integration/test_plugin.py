@@ -382,7 +382,7 @@ def test_parametrized_test_as_table(pytester, tmp_path):
 
 
 @scenario(
-    t'A {pg["Parameter table"].l} names its rows by their {pg["Case id"].l.s} '
+    t'A {pg["Parameter table"].l} names its rows by their {pg["Case ID"].l.s} '
     t'when any is custom',
     tags=['parametrization', 'spec/parameter-table-case-ids'],
 )
@@ -414,10 +414,10 @@ def test_a_parameter_table_names_its_rows_by_their_case_ids(pytester, tmp_path):
     with then('both cases pass'):
         result.assert_outcomes(passed=2)
     with then(
-        t'the {pg["Parameter table"].l} leads with a case id column, '
-        t'the generated {pg["Case id"].l} shown beside the custom one'
+        t'the {pg["Parameter table"].l} leads with a case ID column, '
+        t'the generated {pg["Case ID"].l} shown beside the custom one'
     ):
-        assert '| case id | start | clashes |' in md
+        assert '| case ID | start | clashes |' in md
         assert '| touching-edges | 20 | False |' in md
         assert '| 19-True | 19 | True |' in md
 
@@ -2459,7 +2459,7 @@ def test_scenario_pin_missing_from_its_story_raises_at_import(pytester):
     result = pytester.runpytest('--collect-only')
     assert result.ret != 0
     # The handle is looked up where it is written, so the traceback points at
-    # the `@scenario(...)` line rather than naming a node id.
+    # the `@scenario(...)` line rather than naming a node ID.
     result.stdout.fnmatch_lines(["*story 'Book' has no sentence 'cancel'*"])
     assert 'INTERNALERROR' not in result.stdout.str()
 
@@ -2651,16 +2651,16 @@ def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_pa
         ]
 
 
-# --- Annotated labels and fixture labels carry pins ---
+# --- Given annotations and fixture labels carry pins ---
 
 
 @scenario(
-    t'An Annotated label carrying a {pg["Pin"].l} pins its {pg["Step"].l}',
+    t'A {pg["Pin"].l} on a {pg["Given annotation"].l} pins the {pg["Step"].l} it adds',
     stories=adopt_pytest_given,
 )
-def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
+def test_a_pin_on_a_given_annotation_pins_its_step(pytester):
     with given(
-        t'a {pg["Scenario"].l} whose Annotated given(...) label on a '
+        t'a {pg["Scenario"].l} whose {pg["Given annotation"].l} on a '
         t'{pg["Plain fixture"].l} carries a {pg["Pin"].l}'
     ):
         suite = """
@@ -2686,7 +2686,7 @@ def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest('--given-json=report.json')
-    with then(t"the label's {pg['Step'].l} carries the {pg['Pin'].l}"):
+    with then(t"the annotation's {pg['Step'].l} carries the {pg['Pin'].l}"):
         result.assert_outcomes(passed=1)
         data = json.loads(pytester.path.joinpath('report.json').read_text())
         assert data['scenarios'][0]['steps'][0]['pins'] == [
@@ -2695,19 +2695,25 @@ def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
 
 
 @scenario(
-    t'An Annotated label retells the {pg["Pin"].l.s} of the fixture label it replaces',
+    t'A {pg["Given annotation"].l} retells the {pg["Pin"].l.s} of the '
+    t'{pg["Step fixture"].l} label it replaces',
     stories=adopt_pytest_given,
 )
 @pytest.mark.parametrize(
-    ('label_pins', 'root_sentences'),
+    ('annotation_pins', 'root_sentences'),
     [('None', [1]), ('[]', []), ('[a[2]]', [2])],
     ids=['none-keeps', 'empty-clears', 'list-replaces'],
 )
-def test_annotated_label_pins_retell_the_fixture_root(
+def test_a_given_annotation_retells_the_step_fixture_pins(
     pytester,
-    label_pins: Annotated[
+    annotation_pins: Annotated[
         str,
-        given(Template('a label with pins={label_pins} over a fixture pinning a[1]')),
+        given(
+            Template(
+                'a given annotation with pins={annotation_pins} over a step fixture '
+                'pinning a[1]'
+            )
+        ),
     ],
     root_sentences,
 ):
@@ -2734,7 +2740,7 @@ def test_annotated_label_pins_retell_the_fixture_root(
 
         @scenario('x', stories=a)
         def test_x(
-            arranged: Annotated[int, given('a retold label', pins={label_pins})],
+            arranged: Annotated[int, given('a retold label', pins={annotation_pins})],
         ):
             pass
     """)
@@ -3181,13 +3187,16 @@ _TEMPLATE_LABEL_WITHOUT_PARAMETRIZE = """
 
 
 @scenario(
-    t'An Annotated Template label on an unparametrized {pg["Scenario"].l} '
-    t'fails that {pg["Scenario"].l}'
+    t'A `Template` {pg["Given annotation"].l} on an unparametrized '
+    t'{pg["Scenario"].l} fails that {pg["Scenario"].l}'
 )
-def test_annotated_template_label_without_parametrize_fails_scenario(
+def test_a_template_given_annotation_without_parametrize_fails_the_scenario(
     pytester: pytest.Pytester,
 ) -> None:
-    with given('a Template label on a plain fixture parameter'):
+    with given(
+        t'a `Template` {pg["Given annotation"].l} on a {pg["Plain fixture"].l} '
+        t'parameter'
+    ):
         pytester.makepyfile(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE)
         attach('suite', textwrap.dedent(_TEMPLATE_LABEL_WITHOUT_PARAMETRIZE).strip())
     with when(t'the suite runs with an HTML {pg["Report"].l}'):
@@ -3195,7 +3204,7 @@ def test_annotated_template_label_without_parametrize_fails_scenario(
     with then('the scenario errors, naming the parameter and the fix'):
         result.assert_outcomes(errors=1)
         result.stdout.fnmatch_lines(
-            ["*label on parameter 'room'*needs @pytest.mark.parametrize*"]
+            ["*annotation on parameter 'room'*needs @pytest.mark.parametrize*"]
         )
     with then(t'the HTML {pg["Report"].l} is still written'):
         assert (pytester.path / 'report.html').is_file()
@@ -3219,7 +3228,7 @@ _ANNOTATED_TEMPLATE_SUITE = """
 
 
 @scenario(
-    'An Annotated Template label may only hold a bare parametrize column',
+    t'A `Template` {pg["Given annotation"].l} may only hold a bare parametrize column',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -3229,25 +3238,25 @@ _ANNOTATED_TEMPLATE_SUITE = """
         (
             '{room}',
             'refused',
-            "'{room}' in the Annotated label on parameter 'room' does not match",
+            "'{room}' in the given annotation on parameter 'room' does not match",
         ),
         ('{room.number}', 'refused', 'bare identifiers'),
     ],
     ids=['column', 'plain-fixture', 'attribute'],
 )
-def test_an_annotated_template_label_needs_a_bare_parametrize_column(
+def test_a_template_given_annotation_needs_a_bare_parametrize_column(
     pytester, placeholder, outcome, error
 ):
     with given(
-        t'a {pg["Parametrized scenario"].l} whose Template label on a plain '
-        t'fixture holds {placeholder}'
+        t'a {pg["Parametrized scenario"].l} whose `Template` '
+        t'{pg["Given annotation"].l} on a {pg["Plain fixture"].l} holds {placeholder}'
     ):
         suite = _ANNOTATED_TEMPLATE_SUITE.replace('PLACEHOLDER', placeholder)
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
-    with then(t'the label is {outcome}'):
+    with then(t'the annotation is {outcome}'):
         errored = result.parseoutcomes().get('errors', 0) == 1
         assert ('refused' if errored else 'accepted') == outcome
     with then(t'a refusal errors the scenario, saying {error}'):
@@ -3378,7 +3387,7 @@ def test_given_md_lines_ini_drops_the_anchor_line(pytester: pytest.Pytester) -> 
         md_path = pytester.path / 'out.md'
     with when('the suite runs with --given-md'):
         pytester.runpytest(f'--given-md={md_path}')
-    with then('the anchor is the node id, without a line number'):
+    with then('the anchor is the node ID, without a line number'):
         md = md_path.read_text(encoding='utf-8')
         assert '`test_given_md_lines_ini_drops_the_anchor_line.py::test_buy`' in md
 

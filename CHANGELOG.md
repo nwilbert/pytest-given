@@ -24,7 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
 - The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 - Scenario titles and step text render `**bold**`, `*italic*` and `` `code` `` in the HTML report.
-- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case id` column when any case id is custom, flagged by each case's `custom_id` in the JSON report.
+- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case ID` column when any case ID is custom, flagged by each case's `custom_id` in the JSON report.
 
 ### Changed
 
@@ -35,13 +35,14 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
 - Glossary definitions render code inside bold and no longer italicize between spaced asterisks.
 - The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.
-- A per-case scenario title highlights its case id as a value, and the JSON report records it as a value part.
+- A per-case scenario title highlights its case ID as a value, and the JSON report records it as a value part.
 - The HTML report's top bar and term ref underlines are visually tidied.
 - The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
 - The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.
 - The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing and a stub that raises to prove "never called", and starts its completeness audit from the undecorated tests in narrated test files.
-- The bundled skills leave bold and italic in titles and steps to the user, keep custom case ids for complex parameter-table rows, and search the JSON report's narration with its Markdown markers stripped.
+- The bundled skills leave bold and italic in titles and steps to the user, keep custom case IDs for complex parameter-table rows, and search the JSON report's narration with its Markdown markers stripped.
 - The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
+- The docs and error messages call `Annotated[..., given(...)]` on a test parameter a given annotation, and write node ID and case ID.
 
 ### Fixed
 

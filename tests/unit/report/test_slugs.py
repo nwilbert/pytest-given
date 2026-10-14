@@ -133,7 +133,7 @@ def test_scenario_slug_fallback_stays_fragment_safe() -> None:
 
 
 def test_scenario_slug_fallback_separates_ids_that_fold_together() -> None:
-    """Two node ids differing only in a character the fold removes are still
+    """Two node IDs differing only in a character the fold removes are still
     told apart, and which one gets which slug does not depend on the order the
     report lists them in."""
     ids = ['test_x.py::test_y[a+b]', 'test_x.py::test_y[a-b]']
@@ -149,7 +149,7 @@ def test_scenario_slug_fallback_separates_ids_that_fold_together() -> None:
 
 def test_scenario_slug_falls_back_to_the_node_id_when_paths_cannot_separate() -> None:
     """`test_x.py` beside `x.py` in one directory reads the same at every
-    depth; the node id is the only thing left that is unique."""
+    depth; the node ID is the only thing left that is unique."""
     rd = ReportData(
         metadata=_meta(),
         scenarios=[_scn('a/test_x.py::test_y'), _scn('a/x.py::test_y')],

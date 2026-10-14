@@ -125,15 +125,16 @@ def _ensure_teardown_wrapped(
 def graft_fixture_recordings(item: pytest.Item, collector: Collector) -> None:
     func = getattr(item, 'function', None)
     descriptors = annotated_given_descriptors(func) if func is not None else {}
-    _check_template_labels(item, descriptors)
+    _check_template_annotations(item, descriptors)
     grafted = _graft_recorded_fixtures(item, collector, descriptors)
-    _graft_annotated_leaves(item, collector, descriptors, grafted)
+    _graft_given_annotations(item, collector, descriptors, grafted)
 
 
-def _check_template_labels(
+def _check_template_annotations(
     item: pytest.Item, descriptors: dict[str, StepDescriptor]
 ) -> None:
-    """Refuse a `Template` label whose placeholder names no parametrize column.
+    """Refuse a `Template` given annotation whose placeholder names no
+    parametrize column.
 
     Nothing downstream can fill such a slot: an unparametrized scenario never
     reaches grouping, so the placeholder would reach the renderers unresolved.
@@ -146,16 +147,16 @@ def _check_template_labels(
                 continue
             if callspec is None:
                 raise PytestGivenError(
-                    f'the Annotated given(Template(...)) label on parameter '
+                    f'the given(Template(...)) annotation on parameter '
                     f'{parameter!r} of {item.nodeid!r} needs '
                     f'@pytest.mark.parametrize: its placeholders name '
-                    f'parametrize columns. Use a plain string label instead.'
+                    f'parametrize columns. Use a plain string instead.'
                 )
             if part.name not in param_names:
                 raise placeholder_mismatch(
                     part.name,
                     param_names,
-                    where=f'in the Annotated label on parameter {parameter!r}',
+                    where=f'in the given annotation on parameter {parameter!r}',
                 )
 
 
@@ -165,8 +166,8 @@ def _graft_recorded_fixtures(
     descriptors: dict[str, StepDescriptor],
 ) -> set[str | None]:
     """Graft what this item's step fixtures recorded, in setup order, each with
-    the Annotated override narration its parameter name carries. Returns the
-    fixture names grafted — what `_graft_annotated_leaves` must leave alone.
+    the given annotation its parameter carries, if any. Returns the
+    fixture names grafted — what `_graft_given_annotations` must leave alone.
     """
     recordings = session_state(item.config).fixture_recordings
     cached = _cached_step_fixturedefs(item)
@@ -175,8 +176,8 @@ def _graft_recorded_fixtures(
         if fixturedef not in cached:
             continue
         name = recording.root.fixture_name
-        label = descriptors.get(name) if name is not None else None
-        collector.graft_recording(recording.root, label=label)
+        annotation = descriptors.get(name) if name is not None else None
+        collector.graft_recording(recording.root, annotation=annotation)
         grafted.add(name)
         if fixturedef.scope == 'function':
             # Never re-consumed; dropped so the store doesn't grow
@@ -196,14 +197,14 @@ def _cached_step_fixturedefs(item: pytest.Item) -> set[pytest.FixtureDef[object]
     }
 
 
-def _graft_annotated_leaves(
+def _graft_given_annotations(
     item: pytest.Item,
     collector: Collector,
     descriptors: dict[str, StepDescriptor],
     grafted: set[str | None],
 ) -> None:
-    """Graft the Annotated-only labels — parametrize values and built-in or
-    undecorated fixtures — in test-signature order.
+    """Graft the given annotations with no recording behind them — parametrize
+    values and built-in or undecorated fixtures — in test-signature order.
 
     A step fixture is grafted from its recording, even an empty one, and never
     as a bodyless leaf.
@@ -211,7 +212,7 @@ def _graft_annotated_leaves(
     for name, descriptor in descriptors.items():
         if name in grafted or _step_fixturedef(item, name) is not None:
             continue
-        collector.graft_leaf_given(descriptor.narration, pins=descriptor.pins)
+        collector.graft_given_annotation(descriptor.narration, pins=descriptor.pins)
 
 
 def _step_fixturedef(item: pytest.Item, name: str) -> pytest.FixtureDef[object] | None:

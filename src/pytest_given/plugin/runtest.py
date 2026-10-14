@@ -149,7 +149,7 @@ def pytest_runtest_makereport(
     Setup (a fixture exception) and call (a test-body failure) fail the
     *active* scenario. Teardown is the odd one out: the call report has already
     run `finish_scenario`, so there is no active scenario left and the one with
-    that node id is amended instead — otherwise a fixture raising past its
+    that node ID is amended instead — otherwise a fixture raising past its
     `yield` leaves a green scenario behind a run pytest counted as an error.
     `pytest_runtest_logreport` cannot do it, as `pytest_runtest_teardown` has
     unpublished the collector by then.

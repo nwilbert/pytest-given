@@ -43,7 +43,7 @@
 - **when** I insert \${euros}
 - **then** the purchase is allowed: {expect}
 
-| case id | euros | expect | |
+| case ID | euros | expect | |
 |---|---|---|---|
 | a-euro-short | 1 | False | ✓ |
 | 2-True | 2 | True | ✓ |

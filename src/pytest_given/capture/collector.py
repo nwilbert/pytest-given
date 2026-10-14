@@ -138,7 +138,7 @@ class Collector:
         self._current_scenario: Scenario | None = None
         self._step_stack: list[Step] = []
         # When the active scenario's clock was started, or None before it is.
-        # A single slot rather than a dict keyed by node id: scenarios never
+        # A single slot rather than a dict keyed by node ID: scenarios never
         # overlap.
         self._started_at: float | None = None
         self._state: RecordingState = 'idle'
@@ -298,11 +298,11 @@ class Collector:
         self,
         root: Step,
         *,
-        label: StepDescriptor | None = None,
+        annotation: StepDescriptor | None = None,
     ) -> None:
         """Deep-copy a fixture's recorded root into the active scenario's steps.
 
-        *label*, an Annotated label on the fixture parameter, retells the
+        *annotation*, a given annotation on the fixture parameter, retells the
         grafted root: its narration replaces the root's, and its pins, when
         given (`()` included), the root's pins. The recorded children and
         attachments are preserved.
@@ -311,18 +311,18 @@ class Collector:
         # the scenario before fixtures ran; nothing closes it until logreport.
         assert self._current_scenario is not None
         grafted = copy.deepcopy(root)
-        if label is not None:
-            grafted.narration = label.narration
-            if label.pins is not None:
-                grafted.pins = label.pins
+        if annotation is not None:
+            grafted.narration = annotation.narration
+            if annotation.pins is not None:
+                grafted.pins = annotation.pins
         self._current_scenario.steps.append(grafted)
 
-    def graft_leaf_given(
+    def graft_given_annotation(
         self, narration: Narration, *, pins: tuple[Pin, ...] | None = None
     ) -> None:
         """Append a childless `given` step to the active scenario.
 
-        Used for Annotated labels on parametrize values and undecorated /
+        Used for given annotations on parametrize values and undecorated /
         built-in fixtures — arrangements with no recorded body.
         """
         assert self._current_scenario is not None

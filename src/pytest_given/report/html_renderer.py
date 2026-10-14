@@ -316,7 +316,7 @@ def _script_json_parse(value: object) -> Markup:
 
     The tokenizer-steering sequences are neutralized on the way out —
     `json.dumps` escapes neither inside a string literal, and this blob carries
-    user-controlled node ids and sentence prose.
+    user-controlled node IDs and sentence prose.
     """
     payload = json.dumps(json.dumps(value, separators=(',', ':')))
     return Markup('JSON.parse(' + _neutralize_script_data(payload) + ')')

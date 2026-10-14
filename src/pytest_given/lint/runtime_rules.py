@@ -76,7 +76,7 @@ def _missing_phase_findings(context: _Context) -> list[RawFinding]:
 class _ShadowingTag:
     """A tag that collides with a glossary term, and where it was first seen.
 
-    The example node id is the first scenario carrying the tag, so the message
+    The example node ID is the first scenario carrying the tag, so the message
     can point at one without listing them all.
     """
 

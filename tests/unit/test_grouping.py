@@ -291,7 +291,7 @@ def test_group_parametrized_keeps_source_order() -> None:
     tags=['parametrization'],
 )
 def test_group_parametrized_distinct_functions_same_name_do_not_group() -> None:
-    """Grouping keys on the test function (the node id without its
+    """Grouping keys on the test function (the node ID without its
     parametrize tail), not on the rendered label."""
     with given(t'two test functions whose {pg["Case"].l.s} share one name'):
         nid1, nid2 = NodeId('t::x[1]'), NodeId('t::y[1]')

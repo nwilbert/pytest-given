@@ -44,10 +44,10 @@ def _descriptor(text: str = 'a shop') -> StepDescriptor:
 def test_start_and_finish_scenario() -> None:
     with given(t'a fresh {pg["Collector"].l}'):
         collector = Collector()
-    with when(t'a {pg["Scenario"].l} starts under its {pg["Node ID"]} and finishes'):
+    with when(t'a {pg["Scenario"].l} starts under its {pg["Node ID"].l} and finishes'):
         collector.start_scenario('test.py::test_x', 'Test X', 'test_module', ['tag1'])
         recorded = collector.finish_scenario(status='passed')
-    with then(t'it carries its {pg["Node ID"]}, name, status and {pg["Tag"].l}'):
+    with then(t'it carries its {pg["Node ID"].l}, name, status and {pg["Tag"].l}'):
         assert recorded.id == 'test.py::test_x'
         assert recorded.narration.text == 'Test X'
         assert recorded.status == 'passed'
@@ -565,7 +565,7 @@ def test_fail_as_expected_drops_the_skip_reason_of_a_skipped_scenario() -> None:
 
 
 @scenario(
-    t'A {pg["Collector"].l} reports which {pg["Node ID"]("node ids")} it recorded',
+    t'A {pg["Collector"].l} reports which {pg["Node ID"].l.s} it recorded',
 )
 def test_records_reports_only_recorded_node_ids() -> None:
     """The teardown hook asks this before doing any traceback work, so an item
@@ -574,27 +574,28 @@ def test_records_reports_only_recorded_node_ids() -> None:
         collector = Collector()
         collector.start_scenario(NodeId('test.py::test_x'), 'Test X', 'mod', [])
         collector.finish_scenario(status='passed')
-    with when('the recorded and an unrecorded node id are both asked about'):
+    with when('the recorded and an unrecorded node ID are both asked about'):
         recorded = collector.records(NodeId('test.py::test_x'))
         unrecorded = collector.records(NodeId('test.py::test_other'))
-    with then('only the recorded node id is claimed'):
+    with then('only the recorded node ID is claimed'):
         assert recorded
         assert not unrecorded
 
 
 @scenario(
-    t'A leaf given is {pg["Graft"]("grafted")} as a childless given {pg["Step"].l}',
+    t'A {pg["Given annotation"].l} with no recording behind it is '
+    t'{pg["Graft"]("grafted")} as a childless given {pg["Step"].l}',
     stories=adopt_pytest_given,
 )
-def test_graft_leaf_given_appends_childless_given_step() -> None:
+def test_graft_given_annotation_appends_childless_given_step() -> None:
     collector = Collector()
     with given(t'an {pg["Active scenario"].l} is being recorded'):
         collector.start_scenario('id', 'name', 'mod', [])
     with when(
-        t'a leaf {pg["Graft"].l} appends a childless {pg["Step"].l}',
+        t'a {pg["Given annotation"].l} is {pg["Graft"]("grafted")} on its own',
         pins=adopt_pytest_given['graft'],
     ):
-        collector.graft_leaf_given(_n('the name {text}'))
+        collector.graft_given_annotation(_n('the name {text}'))
         recorded = collector.finish_scenario(status='passed')
     with then('the step is a given with no children'):
         leaf = recorded.steps[0]
@@ -604,8 +605,8 @@ def test_graft_leaf_given_appends_childless_given_step() -> None:
 
 
 @scenario(
-    t'{pg["Graft"]("Grafting")} with an override replaces the root label but '
-    t'keeps children',
+    t'{pg["Graft"]("Grafting")} with a {pg["Given annotation"].l} replaces the '
+    t'root label but keeps children',
     stories=adopt_pytest_given,
 )
 def test_graft_recording_override_replaces_root_narration_keeps_children() -> None:
@@ -618,14 +619,14 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
         root.children.append(Step(phase='given', narration=_n('a recorded child')))
         recording = FixtureRecording(root=root)
     with when(
-        t'a {pg["Graft"].l} supplies an override {pg["Narration"].l}',
+        t'the {pg["Graft"].l} carries a {pg["Given annotation"].l}',
         pins=adopt_pytest_given['graft'],
     ):
         collector.graft_recording(
-            recording.root, label=StepDescriptor('given', 'a fancy machine')
+            recording.root, annotation=StepDescriptor('given', 'a fancy machine')
         )
         recorded = collector.finish_scenario(status='passed')
-    with then('the grafted root shows the override text and keeps its children'):
+    with then("the grafted root shows the annotation's text and keeps its children"):
         grafted = recorded.steps[0]
         assert grafted.narration.text == 'a fancy machine'
         assert [c.narration.text for c in grafted.children] == ['a recorded child']
@@ -636,7 +637,7 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
 @scenario(
     t'{pg["Graft"]("Grafting")} with no {pg["Active scenario"].l} is refused',
 )
-def test_graft_leaf_given_without_scenario_is_refused() -> None:
+def test_graft_given_annotation_without_scenario_is_refused() -> None:
     with given(t'a collector with no {pg["Active scenario"].l}'):
         collector = Collector()
     with (
@@ -646,7 +647,7 @@ def test_graft_leaf_given_without_scenario_is_refused() -> None:
         ),
         pytest.raises(AssertionError),
     ):
-        collector.graft_leaf_given(_n('orphan'))
+        collector.graft_given_annotation(_n('orphan'))
 
 
 def test_graft_recording_without_override_is_unchanged() -> None:
@@ -726,15 +727,15 @@ def test_graft_override_pins_retell_only_the_root(override, expected):
     collector = Collector()
     collector.start_scenario('id', 'a', 'mod', [])
     collector.graft_recording(
-        root, label=StepDescriptor('given', 'a room', pins=override)
+        root, annotation=StepDescriptor('given', 'a room', pins=override)
     )
     grafted = collector.finish_scenario(status='passed').steps[0]
     assert grafted.pins == expected
     assert grafted.children[0].pins == (_pin('a'),)
 
 
-def test_graft_leaf_given_records_its_pins():
+def test_graft_given_annotation_records_its_pins():
     collector = Collector()
     collector.start_scenario('id', 'a', 'mod', [])
-    collector.graft_leaf_given(Narration(text='a room'), pins=(_pin('a'),))
+    collector.graft_given_annotation(Narration(text='a room'), pins=(_pin('a'),))
     assert collector.finish_scenario(status='passed').steps[0].pins == (_pin('a'),)

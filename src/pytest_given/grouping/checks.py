@@ -239,7 +239,7 @@ def check_attachment_labels(
     comparison is over the *distinct* labels, so a label attached a different
     number of times does not raise.
 
-    Takes label *sets*, each with its case id so the message can name the case.
+    Takes label *sets*, each with its case ID so the message can name the case.
     """
     for case_id, other in others:
         differing = sorted(baseline ^ other)

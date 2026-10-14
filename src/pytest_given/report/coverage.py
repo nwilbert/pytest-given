@@ -37,7 +37,7 @@ class StoryIndex:
 
 
 def build_coverage_map(report: ReportData) -> CoverageMap:
-    """Which sentences each scenario covers, keyed by node id, then by story:
+    """Which sentences each scenario covers, keyed by node ID, then by story:
     every story in its `stories=`, even where nothing matched, and every other
     story it covers a sentence of, which only a pin reaches.
 

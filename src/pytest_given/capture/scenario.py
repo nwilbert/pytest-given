@@ -1,4 +1,4 @@
-"""The scenario marker: `@scenario`, and the `Annotated` labels it reads.
+"""The scenario marker: `@scenario`, and the given annotations it reads.
 
 What marks a test for the report, as opposed to what records inside one —
 that is `steps.py`, which this module imports for the descriptor an
@@ -151,11 +151,11 @@ def annotated_given_descriptors(func: object) -> dict[str, StepDescriptor]:
             )
         if desc.is_tstring:
             raise PytestGivenError(
-                f'Annotated given(t"...") on parameter {name!r} is not '
+                f'a given(t"...") annotation on parameter {name!r} is not '
                 f'supported: a t-string evaluates at function-definition time, '
                 f'where the parameter value is not in scope. Use '
                 f'given(Template("... {{{name}}} ...")) for a per-case '
-                f'placeholder, or a plain string label.'
+                f'placeholder, or a plain string.'
             )
         out[name] = desc
     return out

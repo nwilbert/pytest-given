@@ -140,7 +140,7 @@
 - **then** it holds one row per «case», with that row's values
 - **then** the grouped steps carry a placeholder per matching name
 
-## ✓ A «parameter table» names its rows by their «case ids» when any is custom
+## ✓ A «parameter table» names its rows by their «case IDs» when any is custom
 `tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids` · parametrization, spec/parameter-table-case-ids
 
 - **given** a «parametrized scenario» naming one «case» with `pytest.param(..., id=...)` and leaving the other to pytest
@@ -168,13 +168,13 @@
     
     - **then** a booking from {start} clashes: {clashes}
     
-    | case id | start | clashes |
+    | case ID | start | clashes |
     |---|---|---|
     | touching-edges | 20 | False |
     | 19-True | 19 | True |
     ```
 - **then** both cases pass
-- **then** the «parameter table» leads with a case id column, the generated «case id» shown beside the custom one
+- **then** the «parameter table» leads with a case ID column, the generated «case ID» shown beside the custom one
 
 ## ✓ A refusal on a run with no sink does not claim a «report» was skipped
 `tests/integration/test_plugin.py::test_a_grouping_error_without_sinks_does_not_say_report_not_written` · validation
@@ -532,10 +532,10 @@
 - **when** the suite runs with --given-json
 - **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
-## ✓ An Annotated label carrying a «pin» pins its «step»
-`tests/integration/test_plugin.py::test_annotated_label_carrying_a_pin_pins_its_step`
+## ✓ A «pin» on a «given annotation» pins the «step» it adds
+`tests/integration/test_plugin.py::test_a_pin_on_a_given_annotation_pins_its_step`
 
-- **given** a «scenario» whose Annotated given(...) label on a «plain fixture» carries a «pin»
+- **given** a «scenario» whose «given annotation» on a «plain fixture» carries a «pin»
   - 📎 suite:
     ```
     from typing import Annotated
@@ -557,26 +557,26 @@
         pass
     ```
 - **when** the suite runs
-- **then** the label's «step» carries the «pin»
+- **then** the annotation's «step» carries the «pin»
 
-## ✓ An Annotated label retells the «pins» of the fixture label it replaces · 3 cases
-`tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root`
+## ✓ A «given annotation» retells the «pins» of the «step fixture» label it replaces · 3 cases
+`tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins`
 
-- **given** a label with pins={label_pins} over a fixture pinning a\[1\]
+- **given** a given annotation with pins={annotation_pins} over a step fixture pinning a\[1\]
 - **when** the suite runs
 - **then** the grafted root «pins» the sentences {root_sentences} of a
 - **then** the inner «step» keeps its own «pin», a\[3\]
 
-| case id | label_pins | root_sentences |
+| case ID | annotation_pins | root_sentences |
 |---|---|---|
 | none-keeps | None | \[1\] |
 | empty-clears | \[\] | \[\] |
 | list-replaces | \[a\[2\]\] | \[2\] |
 
-## ✓ An Annotated Template label on an unparametrized «scenario» fails that «scenario»
-`tests/integration/test_plugin.py::test_annotated_template_label_without_parametrize_fails_scenario`
+## ✓ A `Template` «given annotation» on an unparametrized «scenario» fails that «scenario»
+`tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario`
 
-- **given** a Template label on a plain fixture parameter
+- **given** a `Template` «given annotation» on a «plain fixture» parameter
   - 📎 suite:
     ```
     from typing import Annotated
@@ -596,19 +596,19 @@
 - **then** the scenario errors, naming the parameter and the fix
 - **then** the HTML «report» is still written
 
-## ✓ An Annotated Template label may only hold a bare parametrize column · 3 cases
-`tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column` · validation
+## ✓ A `Template` «given annotation» may only hold a bare parametrize column · 3 cases
+`tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column` · validation
 
-- **given** a «parametrized scenario» whose Template label on a plain fixture holds {placeholder}
+- **given** a «parametrized scenario» whose `Template` «given annotation» on a «plain fixture» holds {placeholder}
   - 📎 suite — *see parameter table*
 - **when** the suite runs
-- **then** the label is {outcome}
+- **then** the annotation is {outcome}
 - **then** a refusal errors the scenario, saying {error}
 
-| case id | placeholder | suite | outcome | error |
+| case ID | placeholder | suite | outcome | error |
 |---|---|---|---|---|
 | column | {x} | suite | accepted | None |
-| plain-fixture | {room} | suite | refused | '{room}' in the Annotated label on parameter 'room' does not match |
+| plain-fixture | {room} | suite | refused | '{room}' in the given annotation on parameter 'room' does not match |
 | attribute | {room.number} | suite | refused | bare identifiers |
 
 - **column** — suite:
@@ -697,7 +697,7 @@
 
 - **given** a suite with one «scenario», and `given_md_lines = false`
 - **when** the suite runs with --given-md
-- **then** the anchor is the node id, without a line number
+- **then** the anchor is the node ID, without a line number
 
 ## ✓ `--given-html` alone writes no JSON «report»
 `tests/integration/test_plugin.py::test_given_html_alone_writes_no_json`
@@ -977,8 +977,8 @@
 `tests/unit/capture/test_collector.py::test_start_and_finish_scenario`
 
 - **given** a fresh «collector»
-- **when** a «scenario» starts under its «Node ID» and finishes
-- **then** it carries its «Node ID», name, status and «tag»
+- **when** a «scenario» starts under its «node ID» and finishes
+- **then** it carries its «node ID», name, status and «tag»
 
 ## ✓ The «collector» records each «step» with its «phase»
 `tests/unit/capture/test_collector.py::test_collect_steps`
@@ -1029,29 +1029,29 @@
 - **when** its fixture then also fails in teardown
 - **then** the body failure is what the report shows
 
-## ✓ A «collector» reports which «node ids» it recorded
+## ✓ A «collector» reports which «node IDs» it recorded
 `tests/unit/capture/test_collector.py::test_records_reports_only_recorded_node_ids`
 
 - **given** a «collector» that recorded one «scenario»
-- **when** the recorded and an unrecorded node id are both asked about
-- **then** only the recorded node id is claimed
+- **when** the recorded and an unrecorded node ID are both asked about
+- **then** only the recorded node ID is claimed
 
-## ✓ A leaf given is «grafted» as a childless given «step»
-`tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step`
+## ✓ A «given annotation» with no recording behind it is «grafted» as a childless given «step»
+`tests/unit/capture/test_collector.py::test_graft_given_annotation_appends_childless_given_step`
 
 - **given** an «active scenario» is being recorded
-- **when** a leaf «graft» appends a childless «step»
+- **when** a «given annotation» is «grafted» on its own
 - **then** the step is a given with no children
 
-## ✓ «Grafting» with an override replaces the root label but keeps children
+## ✓ «Grafting» with a «given annotation» replaces the root label but keeps children
 `tests/unit/capture/test_collector.py::test_graft_recording_override_replaces_root_narration_keeps_children`
 
 - **given** a «fixture recording» whose root has a label and a child
-- **when** a «graft» supplies an override «narration»
-- **then** the grafted root shows the override text and keeps its children
+- **when** the «graft» carries a «given annotation»
+- **then** the grafted root shows the annotation's text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py::test_graft_leaf_given_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py::test_graft_given_annotation_without_scenario_is_refused`
 
 - **given** a collector with no «active scenario»
 - **when** a leaf «graft» runs
@@ -2126,7 +2126,7 @@
 - **then** the placeholder is {outcome}
 - **then** a refusal says bare identifiers only
 
-| case id | text | outcome |
+| case ID | text | outcome |
 |---|---|---|
 | bare-identifier | count={count} | accepted |
 | attribute | count={obj.attr} | refused |
@@ -2463,7 +2463,7 @@
 - **when** «coverage» is computed against the «story»
 - **then** the «scenario» covers the «sentences» {covered}
 
-| case id | scenario_pins | step_pins | covered |
+| case ID | scenario_pins | step_pins | covered |
 |---|---|---|---|
 | nothing-pinned | None | None | \[1\] |
 | step-pinned | None | \[2\] | \[2\] |
@@ -2955,7 +2955,7 @@
 
 - **given** a skipped «scenario» with a reason
 - **when** the Markdown «report» is rendered
-- **then** the heading is marked skipped and the reason follows the node id
+- **then** the heading is marked skipped and the reason follows the node ID
   - 📎 Rendered Markdown:
     ```
     # pytest-given — proj

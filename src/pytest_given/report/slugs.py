@@ -7,10 +7,10 @@ from ..model import NodeId, ReportData, node_base
 
 
 def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
-    """Map each scenario's node id to a short, readable slug for the URL
+    """Map each scenario's node ID to a short, readable slug for the URL
     fragment (`#scenario=<slug>`).
 
-    The short form is `<file>/<func>`: the node id's basename with `.py` and a
+    The short form is `<file>/<func>`: the node ID's basename with `.py` and a
     leading `test_` removed, the part after `::` with a leading `test_`
     removed, and the parametrization tail (`[water]`) dropped — a parametrized
     test usually groups into one scenario, so the tail is just noise.
@@ -24,7 +24,7 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     report lists them in.
 
     A pair that survives a full path (`a/test_x.py` beside `a/x.py`, both
-    defining `test_y`) falls back to the node id, which is unique by
+    defining `test_y`) falls back to the node ID, which is unique by
     construction.
     """
     bases = {s.id: _scenario_slug(s.id, with_tail=False) for s in report.scenarios}
@@ -43,7 +43,7 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
             slugs[node_id] = candidate
         if not moved:
             # Every directory is already in the slug and the pair still reads
-            # the same. Nothing shorter than the node id can separate them.
+            # the same. Nothing shorter than the node ID can separate them.
             slugs.update(_fallback_slugs(colliding))
             break
     return slugs
@@ -52,7 +52,7 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
 def _fallback_slugs(colliding: list[NodeId]) -> dict[NodeId, str]:
     """Fragment-safe, unique slugs for scenarios no path depth separates.
 
-    A node id is unique by construction but may carry the characters
+    A node ID is unique by construction but may carry the characters
     `_fragment_safe` folds — and folding can make two of them collide all over
     again, which is the one case the escalation above cannot reach. Such a
     group is separated by an ordinal over the *sorted* ids, so the slug a
@@ -77,12 +77,12 @@ def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:
 # character a strict URI grammar would escape: `&` ends the value, `=`
 # splits it, `+` decodes to a space, and `#` ends the fragment. Brackets
 # and the rest of pytest's parametrize punctuation survive, so a slug
-# still reads like the node id it came from.
+# still reads like the node ID it came from.
 _UNSAFE_IN_FRAGMENT = re.compile(r'[^A-Za-z0-9._~()\[\]!$\'*,;:@/-]+|[+&=#]')
 
 
 def _scenario_slug(node_id: NodeId, *, with_tail: bool, depth: int = 0) -> str:
-    # Cut on the whole node id: a tail may hold a `::` of its own.
+    # Cut on the whole node ID: a tail may hold a `::` of its own.
     file_part, _, func_part = (node_id if with_tail else node_base(node_id)).partition(
         '::'
     )
@@ -100,7 +100,7 @@ def _fragment_safe(text: str) -> str:
     fragment with `URLSearchParams`, so an `&` in a parametrize tail or a file
     name would truncate the value and a `+` would decode to a space — either
     way the reverse map misses and the deep link silently does nothing. pytest
-    keeps all three, plus `#` and spaces, in a node id.
+    keeps all three, plus `#` and spaces, in a node ID.
 
     Folding can make two slugs collide; the escalation loop above already
     handles that, down to the node-id fallback.

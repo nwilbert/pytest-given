@@ -97,7 +97,7 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
     A prefix is only recognized when the text before the first ':' is shaped
     like a rule id — so node-id globs (``*::test_x``, ``tests/t.py::test_a``)
     parse as bare patterns. A rule-shaped prefix that names no known rule is a
-    typo worth reporting, *unless* what follows is itself a node id: that is
+    typo worth reporting, *unless* what follows is itself a node ID: that is
     how a Windows drive letter arrives (``c:/repo/tests/t.py::test_x``), where
     the prefix is part of a path rather than a rule scope.
     """

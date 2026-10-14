@@ -34,7 +34,7 @@ _TAG_SEPARATOR = '/'
 
 @dataclass(frozen=True)
 class Target:
-    """What a report link's fragment names: a scenario by node id — or by
+    """What a report link's fragment names: a scenario by node ID — or by
     slug, until `citations update` rewrites it — a tag, or a story by id."""
 
     kind: TargetKind
@@ -70,7 +70,7 @@ class Citation:
 
 
 def report_fragment(target: Target) -> str:
-    """The fragment naming `target`, readable for a typical node id or tag:
+    """The fragment naming `target`, readable for a typical node ID or tag:
     only what `URLSearchParams` and `parse_qs` could misread is encoded."""
     value = quote(target.key, safe='/:')
     match target.kind:
@@ -137,9 +137,9 @@ class CitationIndex:
 
 
 def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
-    """Each scenario under the node id a citation names it by.
+    """Each scenario under the node ID a citation names it by.
 
-    A grouped scenario is cited as a whole, by its base node id: its own `id`
+    A grouped scenario is cited as a whole, by its base node ID: its own `id`
     is its first case's. Two groups of one function — a title differing per
     case — would share that base, so each keeps its own id instead.
     """
@@ -158,7 +158,7 @@ def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
 
 def _cited_by_case(cited: Mapping[NodeId, Scenario]) -> dict[NodeId, NodeId]:
     """The cited id of each later case of a group cited by its first case's id,
-    which no base node id names."""
+    which no base node ID names."""
     return {
         case.id: cited_id
         for cited_id, scenario in cited.items()

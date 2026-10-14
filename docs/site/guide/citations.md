@@ -90,7 +90,7 @@ The part after `#` names the target:
 
 | Target | Fragment |
 |---|---|
-| Scenario | `#scenario=<node id>` — for a parametrized scenario, any case's node id |
+| Scenario | `#scenario=<node ID>` — for a parametrized scenario, any case's node ID |
 | Tag | `#tag=<tag>` |
 | Story | `#view=stories&story=<story id>` |
 
@@ -105,8 +105,8 @@ pytest-given citations update docs/ README.md --report report.json
 It rewrites what the report now says:
 
 - a citation's glyph, link text and summary;
-- the fragment of any report link that uses a scenario's slug or a `[case]`, to its node id;
-- the node id of a renamed test, when exactly one scenario still has the citation's title.
+- the fragment of any report link that uses a scenario's slug or a `[case]`, to its node ID;
+- the node ID of a renamed test, when exactly one scenario still has the citation's title.
 
 It can't fix everything. These stay as findings for you to resolve, and the command exits 1:
 
@@ -134,7 +134,7 @@ If you commit the reports instead, write the JSON and HTML report together whene
 
 These habits keep `pytest-given citations check` from failing on a document nothing is wrong with, or from skipping a citation it should check:
 
-- **Run pytest from the same rootdir.** A node id is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.
+- **Run pytest from the same rootdir.** A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.
 - **Use a plain report link for a scenario whose title contains a per-run value**, such as a temporary path. Its citation's link text would be stale after every run.
 - **Cite a tag that belongs to one piece of work**, like `spec/<slug>`. A broad area tag's summary changes with every new scenario, so link it with a plain report link.
 - **Leave the glyph and link unformatted.** In `**✅** […](…)` or `✅ *[…](…)*` pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.

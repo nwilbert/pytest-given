@@ -636,7 +636,7 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
 
 
 def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
-    """A node id carrying `</script>` (via a parametrize id) flows into the
+    """A node ID carrying `</script>` (via a parametrize id) flows into the
     derived `__scenarioSlugs`/`__termScenarios` blobs, not just the report data;
     every inline-script blob must neutralize `</` the same way."""
     json_path = tmp_path / 'data.json'
@@ -2069,10 +2069,10 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    # Anchor carries the short slug, not the raw node id.
+    # Anchor carries the short slug, not the raw node ID.
     assert 'scenario=booking/make' in content
     assert 'scenario=pkg/test_booking.py::test_make' not in content
-    # The app data resolves slug -> node id.
+    # The app data resolves slug -> node ID.
     slugs = _embedded_app_data(content)['scenario_slugs']
     assert slugs['booking/make'] == 'pkg/test_booking.py::test_make'
 

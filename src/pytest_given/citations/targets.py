@@ -62,7 +62,7 @@ class TargetResolver:
         match target.kind:
             case 'scenario':
                 return _closest(
-                    id_label='node id',
+                    id_label='node ID',
                     key=target.key,
                     ids=self.index.scenarios,
                     title_label='scenario title',

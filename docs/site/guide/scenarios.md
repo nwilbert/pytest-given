@@ -18,7 +18,7 @@ Only tests with `@scenario` appear in the report. The decorator returns your fun
 
 `given(text, *, pins=None)`, `when(text, *, pins=None)`, `then(text, *, pins=None)`
 
-You can use a step in four places: as a **context manager** in a test body, as a **decorator** on a fixture or a helper function, or as an **`Annotated` label** on a test parameter.
+You can use a step in four places: as a **context manager** in a test body, as a **decorator** on a fixture or a helper function, or as a **given annotation** (`Annotated[..., given(...)]`) on a test parameter.
 
 `pins=` links the step to specific story sentences; see [Pins](domain-storytelling.md#pins).
 
@@ -66,7 +66,7 @@ A fixture's label must be a plain string; `@given(Template(...))` on a fixture r
 
 ### On test parameters
 
-With `Annotated`, you can add a `given` step to a test parameter: a fixture or a `@pytest.mark.parametrize` value. Use it to:
+With a **given annotation**, `Annotated[..., given(...)]`, you can add a `given` step to a test parameter: a fixture or a `@pytest.mark.parametrize` value. Use it to:
 
 - show a parametrized value as a `given` step (otherwise it only appears in the parameter table)
 - label a fixture that has no `@given`, including pytest's built-in fixtures
@@ -92,7 +92,7 @@ def test_rejects_underpayment(
 
 The report shows a `Template` placeholder as `{cents}` in the grouped scenario, and the actual value in each row of the parameter table. `when` and `then` raise an error here, because the action and its check belong in the test body.
 
-The label takes `pins=` like any step. On a fixture with its own `@given(..., pins=...)`, the label's pins replace the fixture's pins; `pins=[]` removes them. Pins of steps inside the fixture body stay as they are.
+The annotation takes `pins=` like any step. On a fixture with its own `@given(..., pins=...)`, the annotation's pins replace the fixture's pins; `pins=[]` removes them. Pins of steps inside the fixture body stay as they are.
 
 ### On helper functions
 

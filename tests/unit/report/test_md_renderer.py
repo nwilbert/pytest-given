@@ -614,7 +614,7 @@ def test_skipped_scenario_shows_reason() -> None:
         )
     with when(t'the Markdown {pg["Report"].l} is rendered'):
         md = render_md(_report(scn))
-    with then('the heading is marked skipped and the reason follows the node id'):
+    with then('the heading is marked skipped and the reason follows the node ID'):
         attach('Rendered Markdown', md)
         assert '## ○ Later · skipped' in md
         assert '`tests/t.py::test_skip` — reason: needs fixture data' in md
@@ -1062,7 +1062,7 @@ def test_a_table_with_custom_ids_leads_with_every_cases_id() -> None:
         ParameterCase(id=NodeId('t.py::test_x[11]'), values=[11], status='failed'),
     )
     md = render_md(_report_with(table))
-    assert '| case id | hours | |\n|---|---|---|' in md
+    assert '| case ID | hours | |\n|---|---|---|' in md
     assert '| touching-edges | 10 | ✓ |' in md
     assert '| 11 | 11 | ✗ |' in md
 
@@ -1135,7 +1135,7 @@ def test_a_custom_id_shows_whole_however_long() -> None:
 
 
 def test_notes_sharing_a_key_add_their_row() -> None:
-    """A hidden id falls back to its values, which a custom id may match."""
+    """A hidden id falls back to its values, which a custom ID may match."""
     error = ErrorInfo(message='clash')
     table = _table_with_custom_ids(
         _custom('t.py::test_x[11]', 5, status='failed', error=error),

@@ -2,7 +2,7 @@
 
 ## Now
 
-- [ ] Implement the inline Markdown spec, then the case ids spec on top of it (see `docs/specs/proposed/2026-10-11-inline-markdown-design.md` and `docs/specs/proposed/2026-10-10-parameter-table-case-ids-design.md`)
+- [ ] Implement the inline Markdown spec, then the case IDs spec on top of it (see `docs/specs/proposed/2026-10-11-inline-markdown-design.md` and `docs/specs/proposed/2026-10-10-parameter-table-case-ids-design.md`)
 - [ ] Optionally include the full test narration as a GitHub-Flavored Markdown (GFM) details section
 
 ## Next

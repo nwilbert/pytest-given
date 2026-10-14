@@ -6,7 +6,7 @@ The `with given(...)` / `with when(...)` / `with then(...)` blocks keep the *cla
 
 What the agent itself gets out of it:
 
-- **Context economy.** `pytest --given-md` renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (`-k`, `--lf`, node ids).
+- **Context economy.** `pytest --given-md` renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (`-k`, `--lf`, node IDs).
 - **Structured queries.** `--given-json` + `jq` filter scenarios by tag, status, or glossary term.
 - **A controlled vocabulary.** A [`Glossary`](guide/glossary.md) — or a `FileGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
 - **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.

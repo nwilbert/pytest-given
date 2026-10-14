@@ -490,7 +490,7 @@ def test_a_missing_target_lists_the_closest_candidates(tmp_path: Path) -> None:
         tmp_path, f'✅ [Pay by card]({URL}#scenario=t.py::test_pay_card)\n', report
     )
     (finding,) = result.findings
-    assert finding.details[0].startswith('closest by node id: t.py::test_pay_by_card')
+    assert finding.details[0].startswith('closest by node ID: t.py::test_pay_by_card')
     assert finding.lines()[0] == (
         f'{(tmp_path / "doc.md").as_posix()}:1: {finding.message}'
     )

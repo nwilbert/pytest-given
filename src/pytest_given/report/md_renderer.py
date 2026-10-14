@@ -68,11 +68,11 @@ def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
 
 
 def _source_md(scenario: Scenario, with_lines: bool) -> str:
-    """The subtitle source pointer: `relpath:line::test_name`, or the node id
+    """The subtitle source pointer: `relpath:line::test_name`, or the node ID
     when there is no source or no line is wanted.
 
     The parametrize suffix (`[case-id]`) is dropped — the grouped scenario
-    narrates every case, so the representative case id is noise.
+    narrates every case, so the representative case ID is noise.
     """
     node = node_base(scenario.id)
     if scenario.source is None or not with_lines:
@@ -90,14 +90,14 @@ def _param_table_md(table: ParameterTable) -> str:
     shows the label in the cell and renders fenced below the table, keyed by
     the row (see `_case_key`).
 
-    The leading case id column only appears when some case id is custom,
+    The leading case ID column only appears when some case ID is custom,
     and the trailing status column only when the cases differ in status: a
     column of one glyph says nothing the heading's glyph hasn't.
     """
     show_status = table.has_mixed_statuses
     names = [_cell(column.name) for column in table.columns]
     if table.has_custom_ids:
-        names.insert(0, 'case id')
+        names.insert(0, 'case ID')
     header = '| ' + ' | '.join(names) + ' |' + ' |' * show_status
     separator = '|' + '---|' * (len(names) + show_status)
     rows: list[str] = []

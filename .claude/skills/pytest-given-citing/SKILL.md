@@ -21,8 +21,8 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 | Stale glyph or text; stale or missing summary; slug or `[case]` in a fragment; a renamed test whose title one scenario still has | Run `citations update`. |
 | Cited target fails | The document claims what doesn't hold now. Fix the code, or, if the claim itself is outdated, tell the human: the prose is theirs. |
 | Summary after a scenario citation | Delete it, unless the author wrote it as prose — then reword it so it no longer reads as a summary. |
-| Mistyped citation | Fix the fragment to `#scenario=<node id>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. |
-| Target not in the report | Rule out the report first: a partial run, or one from another rootdir (node ids are relative to it), loses many targets at once. Then follow [references/repair.md](references/repair.md). |
+| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. |
+| Target not in the report | Rule out the report first: a partial run, or one from another rootdir (node IDs are relative to it), loses many targets at once. Then follow [references/repair.md](references/repair.md). |
 
 ## Writing citations
 

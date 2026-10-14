@@ -50,9 +50,9 @@ function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
-// `#scenario=` takes the slug the copy-link button writes or the node id a
+// `#scenario=` takes the slug the copy-link button writes or the node ID a
 // citation writes — a grouped scenario's without its first case's `[…]`. Any
-// case's node id opens its group too, as `citations check` reads it.
+// case's node ID opens its group too, as `citations check` reads it.
 function scenarioFromParam(value) {
   const data = window.__REPORT_DATA__;
   return lookup(data.scenario_slugs || {}, value, null)

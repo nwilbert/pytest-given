@@ -300,7 +300,7 @@ def test_makereport_ignores_a_failure_outside_the_active_scenario(
 
     Only the teardown phase reaches the collector without an active scenario
     (the call report finished it already); every other phase still has to match
-    the node id it is reporting on.
+    the node ID it is reporting on.
     """
     fresh_collector.start_scenario(NodeId('t::a'), 'a', 'mod', [])
     call = SimpleNamespace(when='call', excinfo=SimpleNamespace())

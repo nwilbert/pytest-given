@@ -14,7 +14,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 
 | Field | Meaning |
 |---|---|
-| `id` | The pytest node id. A grouped parametrized scenario **keeps the suffix of its first collected case** (`tests/test_x.py::test_y[1-False]`). The suffix is not removed, so match on a prefix, not on equality. |
+| `id` | The pytest node ID. A grouped parametrized scenario **keeps the suffix of its first collected case** (`tests/test_x.py::test_y[1-False]`). The suffix is not removed, so match on a prefix, not on equality. |
 | `narration.text` | The scenario title. It keeps its `**`, `*` and `` ` `` markers as written, and so does a step's, so strip them before you search for words. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
 | `module` | The Python module the test lives in. |
 | `tags[]` | `tags=` from `@scenario`. These are report metadata, **not** pytest marks. |
@@ -23,7 +23,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail. Such a scenario keeps its steps and error too. |
 | `duration_ms` | The wall-clock time of the test. |
 | `steps[]` | The tree of steps (see below). |
-| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node id, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`, unless it only repeats the case's values); when any case's is, the report starts the table with the case ids. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
+| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node ID, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`, unless it only repeats the case's values); when any case's is, the report starts the table with the case IDs. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}]}`. `is_internal` marks a frame from `pluggy`, `_pytest` or pytest-given; such frames are kept only with `--given-all-frames`. **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`, with the same shape. |
 | `source` | `{relpath, line}`: where the test function is defined. |
 | `story_ids` / `pins` | `story_ids` lists the stories `@scenario(stories=...)` matches against. `pins` lists the scenario's pins as `[{story_id, sentence_id}]`: `null` when the scenario isn't pinned, `[]` when it turned matching off. A step's `pins` works the same way. |
@@ -32,7 +32,7 @@ In a grouped scenario, `id`, `module`, `tags` and `source` come from the first
 *collected* case, while `steps` are built from the first case that *passed*.
 So when the first case was skipped, the `id` and the step tree come from two
 different cases. Neither identifies a case: read `parameters.cases[]` for the
-node id and status of each case.
+node ID and status of each case.
 
 ## Step
 
@@ -41,7 +41,7 @@ A step is `{phase, narration, children[], attachments[], pins, fixture_name}`. `
 `narration.parts[]` holds the step text in structured form. Each part is one of:
 
 - `{value: "literal text"}`: plain text.
-- `{rendered, expression, format_spec, conversion}`: a t-string interpolation whose value is the same in every case. `rendered` is the text shown, and `expression` the source code it came from. In the title of a scenario with `group_parametrized=False`, the case id between the trailing brackets is a value too, with an empty `expression`.
+- `{rendered, expression, format_spec, conversion}`: a t-string interpolation whose value is the same in every case. `rendered` is the text shown, and `expression` the source code it came from. In the title of a scenario with `group_parametrized=False`, the case ID between the trailing brackets is a value too, with an empty `expression`.
 - `{term_id, display, expression}`: a term ref.
 - `{name, column_id, format_spec, conversion}`: a placeholder for the column `column_id` in a grouped parametrized scenario.
 
@@ -59,7 +59,7 @@ A story is `{id, title, sentences: [{id, name, clauses: [{parts: [...]}]}], sour
 
 ## Coverage
 
-A coverage record is `{story_id, sentence_id, tracked, scenario_ids: [...]}`. It is the same coverage per sentence that the Stories tab shows, with one record for every sentence of every story, ordered by story and then by sentence. `scenario_ids` are the node ids of the scenarios that cover the sentence. `tracked: false` marks a sentence the report can't say anything about: it has fewer than two glossary terms, and no pin covers it. That is the Stories tab's "not coverage-tracked", and it points to a gap in the vocabulary, not in the tests. **Read coverage from here instead of recomputing it from `steps[]`.** The rule works step by step, needs at least two terms per sentence, and lets pins replace narration matching. Reimplementing it gives wrong answers.
+A coverage record is `{story_id, sentence_id, tracked, scenario_ids: [...]}`. It is the same coverage per sentence that the Stories tab shows, with one record for every sentence of every story, ordered by story and then by sentence. `scenario_ids` are the node IDs of the scenarios that cover the sentence. `tracked: false` marks a sentence the report can't say anything about: it has fewer than two glossary terms, and no pin covers it. That is the Stories tab's "not coverage-tracked", and it points to a gap in the vocabulary, not in the tests. **Read coverage from here instead of recomputing it from `steps[]`.** The rule works step by step, needs at least two terms per sentence, and lets pins replace narration matching. Reimplementing it gives wrong answers.
 
 ## Recipes
 
@@ -94,7 +94,7 @@ jq -r '.scenarios[] | select([.. | .term_id? // empty] | index("waitlist"))
 jq -r '.scenarios[] | select(.tags | index("validation")) | .narration.text' report.json
 jq -r '.scenarios[] | select(.tags | any(startswith("ticket/"))) | .narration.text' report.json
 
-# Scenarios covering a story (node ids) — `story_ids` misses one that only pins it
+# Scenarios covering a story (node IDs) — `story_ids` misses one that only pins it
 jq -r '[.coverage[] | select(.story_id == "lend-and-return-a-book") | .scenario_ids[]]
        | unique[]' report.json
 

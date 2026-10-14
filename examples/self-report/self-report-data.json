@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-14T19:56:07.128679+00:00",
+    "timestamp": "2026-10-14T19:57:04.875063+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "146eaf92cbfcbdf723ae29d9c4f559d834f46315",
+    "commit_sha": "a9c52ac342f389e36b41210b33aba3f5affc2770",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 158,
+      "duration_ms": 184,
       "steps": [
         {
           "phase": "given",
@@ -156,7 +156,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 85,
       "steps": [
         {
           "phase": "given",
@@ -340,7 +340,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 126,
+      "duration_ms": 153,
       "steps": [
         {
           "phase": "given",
@@ -422,7 +422,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -531,7 +531,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -660,7 +660,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 561,
+      "duration_ms": 569,
       "steps": [
         {
           "phase": "given",
@@ -788,7 +788,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -945,7 +945,7 @@
     {
       "id": "tests/integration/test_plugin.py::test_a_parameter_table_names_its_rows_by_their_case_ids",
       "narration": {
-        "text": "A parameter table names its rows by their case ids when any is custom",
+        "text": "A parameter table names its rows by their case IDs when any is custom",
         "parts": [
           {
             "value": "A "
@@ -960,8 +960,8 @@
           },
           {
             "term_id": "case-id",
-            "display": "case ids",
-            "expression": "pg[\"Case id\"].l.s"
+            "display": "case IDs",
+            "expression": "pg[\"Case ID\"].l.s"
           },
           {
             "value": " when any is custom"
@@ -974,7 +974,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -1023,7 +1023,7 @@
           "attachments": [
             {
               "label": "report.md",
-              "content": "# pytest-given \u2014 test_a_parameter_table_names_its_rows_by_their_case_ids0\n\n## \u2713 Bookings clash \u00b7 2 cases\n`test_a_parameter_table_names_its_rows_by_their_case_ids.py:4::test_overlap`\n\n- **then** a booking from {start} clashes: {clashes}\n\n| case id | start | clashes |\n|---|---|---|\n| touching-edges | 20 | False |\n| 19-True | 19 | True |\n",
+              "content": "# pytest-given \u2014 test_a_parameter_table_names_its_rows_by_their_case_ids0\n\n## \u2713 Bookings clash \u00b7 2 cases\n`test_a_parameter_table_names_its_rows_by_their_case_ids.py:4::test_overlap`\n\n- **then** a booking from {start} clashes: {clashes}\n\n| case ID | start | clashes |\n|---|---|---|\n| touching-edges | 20 | False |\n| 19-True | 19 | True |\n",
               "content_type": "text"
             }
           ],
@@ -1044,7 +1044,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the parameter table leads with a case id column, the generated case id shown beside the custom one",
+            "text": "the parameter table leads with a case ID column, the generated case ID shown beside the custom one",
             "parts": [
               {
                 "value": "the "
@@ -1055,12 +1055,12 @@
                 "expression": "pg[\"Parameter table\"].l"
               },
               {
-                "value": " leads with a case id column, the generated "
+                "value": " leads with a case ID column, the generated "
               },
               {
                 "term_id": "case-id",
-                "display": "case id",
-                "expression": "pg[\"Case id\"].l"
+                "display": "case ID",
+                "expression": "pg[\"Case ID\"].l"
               },
               {
                 "value": " shown beside the custom one"
@@ -1107,7 +1107,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -1174,7 +1174,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -1284,7 +1284,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -1453,7 +1453,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -1573,7 +1573,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -1708,7 +1708,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 101,
       "steps": [
         {
           "phase": "given",
@@ -1836,7 +1836,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 101,
+      "duration_ms": 118,
       "steps": [
         {
           "phase": "given",
@@ -2006,7 +2006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -2123,7 +2123,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 198,
+      "duration_ms": 220,
       "steps": [
         {
           "phase": "given",
@@ -2196,7 +2196,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 62,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -2368,7 +2368,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -2507,7 +2507,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 92,
       "steps": [
         {
           "phase": "given",
@@ -2652,7 +2652,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 63,
       "steps": [
         {
           "phase": "given",
@@ -2805,7 +2805,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -2914,12 +2914,12 @@
       "pins": null
     },
     {
-      "id": "tests/integration/test_plugin.py::test_annotated_label_carrying_a_pin_pins_its_step",
+      "id": "tests/integration/test_plugin.py::test_a_pin_on_a_given_annotation_pins_its_step",
       "narration": {
-        "text": "An Annotated label carrying a pin pins its step",
+        "text": "A pin on a given annotation pins the step it adds",
         "parts": [
           {
-            "value": "An Annotated label carrying a "
+            "value": "A "
           },
           {
             "term_id": "pin",
@@ -2927,24 +2927,35 @@
             "expression": "pg[\"Pin\"].l"
           },
           {
-            "value": " pins its "
+            "value": " on a "
+          },
+          {
+            "term_id": "given-annotation",
+            "display": "given annotation",
+            "expression": "pg[\"Given annotation\"].l"
+          },
+          {
+            "value": " pins the "
           },
           {
             "term_id": "step",
             "display": "step",
             "expression": "pg[\"Step\"].l"
+          },
+          {
+            "value": " it adds"
           }
         ]
       },
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a scenario whose Annotated given(...) label on a plain fixture carries a pin",
+            "text": "a scenario whose given annotation on a plain fixture carries a pin",
             "parts": [
               {
                 "value": "a "
@@ -2955,7 +2966,15 @@
                 "expression": "pg[\"Scenario\"].l"
               },
               {
-                "value": " whose Annotated given(...) label on a "
+                "value": " whose "
+              },
+              {
+                "term_id": "given-annotation",
+                "display": "given annotation",
+                "expression": "pg[\"Given annotation\"].l"
+              },
+              {
+                "value": " on a "
               },
               {
                 "term_id": "plain-fixture",
@@ -3002,10 +3021,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the label's step carries the pin",
+            "text": "the annotation's step carries the pin",
             "parts": [
               {
-                "value": "the label's "
+                "value": "the annotation's "
               },
               {
                 "term_id": "step",
@@ -3042,12 +3061,20 @@
       "pins": null
     },
     {
-      "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[none-keeps]",
+      "id": "tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins[none-keeps]",
       "narration": {
-        "text": "An Annotated label retells the pins of the fixture label it replaces",
+        "text": "A given annotation retells the pins of the step fixture label it replaces",
         "parts": [
           {
-            "value": "An Annotated label retells the "
+            "value": "A "
+          },
+          {
+            "term_id": "given-annotation",
+            "display": "given annotation",
+            "expression": "pg[\"Given annotation\"].l"
+          },
+          {
+            "value": " retells the "
           },
           {
             "term_id": "pin",
@@ -3055,31 +3082,39 @@
             "expression": "pg[\"Pin\"].l.s"
           },
           {
-            "value": " of the fixture label it replaces"
+            "value": " of the "
+          },
+          {
+            "term_id": "step-fixture",
+            "display": "step fixture",
+            "expression": "pg[\"Step fixture\"].l"
+          },
+          {
+            "value": " label it replaces"
           }
         ]
       },
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 172,
+      "duration_ms": 194,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a label with pins={label_pins} over a fixture pinning a[1]",
+            "text": "a given annotation with pins={annotation_pins} over a step fixture pinning a[1]",
             "parts": [
               {
-                "value": "a label with pins="
+                "value": "a given annotation with pins="
               },
               {
-                "name": "label_pins",
-                "column_id": "label_pins",
+                "name": "annotation_pins",
+                "column_id": "annotation_pins",
                 "format_spec": "",
                 "conversion": null
               },
               {
-                "value": " over a fixture pinning a[1]"
+                "value": " over a step fixture pinning a[1]"
               }
             ]
           },
@@ -3171,8 +3206,8 @@
       "parameters": {
         "columns": [
           {
-            "id": "label_pins",
-            "name": "label_pins",
+            "id": "annotation_pins",
+            "name": "annotation_pins",
             "kind": "param"
           },
           {
@@ -3183,7 +3218,7 @@
         ],
         "cases": [
           {
-            "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[none-keeps]",
+            "id": "tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins[none-keeps]",
             "values": [
               "None",
               "[1]"
@@ -3193,7 +3228,7 @@
             "custom_id": true
           },
           {
-            "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[empty-clears]",
+            "id": "tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins[empty-clears]",
             "values": [
               "[]",
               "[]"
@@ -3203,7 +3238,7 @@
             "custom_id": true
           },
           {
-            "id": "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[list-replaces]",
+            "id": "tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins[list-replaces]",
             "values": [
               "[a[2]]",
               "[2]"
@@ -3227,12 +3262,20 @@
       "pins": null
     },
     {
-      "id": "tests/integration/test_plugin.py::test_annotated_template_label_without_parametrize_fails_scenario",
+      "id": "tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario",
       "narration": {
-        "text": "An Annotated Template label on an unparametrized scenario fails that scenario",
+        "text": "A `Template` given annotation on an unparametrized scenario fails that scenario",
         "parts": [
           {
-            "value": "An Annotated Template label on an unparametrized "
+            "value": "A `Template` "
+          },
+          {
+            "term_id": "given-annotation",
+            "display": "given annotation",
+            "expression": "pg[\"Given annotation\"].l"
+          },
+          {
+            "value": " on an unparametrized "
           },
           {
             "term_id": "scenario",
@@ -3252,13 +3295,33 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 123,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a Template label on a plain fixture parameter",
-            "parts": []
+            "text": "a `Template` given annotation on a plain fixture parameter",
+            "parts": [
+              {
+                "value": "a `Template` "
+              },
+              {
+                "term_id": "given-annotation",
+                "display": "given annotation",
+                "expression": "pg[\"Given annotation\"].l"
+              },
+              {
+                "value": " on a "
+              },
+              {
+                "term_id": "plain-fixture",
+                "display": "plain fixture",
+                "expression": "pg[\"Plain fixture\"].l"
+              },
+              {
+                "value": " parameter"
+              }
+            ]
           },
           "children": [],
           "attachments": [
@@ -3332,28 +3395,40 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3183
+        "line": 3189
       },
       "story_ids": [],
       "pins": null
     },
     {
-      "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[column]",
+      "id": "tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column[column]",
       "narration": {
-        "text": "An Annotated Template label may only hold a bare parametrize column",
-        "parts": []
+        "text": "A `Template` given annotation may only hold a bare parametrize column",
+        "parts": [
+          {
+            "value": "A `Template` "
+          },
+          {
+            "term_id": "given-annotation",
+            "display": "given annotation",
+            "expression": "pg[\"Given annotation\"].l"
+          },
+          {
+            "value": " may only hold a bare parametrize column"
+          }
+        ]
       },
       "module": "tests.integration.test_plugin",
       "tags": [
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 166,
+      "duration_ms": 182,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a parametrized scenario whose Template label on a plain fixture holds {placeholder}",
+            "text": "a parametrized scenario whose `Template` given annotation on a plain fixture holds {placeholder}",
             "parts": [
               {
                 "value": "a "
@@ -3364,7 +3439,23 @@
                 "expression": "pg[\"Parametrized scenario\"].l"
               },
               {
-                "value": " whose Template label on a plain fixture holds "
+                "value": " whose `Template` "
+              },
+              {
+                "term_id": "given-annotation",
+                "display": "given annotation",
+                "expression": "pg[\"Given annotation\"].l"
+              },
+              {
+                "value": " on a "
+              },
+              {
+                "term_id": "plain-fixture",
+                "display": "plain fixture",
+                "expression": "pg[\"Plain fixture\"].l"
+              },
+              {
+                "value": " holds "
               },
               {
                 "name": "placeholder",
@@ -3399,10 +3490,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the label is {outcome}",
+            "text": "the annotation is {outcome}",
             "parts": [
               {
-                "value": "the label is "
+                "value": "the annotation is "
               },
               {
                 "name": "outcome",
@@ -3464,7 +3555,7 @@
         ],
         "cases": [
           {
-            "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[column]",
+            "id": "tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column[column]",
             "values": [
               "{x}",
               {
@@ -3480,7 +3571,7 @@
             "custom_id": true
           },
           {
-            "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[plain-fixture]",
+            "id": "tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column[plain-fixture]",
             "values": [
               "{room}",
               {
@@ -3489,14 +3580,14 @@
                 "content_type": "text"
               },
               "refused",
-              "'{room}' in the Annotated label on parameter 'room' does not match"
+              "'{room}' in the given annotation on parameter 'room' does not match"
             ],
             "status": "passed",
             "error": null,
             "custom_id": true
           },
           {
-            "id": "tests/integration/test_plugin.py::test_an_annotated_template_label_needs_a_bare_parametrize_column[attribute]",
+            "id": "tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column[attribute]",
             "values": [
               "{room.number}",
               {
@@ -3518,7 +3609,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3221
+        "line": 3230
       },
       "story_ids": [],
       "pins": null
@@ -3544,7 +3635,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -3612,7 +3703,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3329
+        "line": 3338
       },
       "story_ids": [],
       "pins": null
@@ -3638,7 +3729,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -3689,7 +3780,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3342
+        "line": 3351
       },
       "story_ids": [],
       "pins": null
@@ -3723,7 +3814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -3762,7 +3853,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the anchor is the node id, without a line number",
+            "text": "the anchor is the node ID, without a line number",
             "parts": []
           },
           "children": [],
@@ -3777,7 +3868,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3365
+        "line": 3374
       },
       "story_ids": [],
       "pins": null
@@ -3800,7 +3891,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 97,
+      "duration_ms": 114,
       "steps": [
         {
           "phase": "given",
@@ -3862,7 +3953,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3402
+        "line": 3411
       },
       "story_ids": [],
       "pins": null
@@ -3882,7 +3973,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -3948,7 +4039,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3422
+        "line": 3431
       },
       "story_ids": [],
       "pins": null
@@ -4032,7 +4123,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3455
+        "line": 3464
       },
       "story_ids": [],
       "pins": null
@@ -4058,7 +4149,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -4131,7 +4222,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3487
+        "line": 3496
       },
       "story_ids": [],
       "pins": null
@@ -4165,7 +4256,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 196,
+      "duration_ms": 219,
       "steps": [
         {
           "phase": "given",
@@ -4236,7 +4327,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3628
+        "line": 3637
       },
       "story_ids": [],
       "pins": null
@@ -4264,7 +4355,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -4329,7 +4420,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3676
+        "line": 3685
       },
       "story_ids": [],
       "pins": null
@@ -4378,7 +4469,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 67,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -4492,7 +4583,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3729
+        "line": 3738
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -4570,7 +4661,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3811
+        "line": 3820
       },
       "story_ids": [],
       "pins": null
@@ -4596,7 +4687,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -4695,7 +4786,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3860
+        "line": 3869
       },
       "story_ids": [],
       "pins": null
@@ -4737,7 +4828,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 429,
+      "duration_ms": 476,
       "steps": [
         {
           "phase": "given",
@@ -4896,7 +4987,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -4998,7 +5089,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -5103,7 +5194,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -5231,7 +5322,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -5343,7 +5434,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -5439,7 +5530,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 112,
+      "duration_ms": 122,
       "steps": [
         {
           "phase": "given",
@@ -5548,7 +5639,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a scenario starts under its Node ID and finishes",
+            "text": "a scenario starts under its node ID and finishes",
             "parts": [
               {
                 "value": "a "
@@ -5563,8 +5654,8 @@
               },
               {
                 "term_id": "node-id",
-                "display": "Node ID",
-                "expression": "pg[\"Node ID\"]"
+                "display": "node ID",
+                "expression": "pg[\"Node ID\"].l"
               },
               {
                 "value": " and finishes"
@@ -5579,15 +5670,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "it carries its Node ID, name, status and tag",
+            "text": "it carries its node ID, name, status and tag",
             "parts": [
               {
                 "value": "it carries its "
               },
               {
                 "term_id": "node-id",
-                "display": "Node ID",
-                "expression": "pg[\"Node ID\"]"
+                "display": "node ID",
+                "expression": "pg[\"Node ID\"].l"
               },
               {
                 "value": ", name, status and "
@@ -6390,7 +6481,7 @@
     {
       "id": "tests/unit/capture/test_collector.py::test_records_reports_only_recorded_node_ids",
       "narration": {
-        "text": "A collector reports which node ids it recorded",
+        "text": "A collector reports which node IDs it recorded",
         "parts": [
           {
             "value": "A "
@@ -6405,8 +6496,8 @@
           },
           {
             "term_id": "node-id",
-            "display": "node ids",
-            "expression": "pg[\"Node ID\"](\"node ids\")"
+            "display": "node IDs",
+            "expression": "pg[\"Node ID\"].l.s"
           },
           {
             "value": " it recorded"
@@ -6449,7 +6540,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the recorded and an unrecorded node id are both asked about",
+            "text": "the recorded and an unrecorded node ID are both asked about",
             "parts": []
           },
           "children": [],
@@ -6460,7 +6551,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "only the recorded node id is claimed",
+            "text": "only the recorded node ID is claimed",
             "parts": []
           },
           "children": [],
@@ -6481,12 +6572,20 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step",
+      "id": "tests/unit/capture/test_collector.py::test_graft_given_annotation_appends_childless_given_step",
       "narration": {
-        "text": "A leaf given is grafted as a childless given step",
+        "text": "A given annotation with no recording behind it is grafted as a childless given step",
         "parts": [
           {
-            "value": "A leaf given is "
+            "value": "A "
+          },
+          {
+            "term_id": "given-annotation",
+            "display": "given annotation",
+            "expression": "pg[\"Given annotation\"].l"
+          },
+          {
+            "value": " with no recording behind it is "
           },
           {
             "term_id": "graft",
@@ -6534,23 +6633,26 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a leaf graft appends a childless step",
+            "text": "a given annotation is grafted on its own",
             "parts": [
               {
-                "value": "a leaf "
+                "value": "a "
+              },
+              {
+                "term_id": "given-annotation",
+                "display": "given annotation",
+                "expression": "pg[\"Given annotation\"].l"
+              },
+              {
+                "value": " is "
               },
               {
                 "term_id": "graft",
-                "display": "graft",
-                "expression": "pg[\"Graft\"].l"
+                "display": "grafted",
+                "expression": "pg[\"Graft\"](\"grafted\")"
               },
               {
-                "value": " appends a childless "
-              },
-              {
-                "term_id": "step",
-                "display": "step",
-                "expression": "pg[\"Step\"].l"
+                "value": " on its own"
               }
             ]
           },
@@ -6592,7 +6694,7 @@
     {
       "id": "tests/unit/capture/test_collector.py::test_graft_recording_override_replaces_root_narration_keeps_children",
       "narration": {
-        "text": "Grafting with an override replaces the root label but keeps children",
+        "text": "Grafting with a given annotation replaces the root label but keeps children",
         "parts": [
           {
             "term_id": "graft",
@@ -6600,7 +6702,15 @@
             "expression": "pg[\"Graft\"](\"Grafting\")"
           },
           {
-            "value": " with an override replaces the root label but keeps children"
+            "value": " with a "
+          },
+          {
+            "term_id": "given-annotation",
+            "display": "given annotation",
+            "expression": "pg[\"Given annotation\"].l"
+          },
+          {
+            "value": " replaces the root label but keeps children"
           }
         ]
       },
@@ -6635,10 +6745,10 @@
         {
           "phase": "when",
           "narration": {
-            "text": "a graft supplies an override narration",
+            "text": "the graft carries a given annotation",
             "parts": [
               {
-                "value": "a "
+                "value": "the "
               },
               {
                 "term_id": "graft",
@@ -6646,12 +6756,12 @@
                 "expression": "pg[\"Graft\"].l"
               },
               {
-                "value": " supplies an override "
+                "value": " carries a "
               },
               {
-                "term_id": "narration",
-                "display": "narration",
-                "expression": "pg[\"Narration\"].l"
+                "term_id": "given-annotation",
+                "display": "given annotation",
+                "expression": "pg[\"Given annotation\"].l"
               }
             ]
           },
@@ -6668,7 +6778,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the grafted root shows the override text and keeps its children",
+            "text": "the grafted root shows the annotation's text and keeps its children",
             "parts": []
           },
           "children": [],
@@ -6683,7 +6793,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 606
+        "line": 607
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -6691,7 +6801,7 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_collector.py::test_graft_leaf_given_without_scenario_is_refused",
+      "id": "tests/unit/capture/test_collector.py::test_graft_given_annotation_without_scenario_is_refused",
       "narration": {
         "text": "Grafting with no active scenario is refused",
         "parts": [
@@ -6779,7 +6889,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 636
+        "line": 637
       },
       "story_ids": [],
       "pins": null
@@ -6991,7 +7101,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7108,7 +7218,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -7203,7 +7313,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7295,7 +7405,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -7839,7 +7949,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -8124,7 +8234,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -17929,7 +18039,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -18348,7 +18458,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -18525,7 +18635,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -18806,7 +18916,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -19070,7 +19180,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -19403,7 +19513,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -23140,7 +23250,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 178,
+      "duration_ms": 196,
       "steps": [
         {
           "phase": "given",
@@ -24537,7 +24647,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the heading is marked skipped and the reason follows the node id",
+            "text": "the heading is marked skipped and the reason follows the node ID",
             "parts": []
           },
           "children": [],
@@ -28163,7 +28273,7 @@
         "id": "scenario-title",
         "kind": null,
         "canonical": "Scenario title",
-        "definition": "The text `@scenario` takes first: the statement of the rule a *Scenario* demonstrates, shown as its heading in the report. A plain string, a t-string of glossary handles, or a `Template` filled per *Case*; recorded as the scenario's *Narration*. Not the test function's name, which the node id carries.",
+        "definition": "The text `@scenario` takes first: the statement of the rule a *Scenario* demonstrates, shown as its heading in the report. A plain string, a t-string of glossary handles, or a `Template` filled per *Case*; recorded as the scenario's *Narration*. Not the test function's name, which the node ID carries.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 14
@@ -28243,7 +28353,7 @@
         "id": "case",
         "kind": null,
         "canonical": "Case",
-        "definition": "One row of a parametrized scenario \u2014 its node id, a single tuple of parameter values, its status, and any error.",
+        "definition": "One row of a parametrized scenario \u2014 its node ID, a single tuple of parameter values, its status, and any error.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 27
@@ -28252,8 +28362,8 @@
       {
         "id": "case-id",
         "kind": null,
-        "canonical": "Case id",
-        "definition": "A *Case*'s pytest id: its *Node ID*'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`; a *Parameter table* leads with its case ids when any one is.",
+        "canonical": "Case ID",
+        "definition": "A *Case*'s pytest ID: its *Node ID*'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`; a *Parameter table* leads with its case IDs when any one is.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28
@@ -28303,10 +28413,20 @@
         "id": "plain-fixture",
         "kind": null,
         "canonical": "Plain fixture",
-        "definition": "A pytest fixture without a pytest-given decorator. It produces no step in the report unless an `Annotated[..., given(...)]` label on the test's parameter narrates it.",
+        "definition": "A pytest fixture without a pytest-given decorator. It produces no step in the report unless a *Given annotation* on the test's parameter narrates it.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 38
+        }
+      },
+      {
+        "id": "given-annotation",
+        "kind": null,
+        "canonical": "Given annotation",
+        "definition": "A `given(...)` in a test parameter's `Annotated[...]` type: `def test(room: Annotated[int, given('a room')])`. On a parametrize value or a *Plain fixture* it adds a childless `given` step; on a *Step fixture* it replaces the fixture's root label and its pins. Only `given` is allowed, and a `Template` in it may only hold a bare parametrize column.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 39
         }
       },
       {
@@ -28316,7 +28436,7 @@
         "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up. Stored keyed by fixture-instance identity. A generator fixture's teardown records nothing \u2014 it refuses steps and attachments.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 39
+          "line": 40
         }
       },
       {
@@ -28326,7 +28446,7 @@
         "definition": "Attaching a fixture recording into the active scenario's step tree at the moment its host test starts.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 40
+          "line": 41
         }
       },
       {
@@ -28336,7 +28456,7 @@
         "definition": "The per-session object accumulating scenarios, fixture recordings, and parameter info, published through a `ContextVar` so a nested run can displace and restore it.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 46
+          "line": 47
         }
       },
       {
@@ -28346,7 +28466,7 @@
         "definition": "The scenario currently being recorded into; tracked by node ID.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 47
+          "line": 48
         }
       },
       {
@@ -28356,7 +28476,7 @@
         "definition": "A pytest test identifier (e.g., `tests/test_x.py::test_y[a-b]`). Used as a key throughout the collector.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 48
+          "line": 49
         }
       },
       {
@@ -28366,7 +28486,7 @@
         "definition": "The chain of currently-open steps; entered by `with given(...)`, popped on exit. Mirrored inside a fixture recording while a fixture body is running.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 49
+          "line": 50
         }
       },
       {
@@ -28376,7 +28496,7 @@
         "definition": "The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 55
+          "line": 56
         }
       },
       {
@@ -28386,7 +28506,7 @@
         "definition": "Converts a JSON report into a rendering \u2014 a self-contained HTML page or a Markdown document.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 56
+          "line": 57
         }
       },
       {
@@ -28396,7 +28516,7 @@
         "definition": "Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 57
+          "line": 58
         }
       },
       {
@@ -28406,7 +28526,7 @@
         "definition": "A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 58
+          "line": 59
         }
       },
       {
@@ -28416,17 +28536,17 @@
         "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card, resolved from the `given_source_link` config \u2014 a preset name like `vscode` / `github`, or a raw URL template. Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 59
+          "line": 60
         }
       },
       {
         "id": "report-link",
         "kind": null,
         "canonical": "Report link",
-        "definition": "A Markdown link to a scenario, tag or story in the HTML *Report*: the report's URL with a `#scenario=<node id>`, `#tag=<tag>` or `#view=stories&story=<story id>` fragment. Without a glyph it is a plain one, which claims only that its target exists.",
+        "definition": "A Markdown link to a scenario, tag or story in the HTML *Report*: the report's URL with a `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<story id>` fragment. Without a glyph it is a plain one, which claims only that its target exists.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 60
+          "line": 61
         }
       },
       {
@@ -28436,7 +28556,7 @@
         "definition": "A *Report link* led by a status glyph, citing a scenario, tag or story from a Markdown document: `\u2705 [title](<report URL>#scenario=\u2026)`, and for a tag or story a summary after it, `(5 \u2705 \u00b7 2 \ud83d\udd35)`. `pytest-given citations check` holds its glyph, link text and summary to a JSON *Report*; `citations update` rewrites them, and marks a target the report lacks `\u2753`.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 61
+          "line": 62
         }
       },
       {
@@ -28446,7 +28566,7 @@
         "definition": "The HTML report's colour scheme \u2014 `light`, `dark`, or `auto` (follow the viewer's system). The `given_theme` config sets the default a report opens in; a viewer's own choice from the report's theme control, once made, wins over it in that browser.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 62
+          "line": 63
         }
       },
       {
@@ -28456,7 +28576,7 @@
         "definition": "The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog once the *Report* model is built. It enforces the structural subset of the narration conventions \u2014 it cannot check whether a *Step*'s text is semantically true.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 68
+          "line": 69
         }
       },
       {
@@ -28466,7 +28586,7 @@
         "definition": "One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source. The catalog in `lint/base.py` is data, so severities, config validation and docs stay in sync with one table.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 69
+          "line": 70
         }
       },
       {
@@ -28476,7 +28596,7 @@
         "definition": "One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 70
+          "line": 71
         }
       },
       {
@@ -28486,7 +28606,7 @@
         "definition": "A *Lint rule*'s level \u2014 `off`, `warn` or `error` \u2014 defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary; an `off` rule is not evaluated at all.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 71
+          "line": 72
         }
       },
       {
@@ -28496,7 +28616,7 @@
         "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.activity(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 81
+          "line": 82
         }
       },
       {
@@ -28506,7 +28626,7 @@
         "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from clause *slot* positions when no explicit `kind_column` is configured.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 82
+          "line": 83
         }
       },
       {
@@ -28516,7 +28636,7 @@
         "definition": "A term handed over before its kind is settled \u2014 what `g('foo')` and `g['foo']` on a code glossary return, and every *file glossary* lookup. The handle is the same `TermHandle` the typed registrations (`g.actor(...)` and friends) hand back; `declared_kind is None` is what marks the deferral. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 83
+          "line": 84
         }
       },
       {
@@ -28526,7 +28646,7 @@
         "definition": "A registered glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str | None`, `None` when undefined).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 84
+          "line": 85
         }
       },
       {
@@ -28536,7 +28656,7 @@
         "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of four surface forms: **bare** (`room` \u2014 the canonical display), **`.l`** (`room.l` \u2014 capitalized words lowercased, acronyms kept), **`.s`** (`room.s` \u2014 the *S-form*), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). `.l` and `.s` also apply to a called form and chain (`room.l.s` reads *rooms*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 85
+          "line": 86
         }
       },
       {
@@ -28546,7 +28666,7 @@
         "definition": "A term's name with the regular English -s ending, from the `.s` handle form: the plural of an Actor or Work Object (*rooms*), the third person singular of an Activity (*books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies, but an acronym takes a plain -s (*APIs*); anything else, such as *people* or *checks in*, needs the called form. The Glossary tab counts an S-form reference, in any case, as the term itself \u2014 not an *instance* or an *inflection*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 86
+          "line": 87
         }
       },
       {
@@ -28556,7 +28676,7 @@
         "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind color in the report.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 87
+          "line": 88
         }
       },
       {
@@ -28566,7 +28686,7 @@
         "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind color in the report.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 88
+          "line": 89
         }
       },
       {
@@ -28576,7 +28696,7 @@
         "definition": "A glossary term for what an actor does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept inflections: calling `search('searches for')` records *searches for* as a surface form of the canonical *search*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 89
+          "line": 90
         }
       },
       {
@@ -28586,7 +28706,7 @@
         "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ClauseTermRef` inside a clause.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 90
+          "line": 91
         }
       },
       {
@@ -28596,7 +28716,7 @@
         "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 91
+          "line": 92
         }
       },
       {
@@ -28606,7 +28726,7 @@
         "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*). Reported under \"Also used as:\" in the Glossary.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 92
+          "line": 93
         }
       },
       {
@@ -28616,7 +28736,7 @@
         "definition": "A named flow modeled as a sequence of sentences. Constructed by `story('Title', [sentence(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 93
+          "line": 94
         }
       },
       {
@@ -28626,7 +28746,7 @@
         "definition": "What Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. One row in a story, numbered by its position (1..N, never set by hand) and optionally named with `sentence(..., name='cancel')`, a name that stays put when rows are inserted. Constructed by `sentence(...)`. Usually one clause, built implicitly; several when the sentence has several arrows under one number.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 94
+          "line": 95
         }
       },
       {
@@ -28636,7 +28756,7 @@
         "definition": "The two-variant union making up a clause's prose (`ClausePart` = `ClauseTermRef` or `ClauseWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare clause word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 95
+          "line": 96
         }
       },
       {
@@ -28646,7 +28766,7 @@
         "definition": "One linear walk through a sentence's arrows, a node/edge alternation starting actor \u2192 verb \u2192 noun, constructed by `clause(...)`. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 96
+          "line": 97
         }
       },
       {
@@ -28656,7 +28776,7 @@
         "definition": "A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both clause validation and *kind inference*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 97
+          "line": 98
         }
       },
       {
@@ -28666,7 +28786,7 @@
         "definition": "The link between a scenario (or step) and story sentences. `@scenario(stories=...)` names the stories a scenario is narration-matched against; a *pin* (`pins=` on `@scenario` or on `given`/`when`/`then`) binds sentences explicitly, in any story, whether `stories=` names it or not.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 98
+          "line": 99
         }
       },
       {
@@ -28676,7 +28796,7 @@
         "definition": "What a *sentence handle* passed to `pins=` is recorded as, the way a term handle in narration is recorded as a *term ref*: a `Pin` naming a story and a sentence number. A pin binds explicitly and replaces narration matching \u2014 a step pin for that step, a scenario pin (`@scenario(pins=...)`) for every step of the scenario, which then covers its own pins plus its steps'. `pins=[]` pins nothing but still opts out of narration matching. A pin reaches under-anchored sentences too.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 99
+          "line": 100
         }
       },
       {
@@ -28686,7 +28806,7 @@
         "definition": "The \"did this scenario touch that sentence\" relation. Computed by the *A_refs \u2286 S* rule: a sentence is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A *pin* covers its sentences directly instead, regardless of narration or term count.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 100
+          "line": 101
         }
       },
       {
@@ -28696,7 +28816,7 @@
         "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story sentences; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any sentence stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 101
+          "line": 102
         }
       },
       {
@@ -28706,7 +28826,7 @@
         "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence). Shown in the report's *Uncategorized* bucket.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 102
+          "line": 103
         }
       },
       {
@@ -28716,7 +28836,7 @@
         "definition": "A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 103
+          "line": 104
         }
       },
       {
@@ -28726,7 +28846,7 @@
         "definition": "Person who writes the application code and \u2014 together with the *Agent* \u2014 the scenarios; curates the glossary with the *Domain Expert*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 111
+          "line": 112
         }
       },
       {
@@ -28736,7 +28856,7 @@
         "definition": "Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 112
+          "line": 113
         }
       },
       {
@@ -28746,7 +28866,7 @@
         "definition": "AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 113
+          "line": 114
         }
       }
     ]
@@ -29206,10 +29326,10 @@
       "scenario_ids": [
         "tests/integration/test_plugin.py::test_step_fixture_appears_as_given_step",
         "tests/integration/test_plugin.py::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches",
-        "tests/integration/test_plugin.py::test_annotated_label_carrying_a_pin_pins_its_step",
-        "tests/integration/test_plugin.py::test_annotated_label_pins_retell_the_fixture_root[none-keeps]",
+        "tests/integration/test_plugin.py::test_a_pin_on_a_given_annotation_pins_its_step",
+        "tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins[none-keeps]",
         "tests/unit/capture/test_collector.py::test_graft_recording_deep_copies_into_scenario",
-        "tests/unit/capture/test_collector.py::test_graft_leaf_given_appends_childless_given_step",
+        "tests/unit/capture/test_collector.py::test_graft_given_annotation_appends_childless_given_step",
         "tests/unit/capture/test_collector.py::test_graft_recording_override_replaces_root_narration_keeps_children"
       ]
     },
