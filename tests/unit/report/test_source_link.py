@@ -94,7 +94,7 @@ def test_resolve_github_preset_from_env(monkeypatch: pytest.MonkeyPatch) -> None
     )
 
 
-@scenario('The github preset prefers GITHUB_REPOSITORY over the git remote')
+@scenario('The github preset prefers `GITHUB_REPOSITORY` over the git remote')
 def test_resolve_github_preset_env_beats_remote(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

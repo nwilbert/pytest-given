@@ -26,7 +26,8 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
 @scenario(
-    t'{pg["Term"]} ids are derived as URL-safe slugs, and a name with none is refused',
+    t"A {pg['Term'].l}'s ID is its name as a URL-safe slug, and a name that "
+    t'leaves no slug is refused',
     tags=['validation'],
 )
 @pytest.mark.parametrize(

@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from pytest_given import attach, given, scenario, then, when, when_then
@@ -106,83 +108,60 @@ def test_skips_tables_in_fenced_code_blocks():
         assert [row.term for row in rows] == ['Real']
 
 
-@scenario(
-    'A file with no pipe table is rejected',
-    tags=['validation'],
-)
-def test_no_table_raises():
-    with given('a document with no pipe table'):
-        text = '# Just a heading\n\nNo tables here.'
-        attach('Markdown document', text)
-    with (
-        when_then(
-            t'the parser reads it for a {pg["File glossary"].l}',
-            'a PytestGivenError reports that the file has no pipe table',
-        ),
-        pytest.raises(PytestGivenError, match=r'no .*table'),
-    ):
-        parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
-        )
-
-
-@scenario(
-    'A missing named column is rejected',
-    tags=['diagnostics', 'validation'],
-)
-def test_missing_named_column_raises(simple_doc):
-    with (
-        when_then(
-            'the parser selects a header name that is absent',
-            'a PytestGivenError names the missing column',
-        ),
-        pytest.raises(PytestGivenError, match=r"column 'Nope' not found"),
-    ):
-        parse_glossary_tables(
-            simple_doc, term_column='Nope', definition_column=1, kind_column=None
-        )
-
-
-@scenario(
-    'A column index out of range is rejected',
-    tags=['diagnostics', 'validation'],
-)
-def test_index_out_of_range_raises(simple_doc):
-    with (
-        when_then(
-            'the parser selects a column index past the table width',
-            'a PytestGivenError names the out-of-range column',
-        ),
-        pytest.raises(PytestGivenError, match='column index 5 is out of range'),
-    ):
-        parse_glossary_tables(
-            simple_doc, term_column=0, definition_column=5, kind_column=None
-        )
-
-
 SHORT_ROW_TABLE = """| Term | Meaning | Type |
 |---|---|---|
 | Guest | A person |
 | Room | A bookable room | place |
 """
 
+_UNREADABLE_DOCUMENTS = {
+    'no pipe table': '# Just a heading\n\nNo tables here.',
+    'one pipe table': SIMPLE,
+    'a data row narrower than its header': SHORT_ROW_TABLE,
+}
+
 
 @scenario(
-    'A data row with too few columns is rejected',
+    t'A {pg["File glossary"].l} table the parser cannot read is refused, saying '
+    t'what is wrong',
     tags=['diagnostics', 'validation'],
 )
-def test_data_row_with_fewer_columns_raises():
-    with given('a table with a data row narrower than its header'):
-        text = SHORT_ROW_TABLE
+@pytest.mark.parametrize(
+    ('document', 'columns', 'message'),
+    [
+        ('no pipe table', {}, 'found no Markdown pipe table'),
+        ('one pipe table', {'term_column': 'Nope'}, "column 'Nope' not found"),
+        (
+            'one pipe table',
+            {'definition_column': 5},
+            'column index 5 is out of range',
+        ),
+        (
+            'a data row narrower than its header',
+            {'kind_column': 2},
+            'data row at line 3',
+        ),
+    ],
+)
+def test_an_unreadable_glossary_table_is_refused(document, columns, message):
+    with given(t'a Markdown document with {document}'):
+        text = _UNREADABLE_DOCUMENTS[document]
         attach('Markdown document', text)
+    with given(t'the columns selected as {columns}, the rest left at their defaults'):
+        selection = {
+            'term_column': 0,
+            'definition_column': 1,
+            'kind_column': None,
+            **columns,
+        }
     with (
         when_then(
-            'the parser reads the short row',
-            'a PytestGivenError points at the short row',
+            'the parser reads the document',
+            t'a PytestGivenError says {message}',
         ),
-        pytest.raises(PytestGivenError, match='row at line 3'),
+        pytest.raises(PytestGivenError, match=re.escape(message)),
     ):
-        parse_glossary_tables(text, term_column=0, definition_column=1, kind_column=2)
+        parse_glossary_tables(text, **selection)
 
 
 @scenario(
@@ -213,7 +192,7 @@ def test_a_term_cell_is_read_as_its_plain_text(cell, term):
 
 
 @scenario(
-    'Emphasis is stripped from kind cells too',
+    'A kind cell is read as its plain text, with emphasis unwrapped',
 )
 def test_strips_emphasis_from_kind_cell():
     with given('a Kind cell written with bold emphasis'):

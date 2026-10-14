@@ -295,7 +295,7 @@ def test_clause_rejects_dangling_edge():
 
 
 @scenario(
-    t'A single-clause {pg["Sentence"].l} synthesizes one {pg["Clause"].l}',
+    t'A {pg["Sentence"].l} built from loose parts holds them as one {pg["Clause"].l}',
     stories=adopt_pytest_given,
 )
 def test_sentence_single_clause_synthesizes_one_clause(guest, search, room):
@@ -736,8 +736,8 @@ def test_top_level_imports():
 
 
 @scenario(
-    t'A declared {pg["Work Object"].l} in a verb {pg["Slot"].l} '
-    t'is rejected at construction',
+    t"A {pg['File glossary'].l}'s declared kind is checked when a "
+    t'{pg["Clause"].l} is built',
     tags=['validation'],
 )
 def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):

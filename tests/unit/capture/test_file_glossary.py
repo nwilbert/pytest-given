@@ -28,7 +28,7 @@ def glossary_file(tmp_path):
 
 
 @scenario(
-    t'{pg["File glossary"]("FileGlossary")} lookup is case-insensitive',
+    t'A {pg["File glossary"].l} looks {pg["Term"].l.s} up case-insensitively',
 )
 def test_lookup_is_case_insensitive(glossary_file):
     with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
@@ -164,7 +164,7 @@ def test_kind_column_by_integer_index(tmp_path):
 
 
 @scenario(
-    t'A {pg["Work Object"]("work_object")} kind alias maps to the object kind',
+    t'A `work_object` kind cell maps to the {pg["Work Object"].l} kind',
 )
 def test_work_object_underscore_alias(tmp_path):
     with given(t'a glossary whose Kind cell says work_object'):
@@ -199,7 +199,7 @@ def test_unrecognized_kind_value_raises(tmp_path):
 
 
 @scenario(
-    t'A missing {pg["Glossary"].l} file is reported clearly',
+    t'A missing {pg["Glossary"].l} file is refused as not found',
     tags=['validation'],
 )
 def test_missing_file_raises(tmp_path):
@@ -348,7 +348,7 @@ def test_blank_definition_cell_normalizes_to_none(tmp_path):
 
 
 @scenario(
-    t'Calling {pg["File glossary"]("FileGlossary")} looks up a known {pg["Term"].l}',
+    t'Calling a {pg["File glossary"].l} looks up a known {pg["Term"].l}',
 )
 def test_file_glossary_call_known_name_returns_handle(glossary_file):
     with given(t'a {pg["File glossary"].l} loaded from a Markdown file'):
@@ -362,7 +362,7 @@ def test_file_glossary_call_known_name_returns_handle(glossary_file):
 
 
 @scenario(
-    t'{pg["File glossary"]("FileGlossary")} is a closed vocabulary',
+    t'A {pg["File glossary"].l} is a closed vocabulary',
     tags=['validation'],
 )
 def test_file_glossary_call_unknown_name_raises(glossary_file):

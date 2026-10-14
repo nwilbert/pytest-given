@@ -52,8 +52,8 @@ def _clause(*parts):
 
 
 @scenario(
-    t'A {pg["Sentence"].l} is referenced by its {pg["Term"].l.s}, '
-    t'whatever their surface form',
+    t'A {pg["Sentence"].l} references its {pg["Term"].l.s}, whatever surface '
+    t'form they take',
 )
 def test_a_refs_collects_term_ids_whatever_the_display():
     with given(
@@ -162,8 +162,8 @@ def _term_ref(tid, display):
 
 
 @scenario(
-    t'A {pg["Step"].l} is referenced by its {pg["Term"].l.s}, '
-    t'whatever their surface form',
+    t'A {pg["Step"].l} references its {pg["Term"].l.s}, whatever surface form '
+    t'they take',
 )
 def test_s_for_step_collects_term_ids_whatever_the_display():
     with given(
@@ -337,35 +337,21 @@ def test_compute_coverage_lost_when_sentence_gains_a_term():
         assert SentenceId(1) not in after
 
 
-@scenario(
-    t'A {pg["Scenario"].l} {pg["Pin"].l} covers exactly its {pg["Sentence"].l.s}',
-)
 def test_compute_coverage_scenario_pin_replaces_matching():
-    with given(
-        t'a {pg["Story"].l} with a matching and an under-anchored {pg["Sentence"].l}'
-    ):
-        matching = _guest_search_room_story().sentences[0]
-        under_anchored = Sentence(
-            id=SentenceId(2),
-            clauses=(
-                _clause(
-                    _entity('guest', 'Guest'),
-                    ClauseWord(text='browses'),
-                    ClauseWord(text='listings'),
-                ),
+    matching = _guest_search_room_story().sentences[0]
+    under_anchored = Sentence(
+        id=SentenceId(2),
+        clauses=(
+            _clause(
+                _entity('guest', 'Guest'),
+                ClauseWord(text='browses'),
+                ClauseWord(text='listings'),
             ),
-        )
-        story = Story(id=StoryId('s'), title='S', sentences=(matching, under_anchored))
-    with given(
-        t'a {pg["Scenario"].l} whose {pg["Step"].l} matches sentence 1 but which '
-        t'pins '
-        t'sentence 2'
-    ):
-        scenario_ = _scenario_with_steps(_matching_step(), pins=[2])
-    with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
-        coverage = compute_coverage(scenario_, build_story_index(story))
-    with then(t'only the pinned {pg["Sentence"].l} is covered, matching never ran'):
-        assert coverage == {SentenceId(2)}
+        ),
+    )
+    story = Story(id=StoryId('s'), title='S', sentences=(matching, under_anchored))
+    scenario_ = _scenario_with_steps(_matching_step(), pins=[2])
+    assert compute_coverage(scenario_, build_story_index(story)) == {SentenceId(2)}
 
 
 def _guest_search_room_story():
@@ -432,6 +418,7 @@ def _search_and_book_story():
         (None, [2], [2]),
         ([], None, []),
         ([], [2], [2]),
+        ([2], None, [2]),
         ([1], [2], [1, 2]),
     ],
     ids=[
@@ -439,6 +426,7 @@ def _search_and_book_story():
         'step-pinned',
         'scenario-pinned',
         'both-pinned',
+        'scenario-pins-elsewhere',
         'scenario-and-step-pinned',
     ],
 )
@@ -564,7 +552,7 @@ def test_an_under_anchored_sentence_is_covered_only_through_a_pin(
 
 
 @scenario(
-    t'Nested {pg["Step"].l.s} are walked for {pg["Coverage"].l}',
+    t'A nested {pg["Step"].l} covers a {pg["Sentence"].l} like a top-level one',
 )
 def test_compute_coverage_nested_steps_are_walked():
     """Steps nested as children are also examined for coverage."""

@@ -77,7 +77,7 @@
 - **then** the given «step» holds a «term ref» to the term
 
 ## ✓ A «scenario» failing on a pytest-given refusal points at the test, not at pytest-given
-`tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test`
+`tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test` · validation
 
 - **given** a suite that nests across phases and mistypes a term
   - 📎 suite:
@@ -248,7 +248,7 @@
 - **when** the suite runs with an HTML report
 - **then** the error names the ini setting, not a flag the user never typed
 
-## ✓ A «report» that fails to render discards the previous one too
+## ✓ A «report» that fails to render leaves no report behind, not even the previous one
 `tests/integration/test_plugin.py::test_a_render_failure_leaves_no_half_replaced_report` · validation
 
 - **given** a suite with one «scenario»
@@ -329,7 +329,7 @@
           assert thing == 1
   ```
 
-## ✓ A fixture takes only @given, never @when or @then · 3 cases
+## ✓ A fixture takes only `@given`, never `@when` or `@then` · 3 cases
 `tests/integration/test_plugin.py::test_a_fixture_takes_only_given` · validation
 
 - **given** a fixture decorated with @{decorator}
@@ -553,7 +553,7 @@
 - **when** the suite runs with --given-json
 - **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
-## ✓ A «pin» on a «given annotation» pins the «step» it adds
+## ✓ A «given annotation»'s «pin» lands on the «step» it adds
 `tests/integration/test_plugin.py::test_a_pin_on_a_given_annotation_pins_its_step`
 
 - **given** a «scenario» whose «given annotation» on a «plain fixture» carries a «pin»
@@ -585,7 +585,7 @@
 
 - **given** a given annotation with pins={annotation_pins} over a step fixture pinning a\[1\]
 - **when** the suite runs
-- **then** the grafted root «pins» the sentences {root_sentences} of a
+- **then** the grafted root pins the sentences {root_sentences} of a
 - **then** the inner «step» keeps its own «pin», a\[3\]
 
 | case ID | annotation_pins | root_sentences |
@@ -595,7 +595,7 @@
 | list-replaces | \[a\[2\]\] | \[2\] |
 
 ## ✓ A `Template` «given annotation» on an unparametrized «scenario» fails that «scenario»
-`tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario`
+`tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario` · parametrization, validation
 
 - **given** a `Template` «given annotation» on a «plain fixture» parameter
   - 📎 suite:
@@ -618,70 +618,18 @@
 - **then** the HTML «report» is still written
 
 ## ✓ A `Template` «given annotation» may only hold a bare parametrize column · 3 cases
-`tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column` · validation
+`tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column` · parametrization, validation
 
 - **given** a «parametrized scenario» whose `Template` «given annotation» on a «plain fixture» holds {placeholder}
-  - 📎 suite — *see parameter table*
 - **when** the suite runs
 - **then** the annotation is {outcome}
 - **then** a refusal errors the scenario, saying {error}
 
-| case ID | placeholder | suite | outcome | error |
-|---|---|---|---|---|
-| column | {x} | suite | accepted | None |
-| plain-fixture | {room} | suite | refused | '{room}' in the given annotation on parameter 'room' does not match |
-| attribute | {room.number} | suite | refused | bare identifiers |
-
-- **column** — suite:
-  ```
-  from typing import Annotated
-  import pytest
-  from pytest_given import scenario, given, when, Template
-  
-  @pytest.fixture
-  def room():
-      return 101
-  
-  @scenario('bad')
-  @pytest.mark.parametrize('x', [1])
-  def test_it(x, room: Annotated[int, given(Template('room {x}'))]):
-      with when('it is booked'):
-          pass
-  ```
-
-- **plain-fixture** — suite:
-  ```
-  from typing import Annotated
-  import pytest
-  from pytest_given import scenario, given, when, Template
-  
-  @pytest.fixture
-  def room():
-      return 101
-  
-  @scenario('bad')
-  @pytest.mark.parametrize('x', [1])
-  def test_it(x, room: Annotated[int, given(Template('room {room}'))]):
-      with when('it is booked'):
-          pass
-  ```
-
-- **attribute** — suite:
-  ```
-  from typing import Annotated
-  import pytest
-  from pytest_given import scenario, given, when, Template
-  
-  @pytest.fixture
-  def room():
-      return 101
-  
-  @scenario('bad')
-  @pytest.mark.parametrize('x', [1])
-  def test_it(x, room: Annotated[int, given(Template('room {room.number}'))]):
-      with when('it is booked'):
-          pass
-  ```
+| case ID | placeholder | outcome | error |
+|---|---|---|---|
+| column | {x} | accepted | None |
+| plain-fixture | {room} | refused | '{room}' in the given annotation on parameter 'room' does not match |
+| attribute | {room.number} | refused | bare identifiers |
 
 ## ✓ A bare run writes no «report» at all
 `tests/integration/test_plugin.py::test_no_output_flags_writes_nothing`
@@ -737,7 +685,7 @@
 - **then** the source file is left exactly as it was, not overwritten
 
 ## ✓ A rejected authoring form fails the run and writes no «report»
-`tests/integration/test_plugin.py::test_a_rejected_form_fails_the_run_and_writes_no_sink` · validation
+`tests/integration/test_plugin.py::test_a_rejected_form_fails_the_run_and_writes_no_sink` · parametrization, validation
 
 - **given** a suite whose narration varies across parametrize cases
   - 📎 suite:
@@ -801,7 +749,7 @@
 - **then** each «case» is its own «scenario», titled with its id, with no «parameter table»
 
 ## ✓ A run that writes no «report» still enforces the «grouping» rules
-`tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules` · validation
+`tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules` · parametrization, validation
 
 - **given** a suite whose f-string narration records no parts
   - 📎 suite:
@@ -845,7 +793,7 @@
 - **then** the «scenario» and every «case» run
 - **then** the plain test is deselected
 
-## ✓ A run gives each «kindless» «term» the kind of the «slot» it fills
+## ✓ A «file glossary»'s «kindless» «terms» reach the «report» with the kinds the run infers
 `tests/integration/test_plugin_file_glossary.py::test_file_glossary_kinds_resolved_in_report`
 
 - **given** a «file glossary» of «kindless» «terms» and a «story» whose «sentence» uses them
@@ -1149,13 +1097,13 @@
 - **then** the grafted root shows the annotation's text and keeps its children
 
 ## ✓ «Grafting» with no «active scenario» is refused
-`tests/unit/capture/test_collector.py::test_graft_given_annotation_without_scenario_is_refused`
+`tests/unit/capture/test_collector.py::test_graft_given_annotation_without_scenario_is_refused` · validation
 
 - **given** a collector with no «active scenario»
 - **when** a leaf «graft» runs
 - **then** the invariant is asserted rather than silently dropping the step
 
-## ✓ «FileGlossary» lookup is case-insensitive
+## ✓ A «file glossary» looks «terms» up case-insensitively
 `tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive`
 
 - **given** a «file glossary» loaded from a Markdown file
@@ -1286,7 +1234,7 @@
 - **when** the «file glossary» selects the kind column by index
 - **then** the kinds are read from that column
 
-## ✓ A «work_object» kind alias maps to the object kind
+## ✓ A `work_object` kind cell maps to the «work object» kind
 `tests/unit/capture/test_file_glossary.py::test_work_object_underscore_alias`
 
 - **given** a glossary whose Kind cell says work_object
@@ -1312,7 +1260,7 @@
 - **when** the «file glossary» loads the file
 - **then** a PytestGivenError names the unrecognized kind
 
-## ✓ A missing «glossary» file is reported clearly
+## ✓ A missing «glossary» file is refused as not found
 `tests/unit/capture/test_file_glossary.py::test_missing_file_raises` · validation
 
 - **given** a path to a file that does not exist
@@ -1409,7 +1357,7 @@
 - **when** the «file glossary» parses it
 - **then** the «term» definition is None, i.e. «undefined»
 
-## ✓ Calling «FileGlossary» looks up a known «term»
+## ✓ Calling a «file glossary» looks up a known «term»
 `tests/unit/capture/test_file_glossary.py::test_file_glossary_call_known_name_returns_handle`
 
 - **given** a «file glossary» loaded from a Markdown file
@@ -1426,7 +1374,7 @@
 - **when** a known «term» is looked up by call
 - **then** a «deferred term» is returned
 
-## ✓ «FileGlossary» is a closed vocabulary
+## ✓ A «file glossary» is a closed vocabulary
 `tests/unit/capture/test_file_glossary.py::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «file glossary» loaded from a Markdown file
@@ -1444,7 +1392,7 @@
 - **then** a PytestGivenError is raised
 - **then** no new «term» was created
 
-## ✓ «Term» ids are derived as URL-safe slugs, and a name with none is refused · 12 cases
+## ✓ A «term»'s ID is its name as a URL-safe slug, and a name that leaves no slug is refused · 12 cases
 `tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs` · validation
 
 - **given** the name {text}
@@ -1732,64 +1680,56 @@
 - **when** the parser reads the document
 - **then** only the real table outside the fence contributes rows
 
-## ✓ A file with no pipe table is rejected
-`tests/unit/capture/test_markdown_glossary.py::test_no_table_raises` · validation
+## ✓ A «file glossary» table the parser cannot read is refused, saying what is wrong · 4 cases
+`tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused` · diagnostics, validation
 
-- **given** a document with no pipe table
-  - 📎 Markdown document:
-    ```
-    # Just a heading
-    
-    No tables here.
-    ```
-- **when** the parser reads it for a «file glossary»
-- **then** a PytestGivenError reports that the file has no pipe table
+- **given** a Markdown document with {document}
+  - 📎 Markdown document — *see parameter table*
+- **given** the columns selected as {columns}, the rest left at their defaults
+- **when** the parser reads the document
+- **then** a PytestGivenError says {message}
 
-## ✓ A missing named column is rejected
-`tests/unit/capture/test_markdown_glossary.py::test_missing_named_column_raises` · diagnostics, validation
+| document | Markdown document | columns | message |
+|---|---|---|---|
+| no pipe table | Markdown document | {} | found no Markdown pipe table |
+| one pipe table | Markdown document | {'term_column': 'Nope'} | column 'Nope' not found |
+| one pipe table | Markdown document | {'definition_column': 5} | column index 5 is out of range |
+| a data row narrower than its header | Markdown document | {'kind_column': 2} | data row at line 3 |
 
-- **given** a Markdown document with one pipe table
-  - 📎 Markdown document:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest | A person booking. |
-    | Room  | A bookable room. |
-    ```
-- **when** the parser selects a header name that is absent
-- **then** a PytestGivenError names the missing column
+- **no pipe table, {}, found no Markdown pipe table** — Markdown document:
+  ```
+  # Just a heading
+  
+  No tables here.
+  ```
 
-## ✓ A column index out of range is rejected
-`tests/unit/capture/test_markdown_glossary.py::test_index_out_of_range_raises` · diagnostics, validation
+- **one pipe table, {'term_column': 'Nope'}, column 'Nope' not found** — Markdown document:
+  ```
+  # Glossary
+  
+  | Term | Meaning |
+  |------|---------|
+  | Guest | A person booking. |
+  | Room  | A bookable room. |
+  ```
 
-- **given** a Markdown document with one pipe table
-  - 📎 Markdown document:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest | A person booking. |
-    | Room  | A bookable room. |
-    ```
-- **when** the parser selects a column index past the table width
-- **then** a PytestGivenError names the out-of-range column
+- **one pipe table, {'definition_column': 5}, column index 5 is out of range** — Markdown document:
+  ```
+  # Glossary
+  
+  | Term | Meaning |
+  |------|---------|
+  | Guest | A person booking. |
+  | Room  | A bookable room. |
+  ```
 
-## ✓ A data row with too few columns is rejected
-`tests/unit/capture/test_markdown_glossary.py::test_data_row_with_fewer_columns_raises` · diagnostics, validation
-
-- **given** a table with a data row narrower than its header
-  - 📎 Markdown document:
-    ```
-    | Term | Meaning | Type |
-    |---|---|---|
-    | Guest | A person |
-    | Room | A bookable room | place |
-    ```
-- **when** the parser reads the short row
-- **then** a PytestGivenError points at the short row
+- **a data row narrower than its header, {'kind_column': 2}, data row at line 3** — Markdown document:
+  ```
+  | Term | Meaning | Type |
+  |---|---|---|
+  | Guest | A person |
+  | Room | A bookable room | place |
+  ```
 
 ## ✓ A «term» cell is read as its plain text, with emphasis unwrapped · 6 cases
 `tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text`
@@ -1807,7 +1747,7 @@
 | \`a\*b\*c\` | a\*b\*c |
 | \_\_Scenario\_\_ | \_\_Scenario\_\_ |
 
-## ✓ Emphasis is stripped from kind cells too
+## ✓ A kind cell is read as its plain text, with emphasis unwrapped
 `tests/unit/capture/test_markdown_glossary.py::test_strips_emphasis_from_kind_cell`
 
 - **given** a Kind cell written with bold emphasis
@@ -1870,7 +1810,7 @@
 - **when** a «when_then» block exits cleanly
 - **then** a when and a sibling then «step» are recorded
 
-## ✓ «when_then» pairs with an inner pytest.raises
+## ✓ «when_then» pairs with an inner `pytest.raises`
 `tests/unit/capture/test_step_descriptor.py::test_when_then_pairs_with_inner_pytest_raises`
 
 - **given** an «active scenario» in a local «collector»
@@ -1921,7 +1861,7 @@
 | not-a-string |
 
 ## ✓ A `Template` «narration» is refused in a test body · 3 cases
-`tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises` · validation
+`tests/unit/capture/test_step_descriptor.py::test_phase_with_pytest_given_template_as_context_manager_raises` · parametrization, validation
 
 - **given** an «active scenario» in a local «collector»
 - **when** a {phase_name} «step» opens on a `Template`
@@ -1933,7 +1873,7 @@
 | when |
 | then |
 
-## ✓ A sentence number or name pins only once looked up on its «story» · 6 cases
+## ✓ A «pin» takes a «sentence» handle from its «story», never a bare number or name · 6 cases
 `tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story` · validation
 
 - **given** the sentence {written}, looked up on its «story»: {looked_up}
@@ -2050,7 +1990,7 @@
 - **when** a clause ending on a connective edge is built
 - **then** a PytestGivenError names the trailing arrow with no target
 
-## ✓ A single-clause «sentence» synthesizes one «clause»
+## ✓ A «sentence» built from loose parts holds them as one «clause»
 `tests/unit/capture/test_story.py::test_sentence_single_clause_synthesizes_one_clause`
 
 - **given** a Guest actor
@@ -2177,7 +2117,7 @@
 - **when** they form a five-node «clause» (actor verb object verb object)
 - **then** every slot is a «term ref», with no bare words
 
-## ✓ A declared «work object» in a verb «slot» is rejected at construction
+## ✓ A «file glossary»'s declared kind is checked when a «clause» is built
 `tests/unit/capture/test_story.py::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
 - **given** a «file glossary» declaring Room a work object
@@ -2202,22 +2142,22 @@
 - **when** an int is passed where an «activity» handle belongs
 - **then** a PytestGivenError names the offending type and the clause
 
-## ✓ A Template parses a bare placeholder
+## ✓ A `Template` parses a bare placeholder
 `tests/unit/capture/test_template.py::test_template_parses_single_placeholder` · parametrization
 
 - **given** a deferred `Template` with one placeholder
 - **when** the template is parsed
 - **then** it splits into literal and placeholder «narration» parts
 
-## ✓ A Template substitutes parametrize values
+## ✓ A `Template` substitutes parametrize values
 `tests/unit/capture/test_template.py::test_template_substitute_basic` · parametrization
 
 - **given** a `Template` referencing a parametrize column
 - **when** a parametrize value is substituted in
 - **then** the placeholder is filled with that value
 
-## ✓ A Template accepts bare identifiers only · 4 cases
-`tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only` · validation
+## ✓ A `Template` accepts bare identifiers only · 4 cases
+`tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only` · parametrization, validation
 
 - **given** the placeholder {text}
 - **when** a `Template` is built from it
@@ -2269,7 +2209,7 @@
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «term ref» takes no format spec
 
-## ✓ A «FileGlossary» handle works in a t-string «step»
+## ✓ A «file glossary» handle works in a t-string «step»
 `tests/unit/capture/test_template.py::test_tstring_with_file_term_handle_emits_term_ref`
 
 - **given** a «deferred term» from a «file glossary»
@@ -2497,7 +2437,7 @@
 - **when** the runtime «lint rules» run over that story
 - **then** dead-term flags none of its terms
 
-## ✓ A «sentence» is referenced by its «terms», whatever their surface form
+## ✓ A «sentence» references its «terms», whatever surface form they take
 `tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display`
 
 - **given** a «sentence» written with an «instance» and an «inflection»
@@ -2519,7 +2459,7 @@
 - **when** «coverage» is computed against the «story»
 - **then** the «sentence» is covered
 
-## ✓ A «step» is referenced by its «terms», whatever their surface form
+## ✓ A «step» references its «terms», whatever surface form they take
 `tests/unit/report/test_coverage.py::test_s_for_step_collects_term_ids_whatever_the_display`
 
 - **given** a «step» naming an «instance» and an «inflection»
@@ -2559,15 +2499,7 @@
 - **then** the two-ref «sentence» is covered
 - **then** the widened «sentence» is no longer covered
 
-## ✓ A «scenario» «pin» covers exactly its «sentences»
-`tests/unit/report/test_coverage.py::test_compute_coverage_scenario_pin_replaces_matching`
-
-- **given** a «story» with a matching and an under-anchored «sentence»
-- **given** a «scenario» whose «step» matches sentence 1 but which pins sentence 2
-- **when** «coverage» is computed against the «story»
-- **then** only the pinned «sentence» is covered, matching never ran
-
-## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 5 cases
+## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 6 cases
 `tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins`
 
 - **given** a scenario with pins={scenario_pins}
@@ -2581,6 +2513,7 @@
 | step-pinned | None | \[2\] | \[2\] |
 | scenario-pinned | \[\] | None | \[\] |
 | both-pinned | \[\] | \[2\] | \[2\] |
+| scenario-pins-elsewhere | \[2\] | None | \[2\] |
 | scenario-and-step-pinned | \[1\] | \[2\] | \[1, 2\] |
 
 ## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
@@ -2612,7 +2545,7 @@
 | \['guest'\] | False | False |
 | \['guest'\] | True | True |
 
-## ✓ Nested «steps» are walked for «coverage»
+## ✓ A nested «step» covers a «sentence» like a top-level one
 `tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
 
 - **given** a «story» with one canonical «sentence»
@@ -2798,14 +2731,13 @@
 - **when** the term-scenario index is built
 - **then** each «term» maps to the scenario exactly once
 
-## ✓ «Parameter coloring» marks placeholders and table headers
+## ✓ «Parameter coloring» ties each placeholder to its column header
 `tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration` · parametrization
 
-- **given** a «report» holding a «parametrized scenario» with a «parameter table»
+- **given** a «report» holding a «parametrized scenario» with a «parameter table» of the columns euros and expect
 - **when** the «renderer» renders the HTML page
-- **then** «parameter coloring» classes mark the grouped placeholder and the table headers
-- **then** the page carries one generated color rule per column, after the stylesheet so a term ref bound to a column takes the column ink
-- **then** each column ink is a token set once per theme, so the dark theme only redefines the token
+- **then** the grouped step shows its placeholder, keyed to the euros column
+- **then** each column header carries its own column key
 
 ## ✓ A «scenario title»'s emphasis renders the same in every output
 `tests/unit/report/test_inline_markdown.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown
@@ -3135,13 +3067,6 @@
 - **then** a top-level `coverage` lists every «sentence» once
 - **then** the rest of the report is the input dict, unchanged
 
-## ✓ The JSON report carries the «coverage» it computes, not the one it is handed
-`tests/unit/report/test_sinks.py::test_json_sink_replaces_incoming_coverage`
-
-- **given** a report dict whose `coverage` does not match its steps
-- **when** the JSON report is rendered from it
-- **then** the «coverage» is the one the «steps» actually earn
-
 ## ✓ A «source link» config value resolves to its template · 6 cases
 `tests/unit/report/test_source_link.py::test_a_source_link_config_value_resolves_to_its_template`
 
@@ -3166,7 +3091,7 @@
 - **then** the value is refused
 - **then** the error names the offender and lists every valid preset
 
-## ✓ The github preset prefers GITHUB_REPOSITORY over the git remote
+## ✓ The github preset prefers `GITHUB_REPOSITORY` over the git remote
 `tests/unit/report/test_source_link.py::test_resolve_github_preset_env_beats_remote`
 
 - **given** GITHUB_REPOSITORY naming one repository
@@ -3327,7 +3252,7 @@
 - **then** the grouping is refused
 - **then** the error names the «term ref» and the split-it-out fix
 
-## ✓ A «term ref» that *is* the parametrize value is refused too
+## ✓ A «term ref» whose display varies is refused even when a parametrize value binds it
 `tests/unit/test_grouping.py::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
 
 - **given** two «cases» whose «term ref» is the parameter itself
@@ -3359,7 +3284,7 @@
 - **then** the grouping is refused
 - **then** the error names the label, the case, and asks for a constant one
 
-## ✓ A «parameter table» cell reads the way the «step» that points at it read
+## ✓ A «parameter table» cell holds the text the «step» pointing at it narrated
 `tests/unit/test_grouping.py::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
 
 - **given** two «cases» narrating a parameter with a format spec

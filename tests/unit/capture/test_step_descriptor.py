@@ -311,7 +311,7 @@ def test_when_then_records_two_sibling_steps_on_clean_exit() -> None:
 
 
 @scenario(
-    t'{pg["when_then"]} pairs with an inner pytest.raises',
+    t'{pg["when_then"]} pairs with an inner `pytest.raises`',
 )
 def test_when_then_pairs_with_inner_pytest_raises() -> None:
     session_collector = get_active_collector()
@@ -558,7 +558,7 @@ def test_step_descriptor_with_tstring_records_rendered_text_and_parts() -> None:
 
 @scenario(
     t'A `Template` {pg["Narration"].l} is refused in a test body',
-    tags=['validation'],
+    tags=['parametrization', 'validation'],
 )
 @pytest.mark.parametrize('phase_name', ['given', 'when', 'then'])
 def test_phase_with_pytest_given_template_as_context_manager_raises(
@@ -955,7 +955,8 @@ def _looked_up(the_story, written):
 
 
 @scenario(
-    t'A sentence number or name pins only once looked up on its {pg["Story"].l}',
+    t'A {pg["Pin"].l} takes a {pg["Sentence"].l} handle from its {pg["Story"].l}, '
+    t'never a bare number or name',
     tags=['validation'],
 )
 @pytest.mark.parametrize(

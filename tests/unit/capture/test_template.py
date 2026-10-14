@@ -39,7 +39,7 @@ def test_template_parses_literal_only() -> None:
 
 
 @scenario(
-    'A Template parses a bare placeholder',
+    'A `Template` parses a bare placeholder',
     tags=['parametrization'],
 )
 def test_template_parses_single_placeholder() -> None:
@@ -83,7 +83,7 @@ def test_template_get_identifiers() -> None:
 
 
 @scenario(
-    'A Template substitutes parametrize values',
+    'A `Template` substitutes parametrize values',
     tags=['parametrization'],
 )
 def test_template_substitute_basic() -> None:
@@ -120,8 +120,8 @@ def test_template_unclosed_brace_raises_value_error() -> None:
 
 
 @scenario(
-    'A Template accepts bare identifiers only',
-    tags=['validation'],
+    'A `Template` accepts bare identifiers only',
+    tags=['parametrization', 'validation'],
 )
 @pytest.mark.parametrize(
     ('text', 'outcome'),
@@ -366,8 +366,7 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 
 
 @scenario(
-    t'A {pg["File glossary"]("FileGlossary")} handle works in a t-string '
-    t'{pg["Step"].l}',
+    t'A {pg["File glossary"].l} handle works in a t-string {pg["Step"].l}',
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,

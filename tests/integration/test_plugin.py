@@ -170,7 +170,8 @@ _AUTHORING_MISTAKES = """
 
 @scenario(
     t'A {pg["Scenario"].l} failing on a pytest-given refusal points at the '
-    t'test, not at pytest-given'
+    t'test, not at pytest-given',
+    tags=['validation'],
 )
 def test_refusal_frame_points_at_the_test(
     pytester: pytest.Pytester, tmp_path: Path
@@ -689,7 +690,8 @@ def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
 
 
 @scenario(
-    t'A {pg["Report"].l} that fails to render discards the previous one too',
+    t'A {pg["Report"].l} that fails to render leaves no report behind, not even '
+    t'the previous one',
     tags=['validation'],
 )
 def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
@@ -1105,7 +1107,7 @@ def test_step_fixture_yielding_twice_keeps_pytests_error(pytester):
 
 
 @scenario(
-    'A fixture takes only @given, never @when or @then',
+    'A fixture takes only `@given`, never `@when` or `@then`',
     tags=['validation'],
 )
 @pytest.mark.parametrize(
@@ -2662,7 +2664,7 @@ def test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches(pytester, tmp_pa
 
 
 @scenario(
-    t'A {pg["Pin"].l} on a {pg["Given annotation"].l} pins the {pg["Step"].l} it adds',
+    t"A {pg['Given annotation'].l}'s {pg['Pin'].l} lands on the {pg['Step'].l} it adds",
     stories=adopt_pytest_given,
 )
 def test_a_pin_on_a_given_annotation_pins_its_step(pytester):
@@ -2753,7 +2755,7 @@ def test_a_given_annotation_retells_the_step_fixture_pins(
     """)
     with when('the suite runs', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest('--given-json=report.json')
-    with then(t'the grafted root {pg["Pin"].l.s} the sentences {root_sentences} of a'):
+    with then(t'the grafted root pins the sentences {root_sentences} of a'):
         result.assert_outcomes(passed=1)
         data = json.loads(pytester.path.joinpath('report.json').read_text())
         root = data['scenarios'][0]['steps'][0]
@@ -3195,7 +3197,8 @@ _TEMPLATE_LABEL_WITHOUT_PARAMETRIZE = """
 
 @scenario(
     t'A `Template` {pg["Given annotation"].l} on an unparametrized '
-    t'{pg["Scenario"].l} fails that {pg["Scenario"].l}'
+    t'{pg["Scenario"].l} fails that {pg["Scenario"].l}',
+    tags=['parametrization', 'validation'],
 )
 def test_a_template_given_annotation_without_parametrize_fails_the_scenario(
     pytester: pytest.Pytester,
@@ -3236,7 +3239,7 @@ _ANNOTATED_TEMPLATE_SUITE = """
 
 @scenario(
     t'A `Template` {pg["Given annotation"].l} may only hold a bare parametrize column',
-    tags=['validation'],
+    tags=['parametrization', 'validation'],
 )
 @pytest.mark.parametrize(
     ('placeholder', 'outcome', 'error'),
@@ -3260,7 +3263,6 @@ def test_a_template_given_annotation_needs_a_bare_parametrize_column(
     ):
         suite = _ANNOTATED_TEMPLATE_SUITE.replace('PLACEHOLDER', placeholder)
         pytester.makepyfile(suite)
-        attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
     with then(t'the annotation is {outcome}'):
@@ -3470,7 +3472,7 @@ def test_brew(cup_size):
 
 @scenario(
     t'A rejected authoring form fails the run and writes no {pg["Report"].l}',
-    tags=['validation'],
+    tags=['parametrization', 'validation'],
 )
 def test_a_rejected_form_fails_the_run_and_writes_no_sink(pytester):
     with given('a suite whose narration varies across parametrize cases'):
@@ -3827,7 +3829,7 @@ def test_bare_run_does_no_report_rendering_work(pytester, tmp_path, monkeypatch)
 @scenario(
     t'A run that writes no {pg["Report"].l} still enforces the '
     t'{pg["Group"]("grouping")} rules',
-    tags=['validation'],
+    tags=['parametrization', 'validation'],
 )
 def test_bare_run_still_enforces_the_grouping_rules(pytester):
     """The grouping pass runs whether or not a sink is configured."""

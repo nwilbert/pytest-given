@@ -636,6 +636,7 @@ def test_graft_recording_override_replaces_root_narration_keeps_children() -> No
 
 @scenario(
     t'{pg["Graft"]("Grafting")} with no {pg["Active scenario"].l} is refused',
+    tags=['validation'],
 )
 def test_graft_given_annotation_without_scenario_is_refused() -> None:
     with given(t'a collector with no {pg["Active scenario"].l}'):

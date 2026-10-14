@@ -277,125 +277,121 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
 
 
 @scenario(
-    t'{pg["Parameter coloring"]} marks placeholders and table headers',
+    t'{pg["Parameter coloring"]} ties each placeholder to its column header',
     tags=['parametrization'],
     stories=adopt_pytest_given,
 )
 def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> None:
     with given(
         t'a {pg["Report"].l} holding a {pg["Parametrized scenario"].l} '
-        t'with a {pg["Parameter table"].l}'
+        t'with a {pg["Parameter table"].l} of the columns euros and expect'
     ):
-        json_path = tmp_path / 'data.json'
-        json_path.write_text(
-            json.dumps(
-                {
-                    'metadata': {
-                        'project': 'p',
-                        'timestamp': 't',
-                        'pytest_version': '9',
-                        'plugin_version': '0.1',
-                    },
-                    'scenarios': [
-                        {
-                            'id': 'test.py::test_p',
-                            'narration': _narration('Param scenario'),
-                            'module': 'mod',
-                            'tags': [],
-                            'status': 'passed',
-                            'duration_ms': 0,
-                            'steps': [
-                                {
-                                    'phase': 'when',
-                                    'narration': _narration(
-                                        'I insert 1 into shop',
-                                        [
-                                            {'value': 'I insert '},
-                                            {
-                                                'name': 'euros',
-                                                'column_id': 'euros',
-                                                'format_spec': '',
-                                                'conversion': None,
-                                            },
-                                            {'value': ' into shop'},
-                                        ],
-                                    ),
-                                    'status': 'passed',
-                                    'children': [],
-                                    'attachments': [],
-                                    'error': None,
-                                }
-                            ],
-                            'parameters': {
-                                'columns': [
-                                    {'id': 'euros', 'name': 'euros', 'kind': 'param'},
-                                    {'id': 'expect', 'name': 'expect', 'kind': 'param'},
-                                ],
-                                'cases': [
-                                    {
-                                        'id': 't.py::test_x[2]',
-                                        'values': [1, False],
-                                        'custom_id': False,
-                                        'status': 'passed',
-                                        'error': None,
-                                    },
-                                    {
-                                        'id': 't.py::test_x[3]',
-                                        'values': [2, True],
-                                        'custom_id': False,
-                                        'status': 'passed',
-                                        'error': None,
-                                    },
-                                ],
-                            },
-                            'error': None,
-                        }
-                    ],
-                }
-            )
-        )
+        report = report_from_dict(_parametrized_report())
     with when(
         t'the {pg["Renderer"].l} renders the HTML page',
         pins=adopt_pytest_given['render'],
     ):
         html_path = tmp_path / 'report.html'
-        render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+        render_html(report, html_path)
         content = html_path.read_text(encoding='utf-8')
-    with then(
-        t'{pg["Parameter coloring"].l} classes mark the grouped placeholder '
-        t'and the table headers'
-    ):
-        assert 'param-color-0' in content
-        # The grouped step shows the {name} token
-        assert '{euros}' in content
-        # Headers carry color class + data-param for the crosshair JS
-        assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
-        assert re.search(
-            r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content
-        )
-    with then(
-        t'the page carries one generated color rule per column, after the '
-        t'stylesheet so a term ref bound to a column takes the column ink'
-    ):
-        rules = re.findall(
-            r'\.param-color-(\d+), th\.param-color-\1 '
-            r'\{ color: var\(--param-color-\1\); \}',
-            content,
-        )
-        assert rules == ['0', '1']
-        assert content.index('.param-color-0,') > content.index('.term-ref-actor {')
-    with then(
-        t'each column ink is a token set once per theme, so the dark theme '
-        t'only redefines the token'
-    ):
-        light = re.findall(r':root \{ --param-color-(\d+): (#[0-9a-f]{6}); \}', content)
-        dark = re.findall(
-            r'\[data-theme="dark"\] \{ --param-color-(\d+): (#[0-9a-f]{6}); \}',
-            content,
-        )
-        assert [index for index, _ in light] == ['0', '1']
-        assert [index for index, _ in dark] == ['0', '1']
-        assert len({color for _, color in light + dark}) == 4
+    with then('the grouped step shows its placeholder, keyed to the euros column'):
+        assert re.search(r'<span[^>]*\bdata-param="euros"[^>]*>\{euros\}', content)
+    with then('each column header carries its own column key'):
+        assert re.search(r'<th[^>]*\bdata-param="euros"', content)
+        assert re.search(r'<th[^>]*\bdata-param="expect"', content)
+
+
+def _parametrized_report() -> dict[str, object]:
+    return {
+        'metadata': {
+            'project': 'p',
+            'timestamp': 't',
+            'pytest_version': '9',
+            'plugin_version': '0.1',
+        },
+        'scenarios': [
+            {
+                'id': 'test.py::test_p',
+                'narration': _narration('Param scenario'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [
+                    {
+                        'phase': 'when',
+                        'narration': _narration(
+                            'I insert 1 into shop',
+                            [
+                                {'value': 'I insert '},
+                                {
+                                    'name': 'euros',
+                                    'column_id': 'euros',
+                                    'format_spec': '',
+                                    'conversion': None,
+                                },
+                                {'value': ' into shop'},
+                            ],
+                        ),
+                        'status': 'passed',
+                        'children': [],
+                        'attachments': [],
+                        'error': None,
+                    }
+                ],
+                'parameters': {
+                    'columns': [
+                        {'id': 'euros', 'name': 'euros', 'kind': 'param'},
+                        {'id': 'expect', 'name': 'expect', 'kind': 'param'},
+                    ],
+                    'cases': [
+                        {
+                            'id': 't.py::test_x[2]',
+                            'values': [1, False],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
+                        },
+                        {
+                            'id': 't.py::test_x[3]',
+                            'values': [2, True],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
+                        },
+                    ],
+                },
+                'error': None,
+            }
+        ],
+    }
+
+
+def test_param_coloring_classes_and_theme_rules(tmp_path: Path) -> None:
+    html_path = tmp_path / 'report.html'
+    render_html(report_from_dict(_parametrized_report()), html_path)
+    content = html_path.read_text(encoding='utf-8')
+    assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
+    assert re.search(r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content)
+    # One generated rule per column, after the stylesheet so a term ref bound
+    # to a column takes the column ink.
+    rules = re.findall(
+        r'\.param-color-(\d+), th\.param-color-\1 '
+        r'\{ color: var\(--param-color-\1\); \}',
+        content,
+    )
+    assert rules == ['0', '1']
+    assert content.index('.param-color-0,') > content.index('.term-ref-actor {')
+    # Each column ink is a token set once per theme; the dark theme only
+    # redefines the token.
+    light = re.findall(r':root \{ --param-color-(\d+): (#[0-9a-f]{6}); \}', content)
+    dark = re.findall(
+        r'\[data-theme="dark"\] \{ --param-color-(\d+): (#[0-9a-f]{6}); \}',
+        content,
+    )
+    assert [index for index, _ in light] == ['0', '1']
+    assert [index for index, _ in dark] == ['0', '1']
+    assert len({color for _, color in light + dark}) == 4
 
 
 def test_render_grouped_placeholder_drops_format_spec_and_conversion(

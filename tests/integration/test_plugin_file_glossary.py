@@ -33,8 +33,8 @@ def test_guest_searches():
 
 
 @scenario(
-    t'A run gives each {pg["Kindless"].l} {pg["Term"].l} the kind of the '
-    t'{pg["Slot"].l} it fills',
+    t"A {pg['File glossary'].l}'s {pg['Kindless'].l} {pg['Term'].l.s} reach the "
+    t'{pg["Report"].l} with the kinds the run infers',
 )
 def test_file_glossary_kinds_resolved_in_report(pytester):
     with given(

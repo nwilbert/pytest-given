@@ -1803,7 +1803,8 @@ def test_an_identical_term_ref_stays_inline() -> None:
 
 
 @scenario(
-    t'A {pg["Term ref"].l} that *is* the parametrize value is refused too',
+    t'A {pg["Term ref"].l} whose display varies is refused even when a '
+    t'parametrize value binds it',
     tags=['parametrization', 'validation'],
 )
 def test_a_param_bound_term_ref_that_varies_raises_rule_four() -> None:
@@ -2601,8 +2602,8 @@ def test_extra_occurrences_count_from_the_baseline_not_the_first_case() -> None:
 
 
 @scenario(
-    t'A {pg["Parameter table"].l} cell reads the way the {pg["Step"].l} '
-    t'that points at it read',
+    t'A {pg["Parameter table"].l} cell holds the text the {pg["Step"].l} '
+    t'pointing at it narrated',
     tags=['parametrization'],
     stories=adopt_pytest_given,
 )

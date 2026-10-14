@@ -206,21 +206,10 @@ def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
         assert data == report_to_dict(report)
 
 
-@scenario(
-    t'The JSON report carries the {pg["Coverage"].l} it computes, not the one '
-    t'it is handed',
-)
 def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
-    with given('a report dict whose `coverage` does not match its steps'):
-        stale = report_to_dict(_story_report())
-        stale['coverage'] = ['stale']
-    with when('the JSON report is rendered from it'):
-        rendered = sinks.render_sinks(
-            stale, SinkConfig(json_path=tmp_path / 'report.json')
-        )
-        data = json.loads(rendered.files[0].text)
-    with then(t'the {pg["Coverage"].l} is the one the {pg["Step"].l.s} actually earn'):
-        covered = [
-            row['sentence_id'] for row in data['coverage'] if row['scenario_ids']
-        ]
-        assert covered == [1]
+    stale = report_to_dict(_story_report())
+    stale['coverage'] = ['stale']
+    rendered = sinks.render_sinks(stale, SinkConfig(json_path=tmp_path / 'report.json'))
+    data = json.loads(rendered.files[0].text)
+    covered = [row['sentence_id'] for row in data['coverage'] if row['scenario_ids']]
+    assert covered == [1]
