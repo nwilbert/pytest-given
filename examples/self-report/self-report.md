@@ -8,6 +8,31 @@
 - **then** the command succeeds
 - **then** the copy buttons' «citations» link the `/1.0/` URL
 
+## ✓ A «scenario» reaches the «report» with its «tags» and «term refs»
+`tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
+
+- **given** a «scenario» with a «tag», whose «step» names a «glossary» term
+  - 📎 suite:
+    ```
+    from pytest_given import Glossary, scenario, given, when, then
+    
+    g = Glossary()
+    guest = g.actor('Guest')
+    
+    @scenario("Check in", tags=["smoke"])
+    def test_check_in():
+        with given(t"a {guest} at the desk"):
+            keys = 0
+        with when("the desk hands over a key"):
+            keys += 1
+        with then("the guest holds one key"):
+            assert keys == 1
+    ```
+- **when** the suite runs with --given-json
+- **then** the test passes
+- **then** the «scenario» carries its title, its «tag» and its three «steps»
+- **then** the given «step» holds a «term ref» to the term
+
 ## ✓ A «scenario» failing on a pytest-given refusal points at the test, not at pytest-given
 `tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test`
 
@@ -65,6 +90,31 @@
 - **when** the suite runs with --given-json
 - **then** the test passes
 - **then** the «step» from the fixture leads the recorded steps
+
+## ✓ A «scenario» is timed from past its «step fixture» setup
+`tests/integration/test_plugin.py::test_a_scenario_is_timed_from_past_its_step_fixture_setup`
+
+- **given** a «scenario» whose «step fixture» takes half a second
+  - 📎 suite:
+    ```
+    import time
+    import pytest
+    from pytest_given import scenario, given, then
+    
+    @pytest.fixture
+    @given("a slow arrangement")
+    def slow():
+        time.sleep(0.5)
+        return 1
+    
+    @scenario("Quick body")
+    def test_quick(slow):
+        with then("it is one"):
+            assert slow == 1
+    ```
+- **when** the suite runs with --given-json
+- **then** the test passes
+- **then** the recorded duration leaves out the half second of setup
 
 ## ✓ The «cases» of a «parametrized scenario» become one «scenario» with a «parameter table»
 `tests/integration/test_plugin.py::test_parametrized_test_as_table` · parametrization
@@ -552,13 +602,14 @@
 - **given** a «parametrized scenario» whose Template label on a plain fixture holds {placeholder}
   - 📎 suite — *see parameter table*
 - **when** the suite runs
-- **then** the scenario errors, saying {error}
+- **then** the label is {outcome}
+- **then** a refusal errors the scenario, saying {error}
 
-| case id | placeholder | suite | error |
-|---|---|---|---|
-| column | {x} | suite | None |
-| plain-fixture | {room} | suite | '{room}' in the Annotated label on parameter 'room' does not match |
-| attribute | {room.number} | suite | bare identifiers |
+| case id | placeholder | suite | outcome | error |
+|---|---|---|---|---|
+| column | {x} | suite | accepted | None |
+| plain-fixture | {room} | suite | refused | '{room}' in the Annotated label on parameter 'room' does not match |
+| attribute | {room.number} | suite | refused | bare identifiers |
 
 - **column** — suite:
   ```
@@ -911,6 +962,7 @@
             assert x == 2
     ```
 - **when** the suite runs deselected, so nothing is collected
+- **then** the lint still reports the stale entry as an error «finding»
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
 
 ## ✓ A failure inside the lint keeps the «report» it was handed
@@ -927,13 +979,6 @@
 - **given** a fresh «collector»
 - **when** a «scenario» starts under its «Node ID» and finishes
 - **then** it carries its «Node ID», name, status and «tag»
-
-## ✓ A «scenario» is timed from past its «step fixture» setup
-`tests/unit/capture/test_collector.py::test_duration_excludes_fixture_setup`
-
-- **given** a «collector» whose clock reads 100.3s once setup is done
-- **when** the clock is started past setup and the body runs 0.2s
-- **then** the recorded duration is the body alone, not the setup before it
 
 ## ✓ The «collector» records each «step» with its «phase»
 `tests/unit/capture/test_collector.py::test_collect_steps`
@@ -2100,7 +2145,7 @@
 
 - **given** a t-string step interpolating a computed expression
 - **when** the t-string is parsed
-- **then** the «value highlight» part records the full expression
+- **then** it renders the result, its value part recording the full expression
 
 ## ✓ A «handle» in a t-string becomes a «term ref» showing what it was called with · 6 cases
 `tests/unit/capture/test_template.py::test_a_tstring_term_ref_shows_what_its_handle_was_called_with`
@@ -2929,11 +2974,11 @@
 - **then** a top-level `coverage` lists every «sentence» once
 - **then** the rest of the report is the input dict, unchanged
 
-## ✓ A re-rendered report recomputes «coverage» rather than carrying it
+## ✓ The JSON sink computes «coverage» itself rather than carrying the one it is handed
 `tests/unit/report/test_sinks.py::test_json_sink_replaces_incoming_coverage`
 
-- **given** a saved report dict whose `coverage` no longer matches its steps
-- **when** `pytest-given report` re-renders it to JSON
+- **given** a report dict whose `coverage` does not match its steps
+- **when** the JSON sink renders it
 - **then** the «coverage» is the one the «steps» actually earn
 
 ## ✓ A «source link» config value resolves to its template · 6 cases

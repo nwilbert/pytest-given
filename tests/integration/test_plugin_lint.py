@@ -451,6 +451,11 @@ def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
         pytester.makepyfile(test_sample=EMPTY_GIVEN)
     with when('the suite runs deselected, so nothing is collected'):
         result = pytester.runpytest_inprocess('-k', 'no-such-test')
+    with then(t'the lint still reports the stale entry as an error {pg["Finding"].l}'):
+        result.stdout.fnmatch_lines(
+            ['*narration lint (1 finding, 1 error)*', '*ERROR*stale-ignore*']
+        )
+        assert 'never-matches-*' in result.stdout.str()
     with then('the run keeps NO_TESTS_COLLECTED rather than reporting a test failure'):
         # pytest binds exitstatus before sessionfinish, so overwriting it
         # unconditionally would report 5 as a plain 1.

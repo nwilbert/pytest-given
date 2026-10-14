@@ -12,35 +12,49 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 # --- Capture to report: the basic shapes ---
 
 
-def test_basic_scenario_generates_json(pytester, tmp_path):
-    """A simple @scenario test produces JSON output."""
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, given, when, then
+@scenario(
+    t'A {pg["Scenario"].l} reaches the {pg["Report"].l} with its {pg["Tag"].l.s} '
+    t'and {pg["Term ref"].l.s}',
+    stories=adopt_pytest_given,
+)
+def test_a_scenario_reaches_the_report_with_its_tags_and_term_refs(pytester, tmp_path):
+    with given(
+        t'a {pg["Scenario"].l} with a {pg["Tag"].l}, whose {pg["Step"].l} names a '
+        t'{pg["Glossary"].l} term'
+    ):
+        suite = """
+            from pytest_given import Glossary, scenario, given, when, then
 
-        @scenario("My scenario", tags=["smoke"])
-        def test_example():
-            with given("a value"):
-                x = 1
-            with when("I double it"):
-                result = x * 2
-            with then("it is 2"):
-                assert result == 2
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    result = pytester.runpytest(f'--given-json={json_path}')
-    result.assert_outcomes(passed=1)
-    assert json_path.exists()
-    data = json.loads(json_path.read_text())
-    assert len(data['scenarios']) == 1
-    s = data['scenarios'][0]
-    assert s['narration']['text'] == 'My scenario'
-    assert s['tags'] == ['smoke']
-    assert s['status'] == 'passed'
-    assert len(s['steps']) == 3
-    assert s['steps'][0]['phase'] == 'given'
-    assert s['steps'][0]['narration']['text'] == 'a value'
+            g = Glossary()
+            guest = g.actor('Guest')
+
+            @scenario("Check in", tags=["smoke"])
+            def test_check_in():
+                with given(t"a {guest} at the desk"):
+                    keys = 0
+                with when("the desk hands over a key"):
+                    keys += 1
+                with then("the guest holds one key"):
+                    assert keys == 1
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['write']):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('the test passes'):
+        result.assert_outcomes(passed=1)
+    with then(
+        t'the {pg["Scenario"].l} carries its title, its {pg["Tag"].l} and its '
+        t'three {pg["Step"].l.s}'
+    ):
+        s = json.loads(json_path.read_text())['scenarios'][0]
+        assert s['narration']['text'] == 'Check in'
+        assert s['tags'] == ['smoke']
+        assert [step['phase'] for step in s['steps']] == ['given', 'when', 'then']
+    with then(t'the given {pg["Step"].l} holds a {pg["Term ref"].l} to the term'):
+        parts = s['steps'][0]['narration']['parts']
+        assert [part['term_id'] for part in parts if 'term_id' in part] == ['guest']
 
 
 def test_nested_steps(pytester, tmp_path):
@@ -277,6 +291,41 @@ def test_step_fixture_appears_as_given_step(pytester, tmp_path):
         steps = data['scenarios'][0]['steps']
         assert steps[0]['phase'] == 'given'
         assert steps[0]['narration']['text'] == 'a prepared value'
+
+
+@scenario(
+    t'A {pg["Scenario"].l} is timed from past its {pg["Step fixture"].l} setup',
+)
+def test_a_scenario_is_timed_from_past_its_step_fixture_setup(pytester, tmp_path):
+    with given(
+        t'a {pg["Scenario"].l} whose {pg["Step fixture"].l} takes half a second'
+    ):
+        suite = """
+            import time
+            import pytest
+            from pytest_given import scenario, given, then
+
+            @pytest.fixture
+            @given("a slow arrangement")
+            def slow():
+                time.sleep(0.5)
+                return 1
+
+            @scenario("Quick body")
+            def test_quick(slow):
+                with then("it is one"):
+                    assert slow == 1
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('the test passes'):
+        result.assert_outcomes(passed=1)
+    with then('the recorded duration leaves out the half second of setup'):
+        scenario_ = json.loads(json_path.read_text())['scenarios'][0]
+        assert scenario_['duration_ms'] < 500
 
 
 # --- Parametrize capture and the parameter table ---
@@ -2373,7 +2422,7 @@ def test_scenario_matched_against_two_stories(pytester, tmp_path):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
         json_path = tmp_path / 'report.json'
-    with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['match']):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then('the test passes'):
         result.assert_outcomes(passed=1)
@@ -2445,7 +2494,7 @@ def test_a_declared_story_no_scenario_covers_appears(pytester, tmp_path):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
         json_path = tmp_path / 'report.json'
-    with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['match']):
         pytester.runpytest(f'--given-json={json_path}')
     with then(
         t'the report lists the {pg["Story"].l}, its {pg["Sentence"].l} covered '
@@ -2487,7 +2536,7 @@ def test_a_pinned_scenario_still_counts_its_step_pins(pytester, tmp_path):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
         json_path = tmp_path / 'report.json'
-    with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['match']):
         pytester.runpytest(f'--given-json={json_path}')
     with then(
         t'the {pg["Scenario"].l} covers both pinned {pg["Sentence"].l.s} '
@@ -2529,7 +2578,7 @@ def test_a_step_pin_into_a_story_outside_stories_covers_it(pytester, tmp_path):
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
         json_path = tmp_path / 'report.json'
-    with when('the suite runs with --given-json', pins=adopt_pytest_given['record']):
+    with when('the suite runs with --given-json', pins=adopt_pytest_given['match']):
         result = pytester.runpytest(f'--given-json={json_path}')
     with then(
         t'the {pg["Scenario"].l} passes and covers the pinned '
@@ -2635,7 +2684,7 @@ def test_annotated_label_carrying_a_pin_pins_its_step(pytester):
             """
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
-    with when('the suite runs', pins=adopt_pytest_given['record']):
+    with when('the suite runs', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest('--given-json=report.json')
     with then(t"the label's {pg['Step'].l} carries the {pg['Pin'].l}"):
         result.assert_outcomes(passed=1)
@@ -3174,19 +3223,20 @@ _ANNOTATED_TEMPLATE_SUITE = """
     tags=['validation'],
 )
 @pytest.mark.parametrize(
-    ('placeholder', 'error'),
+    ('placeholder', 'outcome', 'error'),
     [
-        ('{x}', None),
+        ('{x}', 'accepted', None),
         (
             '{room}',
+            'refused',
             "'{room}' in the Annotated label on parameter 'room' does not match",
         ),
-        ('{room.number}', 'bare identifiers'),
+        ('{room.number}', 'refused', 'bare identifiers'),
     ],
     ids=['column', 'plain-fixture', 'attribute'],
 )
 def test_an_annotated_template_label_needs_a_bare_parametrize_column(
-    pytester, placeholder, error
+    pytester, placeholder, outcome, error
 ):
     with given(
         t'a {pg["Parametrized scenario"].l} whose Template label on a plain '
@@ -3197,10 +3247,11 @@ def test_an_annotated_template_label_needs_a_bare_parametrize_column(
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
-    with then(t'the scenario errors, saying {error}'):
-        outcomes = result.parseoutcomes()
-        assert (outcomes.get('errors', 0) == 1) == (error is not None)
-        assert error is None or error in result.stdout.str()
+    with then(t'the label is {outcome}'):
+        errored = result.parseoutcomes().get('errors', 0) == 1
+        assert ('refused' if errored else 'accepted') == outcome
+    with then(t'a refusal errors the scenario, saying {error}'):
+        assert outcome == 'accepted' or error in result.stdout.str()
 
 
 def test_param_without_annotated_stays_table_only(pytester, tmp_path):

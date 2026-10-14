@@ -54,26 +54,20 @@ def test_start_and_finish_scenario() -> None:
         assert recorded.tags == ['tag1']
 
 
-@scenario(
-    t'A {pg["Scenario"].l} is timed from past its {pg["Step fixture"].l} setup',
-)
-def test_duration_excludes_fixture_setup(monkeypatch: pytest.MonkeyPatch) -> None:
-    with given(t'a {pg["Collector"].l} whose clock reads 100.3s once setup is done'):
-        readings = iter([100.3, 100.5])
-        collector = Collector()
-        collector.start_scenario(NodeId('t::x'), title='x', module='m', tags=[])
-    with when('the clock is started past setup and the body runs 0.2s'):
-        monkeypatch.setattr(
-            collector_mod, 'time', SimpleNamespace(monotonic=lambda: next(readings))
-        )
-        collector.begin_timing()
-        recorded = collector.finish_scenario(status='passed')
-        # Undone here rather than at teardown: this session's own Collector
-        # finishes *this* scenario before teardown runs, and would otherwise
-        # drain the fake clock and abort the run.
-        monkeypatch.undo()
-    with then('the recorded duration is the body alone, not the setup before it'):
-        assert recorded.duration_ms == 200
+def test_duration_runs_from_begin_timing(monkeypatch: pytest.MonkeyPatch) -> None:
+    readings = iter([100.3, 100.5])
+    collector = Collector()
+    collector.start_scenario(NodeId('t::x'), title='x', module='m', tags=[])
+    monkeypatch.setattr(
+        collector_mod, 'time', SimpleNamespace(monotonic=lambda: next(readings))
+    )
+    collector.begin_timing()
+    recorded = collector.finish_scenario(status='passed')
+    # Undone here rather than at teardown: this session's own Collector
+    # finishes *this* scenario before teardown runs, and would otherwise
+    # drain the fake clock and abort the run.
+    monkeypatch.undo()
+    assert recorded.duration_ms == 200
 
 
 @scenario(

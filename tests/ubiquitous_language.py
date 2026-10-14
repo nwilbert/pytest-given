@@ -88,7 +88,8 @@ adopt_pytest_given = story(
             step_fixture_t,
             name='graft',
         ),
-        # 9
+        # 9 — the Collector stands in for the session's machinery: grouping
+        # runs at session finish in `grouping/`, not in the Collector itself.
         sentence(
             collector_t,
             pg['Group'].l.s,
@@ -98,14 +99,16 @@ adopt_pytest_given = story(
             name='group',
         ),
         # 10
+        sentence(renderer_t, 'matches', scenario_t, 'to a', sentence_t, name='match'),
+        # 11
         sentence(
             renderer_t, 'renders', report_t, 'with', parameter_coloring_t, name='render'
         ),
-        # 11
+        # 12
         sentence(
             narration_lint_t, 'flags', scenario_t, 'against a', lint_rule_t, name='flag'
         ),
-        # 12 — honest gap: a human does the review.
+        # 13 — honest gap: a human does the review.
         sentence(
             domain_expert, 'reviews', scenario_t, 'in the', report_t, name='review'
         ),

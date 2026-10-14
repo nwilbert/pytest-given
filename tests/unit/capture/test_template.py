@@ -22,7 +22,7 @@ from pytest_given.model import (
     TermId,
     narration_text,
 )
-from tests.ubiquitous_language import adopt_pytest_given, pg
+from tests.ubiquitous_language import pg
 
 
 def test_narration_from_passes_through_narration() -> None:
@@ -233,7 +233,7 @@ def test_parse_tstring_expression() -> None:
     with when('the t-string is parsed'):
         parts = parse_tstring(t'cost: {price * 1.2}')
         rendered = narration_text(parts)
-    with then(t'the {pg["Value highlight"].l} part records the full expression'):
+    with then('it renders the result, its value part recording the full expression'):
         assert rendered == 'cost: 12.0'
         assert parts[1] == NarrationValue(
             rendered='12.0',
@@ -368,16 +368,13 @@ def file_glossary(tmp_path: Path) -> FileGlossary:
 @scenario(
     t'A {pg["File glossary"]("FileGlossary")} handle works in a t-string '
     t'{pg["Step"].l}',
-    stories=adopt_pytest_given,
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: FileGlossary,
 ) -> None:
     with given(t'a {pg["Deferred term"].l} from a {pg["File glossary"].l}'):
         guest = file_glossary['Guest']
-    with when(
-        'it is interpolated into a t-string step', pins=adopt_pytest_given['write']
-    ):
+    with when('it is interpolated into a t-string step'):
         parts = parse_tstring(t'a {guest} arrives')
     with then(t'the step carries a single {pg["Term ref"].l}'):
         term_refs = [p for p in parts if isinstance(p, NarrationTermRef)]

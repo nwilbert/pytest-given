@@ -207,13 +207,14 @@ def test_json_sink_carries_per_sentence_coverage(tmp_path: Path) -> None:
 
 
 @scenario(
-    t'A re-rendered report recomputes {pg["Coverage"].l} rather than carrying it',
+    t'The JSON sink computes {pg["Coverage"].l} itself rather than carrying '
+    t'the one it is handed',
 )
 def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
-    with given('a saved report dict whose `coverage` no longer matches its steps'):
+    with given('a report dict whose `coverage` does not match its steps'):
         stale = report_to_dict(_story_report())
         stale['coverage'] = ['stale']
-    with when('`pytest-given report` re-renders it to JSON'):
+    with when('the JSON sink renders it'):
         rendered = sinks.render_sinks(
             stale, SinkConfig(json_path=tmp_path / 'report.json')
         )
