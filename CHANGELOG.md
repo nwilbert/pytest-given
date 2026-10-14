@@ -29,6 +29,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - **Breaking.** `@scenario`'s first parameter is now `title`: replace `@scenario(name=...)` with `@scenario(title=...)`; a positional title is unaffected.
+- **Breaking.** `FileGlossary`'s `description_column` is now `definition_column`, the word the rest of the glossary API uses: rename the keyword.
 - **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
 - **Breaking.** Glossary definitions no longer render `__bold__`, and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".

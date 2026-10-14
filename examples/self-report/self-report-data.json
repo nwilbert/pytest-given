@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-14T19:31:36.946541+00:00",
+    "timestamp": "2026-10-14T19:56:07.128679+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "43fb7dc32cbc969d1ccd0fed5a358662ee99b18b",
+    "commit_sha": "146eaf92cbfcbdf723ae29d9c4f559d834f46315",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 129,
+      "duration_ms": 158,
       "steps": [
         {
           "phase": "given",
@@ -156,7 +156,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -340,7 +340,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 126,
       "steps": [
         {
           "phase": "given",
@@ -422,7 +422,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -531,7 +531,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -660,7 +660,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 546,
+      "duration_ms": 561,
       "steps": [
         {
           "phase": "given",
@@ -788,7 +788,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -974,7 +974,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -1107,7 +1107,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -1174,7 +1174,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -1284,7 +1284,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -1383,7 +1383,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -1453,7 +1453,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -1573,7 +1573,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -1708,7 +1708,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 73,
+      "duration_ms": 95,
       "steps": [
         {
           "phase": "given",
@@ -1836,7 +1836,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 80,
+      "duration_ms": 101,
       "steps": [
         {
           "phase": "given",
@@ -2006,7 +2006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -2123,7 +2123,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 178,
+      "duration_ms": 198,
       "steps": [
         {
           "phase": "given",
@@ -2196,7 +2196,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -2368,7 +2368,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -2507,7 +2507,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -2652,7 +2652,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -2805,7 +2805,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -2939,7 +2939,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -3062,7 +3062,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 149,
+      "duration_ms": 172,
       "steps": [
         {
           "phase": "given",
@@ -3252,7 +3252,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 114,
+      "duration_ms": 123,
       "steps": [
         {
           "phase": "given",
@@ -3348,7 +3348,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 189,
+      "duration_ms": 166,
       "steps": [
         {
           "phase": "given",
@@ -3544,7 +3544,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -3638,7 +3638,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -3723,7 +3723,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -3800,7 +3800,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 101,
+      "duration_ms": 97,
       "steps": [
         {
           "phase": "given",
@@ -3882,7 +3882,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3973,7 +3973,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -4058,7 +4058,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -4165,7 +4165,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 178,
+      "duration_ms": 196,
       "steps": [
         {
           "phase": "given",
@@ -4264,7 +4264,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -4378,7 +4378,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -4522,7 +4522,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -4596,7 +4596,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -4737,7 +4737,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 338,
+      "duration_ms": 429,
       "steps": [
         {
           "phase": "given",
@@ -4896,7 +4896,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -4998,7 +4998,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -5103,7 +5103,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -5231,7 +5231,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -5343,7 +5343,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -5439,7 +5439,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 97,
+      "duration_ms": 112,
       "steps": [
         {
           "phase": "given",
@@ -6991,7 +6991,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -7203,7 +7203,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -7295,7 +7295,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -8124,7 +8124,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -8279,12 +8279,12 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_file_glossary.py::test_blank_description_cell_normalizes_to_none",
+      "id": "tests/unit/capture/test_file_glossary.py::test_blank_definition_cell_normalizes_to_none",
       "narration": {
-        "text": "A blank description normalizes to undefined",
+        "text": "A blank definition normalizes to undefined",
         "parts": [
           {
-            "value": "A blank description normalizes to "
+            "value": "A blank definition normalizes to "
           },
           {
             "term_id": "undefined",
@@ -8301,10 +8301,10 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a row whose description cell is blank",
+            "text": "a row whose definition cell is blank",
             "parts": [
               {
-                "value": "a row whose description cell is blank"
+                "value": "a row whose definition cell is blank"
               }
             ]
           },
@@ -10394,7 +10394,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -12288,7 +12288,7 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_markdown_glossary.py::test_leaves_description_markdown_intact",
+      "id": "tests/unit/capture/test_markdown_glossary.py::test_leaves_definition_markdown_intact",
       "narration": {
         "text": "Definition markdown is left intact",
         "parts": []
@@ -16801,7 +16801,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -17929,7 +17929,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -18050,7 +18050,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -18176,7 +18176,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -18928,7 +18928,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -23140,7 +23140,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 169,
+      "duration_ms": 178,
       "steps": [
         {
           "phase": "given",

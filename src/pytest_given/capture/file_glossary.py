@@ -39,7 +39,7 @@ class FileGlossary(LookupGlossary):
         path: str | Path,
         *,
         term_column: ColumnSpec = 0,
-        description_column: ColumnSpec = 1,
+        definition_column: ColumnSpec = 1,
         kind_column: ColumnSpec | None = None,
     ) -> None:
         super().__init__()
@@ -56,7 +56,7 @@ class FileGlossary(LookupGlossary):
             rows = parse_glossary_tables(
                 text,
                 term_column=term_column,
-                description_column=description_column,
+                definition_column=definition_column,
                 kind_column=kind_column,
             )
         except PytestGivenError as exc:

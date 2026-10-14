@@ -49,13 +49,13 @@ from pytest_given import FileGlossary
 g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
 ```
 
-The file needs at least one Markdown table (a GFM pipe table). By default, the first column is the term and the second is its description. To use other columns, pass `term_column`, `description_column`, or `kind_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
+The file needs at least one Markdown table (a GFM pipe table). By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, or `kind_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
 
 ```python
-g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning', kind_column='Kind')
+g = FileGlossary('GLOSSARY.md', term_column='Term', definition_column='Meaning', kind_column='Kind')
 ```
 
-A term or kind cell may be formatted: `**Guest**` reads as `Guest`. The description keeps its [formatting](step-text.md#formatting).
+A term or kind cell may be formatted: `**Guest**` reads as `Guest`. The definition keeps its [formatting](step-text.md#formatting).
 
 Look up a term by name with `g['Guest']` (case-insensitive). The result is a handle like any other:
 

@@ -330,10 +330,10 @@ def test_duplicate_rows_collapse_only_when_identical(tmp_path, identical, outcom
 
 
 @scenario(
-    t'A blank description normalizes to {pg["Undefined"].l}',
+    t'A blank definition normalizes to {pg["Undefined"].l}',
 )
-def test_blank_description_cell_normalizes_to_none(tmp_path):
-    with given(t'a row whose description cell is blank'):
+def test_blank_definition_cell_normalizes_to_none(tmp_path):
+    with given(t'a row whose definition cell is blank'):
         doc = '| Term | Meaning |\n|---|---|\n| Guest |   |\n'
         attach('Glossary file', doc)
         path = tmp_path / 'g.md'

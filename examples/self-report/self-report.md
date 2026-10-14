@@ -1298,10 +1298,10 @@
   | Guest | Second definition. |
   ```
 
-## ✓ A blank description normalizes to «undefined»
-`tests/unit/capture/test_file_glossary.py::test_blank_description_cell_normalizes_to_none`
+## ✓ A blank definition normalizes to «undefined»
+`tests/unit/capture/test_file_glossary.py::test_blank_definition_cell_normalizes_to_none`
 
-- **given** a row whose description cell is blank
+- **given** a row whose definition cell is blank
   - 📎 Glossary file:
     ```
     | Term | Meaning |
@@ -1723,7 +1723,7 @@
 - **then** the kind is unwrapped to plain text
 
 ## ✓ Definition markdown is left intact
-`tests/unit/capture/test_markdown_glossary.py::test_leaves_description_markdown_intact`
+`tests/unit/capture/test_markdown_glossary.py::test_leaves_definition_markdown_intact`
 
 - **given** a definition cell rich with inline code
   - 📎 Markdown document:

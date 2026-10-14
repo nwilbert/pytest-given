@@ -13,15 +13,15 @@ from pytest_given import FileGlossary
 g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
 ```
 
-The file needs at least one GFM pipe table. By default, the first column holds the term and the second its description. Each override takes a 0-based index or a header name (case-insensitive):
+The file needs at least one GFM pipe table. By default, the first column holds the term and the second its definition. Each override takes a 0-based index or a header name (case-insensitive):
 
 ```python
-g = FileGlossary('GLOSSARY.md', term_column='Term', description_column='Meaning', kind_column='Kind')
+g = FileGlossary('GLOSSARY.md', term_column='Term', definition_column='Meaning', kind_column='Kind')
 ```
 
 The kind column takes `actor`, `work object` (or `object`), or `activity`.
 
-A term or kind cell may be emphasized: `**Guest**` reads `Guest`. A description renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
+A term or kind cell may be emphasized: `**Guest**` reads `Guest`. A definition renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
 
 **A code-defined `Glossary`** declares terms where the tests live:
 

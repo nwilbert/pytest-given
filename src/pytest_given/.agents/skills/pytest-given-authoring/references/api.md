@@ -47,7 +47,7 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Glossary
 
-- `Glossary()` offers `g.actor(name, definition=…)`, `g.work_object(…)`, `g.activity(…)` and `g('foo')` (kindless). `FileGlossary(path, *, term_column=0, description_column=1, kind_column=None)` loads a Markdown file. `g['Guest']` looks a term up, case-insensitive.
+- `Glossary()` offers `g.actor(name, definition=…)`, `g.work_object(…)`, `g.activity(…)` and `g('foo')` (kindless). `FileGlossary(path, *, term_column=0, definition_column=1, kind_column=None)` loads a Markdown file. `g['Guest']` looks a term up, case-insensitive.
 
 Handle forms, discovery, kinds and the one-glossary-per-suite rule are in [glossaries.md](glossaries.md).
 

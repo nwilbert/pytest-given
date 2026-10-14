@@ -27,7 +27,7 @@ def simple_doc():
 def test_parses_default_columns(simple_doc):
     with when(t'the parser reads it into rows for a {pg["File glossary"].l}'):
         rows = parse_glossary_tables(
-            simple_doc, term_column=0, description_column=1, kind_column=None
+            simple_doc, term_column=0, definition_column=1, kind_column=None
         )
     with then(t'each row carries a {pg["Term"].l}, definition and source line'):
         assert rows == [
@@ -50,7 +50,7 @@ def test_merges_multiple_tables():
         attach('Markdown document', text)
     with when('the parser reads the whole document'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
     with then(t'every table contributes its {pg["Term"].l} rows'):
         assert [row.term for row in rows] == ['Guest', 'Room', 'Search']
@@ -65,7 +65,7 @@ def test_column_by_header_name_case_insensitive():
         attach('Markdown document', text)
     with when('the parser selects columns by header name'):
         rows = parse_glossary_tables(
-            text, term_column='word', description_column='note', kind_column='role'
+            text, term_column='word', definition_column='note', kind_column='role'
         )
     with then('the named columns are matched case-insensitively'):
         assert rows == [GlossaryRow(term='Guest', definition='x', kind='Actor', line=3)]
@@ -80,7 +80,7 @@ def test_escaped_pipe_in_cell():
         attach('Markdown document', text)
     with when('the parser splits the row'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
     with then('the escaped pipe survives as a literal pipe'):
         assert rows == [
@@ -100,7 +100,7 @@ def test_skips_tables_in_fenced_code_blocks():
         attach('Markdown document', text)
     with when('the parser reads the document'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
     with then('only the real table outside the fence contributes rows'):
         assert [row.term for row in rows] == ['Real']
@@ -122,7 +122,7 @@ def test_no_table_raises():
         pytest.raises(PytestGivenError, match=r'no .*table'),
     ):
         parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
 
 
@@ -139,7 +139,7 @@ def test_missing_named_column_raises(simple_doc):
         pytest.raises(PytestGivenError, match=r"column 'Nope' not found"),
     ):
         parse_glossary_tables(
-            simple_doc, term_column='Nope', description_column=1, kind_column=None
+            simple_doc, term_column='Nope', definition_column=1, kind_column=None
         )
 
 
@@ -156,7 +156,7 @@ def test_index_out_of_range_raises(simple_doc):
         pytest.raises(PytestGivenError, match='column index 5 is out of range'),
     ):
         parse_glossary_tables(
-            simple_doc, term_column=0, description_column=5, kind_column=None
+            simple_doc, term_column=0, definition_column=5, kind_column=None
         )
 
 
@@ -182,7 +182,7 @@ def test_data_row_with_fewer_columns_raises():
         ),
         pytest.raises(PytestGivenError, match='row at line 3'),
     ):
-        parse_glossary_tables(text, term_column=0, description_column=1, kind_column=2)
+        parse_glossary_tables(text, term_column=0, definition_column=1, kind_column=2)
 
 
 @scenario(
@@ -206,7 +206,7 @@ def test_a_term_cell_is_read_as_its_plain_text(cell, term):
         text = f'| Term | Meaning |\n|---|---|\n| {cell} | A thing. |\n'
     with when('the parser reads the term cell'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
     with then(t'the {pg["Term"].l} is {term}'):
         assert [row.term for row in rows] == [term]
@@ -221,7 +221,7 @@ def test_strips_emphasis_from_kind_cell():
         attach('Markdown document', text)
     with when('the parser reads the kind cell'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=2
+            text, term_column=0, definition_column=1, kind_column=2
         )
     with then('the kind is unwrapped to plain text'):
         assert rows[0].kind == 'Actor'
@@ -230,7 +230,7 @@ def test_strips_emphasis_from_kind_cell():
 @scenario(
     'Definition markdown is left intact',
 )
-def test_leaves_description_markdown_intact():
+def test_leaves_definition_markdown_intact():
     with given('a definition cell rich with inline code'):
         text = (
             '| Term | Meaning |\n|---|---|\n'
@@ -239,7 +239,7 @@ def test_leaves_description_markdown_intact():
         attach('Markdown document', text)
     with when('the parser reads the row'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
     with then('the definition keeps its markup for the tooltip'):
         assert rows[0].definition == 'A test decorated with `@scenario(...)`.'
@@ -261,7 +261,7 @@ def test_pipe_line_without_separator_is_skipped():
         attach('Markdown document', text)
     with when('the parser reads the document'):
         rows = parse_glossary_tables(
-            text, term_column=0, description_column=1, kind_column=None
+            text, term_column=0, definition_column=1, kind_column=None
         )
     with then('only the real pipe table produces rows'):
         assert [row.term for row in rows] == ['Real']
@@ -270,7 +270,7 @@ def test_pipe_line_without_separator_is_skipped():
 def test_nested_emphasis_unwraps_all_the_way():
     text = '| Term | Meaning |\n|---|---|\n| **`Scenario`** | nested. |\n'
     rows = parse_glossary_tables(
-        text, term_column=0, description_column=1, kind_column=None
+        text, term_column=0, definition_column=1, kind_column=None
     )
     assert rows[0].term == 'Scenario'
 
@@ -289,10 +289,10 @@ def test_a_named_spec_skips_a_table_it_cannot_address() -> None:
         '| --flag | off |\n'
     )
     rows = parse_glossary_tables(
-        doc, term_column='Term', description_column='Description', kind_column=None
+        doc, term_column='Term', definition_column='Description', kind_column=None
     )
     assert [(r.term, r.definition) for r in rows] == [('Guest', 'someone')]
     with pytest.raises(PytestGivenError, match='Nope'):
         parse_glossary_tables(
-            doc, term_column='Term', description_column='Nope', kind_column=None
+            doc, term_column='Term', definition_column='Nope', kind_column=None
         )

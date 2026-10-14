@@ -37,7 +37,7 @@ def parse_glossary_tables(
     text: str,
     *,
     term_column: ColumnSpec,
-    description_column: ColumnSpec,
+    definition_column: ColumnSpec,
     kind_column: ColumnSpec | None,
 ) -> list[GlossaryRow]:
     rows: list[GlossaryRow] = []
@@ -45,7 +45,7 @@ def parse_glossary_tables(
     lines = text.splitlines()
     in_code = False
     index = 0
-    specs = (term_column, description_column) + (
+    specs = (term_column, definition_column) + (
         () if kind_column is None else (kind_column,)
     )
     while index < len(lines):
@@ -70,13 +70,13 @@ def parse_glossary_tables(
             continue
         saw_table = True
         term_idx = _resolve_column(term_column, header)
-        desc_idx = _resolve_column(description_column, header)
+        definition_idx = _resolve_column(definition_column, header)
         kind_idx = (
             _resolve_column(kind_column, header) if kind_column is not None else None
         )
         index += 2  # consume header + separator
         required_width = (
-            max(term_idx, desc_idx, kind_idx if kind_idx is not None else -1) + 1
+            max(term_idx, definition_idx, kind_idx if kind_idx is not None else -1) + 1
         )
         while (
             index < len(lines)
@@ -95,7 +95,7 @@ def parse_glossary_tables(
             rows.append(
                 GlossaryRow(
                     term=_strip_emphasis(cells[term_idx]),
-                    definition=cells[desc_idx],
+                    definition=cells[definition_idx],
                     kind=kind_value or None,
                     line=index + 1,
                 )
