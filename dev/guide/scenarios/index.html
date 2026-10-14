@@ -1031,15 +1031,16 @@
 <p>A narrated test uses two things: the <code>@scenario</code> decorator, which puts the test in the report, and the steps <code>given</code>, <code>when</code> and <code>then</code>, which describe what it does.</p>
 <h2 id="scenario"><code>@scenario</code><a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
 <p><code>@scenario(title, tags=None, *, stories=None, pins=None, group_parametrized=True)</code></p>
-<p>Only tests with <code>@scenario</code> appear in the report. The decorator returns your function unchanged.</p>
+<p>Only tests with <code>@scenario</code> appear in the report. The decorator returns your function unchanged, and marks it with the <a href="../../configuration/pytest-options/#selecting-scenarios"><code>pytest_given</code> marker</a>.</p>
 <ul>
+<li><code>title</code> is a plain string, a <code>Template</code> for a <a href="../parametrized/#scenario-titles">parametrized title</a>, or a t-string of glossary handles (see <a href="../step-text/">Step text</a>). It can use <a href="../step-text/#formatting">bold, italic and code</a>.</li>
 <li><code>stories=</code> takes one story or a list of stories, and <code>pins=</code> one sentence handle or a list. Both link the scenario to domain stories; see <a href="../domain-storytelling/">Domain Storytelling</a>.</li>
 <li><code>group_parametrized=False</code> turns off grouping for a parametrized test; see <a href="../parametrized/#declining-the-merge">Parametrized scenarios</a>.</li>
 </ul>
 <p><code>tags=</code> takes any strings. Use <code>/</code> to nest tags in the report's Tags sidebar: <code>ticket/ABC-123</code> appears under a <code>ticket</code> heading, and selecting the heading shows all tags below it. Tags only affect the report; they are not pytest marks.</p>
 <h2 id="given-when-then"><code>given</code> / <code>when</code> / <code>then</code><a class="headerlink" href="#given-when-then" title="Permanent link">&para;</a></h2>
 <p><code>given(text, *, pins=None)</code>, <code>when(text, *, pins=None)</code>, <code>then(text, *, pins=None)</code></p>
-<p>You can use a step in four places: as a <strong>context manager</strong> in a test body, as a <strong>decorator</strong> on a fixture or a helper function, or as an <strong><code>Annotated</code> label</strong> on a test parameter.</p>
+<p>You can use a step in four places: as a <strong>context manager</strong> in a test body, as a <strong>decorator</strong> on a fixture or a helper function, or as a <strong>given annotation</strong> (<code>Annotated[..., given(...)]</code>) on a test parameter.</p>
 <p><code>pins=</code> links the step to specific story sentences; see <a href="../domain-storytelling/#pins">Pins</a>.</p>
 <h3 id="in-a-test-body">In a test body<a class="headerlink" href="#in-a-test-body" title="Permanent link">&para;</a></h3>
 <p>Each <code>with</code> block narrates the code inside it:</p>
@@ -1070,7 +1071,7 @@
 <p>Generator fixtures work too, but only the part before <code>yield</code> is narrated. The teardown after <code>yield</code> isn't recorded, and a step or <code>attach</code> there raises <code>PytestGivenError</code>.</p>
 <p>A fixture's label must be a plain string; <code>@given(Template(...))</code> on a fixture raises an error. If the label needs to change, move the step into a helper function.</p>
 <h3 id="on-test-parameters">On test parameters<a class="headerlink" href="#on-test-parameters" title="Permanent link">&para;</a></h3>
-<p>With <code>Annotated</code>, you can add a <code>given</code> step to a test parameter: a fixture or a <code>@pytest.mark.parametrize</code> value. Use it to:</p>
+<p>With a <strong>given annotation</strong>, <code>Annotated[..., given(...)]</code>, you can add a <code>given</code> step to a test parameter: a fixture or a <code>@pytest.mark.parametrize</code> value. Use it to:</p>
 <ul>
 <li>show a parametrized value as a <code>given</code> step (otherwise it only appears in the parameter table)</li>
 <li>label a fixture that has no <code>@given</code>, including pytest's built-in fixtures</li>
@@ -1092,7 +1093,7 @@
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="n">buy_coffee</span><span class="p">(</span><span class="n">machine</span><span class="p">,</span> <span class="n">cents</span><span class="p">)</span>
 </code></pre></div>
 <p>The report shows a <code>Template</code> placeholder as <code>{cents}</code> in the grouped scenario, and the actual value in each row of the parameter table. <code>when</code> and <code>then</code> raise an error here, because the action and its check belong in the test body.</p>
-<p>The label takes <code>pins=</code> like any step. On a fixture with its own <code>@given(..., pins=...)</code>, the label's pins replace the fixture's pins; <code>pins=[]</code> removes them. Pins of steps inside the fixture body stay as they are.</p>
+<p>The annotation takes <code>pins=</code> like any step. On a fixture with its own <code>@given(..., pins=...)</code>, the annotation's pins replace the fixture's pins; <code>pins=[]</code> removes them. Pins of steps inside the fixture body stay as they are.</p>
 <h3 id="on-helper-functions">On helper functions<a class="headerlink" href="#on-helper-functions" title="Permanent link">&para;</a></h3>
 <p><code>given</code>, <code>when</code> and <code>then</code> can all decorate a helper function. The helper then records a step each time it's called. To put argument values into the step text, use <code>pytest_given.Template</code> with the helper's parameter names:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@when</span><span class="p">(</span><span class="s1">'inserting money'</span><span class="p">)</span>

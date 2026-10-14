@@ -1056,24 +1056,34 @@
 <li>The <code>given_md_lines = false</code> setting, or <code>--no-given-md-lines</code> (<code>--no-lines</code> on <code>pytest-given report</code>), leaves the line number out of each Markdown scenario anchor.</li>
 <li>The <a href="https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules">narration lint</a>'s <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
 <li>Scenario titles and step text render <code>**bold**</code>, <code>*italic*</code> and <code>`code`</code> in the HTML report.</li>
+<li>A <a href="https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping">parameter table</a> starts with a <code>case ID</code> column when any case ID is custom, flagged by each case's <code>custom_id</code> in the JSON report.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Breaking.</strong> <code>@scenario</code>'s first parameter is now <code>title</code>: replace <code>@scenario(name=...)</code> with <code>@scenario(title=...)</code>; a positional title is unaffected.</li>
+<li><strong>Breaking.</strong> <code>FileGlossary</code>'s <code>description_column</code> is now <code>definition_column</code>, the word the rest of the glossary API uses: rename the keyword.</li>
 <li><strong>Breaking.</strong> A handle's <code>.low</code> form is now <code>.l</code>, and lowercases only capitalized words, so an acronym keeps its case (<code>LLM Call</code> reads <em>LLM call</em>): replace <code>.low</code> with <code>.l</code>.</li>
 <li><strong>Breaking.</strong> Glossary definitions no longer render <code>__bold__</code>, and <code>FileGlossary</code> no longer unwraps it in term and kind cells: write <code>**bold**</code>.</li>
-<li>The Glossary view counts a term ref reading as the term's S-form as the term itself, so <code>room('rooms')</code> and <code>book('books')</code> no longer appear under Instances or "Also used as".</li>
+<li>The Glossary view counts a term ref reading as the term's S-form as the term itself, so <code>room('rooms')</code> and <code>book('books')</code> no longer appear among the term's other forms.</li>
+<li>The Glossary tab lists every term's called forms, an instance or another wording alike, under one "Other forms" label.</li>
 <li>Glossary definitions render code inside bold and no longer italicize between spaced asterisks.</li>
 <li>The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.</li>
-<li>A per-case scenario title highlights its case id as a value, and the JSON report records it as a value part.</li>
+<li>A per-case scenario title highlights its case ID as a value, and the JSON report records it as a value part.</li>
 <li>The HTML report's top bar and term ref underlines are visually tidied.</li>
 <li>The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.</li>
-<li>The bundled <code>pytest-given-authoring</code> skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants.</li>
-<li>The bundled <code>pytest-given-reviewing</code> skill reviews titles as a list, flags a rule narrated at the wrong layer, a <code>then</code> that checks nothing and a stub that raises to prove "never called", and starts its completeness audit from the undecorated tests in narrated test files.</li>
+<li>The bundled <code>pytest-given-authoring</code> skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants, and asks the user before adding a glossary term.</li>
+<li>The bundled <code>pytest-given-reviewing</code> skill reviews titles as a list, flags a rule narrated at the wrong layer, a <code>then</code> that checks nothing or fails a row of its table, a stub that raises to prove "never called" and a missing glossary term, shows each scenario's recorded steps beside its source, lists whether a pin or narration matching ties each scenario to its story sentence, and starts its completeness audit from what the project promises.</li>
+<li>The bundled skills leave bold and italic in titles and steps to the user, keep custom case IDs for complex parameter-table rows, and search the JSON report's narration with its Markdown markers stripped.</li>
 <li>The bundled <code>pytest-given-authoring</code> and <code>pytest-given-reviewing</code> skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.</li>
+<li>A <code>--given-lint</code> run that finds nothing prints <code>pytest-given: narration lint (no findings)</code>.</li>
+<li>The docs and error messages call <code>Annotated[..., given(...)]</code> on a test parameter a given annotation, and write node ID and case ID.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Notes below a parameter table in the Markdown report that would share a key add their row number.</li>
 </ul>
 <h2 id="041-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1">0.4.1</a> - 2026-10-04<a class="headerlink" href="#041-2026-10-04" title="Permanent link">&para;</a></h2>
-<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The HTML report's phase hover outline in a parameter table now follows an attachment payload opened or closed under the pointer.</li>
 </ul>
@@ -1091,7 +1101,7 @@
 <li>The HTML report is visually tidied: term refs, the Glossary view, story coverage, narration spacing, hover states and the header row are restyled, and a parametrized scenario is marked by a second status bar.</li>
 <li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the <code>pytest-given-reviewing</code> skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.</li>
 </ul>
-<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A <code>@given</code> fixture parametrized with an unhashable value, such as a list, no longer errors every test that requests it.</li>
 <li>Editor source links build <code>{path}</code> from pytest's rootdir instead of the working directory, so they no longer point at a doubled path when pytest runs from a subdirectory.</li>
@@ -1139,7 +1149,7 @@
 <li>The reviewing skill can list each scenario's narration beside its test's source for side-by-side review, and checks that a scenario demonstrates every rule the project's changelog announces. Both skills flag <code>match=</code> pins that use alternation, and a <code>when</code> that narrates setup while its body acts.</li>
 <li>The authoring, reviewing and navigating skills cover sentence handles, <code>pins=</code> and <code>stories=</code>. The reviewing skill also checks that the test body exercises each sentence its scenario pins.</li>
 </ul>
-<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>When rendering a report fails unexpectedly, the previous run's report is still discarded instead of staying on disk looking current.</li>
 <li>A <code>#scenario=</code> deep link now opens the right scenario when two node ids differ only in a character the slug folds, and no longer breaks the URL.</li>
@@ -1284,7 +1294,7 @@
   <code>given_lint_rules</code> or <code>given_lint_ignore</code> entry naming it, which would
   otherwise fail config parsing.</li>
 </ul>
-<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_4">Fixed<a class="headerlink" href="#fixed_4" title="Permanent link">&para;</a></h3>
 <h4 id="authoring-api_1">Authoring API<a class="headerlink" href="#authoring-api_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>

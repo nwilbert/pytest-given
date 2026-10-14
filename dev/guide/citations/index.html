@@ -1062,7 +1062,7 @@
 <p>Live, against this site's example reports:</p>
 <ul>
 <li>🔵 <a href="../../examples/hotel-booking.html#view=stories&amp;story=cancel-a-booking">Cancel a Booking</a> (2 ✅ · 1 🔵)</li>
-<li>✅ <a href="../../examples/self-report.html#tag=spec/citations">spec/citations</a> (6 ✅)</li>
+<li>✅ <a href="../../examples/self-report.html#tag=spec/citations">spec/citations</a> (7 ✅)</li>
 </ul>
 <h2 id="how-it-fits-together">How it fits together<a class="headerlink" href="#how-it-fits-together" title="Permanent link">&para;</a></h2>
 <p>Citations link to the HTML report you publish, but the <code>pytest-given citations</code> commands read a JSON report and run no tests. So a citation is only right if the two reports match: write both from the same run.</p>
@@ -1148,7 +1148,7 @@
 <tbody>
 <tr>
 <td>Scenario</td>
-<td><code>#scenario=&lt;node id&gt;</code> — for a parametrized scenario, any case's node id</td>
+<td><code>#scenario=&lt;node ID&gt;</code> — for a parametrized scenario, any case's node ID</td>
 </tr>
 <tr>
 <td>Tag</td>
@@ -1167,8 +1167,8 @@
 <p>It rewrites what the report now says:</p>
 <ul>
 <li>a citation's glyph, link text and summary;</li>
-<li>the fragment of any report link that uses a scenario's slug or a <code>[case]</code>, to its node id;</li>
-<li>the node id of a renamed test, when exactly one scenario still has the citation's title.</li>
+<li>the fragment of any report link that uses a scenario's slug or a <code>[case]</code>, to its node ID;</li>
+<li>the node ID of a renamed test, when exactly one scenario still has the citation's title.</li>
 </ul>
 <p>It can't fix everything. These stay as findings for you to resolve, and the command exits 1:</p>
 <ul>
@@ -1188,7 +1188,7 @@
 <h2 id="keeping-the-check-accurate">Keeping the check accurate<a class="headerlink" href="#keeping-the-check-accurate" title="Permanent link">&para;</a></h2>
 <p>These habits keep <code>pytest-given citations check</code> from failing on a document nothing is wrong with, or from skipping a citation it should check:</p>
 <ul>
-<li><strong>Run pytest from the same rootdir.</strong> A node id is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.</li>
+<li><strong>Run pytest from the same rootdir.</strong> A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.</li>
 <li><strong>Use a plain report link for a scenario whose title contains a per-run value</strong>, such as a temporary path. Its citation's link text would be stale after every run.</li>
 <li><strong>Cite a tag that belongs to one piece of work</strong>, like <code>spec/&lt;slug&gt;</code>. A broad area tag's summary changes with every new scenario, so link it with a plain report link.</li>
 <li><strong>Leave the glyph and link unformatted.</strong> In <code>**✅** […](…)</code> or <code>✅ *[…](…)*</code> pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.</li>

@@ -851,6 +851,14 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 .param-table .param-status { text-align: center; }
+
+.param-table tbody th.param-id {
+  font-weight: normal;
+  color: var(--text-secondary);
+  background: none;
+  border-bottom: none;
+  border-top: 1px solid var(--border);
+}
 .param-table tr.failed-row { background: var(--color-failed-tint); }
 .param-table tr.xfailed-row { background: var(--color-xfailed-tint); }
 .param-table tbody tr { transition: background-color 120ms ease-out; }
@@ -2626,7 +2634,14 @@ function scenarioFromParam(value) {
   const data = window.__REPORT_DATA__;
   return lookup(data.scenario_slugs || {}, value, null)
     ?? citedScenario(value)
-    ?? citedScenario(value.split('[')[0]);
+    ?? citedScenario(nodeBase(value));
+}
+
+
+
+function nodeBase(nodeId) {
+  const start = nodeId.indexOf('[', nodeId.indexOf('::') + 1);
+  return start < 0 ? nodeId : nodeId.slice(0, start);
 }
 
 function citedScenario(nodeId) {
@@ -3460,6 +3475,7 @@ function reportApp() {
 
 
 
+
     _initPhaseHover() {
       let hovered = null;
       const redraw = new ResizeObserver(() => {
@@ -3491,6 +3507,7 @@ function reportApp() {
 
 
 
+
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
@@ -3498,22 +3515,26 @@ function reportApp() {
       if (!table) return;
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
-      const boxes = [];
-      let box = null;
+      const columns = [];
+      for (const cell of table.tHead.rows[0].querySelectorAll(`[data-block="${safe}"]`)) {
+        const { left, right } = cell.getBoundingClientRect();
+        const columnRun = columns[columns.length - 1];
+        if (columnRun && cell.previousElementSibling === columnRun.cell) Object.assign(columnRun, { cell, right });
+        else columns.push({ cell, left, right });
+      }
+      const rows = [];
+      let rowRun = null;
       for (const row of table.rows) {
-        const cells = row.querySelectorAll(`[data-block="${safe}"]`);
-        if (!cells.length) {
-          if (row.getBoundingClientRect().height > 1) box = null;
+        const cell = row.querySelector(`[data-block="${safe}"]`);
+        if (!cell) {
+          if (row.getBoundingClientRect().height > 1) rowRun = null;
           continue;
         }
-        const first = cells[0].getBoundingClientRect();
-        const last = cells[cells.length - 1].getBoundingClientRect();
-        if (!box) {
-          box = { left: first.left, right: last.right, top: first.top };
-          boxes.push(box);
-        }
-        box.bottom = first.bottom;
+        const { top, bottom } = cell.getBoundingClientRect();
+        if (!rowRun) rows.push(rowRun = { top });
+        rowRun.bottom = bottom;
       }
+      const boxes = rows.flatMap(({ top, bottom }) => columns.map(({ left, right }) => ({ left, right, top, bottom })));
       for (const { left, right, top, bottom } of boxes) {
         const outline = document.createElement('div');
         outline.className = 'phase-outline';
