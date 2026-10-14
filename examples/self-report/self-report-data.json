@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-14T20:32:54.009227+00:00",
+    "timestamp": "2026-10-14T20:36:24.857504+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "0b469d1bed5416237a346112e856ee6861711879",
+    "commit_sha": "4df53c5d5379a5a55da87381a940e91533202efd",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 203,
+      "duration_ms": 126,
       "steps": [
         {
           "phase": "given",
@@ -137,7 +137,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -448,7 +448,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 93,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -634,7 +634,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 131,
+      "duration_ms": 94,
       "steps": [
         {
           "phase": "given",
@@ -716,7 +716,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -825,7 +825,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -1082,7 +1082,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1454,7 +1454,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1521,7 +1521,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1730,7 +1730,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -1800,7 +1800,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -1920,7 +1920,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2183,7 +2183,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 73,
       "steps": [
         {
           "phase": "given",
@@ -2470,7 +2470,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 158,
+      "duration_ms": 160,
       "steps": [
         {
           "phase": "given",
@@ -2543,7 +2543,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -2715,7 +2715,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -3444,7 +3444,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 130,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
@@ -3637,7 +3637,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 116,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
@@ -3952,7 +3952,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4046,7 +4046,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -4208,7 +4208,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 79,
+      "duration_ms": 77,
       "steps": [
         {
           "phase": "given",
@@ -4382,7 +4382,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4574,7 +4574,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 161,
       "steps": [
         {
           "phase": "given",
@@ -4787,7 +4787,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -4940,7 +4940,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -5163,7 +5163,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 338,
+      "duration_ms": 324,
       "steps": [
         {
           "phase": "given",
@@ -5424,7 +5424,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -5779,7 +5779,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
@@ -6009,7 +6009,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -6217,7 +6217,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 83,
+      "duration_ms": 80,
       "steps": [
         {
           "phase": "given",
@@ -7698,7 +7698,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -13517,7 +13517,7 @@
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -23066,7 +23066,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 66
+        "line": 91
       },
       "story_ids": [],
       "pins": null
@@ -23185,7 +23185,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 168
+        "line": 193
       },
       "story_ids": [],
       "pins": null
@@ -23326,7 +23326,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 198
+        "line": 223
       },
       "story_ids": [],
       "pins": null
@@ -23435,7 +23435,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 253
+        "line": 278
       },
       "story_ids": [],
       "pins": null
@@ -23581,7 +23581,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 299
+        "line": 324
       },
       "story_ids": [],
       "pins": null
@@ -23738,7 +23738,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 385
+        "line": 410
       },
       "story_ids": [],
       "pins": null
@@ -23863,7 +23863,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 418
+        "line": 443
       },
       "story_ids": [],
       "pins": null
@@ -23979,7 +23979,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 507
+        "line": 532
       },
       "story_ids": [],
       "pins": null
@@ -29875,7 +29875,7 @@
         "id": "instance",
         "kind": null,
         "canonical": "Instance",
-        "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). Instances aggregate in the Glossary tab's refs block.",
+        "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). The Glossary tab lists a term's instances under *Other forms*, with its other surface forms.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 92
@@ -29885,7 +29885,7 @@
         "id": "inflection",
         "kind": null,
         "canonical": "Inflection",
-        "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*). Reported under \"Also used as:\" in the Glossary.",
+        "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*). The Glossary tab lists it under *Other forms*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 93

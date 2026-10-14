@@ -193,16 +193,26 @@ def _term_entry(
     aggregation = crossrefs.aggregations.get(term.id, GlossaryAggregation())
     scenario_ids = crossrefs.term_scenarios.get(term.id, [])
     show_instances = kind_key in _INSTANCE_KINDS and bool(aggregation.instances)
+    show_forms = kind_key == 'activity' and bool(aggregation.forms)
+    # An instance and an activity's inflection are both a term's other forms:
+    # the card lists and counts them under one label.
+    other_forms = (
+        len(aggregation.instances)
+        if show_instances
+        else len(aggregation.forms)
+        if show_forms
+        else 0
+    )
     return TermEntry(
         term=term,
         aggregation=aggregation,
         scenario_ids=scenario_ids,
         show_instances=show_instances,
-        show_forms=kind_key == 'activity' and bool(aggregation.forms),
+        show_forms=show_forms,
         summary=tuple(
             part
             for part in (
-                _some(len(aggregation.instances), 'instance') if show_instances else '',
+                _some(other_forms, 'other form'),
                 _some(len(aggregation.stories), 'story'),
                 _some(len(scenario_ids), 'scenario'),
             )

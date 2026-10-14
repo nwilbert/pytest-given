@@ -34,7 +34,7 @@ A term ref has four forms. Use the simplest one that fits your sentence:
 - **`{guest}`** shows the term as declared: *Guest*.
 - **`{guest.l}`** shows the term in lowercase: *guest*. This is the usual form in the middle of a sentence. Only capitalized words are lowercased, so acronyms keep their case: `LLM Call` reads *LLM call*.
 - **`{room.s}`** shows the term's **S-form**: the plural of a noun (*Rooms*), or the third person singular of a verb (`book.s` reads *books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies. Anything else, such as *people* or *checks in*, takes the called form.
-- **`guest('Alice')`** shows any other text: an irregular form (`person('people')`), another verb form (`search('searches for')`), or a specific instance (`guest('Alice')`). Don't write `guest('Guest')`, `guest('guest')` or `room('rooms')`; use `{guest}`, `{guest.l}` or `{room.l.s}` instead.
+- **`guest('Alice')`** shows any other text: an irregular form (`person('people')`), another verb form (`search('searches for')`), or a specific instance (`guest('Alice')`). Don't write `guest('Guest')`, `guest('guest')` or `room('rooms')`; use `{guest}`, `{guest.l}` or `{room.l.s}` instead. The Glossary tab lists every called form of a term under *Other forms*, whether it names an instance or is another form of the word.
 
 `.l` and `.s` chain and also apply to the called form: `{room.l.s}` reads *rooms*, `{room('suite').s}` reads *suites*. All forms work on every handle, including handles you look up by name.
 

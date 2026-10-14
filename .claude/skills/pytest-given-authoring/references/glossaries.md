@@ -61,7 +61,7 @@ Every handle offers the same four forms, whether you captured it (`guest = g.act
 - **Bare handle:** `g['Room']` renders the term's canonical text. Use it whenever the word appears unchanged. Writing `g['Room']('Room')` adds nothing.
 - **`.l`:** `g['Attachment'].l` (or `guest.l`) renders the canonical text in lowercase, the usual form in the middle of a sentence. Acronyms keep their case (`LLM Call` becomes *LLM call*). Prefer it to `g['Attachment']('attachment')`.
 - **`.s`:** the S-form. `room.s` renders *Rooms* and `book.s` renders *books*. It chains with `.l` (`room.l.s` renders *rooms*). Prefer it to `room('rooms')`. It only adds -s, -es or -ies to the last word; anything else (*people*, *checks in*) needs the called form.
-- **Called:** `g['search']('searches for')` supplies any *other* wording: an irregular plural (`person('people')`), another inflection, or a concrete instance (`organizer('Carol')`). `.l` and `.s` work on it too.
+- **Called:** `g['search']('searches for')` supplies any *other* wording: an irregular plural (`person('people')`), another inflection, or a concrete instance (`organizer('Carol')`). The Glossary tab lists them all under *Other forms*. `.l` and `.s` work on it too.
 
 ## Naming terms
 

@@ -45,6 +45,31 @@ def _meta() -> Metadata:
     return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
 
 
+def test_a_term_summary_counts_its_other_forms_whatever_its_kind() -> None:
+    sentence = Sentence(
+        id=SentenceId(1),
+        clauses=(
+            Clause(
+                parts=(
+                    _ent('guest', 'Alice'),
+                    ClauseTermRef(term_id=TermId('search'), display='searches for'),
+                    _ent('room', 'Room'),
+                )
+            ),
+        ),
+    )
+    story = Story(id=StoryId('book'), title='Book', sentences=(sentence,))
+    view = build_glossary_view(
+        ReportData(metadata=_meta(), stories=[story], glossary=_g())
+    )
+    summaries = {
+        entry.term.id: entry.summary for group in view.groups for entry in group.entries
+    }
+    assert summaries[TermId('guest')] == ('1 other form', '1 story')
+    assert summaries[TermId('search')] == ('1 other form', '1 story')
+    assert summaries[TermId('room')] == ('1 story',)
+
+
 def test_build_glossary_aggregations_empty_when_no_glossary() -> None:
     rd = ReportData(metadata=_meta())
     assert build_term_crossrefs(rd).aggregations == {}

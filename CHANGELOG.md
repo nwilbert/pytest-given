@@ -32,7 +32,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** `FileGlossary`'s `description_column` is now `definition_column`, the word the rest of the glossary API uses: rename the keyword.
 - **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
 - **Breaking.** Glossary definitions no longer render `__bold__`, and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
-- The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear under Instances or "Also used as".
+- The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear among the term's other forms.
+- The Glossary tab lists every term's called forms, an instance or another wording alike, under one "Other forms" label.
 - Glossary definitions render code inside bold and no longer italicize between spaced asterisks.
 - The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.
 - A per-case scenario title highlights its case ID as a value, and the JSON report records it as a value part.
