@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-14T20:36:24.857504+00:00",
+    "timestamp": "2026-10-15T19:56:38.033059+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "4df53c5d5379a5a55da87381a940e91533202efd",
+    "commit_sha": "c7bb24a790b12c039524997466fe137fdb4dedcd",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 126,
+      "duration_ms": 120,
       "steps": [
         {
           "phase": "given",
@@ -137,7 +137,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -448,7 +448,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -634,7 +634,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 94,
+      "duration_ms": 104,
       "steps": [
         {
           "phase": "given",
@@ -716,7 +716,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -954,7 +954,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 547,
+      "duration_ms": 546,
       "steps": [
         {
           "phase": "given",
@@ -1268,7 +1268,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 88,
+      "duration_ms": 83,
       "steps": [
         {
           "phase": "given",
@@ -1454,7 +1454,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -1521,7 +1521,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -1730,7 +1730,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -1920,7 +1920,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2183,7 +2183,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 73,
+      "duration_ms": 75,
       "steps": [
         {
           "phase": "given",
@@ -2353,7 +2353,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2470,7 +2470,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 158,
       "steps": [
         {
           "phase": "given",
@@ -2543,7 +2543,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 62,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2715,7 +2715,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -2999,7 +2999,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -3152,7 +3152,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -3297,7 +3297,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -3444,7 +3444,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 136,
+      "duration_ms": 134,
       "steps": [
         {
           "phase": "given",
@@ -3637,7 +3637,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 90,
+      "duration_ms": 116,
       "steps": [
         {
           "phase": "given",
@@ -3766,7 +3766,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 124,
+      "duration_ms": 134,
       "steps": [
         {
           "phase": "given",
@@ -3952,7 +3952,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4020,7 +4020,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3347
+        "line": 3348
       },
       "story_ids": [],
       "pins": null
@@ -4046,7 +4046,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -4097,7 +4097,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3360
+        "line": 3361
       },
       "story_ids": [],
       "pins": null
@@ -4185,7 +4185,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3383
+        "line": 3384
       },
       "story_ids": [],
       "pins": null
@@ -4208,7 +4208,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 267,
       "steps": [
         {
           "phase": "given",
@@ -4270,7 +4270,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3420
+        "line": 3421
       },
       "story_ids": [],
       "pins": null
@@ -4290,7 +4290,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -4356,7 +4356,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3440
+        "line": 3441
       },
       "story_ids": [],
       "pins": null
@@ -4382,7 +4382,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -4441,7 +4441,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3473
+        "line": 3474
       },
       "story_ids": [],
       "pins": null
@@ -4467,7 +4467,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -4540,7 +4540,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3505
+        "line": 3506
       },
       "story_ids": [],
       "pins": null
@@ -4574,7 +4574,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 161,
+      "duration_ms": 173,
       "steps": [
         {
           "phase": "given",
@@ -4645,7 +4645,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3646
+        "line": 3647
       },
       "story_ids": [],
       "pins": null
@@ -4738,7 +4738,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3694
+        "line": 3695
       },
       "story_ids": [],
       "pins": null
@@ -4787,7 +4787,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -4901,7 +4901,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3747
+        "line": 3748
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -4940,7 +4940,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4988,7 +4988,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3829
+        "line": 3830
       },
       "story_ids": [],
       "pins": null
@@ -5113,7 +5113,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3879
+        "line": 3880
       },
       "story_ids": [],
       "pins": null
@@ -5163,7 +5163,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 324,
+      "duration_ms": 355,
       "steps": [
         {
           "phase": "given",
@@ -5322,7 +5322,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5424,7 +5424,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5529,7 +5529,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5649,7 +5649,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5779,7 +5779,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 90,
+      "duration_ms": 98,
       "steps": [
         {
           "phase": "given",
@@ -6009,7 +6009,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -6121,7 +6121,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -6217,7 +6217,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 80,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -7612,7 +7612,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -7698,7 +7698,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8013,7 +8013,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -8105,7 +8105,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8750,7 +8750,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -8934,7 +8934,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -13517,7 +13517,7 @@
       "module": "tests.unit.capture.test_step_descriptor",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -17579,7 +17579,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -19827,7 +19827,7 @@
       "pins": null
     },
     {
-      "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-True]",
+      "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-messages0]",
       "narration": {
         "text": "Narration lint flags an assert outside a then step",
         "parts": [
@@ -19920,31 +19920,22 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a warn finding names the {phase} step holding the assert: {flagged}",
+            "text": "the warn findings say {messages}",
             "parts": [
               {
-                "value": "a warn "
+                "value": "the warn "
               },
               {
                 "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "display": "findings",
+                "expression": "pg[\"Finding\"].l.s"
               },
               {
-                "value": " names the "
+                "value": " say "
               },
               {
-                "name": "phase",
-                "column_id": "phase",
-                "format_spec": "",
-                "conversion": null
-              },
-              {
-                "value": " step holding the assert: "
-              },
-              {
-                "name": "flagged",
-                "column_id": "flagged",
+                "name": "messages",
+                "column_id": "messages",
                 "format_spec": "",
                 "conversion": null
               }
@@ -19969,14 +19960,14 @@
             "kind": "attachment"
           },
           {
-            "id": "flagged",
-            "name": "flagged",
+            "id": "messages",
+            "name": "messages",
             "kind": "param"
           }
         ],
         "cases": [
           {
-            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-True]",
+            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-messages0]",
             "values": [
               "given",
               {
@@ -19984,14 +19975,14 @@
                 "content": "def test_a():\n    with given('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
                 "content_type": "text"
               },
-              true
+              "[\"assert inside given 'a stocked machine'\"]"
             ],
             "status": "passed",
             "error": null,
             "custom_id": false
           },
           {
-            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[when-True]",
+            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[when-messages1]",
             "values": [
               "when",
               {
@@ -19999,14 +19990,14 @@
                 "content": "def test_a():\n    with when('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
                 "content_type": "text"
               },
-              true
+              "[\"assert inside when 'a stocked machine'\"]"
             ],
             "status": "passed",
             "error": null,
             "custom_id": false
           },
           {
-            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[then-False]",
+            "id": "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[then-messages2]",
             "values": [
               "then",
               {
@@ -20014,7 +20005,7 @@
                 "content": "def test_a():\n    with then('a stocked machine'):\n        machine = stock()\n        assert machine['coffees'] > 0\n",
                 "content_type": "text"
               },
-              false
+              "[]"
             ],
             "status": "passed",
             "error": null,
@@ -20149,7 +20140,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 749
+        "line": 751
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -20271,7 +20262,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 929
+        "line": 931
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -24004,7 +23995,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 142,
       "steps": [
         {
           "phase": "given",
@@ -24991,7 +24982,7 @@
       "pins": null
     },
     {
-      "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-passed-omitted]",
+      "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-passed-| coin |]",
       "narration": {
         "text": "The parameter table shows a status column only when its cases differ in status",
         "parts": [
@@ -25087,14 +25078,14 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the status column is {status_column}",
+            "text": "the table header reads {header}",
             "parts": [
               {
-                "value": "the status column is "
+                "value": "the table header reads "
               },
               {
-                "name": "status_column",
-                "column_id": "status_column",
+                "name": "header",
+                "column_id": "header",
                 "format_spec": "",
                 "conversion": null
               }
@@ -25125,8 +25116,8 @@
             "kind": "param"
           },
           {
-            "id": "status_column",
-            "name": "status_column",
+            "id": "header",
+            "name": "header",
             "kind": "param"
           },
           {
@@ -25137,11 +25128,11 @@
         ],
         "cases": [
           {
-            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-passed-omitted]",
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-passed-| coin |]",
             "values": [
               "passed",
               "passed",
-              "omitted",
+              "| coin |",
               {
                 "label": "Rendered Markdown",
                 "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
@@ -25153,11 +25144,11 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[skipped-skipped-omitted]",
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[skipped-skipped-| coin |]",
             "values": [
               "skipped",
               "skipped",
-              "omitted",
+              "| coin |",
               {
                 "label": "Rendered Markdown",
                 "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
@@ -25169,11 +25160,11 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[failed-failed-omitted]",
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[failed-failed-| coin |]",
             "values": [
               "failed",
               "failed",
-              "omitted",
+              "| coin |",
               {
                 "label": "Rendered Markdown",
                 "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
@@ -25185,11 +25176,11 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-skipped-shown]",
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-skipped-| coin | |]",
             "values": [
               "passed",
               "skipped",
-              "shown",
+              "| coin | |",
               {
                 "label": "Rendered Markdown",
                 "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin | |\n|---|---|\n| euro | \u2713 |\n| token | \u25cb |\n",
@@ -25201,11 +25192,11 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-failed-shown]",
+            "id": "tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ[passed-failed-| coin | |]",
             "values": [
               "passed",
               "failed",
-              "shown",
+              "| coin | |",
               {
                 "label": "Rendered Markdown",
                 "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin | |\n|---|---|\n| euro | \u2713 |\n| token | \u2717 |\n",
@@ -25338,7 +25329,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 364
+        "line": 366
       },
       "story_ids": [],
       "pins": null
@@ -25453,7 +25444,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 435
+        "line": 437
       },
       "story_ids": [],
       "pins": null
@@ -25539,7 +25530,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 614
+        "line": 616
       },
       "story_ids": [],
       "pins": null
@@ -25648,7 +25639,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1149
+        "line": 1151
       },
       "story_ids": [],
       "pins": null
@@ -27909,7 +27900,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1256
+        "line": 1270
       },
       "story_ids": [],
       "pins": null
@@ -28015,7 +28006,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1272
+        "line": 1286
       },
       "story_ids": [],
       "pins": null
@@ -28121,7 +28112,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1315
+        "line": 1329
       },
       "story_ids": [],
       "pins": null
@@ -28232,7 +28223,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1397
+        "line": 1411
       },
       "story_ids": [],
       "pins": null
@@ -28371,7 +28362,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1749
+        "line": 1763
       },
       "story_ids": [],
       "pins": null
@@ -28502,7 +28493,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1805
+        "line": 1819
       },
       "story_ids": [],
       "pins": null
@@ -28641,7 +28632,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1970
+        "line": 1984
       },
       "story_ids": [],
       "pins": null
@@ -28780,7 +28771,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2002
+        "line": 2016
       },
       "story_ids": [],
       "pins": null
@@ -28915,7 +28906,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2058
+        "line": 2072
       },
       "story_ids": [],
       "pins": null
@@ -29035,7 +29026,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2604
+        "line": 2618
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -29166,7 +29157,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2764
+        "line": 2778
       },
       "story_ids": [],
       "pins": null
@@ -29284,7 +29275,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2914
+        "line": 2928
       },
       "story_ids": [],
       "pins": null
@@ -30537,7 +30528,7 @@
         "tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body",
         "tests/unit/lint/test_ast_rules.py::test_then_without_check_fires",
         "tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if",
-        "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-True]",
+        "tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then[given-messages0]",
         "tests/unit/lint/test_ast_rules.py::test_action_in_then_fires_when_no_when_exists",
         "tests/unit/lint/test_ast_rules.py::test_unused_interpolation_fires_on_unused_bare_identifier",
         "tests/unit/lint/test_runtime_rules.py::test_missing_phase_fires_on_passed_two_phase_scenario",

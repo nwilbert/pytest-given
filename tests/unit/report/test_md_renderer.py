@@ -326,17 +326,17 @@ def test_parametrized_scenario_renders_table() -> None:
     tags=['parametrization'],
 )
 @pytest.mark.parametrize(
-    ('first_status', 'second_status', 'status_column'),
+    ('first_status', 'second_status', 'header'),
     [
-        ('passed', 'passed', 'omitted'),
-        ('skipped', 'skipped', 'omitted'),
-        ('failed', 'failed', 'omitted'),
-        ('passed', 'skipped', 'shown'),
-        ('passed', 'failed', 'shown'),
+        ('passed', 'passed', '| coin |'),
+        ('skipped', 'skipped', '| coin |'),
+        ('failed', 'failed', '| coin |'),
+        ('passed', 'skipped', '| coin | |'),
+        ('passed', 'failed', '| coin | |'),
     ],
 )
 def test_param_table_shows_status_column_only_when_case_statuses_differ(
-    first_status: Status, second_status: Status, status_column: str
+    first_status: Status, second_status: Status, header: str
 ) -> None:
     with given(
         t'a {pg["Parameter table"].l} whose first {pg["Case"].l} is '
@@ -355,10 +355,12 @@ def test_param_table_shows_status_column_only_when_case_statuses_differ(
         )
     with when(t'the Markdown {pg["Report"].l} is rendered'):
         md = render_md(_report_with(table))
-    with then(t'the status column is {status_column}'):
+    with then(t'the table header reads {header}'):
         attach('Rendered Markdown', md)
-        header = next(line for line in md.splitlines() if line.startswith('| coin'))
-        assert header == ('| coin | |' if status_column == 'shown' else '| coin |')
+        assert (
+            next(line for line in md.splitlines() if line.startswith('| coin'))
+            == header
+        )
 
 
 @scenario(

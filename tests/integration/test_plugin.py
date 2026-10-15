@@ -3266,9 +3266,10 @@ def test_a_template_given_annotation_needs_a_bare_parametrize_column(
     with when('the suite runs'):
         result = pytester.runpytest()
     with then(t'the annotation is {outcome}'):
-        errored = result.parseoutcomes().get('errors', 0) == 1
-        assert ('refused' if errored else 'accepted') == outcome
+        assert ('accepted' if result.ret == 0 else 'refused') == outcome
     with then(t'a refusal errors the scenario, saying {error}'):
+        errored = result.parseoutcomes().get('errors', 0) == 1
+        assert errored == (outcome == 'refused')
         assert outcome == 'accepted' or error in result.stdout.str()
 
 

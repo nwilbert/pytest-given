@@ -2369,15 +2369,15 @@
 - **given** a {phase} «step» whose body asserts
   - 📎 step body — *see parameter table*
 - **when** the AST «lint rules» parse that source
-- **then** a warn «finding» names the {phase} step holding the assert: {flagged}
+- **then** the warn «findings» say {messages}
 
-| phase | step body | flagged |
+| phase | step body | messages |
 |---|---|---|
-| given | step body | True |
-| when | step body | True |
-| then | step body | False |
+| given | step body | \["assert inside given 'a stocked machine'"\] |
+| when | step body | \["assert inside when 'a stocked machine'"\] |
+| then | step body | \[\] |
 
-- **given, True** — step body:
+- **given, \["assert inside given 'a stocked machine'"\]** — step body:
   ```
   def test_a():
       with given('a stocked machine'):
@@ -2385,7 +2385,7 @@
           assert machine['coffees'] > 0
   ```
 
-- **when, True** — step body:
+- **when, \["assert inside when 'a stocked machine'"\]** — step body:
   ```
   def test_a():
       with when('a stocked machine'):
@@ -2393,7 +2393,7 @@
           assert machine['coffees'] > 0
   ```
 
-- **then, False** — step body:
+- **then, \[\]** — step body:
   ```
   def test_a():
       with then('a stocked machine'):
@@ -2884,18 +2884,18 @@
 
 - **given** a «parameter table» whose first «case» is {first_status} and whose second is {second_status}
 - **when** the Markdown «report» is rendered
-- **then** the status column is {status_column}
+- **then** the table header reads {header}
   - 📎 Rendered Markdown — *see parameter table*
 
-| first_status | second_status | status_column | Rendered Markdown |
+| first_status | second_status | header | Rendered Markdown |
 |---|---|---|---|
-| passed | passed | omitted | Rendered Markdown |
-| skipped | skipped | omitted | Rendered Markdown |
-| failed | failed | omitted | Rendered Markdown |
-| passed | skipped | shown | Rendered Markdown |
-| passed | failed | shown | Rendered Markdown |
+| passed | passed | \| coin \| | Rendered Markdown |
+| skipped | skipped | \| coin \| | Rendered Markdown |
+| failed | failed | \| coin \| | Rendered Markdown |
+| passed | skipped | \| coin \| \| | Rendered Markdown |
+| passed | failed | \| coin \| \| | Rendered Markdown |
 
-- **passed, passed, omitted** — Rendered Markdown:
+- **passed, passed, \| coin \|** — Rendered Markdown:
   ```
   # pytest-given — proj
   
@@ -2910,7 +2910,7 @@
   | token |
   ```
 
-- **skipped, skipped, omitted** — Rendered Markdown:
+- **skipped, skipped, \| coin \|** — Rendered Markdown:
   ```
   # pytest-given — proj
   
@@ -2925,7 +2925,7 @@
   | token |
   ```
 
-- **failed, failed, omitted** — Rendered Markdown:
+- **failed, failed, \| coin \|** — Rendered Markdown:
   ```
   # pytest-given — proj
   
@@ -2940,7 +2940,7 @@
   | token |
   ```
 
-- **passed, skipped, shown** — Rendered Markdown:
+- **passed, skipped, \| coin \| \|** — Rendered Markdown:
   ```
   # pytest-given — proj
   
@@ -2955,7 +2955,7 @@
   | token | ○ |
   ```
 
-- **passed, failed, shown** — Rendered Markdown:
+- **passed, failed, \| coin \| \|** — Rendered Markdown:
   ```
   # pytest-given — proj
   

@@ -605,10 +605,15 @@ def test_anchor_line_with_no_matching_node_is_skipped(tmp_path) -> None:
     stories=adopt_pytest_given,
 )
 @pytest.mark.parametrize(
-    ('phase', 'flagged'), [('given', True), ('when', True), ('then', False)]
+    ('phase', 'messages'),
+    [
+        ('given', ["assert inside given 'a stocked machine'"]),
+        ('when', ["assert inside when 'a stocked machine'"]),
+        ('then', []),
+    ],
 )
 def test_check_outside_then_flags_an_assert_only_outside_a_then(
-    tmp_path, phase, flagged
+    tmp_path, phase, messages
 ) -> None:
     with given(t'a {phase} {pg["Step"].l} whose body asserts'):
         src = _write(
@@ -630,11 +635,8 @@ def test_check_outside_then_flags_an_assert_only_outside_a_then(
         findings = _rule_findings(
             _ast_rules([checking], tmp_path), 'check-outside-then'
         )
-    with then(
-        t'a warn {pg["Finding"].l} names the {phase} step holding the assert: {flagged}'
-    ):
-        expected = [f"assert inside {phase} 'a stocked machine'"] if flagged else []
-        assert [finding.message for finding in findings] == expected
+    with then(t'the warn {pg["Finding"].l.s} say {messages}'):
+        assert [finding.message for finding in findings] == messages
         assert all(DEFAULTS[finding.rule] == 'warn' for finding in findings)
 
 
