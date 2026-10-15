@@ -951,6 +951,20 @@ def test_rule_two_names_the_violating_steps_own_phase() -> None:
     message = str(excinfo.value)
     assert 'given(t"… {value} …").' in message
     assert 'when(' not in message
+    assert 'expected outcome' not in message
+
+
+def test_rule_two_in_a_then_offers_an_expected_outcome_column() -> None:
+    scenarios, info = _two_case_group(
+        [_value_step('[1, 2]', expression='[1, 2] if enabled else []')],
+        [_value_step('[]', expression='[1, 2] if enabled else []')],
+    )
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(scenarios, info)
+    assert (
+        'parametrize an expected outcome as its own column; otherwise bind it '
+        'to a local' in str(excinfo.value)
+    )
 
 
 def test_a_constant_compound_interpolation_stays_inline() -> None:

@@ -54,7 +54,7 @@ Some ways of writing steps would make the grouped scenario show the wrong text. 
 | # | Rejected | Fix |
 |---|---|---|
 | 1 | A plain string (usually an f-string) whose text differs between cases | Use a t-string, so the changing part becomes a placeholder instead of showing the first case's text |
-| 2 | A changing t-string value that isn't a plain variable name, like `t'{cup_size * 0.01}'` or `t'{m.balance}'` | Assign it to a local variable and use that in the t-string |
+| 2 | A changing t-string value that isn't a plain variable name, like `t'{cup_size * 0.01}'` or `t'{m.balance}'` | Assign it to a local variable and use that in the t-string. If a `then` computes its expected outcome this way, parametrize the outcome as its own column instead |
 | 3 | A t-string value named after a parametrize argument, when the variable no longer holds that argument's value | If you reassigned the variable, give the new value a new name. If the test changed the value in place, assign the result to a new variable and use that |
 | 4 | A term ref that names a different term or reads differently between cases, including one that takes its text from a parametrize argument | Keep the term ref and the value apart: `given(t"{pg['Customer']} {name} places an order")` |
 | 5 | A step whose `attach` labels differ between cases | Keep the labels the same and let only the content differ; the parameter table gets a column for it |

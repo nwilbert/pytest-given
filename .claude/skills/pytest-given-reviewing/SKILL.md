@@ -74,7 +74,7 @@ Parameter tables are part of the document too. Flag these:
 - A column that no step narrates.
 - A label column that the body turns back into data, with no attachment showing the data.
 - A case ID that misnames its row, or only repeats a column's value.
-- An outcome that varies but has no column of its own.
+- An outcome that varies but has no column of its own, or that the body derives from an input column (`[1, 2] if enabled else []`).
 - Sibling scenarios that should be one table: the same steps with one arrangement varied, or titles that negate each other.
 
 The fixes are in the authoring skill's [parameter-tables.md](../pytest-given-authoring/references/parameter-tables.md). Report all legibility problems as one combined finding, not one per instance. A wording you would simply have chosen differently is out of scope.

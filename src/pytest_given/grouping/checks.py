@@ -157,10 +157,13 @@ def check_promotable_expression(
     """
     if part.expression.isidentifier():
         return
+    fix = 'bind it to a local and narrate that'
+    if phase == 'then':
+        fix = f'parametrize an expected outcome as its own column; otherwise {fix}'
     raise _grouping_error(
         group,
         f'{part.expression!r} in {_test_name(group.anchor)!r} varies across '
-        f'parametrize cases — bind it to a local and narrate that: '
+        f'parametrize cases — {fix}: '
         f'value = {part.expression}; {phase}(t"… {{value}} …").',
     )
 
