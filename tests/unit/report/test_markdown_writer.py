@@ -187,7 +187,7 @@ def test_no_two_spans_touch_across_an_empty_value(marker: str, written: str) -> 
     )
     html = _make_narration_filter(param_color_map={}, glossary=None)(narration)
     assert narration_markdown(narration) == written
-    assert _MARKDOWN.renderInline(written) == html.replace(
+    assert _MARKDOWN.renderInline(written) == str(html).replace(
         '<span class="value-highlight"></span>', ''
     )
 

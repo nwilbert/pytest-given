@@ -888,6 +888,7 @@ source = { editable = "." }
 dependencies = [
     { name = "jinja2" },
     { name = "markdown-it-py" },
+    { name = "markupsafe" },
     { name = "pytest" },
 ]
 
@@ -931,6 +932,7 @@ typecheck = [
 requires-dist = [
     { name = "jinja2", specifier = ">=3.1" },
     { name = "markdown-it-py", specifier = ">=3.0" },
+    { name = "markupsafe", specifier = ">=2.0" },
     { name = "pytest", specifier = ">=9.0" },
 ]
 
