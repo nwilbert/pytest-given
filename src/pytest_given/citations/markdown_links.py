@@ -9,8 +9,7 @@ characters around it, sit in the source — and an update must change those
 bytes and no others.
 """
 
-# Python 3.15 imports these on first use, so a CLI command that checks no
-# citations never loads markdown-it; older versions ignore the list.
+# A CLI command that checks no citations never loads markdown-it.
 __lazy_modules__ = ['markdown_it']
 
 import bisect
