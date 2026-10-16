@@ -94,7 +94,7 @@ def mypy(session: nox.Session) -> None:
 
 @nox.session
 def test(session: nox.Session) -> None:
-    _sync(session, 'test', include_project=True)
+    _sync(session, include_project=True)
     session.run('pytest')
 
 
@@ -103,18 +103,26 @@ def test(session: nox.Session) -> None:
     'pytest_version', ['9.0', 'latest'], ids=['pytest-9.0', 'pytest-latest']
 )
 def compat(session: nox.Session, pytest_version: str) -> None:
-    """Run the suite on every supported Python against pytest 9.0.x and the newest.
+    """Run the suite on every supported Python against pytest 9.0.x and the newest,
+    with the oldest supported markdown-it-py and the newest alike.
 
-    `latest` installs the newest release rather than trusting the lock, which
+    `latest` installs the newest releases rather than trusting the lock, which
     only moves on `uv lock --upgrade`. pytest 9.0 predates the `max_warnings`
     option, so there an unknown-option warning replaces the warnings gate.
     """
-    _sync(session, 'test', include_project=True)
+    _sync(session, include_project=True)
     if pytest_version == 'latest':
-        pytest_install = ['pytest', '--upgrade-package', 'pytest']
+        installs = [
+            'pytest',
+            'markdown-it-py',
+            '--upgrade-package',
+            'pytest',
+            '--upgrade-package',
+            'markdown-it-py',
+        ]
     else:
-        pytest_install = [f'pytest~={pytest_version}.0']
-    session.run('uv', 'pip', 'install', *pytest_install, external=True)
+        installs = [f'pytest~={pytest_version}.0', 'markdown-it-py~=3.0.0']
+    session.run('uv', 'pip', 'install', *installs, external=True)
     session.run('pytest')
 
 
@@ -440,7 +448,7 @@ def reports_current(session: nox.Session) -> None:
     against unnoticed: regenerate every report, then diff the tracked Markdown —
     the reports' `.md` and the documents whose citations that updated. Markdown
     alone, as it carries no commit SHA, timestamp or duration."""
-    _sync(session, 'test', include_project=True)
+    _sync(session, include_project=True)
     _regenerate_examples(session)
     _regenerate_self_report(session)
     session.run('git', 'diff', '--exit-code', '--', '*.md', external=True)
@@ -449,7 +457,7 @@ def reports_current(session: nox.Session) -> None:
 @nox.session
 def examples(session: nox.Session) -> None:
     """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
-    _sync(session, 'test', include_project=True)
+    _sync(session, include_project=True)
     _regenerate_examples(session)
 
 
@@ -662,7 +670,7 @@ def self_report(session: nox.Session) -> None:
     tests. The @scenario-decorated unit tests narrate the plugin's behavior in
     the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
     """
-    _sync(session, 'test', include_project=True)
+    _sync(session, include_project=True)
     _regenerate_self_report(session)
 
 
@@ -701,7 +709,7 @@ def benchmark(session: nox.Session) -> None:
     Outputs land in `benchmarks/` and are gitignored. For size sweeps or
     cProfile runs, invoke `benchmarks/bench.py` directly (see its docstring).
     """
-    _sync(session, 'test', include_project=True)
+    _sync(session, include_project=True)
     session.run('python', 'benchmarks/gen_large_scenarios.py')
     session.run(
         'pytest',

@@ -1,20 +1,25 @@
 """Inline links in a Markdown document, with the source span of every part
 `pytest-given citations update` may rewrite.
 
-Hand-written because no Markdown parser reports where a link's text and
-destination, or the characters around it, sit in the source — and an update
-must change those bytes and no others. It follows CommonMark plus GFM tables
-closely enough for documentation; `test_markdown_links_oracle.py` holds it to
-markdown-it-py over every Markdown file the repository tracks.
+markdown-it-py reads the block structure — which text is a paragraph, heading
+or table cell, and which is code or HTML — with its block rules wrapped to
+record where each line of that text starts. The inline links are read here,
+because no Markdown parser reports where a link's text and destination, or the
+characters around it, sit in the source — and an update must change those
+bytes and no others.
 """
 
 import bisect
 import html
 import re
-from collections.abc import Collection, Iterator, Sequence
+from collections.abc import Callable, Collection, Iterator, Sequence
 from dataclasses import dataclass
 from html.entities import html5
-from typing import Literal, NamedTuple
+from typing import NamedTuple
+
+from markdown_it import MarkdownIt
+from markdown_it.rules_block import StateBlock
+from markdown_it.token import Token
 
 from ..model import table_cell_spans
 from ..report import ASCII_PUNCTUATION, code_span_at
@@ -85,13 +90,32 @@ class MarkdownLink:
 def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
     """Every inline link outside code and HTML blocks, in document order. A
     reference-style link is none, and neither is an image."""
-    line_starts = [0, *(match.end() for match in re.finditer('\n', source))]
+    lines = _source_lines(source)
+    line_starts = [line.start for line in lines]
     longest_first = sorted(glyphs, key=len, reverse=True)
     return [
         link
-        for run in _inline_runs(source)
+        for run in _inline_runs(source, lines)
         for link in _links_in(run, line_starts, longest_first)
     ]
+
+
+# One character of a destination as written, or the escape or entity
+# reference that reads as one.
+_DESTINATION_TOKEN = re.compile(
+    r'\\[!-/:-@\[-`{-~]|&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});|.',
+    re.DOTALL,
+)
+
+
+def _unescaped(token: str) -> str:
+    if token.startswith('\\') and len(token) == 2:
+        return token[1]
+    if token.startswith('&#'):
+        return html.unescape(token)
+    # Not `html.unescape`, which also reads `&notit;` as `¬it;`: CommonMark
+    # resolves only a whole entity name.
+    return html5.get(token[1:], token) if token.startswith('&') else token
 
 
 # --- Block structure ---
@@ -99,9 +123,15 @@ def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
 
 @dataclass(frozen=True)
 class _Line:
+    """A source line, or the part of one a block's inline text takes up."""
+
     start: int
     content: str
+    # Where the source line ends, before its line break.
     end: int
+
+    def after(self, column: int) -> _Line:
+        return _Line(self.start + column, self.content[column:], self.end)
 
 
 @dataclass(frozen=True)
@@ -137,366 +167,109 @@ def _span(offsets: Sequence[int], start: int, end: int) -> Span:
     return (offsets[start], offsets[end - 1] + 1)
 
 
-# One character of a destination as written, or the escape or entity
-# reference that reads as one.
-_DESTINATION_TOKEN = re.compile(
-    r'\\[!-/:-@\[-`{-~]|&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});|.',
-    re.DOTALL,
-)
-
-
-def _unescaped(token: str) -> str:
-    if token.startswith('\\') and len(token) == 2:
-        return token[1]
-    if token.startswith('&#'):
-        return html.unescape(token)
-    # Not `html.unescape`, which also reads `&notit;` as `¬it;`: CommonMark
-    # resolves only a whole entity name.
-    return html5.get(token[1:], token) if token.startswith('&') else token
-
-
-@dataclass(frozen=True)
-class _Fence:
-    char: str
-    width: int
-    base: int
-    quote_depth: int
-
-
-class _HtmlEnd(NamedTuple):
-    marker: re.Pattern[str]
-    quote_depth: int
-
-
-class _ListItem(NamedTuple):
-    quote_depth: int
-    column: int
-
-
-_BLOCKQUOTE_MARKER = re.compile(r' {0,3}> ?')
-_FENCE_OPEN = re.compile(r'`{3,}(?=[^`]*$)|~{3,}')
-_ATX_HEADING = re.compile(r'#{1,6}(?:[ \t]|$)')
-_SETEXT_UNDERLINE = re.compile(r'(?:=+|-+)[ \t]*$')
-_THEMATIC_BREAK = re.compile(r'(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$')
-_LIST_ITEM = re.compile(r'([-+*]|\d{1,9}[.)])([ \t]+|$)')
-_DELIMITER_ROW = re.compile(
-    r' {0,3}\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$'
-)
-_BLOCK_TAGS = (
-    'address|article|aside|base|basefont|blockquote|body|caption|center|col|'
-    'colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|'
-    'footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|'
-    'link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|search|'
-    'section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul'
-)
-_HTML_BLOCK_START = re.compile(rf'</?(?:{_BLOCK_TAGS})(?:[ \t>]|/>|$)', re.IGNORECASE)
-_HTML_TAG_LINE = re.compile(
-    r'(?:<[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>|</[A-Za-z][A-Za-z0-9-]*\s*>)[ \t]*$'
-)
-# The HTML blocks that run, blank lines and all, to the first line holding
-# their end marker: each one's start, and its end.
-_MARKED_HTML_BLOCKS = (
-    (
-        re.compile(r'<(?:script|pre|style|textarea)(?:[ \t>]|$)', re.IGNORECASE),
-        re.compile(r'</(?:script|pre|style|textarea)>', re.IGNORECASE),
-    ),
-    (re.compile('<!--'), re.compile('-->')),
-    (re.compile(r'<\?'), re.compile(r'\?>')),
-    (re.compile('<![A-Za-z]'), re.compile('>')),
-    (re.compile(r'<!\[CDATA\['), re.compile(r'\]\]>')),
-)
-
-
-def _inline_runs(source: str) -> Iterator[_Run]:
-    raw_lines = list(_raw_lines(source))
-    paragraph: list[_Line] = []
-    paragraph_depth = 0
-    fence: _Fence | None = None
-    # Inside an HTML block: the end marker of one that has its own, else
-    # whether in one that a blank line ends.
-    html_end: _HtmlEnd | None = None
-    in_html_block = False
-    in_table = False
-    table_depth = 0
-    skip_delimiter = False
-    list_items: list[_ListItem] = []
-    # An item whose marker line held nothing else, until the line after it.
-    empty_item: _ListItem | None = None
-    for index, (line_start, raw) in enumerate(raw_lines):
-        if skip_delimiter:
-            skip_delimiter = False
+def _inline_runs(source: str, lines: list[_Line]) -> Iterator[_Run]:
+    tokens = _BLOCKS.parse(source)
+    cells: Iterator[_Line] = iter(())
+    for index, token in enumerate(tokens):
+        if token.type != 'inline':
             continue
-        if fence is not None:
-            fenced = _fence_content(fence, raw)
-            if fenced is not None:
-                if _closes(fence, fenced):
-                    fence = None
-                continue
-            fence = None
-        depth, prefix = _quote_prefix(raw, None)
-        content = raw[prefix:]
-        line = _Line(line_start + prefix, content, line_start + len(raw))
-        if html_end is not None:
-            # Read inside the block's own quote alone: a `>` past it is text.
-            _, inside = _quote_prefix(raw, html_end.quote_depth)
-            if html_end.marker.search(raw, inside):
-                html_end = None
-            continue
-        if in_html_block and content.strip():
-            continue
-        in_html_block = False
-        # A line ends the list items it is not indented into, or whose quote
-        # it leaves — unless it continues a paragraph lazily, which keeps them.
-        # A quote marker outside an item it ends opens a new quote instead.
-        open_items = list_items
-        list_items = [o for o in open_items if _holds(o, raw, depth)]
-        if not content.strip():
-            # An item can begin with at most one blank line: its marker line.
-            list_items = [o for o in list_items if o is not empty_item]
-            empty_item = None
-            yield from _paragraph_run(paragraph)
-            paragraph = []
-            in_table = False
-            continue
-        empty_item = None
-        chars, columns = _leading(content)
-        ended = [o for o in open_items if o not in list_items]
-        # A table has no lazy continuation: a line outside its list item or
-        # quote ends it.
-        if in_table and (ended or depth < table_depth):
-            in_table = False
-        may_be_lazy = all(o.quote_depth >= depth for o in ended)
-        base = max((o.column for o in list_items if o.quote_depth == depth), default=0)
-        relative = columns - base
-        rest = content[chars:]
-        if paragraph and depth > paragraph_depth:
-            yield from _paragraph_run(paragraph)
-            paragraph = []
-        block_start = relative <= 3
-        # A line outside the paragraph's item or quote continues it only
-        # lazily: it is no setext underline, starts no table, and any list
-        # item may interrupt it.
-        lazy = bool(ended) or depth < paragraph_depth
-        # A list item, or a blockquote opened inside one, holds blocks of its
-        # own: open each container, then read what follows it as a line.
-        opened_item: _ListItem | None = None
-        while block_start:
-            interrupts = bool(paragraph) and not lazy
-            if item := _list_item(rest, interrupts_paragraph=interrupts):
-                gap = len(item.group(2))
-                taken = gap if gap <= 4 else 1
-                width = len(item.group(1)) + taken
-                base = columns + len(item.group(1)) + (taken or 1)
-                opened_item = _ListItem(depth, base)
-                list_items = [
-                    *(
-                        o
-                        for o in list_items
-                        if o.quote_depth < depth or o.column <= columns
-                    ),
-                    opened_item,
-                ]
-            elif quote := _BLOCKQUOTE_MARKER.match(rest):
-                width, base, depth = quote.end(), 0, depth + 1
-                lazy = bool(ended) or depth < paragraph_depth
-                opened_item = None
-            else:
-                break
-            # A quote marker under a list item continues that quote's paragraph.
-            if item or depth > paragraph_depth or not paragraph:
-                yield from _paragraph_run(paragraph)
-                paragraph, paragraph_depth, in_table = [], depth, False
-            offset = line.start + len(line.content) - len(rest) + width
-            line = _Line(offset, rest[width:], line.end)
-            content = line.content
-            chars, relative = _leading(content)
-            columns = base + relative
-            rest = content[chars:]
-            block_start = relative <= 3
-        if not rest:
-            empty_item = opened_item
-            continue
-        if relative >= 4 and not paragraph and not in_table:
-            continue
-        opener = (
-            _block_opener(rest, paragraph=bool(paragraph), lazy=lazy)
-            if block_start
-            else None
+        opener = tokens[index - 1]
+        if opener.type in ('th_open', 'td_open'):
+            # markdown-it does not say where a cell sits in its row, so the
+            # row is split again at its first cell, and each cell markdown-it
+            # reads takes the next: a cell past the header's is dropped.
+            if tokens[index - 2].type == 'tr_open':
+                cells = _cells(_text_lines(token, lines)[0])
+            cell = next(cells, None)
+            if cell is not None and '](' in cell.content:
+                yield _Run.of_lines([cell], in_table_row=True)
+        # A link's text always runs into its destination.
+        elif '](' in token.content:
+            text = _text_lines(token, lines)
+            if opener.type == 'heading_open' and opener.markup.startswith('#'):
+                text[0] = _past_hashes(text[0], opener.markup)
+            yield _Run.of_lines(text)
+
+
+def _text_lines(token: Token, lines: list[_Line]) -> list[_Line]:
+    assert token.map is not None
+    return [
+        line.after(column)
+        for line, column in zip(
+            lines[slice(*token.map)], token.meta['columns'], strict=True
         )
-        if opener is not None:
-            yield from _paragraph_run(paragraph)
-            paragraph, in_table = [], False
-            match opener:
-                case 'fence':
-                    run = len(rest) - len(rest.lstrip(rest[0]))
-                    fence = _Fence(rest[0], run, base, depth)
-                case 'marked-html':
-                    marker = _marked_html_end(rest)
-                    assert marker is not None
-                    if not marker.search(rest):
-                        html_end = _HtmlEnd(marker, depth)
-                case 'html':
-                    in_html_block = True
-                case 'heading':
-                    yield _Run.of_lines([line])
-            continue
-        if in_table:
-            yield from _cell_runs(line)
-            continue
-        if (
-            block_start
-            and not (paragraph and lazy)
-            and _starts_table(content, raw_lines, index)
-        ):
-            yield from _paragraph_run(paragraph)
-            paragraph, in_table, skip_delimiter = [], True, True
-            table_depth = depth
-            yield from _cell_runs(line)
-            continue
-        if paragraph and not may_be_lazy:
-            yield from _paragraph_run(paragraph)
-            paragraph = []
-        if paragraph:
-            list_items = open_items
-        else:
-            paragraph_depth = depth
-        paragraph.append(line)
-    yield from _paragraph_run(paragraph)
+    ]
 
 
-type _BlockOpener = Literal[
-    'fence', 'marked-html', 'html', 'heading', 'setext-underline', 'thematic-break'
-]
+def _cells(row: _Line) -> Iterator[_Line]:
+    for start, end in table_cell_spans(row.content):
+        yield _Line(row.start + start, row.content[start:end], row.start + end)
 
 
-def _block_opener(rest: str, *, paragraph: bool, lazy: bool) -> _BlockOpener | None:
-    """The block a line opens that ends the paragraph or table before it."""
-    if _FENCE_OPEN.match(rest):
-        return 'fence'
-    if _marked_html_end(rest):
-        return 'marked-html'
-    if _HTML_BLOCK_START.match(rest) or (not paragraph and _HTML_TAG_LINE.match(rest)):
-        return 'html'
-    if _ATX_HEADING.match(rest):
-        return 'heading'
-    if paragraph and not lazy and _SETEXT_UNDERLINE.match(rest):
-        return 'setext-underline'
-    if _THEMATIC_BREAK.match(rest):
-        return 'thematic-break'
-    return None
+def _past_hashes(line: _Line, hashes: str) -> _Line:
+    """An ATX heading's text, past its opening hashes and the space after."""
+    rest = line.content[len(hashes) :]
+    return line.after(len(hashes) + len(rest) - len(rest.lstrip(' \t')))
 
 
-def _marked_html_end(rest: str) -> re.Pattern[str] | None:
-    for start, end in _MARKED_HTML_BLOCKS:
-        if start.match(rest):
-            return end
-    return None
+type _BlockRule = Callable[[StateBlock, int, int, bool], bool]
 
 
-def _list_item(rest: str, *, interrupts_paragraph: bool) -> re.Match[str] | None:
-    """A list marker opening `rest`, unless the line is a thematic break or a
-    setext underline, which win over it. Only an item that holds text, and an
-    ordered one only from 1, interrupts a paragraph."""
-    item = _LIST_ITEM.match(rest)
-    if item is None or _THEMATIC_BREAK.match(rest):
-        return None
-    number = item.group(1)[:-1]
-    if interrupts_paragraph and (
-        _SETEXT_UNDERLINE.match(rest)
-        or not rest[item.end() :].strip()
-        or (number and int(number) != 1)
-    ):
-        return None
-    return item
+def _recording(rule: _BlockRule) -> _BlockRule:
+    """`rule`, recording on each inline token it makes the column each line's
+    text starts at, past the line's container prefix and indent: markdown-it
+    knows it while the rule runs, but its tokens do not say."""
+
+    def recorded(state: StateBlock, start: int, end: int, silent: bool) -> bool:
+        made = len(state.tokens)
+        matched = rule(state, start, end, silent)
+        if matched and not silent:
+            for token in state.tokens[made:]:
+                if token.type == 'inline':
+                    assert token.map is not None
+                    token.meta['columns'] = [
+                        _column(state, line) for line in range(*token.map)
+                    ]
+        return matched
+
+    return recorded
 
 
-def _holds(item: _ListItem, raw: str, depth: int) -> bool:
-    """Whether the line stays in the list item: inside the item's quote, and
-    blank or indented into it there — a quote opened in the item counts as
-    indent, so a bare `>` outside the item ends it."""
-    if item.quote_depth > depth:
-        return False
-    _, prefix = _quote_prefix(raw, item.quote_depth)
-    inside = raw[prefix:]
-    return not inside.strip() or _leading(inside)[1] >= item.column
+def _column(state: StateBlock, line: int) -> int:
+    # Normalizing the source rewrites line breaks, and NULs one for one, so
+    # a column within a line of it is one in the source line too.
+    text_start = state.bMarks[line] + state.tShift[line]
+    return text_start - (state.src.rfind('\n', 0, text_start) + 1)
 
 
-def _raw_lines(source: str) -> Iterator[tuple[int, str]]:
-    """Each line's start offset and text, without its `\\n` or `\\r\\n`."""
+def _block_parser() -> MarkdownIt:
+    # The preset stops reading blocks nested 20 deep; a renderer does not.
+    parser = MarkdownIt('commonmark', {'maxNesting': 100})
+    parser.enable('table').disable('inline')
+    ruler = parser.block.ruler
+    for rule in list(ruler.__rules__):
+        if rule.name in ('paragraph', 'heading', 'lheading', 'table'):
+            # Given no options, `at` drops the blocks the rule may interrupt.
+            ruler.at(rule.name, _recording(rule.fn), {'alt': rule.alt})
+    return parser
+
+
+_BLOCKS = _block_parser()
+# Every line break markdown-it reads, so its line numbers are the source's.
+_LINE_BREAK = re.compile(r'\r\n|\r|\n')
+
+
+def _source_lines(source: str) -> list[_Line]:
+    lines: list[_Line] = []
     start = 0
-    while start < len(source):
-        newline = source.find('\n', start)
-        stop = len(source) if newline == -1 else newline + 1
-        yield start, source[start:stop].removesuffix('\n').removesuffix('\r')
-        start = stop
-
-
-def _quote_prefix(raw: str, limit: int | None) -> tuple[int, int]:
-    """How many blockquote markers open the line, and where its content
-    starts. Inside a fence, only the fence's own markers are containers."""
-    depth = position = 0
-    while (limit is None or depth < limit) and (
-        marker := _BLOCKQUOTE_MARKER.match(raw, position)
-    ):
-        depth, position = depth + 1, marker.end()
-    return depth, position
-
-
-def _leading(content: str) -> tuple[int, int]:
-    """The leading whitespace as characters, and as columns (a tab reaches the
-    next multiple of 4)."""
-    columns = chars = 0
-    for char in content:
-        if char == ' ':
-            columns += 1
-        elif char == '\t':
-            columns += 4 - columns % 4
-        else:
-            break
-        chars += 1
-    return chars, columns
-
-
-def _fence_content(fence: _Fence, raw: str) -> str | None:
-    """The line inside the fence's containers, or None when the line ends one
-    of them, and the fence with it: a quote it leaves out, or a list item it
-    is not indented into."""
-    depth, prefix = _quote_prefix(raw, fence.quote_depth)
-    content = raw[prefix:]
-    if depth < fence.quote_depth or (
-        content.strip() and _leading(content)[1] < fence.base
-    ):
-        return None
-    return content
-
-
-def _closes(fence: _Fence, content: str) -> bool:
-    chars, columns = _leading(content)
-    rest = content[chars:]
-    run = len(rest) - len(rest.lstrip(fence.char))
-    return columns - fence.base <= 3 and run >= fence.width and not rest[run:].strip()
-
-
-def _starts_table(content: str, raw_lines: list[tuple[int, str]], index: int) -> bool:
-    if '|' not in content or index + 1 >= len(raw_lines):
-        return False
-    _, next_raw = raw_lines[index + 1]
-    _, prefix = _quote_prefix(next_raw, None)
-    delimiter = next_raw[prefix:]
-    return bool(_DELIMITER_ROW.match(delimiter)) and len(
-        table_cell_spans(content)
-    ) == len(table_cell_spans(delimiter))
-
-
-def _paragraph_run(lines: list[_Line]) -> Iterator[_Run]:
-    if lines:
-        yield _Run.of_lines(lines)
-
-
-def _cell_runs(line: _Line) -> Iterator[_Run]:
-    for start, end in table_cell_spans(line.content):
-        cell = _Line(line.start + start, line.content[start:end], line.start + end)
-        yield _Run.of_lines([cell], in_table_row=True)
+    for line_break in _LINE_BREAK.finditer(source):
+        lines.append(
+            _Line(start, source[start : line_break.start()], line_break.start())
+        )
+        start = line_break.end()
+    if start < len(source):
+        lines.append(_Line(start, source[start:], len(source)))
+    return lines
 
 
 # --- Inline structure ---

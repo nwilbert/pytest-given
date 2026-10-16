@@ -1,7 +1,9 @@
-"""Holds the hand-written link scanner to markdown-it-py over every Markdown
-file the repository tracks: both must find the same inline links, with the
-same destination and the same text once escapes are resolved."""
+"""Holds the link scanner to markdown-it-py's own inline links over every
+Markdown file the repository tracks: both must find the same links, with the
+same destination, the same text once escapes are resolved, and in a table cell
+alike."""
 
+import itertools
 import subprocess
 from pathlib import Path
 from urllib.parse import unquote
@@ -17,20 +19,8 @@ _ROOT = Path(__file__).parents[3]
 _FIXTURE = 'tests/unit/citations/fixtures/citation-forms.md'
 _MARKDOWN = MarkdownIt('commonmark').enable(['table', 'strikethrough'])
 
-type FoundLink = tuple[str, str]
-
-# Constructs the scanner deliberately reads differently, by file: the links
-# to leave out of both sides, each with the reason in a comment.
-KNOWN_DIFFERENCES: dict[str, list[FoundLink]] = {
-    _FIXTURE: [
-        # markdown-it continues a quote at a `>` indented 4 columns; CommonMark
-        # reads indented code, as the scanner does.
-        ('https://example.org/edge/12', 'Indented quote marker'),
-        # markdown-it ends a nested quote's paragraph at an indented fence
-        # opener; CommonMark continues it lazily, as the scanner does.
-        ('https://example.org/edge/13', 'Indented fence opener'),
-    ]
-}
+# Destination, text, and whether the link sits in a table cell.
+type FoundLink = tuple[str, str, bool]
 
 
 def _documents() -> list[str]:
@@ -48,12 +38,9 @@ def _documents() -> list[str]:
 def test_the_scanner_finds_the_links_markdown_it_finds(document: str) -> None:
     source = (_ROOT / document).read_text(encoding='utf-8')
     parsed, references = _parsed(source)
-    ignored = set(KNOWN_DIFFERENCES.get(document, []))
 
     def compared(links: list[FoundLink]) -> list[FoundLink]:
-        return [
-            link for link in links if link[0] not in references and link not in ignored
-        ]
+        return [link for link in links if link[0] not in references]
 
     assert compared(_scanned(source)) == compared(parsed)
 
@@ -63,6 +50,7 @@ def _scanned(source: str) -> list[FoundLink]:
         (
             unquote(link.destination),
             plain_link_text(link.text, in_table_row=link.in_table_row),
+            link.in_table_row,
         )
         for link in scan_links(source)
     ]
@@ -73,15 +61,17 @@ def _parsed(source: str) -> tuple[list[FoundLink], set[str]]:
     a reference-style link is a link to markdown-it, never to the scanner."""
     env: dict[str, object] = {}
     links: list[FoundLink] = []
-    for token in _MARKDOWN.parse(source, env):
+    tokens = _MARKDOWN.parse(source, env)
+    for opener, token in itertools.pairwise(tokens):
         if token.type == 'inline':
-            links.extend(_inline_links(token.children or []))
+            in_cell = opener.type in ('th_open', 'td_open')
+            links.extend(_inline_links(token.children or [], in_cell))
     references = env.get('references', {})
     assert isinstance(references, dict)
     return links, {unquote(reference['href']) for reference in references.values()}
 
 
-def _inline_links(children: list[Token]) -> list[FoundLink]:
+def _inline_links(children: list[Token], in_cell: bool) -> list[FoundLink]:
     found: list[FoundLink] = []
     stack: list[tuple[bool, str, list[str]]] = []
     for child in children:
@@ -90,7 +80,7 @@ def _inline_links(children: list[Token]) -> list[FoundLink]:
         elif child.type == 'link_close':
             autolink, href, parts = stack.pop()
             if not autolink:
-                found.append((unquote(href), fold_whitespace(''.join(parts))))
+                found.append((unquote(href), fold_whitespace(''.join(parts)), in_cell))
         elif stack:
             stack[-1][2].append(_source_text(child))
     return found

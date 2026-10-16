@@ -887,6 +887,7 @@ version = "0.4.1"
 source = { editable = "." }
 dependencies = [
     { name = "jinja2" },
+    { name = "markdown-it-py" },
     { name = "pytest" },
 ]
 
@@ -900,12 +901,10 @@ build = [
 ]
 coverage = [
     { name = "coverage" },
-    { name = "markdown-it-py" },
 ]
 dev = [
     { name = "coverage" },
     { name = "library-skills" },
-    { name = "markdown-it-py" },
     { name = "mike" },
     { name = "mypy" },
     { name = "nox" },
@@ -923,9 +922,6 @@ lint = [
 nox = [
     { name = "nox" },
 ]
-test = [
-    { name = "markdown-it-py" },
-]
 typecheck = [
     { name = "mypy" },
     { name = "nox" },
@@ -934,6 +930,7 @@ typecheck = [
 [package.metadata]
 requires-dist = [
     { name = "jinja2", specifier = ">=3.1" },
+    { name = "markdown-it-py", specifier = ">=3.0" },
     { name = "pytest", specifier = ">=9.0" },
 ]
 
@@ -943,14 +940,10 @@ build = [
     { name = "library-skills", specifier = ">=0.0.19" },
     { name = "nox", specifier = ">=2026.4.10" },
 ]
-coverage = [
-    { name = "coverage", specifier = ">=7.14.0" },
-    { name = "markdown-it-py", specifier = ">=4.2.0" },
-]
+coverage = [{ name = "coverage", specifier = ">=7.14.0" }]
 dev = [
     { name = "coverage", specifier = ">=7.14.0" },
     { name = "library-skills", specifier = ">=0.0.19" },
-    { name = "markdown-it-py", specifier = ">=4.2.0" },
     { name = "mike", git = "https://github.com/squidfunk/mike.git?rev=2d4ad799442f4592db8ad53b179bfb33db8c69ac" },
     { name = "mypy", specifier = ">=2.1.0" },
     { name = "nox", specifier = ">=2026.4.10" },
@@ -964,7 +957,6 @@ docs = [
 ]
 lint = [{ name = "ruff", specifier = ">=0.15.13" }]
 nox = [{ name = "nox", specifier = ">=2026.4.10" }]
-test = [{ name = "markdown-it-py", specifier = ">=4.2.0" }]
 typecheck = [
     { name = "mypy", specifier = ">=2.1.0" },
     { name = "nox", specifier = ">=2026.4.10" },

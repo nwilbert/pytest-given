@@ -46,6 +46,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
 - A `--given-lint` run that finds nothing prints `pytest-given: narration lint (no findings)`.
 - The docs and error messages call `Annotated[..., given(...)]` on a test parameter a given annotation, and write node ID and case ID.
+- pytest-given now depends on markdown-it-py, which reads the paragraphs, headings and table cells of the documents `pytest-given citations` checks.
 
 ### Fixed
 

@@ -1,8 +1,8 @@
 name: Compat
 
 # Manual dispatch, run before every release (see docs/releasing.md): the
-# `compat` nox session tests every supported Python against pytest 9.0.x and the
-# newest pytest, here on both Linux and Windows.
+# `compat` nox session tests every supported Python against the oldest supported
+# pytest and markdown-it-py and the newest, here on both Linux and Windows.
 on:
   workflow_dispatch:
 
