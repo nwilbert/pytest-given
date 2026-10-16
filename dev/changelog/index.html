@@ -1078,6 +1078,8 @@
 <li>The bundled <code>pytest-given-authoring</code> and <code>pytest-given-reviewing</code> skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.</li>
 <li>A <code>--given-lint</code> run that finds nothing prints <code>pytest-given: narration lint (no findings)</code>.</li>
 <li>The docs and error messages call <code>Annotated[..., given(...)]</code> on a test parameter a given annotation, and write node ID and case ID.</li>
+<li>pytest-given now depends on markdown-it-py, which reads the tables of a <code>FileGlossary</code>'s file and the paragraphs, headings and table cells of the documents <code>pytest-given citations</code> checks.</li>
+<li><code>FileGlossary</code> reads the tables a GFM renderer shows, so it reads a table in a blockquote or list, skips one in an indented code or HTML block, and reads a cell missing from a row as empty instead of raising.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
