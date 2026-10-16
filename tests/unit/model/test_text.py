@@ -13,7 +13,6 @@ from pytest_given.model import (
     plural,
     read_spans,
     s_form,
-    table_cell_spans,
 )
 
 
@@ -66,26 +65,6 @@ def test_plural_agrees_the_noun_with_its_count() -> None:
         '1 story',
         '2 stories',
     ]
-
-
-@pytest.mark.parametrize(
-    ('row', 'cells'),
-    [
-        ('| a | b |', [' a ', ' b ']),
-        ('a | b', ['a ', ' b']),
-        (r'| a \| b | c |', [r' a \| b ', ' c ']),
-        # An escaped backslash still escapes the pipe after it, as GFM splits
-        # the row before it reads escapes.
-        (r'| a \\| b | c |', [r' a \\| b ', ' c ']),
-        (r'| `a\|b` | c |', [r' `a\|b` ', ' c ']),
-        ('| | a |', [' ', ' a ']),
-        ('|', []),
-    ],
-)
-def test_table_cell_spans_split_a_row_on_its_unescaped_pipes(
-    row: str, cells: list[str]
-) -> None:
-    assert [row[start:end] for start, end in table_cell_spans(row)] == cells
 
 
 def _strong(*content: PlainSpan | CodeSpan) -> EmphasisSpan:

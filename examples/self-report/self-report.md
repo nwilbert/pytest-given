@@ -1315,7 +1315,7 @@
 | problem | Glossary file | message |
 |---|---|---|
 | no table | Glossary file | bad.md: found no Markdown pipe table |
-| a short row | Glossary file | bad.md: data row at line 3 |
+| a header but no data rows | Glossary file | bad.md: the glossary file's Markdown table has no data rows |
 | no Term column | Glossary file | bad.md: column 'Term' |
 
 - **no table, bad.md: found no Markdown pipe table** — Glossary file:
@@ -1323,11 +1323,10 @@
   # no table here
   ```
 
-- **a short row, bad.md: data row at line 3** — Glossary file:
+- **a header but no data rows, bad.md: the glossary file's Markdown table has no data rows** — Glossary file:
   ```
   | Term | Meaning |
   |---|---|
-  | Guest |
   ```
 
 - **no Term column, bad.md: column 'Term'** — Glossary file:
@@ -1703,7 +1702,7 @@
 - **when** the parser reads the document
 - **then** only the real table outside the fence contributes rows
 
-## ✓ A «file glossary» table the parser cannot read is refused, saying what is wrong · 4 cases
+## ✓ A «file glossary» table the parser cannot read is refused, saying what is wrong · 3 cases
 `tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused` · diagnostics, validation
 
 - **given** a Markdown document with {document}
@@ -1717,7 +1716,6 @@
 | no pipe table | Markdown document | {} | found no Markdown pipe table |
 | one pipe table | Markdown document | {'term_column': 'Nope'} | column 'Nope' not found |
 | one pipe table | Markdown document | {'definition_column': 5} | column index 5 is out of range |
-| a data row narrower than its header | Markdown document | {'kind_column': 2} | data row at line 3 |
 
 - **no pipe table, {}, found no Markdown pipe table** — Markdown document:
   ```
@@ -1746,12 +1744,55 @@
   | Room  | A bookable room. |
   ```
 
-- **a data row narrower than its header, {'kind_column': 2}, data row at line 3** — Markdown document:
+## ✓ A «file glossary» reads the tables a GFM renderer shows, and no others · 4 cases
+`tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows`
+
+- **given** a Markdown document with {document}
+  - 📎 Markdown document — *see parameter table*
+- **when** the parser reads the document
+- **then** it reads the term and definition rows {rows}
+
+| document | Markdown document | rows |
+|---|---|---|
+| a table in a blockquote | Markdown document | \[('Quoted', 'yes')\] |
+| a table in an indented code block | Markdown document | \[('Real', 'yes')\] |
+| a separator row narrower than its header | Markdown document | \[('Real', 'yes')\] |
+| a data row narrower than its header | Markdown document | \[('Short', '')\] |
+
+- **a table in a blockquote, \[('Quoted', 'yes')\]** — Markdown document:
   ```
-  | Term | Meaning | Type |
-  |---|---|---|
-  | Guest | A person |
-  | Room | A bookable room | place |
+  > | Term | Meaning |
+  > |---|---|
+  > | Quoted | yes |
+  ```
+
+- **a table in an indented code block, \[('Real', 'yes')\]** — Markdown document:
+  ```
+      | Term | Meaning |
+      |---|---|
+      | Code | no |
+  
+  | Term | Meaning |
+  |---|---|
+  | Real | yes |
+  ```
+
+- **a separator row narrower than its header, \[('Real', 'yes')\]** — Markdown document:
+  ```
+  | Term | Meaning |
+  |---|
+  | Odd | no |
+  
+  | Term | Meaning |
+  |---|---|
+  | Real | yes |
+  ```
+
+- **a data row narrower than its header, \[('Short', '')\]** — Markdown document:
+  ```
+  | Term | Meaning |
+  |---|---|
+  | Short |
   ```
 
 ## ✓ A «term» cell is read as its plain text, with emphasis unwrapped · 6 cases

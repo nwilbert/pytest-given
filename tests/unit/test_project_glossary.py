@@ -3,21 +3,36 @@ GFM does: a row wider than its header lost its tail to an unescaped `|`."""
 
 from pathlib import Path
 
-from pytest_given.model import table_cell_spans
+from markdown_it import MarkdownIt
+from markdown_it.rules_block.table import escapedSplit
 
 _GLOSSARY = Path(__file__).parents[2] / 'GLOSSARY.md'
 
 
 def test_every_glossary_row_is_as_wide_as_its_header() -> None:
-    lines = _GLOSSARY.read_text(encoding='utf-8').splitlines()
+    text = _GLOSSARY.read_text(encoding='utf-8')
+    # Not `splitlines`, which also breaks where markdown-it does not.
+    lines = text.split('\n')
+    in_header = False
     width = 0
     misfits = []
-    for number, line in enumerate(lines, start=1):
-        if not line.startswith('|'):
-            continue
-        cells = len(table_cell_spans(line))
-        if number < len(lines) and set(lines[number]) <= set('|-: '):
-            width = cells
-        elif cells != width:
-            misfits.append(f'line {number}: {cells} cells, header has {width}')
+    for token in MarkdownIt('commonmark').enable('table').parse(text):
+        if token.type == 'thead_open':
+            in_header = True
+        elif token.type == 'tr_open':
+            assert token.map is not None
+            cells = _written_cells(lines[token.map[0]])
+            if in_header:
+                in_header, width = False, cells
+            elif cells != width:
+                misfits.append(
+                    f'line {token.map[0] + 1}: {cells} cells, header has {width}'
+                )
     assert misfits == []
+
+
+def _written_cells(row: str) -> int:
+    # markdown-it fits every row's tokens to its header, so the row is split
+    # again the way its table rule splits one.
+    cells = escapedSplit(row.strip())
+    return len(cells) - (cells[0] == '') - (len(cells) > 1 and cells[-1] == '')

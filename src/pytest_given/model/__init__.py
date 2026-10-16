@@ -100,7 +100,6 @@ from .text import (
     plural,
     read_spans,
     s_form,
-    table_cell_spans,
 )
 
 __all__ = [
@@ -190,6 +189,5 @@ __all__ = [
     'rolled_up_status',
     's_form',
     'snapshot_param_value',
-    'table_cell_spans',
     'walk_steps',
 ]

@@ -16,6 +16,7 @@ __lazy_modules__ = ['markdown_it']
 import bisect
 import functools
 import html
+import itertools
 import re
 from collections.abc import Callable, Collection, Iterator, Sequence
 from dataclasses import dataclass
@@ -24,7 +25,6 @@ from typing import TYPE_CHECKING, NamedTuple
 
 from markdown_it import MarkdownIt
 
-from ..model import table_cell_spans
 from ..report import ASCII_PUNCTUATION, code_span_at
 
 if TYPE_CHECKING:
@@ -211,6 +211,24 @@ def _text_lines(token: Token, lines: list[_Line]) -> list[_Line]:
 def _cells(row: _Line) -> Iterator[_Line]:
     for start, end in table_cell_spans(row.content):
         yield _Line(row.start + start, row.content[start:end], row.start + end)
+
+
+def table_cell_spans(row: str) -> list[Span]:
+    """Each cell's span in a GFM table row, its outer pipes left out. A pipe
+    right after a backslash is the cell's, escaped backslash or code span
+    around it or not: GFM splits the row before it reads any inline syntax."""
+    pipes = [
+        index
+        for index, char in enumerate(row)
+        if char == '|' and row[index - 1 : index] != '\\'
+    ]
+    edges = [-1, *pipes, len(row)]
+    spans = [(left + 1, right) for left, right in itertools.pairwise(edges)]
+    if spans and not row[: spans[0][1]].strip():
+        spans = spans[1:]
+    if spans and not row[spans[-1][0] :].strip():
+        spans = spans[:-1]
+    return spans
 
 
 def _past_hashes(line: _Line, hashes: str) -> _Line:

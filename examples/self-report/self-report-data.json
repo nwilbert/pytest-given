@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-15T19:56:38.033059+00:00",
+    "timestamp": "2026-10-16T20:26:44.196380+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "c7bb24a790b12c039524997466fe137fdb4dedcd",
+    "commit_sha": "184aa747f911993cc872a670b7a10dd99974cddf",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 120,
+      "duration_ms": 121,
       "steps": [
         {
           "phase": "given",
@@ -448,7 +448,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -634,7 +634,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 104,
+      "duration_ms": 98,
       "steps": [
         {
           "phase": "given",
@@ -825,7 +825,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1082,7 +1082,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1268,7 +1268,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 83,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -1454,7 +1454,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1521,7 +1521,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1800,7 +1800,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -2183,7 +2183,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 75,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -2353,7 +2353,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -2470,7 +2470,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 158,
+      "duration_ms": 163,
       "steps": [
         {
           "phase": "given",
@@ -2715,7 +2715,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2854,7 +2854,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2999,7 +2999,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -3297,7 +3297,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -3444,7 +3444,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 134,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
@@ -3637,7 +3637,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 116,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -3766,7 +3766,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 134,
+      "duration_ms": 122,
       "steps": [
         {
           "phase": "given",
@@ -3952,7 +3952,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -4046,7 +4046,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -4131,7 +4131,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -4208,7 +4208,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 267,
+      "duration_ms": 77,
       "steps": [
         {
           "phase": "given",
@@ -4290,7 +4290,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -4382,7 +4382,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -4467,7 +4467,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -4574,7 +4574,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 173,
+      "duration_ms": 160,
       "steps": [
         {
           "phase": "given",
@@ -4787,7 +4787,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -4940,7 +4940,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -5014,7 +5014,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -5163,7 +5163,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 355,
+      "duration_ms": 423,
       "steps": [
         {
           "phase": "given",
@@ -5322,7 +5322,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -5424,7 +5424,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5529,7 +5529,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -5649,7 +5649,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5779,7 +5779,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 98,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -6009,7 +6009,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -6121,7 +6121,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -6217,7 +6217,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -7612,7 +7612,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8013,7 +8013,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8478,7 +8478,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -8649,7 +8649,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -8750,7 +8750,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -8870,15 +8870,15 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_file_glossary.py::test_table_errors_name_the_file[a short row-bad.md: data row at line 3]",
+            "id": "tests/unit/capture/test_file_glossary.py::test_table_errors_name_the_file[a header but no data rows-bad.md: the glossary file's Markdown table has no data rows]",
             "values": [
-              "a short row",
+              "a header but no data rows",
               {
                 "label": "Glossary file",
-                "content": "| Term | Meaning |\n|---|---|\n| Guest |\n",
+                "content": "| Term | Meaning |\n|---|---|\n",
                 "content_type": "text"
               },
-              "bad.md: data row at line 3"
+              "bad.md: the glossary file's Markdown table has no data rows"
             ],
             "status": "passed",
             "error": null,
@@ -9083,7 +9083,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 297
+        "line": 300
       },
       "story_ids": [],
       "pins": null
@@ -9187,7 +9187,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 332
+        "line": 335
       },
       "story_ids": [],
       "pins": null
@@ -9302,7 +9302,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 350
+        "line": 353
       },
       "story_ids": [],
       "pins": null
@@ -9413,7 +9413,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
-        "line": 364
+        "line": 367
       },
       "story_ids": [],
       "pins": null
@@ -12775,18 +12775,176 @@
             "status": "passed",
             "error": null,
             "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_markdown_glossary.py",
+        "line": 117
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a table in a blockquote-rows0]",
+      "narration": {
+        "text": "A file glossary reads the tables a GFM renderer shows, and no others",
+        "parts": [
+          {
+            "value": "A "
           },
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused[a data row narrower than its header-columns3-data row at line 3]",
+            "term_id": "file-glossary",
+            "display": "file glossary",
+            "expression": "pg[\"File glossary\"].l"
+          },
+          {
+            "value": " reads the tables a GFM renderer shows, and no others"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_markdown_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Markdown document with {document}",
+            "parts": [
+              {
+                "value": "a Markdown document with "
+              },
+              {
+                "name": "document",
+                "column_id": "document",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "Markdown document",
+              "content_type": "text",
+              "column_id": "attachment:0"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the parser reads the document",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it reads the term and definition rows {rows}",
+            "parts": [
+              {
+                "value": "it reads the term and definition rows "
+              },
+              {
+                "name": "rows",
+                "column_id": "rows",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "document",
+            "name": "document",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "Markdown document",
+            "kind": "attachment"
+          },
+          {
+            "id": "rows",
+            "name": "rows",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a table in a blockquote-rows0]",
+            "values": [
+              "a table in a blockquote",
+              {
+                "label": "Markdown document",
+                "content": "> | Term | Meaning |\n> |---|---|\n> | Quoted | yes |\n",
+                "content_type": "text"
+              },
+              "[('Quoted', 'yes')]"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a table in an indented code block-rows1]",
+            "values": [
+              "a table in an indented code block",
+              {
+                "label": "Markdown document",
+                "content": "    | Term | Meaning |\n    |---|---|\n    | Code | no |\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
+                "content_type": "text"
+              },
+              "[('Real', 'yes')]"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a separator row narrower than its header-rows2]",
+            "values": [
+              "a separator row narrower than its header",
+              {
+                "label": "Markdown document",
+                "content": "| Term | Meaning |\n|---|\n| Odd | no |\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
+                "content_type": "text"
+              },
+              "[('Real', 'yes')]"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a data row narrower than its header-rows3]",
             "values": [
               "a data row narrower than its header",
               {
                 "label": "Markdown document",
-                "content": "| Term | Meaning | Type |\n|---|---|---|\n| Guest | A person |\n| Room | A bookable room | place |\n",
+                "content": "| Term | Meaning |\n|---|---|\n| Short |\n",
                 "content_type": "text"
               },
-              "{'kind_column': 2}",
-              "data row at line 3"
+              "[('Short', '')]"
             ],
             "status": "passed",
             "error": null,
@@ -12799,7 +12957,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 124
+        "line": 173
       },
       "story_ids": [],
       "pins": null
@@ -12978,7 +13136,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 167
+        "line": 197
       },
       "story_ids": [],
       "pins": null
@@ -13040,7 +13198,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 194
+        "line": 224
       },
       "story_ids": [],
       "pins": null
@@ -13102,7 +13260,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 209
+        "line": 239
       },
       "story_ids": [],
       "pins": null
@@ -13164,7 +13322,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 227
+        "line": 257
       },
       "story_ids": [],
       "pins": null
@@ -17579,7 +17737,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -18955,7 +19113,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -19849,7 +20007,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -23995,7 +24153,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 142,
+      "duration_ms": 148,
       "steps": [
         {
           "phase": "given",

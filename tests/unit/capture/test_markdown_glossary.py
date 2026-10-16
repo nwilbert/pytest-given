@@ -108,16 +108,9 @@ def test_skips_tables_in_fenced_code_blocks():
         assert [row.term for row in rows] == ['Real']
 
 
-SHORT_ROW_TABLE = """| Term | Meaning | Type |
-|---|---|---|
-| Guest | A person |
-| Room | A bookable room | place |
-"""
-
 _UNREADABLE_DOCUMENTS = {
     'no pipe table': '# Just a heading\n\nNo tables here.',
     'one pipe table': SIMPLE,
-    'a data row narrower than its header': SHORT_ROW_TABLE,
 }
 
 
@@ -135,11 +128,6 @@ _UNREADABLE_DOCUMENTS = {
             'one pipe table',
             {'definition_column': 5},
             'column index 5 is out of range',
-        ),
-        (
-            'a data row narrower than its header',
-            {'kind_column': 2},
-            'data row at line 3',
         ),
     ],
 )
@@ -162,6 +150,48 @@ def test_an_unreadable_glossary_table_is_refused(document, columns, message):
         pytest.raises(PytestGivenError, match=re.escape(message)),
     ):
         parse_glossary_tables(text, **selection)
+
+
+REAL_TABLE = '| Term | Meaning |\n|---|---|\n| Real | yes |\n'
+
+_GFM_DOCUMENTS = {
+    'a table in a blockquote': (
+        '> | Term | Meaning |\n> |---|---|\n> | Quoted | yes |\n'
+    ),
+    'a table in an indented code block': (
+        '    | Term | Meaning |\n    |---|---|\n    | Code | no |\n\n' + REAL_TABLE
+    ),
+    'a separator row narrower than its header': (
+        '| Term | Meaning |\n|---|\n| Odd | no |\n\n' + REAL_TABLE
+    ),
+    'a data row narrower than its header': (
+        '| Term | Meaning |\n|---|---|\n| Short |\n'
+    ),
+}
+
+
+@scenario(
+    t'A {pg["File glossary"].l} reads the tables a GFM renderer shows, and no others',
+)
+@pytest.mark.parametrize(
+    ('document', 'rows'),
+    [
+        ('a table in a blockquote', [('Quoted', 'yes')]),
+        ('a table in an indented code block', [('Real', 'yes')]),
+        ('a separator row narrower than its header', [('Real', 'yes')]),
+        ('a data row narrower than its header', [('Short', '')]),
+    ],
+)
+def test_a_glossary_reads_the_tables_a_gfm_renderer_shows(document, rows):
+    with given(t'a Markdown document with {document}'):
+        text = _GFM_DOCUMENTS[document]
+        attach('Markdown document', text)
+    with when('the parser reads the document'):
+        read = parse_glossary_tables(
+            text, term_column=0, definition_column=1, kind_column=None
+        )
+    with then(t'it reads the term and definition rows {rows}'):
+        assert [(row.term, row.definition) for row in read] == rows
 
 
 @scenario(

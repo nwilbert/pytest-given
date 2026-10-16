@@ -4,7 +4,11 @@ update rewrites."""
 import pytest
 
 from pytest_given.citations.check import _READ_GLYPHS
-from pytest_given.citations.markdown_links import MarkdownLink, scan_links
+from pytest_given.citations.markdown_links import (
+    MarkdownLink,
+    scan_links,
+    table_cell_spans,
+)
 
 GLYPHS = _READ_GLYPHS
 
@@ -314,3 +318,23 @@ def test_links_in_headings_setext_and_any_line_break() -> None:
 
 def test_an_autolink_and_inline_html_hide_brackets() -> None:
     assert scan_links('<a href="[x](y)">z</a> <https://x.org/[a](b)>\n') == []
+
+
+@pytest.mark.parametrize(
+    ('row', 'cells'),
+    [
+        ('| a | b |', [' a ', ' b ']),
+        ('a | b', ['a ', ' b']),
+        (r'| a \| b | c |', [r' a \| b ', ' c ']),
+        # An escaped backslash still escapes the pipe after it, as GFM splits
+        # the row before it reads escapes.
+        (r'| a \\| b | c |', [r' a \\| b ', ' c ']),
+        (r'| `a\|b` | c |', [r' `a\|b` ', ' c ']),
+        ('| | a |', [' ', ' a ']),
+        ('|', []),
+    ],
+)
+def test_table_cell_spans_split_a_row_on_its_unescaped_pipes(
+    row: str, cells: list[str]
+) -> None:
+    assert [row[start:end] for start, end in table_cell_spans(row)] == cells

@@ -11,12 +11,8 @@ as the same term; `plural` so the lint summary and the report count alike.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
-
-`table_cell_spans` is how `capture` reads a glossary file's table and
-`citations` a cited document's: one GFM row rule, not two.
 """
 
-import itertools
 import re
 from dataclasses import dataclass
 
@@ -66,24 +62,6 @@ def s_form(text: str) -> str:
     if _CONSONANT_Y.search(text):
         return f'{text[:-1]}ies'
     return f'{text}s'
-
-
-def table_cell_spans(row: str) -> list[tuple[int, int]]:
-    """Each cell's span in a GFM table row, its outer pipes left out. A pipe
-    right after a backslash is the cell's, escaped backslash or code span
-    around it or not: GFM splits the row before it reads any inline syntax."""
-    pipes = [
-        index
-        for index, char in enumerate(row)
-        if char == '|' and row[index - 1 : index] != '\\'
-    ]
-    edges = [-1, *pipes, len(row)]
-    spans = [(left + 1, right) for left, right in itertools.pairwise(edges)]
-    if spans and not row[: spans[0][1]].strip():
-        spans = spans[1:]
-    if spans and not row[spans[-1][0] :].strip():
-        spans = spans[:-1]
-    return spans
 
 
 @dataclass(frozen=True)

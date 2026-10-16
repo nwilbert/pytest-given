@@ -257,7 +257,7 @@ def test_empty_id_term_cell_raises(tmp_path):
 
 _BAD_TABLES = {
     'no table': '# no table here\n',
-    'a short row': '| Term | Meaning |\n|---|---|\n| Guest |\n',
+    'a header but no data rows': '| Term | Meaning |\n|---|---|\n',
     'no Term column': '| Word | Meaning |\n|---|---|\n| Guest | x |\n',
 }
 
@@ -270,7 +270,10 @@ _BAD_TABLES = {
     ('problem', 'message'),
     [
         ('no table', 'bad.md: found no Markdown pipe table'),
-        ('a short row', 'bad.md: data row at line 3'),
+        (
+            'a header but no data rows',
+            "bad.md: the glossary file's Markdown table has no data rows",
+        ),
         ('no Term column', "bad.md: column 'Term'"),
     ],
 )
