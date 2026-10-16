@@ -22,7 +22,7 @@ from ..report import (
     plain_link_text,
     report_fragment,
 )
-from .markdown_links import VARIATION_SELECTOR, MarkdownLink, scan_links
+from .markdown_links import VARIATION_SELECTOR, Glyph, MarkdownLink, scan_links
 from .targets import TargetResolver, parse_fragment
 
 type FindingKind = Literal[
@@ -203,118 +203,129 @@ class _LinkCheck:
     edits: list[_Edit]
 
     def run(self, fragment: str) -> None:
-        is_citation = self.link.glyph is not None
+        glyph = self.link.glyph
         target = parse_fragment(fragment)
         if target is None:
-            if is_citation:
+            if glyph is not None:
                 self._find(
                     'mistyped',
                     f'citation links the report, but #{fragment} names no scenario, '
                     'tag or story',
                 )
             return
-        resolved = self.resolver.resolve(target)
-        if resolved is not None and resolved != target:
-            self._repoint(
-                'fragment',
-                f'{target.kind} fragment names {target.key!r}, which a report link '
-                f'names as {resolved.key!r}',
-                target,
-                resolved,
-            )
         written_title = plain_link_text(
             self.link.text, in_table_row=self.link.in_table_row
         )
-        if resolved is None and is_citation and target.kind == 'scenario':
-            titled = self.resolver.scenarios_titled(written_title)
-            if len(titled) == 1:
-                resolved = Target('scenario', titled[0])
-                self._repoint(
-                    'repointed',
-                    f'{_named(target)} is not in the report; its link text is '
-                    f'the title of {titled[0]}',
-                    target,
-                    resolved,
-                )
+        resolved = self._resolve_and_repoint(target, glyph, written_title)
         if resolved is None:
             self._find(
                 'missing',
                 f'{_named(target)} is not in the report',
                 *self.resolver.suggestions(target, written_title),
             )
-            if is_citation:
-                self._mark_missing()
-            return
-        if is_citation:
-            self._check_citation(resolved, written_title)
+            if glyph is not None:
+                self._mark_missing(glyph)
+        elif glyph is not None:
+            self._check_citation(resolved, glyph, written_title)
 
-    def _check_citation(self, target: Target, written_title: str) -> None:
+    def _resolve_and_repoint(
+        self, target: Target, glyph: Glyph | None, written_title: str
+    ) -> Target | None:
+        """The target as a citation names it now, the fragment repointed to it —
+        for a scenario citation the report lacks, the one titled as its text."""
+        resolved = self.resolver.resolve(target)
+        if resolved is not None:
+            if resolved != target:
+                self._repoint(
+                    'fragment',
+                    f'{target.kind} fragment names {target.key!r}, which a report '
+                    f'link names as {resolved.key!r}',
+                    target,
+                    resolved,
+                )
+            return resolved
+        if glyph is None or target.kind != 'scenario':
+            return None
+        titled = self.resolver.scenarios_titled(written_title)
+        if len(titled) != 1:
+            return None
+        resolved = Target('scenario', titled[0])
+        self._repoint(
+            'repointed',
+            f'{_named(target)} is not in the report; its link text is the title '
+            f'of {titled[0]}',
+            target,
+            resolved,
+        )
+        return resolved
+
+    def _check_citation(self, target: Target, glyph: Glyph, written_title: str) -> None:
         citation = self.resolver.index.citation(target)
         link = self.link
-        assert link.glyph is not None
-        if link.glyph.bare != citation.glyph:
-            self._find(
-                'stale',
+        if glyph.bare != citation.glyph:
+            self._fix(
                 'stale glyph',
-                f'{link.glyph.text} → {citation.glyph}',
-                fixed=True,
+                f'{glyph.text} → {citation.glyph}',
+                _Edit(*glyph.span, citation.glyph),
             )
-            self.edits.append(_Edit(*link.glyph.span, citation.glyph))
         if written_title != fold_whitespace(citation.title_text):
-            self._find(
-                'stale',
+            self._fix(
                 'stale link text',
                 f'{written_title} → {citation.title_text}',
-                fixed=True,
-            )
-            self.edits.append(
                 _Edit(
                     *link.text_span,
                     link_text(citation.title, in_table_row=link.in_table_row),
-                )
+                ),
             )
-        summary = _SUMMARY.match(link.trailing)
-        if citation.summary is None:
-            if summary is not None:
+        match citation.summary, _SUMMARY.match(link.trailing):
+            case None, re.Match() as written:
                 self._find(
                     'stray-summary',
-                    f'a scenario citation takes no summary: {summary.group(1)}',
+                    f'a scenario citation takes no summary: {written.group(1)}',
                 )
-        elif summary is None:
-            self._find('stale', 'missing summary', f'→ {citation.summary}', fixed=True)
-            self.edits.append(_Edit(link.end, link.end, f' {citation.summary}'))
-        elif summary.group(1).replace(VARIATION_SELECTOR, '') != citation.summary:
-            self._find(
-                'stale',
-                'stale summary',
-                f'{summary.group(1)} → {citation.summary}',
-                fixed=True,
-            )
-            self.edits.append(
-                _Edit(*link.trailing_span(*summary.span(1)), citation.summary)
-            )
+            case str() as summary, None:
+                self._fix(
+                    'missing summary',
+                    f'→ {summary}',
+                    _Edit(link.end, link.end, f' {summary}'),
+                )
+            case str() as summary, re.Match() as written if (
+                written.group(1).replace(VARIATION_SELECTOR, '') != summary
+            ):
+                self._fix(
+                    'stale summary',
+                    f'{written.group(1)} → {summary}',
+                    _Edit(*link.trailing_span(*written.span(1)), summary),
+                )
         if citation.state == 'failed':
             self._find('failed', f'cited {target.kind} fails: {citation.title_text}')
 
-    def _mark_missing(self) -> None:
+    def _mark_missing(self, glyph: Glyph) -> None:
         link = self.link
-        assert link.glyph is not None
         missing = CITATION_GLYPH['missing']
-        if link.glyph.bare != missing:
-            self.edits.append(_Edit(*link.glyph.span, missing))
+        if glyph.bare != missing:
+            self.edits.append(_Edit(*glyph.span, missing))
         if summary := _SUMMARY.match(link.trailing):
             self.edits.append(_Edit(*link.trailing_span(0, summary.end()), ''))
 
     def _repoint(
         self, kind: FindingKind, message: str, old: Target, new: Target
     ) -> None:
-        new_fragment = report_fragment(new)
-        self._find(
-            kind, message, f'#{report_fragment(old)} → #{new_fragment}', fixed=True
-        )
         span = self.link.fragment_span
         assert span is not None
-        self.edits.append(_Edit(*span, new_fragment))
+        new_fragment = report_fragment(new)
+        self._fix(
+            message,
+            f'#{report_fragment(old)} → #{new_fragment}',
+            _Edit(*span, new_fragment),
+            kind=kind,
+        )
+
+    def _fix(
+        self, message: str, detail: str, edit: _Edit, *, kind: FindingKind = 'stale'
+    ) -> None:
+        self._find(kind, message, detail, fixed=True)
+        self.edits.append(edit)
 
     def _find(
         self, kind: FindingKind, message: str, *details: str, fixed: bool = False
