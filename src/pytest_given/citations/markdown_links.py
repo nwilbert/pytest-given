@@ -9,20 +9,27 @@ characters around it, sit in the source — and an update must change those
 bytes and no others.
 """
 
+# Python 3.15 imports these on first use, so a CLI command that checks no
+# citations never loads markdown-it; older versions ignore the list.
+__lazy_modules__ = ['markdown_it']
+
 import bisect
+import functools
 import html
 import re
 from collections.abc import Callable, Collection, Iterator, Sequence
 from dataclasses import dataclass
 from html.entities import html5
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 from markdown_it import MarkdownIt
-from markdown_it.rules_block import StateBlock
-from markdown_it.token import Token
 
 from ..model import table_cell_spans
 from ..report import ASCII_PUNCTUATION, code_span_at
+
+if TYPE_CHECKING:
+    from markdown_it.rules_block import StateBlock
+    from markdown_it.token import Token
 
 type Span = tuple[int, int]
 
@@ -168,7 +175,7 @@ def _span(offsets: Sequence[int], start: int, end: int) -> Span:
 
 
 def _inline_runs(source: str, lines: list[_Line]) -> Iterator[_Run]:
-    tokens = _BLOCKS.parse(source)
+    tokens = _block_parser().parse(source)
     cells: Iterator[_Line] = iter(())
     for index, token in enumerate(tokens):
         if token.type != 'inline':
@@ -242,6 +249,7 @@ def _column(state: StateBlock, line: int) -> int:
     return text_start - (state.src.rfind('\n', 0, text_start) + 1)
 
 
+@functools.cache
 def _block_parser() -> MarkdownIt:
     # The preset stops reading blocks nested 20 deep; a renderer does not.
     parser = MarkdownIt('commonmark', {'maxNesting': 100})
@@ -254,7 +262,6 @@ def _block_parser() -> MarkdownIt:
     return parser
 
 
-_BLOCKS = _block_parser()
 # Every line break markdown-it reads, so its line numbers are the source's.
 _LINE_BREAK = re.compile(r'\r\n|\r|\n')
 
