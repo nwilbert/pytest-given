@@ -2,6 +2,9 @@
 text, and in glossary definitions, which also break lines. Rendering is a
 report concern, so this lives in `report/` and never imports from `capture/`."""
 
+# A run that renders no HTML never loads MarkupSafe.
+__lazy_modules__ = ['markupsafe']
+
 import re
 from collections.abc import Callable
 

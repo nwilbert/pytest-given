@@ -14,7 +14,7 @@ def test_an_entry_point_loads_no_renderer_or_parser_until_used(
 ) -> None:
     code = (
         f'import sys, {entry_point}; '
-        "print(sorted({'jinja2', 'markdown_it'} & set(sys.modules)))"
+        "print(sorted({'jinja2', 'markdown_it', 'markupsafe'} & set(sys.modules)))"
     )
     loaded = subprocess.run(
         [sys.executable, '-c', code],

@@ -5,8 +5,9 @@ Everything the page displays is rendered into the markup here; the one
 JSON blob beside it is what `app.js` seeds its state from.
 """
 
-# A pytest session or CLI command that renders no HTML never loads Jinja.
-__lazy_modules__ = ['jinja2']
+# A pytest session or CLI command that renders no HTML never loads Jinja or
+# MarkupSafe.
+__lazy_modules__ = ['jinja2', 'markupsafe']
 
 import base64
 import json
