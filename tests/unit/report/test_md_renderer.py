@@ -26,8 +26,7 @@ from pytest_given.model import (
     TracebackFrame,
     report_to_dict,
 )
-from pytest_given.report import narration_body_md
-from pytest_given.report.md_renderer import render_md
+from pytest_given.report.md_renderer import narration_body_md, render_md
 from tests.ubiquitous_language import pg
 
 

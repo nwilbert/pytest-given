@@ -1094,6 +1094,10 @@ def test_a_renamed_test_is_repointed_by_its_shown_title_with_a_code_span(
         ('<details open markdown="0">', '<details open markdown="1">'),
         ("<details markdown='block'>", '<details markdown="1">'),
         ('<details markdown>', '<details markdown="1">'),
+        (
+            '<details title="see markdown here">',
+            '<details markdown="1" title="see markdown here">',
+        ),
     ],
 )
 def test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes(
@@ -1206,6 +1210,38 @@ def test_a_report_link_in_a_stale_body_is_not_read(tmp_path: Path) -> None:
     )
     _, written = _run(tmp_path, document, report_(PAID), update=True)
     assert written == _block(FILLED)
+
+
+def test_a_narrated_citation_nested_in_a_rewritten_body_is_not_read(
+    tmp_path: Path,
+) -> None:
+    report = report_(
+        PAID, _narrated_scenario('t.py::test_refund', 'Refund', status='failed')
+    )
+    nested = _block(FILLED, text='Refund', fragment='scenario=t.py::test_refund')
+    in_item = ''.join(
+        f'  {line}' if line.strip() else line
+        for line in nested.splitlines(keepends=True)
+    )
+    document = _block(f'\n- Refunding:\n\n{in_item}\n')
+    result, written = _run(tmp_path, document, report, update=True)
+    assert [f.message for f in result.findings] == ['stale narration']
+    assert written == _block(FILLED)
+
+
+def test_a_report_link_in_a_tag_citations_body_is_read(tmp_path: Path) -> None:
+    report = report_(_narrated_scenario(tags=('checkout',)))
+    document = _block(
+        f'\n❌ [Pay]({URL}#scenario=t.py::test_pay)\n\n',
+        text='checkout',
+        fragment='tag=checkout',
+    )
+    result, _ = _run(tmp_path, document, report)
+    assert [f.message for f in result.findings] == [
+        'a tag citation takes no narration',
+        'stale glyph',
+        'stale link text',
+    ]
 
 
 @pytest.mark.parametrize(

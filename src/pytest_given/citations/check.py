@@ -3,6 +3,7 @@ finding and edit, and only then write — so a document that cannot be read
 leaves every file as it was.
 """
 
+import bisect
 import itertools
 import re
 from abc import ABC, abstractmethod
@@ -10,10 +11,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Literal, NamedTuple, Protocol
+from typing import ClassVar, Literal, NamedTuple, Protocol
 from urllib.parse import SplitResult, unquote, urlsplit
 
-from ..markdown import Span, fold_whitespace, plain_html_text, plain_link_text
+from ..markdown import Span, plain_html_text, plain_link_text
 from ..model import (
     STATUSES,
     NodeId,
@@ -34,7 +35,7 @@ from ..report import (
 )
 from .markdown_links import VARIATION_SELECTOR, Glyph, MarkdownLink, scan_links
 from .narrated import LooseDetails, NarratedCitation, scan_narrated
-from .targets import TargetResolver, parse_fragment
+from .targets import TargetResolver, TitleForm, parse_fragment, shown_title
 
 type CitationFindingKind = Literal[
     'repointed',
@@ -282,36 +283,40 @@ def _check_document(
     resolver: TargetResolver,
     location: _ReportLocation,
 ) -> tuple[list[ReportLink], list[_Edit]]:
-    """A narrated citation's body is rewritten whole, so no link in it is
-    read."""
+    """A scenario's narrated citation owns its body, rewritten whole, so
+    nothing in it is read: neither a link nor a narrated citation."""
     edits: list[_Edit] = []
-    found = scan_narrated(text, _READ_GLYPHS)
-    narrated = [block for block in found if isinstance(block, NarratedCitation)]
-    links = [
-        _mistyped_details(path, loose, fragment)
-        for loose in found
-        if isinstance(loose, LooseDetails)
-        and (fragment := _report_fragment(loose.href, path, location)) is not None
-    ]
+    links: list[ReportLink] = []
     line_break = _first_line_break(text)
-    bodies = [citation.body_span for citation in narrated]
-    checks: list[_NarratedCheck | _MarkdownCheck] = [
-        *(
-            _NarratedCheck(path, citation, resolver, edits, line_break)
-            for citation in narrated
-        ),
-        *(
-            _MarkdownCheck(path, link, resolver, edits)
-            for link in scan_links(text, _READ_GLYPHS)
-            if not any(start <= link.text_span[0] < end for start, end in bodies)
-        ),
-    ]
-    for check in checks:
-        fragment = _report_fragment(check.link.destination, path, location)
-        if fragment is not None and (checked := check.run(fragment)) is not None:
+    # In document order, so an owned body is known before what it holds.
+    owned: list[Span] = []
+
+    def check(link_check: _NarratedCheck | _MarkdownCheck) -> None:
+        fragment = _report_fragment(link_check.link.destination, path, location)
+        if fragment is not None and (checked := link_check.run(fragment)) is not None:
             links.append(checked)
+
+    for found in scan_narrated(text, _READ_GLYPHS):
+        if isinstance(found, LooseDetails):
+            fragment = _report_fragment(found.href, path, location)
+            if fragment is not None and not _within(owned, found.offset):
+                links.append(_mistyped_details(path, found, fragment))
+        elif not _within(owned, found.opening_tag_span[0]):
+            narrated = _NarratedCheck(path, found, resolver, edits, line_break)
+            check(narrated)
+            if narrated.owns_body:
+                owned.append(found.body_span)
+    for link in scan_links(text, _READ_GLYPHS):
+        if not _within(owned, link.text_span[0]):
+            check(_MarkdownCheck(path, link, resolver, edits))
     links.sort(key=lambda link: link.line)
     return links, edits
+
+
+def _within(spans: list[Span], offset: int) -> bool:
+    """Whether `offset` falls in one of `spans`, sorted and disjoint."""
+    index = bisect.bisect_right(spans, offset, key=lambda span: span[0])
+    return index > 0 and offset < spans[index - 1][1]
 
 
 def _first_line_break(text: str) -> str:
@@ -376,6 +381,7 @@ class _LinkCheck[L: _CitingLink](ABC):
     """The rules every report link is held to; a link shape reads and writes
     its link text in its own markup."""
 
+    title_form: ClassVar[TitleForm]
     path: Path
     link: L
     resolver: TargetResolver
@@ -402,14 +408,6 @@ class _LinkCheck[L: _CitingLink](ABC):
         """The link text as the title it is compared with."""
 
     @abstractmethod
-    def _titled(self, written_title: str) -> list[NodeId]:
-        """The scenarios a link text of `written_title` may name."""
-
-    @abstractmethod
-    def _shown_title(self, citation: Citation) -> str:
-        """The citation's title as `_written_title` reads it."""
-
-    @abstractmethod
     def _link_text(self, citation: Citation) -> str: ...
 
     @abstractmethod
@@ -423,7 +421,7 @@ class _LinkCheck[L: _CitingLink](ABC):
             self._find(
                 'missing',
                 f'{_named(target)} is not in the report',
-                *self.resolver.suggestions(target, written_title),
+                *self.resolver.suggestions(target, written_title, self.title_form),
             )
             if glyph is not None:
                 self._mark_missing(glyph)
@@ -460,7 +458,7 @@ class _LinkCheck[L: _CitingLink](ABC):
             return resolved
         if glyph is None or target.kind != 'scenario':
             return None
-        titled = self._titled(written_title)
+        titled = self.resolver.scenarios_titled(written_title, self.title_form)
         if len(titled) != 1:
             return None
         resolved = Target('scenario', titled[0])
@@ -481,12 +479,12 @@ class _LinkCheck[L: _CitingLink](ABC):
                 _Edit(*glyph.span, citation.glyph),
                 f'{glyph.text} → {citation.glyph}',
             )
-        shown_title = self._shown_title(citation)
-        if written_title != shown_title:
+        shown = shown_title(citation.title, self.title_form)
+        if written_title != shown:
             self._fix(
                 'stale link text',
                 _Edit(*self.link.text_span, self._link_text(citation)),
-                f'{written_title} → {shown_title}',
+                f'{written_title} → {shown}',
             )
         self._check_summary(citation)
         if citation.state == 'failed':
@@ -540,14 +538,10 @@ class _LinkCheck[L: _CitingLink](ABC):
 
 
 class _MarkdownCheck(_LinkCheck[MarkdownLink]):
+    title_form = 'markdown'
+
     def _written_title(self) -> str:
         return plain_link_text(self.link.text, in_table_row=self.link.in_table_row)
-
-    def _titled(self, written_title: str) -> list[NodeId]:
-        return self.resolver.scenarios_titled(written_title)
-
-    def _shown_title(self, citation: Citation) -> str:
-        return fold_whitespace(citation.title_text)
 
     def _link_text(self, citation: Citation) -> str:
         return link_text(citation.title, in_table_row=self.link.in_table_row)
@@ -587,16 +581,12 @@ class _NarratedCheck(_LinkCheck[NarratedCitation]):
     """A scenario citation's rules, written as HTML, plus its opening tag and
     body; only a scenario has a narration to write."""
 
+    title_form = 'html'
     line_break: str
+    owns_body: bool = field(default=False, init=False)
 
     def _written_title(self) -> str:
         return plain_html_text(self.link.text)
-
-    def _titled(self, written_title: str) -> list[NodeId]:
-        return self.resolver.scenarios_shown_as(written_title)
-
-    def _shown_title(self, citation: Citation) -> str:
-        return plain_html_text(citation.html_link_text)
 
     def _link_text(self, citation: Citation) -> str:
         return citation.html_link_text
@@ -613,18 +603,15 @@ class _NarratedCheck(_LinkCheck[NarratedCitation]):
         resolved = super()._check_target(target)
         self._check_opening_tag()
         if resolved is not None:
+            self.owns_body = True
             self._check_body(resolved)
         return resolved
 
     def _check_opening_tag(self) -> None:
-        tag = self.link.opening_tag
-        attribute = _MARKDOWN_ATTRIBUTE.search(tag)
-        if attribute is None:
-            start = end = len('<details')
-        elif attribute['value'] in {'1', '"1"', "'1'"}:
+        if self.link.markdown == '1':
             return
-        else:
-            start, end = attribute.span()
+        tag = self.link.opening_tag
+        start, end = self.link.markdown_attribute
         offset = self.link.opening_tag_span[0]
         self._fix(
             'stale opening tag',
@@ -634,7 +621,7 @@ class _NarratedCheck(_LinkCheck[NarratedCitation]):
 
     def _check_body(self, target: Target) -> None:
         """Compared past its container prefixes, line breaks normalized;
-        written back under the prefix, with the document's line break."""
+        written back with the document's line break."""
         written = self.link.body
         expected = f'\n{self.resolver.index.narration(target)}\n'
         if written == expected:
@@ -644,15 +631,11 @@ class _NarratedCheck(_LinkCheck[NarratedCitation]):
             for pair in itertools.zip_longest(written.split('\n'), expected.split('\n'))
             if pair[0] != pair[1]
         )
-        prefix = self.link.prefix
         self._fix(
             'stale narration',
             _Edit(
                 *self.link.body_span,
-                ''.join(
-                    f'{prefix + line if line else prefix.rstrip()}{self.line_break}'
-                    for line in expected.split('\n')
-                ),
+                self.link.written_body(expected, self.line_break),
             ),
             f'written: {_body_line(written_line)}',
             f'expected: {_body_line(expected_line)}',
@@ -660,12 +643,6 @@ class _NarratedCheck(_LinkCheck[NarratedCitation]):
 
 
 _MARKDOWN_1 = ' markdown="1"'
-_MARKDOWN_ATTRIBUTE = re.compile(
-    r"""\smarkdown"""
-    r"""(?:\s*=\s*(?P<value>"[^"]*"|'[^']*'|[^\s"'=<>`]+))?"""
-    r"""(?=[\s/>])""",
-    re.IGNORECASE,
-)
 
 
 def _body_line(line: str | None) -> str:

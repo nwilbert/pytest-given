@@ -38,7 +38,8 @@ def plain_link_text(written: str, *, in_table_row: bool = False) -> str:
 
 def plain_html_text(written: str) -> str:
     """The text HTML renders: tags dropped, character references resolved,
-    whitespace folded."""
+    whitespace folded. References resolve as a browser reads text, `&notit;`
+    as `¬it;`, which it does not in an attribute value."""
     return fold_whitespace(html.unescape(_HTML_TAG.sub('', written)))
 
 

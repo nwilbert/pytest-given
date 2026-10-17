@@ -89,12 +89,15 @@ break included, is read as one space. Its body runs to the next HTML block in th
 — the document, or the same list item or blockquote — that starts with `</details>`; a
 `</details>` inside a fenced block in the body is code, not a closing tag, and a `<details>` block
 before it leaves the first unclosed. A block that also holds its `</details>`, on a line of its own — no blank line after
-`</summary>` — has an empty body; a `</details>` on the `</summary>` line is `mistyped`. Links in the body are not read: the body is the citation's, rewritten whole.
+`</summary>` — has an empty body; a `</details>` on the `</summary>` line is `mistyped`. Nothing in a scenario's body is read, neither a link nor a narrated citation nested in a list item: the body is the citation's, rewritten whole. A narrated citation of a tag or story, or of a scenario the report lacks, keeps the author's body, so its links are read.
 
 A `<details>` block whose summary holds a glyph and a link into the report in any other shape — an
-`<a>` with attributes besides `href`, text after `</a>` — or that no `</details>` in its container
-closes is a `mistyped` finding, and so is such a `<details>` line inside a larger HTML block, with
-no blank line above it, so a narrated citation never goes unchecked unseen. Any other `<details>` block is the author's and is left
+`<a>` with attributes besides `href`, an `href` not in double quotes, text after `</a>` or on the
+`</details>` line, HTML after `</summary>` or a held `</details>` with no blank line between — or
+that no `</details>` in its container closes is a `mistyped` finding. So is such a `<details>`
+line inside a larger HTML block, with no blank line above it, read as a block of its own, and a
+citing `<summary>` cut off from its `<details>` by a blank line or a list item's or blockquote's
+edge, so a narrated citation never goes unchecked unseen. Any other `<details>` block is the author's and is left
 alone.
 
 ## What the body holds

@@ -82,7 +82,7 @@ def test_scenarios_titled_matches_exactly_after_folding() -> None:
         scenario_('t.py::test_b', 'Pay by card'),
         scenario_('t.py::test_c', 'Pay by cards'),
     )
-    assert sorted(resolver.scenarios_titled('Pay by card')) == [
+    assert sorted(resolver.scenarios_titled('Pay by card', 'markdown')) == [
         't.py::test_a',
         't.py::test_b',
     ]
@@ -101,6 +101,16 @@ def test_suggestions_rank_by_node_id_and_by_title() -> None:
         line.startswith('closest by scenario title:') and 'test_pay_by_card' in line
         for line in suggestions
     )
+
+
+def test_an_html_link_text_matches_the_title_as_html_shows_it() -> None:
+    resolver = _resolver(scenario_('t.py::test_pay', 'Pay `by` card'))
+    assert resolver.scenarios_titled('Pay by card', 'html') == ['t.py::test_pay']
+    assert resolver.scenarios_titled('Pay by card', 'markdown') == []
+    suggestions = resolver.suggestions(
+        Target('scenario', 't.py::test_gone'), 'Pay by card', 'html'
+    )
+    assert 'closest by scenario title: t.py::test_pay ("Pay by card")' in suggestions
 
 
 def test_suggestions_for_a_tag_and_a_story() -> None:

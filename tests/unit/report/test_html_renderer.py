@@ -2511,7 +2511,9 @@ def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() 
     data = _embedded_app_data(render_html_string(report, None))
     citations = data['citations']
     index = CitationIndex.of(report)
-    assert citations['templates'] == scenario_citation_templates()
+    assert citations['templates'] == scenario_citation_templates(
+        'https://example.org/report.html'
+    )
     assert citations['scenario'] == [
         index.citation(Target('scenario', cited)).scenario_row()
         for cited in index.scenarios

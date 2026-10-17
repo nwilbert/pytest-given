@@ -50,19 +50,32 @@ function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
-// For a value written into a double-quoted HTML attribute.
-function escapeAttribute(value) {
-  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
-}
-
 // A scenario citation template alternates literal text and slot names. The
 // row is `scenario_row`'s: glyph, fragment, title, and an HTML title only
-// where it differs. The URL lands in a narrated block's `href` escaped;
-// `citations check` resolves the character references when it reads it back.
-function fillCitation(template, row, url) {
+// where it differs.
+function fillCitation(template, row) {
   const [glyph, fragment, title, htmlTitle = title] = row;
-  const slots = { glyph, fragment, title, html_title: htmlTitle, url, url_attribute: escapeAttribute(url) };
+  const slots = { glyph, fragment, title, html_title: htmlTitle };
   return template.map((part, position) => (position % 2 ? slots[part] : part)).join('');
+}
+
+// Places a fixed-position `el` `gap` px above or below the `anchor` rect, on
+// the side it prefers unless the viewport cuts it off there, and at `left`
+// kept inside the viewport.
+function placeBeside(el, anchor, { left, gap, below }) {
+  const margin = 6;
+  const box = el.getBoundingClientRect();
+  const under = anchor.bottom + gap;
+  const over = anchor.top - box.height - gap;
+  const fitsUnder = under + box.height <= window.innerHeight - margin;
+  const top = below ? (fitsUnder ? under : over) : (over < margin ? under : over);
+  el.style.left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin)) + 'px';
+  el.style.top = top + 'px';
+}
+
+function markCopyMenuClosed(trigger) {
+  trigger.classList.remove('copy-menu-open');
+  trigger.setAttribute('aria-expanded', 'false');
 }
 
 // `#scenario=` takes the slug the copy-link button writes or the node ID a
@@ -216,7 +229,8 @@ function reportApp() {
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
   let termCountCache = null;
-  // The button whose copy menu is open, or null.
+  // The shared copy menu, and the button it is open for, or null.
+  let copyMenu = null;
   let copyMenuTrigger = null;
   return {
     search: '',
@@ -316,10 +330,7 @@ function reportApp() {
       // Likewise the tick a copy just set, which the copy's timer clears only
       // on the original.
       part.querySelectorAll('.anchor-copied').forEach(el => el.classList.remove('anchor-copied'));
-      part.querySelectorAll('.copy-menu-open').forEach((el) => {
-        el.classList.remove('copy-menu-open');
-        el.setAttribute('aria-expanded', 'false');
-      });
+      part.querySelectorAll('.copy-menu-open').forEach(markCopyMenuClosed);
       // A tag here shows the active filter but toggles nothing, so it is not
       // announced as a pressed toggle. Dropped before Alpine sees the clone.
       part.querySelectorAll('.scenario-tag').forEach(el => {
@@ -735,23 +746,16 @@ function reportApp() {
     },
     // Python renders a tag's or story's line either side of the report's
     // public URL — the setting's, never `window.location` — and a scenario's
-    // forms as templates its row fills.
+    // forms as templates, the URL in place, that its row fills.
     copyCitation(kind, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
-      if (kind === 'scenario') {
-        this._copyScenarioCitation('scenario', key, btn);
-        return;
-      }
       const halves = lookup(citations[kind], key, null);
       if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
-    },
-    copyNarratedCitation(key, btn) {
-      this._copyScenarioCitation('narrated', key, btn);
     },
     _copyScenarioCitation(form, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
       const row = lookup(citations.scenario, key, null);
-      if (row) this._copyAndFlash(fillCitation(citations.templates[form], row, citations.report_url), btn);
+      if (row) this._copyAndFlash(fillCitation(citations.templates[form], row), btn);
     },
     // A second click on the button that opened the menu closes it. The first
     // entry takes focus, as a menu button's should, so the arrow keys work at
@@ -760,14 +764,13 @@ function reportApp() {
       const reopening = copyMenuTrigger !== trigger;
       this._closeCopyMenu(!reopening);
       if (!reopening) return;
-      const menu = document.getElementById('copy-menu');
-      menu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
-      menu.hidden = false;
+      copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      copyMenu.hidden = false;
       copyMenuTrigger = trigger;
       trigger.setAttribute('aria-expanded', 'true');
       trigger.classList.add('copy-menu-open');
-      this._placeCopyMenu(menu, trigger);
-      this._copyMenuItems(menu)[0].focus({ preventScroll: true });
+      this._placeCopyMenu(copyMenu, trigger);
+      this._copyMenuItems(copyMenu)[0].focus({ preventScroll: true });
     },
     // Wired once, delegated like the tooltip. A press outside is caught in
     // the capture phase because most controls here stop their click from
@@ -776,6 +779,7 @@ function reportApp() {
     _initCopyMenu() {
       const menu = document.getElementById('copy-menu');
       if (!menu) return;
+      copyMenu = menu;
       menu.addEventListener('click', (event) => {
         const item = event.target.closest('[data-copy-entry]');
         if (item) this._copyMenuEntry(item.dataset.copyEntry);
@@ -800,8 +804,8 @@ function reportApp() {
       this._closeCopyMenu(true);
       const { citationKind: kind, citationKey: key } = trigger.dataset;
       if (entry === 'link') this.copyAnchor(trigger);
-      else if (entry === 'citation') this.copyCitation(kind, key, trigger);
-      else this.copyNarratedCitation(key, trigger);
+      else if (kind === 'scenario') this._copyScenarioCitation(entry, key, trigger);
+      else this.copyCitation(kind, key, trigger);
     },
     // Tab closes the menu onto its button rather than moving on from the
     // menu's place at the end of the page.
@@ -826,24 +830,18 @@ function reportApp() {
     // Below the button, flipped above where the viewport ends first, with the
     // first entry's icon right under the button's own.
     _placeCopyMenu(menu, trigger) {
-      const margin = 6;
       const button = trigger.getBoundingClientRect();
       const box = menu.getBoundingClientRect();
       const icon = menu.querySelector('[data-copy-entry] svg').getBoundingClientRect();
       const iconCenter = icon.left - box.left + icon.width / 2;
-      const left = button.left + button.width / 2 - iconCenter;
-      let top = button.bottom + 2;
-      if (top + box.height > window.innerHeight - margin) top = button.top - box.height - 2;
-      menu.style.left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin)) + 'px';
-      menu.style.top = top + 'px';
+      placeBeside(menu, button, { left: button.left + button.width / 2 - iconCenter, gap: 2, below: true });
     },
     _closeCopyMenu(refocus) {
       if (!copyMenuTrigger) return;
       const trigger = copyMenuTrigger;
       copyMenuTrigger = null;
-      document.getElementById('copy-menu').hidden = true;
-      trigger.setAttribute('aria-expanded', 'false');
-      trigger.classList.remove('copy-menu-open');
+      copyMenu.hidden = true;
+      markCopyMenuClosed(trigger);
       if (refocus) trigger.focus({ preventScroll: true });
     },
     // Only flip to the "copied" state once the text is actually on the
@@ -1121,16 +1119,7 @@ function reportApp() {
         defEl.hidden = !def;
         tip.hidden = false;
         const pillRect = pill.getBoundingClientRect();
-        const tipRect = tip.getBoundingClientRect();
-        const margin = 6;
-        let top = pillRect.top - tipRect.height - margin;
-        if (top < margin) top = pillRect.bottom + margin;  // flip below if clipped
-        let left = pillRect.left;
-        const maxLeft = window.innerWidth - tipRect.width - margin;
-        if (left > maxLeft) left = maxLeft;
-        if (left < margin) left = margin;
-        tip.style.top = top + 'px';
-        tip.style.left = left + 'px';
+        placeBeside(tip, pillRect, { left: pillRect.left, gap: 6, below: false });
       });
       document.addEventListener('pointerout', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');

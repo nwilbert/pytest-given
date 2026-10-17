@@ -143,7 +143,7 @@ A scenario citation written as a `<details>` block carries the scenario's narrat
 </details>
 ```
 
-The citation is in the `<summary>`: the glyph, then an `<a href>` with the [report link](#writing-it-by-hand) as its only attribute and the title as its link text, written as HTML. Everything below it, down to `</details>` on a line of its own, is the body. The block needs a blank line above it: `check` reports one that continues the HTML above it, such as another narrated citation's `</details>`, as mistyped. Only a scenario can be narrated, not a tag or a story.
+The citation is in the `<summary>`: the glyph, then an `<a href="…">` with the [report link](#writing-it-by-hand) as its only attribute and the title as its link text, written as HTML. Everything below it, down to `</details>` on a line of its own, is the body. The `<summary>` follows `<details>` with no blank line between, and the block needs a blank line above it: `check` reports a block that breaks either as mistyped, such as one that continues another narrated citation's `</details>`. Only a scenario can be narrated, not a tag or a story.
 
 The body reads as the scenario's section of the Markdown report (`--given-md`), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.
 

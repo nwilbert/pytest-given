@@ -73,18 +73,14 @@ class MarkdownLink:
     def destination(self) -> str:
         """`url` as a renderer reads it: backslash escapes and entity
         references resolved, percent-encoding left alone."""
-        return ''.join(
-            _unescaped(token) for token in _DESTINATION_TOKEN.findall(self.url)
-        )
+        return resolved(self.url, _DESTINATION_TOKEN)
 
     @property
     def fragment_span(self) -> Span | None:
         """Where the fragment sits in the source: past the first `#` that
         `destination` reads, written as `#`, `\\#` or `&#35;`."""
-        for token in _DESTINATION_TOKEN.finditer(self.url):
-            if _unescaped(token.group()) == '#':
-                return (self.url_span[0] + token.end(), self.url_span[1])
-        return None
+        offset = fragment_offset(self.url, _DESTINATION_TOKEN)
+        return None if offset is None else (self.url_span[0] + offset, self.url_span[1])
 
 
 def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
@@ -100,12 +96,24 @@ def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
     ]
 
 
+_REFERENCE = r'&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});'
 # One character of a destination as written, or the escape or entity
 # reference that reads as one.
-_DESTINATION_TOKEN = re.compile(
-    r'\\[!-/:-@\[-`{-~]|&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});|.',
-    re.DOTALL,
-)
+_DESTINATION_TOKEN = re.compile(rf'\\[!-/:-@\[-`{{-~]|{_REFERENCE}|.', re.DOTALL)
+# The same in an HTML attribute value, which reads no backslash escape.
+ATTRIBUTE_TOKEN = re.compile(rf'{_REFERENCE}|.', re.DOTALL)
+
+
+def resolved(written: str, tokens: re.Pattern[str]) -> str:
+    return ''.join(_unescaped(token) for token in tokens.findall(written))
+
+
+def fragment_offset(written: str, tokens: re.Pattern[str]) -> int | None:
+    """Past the first `#` that `resolved` reads, however written."""
+    for token in tokens.finditer(written):
+        if _unescaped(token.group()) == '#':
+            return token.end()
+    return None
 
 
 def _unescaped(token: str) -> str:

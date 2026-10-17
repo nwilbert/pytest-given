@@ -16,7 +16,6 @@ from pytest_given.model import (
     narration_of,
     param_id,
 )
-from pytest_given.report import narration_body_md
 from pytest_given.report.citation_index import (
     Citation,
     CitationIndex,
@@ -25,6 +24,7 @@ from pytest_given.report.citation_index import (
     report_fragment,
     scenario_citation_templates,
 )
+from pytest_given.report.md_renderer import narration_body_md
 from tests.unit.citation_reports import URL, report_, scenario_, story_
 
 
@@ -218,7 +218,7 @@ def test_a_target_counts_the_scenario_or_those_its_summary_counts() -> None:
     assert index.counted(Target('story', 's')) == [pay]
 
 
-def _filled(template: CitationTemplate, row: list[str], url: str) -> str:
+def _filled(template: CitationTemplate, row: list[str]) -> str:
     """As `app.js` fills a template: literal text and slot names alternate."""
     glyph, fragment, title, *html_title = row
     values = {
@@ -226,8 +226,6 @@ def _filled(template: CitationTemplate, row: list[str], url: str) -> str:
         'fragment': fragment,
         'title': title,
         'html_title': html_title[0] if html_title else title,
-        'url': url,
-        'url_attribute': url.replace('&', '&amp;').replace('"', '&quot;'),
     }
     return ''.join(
         part if position % 2 == 0 else values[part]
@@ -238,12 +236,12 @@ def _filled(template: CitationTemplate, row: list[str], url: str) -> str:
 def test_a_scenario_row_fills_each_template_to_its_copied_form() -> None:
     scenario = scenario_('t.py::test_pay', 'Pay `by` card & cash')
     citation = _index(scenario).citation(Target('scenario', 't.py::test_pay'))
-    templates = scenario_citation_templates()
+    templates = scenario_citation_templates(URL)
     row = citation.scenario_row()
-    assert _filled(templates['scenario'], row, URL) == (
+    assert _filled(templates['citation'], row) == (
         f'✅ [Pay `by` card \\& cash]({URL}#scenario=t.py::test_pay)'
     )
-    assert _filled(templates['narrated'], row, URL) == (
+    assert _filled(templates['narrated'], row) == (
         '<details markdown="1">\n'
         f'<summary>✅ <a href="{URL}#scenario=t.py::test_pay">'
         'Pay <code>by</code> card &amp; cash</a></summary>'
@@ -257,7 +255,7 @@ def test_the_scenario_template_matches_a_one_line_citation() -> None:
     )
     before, after = citation.markdown_halves()
     filled = _filled(
-        scenario_citation_templates()['scenario'], citation.scenario_row(), URL
+        scenario_citation_templates(URL)['citation'], citation.scenario_row()
     )
     assert filled == before + URL + after
 
@@ -275,7 +273,7 @@ def test_the_narrated_template_escapes_the_url_as_an_attribute() -> None:
     )
     url = 'https://example.org/r.html?a=1&b="2"'
     filled = _filled(
-        scenario_citation_templates()['narrated'], citation.scenario_row(), url
+        scenario_citation_templates(url)['narrated'], citation.scenario_row()
     )
     assert (
         'href="https://example.org/r.html?a=1&amp;b=&quot;2&quot;#scenario=' in filled

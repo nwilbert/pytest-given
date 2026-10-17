@@ -183,7 +183,13 @@ class SourceLine:
         return SourceLine(self.start + column, self.content[column:], self.end)
 
 
-def _blocks(source: str) -> Iterator[TextRun | Table | HtmlBlock]:
+# The citation readers each walk the document they read.
+@functools.lru_cache(maxsize=1)
+def _blocks(source: str) -> tuple[TextRun | Table | HtmlBlock, ...]:
+    return tuple(_walk(source))
+
+
+def _walk(source: str) -> Iterator[TextRun | Table | HtmlBlock]:
     lines = _source_lines(source)
     tokens = _block_parser().parse(source)
     rows: list[TableRow] = []
@@ -197,21 +203,11 @@ def _blocks(source: str) -> Iterator[TextRun | Table | HtmlBlock]:
             case 'html_block':
                 assert token.map is not None
                 first, last = token.map
-                html_lines = lines[first:last]
-                run = TextRun(
-                    first + 1,
-                    tuple(
-                        line.after(column)
-                        for line, column in zip(
-                            html_lines, token.meta['columns'], strict=True
-                        )
-                    ),
-                )
                 yield HtmlBlock(
-                    run,
+                    TextRun(first + 1, tuple(_text_lines(token, lines))),
                     containers[-1] if containers else -1,
                     token.meta['prefix'],
-                    tuple(line.start for line in html_lines),
+                    tuple(line.start for line in lines[first:last]),
                     lines[last].start if last < len(lines) else len(source),
                 )
             case 'tr_open':
@@ -282,16 +278,13 @@ def _recording(rule: _BlockRule) -> _BlockRule:
         matched = rule(state, start, end, silent)
         if matched and not silent:
             for token in state.tokens[made:]:
-                if token.type == 'inline':
-                    assert token.map is not None
-                    token.meta['columns'] = [
-                        _column(state, line) for line in range(*token.map)
-                    ]
-                elif token.type == 'html_block':
-                    assert token.map is not None
-                    token.meta['columns'] = [
-                        _column(state, line) for line in range(*token.map)
-                    ]
+                if token.type not in ('inline', 'html_block'):
+                    continue
+                assert token.map is not None
+                token.meta['columns'] = [
+                    _column(state, line) for line in range(*token.map)
+                ]
+                if token.type == 'html_block':
                     token.meta['prefix'] = _prefix(state, token.map[0])
         return matched
 

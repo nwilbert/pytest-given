@@ -1,6 +1,7 @@
 """What a citation of each kind says — glyph, link text, fragment, summary —
 and which scenarios, tags and stories a report holds to cite."""
 
+import html
 import re
 from collections import Counter
 from collections.abc import Iterable, Mapping
@@ -90,20 +91,18 @@ class Citation:
 type CitationTemplate = list[str]
 
 
-def scenario_citation_templates() -> dict[str, CitationTemplate]:
-    """Each form a scenario citation is copied in, as literal text and slot
-    names alternating, so a page carries the forms once and each scenario only
-    its `scenario_row`. The slots: `glyph`, `fragment`, `title`, `html_title`,
-    `url`, and `url_attribute` — the URL escaped for an attribute value."""
-    glyph, fragment, title, html_title, url, url_attribute = (
-        f'\0{slot}\0'
-        for slot in ('glyph', 'fragment', 'title', 'html_title', 'url', 'url_attribute')
+def scenario_citation_templates(report_url: str) -> dict[str, CitationTemplate]:
+    """Each form a scenario citation is copied in, keyed by its copy menu
+    entry, as literal text and slot names alternating, so a page carries the
+    forms once and each scenario only its `scenario_row`."""
+    glyph, fragment, title, html_title = (
+        f'\0{slot}\0' for slot in ('glyph', 'fragment', 'title', 'html_title')
     )
     markdown = _markdown_halves(glyph, title, fragment, '')
     narrated = _narrated_halves(glyph, html_title, fragment)
     return {
-        'scenario': _SLOT.split(url.join(markdown)),
-        'narrated': _SLOT.split(url_attribute.join(narrated)),
+        'citation': _SLOT.split(report_url.join(markdown)),
+        'narrated': _SLOT.split(html.escape(report_url).join(narrated)),
     }
 
 

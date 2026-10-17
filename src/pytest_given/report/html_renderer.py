@@ -393,10 +393,9 @@ def _piece_text(piece: NarrationPiece) -> str:
 
 def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | None:
     """What each copy button copies, keyed as the page finds it: a scenario's
-    row for the templates by its card's position, a tag's line either side of
-    the report URL at every level of the tree `app.js` builds, a story's by id.
-    Only a report with a public URL shows the buttons, so only it carries the
-    weight."""
+    row by its card's position, a tag's line at every level of the tree
+    `app.js` builds, a story's by id. Only a report with a public URL carries
+    it."""
     report_url = report.metadata.report_url
     if report_url is None:
         return None
@@ -406,7 +405,7 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
 
     return {
         'report_url': report_url,
-        'templates': scenario_citation_templates(),
+        'templates': scenario_citation_templates(report_url),
         # `index.scenarios` holds every scenario, in the report's order.
         'scenario': [
             index.citation(Target('scenario', cited)).scenario_row()
