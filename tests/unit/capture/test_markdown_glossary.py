@@ -172,6 +172,7 @@ _GFM_DOCUMENTS = {
 
 @scenario(
     t'A {pg["File glossary"].l} reads the tables a GFM renderer shows, and no others',
+    tags=['versions/0.5.0'],
 )
 @pytest.mark.parametrize(
     ('document', 'rows'),

@@ -64,7 +64,7 @@ _CITATIONS = {
 @scenario(
     t'The `citations` exit code says whether a {pg["Citation finding"].l} '
     t'remains, so CI can gate on it',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 @pytest.mark.parametrize(
     ('command', 'citation', 'report_state', 'exit_code', 'rewritten'),
@@ -270,7 +270,7 @@ _LISTED = (
 @scenario(
     t'`citations check --list` prints every {pg["Report link"].l}, its findings '
     t'under it',
-    tags=['spec/citations-list'],
+    tags=['spec/citations-list', 'versions/0.5.0'],
 )
 def test_check_list_prints_every_report_link_with_its_findings(
     tmp_path: Path, capsys, monkeypatch
@@ -307,7 +307,7 @@ def test_check_list_prints_every_report_link_with_its_findings(
 @scenario(
     t'`--covering` leaves {pg["Report link"].l.s} out of the list but still counts '
     t'their findings',
-    tags=['spec/citations-list'],
+    tags=['spec/citations-list', 'versions/0.5.0'],
 )
 def test_covering_still_counts_the_findings_it_leaves_out(
     tmp_path: Path, capsys, monkeypatch

@@ -358,6 +358,7 @@ def test_then_parent_with_checked_nested_child_passes(tmp_path) -> None:
 @scenario(
     t'{pg["Narration lint"]} flags a then {pg["Step"].l} that checks only on some runs',
     stories=adopt_pytest_given,
+    tags=['versions/0.5.0'],
 )
 def test_conditional_check_fires_on_assert_only_under_an_if(tmp_path) -> None:
     with given(t'a then {pg["Step"].l} whose only assert sits under an `if`'):

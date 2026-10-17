@@ -46,7 +46,7 @@ def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
 @scenario(
     t'`pytest-given report --report-url` re-renders a saved {pg["Report"].l} '
     t'for another URL',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 def test_cli_report_url_replaces_the_saved_one(tmp_path: Path) -> None:
     with given(t'a saved {pg["Report"].l} served from `/dev/`'):

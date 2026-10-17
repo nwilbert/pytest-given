@@ -85,6 +85,7 @@ def test_passed_scenario_heading_and_steps() -> None:
 @scenario(
     t'A line break in a {pg["Scenario title"].l} or {pg["Step"].l} reads as a '
     t'space in the Markdown {pg["Report"].l}',
+    tags=['versions/0.5.0'],
 )
 def test_a_newline_in_a_title_or_step_reads_as_a_space() -> None:
     with given(
@@ -1176,6 +1177,7 @@ def test_a_custom_id_shows_whole_however_long() -> None:
 @scenario(
     t'Failure notes below a {pg["Parameter table"].l} that would share a key add '
     t'their row number',
+    tags=['versions/0.5.0'],
 )
 def test_notes_sharing_a_key_add_their_row() -> None:
     """A hidden id falls back to its values, which a custom ID may match."""
@@ -1205,7 +1207,7 @@ def test_notes_sharing_a_key_add_their_row() -> None:
 
 @scenario(
     t'The Markdown {pg["Report"].l} nests steps by four spaces',
-    tags=['spec/narrated-citations'],
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
 def test_nested_steps_and_attachments_indent_by_four_spaces() -> None:
     with given(t'a {pg["Step"].l} with a child whose attachment is multi-line'):
@@ -1277,7 +1279,7 @@ def test_a_note_below_the_parameter_table_indents_its_block_by_four_spaces() -> 
 @scenario(
     t"A {pg['Narrated citation'].l}'s body is the scenario's Markdown narration "
     t'without heading, anchor line or errors',
-    tags=['spec/narrated-citations'],
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
 def test_the_narration_body_leaves_out_heading_subtitle_and_errors() -> None:
     with given(

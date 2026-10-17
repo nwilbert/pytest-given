@@ -417,7 +417,7 @@ def test_resolve_template_parts_rejects_a_part_template_cannot_produce() -> None
 
 @scenario(
     t'A span holding a value, a placeholder or a {pg["Term ref"].l} is refused',
-    tags=['validation'],
+    tags=['validation', 'versions/0.5.0'],
 )
 def test_a_span_holding_a_value_is_refused(glossary: Glossary) -> None:
     with given(

@@ -385,7 +385,7 @@ def test_parametrized_test_as_table(pytester, tmp_path):
 @scenario(
     t'A {pg["Parameter table"].l} names its rows by their {pg["Case ID"].l.s} '
     t'when any is custom',
-    tags=['parametrization', 'spec/parameter-table-case-ids'],
+    tags=['parametrization', 'spec/parameter-table-case-ids', 'versions/0.5.0'],
 )
 @pytest.mark.parametrize(
     ('first_case', 'id_column'),
@@ -3383,7 +3383,8 @@ def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
 
 @scenario(
     t'The Markdown {pg["Report"].l} leaves the line out of each '
-    t'{pg["Scenario"].l} anchor under `given_md_lines = false`'
+    t'{pg["Scenario"].l} anchor under `given_md_lines = false`',
+    tags=['versions/0.5.0'],
 )
 def test_given_md_lines_ini_drops_the_anchor_line(pytester: pytest.Pytester) -> None:
     with given(t'a suite with one {pg["Scenario"].l}, and `given_md_lines = false`'):
@@ -3877,7 +3878,10 @@ _MIXED_SUITE = """
 """
 
 
-@scenario(t'Every {pg["Scenario"].l} carries the `pytest_given` marker')
+@scenario(
+    t'Every {pg["Scenario"].l} carries the `pytest_given` marker',
+    tags=['versions/0.5.0'],
+)
 def test_the_marker_selects_the_scenarios_alone(pytester: pytest.Pytester) -> None:
     with given(
         t'a suite with a {pg["Scenario"].l}, a {pg["Parametrized scenario"].l} '

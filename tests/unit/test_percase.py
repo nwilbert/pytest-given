@@ -154,7 +154,7 @@ def test_suffixed_glossary_name_keeps_its_term_ref_and_carries_the_suffix() -> N
 
 @scenario(
     t'A per-case {pg["Scenario title"].l} ends with its {pg["Case ID"].l} as a value',
-    tags=['parametrization'],
+    tags=['parametrization', 'versions/0.5.0'],
 )
 def test_a_plain_string_title_carries_its_case_id_as_a_value() -> None:
     """The id is generated from values, not written as prose, so no span is

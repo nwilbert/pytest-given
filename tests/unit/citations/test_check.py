@@ -59,7 +59,7 @@ PAY = scenario_('t.py::test_pay', 'Pay by card')
 @scenario(
     t"`citations update` rewrites a stale {pg['Citation'].l} to its target's "
     t'glyph, text and summary',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
     with given(
@@ -84,7 +84,7 @@ def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
 
 @scenario(
     t'A plain {pg["Report link"].l} claims only that its target exists',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 def test_a_plain_report_link_claims_only_that_its_target_exists(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose one {pg["Scenario"].l} fails'):
@@ -108,7 +108,7 @@ def test_a_plain_report_link_claims_only_that_its_target_exists(tmp_path: Path) 
 @scenario(
     t'A {pg["Citation"].l} whose target left the {pg["Report"].l} is marked ❓ '
     t'and recovers once it is back',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> None:
     with given(t'a {pg["Citation"].l} of a passing {pg["Scenario"].l}'):
@@ -132,7 +132,7 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
 @scenario(
     t'A {pg["Citation"].l} of any {pg["Case"].l} cites the grouped '
     t'{pg["Scenario"].l} holding it',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> None:
     with given(
@@ -165,7 +165,7 @@ def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> No
 @scenario(
     t'A {pg["Citation"].l} keeps the emphasis its {pg["Scenario title"].l} '
     t'renders with',
-    tags=['spec/citations'],
+    tags=['spec/citations', 'versions/0.5.0'],
 )
 def test_a_citation_keeps_the_emphasis_of_its_title(tmp_path: Path) -> None:
     with given(
@@ -754,7 +754,7 @@ _COVERING_REPORT = report_(
 @scenario(
     t'`--covering` keeps each {pg["Report link"].l} whose target counts the '
     t'{pg["Scenario"].l}, and each it cannot rule out',
-    tags=['spec/citations-list'],
+    tags=['spec/citations-list', 'versions/0.5.0'],
 )
 @pytest.mark.parametrize(
     ('link', 'kept'),
@@ -957,7 +957,7 @@ FILLED = f'\n{NARRATION}\n\n'
 @scenario(
     t"`citations update` writes a {pg['Narrated citation'].l}'s body from the "
     t'{pg["Report"].l}',
-    tags=['spec/narrated-citations'],
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
 def test_update_writes_a_narrated_citations_body(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose {pg["Scenario"].l} has two steps'):
@@ -980,7 +980,7 @@ def test_update_writes_a_narrated_citations_body(tmp_path: Path) -> None:
 @scenario(
     t'`citations check` reports a {pg["Narrated citation"].l} whose body differs '
     t'from the {pg["Report"].l}',
-    tags=['spec/narrated-citations'],
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
 def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} whose {pg["Scenario"].l} ends in "it is paid"'):
@@ -1007,7 +1007,7 @@ def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
 @scenario(
     t'A {pg["Narrated citation"].l} of a tag or story is a {pg["Citation finding"].l} '
     t'`update` leaves',
-    tags=['spec/narrated-citations'],
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
 def test_a_narrated_tag_citation_is_a_finding_update_leaves(tmp_path: Path) -> None:
     with given(t'a {pg["Report"].l} with the tag `checkout`'):

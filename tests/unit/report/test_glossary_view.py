@@ -324,6 +324,7 @@ def test_build_glossary_aggregations_canonical_ref_is_not_an_instance() -> None:
 @scenario(
     t'An {pg["S-form"]} reference is the {pg["Term"].l} itself, '
     t'not an {pg["Instance"].l} or an {pg["Inflection"].l}',
+    tags=['versions/0.5.0'],
 )
 def test_build_glossary_aggregations_s_form_ref_is_the_term_itself() -> None:
     with given(

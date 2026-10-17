@@ -140,7 +140,10 @@ def test_enabled_error_finding_fails_the_run(pytester):
         )
 
 
-@scenario(t'A {pg["Narration lint"].l} run that finds nothing says so')
+@scenario(
+    t'A {pg["Narration lint"].l} run that finds nothing says so',
+    tags=['versions/0.5.0'],
+)
 def test_enabled_clean_suite_exits_zero_and_captures_sources(pytester):
     with given(t'a suite whose {pg["Step"].l.s} are all sound'):
         attach('suite', CLEAN)

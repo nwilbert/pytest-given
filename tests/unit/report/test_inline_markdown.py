@@ -28,7 +28,7 @@ def _outputs(title: Narration) -> tuple[str, str, str]:
 
 @scenario(
     t"A {pg['Scenario title'].l}'s emphasis renders the same in every output",
-    tags=['spec/inline-markdown'],
+    tags=['spec/inline-markdown', 'versions/0.5.0'],
 )
 def test_a_title_s_emphasis_renders_the_same_in_every_output() -> None:
     with given(t'a {pg["Scenario title"].l} with a bold word and a code span'):
@@ -49,7 +49,7 @@ def test_a_title_s_emphasis_renders_the_same_in_every_output() -> None:
 
 @scenario(
     t'A span crossed by a {pg["Term ref"].l} stays literal in every output',
-    tags=['spec/inline-markdown'],
+    tags=['spec/inline-markdown', 'versions/0.5.0'],
 )
 def test_a_span_crossed_by_a_term_ref_stays_literal() -> None:
     with given(
