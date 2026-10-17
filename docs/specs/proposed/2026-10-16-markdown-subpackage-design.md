@@ -13,10 +13,11 @@ tables through the same reader, so they cannot disagree about what a table is.
 The rules for reading Markdown are spread over four packages, each placed by what could import it
 rather than by what it is:
 
-- `model/text.py` holds `read_spans` and the span types (`PlainSpan`, `CodeSpan`, `EmphasisSpan`,
-  `InlineSpan`): the reader of the inline subset titles, steps and definitions are written in.
-  It sits in the leaf because `model/narration.py`'s `read_narration` calls it, and capture,
-  grouping and report all go through `read_narration`.
+- `model/text.py` holds `read_spans`, `located_spans` and the span types (`PlainSpan`, `CodeSpan`,
+  `EmphasisSpan`, `InlineSpan`): the reader of the inline subset titles, steps and definitions are
+  written in. It sits in the leaf because `model/narration.py` calls it — `read_narration`, which
+  capture, grouping and report all go through, and `spanned_part`, which refuses a span around a
+  value, placeholder or term ref.
 - `report/link_text.py` holds `ASCII_PUNCTUATION`, `code_span_at`, `plain_link_text` and
   `fold_whitespace`. `report` itself uses them only inside `plain_link_text`, and only `citations`
   calls that: they sit in `report` because `citations` may import it.
@@ -56,6 +57,27 @@ rules that record each line's text column, `_source_lines`, and the walk that yi
 paragraph's, heading's and table cell's text with its source offsets (today `_inline_runs` and
 `_Run`). `table_cell_spans` comes with it.
 
+```python
+type Span = tuple[int, int]
+
+@dataclass(frozen=True)
+class TextRun:
+    text: str                 # a paragraph's lines joined by `\n`, container prefixes left out
+    offsets: list[int]        # where each character sits in the source, one more for the end
+    line: int                 # 1-based, the source's, of the run's first line
+    in_table_row: bool = False
+
+    def span(self, start: int, end: int) -> Span: ...
+    def line_at(self, index: int) -> int: ...
+
+def text_runs(source: str) -> Iterator[TextRun]: ...
+def source_span(offsets: Sequence[int], start: int, end: int) -> Span: ...
+```
+
+`text_runs` yields every run, in document order: whether one could hold a link (`](` in it) is
+the link scanner's question, so that filter stays in citations. A run's `line_at` replaces the
+scanner's bisect over line starts: a run's lines are consecutive source lines.
+
 **Tables** — one reader, built on the same parse as the runs:
 
 ```python
@@ -67,7 +89,7 @@ class TableCell:
 
     @property
     def content(self) -> str:
-        """What a renderer reads: stripped, `\\|` as `|`."""
+        """What a renderer reads: stripped, `\\|` as `|`, NUL as U+FFFD."""
 
 @dataclass(frozen=True)
 class TableRow:
@@ -83,11 +105,13 @@ def tables(source: str) -> list[Table]: ...
 ```
 
 `capture/markdown_glossary.py` keeps its column resolution and row checks and reads `tables()`
-instead of walking tokens; its parser goes. Citations reads table cells from the same walk, in
-document order with paragraphs and headings as now.
+instead of walking tokens; its parser goes. `text_runs` yields each table cell as a run, read off
+the same `Table`, in document order with paragraphs and headings as now; a cell GFM supplies to a
+short row is an empty run, which holds no link.
 
-**Inline reading** — `read_spans` and the span types from `model/text.py`; `ASCII_PUNCTUATION`,
-`code_span_at`, `plain_link_text` and `fold_whitespace` from `report/link_text.py`.
+**Inline reading** — `read_spans`, `located_spans` and the span types from `model/text.py`;
+`ASCII_PUNCTUATION`, `code_span_at`, `plain_link_text` and `fold_whitespace` from
+`report/link_text.py`.
 
 ### What stays
 
@@ -109,8 +133,13 @@ is parsed.
 ### Tests
 
 Plain tests follow their code into `tests/unit/markdown/`: the `read_spans` tests from
-`tests/unit/model/test_text.py`, the block and table tests from
-`tests/unit/citations/test_markdown_links.py`. The scenarios in
+`tests/unit/model/test_text.py`, the `table_cell_spans` tests from
+`tests/unit/citations/test_markdown_links.py`, and the `plain_link_text` tests from
+`tests/unit/report/test_link_text.py` that read hand-written text. The round trip — written by
+`link_text`, read back by `plain_link_text` — stays in `report`, with `link_text`. The link
+scanner's tests stay in citations, the block cases among them: they state where a link is found,
+and `tables()` gains tests of its own. The oracle test and `test_template.py` import the moved
+names from `markdown`. The scenarios in
 `tests/unit/capture/test_markdown_glossary.py` stay where they are, unchanged: they state what a
 `FileGlossary` user sees, which the move must not change, so they are its check — and no
 scenario's node ID moves. `tests/unit/test_project_glossary.py` counts a row's written cells with `markdown.table_cell_spans`
@@ -142,5 +171,5 @@ Nothing user-facing changes, so neither the CHANGELOG nor the site nor the bundl
   supported markdown-it-py.
 - `tests/integration/test_lazy_imports.py` passes on Python 3.15.
 - `uv run nox -s self_report examples` leaves every `.md` unchanged.
-- `markdown/` imports nothing from the rest of the package (`grep -rn "from \.\.\(model\|capture\|report\|citations\)" src/pytest_given/markdown`
+- `markdown/` imports nothing from the rest of the package (`grep -rn "from \.\." src/pytest_given/markdown`
   finds nothing).
