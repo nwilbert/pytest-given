@@ -17,6 +17,40 @@ Live, against this site's example reports:
 - 🔵 [Cancel a Booking](../examples/hotel-booking.html#view=stories&story=cancel-a-booking) (2 ✅ · 1 🔵)
 - ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (7 ✅)
 
+And a [narrated citation](#narrated-citations) of a scenario:
+
+<details markdown="1">
+<summary>✅ <a href="../examples/self-report.html#scenario=tests/unit/citations/test_check.py::test_update_writes_a_narrated_citations_body"><code>citations update</code> writes a narrated citation's body from the report</a></summary>
+
+- **given** a «report» whose «scenario» has two steps
+- **given** a document holding a «narrated citation» of it, copied with an empty body
+    - 📎 document:
+        ```
+        Paying:
+        
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+        
+        </details>
+        ```
+- **when** the document is updated
+- **then** its body holds the scenario's narration between blank lines
+    - 📎 updated document:
+        ```
+        Paying:
+        
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+        
+        - **given** a card
+        - **then** it is paid
+        
+        </details>
+        ```
+- **then** no finding remains
+
+</details>
+
 ## How it fits together
 
 Citations link to the HTML report you publish, but the `pytest-given citations` commands read a JSON report and run no tests. So a citation is only right if the two reports match: write both from the same run.
@@ -76,7 +110,7 @@ given_report_url = "https://docs.example.org/report.html"
 
 Then write the HTML report as usual, for example with `pytest --given-html`. To set the URL for one run instead, pass `--given-report-url=URL`. The URL is also stored in the JSON report, so `pytest-given report` re-renders the buttons from it, and the `pytest-given citations` commands know which links point at the report.
 
-The report now shows a **Copy Markdown citation** button on scenario cards, story headers and Tags sidebar rows. The copied link uses the configured URL rather than the address you opened the report at, so you can copy citations from a local report and still get links to the published one. Without the setting, there are no buttons.
+The report now shows a **Copy citation** entry in the copy menu on scenario cards, story headers and Tags sidebar rows. The copied link uses the configured URL rather than the address you opened the report at, so you can copy citations from a local report and still get links to the published one. Scenario cards also offer **Copy narrated citation**, for a [narrated citation](#narrated-citations). Without the setting, there is no such entry.
 
 ### Writing it by hand
 
@@ -93,6 +127,29 @@ The part after `#` names the target:
 | Scenario | `#scenario=<node ID>` — for a parametrized scenario, any case's node ID |
 | Tag | `#tag=<tag>` |
 | Story | `#view=stories&story=<story id>` |
+
+## Narrated citations
+
+A scenario citation written as a `<details>` block carries the scenario's narration, folded under it. A reader sees what the scenario does where it is cited, and your pull request's diff shows the behavior change. A **narrated citation** looks like this:
+
+```markdown
+<details markdown="1">
+<summary>✅ <a href="https://example.org/report.html#scenario=tests/test_x.py::test_y">A renamed <code>test</code> keeps its citation</a></summary>
+
+- **given** a «citation» of `test_y`
+- **when** the test is renamed
+- **then** `citations update` repoints it
+
+</details>
+```
+
+The citation is in the `<summary>`: the glyph, then an `<a href>` with the [report link](#writing-it-by-hand) as its only attribute and the title as its link text, written as HTML. Everything below it, down to `</details>` on a line of its own, is the body. Only a scenario can be narrated, not a tag or a story.
+
+The body reads as the scenario's section of the Markdown report (`--given-md`), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.
+
+To add one, choose **Copy narrated citation** in the report's copy menu on a scenario card, paste it into your document, and run `pytest-given citations update`, which fills the empty body. From then on `update` rewrites the body to match the report, and `pytest-given citations check` fails when it differs, or when the opening tag lacks `markdown="1"`, which `update` adds, keeping any other attributes such as `open`.
+
+On a Python-Markdown site (MkDocs, Zensical), enable `md_in_html` and keep the block at the top level of the page, not inside a list item. GitHub renders it anywhere.
 
 ## Updating citations
 
@@ -113,6 +170,7 @@ It can't fix everything. These stay as findings for you to resolve, and the comm
 - **A target that is no longer in the report.** The citation's glyph becomes `❓`, its URL and text stay, and it recovers on its own once the target is back.
 - **A cited target that fails.** The document claims something that doesn't hold right now: fix the code, or change what the document says.
 - **A summary after a scenario citation**, which takes none.
+- **A tag or story written as a narrated citation**, which has no single narration.
 
 The bundled [`pytest-given-citing` skill](../ai-agents.md#agent-skills) walks an agent through these.
 
@@ -139,6 +197,19 @@ These habits keep `pytest-given citations check` from failing on a document noth
 - **Cite a tag that belongs to one piece of work**, like `spec/<slug>`. A broad area tag's summary changes with every new scenario, so link it with a plain report link.
 - **Leave the glyph and link unformatted.** In `**✅** […](…)` or `✅ *[…](…)*` pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.
 - **On a versioned docs site, link the report relatively**, as in `../examples/report.html#tag=…`, so each version of a page opens its own version's report. Pass `--report-path`, where your docs build puts the report, so the commands recognize these links.
+
+- **Keep a Markdown formatter off narrated citations.** Prettier pads table columns and a two-space list-indent rule reindents nested steps, so `check` then reports the body stale. Wrap each block in ignore comments:
+
+    ```markdown
+    <!-- prettier-ignore-start -->
+    <details markdown="1">
+    <summary>…</summary>
+
+    …
+
+    </details>
+    <!-- prettier-ignore-end -->
+    ```
 
 ### Finding the citations of a changed scenario
 

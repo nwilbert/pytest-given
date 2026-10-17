@@ -86,8 +86,8 @@ glyph and an `<a href>` that names the report, and nothing else; whitespace betw
 break included, is read as one space. Its body runs to the next HTML block in the same container
 — the document, or the same list item or blockquote — that starts with `</details>`; a
 `</details>` inside a fenced block in the body is code, not a closing tag, and a `<details>` block
-before it leaves the first unclosed. A block that also holds its `</details>` — no blank line after `</summary>` — has an empty
-body. Links in the body are not read: the body is the citation's, rewritten whole.
+before it leaves the first unclosed. A block that also holds its `</details>`, on a line of its own — no blank line after
+`</summary>` — has an empty body; a `</details>` on the `</summary>` line is `mistyped`. Links in the body are not read: the body is the citation's, rewritten whole.
 
 A `<details>` block whose summary holds a glyph and a link into the report in any other shape — an
 `<a>` with attributes besides `href`, text after `</a>` — or that no `</details>` in its container

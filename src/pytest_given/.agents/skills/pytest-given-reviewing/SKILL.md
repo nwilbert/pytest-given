@@ -26,7 +26,7 @@ Lint the whole suite, not just the tests a change touches. A `given_lint_ignore`
 
 `warn` findings print in the summary, an `error` finding fails the run, and a clean run prints `narration lint (no findings)`. The rule catalog, and when an ignored `missing-phase` is justified, are in the authoring skill's [lint.md](../pytest-given-authoring/references/lint.md). A finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review.
 
-If Markdown documents cite the report, run `pytest-given citations check` too, and hand its findings to the `pytest-given-citing` skill. Where a cited scenario's title or behavior changed, run `citations update`, then `citations check --covering <node ID>`, and reread each sentence it lists, unresolved links included: the claim may no longer hold.
+If Markdown documents cite the report, run `pytest-given citations check` too, and hand its findings to the `pytest-given-citing` skill. Where a cited scenario's title or behavior changed, run `citations update`, then `citations check --covering <node ID>`, and reread each sentence it lists, unresolved links included: the claim may no longer hold. A narrated citation's body is the behavior its document claims: read it against the prose around it.
 
 ## 2. Semantic audit: step text against step body
 

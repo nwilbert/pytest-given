@@ -10,6 +10,8 @@ A **citation** is a Markdown link into the HTML report, led by a status glyph �
     ✅ [A renamed test keeps its citation](https://example.org/report.html#scenario=tests/test_x.py::test_y)
     🔵 [spec/checkout](https://example.org/report.html#tag=spec/checkout) (5 ✅ · 2 🔵)
 
+A **narrated citation** is a scenario citation written as a `<details>` block, its `<summary>` holding the glyph and link and its body the scenario's narration.
+
 A **plain report link** has no glyph: it keeps its own wording and claims only that its target exists.
 
 `pytest-given citations check DOCS… --report report.json` verifies every report link; `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while any other finding remains. Both read the JSON report of a run of **every** scenario — `pytest -m pytest_given --given-json=report.json` — and take a target the run left out as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or `--report-url` names; a relative link counts only with `--report-path`, where the HTML report sits in the repository.
@@ -20,8 +22,10 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 |---|---|
 | Stale glyph or text; stale or missing summary; slug or `[case]` in a fragment; a renamed test whose title one scenario still has | Run `citations update`. |
 | Cited target fails | The document claims what doesn't hold now. Fix the code, or, if the claim itself is outdated, tell the human: the prose is theirs. |
+| Stale narration or opening tag (a narrated citation) | Run `citations update`: it rewrites the body from the report and adds `markdown="1"` to the opening tag. |
 | Summary after a scenario citation | Delete it, unless the author wrote it as prose — then reword it so it no longer reads as a summary. |
-| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. |
+| `stray-narration` (a tag or story written as a narrated citation) | Rewrite it as a one-line citation. Only a scenario has a narration. |
+| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. For a `<details>` block: the summary shape above, `</details>` on its own line. |
 | Target not in the report | Rule out the report first: a partial run, or one from another rootdir (node IDs are relative to it), loses many targets at once. Then follow [references/repair.md](references/repair.md). |
 
 ## Finding what cites a scenario
@@ -36,6 +40,7 @@ You cannot click a copy button. Write a placeholder — a typed `?` glyph and em
 
 Choose the target as in a repair: read its steps and body against the prose that cites it; a matching title is not enough.
 
+- To narrate a scenario, write a `<details markdown="1">` block: a `<summary>` of the glyph and an `<a href="…#scenario=…">` with no other attribute, `</summary>` ending its line, a blank line, an empty body, `</details>` on its own line. `update` fills the body with the scenario's `--given-md` narration. Keep the block at the top level on a Python-Markdown site, and a formatter off it (Prettier: `<!-- prettier-ignore-start -->` … `<!-- prettier-ignore-end -->`).
 - Write the glyph and link bare: `**✅**` or `*[…](…)*` no longer reads as a citation.
 - On a versioned docs site, link the report relatively (`../examples/report.html#tag=…`), so each version's page opens its own report.
 - Give a piece of work one tag (`spec/<slug>`) and cite that, not a broad area tag, whose summary every later scenario changes; link an area tag with a plain report link.
