@@ -2,8 +2,6 @@
 
 ## Now
 
-- [ ] Optionally include the full test narration as a GitHub-Flavored Markdown (GFM) details section
-
 ## Next
 
 - [ ] Support the glossary format of https://github.com/mattpocock/skills
