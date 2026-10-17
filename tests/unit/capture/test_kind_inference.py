@@ -168,7 +168,8 @@ def test_infers_kinds_from_a_second_clause():
 
 
 @scenario(
-    t'A conflict error names only the offending {pg["Story"].l.s}',
+    t"A declared kind's conflict names only the {pg['Story'].l.s} that put its "
+    t'{pg["Term"].l} in the wrong {pg["Slot"].l}',
     tags=['diagnostics', 'validation'],
 )
 def test_conflict_where_names_only_offending_stories():
@@ -181,9 +182,11 @@ def test_conflict_where_names_only_offending_stories():
     with (
         when_then(
             t'{pg["Kind inference"].l} runs over both {pg["Story"].l.s}',
-            'a PytestGivenError reports the conflict',
+            'a PytestGivenError reports the declared actor in a verb slot',
         ),
-        pytest.raises(PytestGivenError) as excinfo,
+        pytest.raises(
+            PytestGivenError, match="declared kind 'actor' but appears in a verb slot"
+        ) as excinfo,
     ):
         infer_glossary_kinds(glossary, stories)
     with then('only the offending story is named in the message'):
@@ -193,7 +196,8 @@ def test_conflict_where_names_only_offending_stories():
 
 
 @scenario(
-    t'A conflict message excludes {pg["Story"].l.s} with an unrelated {pg["Slot"].l}',
+    t"An inferred kind's conflict names only the {pg['Story'].l.s} whose "
+    t'{pg["Slot"].l.s} disagree',
     tags=['diagnostics', 'validation'],
 )
 def test_inferred_conflict_where_excludes_unrelated_slot_stories():
@@ -211,7 +215,9 @@ def test_inferred_conflict_where_excludes_unrelated_slot_stories():
             t'{pg["Kind inference"].l} runs over all three {pg["Story"].l.s}',
             'a PytestGivenError reports the verb-vs-actor conflict',
         ),
-        pytest.raises(PytestGivenError) as excinfo,
+        pytest.raises(
+            PytestGivenError, match=r'incompatible positions.*a verb slot and an actor'
+        ) as excinfo,
     ):
         infer_glossary_kinds(glossary, stories)
     with then('only the verb and actor stories are named, not the noun one'):

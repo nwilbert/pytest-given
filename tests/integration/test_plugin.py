@@ -3244,7 +3244,7 @@ _ANNOTATED_TEMPLATE_SUITE = """
 @pytest.mark.parametrize(
     ('placeholder', 'outcome', 'error'),
     [
-        ('{x}', 'accepted', None),
+        ('{x}', 'accepted', 'nothing'),
         (
             '{room}',
             'refused',

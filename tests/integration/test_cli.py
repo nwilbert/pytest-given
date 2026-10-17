@@ -61,8 +61,13 @@ def test_cli_report_url_replaces_the_saved_one(tmp_path: Path) -> None:
     with then('the command succeeds'):
         assert rc == 0
     with then(t"the copy buttons' {pg['Citation'].l.s} link the `/1.0/` URL"):
-        app_data = _embedded_app_data(html_path.read_text(encoding='utf-8'))
-        assert app_data['citations']['report_url'] == url
+        citations = _embedded_app_data(html_path.read_text(encoding='utf-8'))[
+            'citations'
+        ]
+        assert citations['report_url'] == url
+        copied = [''.join(form) for form in citations['templates'].values()]
+        assert len(copied) == 2
+        assert all(url in form and '/dev/' not in form for form in copied)
 
 
 def test_cli_refuses_a_report_url_no_citation_can_link(tmp_path: Path, capsys) -> None:

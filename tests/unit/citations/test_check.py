@@ -21,8 +21,14 @@ from pytest_given.model import (
     TermId,
     narration_of,
 )
+from pytest_given.report import Target
+from pytest_given.report.citation_index import (
+    CitationIndex,
+    scenario_citation_templates,
+)
 from tests.ubiquitous_language import pg
 from tests.unit.citation_reports import URL, report_, scenario_, story_
+from tests.unit.report.test_citation_index import _filled
 
 
 def _run(
@@ -187,16 +193,37 @@ def test_a_citation_keeps_the_emphasis_of_its_title(tmp_path: Path) -> None:
 # --- One test per row of the findings table ---
 
 
+@scenario(
+    t'`citations update` repoints the {pg["Citation"].l} of a renamed test by its '
+    t'unchanged {pg["Scenario title"].l}',
+    tags=['spec/citations', 'versions/0.5.0'],
+)
 def test_a_renamed_test_is_repointed_by_its_unchanged_title(tmp_path: Path) -> None:
-    report = report_(scenario_('t.py::test_pay_by_card', 'Pay by card'))
-    document = f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
-    checked, _ = _run(tmp_path, document, report)
-    assert [(f.kind, f.fixed_by_update) for f in checked.findings] == [
-        ('repointed', True)
-    ]
-    result, written = _run(tmp_path, document, report, update=True)
-    assert written == f'✅ [Pay by card]({URL}#scenario=t.py::test_pay_by_card)\n'
-    assert result.remaining == []
+    with given(
+        t'a {pg["Report"].l} where `test_pay` was renamed `test_pay_by_card`, '
+        t'still titled "Pay by card"'
+    ):
+        report = report_(scenario_('t.py::test_pay_by_card', 'Pay by card'))
+    with given(t'a document whose {pg["Citation"].l} still names `test_pay`'):
+        document = f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
+        attach('document', document)
+    with when('the document is checked'):
+        checked, _ = _run(tmp_path, document, report)
+    with then(
+        t'the {pg["Citation"].l} is a {pg["Citation finding"].l} `update` fixes, '
+        t'naming `test_pay_by_card`'
+    ):
+        assert [(f.kind, f.fixed_by_update) for f in checked.findings] == [
+            ('repointed', True)
+        ]
+        assert 'the title of t.py::test_pay_by_card' in checked.findings[0].message
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then(t'the {pg["Citation"].l} names `test_pay_by_card`'):
+        attach('updated document', written)
+        assert written == f'✅ [Pay by card]({URL}#scenario=t.py::test_pay_by_card)\n'
+    with then('no finding remains'):
+        assert result.remaining == []
 
 
 def test_a_gone_tag_citation_is_marked_and_loses_its_summary(tmp_path: Path) -> None:
@@ -522,18 +549,34 @@ def test_an_empty_scenario_key_reads_as_one_when_repointed(tmp_path: Path) -> No
 # --- Reading ---
 
 
+@scenario(
+    t'A relative {pg["Report link"].l} resolves from its document to where '
+    t'`--report-path` places the {pg["Report"].l}',
+    tags=['spec/citations', 'versions/0.5.0'],
+)
 def test_relative_links_resolve_from_the_documents_directory(tmp_path: Path) -> None:
-    report = report_(PAY, report_url=None)
-    document = '✓ [Pay by card](../examples/r.html#scenario=t.py::test_pay)\n'
-    _, written = _run(
-        tmp_path,
-        document,
-        report,
-        update=True,
-        name='guide/doc.md',
-        report_path=tmp_path / 'examples' / 'r.html',
-    )
-    assert written.startswith('✅ ')
+    with given(t'a {pg["Report"].l} that stores no URL, placed at `examples/r.html`'):
+        report = report_(PAY, report_url=None)
+        report_path = tmp_path / 'examples' / 'r.html'
+    with given(
+        t'a stale {pg["Citation"].l} in `guide/doc.md` linking `../examples/r.html`'
+    ):
+        document = '✓ [Pay by card](../examples/r.html#scenario=t.py::test_pay)\n'
+        attach('document', document)
+    with when('the document is updated with that `--report-path`'):
+        _, written = _run(
+            tmp_path,
+            document,
+            report,
+            update=True,
+            name='guide/doc.md',
+            report_path=report_path,
+        )
+    with then(t'the {pg["Citation"].l} is read as one and its glyph rewritten'):
+        attach('updated document', written)
+        assert (
+            written == '✅ [Pay by card](../examples/r.html#scenario=t.py::test_pay)\n'
+        )
 
 
 def test_a_query_leaves_a_link_to_the_report(tmp_path: Path) -> None:
@@ -947,8 +990,9 @@ def _narrated_scenario(
     *,
     status: Status = 'passed',
     tags: tuple[str, ...] = (),
+    stories: tuple[str, ...] = (),
 ) -> Scenario:
-    narrated = scenario_(node_id, title, status=status, tags=tags)
+    narrated = scenario_(node_id, title, status=status, tags=tags, stories=stories)
     narrated.steps = [
         Step(phase='given', narration=Narration(text='a card')),
         Step(phase='then', narration=Narration(text='it is paid')),
@@ -1034,15 +1078,28 @@ def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
     t'`update` leaves',
     tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
-def test_a_narrated_tag_citation_is_a_finding_update_leaves(tmp_path: Path) -> None:
-    with given(t'a {pg["Report"].l} with the tag `checkout`'):
-        report = report_(_narrated_scenario(tags=('checkout',)))
+@pytest.mark.parametrize('target', ['tag', 'story'])
+def test_a_narrated_tag_citation_is_a_finding_update_leaves(
+    tmp_path: Path, target: str
+) -> None:
     with given(
-        t'a document with a {pg["Narrated citation"].l} of the tag, its glyph and '
-        t'body stale'
+        t'a {pg["Report"].l} whose {pg["Scenario"].l} is tagged `checkout` and '
+        t'covers the {pg["Story"].l} `checkout`'
     ):
+        report = report_(
+            _narrated_scenario(tags=('checkout',), stories=('checkout',)),
+            stories=(story_('checkout'),),
+        )
+    with given(
+        t'a document with a {pg["Narrated citation"].l} of the {target}, its glyph '
+        t'and body stale'
+    ):
+        fragment = {'tag': 'tag=checkout', 'story': 'view=stories&story=checkout'}
         document = _block(
-            '\nThe checkout.\n\n', glyph='❌', text='checkout', fragment='tag=checkout'
+            '\nThe checkout.\n\n',
+            glyph='❌',
+            text='checkout',
+            fragment=fragment[target],
         )
         attach('document', document)
     with when('the document is updated'):
@@ -1056,6 +1113,92 @@ def test_a_narrated_tag_citation_is_a_finding_update_leaves(tmp_path: Path) -> N
         ]
     with then('the document is left as written'):
         assert written == document
+
+
+_MISTYPED_DETAILS = {
+    'an anchor with a class': (
+        '<details markdown="1">\n'
+        f'<summary>✅ <a class="x" href="{URL}#scenario=t.py::test_pay">'
+        'Pay by card</a></summary>\n\n</details>\n'
+    ),
+    'a single-quoted href': (
+        '<details markdown="1">\n'
+        f"<summary>✅ <a href='{URL}#scenario=t.py::test_pay'>"
+        'Pay by card</a></summary>\n\n</details>\n'
+    ),
+    'no closing tag': f'<details markdown="1">\n{_block().splitlines()[1]}\n\nAfter.\n',
+    'no blank line above it, below another one': _block(FILLED) + _block(FILLED),
+}
+
+
+@scenario(
+    t'A `<details>` block citing the {pg["Report"].l} in any other shape is a '
+    t'mistyped {pg["Citation finding"].l}, never skipped',
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
+)
+@pytest.mark.parametrize(
+    ('shape', 'reason'),
+    [
+        ('an anchor with a class', 'its <a> takes attributes besides href'),
+        ('a single-quoted href', 'its href is not in double quotes'),
+        ('no closing tag', 'no </details> closes it'),
+        (
+            'no blank line above it, below another one',
+            'a blank line must separate it from the HTML above it',
+        ),
+    ],
+)
+def test_a_details_block_in_another_shape_is_a_mistyped_finding(
+    tmp_path: Path, shape: str, reason: str
+) -> None:
+    with given(
+        t'a document whose `<details>` block cites the {pg["Report"].l} with {shape}'
+    ):
+        document = _MISTYPED_DETAILS[shape]
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report_(PAID), update=True)
+    with then(
+        t'a mistyped {pg["Citation finding"].l}, saying {reason}, is the only one'
+    ):
+        assert [(f.kind, f.message) for f in result.findings] == [
+            ('mistyped', f'a <details> block cites the report, but {reason}')
+        ]
+    with then('the document is left as written'):
+        assert written == document
+
+
+@scenario(
+    t'A {pg["Narrated citation"].l} copied from the {pg["Report"].l} is current '
+    t'once `citations update` fills its body',
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
+)
+def test_a_narrated_citation_copied_from_the_report_is_current_once_filled(
+    tmp_path: Path,
+) -> None:
+    with given(
+        t'a {pg["Report"].l} whose {pg["Scenario title"].l} holds a code span and '
+        t'an ampersand'
+    ):
+        report = report_(_narrated_scenario(title='Pay `a&b` & more'))
+    with given(
+        t'the {pg["Narrated citation"].l} the copy menu copies, pasted into a document'
+    ):
+        citation = CitationIndex.of(report).citation(
+            Target('scenario', 't.py::test_pay')
+        )
+        template = scenario_citation_templates(URL)['narrated']
+        document = f'{_filled(template, citation.scenario_row())}\n'
+        attach('document', document)
+    with when('the document is updated'):
+        _, written = _run(tmp_path, document, report, update=True)
+    with then("its body holds the scenario's narration"):
+        attach('updated document', written)
+        assert written == _block(FILLED, text='Pay <code>a&amp;b</code> &amp; more')
+    with when('the updated document is checked'):
+        rechecked, _ = _run(tmp_path, written, report)
+    with then('no finding remains'):
+        assert rechecked.findings == []
 
 
 def test_a_current_narrated_citation_is_silent(tmp_path: Path) -> None:
@@ -1087,13 +1230,29 @@ def test_a_narrated_citation_of_a_gone_scenario_keeps_its_body(tmp_path: Path) -
     assert [f.kind for f in result.remaining] == ['missing']
 
 
+@scenario(
+    t'A failing {pg["Narrated citation"].l} has its body rewritten and stays a '
+    t'{pg["Citation finding"].l}',
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
+)
 def test_a_failed_narrated_citation_has_its_body_rewritten_and_stays_a_finding(
     tmp_path: Path,
 ) -> None:
-    report = report_(_narrated_scenario(status='failed'))
-    result, written = _run(tmp_path, _block(), report, update=True)
-    assert written == _block(FILLED, glyph='❌')
-    assert [f.kind for f in result.remaining] == ['failed']
+    with given(t'a {pg["Report"].l} whose {pg["Scenario"].l} fails'):
+        report = report_(_narrated_scenario(status='failed'))
+    with given(
+        t'a document holding a {pg["Narrated citation"].l} of it, copied with an '
+        t'empty body'
+    ):
+        document = _block()
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('its glyph reads ❌ and its body holds the narration'):
+        attach('updated document', written)
+        assert written == _block(FILLED, glyph='❌')
+    with then('the failure is the only finding that remains'):
+        assert [f.kind for f in result.remaining] == ['failed']
 
 
 def test_a_renamed_test_is_repointed_by_its_shown_title_with_a_code_span(
@@ -1125,16 +1284,28 @@ def test_a_renamed_test_is_repointed_by_its_shown_title_with_a_code_span(
         ),
     ],
 )
+@scenario(
+    t'`citations update` adds `markdown="1"` to a {pg["Narrated citation"].l}\'s '
+    t'opening tag, keeping its other attributes',
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
+)
 def test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes(
     tmp_path: Path, opening: str, expected: str
 ) -> None:
-    document = _block(FILLED, opening=opening)
-    checked, _ = _run(tmp_path, document, report_(PAID))
-    assert [(f.message, f.details) for f in checked.findings] == [
-        ('stale opening tag', (f'{opening} → {expected}',))
-    ]
-    _, written = _run(tmp_path, document, report_(PAID), update=True)
-    assert written == _block(FILLED, opening=expected)
+    with given(t'a current {pg["Narrated citation"].l} whose opening tag is {opening}'):
+        document = _block(FILLED, opening=opening)
+    with when('the document is checked'):
+        checked, _ = _run(tmp_path, document, report_(PAID))
+    with then(
+        t'a stale opening tag is the only {pg["Citation finding"].l}, naming its fix'
+    ):
+        assert [(f.message, f.details) for f in checked.findings] == [
+            ('stale opening tag', (f'{opening} → {expected}',))
+        ]
+    with when('the document is updated'):
+        _, written = _run(tmp_path, document, report_(PAID), update=True)
+    with then(t'the opening tag reads {expected}'):
+        assert written == _block(FILLED, opening=expected)
 
 
 @pytest.mark.parametrize(
@@ -1174,35 +1345,47 @@ _SUMMARY_LINE = (
 )
 
 
-@pytest.mark.parametrize(
-    ('copied', 'filled'),
-    [
+# Each container's copied block, and the same block once `update` filled it.
+_CONTAINED = {
+    'list item': (
+        f'- Paying:\n\n  <details markdown="1">\n  {_SUMMARY_LINE}\n\n  </details>\n',
         (
-            (
-                f'- Paying:\n\n  <details markdown="1">\n  {_SUMMARY_LINE}\n\n'
-                '  </details>\n'
-            ),
-            (
-                f'- Paying:\n\n  <details markdown="1">\n  {_SUMMARY_LINE}\n\n'
-                '  - **given** a card\n  - **then** it is paid\n\n  </details>\n'
-            ),
+            f'- Paying:\n\n  <details markdown="1">\n  {_SUMMARY_LINE}\n\n'
+            '  - **given** a card\n  - **then** it is paid\n\n  </details>\n'
         ),
+    ),
+    'blockquote': (
+        f'> <details markdown="1">\n> {_SUMMARY_LINE}\n>\n> </details>\n',
         (
-            f'> <details markdown="1">\n> {_SUMMARY_LINE}\n>\n> </details>\n',
-            (
-                f'> <details markdown="1">\n> {_SUMMARY_LINE}\n>\n'
-                '> - **given** a card\n> - **then** it is paid\n>\n> </details>\n'
-            ),
+            f'> <details markdown="1">\n> {_SUMMARY_LINE}\n>\n'
+            '> - **given** a card\n> - **then** it is paid\n>\n> </details>\n'
         ),
-    ],
+    ),
+}
+
+
+@scenario(
+    t'A {pg["Narrated citation"].l} in a list item or blockquote has its body '
+    t'written under that prefix',
+    tags=['spec/narrated-citations', 'versions/0.5.0'],
 )
+@pytest.mark.parametrize('container', list(_CONTAINED))
 def test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix(
-    tmp_path: Path, copied: str, filled: str
+    tmp_path: Path, container: str
 ) -> None:
-    _, written = _run(tmp_path, copied, report_(PAID), update=True)
-    assert written == filled
-    rechecked, _ = _run(tmp_path, written, report_(PAID))
-    assert rechecked.findings == []
+    with given(
+        t'a {pg["Narrated citation"].l} copied with an empty body into a {container}'
+    ):
+        copied, filled = _CONTAINED[container]
+        attach('document', copied)
+    with when('the document is updated'):
+        _, written = _run(tmp_path, copied, report_(PAID), update=True)
+    with then("each body line carries the container's prefix"):
+        attach('updated document', written)
+        assert written == filled
+    with then('a check of the updated document finds nothing'):
+        rechecked, _ = _run(tmp_path, written, report_(PAID))
+        assert rechecked.findings == []
 
 
 def test_a_grouped_scenario_in_a_blockquote_is_clean_after_an_update(

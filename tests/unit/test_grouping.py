@@ -3,6 +3,7 @@
 import dataclasses
 import math
 from datetime import UTC, datetime
+from typing import cast
 
 import pytest
 
@@ -121,21 +122,44 @@ def _cases(*specs: tuple[Status, str | None]) -> tuple[list[Scenario], ParamInfo
 
 
 @scenario(
-    t'One xfailed {pg["Case"].l} makes its {pg["Parametrized scenario"].l} '
-    t'an expected failure',
+    t'A {pg["Parametrized scenario"].l} takes the status of its worst '
+    t'{pg["Case"].l}: failed, then xfailed, then passed, then skipped',
     tags=['parametrization'],
+    stories=adopt_pytest_given,
 )
-def test_one_xfailed_case_makes_the_group_xfailed() -> None:
-    with given(t'a passed {pg["Case"].l} and an xfailed one with the reason "planned"'):
-        cases, param_info = _cases(('passed', None), ('xfailed', 'planned'))
-    with when(t'the {pg["Group"]("grouping")} pass collapses them'):
-        [grouped] = group_parametrized(cases, param_info)
-    with then(
-        t'the {pg["Scenario"].l} is xfailed and carries the xfailed '
-        t"{pg['Case'].l}'s reason"
+@pytest.mark.parametrize(
+    ('statuses', 'status', 'reason'),
+    [
+        ('passed, failed, skipped', 'failed', None),
+        ('xfailed, failed', 'failed', None),
+        ('passed, xfailed', 'xfailed', 'planned'),
+        ('skipped, xfailed', 'xfailed', 'planned'),
+        ('skipped, passed', 'passed', None),
+        ('skipped, skipped', 'skipped', None),
+    ],
+)
+def test_a_parametrized_scenario_takes_its_worst_cases_status(
+    statuses: str, status: Status, reason: str | None
+) -> None:
+    with given(
+        t'{pg["Case"].s} of one {pg["Parametrized scenario"].l} that ended '
+        t'{statuses}, each xfailed one for the reason "planned"'
     ):
-        assert grouped.status == 'xfailed'
-        assert grouped.xfail_reason == 'planned'
+        cases, param_info = _cases(
+            *(
+                (case_status, 'planned' if case_status == 'xfailed' else None)
+                for case_status in cast(list[Status], statuses.split(', '))
+            )
+        )
+    with when(
+        t'the {pg["Group"]("grouping")} pass collapses them',
+        pins=adopt_pytest_given['group'],
+    ):
+        [grouped] = group_parametrized(cases, param_info)
+    with then(t'the {pg["Scenario"].l} is {status}'):
+        assert grouped.status == status
+    with then(t'its xfail reason is {reason}'):
+        assert grouped.xfail_reason == reason
 
 
 def test_a_failed_case_outranks_an_xfailed_one() -> None:
@@ -223,40 +247,6 @@ def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:
     }
     grouped = group_parametrized(scenarios, param_info)
     assert grouped[0].status == 'passed'
-
-
-@scenario(
-    t'Any failed {pg["Case"].l} fails its {pg["Parametrized scenario"].l}',
-    tags=['parametrization'],
-    stories=adopt_pytest_given,
-)
-def test_group_parametrized_any_failed_groups_as_failed() -> None:
-    with given(t'three {pg["Case"].l} records of one {pg["Parametrized scenario"].l}'):
-        nid1, nid2, nid3 = NodeId('t::x[1]'), NodeId('t::x[2]'), NodeId('t::x[3]')
-        scenarios = [
-            Scenario(
-                id=nid1, narration=Narration(text='x'), module='m', status='passed'
-            ),
-            Scenario(
-                id=nid2, narration=Narration(text='x'), module='m', status='failed'
-            ),
-            Scenario(
-                id=nid3, narration=Narration(text='x'), module='m', status='skipped'
-            ),
-        ]
-        param_info = {
-            nid1: ParamSpec(names=['n'], values=[1]),
-            nid2: ParamSpec(names=['n'], values=[2]),
-            nid3: ParamSpec(names=['n'], values=[3]),
-        }
-    with when(
-        t'the {pg["Group"]("grouping")} pass collapses them',
-        pins=adopt_pytest_given['group'],
-    ):
-        grouped = group_parametrized(scenarios, param_info)
-    with then(t'one scenario remains and any failed {pg["Case"].l} fails it'):
-        assert len(grouped) == 1
-        assert grouped[0].status == 'failed'
 
 
 @scenario(
@@ -954,17 +944,32 @@ def test_rule_two_names_the_violating_steps_own_phase() -> None:
     assert 'expected outcome' not in message
 
 
+@scenario(
+    t'A varying expression in a then is refused with the fix of an expected-outcome '
+    t'column',
+    tags=['diagnostics', 'parametrization', 'validation', 'versions/0.5.0'],
+)
 def test_rule_two_in_a_then_offers_an_expected_outcome_column() -> None:
-    scenarios, info = _two_case_group(
-        [_value_step('[1, 2]', expression='[1, 2] if enabled else []')],
-        [_value_step('[]', expression='[1, 2] if enabled else []')],
-    )
-    with pytest.raises(PytestGivenError) as excinfo:
+    with given(
+        t'two {pg["Case"].l.s} whose then narrates an outcome derived from an input'
+    ):
+        scenarios, info = _two_case_group(
+            [_value_step('[1, 2]', expression='[1, 2] if enabled else []')],
+            [_value_step('[]', expression='[1, 2] if enabled else []')],
+        )
+    with (
+        when_then(
+            t'the {pg["Case"].l.s} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
         group_parametrized(scenarios, info)
-    assert (
-        'parametrize an expected outcome as its own column; otherwise bind it '
-        'to a local' in str(excinfo.value)
-    )
+    with then('the error first suggests parametrizing the expected outcome'):
+        assert (
+            'parametrize an expected outcome as its own column; otherwise bind it '
+            'to a local' in str(excinfo.value)
+        )
 
 
 def test_a_constant_compound_interpolation_stays_inline() -> None:

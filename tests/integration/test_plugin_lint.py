@@ -220,7 +220,7 @@ _IGNORE_SUITES = {'a flawed step': EMPTY_GIVEN, 'a clean step': CLEAN}
 def test_an_ignore_entry_suppresses_what_it_matches(pytester, suite, entry, outcome):
     with given(t'a suite with {suite}'):
         attach('test file', _IGNORE_SUITES[suite])
-    with when(t'the suite runs with the lint and given_lint_ignore={entry}'):
+    with when(t'the suite runs with the lint and given_lint_ignore={entry!r}'):
         result = _run(
             pytester,
             _IGNORE_SUITES[suite],

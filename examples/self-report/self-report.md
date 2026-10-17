@@ -51,6 +51,19 @@
     ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
     ```
 
+## ✓ `citations` refuses documents that never link the «report», rather than passing them
+`tests/integration/test_cli_citations.py::test_documents_that_never_link_the_report_are_refused` · spec/citations, versions/0.5.0
+
+- **given** a document whose «citation» links another URL
+    - 📎 document:
+        ```
+        ✅ [Pay by card](https://example.org/dev/report.html#scenario=t.py::test_pay)
+        ```
+- **given** a JSON «report» served from https://example.org/report.html
+- **when** `pytest-given citations check` runs on the document
+- **then** it exits 2, as for a report it cannot read
+- **then** the error names the URL it looked for
+
 ## ✓ `citations check --list` prints every «report link», its findings under it
 `tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings` · spec/citations-list, versions/0.5.0
 
@@ -672,7 +685,7 @@
 
 | case ID | placeholder | outcome | error |
 |---|---|---|---|
-| column | {x} | accepted | None |
+| column | {x} | accepted | nothing |
 | plain-fixture | {room} | refused | '{room}' in the given annotation on parameter 'room' does not match |
 | attribute | {room.number} | refused | bare identifiers |
 
@@ -969,12 +982,12 @@
 
 | suite | test file | entry | outcome |
 |---|---|---|---|
-| a flawed step | test file |  | reported |
-| a flawed step | test file | \*::test_empty_given | suppressed |
-| a flawed step | test file | empty-step: \*::test_empty_given | suppressed |
-| a clean step | test file | \*::test_nothing | stale |
+| a flawed step | test file | '' | reported |
+| a flawed step | test file | '\*::test_empty_given' | suppressed |
+| a flawed step | test file | 'empty-step: \*::test_empty_given' | suppressed |
+| a clean step | test file | '\*::test_nothing' | stale |
 
-- **a flawed step, , reported** — test file:
+- **a flawed step, '', reported** — test file:
     ```
 
     from pytest_given import scenario, given, when, then
@@ -989,7 +1002,7 @@
             assert x == 2
     ```
 
-- **a flawed step, \*::test_empty_given, suppressed** — test file:
+- **a flawed step, '\*::test_empty_given', suppressed** — test file:
     ```
 
     from pytest_given import scenario, given, when, then
@@ -1004,7 +1017,7 @@
             assert x == 2
     ```
 
-- **a flawed step, empty-step: \*::test_empty_given, suppressed** — test file:
+- **a flawed step, 'empty-step: \*::test_empty_given', suppressed** — test file:
     ```
 
     from pytest_given import scenario, given, when, then
@@ -1019,7 +1032,7 @@
             assert x == 2
     ```
 
-- **a clean step, \*::test_nothing, stale** — test file:
+- **a clean step, '\*::test_nothing', stale** — test file:
     ```
 
     from pytest_given import scenario, given, when, then
@@ -1092,7 +1105,7 @@
 
 - **given** a fresh «collector»
 - **when** a «scenario» starts under its «node ID» and finishes
-- **then** it carries its «node ID», name, status and «tag»
+- **then** it carries its «node ID», «scenario title», status and «tag»
 
 ## ✓ The «collector» records each «step» with its «phase»
 `tests/unit/capture/test_collector.py::test_collect_steps`
@@ -1641,15 +1654,15 @@
 - **when** «kind inference» runs over its «story»
 - **then** the first «term» of the second clause is an «actor»
 
-## ✓ A conflict error names only the offending «stories»
+## ✓ A declared kind's conflict names only the «stories» that put its «term» in the wrong «slot»
 `tests/unit/capture/test_kind_inference.py::test_conflict_where_names_only_offending_stories` · diagnostics, validation
 
 - **given** an «actor» «term» that also appears in a verb slot
 - **when** «kind inference» runs over both «stories»
-- **then** a PytestGivenError reports the conflict
+- **then** a PytestGivenError reports the declared actor in a verb slot
 - **then** only the offending story is named in the message
 
-## ✓ A conflict message excludes «stories» with an unrelated «slot»
+## ✓ An inferred kind's conflict names only the «stories» whose «slots» disagree
 `tests/unit/capture/test_kind_inference.py::test_inferred_conflict_where_excludes_unrelated_slot_stories` · diagnostics, validation
 
 - **given** a «kindless» «term» used in verb, actor and noun slots
@@ -1728,25 +1741,6 @@
 - **when** the parser splits the row
 - **then** the escaped pipe survives as a literal pipe
 
-## ✓ Tables inside fenced code blocks are skipped
-`tests/unit/capture/test_markdown_glossary.py::test_skips_tables_in_fenced_code_blocks`
-
-- **given** a fenced code block that contains a look-alike table
-    - 📎 Markdown document:
-        ````
-        ```
-        | Term | Meaning |
-        |---|---|
-        | Fake | nope |
-        ```
-
-        | Term | Meaning |
-        |---|---|
-        | Real | yes |
-        ````
-- **when** the parser reads the document
-- **then** only the real table outside the fence contributes rows
-
 ## ✓ A «file glossary» table the parser cannot read is refused, saying what is wrong · 3 cases
 `tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused` · diagnostics, validation
 
@@ -1789,7 +1783,7 @@
     | Room  | A bookable room. |
     ```
 
-## ✓ A «file glossary» reads the tables a GFM renderer shows, and no others · 4 cases
+## ✓ A «file glossary» reads the tables a GFM renderer shows, and no others · 6 cases
 `tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows` · versions/0.5.0
 
 - **given** a Markdown document with {document}
@@ -1803,6 +1797,8 @@
 | a table in an indented code block | Markdown document | \[('Real', 'yes')\] |
 | a separator row narrower than its header | Markdown document | \[('Real', 'yes')\] |
 | a data row narrower than its header | Markdown document | \[('Short', '')\] |
+| a table in a fenced code block | Markdown document | \[('Real', 'yes')\] |
+| a pipe line with no separator row | Markdown document | \[('Real', 'yes')\] |
 
 - **a table in a blockquote, \[('Quoted', 'yes')\]** — Markdown document:
     ```
@@ -1840,34 +1836,46 @@
     | Short |
     ```
 
-## ✓ A «term» cell is read as its plain text, with emphasis unwrapped · 6 cases
-`tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text`
+- **a table in a fenced code block, \[('Real', 'yes')\]** — Markdown document:
+    ````
+    ```
+    | Term | Meaning |
+    |---|---|
+    | Fake | nope |
+    ```
 
-- **given** a «term» cell written as {cell}
-- **when** the parser reads the term cell
-- **then** the «term» is {term}
+    | Term | Meaning |
+    |---|---|
+    | Real | yes |
+    ````
 
-| cell | term |
-|---|---|
-| \*\*Scenario\*\* | Scenario |
-| \*Step\* | Step |
-| \`given\` | given |
-| work_object | work_object |
-| \`a\*b\*c\` | a\*b\*c |
-| \_\_Scenario\_\_ | \_\_Scenario\_\_ |
+- **a pipe line with no separator row, \[('Real', 'yes')\]** — Markdown document:
+    ```
+    This line has a | in it but no separator follows.
+    Next line is not a separator.
 
-## ✓ A kind cell is read as its plain text, with emphasis unwrapped
-`tests/unit/capture/test_markdown_glossary.py::test_strips_emphasis_from_kind_cell`
+    | Term | Meaning |
+    |---|---|
+    | Real | yes |
+    ```
 
-- **given** a Kind cell written with bold emphasis
-    - 📎 Markdown document:
-        ```
-        | Term | Meaning | Kind |
-        |---|---|---|
-        | Guest | x | **Actor** |
-        ```
-- **when** the parser reads the kind cell
-- **then** the kind is unwrapped to plain text
+## ✓ A «term» or kind cell is read as its plain text, with emphasis unwrapped · 8 cases
+`tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text`
+
+- **given** a {column} cell written as {cell}
+- **when** the parser reads the row
+- **then** the {column} is {plain}
+
+| column | cell | plain |
+|---|---|---|
+| term | \*\*Scenario\*\* | Scenario |
+| term | \*Step\* | Step |
+| term | \`given\` | given |
+| term | work_object | work_object |
+| term | \`a\*b\*c\` | a\*b\*c |
+| term | \_\_Scenario\_\_ | \_\_Scenario\_\_ |
+| kind | \*\*Actor\*\* | Actor |
+| kind | \`activity\` | activity |
 
 ## ✓ Definition markdown is left intact
 `tests/unit/capture/test_markdown_glossary.py::test_leaves_definition_markdown_intact`
@@ -1881,22 +1889,6 @@
         ```
 - **when** the parser reads the row
 - **then** the definition keeps its markup for the tooltip
-
-## ✓ A pipe line without a separator is not a table
-`tests/unit/capture/test_markdown_glossary.py::test_pipe_line_without_separator_is_skipped`
-
-- **given** prose containing a stray pipe, then a real table
-    - 📎 Markdown document:
-        ```
-        This line has a | in it but no separator follows.
-        Next line is not a separator.
-
-        | Term | Meaning |
-        |---|---|
-        | Real | yes |
-        ```
-- **when** the parser reads the document
-- **then** only the real pipe table produces rows
 
 ## ✓ A «step» pairs its «narration» with a «phase»
 `tests/unit/capture/test_step_descriptor.py::test_context_manager_basic`
@@ -2414,6 +2406,41 @@
         ✅ [Books a **suite**](https://example.org/report.html#scenario=t.py::test_book)
         ```
 
+## ✓ `citations update` repoints the «citation» of a renamed test by its unchanged «scenario title»
+`tests/unit/citations/test_check.py::test_a_renamed_test_is_repointed_by_its_unchanged_title` · spec/citations, versions/0.5.0
+
+- **given** a «report» where `test_pay` was renamed `test_pay_by_card`, still titled "Pay by card"
+- **given** a document whose «citation» still names `test_pay`
+    - 📎 document:
+        ```
+        ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+        ```
+- **when** the document is checked
+- **then** the «citation» is a «citation finding» `update` fixes, naming `test_pay_by_card`
+- **when** the document is updated
+- **then** the «citation» names `test_pay_by_card`
+    - 📎 updated document:
+        ```
+        ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay_by_card)
+        ```
+- **then** no finding remains
+
+## ✓ A relative «report link» resolves from its document to where `--report-path` places the «report»
+`tests/unit/citations/test_check.py::test_relative_links_resolve_from_the_documents_directory` · spec/citations, versions/0.5.0
+
+- **given** a «report» that stores no URL, placed at `examples/r.html`
+- **given** a stale «citation» in `guide/doc.md` linking `../examples/r.html`
+    - 📎 document:
+        ```
+        ✓ [Pay by card](../examples/r.html#scenario=t.py::test_pay)
+        ```
+- **when** the document is updated with that `--report-path`
+- **then** the «citation» is read as one and its glyph rewritten
+    - 📎 updated document:
+        ```
+        ✅ [Pay by card](../examples/r.html#scenario=t.py::test_pay)
+        ```
+
 ## ✓ `--covering` keeps each «report link» whose target counts the «scenario», and each it cannot rule out · 9 cases
 `tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario` · spec/citations-list, versions/0.5.0
 
@@ -2483,23 +2510,225 @@
 - **then** one stale narration is the only «citation finding»
 - **then** it names the first line that differs, written and expected
 
-## ✓ A «narrated citation» of a tag or story is a «citation finding» `update` leaves
+## ✓ A «narrated citation» of a tag or story is a «citation finding» `update` leaves · 2 cases
 `tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves` · spec/narrated-citations, versions/0.5.0
 
-- **given** a «report» with the tag `checkout`
-- **given** a document with a «narrated citation» of the tag, its glyph and body stale
+- **given** a «report» whose «scenario» is tagged `checkout` and covers the «story» `checkout`
+- **given** a document with a «narrated citation» of the {target}, its glyph and body stale
+    - 📎 document — *see parameter table*
+- **when** the document is updated
+- **then** a stray narration is the only «citation finding», one `update` cannot fix
+- **then** the document is left as written
+
+| target | document |
+|---|---|
+| tag | document |
+| story | document |
+
+- **tag** — document:
+    ```
+    <details markdown="1">
+    <summary>❌ <a href="https://example.org/report.html#tag=checkout">checkout</a></summary>
+
+    The checkout.
+
+    </details>
+    ```
+
+- **story** — document:
+    ```
+    <details markdown="1">
+    <summary>❌ <a href="https://example.org/report.html#view=stories&story=checkout">checkout</a></summary>
+
+    The checkout.
+
+    </details>
+    ```
+
+## ✓ A `<details>` block citing the «report» in any other shape is a mistyped «citation finding», never skipped · 4 cases
+`tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding` · spec/narrated-citations, versions/0.5.0
+
+- **given** a document whose `<details>` block cites the «report» with {shape}
+    - 📎 document — *see parameter table*
+- **when** the document is updated
+- **then** a mistyped «citation finding», saying {reason}, is the only one
+- **then** the document is left as written
+
+| shape | document | reason |
+|---|---|---|
+| an anchor with a class | document | its \<a> takes attributes besides href |
+| a single-quoted href | document | its href is not in double quotes |
+| no closing tag | document | no \</details> closes it |
+| no blank line above it, below another one | document | a blank line must separate it from the HTML above it |
+
+- **an anchor with a class, its \<a> takes attributes besides href** — document:
+    ```
+    <details markdown="1">
+    <summary>✅ <a class="x" href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+    </details>
+    ```
+
+- **a single-quoted href, its href is not in double quotes** — document:
+    ```
+    <details markdown="1">
+    <summary>✅ <a href='https://example.org/report.html#scenario=t.py::test_pay'>Pay by card</a></summary>
+
+    </details>
+    ```
+
+- **no closing tag, no \</details> closes it** — document:
+    ```
+    <details markdown="1">
+    <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+    After.
+    ```
+
+- **no blank line above it, below another one, a blank line must separate it from the HTML above it** — document:
+    ```
+    <details markdown="1">
+    <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+    - **given** a card
+    - **then** it is paid
+
+    </details>
+    <details markdown="1">
+    <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+    - **given** a card
+    - **then** it is paid
+
+    </details>
+    ```
+
+## ✓ A «narrated citation» copied from the «report» is current once `citations update` fills its body
+`tests/unit/citations/test_check.py::test_a_narrated_citation_copied_from_the_report_is_current_once_filled` · spec/narrated-citations, versions/0.5.0
+
+- **given** a «report» whose «scenario title» holds a code span and an ampersand
+- **given** the «narrated citation» the copy menu copies, pasted into a document
     - 📎 document:
         ```
         <details markdown="1">
-        <summary>❌ <a href="https://example.org/report.html#tag=checkout">checkout</a></summary>
-
-        The checkout.
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay <code>a&amp;b</code> &amp; more</a></summary>
 
         </details>
         ```
 - **when** the document is updated
-- **then** a stray narration is the only «citation finding», one `update` cannot fix
-- **then** the document is left as written
+- **then** its body holds the scenario's narration
+    - 📎 updated document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay <code>a&amp;b</code> &amp; more</a></summary>
+
+        - **given** a card
+        - **then** it is paid
+
+        </details>
+        ```
+- **when** the updated document is checked
+- **then** no finding remains
+
+## ✓ A failing «narrated citation» has its body rewritten and stays a «citation finding»
+`tests/unit/citations/test_check.py::test_a_failed_narrated_citation_has_its_body_rewritten_and_stays_a_finding` · spec/narrated-citations, versions/0.5.0
+
+- **given** a «report» whose «scenario» fails
+- **given** a document holding a «narrated citation» of it, copied with an empty body
+    - 📎 document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+        </details>
+        ```
+- **when** the document is updated
+- **then** its glyph reads ❌ and its body holds the narration
+    - 📎 updated document:
+        ```
+        <details markdown="1">
+        <summary>❌ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+        - **given** a card
+        - **then** it is paid
+
+        </details>
+        ```
+- **then** the failure is the only finding that remains
+
+## ✓ `citations update` adds `markdown="1"` to a «narrated citation»'s opening tag, keeping its other attributes · 5 cases
+`tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes` · spec/narrated-citations, versions/0.5.0
+
+- **given** a current «narrated citation» whose opening tag is {opening}
+- **when** the document is checked
+- **then** a stale opening tag is the only «citation finding», naming its fix
+- **when** the document is updated
+- **then** the opening tag reads {expected}
+
+| opening | expected |
+|---|---|
+| \<details open> | \<details markdown="1" open> |
+| \<details open markdown="0"> | \<details open markdown="1"> |
+| \<details markdown='block'> | \<details markdown="1"> |
+| \<details markdown> | \<details markdown="1"> |
+| \<details title="see markdown here"> | \<details markdown="1" title="see markdown here"> |
+
+## ✓ A «narrated citation» in a list item or blockquote has its body written under that prefix · 2 cases
+`tests/unit/citations/test_check.py::test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix` · spec/narrated-citations, versions/0.5.0
+
+- **given** a «narrated citation» copied with an empty body into a {container}
+    - 📎 document — *see parameter table*
+- **when** the document is updated
+- **then** each body line carries the container's prefix
+    - 📎 updated document — *see parameter table*
+- **then** a check of the updated document finds nothing
+
+| container | document | updated document |
+|---|---|---|
+| list item | document | updated document |
+| blockquote | document | updated document |
+
+- **list item** — document:
+    ```
+    - Paying:
+
+      <details markdown="1">
+      <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+      </details>
+    ```
+
+- **list item** — updated document:
+    ```
+    - Paying:
+
+      <details markdown="1">
+      <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+
+      - **given** a card
+      - **then** it is paid
+
+      </details>
+    ```
+
+- **blockquote** — document:
+    ```
+    > <details markdown="1">
+    > <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+    >
+    > </details>
+    ```
+
+- **blockquote** — updated document:
+    ```
+    > <details markdown="1">
+    > <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+    >
+    > - **given** a card
+    > - **then** it is paid
+    >
+    > </details>
+    ```
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
@@ -2626,7 +2855,7 @@
 - **when** the runtime «lint rules» run
 - **then** a single warn «lint finding» names the «tag» and the «term» it shadows, counting the scenarios and naming one
 
-## ✓ «Narration lint» flags a «term» referenced by no «scenario» name, «step» or «story»
+## ✓ «Narration lint» flags a «term» referenced by no «scenario title», «step» or «story»
 `tests/unit/lint/test_runtime_rules.py::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
@@ -3006,23 +3235,6 @@
 - **then** the heading reads on one line
 - **then** so does the «step» bullet
 
-## ✓ Nested «steps» indent under their parent
-`tests/unit/report/test_md_renderer.py::test_nested_steps_indent`
-
-- **given** a «scenario» whose when «step» has a nested child
-- **when** the Markdown «report» is rendered
-- **then** the child bullet indents under its parent
-    - 📎 Rendered Markdown:
-        ```
-        # pytest-given — proj
-
-        ## ✓ Nest
-        `tests/t.py::test_nest`
-
-        - **when** outer
-            - **when** inner
-        ```
-
 ## ✓ Structured «narration» renders «terms», values and placeholders
 `tests/unit/report/test_md_renderer.py::test_narration_parts_resolve_terms_and_values`
 
@@ -3363,19 +3575,22 @@
 - **when** the «sentence» labels are built
 - **then** the label gives the number, then reads as prose under a story-scoped key, with the «clause» texts joined
 
-## ✓ One xfailed «case» makes its «parametrized scenario» an expected failure
-`tests/unit/test_grouping.py::test_one_xfailed_case_makes_the_group_xfailed` · parametrization
+## ✓ A «parametrized scenario» takes the status of its worst «case»: failed, then xfailed, then passed, then skipped · 6 cases
+`tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status` · parametrization
 
-- **given** a passed «case» and an xfailed one with the reason "planned"
+- **given** «Cases» of one «parametrized scenario» that ended {statuses}, each xfailed one for the reason "planned"
 - **when** the «grouping» pass collapses them
-- **then** the «scenario» is xfailed and carries the xfailed «case»'s reason
+- **then** the «scenario» is {status}
+- **then** its xfail reason is {reason}
 
-## ✓ Any failed «case» fails its «parametrized scenario»
-`tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed` · parametrization
-
-- **given** three «case» records of one «parametrized scenario»
-- **when** the «grouping» pass collapses them
-- **then** one scenario remains and any failed «case» fails it
+| statuses | status | reason |
+|---|---|---|
+| passed, failed, skipped | failed | None |
+| xfailed, failed | failed | None |
+| passed, xfailed | xfailed | planned |
+| skipped, xfailed | xfailed | planned |
+| skipped, passed | passed | None |
+| skipped, skipped | skipped | None |
 
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
 `tests/unit/test_grouping.py::test_group_parametrized_keeps_source_order` · parametrization
@@ -3431,6 +3646,14 @@
 - **when** the «cases» are «grouped»
 - **then** the grouping is refused
 - **then** the error quotes the expression and shows the bind-a-local fix
+
+## ✓ A varying expression in a then is refused with the fix of an expected-outcome column
+`tests/unit/test_grouping.py::test_rule_two_in_a_then_offers_an_expected_outcome_column` · diagnostics, parametrization, validation, versions/0.5.0
+
+- **given** two «cases» whose then narrates an outcome derived from an input
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error first suggests parametrizing the expected outcome
 
 ## ✓ A «parameter table» cell reads the way the «scenario title» formats it
 `tests/unit/test_grouping.py::test_a_scenario_title_format_spec_reaches_its_cell` · parametrization

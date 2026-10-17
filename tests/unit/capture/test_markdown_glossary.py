@@ -90,24 +90,6 @@ def test_escaped_pipe_in_cell():
         ]
 
 
-@scenario(
-    'Tables inside fenced code blocks are skipped',
-)
-def test_skips_tables_in_fenced_code_blocks():
-    with given('a fenced code block that contains a look-alike table'):
-        text = (
-            '```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n'
-            '| Term | Meaning |\n|---|---|\n| Real | yes |\n'
-        )
-        attach('Markdown document', text)
-    with when('the parser reads the document'):
-        rows = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
-        )
-    with then('only the real table outside the fence contributes rows'):
-        assert [row.term for row in rows] == ['Real']
-
-
 _UNREADABLE_DOCUMENTS = {
     'no pipe table': '# Just a heading\n\nNo tables here.',
     'one pipe table': SIMPLE,
@@ -167,6 +149,13 @@ _GFM_DOCUMENTS = {
     'a data row narrower than its header': (
         '| Term | Meaning |\n|---|---|\n| Short |\n'
     ),
+    'a table in a fenced code block': (
+        '```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n' + REAL_TABLE
+    ),
+    'a pipe line with no separator row': (
+        'This line has a | in it but no separator follows.\n'
+        'Next line is not a separator.\n\n' + REAL_TABLE
+    ),
 }
 
 
@@ -181,6 +170,8 @@ _GFM_DOCUMENTS = {
         ('a table in an indented code block', [('Real', 'yes')]),
         ('a separator row narrower than its header', [('Real', 'yes')]),
         ('a data row narrower than its header', [('Short', '')]),
+        ('a table in a fenced code block', [('Real', 'yes')]),
+        ('a pipe line with no separator row', [('Real', 'yes')]),
     ],
 )
 def test_a_glossary_reads_the_tables_a_gfm_renderer_shows(document, rows):
@@ -196,45 +187,33 @@ def test_a_glossary_reads_the_tables_a_gfm_renderer_shows(document, rows):
 
 
 @scenario(
-    t'A {pg["Term"].l} cell is read as its plain text, with emphasis unwrapped',
+    t'A {pg["Term"].l} or kind cell is read as its plain text, with emphasis unwrapped',
 )
 @pytest.mark.parametrize(
-    ('cell', 'term'),
+    ('column', 'cell', 'plain'),
     [
-        ('**Scenario**', 'Scenario'),
-        ('*Step*', 'Step'),
-        ('`given`', 'given'),
-        ('work_object', 'work_object'),
-        ('`a*b*c`', 'a*b*c'),
-        ('__Scenario__', '__Scenario__'),
+        ('term', '**Scenario**', 'Scenario'),
+        ('term', '*Step*', 'Step'),
+        ('term', '`given`', 'given'),
+        ('term', 'work_object', 'work_object'),
+        ('term', '`a*b*c`', 'a*b*c'),
+        ('term', '__Scenario__', '__Scenario__'),
+        ('kind', '**Actor**', 'Actor'),
+        ('kind', '`activity`', 'activity'),
     ],
 )
-def test_a_term_cell_is_read_as_its_plain_text(cell, term):
+def test_a_term_or_kind_cell_is_read_as_its_plain_text(column, cell, plain):
     # Inside a code span `*` is text, which is how the same markup renders in a
     # definition cell — the canonical name has to agree with the pill.
-    with given(t'a {pg["Term"].l} cell written as {cell}'):
-        text = f'| Term | Meaning |\n|---|---|\n| {cell} | A thing. |\n'
-    with when('the parser reads the term cell'):
-        rows = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
-        )
-    with then(t'the {pg["Term"].l} is {term}'):
-        assert [row.term for row in rows] == [term]
-
-
-@scenario(
-    'A kind cell is read as its plain text, with emphasis unwrapped',
-)
-def test_strips_emphasis_from_kind_cell():
-    with given('a Kind cell written with bold emphasis'):
-        text = '| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n'
-        attach('Markdown document', text)
-    with when('the parser reads the kind cell'):
-        rows = parse_glossary_tables(
+    with given(t'a {column} cell written as {cell}'):
+        term, kind = (cell, 'Actor') if column == 'term' else ('Guest', cell)
+        text = f'| Term | Meaning | Kind |\n|---|---|---|\n| {term} | x | {kind} |\n'
+    with when('the parser reads the row'):
+        [row] = parse_glossary_tables(
             text, term_column=0, definition_column=1, kind_column=2
         )
-    with then('the kind is unwrapped to plain text'):
-        assert rows[0].kind == 'Actor'
+    with then(t'the {column} is {plain}'):
+        assert (row.term if column == 'term' else row.kind) == plain
 
 
 @scenario(
@@ -253,28 +232,6 @@ def test_leaves_definition_markdown_intact():
         )
     with then('the definition keeps its markup for the tooltip'):
         assert rows[0].definition == 'A test decorated with `@scenario(...)`.'
-
-
-@scenario(
-    'A pipe line without a separator is not a table',
-)
-def test_pipe_line_without_separator_is_skipped():
-    with given('prose containing a stray pipe, then a real table'):
-        text = (
-            'This line has a | in it but no separator follows.\n'
-            'Next line is not a separator.\n'
-            '\n'
-            '| Term | Meaning |\n'
-            '|---|---|\n'
-            '| Real | yes |\n'
-        )
-        attach('Markdown document', text)
-    with when('the parser reads the document'):
-        rows = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
-        )
-    with then('only the real pipe table produces rows'):
-        assert [row.term for row in rows] == ['Real']
 
 
 def test_nested_emphasis_unwraps_all_the_way():

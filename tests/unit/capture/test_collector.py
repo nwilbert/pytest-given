@@ -47,7 +47,10 @@ def test_start_and_finish_scenario() -> None:
     with when(t'a {pg["Scenario"].l} starts under its {pg["Node ID"].l} and finishes'):
         collector.start_scenario('test.py::test_x', 'Test X', 'test_module', ['tag1'])
         recorded = collector.finish_scenario(status='passed')
-    with then(t'it carries its {pg["Node ID"].l}, name, status and {pg["Tag"].l}'):
+    with then(
+        t'it carries its {pg["Node ID"].l}, {pg["Scenario title"].l}, status and '
+        t'{pg["Tag"].l}'
+    ):
         assert recorded.id == 'test.py::test_x'
         assert recorded.narration.text == 'Test X'
         assert recorded.status == 'passed'

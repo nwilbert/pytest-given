@@ -1,6 +1,6 @@
 # Narrated Citations — Design Spec
 
-✅ [spec/narrated-citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/narrated-citations) (5 ✅)
+✅ [spec/narrated-citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/narrated-citations) (10 ✅)
 
 ## Goal
 

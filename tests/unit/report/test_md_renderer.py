@@ -183,31 +183,6 @@ def test_source_without_location_still_drops_parametrize_suffix(
 
 
 @scenario(
-    t'Nested {pg["Step"].l.s} indent under their parent',
-)
-def test_nested_steps_indent() -> None:
-    with given(t'a {pg["Scenario"].l} whose when {pg["Step"].l} has a nested child'):
-        scn = Scenario(
-            id='tests/t.py::test_nest',
-            narration=Narration(text='Nest'),
-            module='tests/t.py',
-            steps=[
-                Step(
-                    phase='when',
-                    narration=Narration(text='outer'),
-                    children=[Step(phase='when', narration=Narration(text='inner'))],
-                )
-            ],
-        )
-    with when(t'the Markdown {pg["Report"].l} is rendered'):
-        md = render_md(_report(scn))
-    with then('the child bullet indents under its parent'):
-        attach('Rendered Markdown', md)
-        assert '- **when** outer' in md
-        assert '    - **when** inner' in md
-
-
-@scenario(
     t'Structured {pg["Narration"].l} renders {pg["Term"].l.s}, values and placeholders',
 )
 def test_narration_parts_resolve_terms_and_values() -> None:

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-17T16:47:59.726384+00:00",
+    "timestamp": "2026-10-17T20:53:19.991434+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "3dd2cdcb6b64cb48d0b7211c3bbbefd15e81da4d",
+    "commit_sha": "a6b345dae4331453f481e3d77befc19348a1cc6f",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 122,
+      "duration_ms": 121,
       "steps": [
         {
           "phase": "given",
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -409,6 +409,135 @@
       "pins": null
     },
     {
+      "id": "tests/integration/test_cli_citations.py::test_documents_that_never_link_the_report_are_refused",
+      "narration": {
+        "text": "`citations` refuses documents that never link the report, rather than passing them",
+        "parts": [
+          {
+            "value": "`citations` refuses documents that never link the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": ", rather than passing them"
+          }
+        ]
+      },
+      "module": "tests.integration.test_cli_citations",
+      "tags": [
+        "spec/citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 2,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document whose citation links another URL",
+            "parts": [
+              {
+                "value": "a document whose "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " links another URL"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Pay by card](https://example.org/dev/report.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a JSON report served from https://example.org/report.html",
+            "parts": [
+              {
+                "value": "a JSON "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " served from "
+              },
+              {
+                "rendered": "https://example.org/report.html",
+                "expression": "URL",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given citations check` runs on the document",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it exits 2, as for a report it cannot read",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the error names the URL it looked for",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_citations.py",
+        "line": 97
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings",
       "narration": {
         "text": "`citations check --list` prints every report link, its findings under it",
@@ -549,7 +678,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 270
+        "line": 295
       },
       "story_ids": [],
       "pins": null
@@ -701,7 +830,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 307
+        "line": 332
       },
       "story_ids": [],
       "pins": null
@@ -748,7 +877,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -934,7 +1063,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 100,
+      "duration_ms": 107,
       "steps": [
         {
           "phase": "given",
@@ -1016,7 +1145,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -1125,7 +1254,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1254,7 +1383,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 546,
+      "duration_ms": 545,
       "steps": [
         {
           "phase": "given",
@@ -1382,7 +1511,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -1569,7 +1698,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 87,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -1755,7 +1884,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1822,7 +1951,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -2031,7 +2160,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -2101,7 +2230,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -2221,7 +2350,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -2356,7 +2485,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 85,
+      "duration_ms": 69,
       "steps": [
         {
           "phase": "given",
@@ -2484,7 +2613,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 80,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -2654,7 +2783,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2771,7 +2900,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 162,
+      "duration_ms": 156,
       "steps": [
         {
           "phase": "given",
@@ -2844,7 +2973,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -3016,7 +3145,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -3155,7 +3284,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -3453,7 +3582,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -3745,7 +3874,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 135,
+      "duration_ms": 134,
       "steps": [
         {
           "phase": "given",
@@ -3938,7 +4067,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 96,
+      "duration_ms": 93,
       "steps": [
         {
           "phase": "given",
@@ -4067,7 +4196,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 119,
+      "duration_ms": 114,
       "steps": [
         {
           "phase": "given",
@@ -4192,7 +4321,7 @@
             "values": [
               "{x}",
               "accepted",
-              null
+              "nothing"
             ],
             "status": "passed",
             "error": null,
@@ -4253,7 +4382,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -4347,7 +4476,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -4434,7 +4563,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -4511,7 +4640,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 81,
+      "duration_ms": 78,
       "steps": [
         {
           "phase": "given",
@@ -4685,7 +4814,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4770,7 +4899,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -4877,7 +5006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 158,
       "steps": [
         {
           "phase": "given",
@@ -5090,7 +5219,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -5319,7 +5448,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5468,7 +5597,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 369,
+      "duration_ms": 382,
       "steps": [
         {
           "phase": "given",
@@ -5627,7 +5756,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5729,7 +5858,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5956,7 +6085,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -6086,7 +6215,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -6127,7 +6256,7 @@
                 "name": "entry",
                 "column_id": "entry",
                 "format_spec": "",
-                "conversion": null
+                "conversion": "r"
               }
             ]
           },
@@ -6228,7 +6357,7 @@
                 "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Empty given\")\ndef test_empty_given():\n    with given(\"a value\"):\n        pass\n    with when(\"computing\"):\n        x = 2\n    with then(\"it is two\"):\n        assert x == 2\n",
                 "content_type": "text"
               },
-              "",
+              "''",
               "reported"
             ],
             "status": "passed",
@@ -6244,7 +6373,7 @@
                 "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Empty given\")\ndef test_empty_given():\n    with given(\"a value\"):\n        pass\n    with when(\"computing\"):\n        x = 2\n    with then(\"it is two\"):\n        assert x == 2\n",
                 "content_type": "text"
               },
-              "*::test_empty_given",
+              "'*::test_empty_given'",
               "suppressed"
             ],
             "status": "passed",
@@ -6260,7 +6389,7 @@
                 "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Empty given\")\ndef test_empty_given():\n    with given(\"a value\"):\n        pass\n    with when(\"computing\"):\n        x = 2\n    with then(\"it is two\"):\n        assert x == 2\n",
                 "content_type": "text"
               },
-              "empty-step: *::test_empty_given",
+              "'empty-step: *::test_empty_given'",
               "suppressed"
             ],
             "status": "passed",
@@ -6276,7 +6405,7 @@
                 "content": "\nfrom pytest_given import scenario, given, when, then\n\n@scenario(\"Clean\")\ndef test_clean():\n    with given(\"a value\"):\n        x = 1\n    with when(\"it is doubled\"):\n        x = x * 2\n    with then(\"it is two\"):\n        assert x == 2\n",
                 "content_type": "text"
               },
-              "*::test_nothing",
+              "'*::test_nothing'",
               "stale"
             ],
             "status": "passed",
@@ -6316,7 +6445,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -6524,7 +6653,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 81,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -6664,7 +6793,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "it carries its node ID, name, status and tag",
+            "text": "it carries its node ID, scenario title, status and tag",
             "parts": [
               {
                 "value": "it carries its "
@@ -6675,7 +6804,15 @@
                 "expression": "pg[\"Node ID\"].l"
               },
               {
-                "value": ", name, status and "
+                "value": ", "
+              },
+              {
+                "term_id": "scenario-title",
+                "display": "scenario title",
+                "expression": "pg[\"Scenario title\"].l"
+              },
+              {
+                "value": ", status and "
               },
               {
                 "term_id": "tag",
@@ -6828,7 +6965,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 73
+        "line": 76
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -6929,7 +7066,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 217
+        "line": 220
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7048,7 +7185,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 241
+        "line": 244
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7157,7 +7294,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 263
+        "line": 266
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7273,7 +7410,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 318
+        "line": 321
       },
       "story_ids": [],
       "pins": null
@@ -7385,7 +7522,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 336
+        "line": 339
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7467,7 +7604,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 488
+        "line": 491
       },
       "story_ids": [],
       "pins": null
@@ -7560,7 +7697,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 567
+        "line": 570
       },
       "story_ids": [],
       "pins": null
@@ -7678,7 +7815,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 585
+        "line": 588
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7787,7 +7924,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 607
+        "line": 610
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -7885,7 +8022,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_collector.py",
-        "line": 637
+        "line": 640
       },
       "story_ids": [],
       "pins": null
@@ -8005,7 +8142,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -8225,7 +8362,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -8412,7 +8549,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9525,7 +9662,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -12227,15 +12364,31 @@
     {
       "id": "tests/unit/capture/test_kind_inference.py::test_conflict_where_names_only_offending_stories",
       "narration": {
-        "text": "A conflict error names only the offending stories",
+        "text": "A declared kind's conflict names only the stories that put its term in the wrong slot",
         "parts": [
           {
-            "value": "A conflict error names only the offending "
+            "value": "A declared kind's conflict names only the "
           },
           {
             "term_id": "story",
             "display": "stories",
-            "expression": "pg[\"Story\"].l.s"
+            "expression": "pg['Story'].l.s"
+          },
+          {
+            "value": " that put its "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " in the wrong "
+          },
+          {
+            "term_id": "slot",
+            "display": "slot",
+            "expression": "pg[\"Slot\"].l"
           }
         ]
       },
@@ -12306,7 +12459,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError reports the conflict",
+            "text": "a PytestGivenError reports the declared actor in a verb slot",
             "parts": []
           },
           "children": [],
@@ -12340,23 +12493,26 @@
     {
       "id": "tests/unit/capture/test_kind_inference.py::test_inferred_conflict_where_excludes_unrelated_slot_stories",
       "narration": {
-        "text": "A conflict message excludes stories with an unrelated slot",
+        "text": "An inferred kind's conflict names only the stories whose slots disagree",
         "parts": [
           {
-            "value": "A conflict message excludes "
+            "value": "An inferred kind's conflict names only the "
           },
           {
             "term_id": "story",
             "display": "stories",
-            "expression": "pg[\"Story\"].l.s"
+            "expression": "pg['Story'].l.s"
           },
           {
-            "value": " with an unrelated "
+            "value": " whose "
           },
           {
             "term_id": "slot",
-            "display": "slot",
-            "expression": "pg[\"Slot\"].l"
+            "display": "slots",
+            "expression": "pg[\"Slot\"].l.s"
+          },
+          {
+            "value": " disagree"
           }
         ]
       },
@@ -12453,7 +12609,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 195
+        "line": 198
       },
       "story_ids": [],
       "pins": null
@@ -12547,7 +12703,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 224
+        "line": 230
       },
       "story_ids": [],
       "pins": null
@@ -12846,68 +13002,6 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_markdown_glossary.py::test_skips_tables_in_fenced_code_blocks",
-      "narration": {
-        "text": "Tables inside fenced code blocks are skipped",
-        "parts": []
-      },
-      "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a fenced code block that contains a look-alike table",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "Markdown document",
-              "content": "```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the parser reads the document",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "only the real table outside the fence contributes rows",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 93
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
       "id": "tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused[no pipe table-columns0-found no Markdown pipe table]",
       "narration": {
         "text": "A file glossary table the parser cannot read is refused, saying what is wrong",
@@ -13096,7 +13190,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 117
+        "line": 99
       },
       "story_ids": [],
       "pins": null
@@ -13264,6 +13358,36 @@
             "status": "passed",
             "error": null,
             "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a table in a fenced code block-rows4]",
+            "values": [
+              "a table in a fenced code block",
+              {
+                "label": "Markdown document",
+                "content": "```\n| Term | Meaning |\n|---|---|\n| Fake | nope |\n```\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
+                "content_type": "text"
+              },
+              "[('Real', 'yes')]"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows[a pipe line with no separator row-rows5]",
+            "values": [
+              "a pipe line with no separator row",
+              {
+                "label": "Markdown document",
+                "content": "This line has a | in it but no separator follows.\nNext line is not a separator.\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
+                "content_type": "text"
+              },
+              "[('Real', 'yes')]"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
           }
         ]
       },
@@ -13272,15 +13396,15 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 173
+        "line": 162
       },
       "story_ids": [],
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[**Scenario**-Scenario]",
+      "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-**Scenario**-Scenario]",
       "narration": {
-        "text": "A term cell is read as its plain text, with emphasis unwrapped",
+        "text": "A term or kind cell is read as its plain text, with emphasis unwrapped",
         "parts": [
           {
             "value": "A "
@@ -13291,7 +13415,7 @@
             "expression": "pg[\"Term\"].l"
           },
           {
-            "value": " cell is read as its plain text, with emphasis unwrapped"
+            "value": " or kind cell is read as its plain text, with emphasis unwrapped"
           }
         ]
       },
@@ -13303,15 +13427,16 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a term cell written as {cell}",
+            "text": "a {column} cell written as {cell}",
             "parts": [
               {
                 "value": "a "
               },
               {
-                "term_id": "term",
-                "display": "term",
-                "expression": "pg[\"Term\"].l"
+                "name": "column",
+                "column_id": "column",
+                "format_spec": "",
+                "conversion": null
               },
               {
                 "value": " cell written as "
@@ -13332,7 +13457,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "the parser reads the term cell",
+            "text": "the parser reads the row",
             "parts": []
           },
           "children": [],
@@ -13343,22 +13468,23 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the term is {term}",
+            "text": "the {column} is {plain}",
             "parts": [
               {
                 "value": "the "
               },
               {
-                "term_id": "term",
-                "display": "term",
-                "expression": "pg[\"Term\"].l"
+                "name": "column",
+                "column_id": "column",
+                "format_spec": "",
+                "conversion": null
               },
               {
                 "value": " is "
               },
               {
-                "name": "term",
-                "column_id": "term",
+                "name": "plain",
+                "column_id": "plain",
                 "format_spec": "",
                 "conversion": null
               }
@@ -13373,20 +13499,26 @@
       "parameters": {
         "columns": [
           {
+            "id": "column",
+            "name": "column",
+            "kind": "param"
+          },
+          {
             "id": "cell",
             "name": "cell",
             "kind": "param"
           },
           {
-            "id": "term",
-            "name": "term",
+            "id": "plain",
+            "name": "plain",
             "kind": "param"
           }
         ],
         "cases": [
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[**Scenario**-Scenario]",
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-**Scenario**-Scenario]",
             "values": [
+              "term",
               "**Scenario**",
               "Scenario"
             ],
@@ -13395,8 +13527,9 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[*Step*-Step]",
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-*Step*-Step]",
             "values": [
+              "term",
               "*Step*",
               "Step"
             ],
@@ -13405,8 +13538,9 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[`given`-given]",
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-`given`-given]",
             "values": [
+              "term",
               "`given`",
               "given"
             ],
@@ -13415,8 +13549,9 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[work_object-work_object]",
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-work_object-work_object]",
             "values": [
+              "term",
               "work_object",
               "work_object"
             ],
@@ -13425,8 +13560,9 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[`a*b*c`-a*b*c]",
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-`a*b*c`-a*b*c]",
             "values": [
+              "term",
               "`a*b*c`",
               "a*b*c"
             ],
@@ -13435,10 +13571,33 @@
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text[__Scenario__-__Scenario__]",
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[term-__Scenario__-__Scenario__]",
             "values": [
+              "term",
               "__Scenario__",
               "__Scenario__"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[kind-**Actor**-Actor]",
+            "values": [
+              "kind",
+              "**Actor**",
+              "Actor"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_markdown_glossary.py::test_a_term_or_kind_cell_is_read_as_its_plain_text[kind-`activity`-activity]",
+            "values": [
+              "kind",
+              "`activity`",
+              "activity"
             ],
             "status": "passed",
             "error": null,
@@ -13451,69 +13610,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 198
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/capture/test_markdown_glossary.py::test_strips_emphasis_from_kind_cell",
-      "narration": {
-        "text": "A kind cell is read as its plain text, with emphasis unwrapped",
-        "parts": []
-      },
-      "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a Kind cell written with bold emphasis",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "Markdown document",
-              "content": "| Term | Meaning | Kind |\n|---|---|---|\n| Guest | x | **Actor** |\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the parser reads the kind cell",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the kind is unwrapped to plain text",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 225
+        "line": 189
       },
       "story_ids": [],
       "pins": null
@@ -13575,69 +13672,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 240
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/capture/test_markdown_glossary.py::test_pipe_line_without_separator_is_skipped",
-      "narration": {
-        "text": "A pipe line without a separator is not a table",
-        "parts": []
-      },
-      "module": "tests.unit.capture.test_markdown_glossary",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "prose containing a stray pipe, then a real table",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "Markdown document",
-              "content": "This line has a | in it but no separator follows.\nNext line is not a separator.\n\n| Term | Meaning |\n|---|---|\n| Real | yes |\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the parser reads the document",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "only the real pipe table produces rows",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 258
+        "line": 219
       },
       "story_ids": [],
       "pins": null
@@ -18052,7 +18087,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -18687,7 +18722,7 @@
       "module": "tests.unit.capture.test_template",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -19369,7 +19404,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 59
+        "line": 67
       },
       "story_ids": [],
       "pins": null
@@ -19398,7 +19433,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -19488,7 +19523,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 85
+        "line": 93
       },
       "story_ids": [],
       "pins": null
@@ -19525,7 +19560,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -19653,7 +19688,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 108
+        "line": 116
       },
       "story_ids": [],
       "pins": null
@@ -19831,7 +19866,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 132
+        "line": 140
       },
       "story_ids": [],
       "pins": null
@@ -19965,7 +20000,330 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 165
+        "line": 173
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_renamed_test_is_repointed_by_its_unchanged_title",
+      "narration": {
+        "text": "`citations update` repoints the citation of a renamed test by its unchanged scenario title",
+        "parts": [
+          {
+            "value": "`citations update` repoints the "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg[\"Citation\"].l"
+          },
+          {
+            "value": " of a renamed test by its unchanged "
+          },
+          {
+            "term_id": "scenario-title",
+            "display": "scenario title",
+            "expression": "pg[\"Scenario title\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 3,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report where `test_pay` was renamed `test_pay_by_card`, still titled \"Pay by card\"",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " where `test_pay` was renamed `test_pay_by_card`, still titled \"Pay by card\""
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document whose citation still names `test_pay`",
+            "parts": [
+              {
+                "value": "a document whose "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " still names `test_pay`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is checked",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the citation is a citation finding `update` fixes, naming `test_pay_by_card`",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " is a "
+              },
+              {
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
+              },
+              {
+                "value": " `update` fixes, naming `test_pay_by_card`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the citation names `test_pay_by_card`",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " names `test_pay_by_card`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay_by_card)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no finding remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 196
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_relative_links_resolve_from_the_documents_directory",
+      "narration": {
+        "text": "A relative report link resolves from its document to where `--report-path` places the report",
+        "parts": [
+          {
+            "value": "A relative "
+          },
+          {
+            "term_id": "report-link",
+            "display": "report link",
+            "expression": "pg[\"Report link\"].l"
+          },
+          {
+            "value": " resolves from its document to where `--report-path` places the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 2,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report that stores no URL, placed at `examples/r.html`",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " that stores no URL, placed at `examples/r.html`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a stale citation in `guide/doc.md` linking `../examples/r.html`",
+            "parts": [
+              {
+                "value": "a stale "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " in `guide/doc.md` linking `../examples/r.html`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2713 [Pay by card](../examples/r.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated with that `--report-path`",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the citation is read as one and its glyph rewritten",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " is read as one and its glyph rewritten"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\u2705 [Pay by card](../examples/r.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 552
       },
       "story_ids": [],
       "pins": null
@@ -20216,7 +20574,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 754
+        "line": 822
       },
       "story_ids": [],
       "pins": null
@@ -20358,7 +20716,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 957
+        "line": 1026
       },
       "story_ids": [],
       "pins": null
@@ -20392,7 +20750,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -20503,13 +20861,13 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 980
+        "line": 1049
       },
       "story_ids": [],
       "pins": null
     },
     {
-      "id": "tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves",
+      "id": "tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves[tag]",
       "narration": {
         "text": "A narrated citation of a tag or story is a citation finding `update` leaves",
         "parts": [
@@ -20540,12 +20898,12 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a report with the tag `checkout`",
+            "text": "a report whose scenario is tagged `checkout` and covers the story `checkout`",
             "parts": [
               {
                 "value": "a "
@@ -20556,7 +20914,23 @@
                 "expression": "pg[\"Report\"].l"
               },
               {
-                "value": " with the tag `checkout`"
+                "value": " whose "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " is tagged `checkout` and covers the "
+              },
+              {
+                "term_id": "story",
+                "display": "story",
+                "expression": "pg[\"Story\"].l"
+              },
+              {
+                "value": " `checkout`"
               }
             ]
           },
@@ -20568,7 +20942,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a document with a narrated citation of the tag, its glyph and body stale",
+            "text": "a document with a narrated citation of the {target}, its glyph and body stale",
             "parts": [
               {
                 "value": "a document with a "
@@ -20579,7 +20953,16 @@
                 "expression": "pg[\"Narrated citation\"].l"
               },
               {
-                "value": " of the tag, its glyph and body stale"
+                "value": " of the "
+              },
+              {
+                "name": "target",
+                "column_id": "target",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": ", its glyph and body stale"
               }
             ]
           },
@@ -20587,8 +20970,8 @@
           "attachments": [
             {
               "label": "document",
-              "content": "<details markdown=\"1\">\n<summary>\u274c <a href=\"https://example.org/report.html#tag=checkout\">checkout</a></summary>\n\nThe checkout.\n\n</details>\n",
-              "content_type": "text"
+              "content_type": "text",
+              "column_id": "attachment:0"
             }
           ],
           "pins": null,
@@ -20640,13 +21023,937 @@
           "fixture_name": null
         }
       ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "target",
+            "name": "target",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "document",
+            "kind": "attachment"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves[tag]",
+            "values": [
+              "tag",
+              {
+                "label": "document",
+                "content": "<details markdown=\"1\">\n<summary>\u274c <a href=\"https://example.org/report.html#tag=checkout\">checkout</a></summary>\n\nThe checkout.\n\n</details>\n",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves[story]",
+            "values": [
+              "story",
+              {
+                "label": "document",
+                "content": "<details markdown=\"1\">\n<summary>\u274c <a href=\"https://example.org/report.html#view=stories&story=checkout\">checkout</a></summary>\n\nThe checkout.\n\n</details>\n",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1076
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding[an anchor with a class-its <a> takes attributes besides href]",
+      "narration": {
+        "text": "A `<details>` block citing the report in any other shape is a mistyped citation finding, never skipped",
+        "parts": [
+          {
+            "value": "A `<details>` block citing the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": " in any other shape is a mistyped "
+          },
+          {
+            "term_id": "citation-finding",
+            "display": "citation finding",
+            "expression": "pg[\"Citation finding\"].l"
+          },
+          {
+            "value": ", never skipped"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/narrated-citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 4,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document whose `<details>` block cites the report with {shape}",
+            "parts": [
+              {
+                "value": "a document whose `<details>` block cites the "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " with "
+              },
+              {
+                "name": "shape",
+                "column_id": "shape",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content_type": "text",
+              "column_id": "attachment:0"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a mistyped citation finding, saying {reason}, is the only one",
+            "parts": [
+              {
+                "value": "a mistyped "
+              },
+              {
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
+              },
+              {
+                "value": ", saying "
+              },
+              {
+                "name": "reason",
+                "column_id": "reason",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": ", is the only one"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the document is left as written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "shape",
+            "name": "shape",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "document",
+            "kind": "attachment"
+          },
+          {
+            "id": "reason",
+            "name": "reason",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding[an anchor with a class-its <a> takes attributes besides href]",
+            "values": [
+              "an anchor with a class",
+              {
+                "label": "document",
+                "content": "<details markdown=\"1\">\n<summary>\u2705 <a class=\"x\" href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n</details>\n",
+                "content_type": "text"
+              },
+              "its <a> takes attributes besides href"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding[a single-quoted href-its href is not in double quotes]",
+            "values": [
+              "a single-quoted href",
+              {
+                "label": "document",
+                "content": "<details markdown=\"1\">\n<summary>\u2705 <a href='https://example.org/report.html#scenario=t.py::test_pay'>Pay by card</a></summary>\n\n</details>\n",
+                "content_type": "text"
+              },
+              "its href is not in double quotes"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding[no closing tag-no </details> closes it]",
+            "values": [
+              "no closing tag",
+              {
+                "label": "document",
+                "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\nAfter.\n",
+                "content_type": "text"
+              },
+              "no </details> closes it"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_details_block_in_another_shape_is_a_mistyped_finding[no blank line above it, below another one-a blank line must separate it from the HTML above it]",
+            "values": [
+              "no blank line above it, below another one",
+              {
+                "label": "document",
+                "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n- **given** a card\n- **then** it is paid\n\n</details>\n<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n- **given** a card\n- **then** it is paid\n\n</details>\n",
+                "content_type": "text"
+              },
+              "a blank line must separate it from the HTML above it"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1134
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_narrated_citation_copied_from_the_report_is_current_once_filled",
+      "narration": {
+        "text": "A narrated citation copied from the report is current once `citations update` fills its body",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "narrated-citation",
+            "display": "narrated citation",
+            "expression": "pg[\"Narrated citation\"].l"
+          },
+          {
+            "value": " copied from the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": " is current once `citations update` fills its body"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/narrated-citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 3,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report whose scenario title holds a code span and an ampersand",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "scenario-title",
+                "display": "scenario title",
+                "expression": "pg[\"Scenario title\"].l"
+              },
+              {
+                "value": " holds a code span and an ampersand"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the narrated citation the copy menu copies, pasted into a document",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "narrated-citation",
+                "display": "narrated citation",
+                "expression": "pg[\"Narrated citation\"].l"
+              },
+              {
+                "value": " the copy menu copies, pasted into a document"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay <code>a&amp;b</code> &amp; more</a></summary>\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its body holds the scenario's narration",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay <code>a&amp;b</code> &amp; more</a></summary>\n\n- **given** a card\n- **then** it is paid\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the updated document is checked",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no finding remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
       "parameters": null,
       "error": null,
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1007
+        "line": 1171
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_failed_narrated_citation_has_its_body_rewritten_and_stays_a_finding",
+      "narration": {
+        "text": "A failing narrated citation has its body rewritten and stays a citation finding",
+        "parts": [
+          {
+            "value": "A failing "
+          },
+          {
+            "term_id": "narrated-citation",
+            "display": "narrated citation",
+            "expression": "pg[\"Narrated citation\"].l"
+          },
+          {
+            "value": " has its body rewritten and stays a "
+          },
+          {
+            "term_id": "citation-finding",
+            "display": "citation finding",
+            "expression": "pg[\"Citation finding\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/narrated-citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 4,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report whose scenario fails",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " fails"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document holding a narrated citation of it, copied with an empty body",
+            "parts": [
+              {
+                "value": "a document holding a "
+              },
+              {
+                "term_id": "narrated-citation",
+                "display": "narrated citation",
+                "expression": "pg[\"Narrated citation\"].l"
+              },
+              {
+                "value": " of it, copied with an empty body"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its glyph reads \u274c and its body holds the narration",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "<details markdown=\"1\">\n<summary>\u274c <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n- **given** a card\n- **then** it is paid\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the failure is the only finding that remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1233
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes[<details open>-<details markdown=\"1\" open>]",
+      "narration": {
+        "text": "`citations update` adds `markdown=\"1\"` to a narrated citation's opening tag, keeping its other attributes",
+        "parts": [
+          {
+            "value": "`citations update` adds `markdown=\"1\"` to a "
+          },
+          {
+            "term_id": "narrated-citation",
+            "display": "narrated citation",
+            "expression": "pg[\"Narrated citation\"].l"
+          },
+          {
+            "value": "'s opening tag, keeping its other attributes"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/narrated-citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 18,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a current narrated citation whose opening tag is {opening}",
+            "parts": [
+              {
+                "value": "a current "
+              },
+              {
+                "term_id": "narrated-citation",
+                "display": "narrated citation",
+                "expression": "pg[\"Narrated citation\"].l"
+              },
+              {
+                "value": " whose opening tag is "
+              },
+              {
+                "name": "opening",
+                "column_id": "opening",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is checked",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a stale opening tag is the only citation finding, naming its fix",
+            "parts": [
+              {
+                "value": "a stale opening tag is the only "
+              },
+              {
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
+              },
+              {
+                "value": ", naming its fix"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the opening tag reads {expected}",
+            "parts": [
+              {
+                "value": "the opening tag reads "
+              },
+              {
+                "name": "expected",
+                "column_id": "expected",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "opening",
+            "name": "opening",
+            "kind": "param"
+          },
+          {
+            "id": "expected",
+            "name": "expected",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes[<details open>-<details markdown=\"1\" open>]",
+            "values": [
+              "<details open>",
+              "<details markdown=\"1\" open>"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes[<details open markdown=\"0\">-<details open markdown=\"1\">]",
+            "values": [
+              "<details open markdown=\"0\">",
+              "<details open markdown=\"1\">"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes[<details markdown='block'>-<details markdown=\"1\">]",
+            "values": [
+              "<details markdown='block'>",
+              "<details markdown=\"1\">"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes[<details markdown>-<details markdown=\"1\">]",
+            "values": [
+              "<details markdown>",
+              "<details markdown=\"1\">"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_an_opening_tag_lacking_markdown_1_gains_it_keeping_other_attributes[<details title=\"see markdown here\">-<details markdown=\"1\" title=\"see markdown here\">]",
+            "values": [
+              "<details title=\"see markdown here\">",
+              "<details markdown=\"1\" title=\"see markdown here\">"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1274
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix[list item]",
+      "narration": {
+        "text": "A narrated citation in a list item or blockquote has its body written under that prefix",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "narrated-citation",
+            "display": "narrated citation",
+            "expression": "pg[\"Narrated citation\"].l"
+          },
+          {
+            "value": " in a list item or blockquote has its body written under that prefix"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/narrated-citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 6,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a narrated citation copied with an empty body into a {container}",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "narrated-citation",
+                "display": "narrated citation",
+                "expression": "pg[\"Narrated citation\"].l"
+              },
+              {
+                "value": " copied with an empty body into a "
+              },
+              {
+                "name": "container",
+                "column_id": "container",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content_type": "text",
+              "column_id": "attachment:0"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each body line carries the container's prefix",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content_type": "text",
+              "column_id": "attachment:1"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a check of the updated document finds nothing",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "container",
+            "name": "container",
+            "kind": "param"
+          },
+          {
+            "id": "attachment:0",
+            "name": "document",
+            "kind": "attachment"
+          },
+          {
+            "id": "attachment:1",
+            "name": "updated document",
+            "kind": "attachment"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix[list item]",
+            "values": [
+              "list item",
+              {
+                "label": "document",
+                "content": "- Paying:\n\n  <details markdown=\"1\">\n  <summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n  </details>\n",
+                "content_type": "text"
+              },
+              {
+                "label": "updated document",
+                "content": "- Paying:\n\n  <details markdown=\"1\">\n  <summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n\n  - **given** a card\n  - **then** it is paid\n\n  </details>\n",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_a_body_under_a_list_item_or_blockquote_is_written_under_its_prefix[blockquote]",
+            "values": [
+              "blockquote",
+              {
+                "label": "document",
+                "content": "> <details markdown=\"1\">\n> <summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n>\n> </details>\n",
+                "content_type": "text"
+              },
+              {
+                "label": "updated document",
+                "content": "> <details markdown=\"1\">\n> <summary>\u2705 <a href=\"https://example.org/report.html#scenario=t.py::test_pay\">Pay by card</a></summary>\n>\n> - **given** a card\n> - **then** it is paid\n>\n> </details>\n",
+                "content_type": "text"
+              }
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1367
       },
       "story_ids": [],
       "pins": null
@@ -21298,7 +22605,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -21833,7 +23140,7 @@
     {
       "id": "tests/unit/lint/test_runtime_rules.py::test_dead_term_flags_unreferenced_term",
       "narration": {
-        "text": "Narration lint flags a term referenced by no scenario name, step or story",
+        "text": "Narration lint flags a term referenced by no scenario title, step or story",
         "parts": [
           {
             "term_id": "narration-lint",
@@ -21852,12 +23159,12 @@
             "value": " referenced by no "
           },
           {
-            "term_id": "scenario",
-            "display": "scenario",
-            "expression": "pg[\"Scenario\"].l"
+            "term_id": "scenario-title",
+            "display": "scenario title",
+            "expression": "pg[\"Scenario title\"].l"
           },
           {
-            "value": " name, "
+            "value": ", "
           },
           {
             "term_id": "step",
@@ -25244,7 +26551,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 147,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -25865,112 +27172,6 @@
       "pins": null
     },
     {
-      "id": "tests/unit/report/test_md_renderer.py::test_nested_steps_indent",
-      "narration": {
-        "text": "Nested steps indent under their parent",
-        "parts": [
-          {
-            "value": "Nested "
-          },
-          {
-            "term_id": "step",
-            "display": "steps",
-            "expression": "pg[\"Step\"].l.s"
-          },
-          {
-            "value": " indent under their parent"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_md_renderer",
-      "tags": [],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a scenario whose when step has a nested child",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              },
-              {
-                "value": " whose when "
-              },
-              {
-                "term_id": "step",
-                "display": "step",
-                "expression": "pg[\"Step\"].l"
-              },
-              {
-                "value": " has a nested child"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the Markdown report is rendered",
-            "parts": [
-              {
-                "value": "the Markdown "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " is rendered"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the child bullet indents under its parent",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 Nest\n`tests/t.py::test_nest`\n\n- **when** outer\n    - **when** inner\n",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 185
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
       "id": "tests/unit/report/test_md_renderer.py::test_narration_parts_resolve_terms_and_values",
       "narration": {
         "text": "Structured narration renders terms, values and placeholders",
@@ -26099,7 +27300,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 210
+        "line": 185
       },
       "story_ids": [],
       "pins": null
@@ -26229,7 +27430,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 283
+        "line": 258
       },
       "story_ids": [],
       "pins": null
@@ -26467,7 +27668,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 324
+        "line": 299
       },
       "story_ids": [],
       "pins": null
@@ -26582,7 +27783,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 367
+        "line": 342
       },
       "story_ids": [],
       "pins": null
@@ -26697,7 +27898,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 438
+        "line": 413
       },
       "story_ids": [],
       "pins": null
@@ -26783,7 +27984,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 617
+        "line": 592
       },
       "story_ids": [],
       "pins": null
@@ -26894,7 +28095,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1177
+        "line": 1152
       },
       "story_ids": [],
       "pins": null
@@ -26989,7 +28190,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1208
+        "line": 1183
       },
       "story_ids": [],
       "pins": null
@@ -27111,7 +28312,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1279
+        "line": 1254
       },
       "story_ids": [],
       "pins": null
@@ -28181,20 +29382,12 @@
       "pins": null
     },
     {
-      "id": "tests/unit/test_grouping.py::test_one_xfailed_case_makes_the_group_xfailed",
+      "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[passed, failed, skipped-failed-None]",
       "narration": {
-        "text": "One xfailed case makes its parametrized scenario an expected failure",
+        "text": "A parametrized scenario takes the status of its worst case: failed, then xfailed, then passed, then skipped",
         "parts": [
           {
-            "value": "One xfailed "
-          },
-          {
-            "term_id": "case",
-            "display": "case",
-            "expression": "pg[\"Case\"].l"
-          },
-          {
-            "value": " makes its "
+            "value": "A "
           },
           {
             "term_id": "parametrized-scenario",
@@ -28202,7 +29395,15 @@
             "expression": "pg[\"Parametrized scenario\"].l"
           },
           {
-            "value": " an expected failure"
+            "value": " takes the status of its worst "
+          },
+          {
+            "term_id": "case",
+            "display": "case",
+            "expression": "pg[\"Case\"].l"
+          },
+          {
+            "value": ": failed, then xfailed, then passed, then skipped"
           }
         ]
       },
@@ -28216,142 +29417,32 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a passed case and an xfailed one with the reason \"planned\"",
+            "text": "Cases of one parametrized scenario that ended {statuses}, each xfailed one for the reason \"planned\"",
             "parts": [
-              {
-                "value": "a passed "
-              },
               {
                 "term_id": "case",
-                "display": "case",
-                "expression": "pg[\"Case\"].l"
+                "display": "Cases",
+                "expression": "pg[\"Case\"].s"
               },
               {
-                "value": " and an xfailed one with the reason \"planned\""
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the grouping pass collapses them",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "group",
-                "display": "grouping",
-                "expression": "pg[\"Group\"](\"grouping\")"
-              },
-              {
-                "value": " pass collapses them"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the scenario is xfailed and carries the xfailed case's reason",
-            "parts": [
-              {
-                "value": "the "
-              },
-              {
-                "term_id": "scenario",
-                "display": "scenario",
-                "expression": "pg[\"Scenario\"].l"
-              },
-              {
-                "value": " is xfailed and carries the xfailed "
-              },
-              {
-                "term_id": "case",
-                "display": "case",
-                "expression": "pg['Case'].l"
-              },
-              {
-                "value": "'s reason"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/test_grouping.py",
-        "line": 123
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
-      "narration": {
-        "text": "Any failed case fails its parametrized scenario",
-        "parts": [
-          {
-            "value": "Any failed "
-          },
-          {
-            "term_id": "case",
-            "display": "case",
-            "expression": "pg[\"Case\"].l"
-          },
-          {
-            "value": " fails its "
-          },
-          {
-            "term_id": "parametrized-scenario",
-            "display": "parametrized scenario",
-            "expression": "pg[\"Parametrized scenario\"].l"
-          }
-        ]
-      },
-      "module": "tests.unit.test_grouping",
-      "tags": [
-        "parametrization"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "three case records of one parametrized scenario",
-            "parts": [
-              {
-                "value": "three "
-              },
-              {
-                "term_id": "case",
-                "display": "case",
-                "expression": "pg[\"Case\"].l"
-              },
-              {
-                "value": " records of one "
+                "value": " of one "
               },
               {
                 "term_id": "parametrized-scenario",
                 "display": "parametrized scenario",
                 "expression": "pg[\"Parametrized scenario\"].l"
+              },
+              {
+                "value": " that ended "
+              },
+              {
+                "name": "statuses",
+                "column_id": "statuses",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": ", each xfailed one for the reason \"planned\""
               }
             ]
           },
@@ -28391,18 +29482,45 @@
         {
           "phase": "then",
           "narration": {
-            "text": "one scenario remains and any failed case fails it",
+            "text": "the scenario is {status}",
             "parts": [
               {
-                "value": "one scenario remains and any failed "
+                "value": "the "
               },
               {
-                "term_id": "case",
-                "display": "case",
-                "expression": "pg[\"Case\"].l"
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
               },
               {
-                "value": " fails it"
+                "value": " is "
+              },
+              {
+                "name": "status",
+                "column_id": "status",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its xfail reason is {reason}",
+            "parts": [
+              {
+                "value": "its xfail reason is "
+              },
+              {
+                "name": "reason",
+                "column_id": "reason",
+                "format_spec": "",
+                "conversion": null
               }
             ]
           },
@@ -28412,13 +29530,99 @@
           "fixture_name": null
         }
       ],
-      "parameters": null,
+      "parameters": {
+        "columns": [
+          {
+            "id": "statuses",
+            "name": "statuses",
+            "kind": "param"
+          },
+          {
+            "id": "status",
+            "name": "status",
+            "kind": "param"
+          },
+          {
+            "id": "reason",
+            "name": "reason",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[passed, failed, skipped-failed-None]",
+            "values": [
+              "passed, failed, skipped",
+              "failed",
+              null
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[xfailed, failed-failed-None]",
+            "values": [
+              "xfailed, failed",
+              "failed",
+              null
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[passed, xfailed-xfailed-planned]",
+            "values": [
+              "passed, xfailed",
+              "xfailed",
+              "planned"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[skipped, xfailed-xfailed-planned]",
+            "values": [
+              "skipped, xfailed",
+              "xfailed",
+              "planned"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[skipped, passed-passed-None]",
+            "values": [
+              "skipped, passed",
+              "passed",
+              null
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[skipped, skipped-skipped-None]",
+            "values": [
+              "skipped, skipped",
+              "skipped",
+              null
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
       "error": null,
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 228
+        "line": 124
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -28539,7 +29743,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 262
+        "line": 252
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -28652,7 +29856,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 288
+        "line": 278
       },
       "story_ids": [],
       "pins": null
@@ -28760,7 +29964,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 418
+        "line": 408
       },
       "story_ids": [],
       "pins": null
@@ -28902,7 +30106,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 645
+        "line": 635
       },
       "story_ids": [],
       "pins": null
@@ -29032,7 +30236,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 767
+        "line": 757
       },
       "story_ids": [],
       "pins": null
@@ -29173,7 +30377,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 871
+        "line": 861
       },
       "story_ids": [],
       "pins": null
@@ -29277,7 +30481,112 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 890
+        "line": 880
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/test_grouping.py::test_rule_two_in_a_then_offers_an_expected_outcome_column",
+      "narration": {
+        "text": "A varying expression in a then is refused with the fix of an expected-outcome column",
+        "parts": [
+          {
+            "value": "A varying expression in a then is refused with the fix of an expected-outcome column"
+          }
+        ]
+      },
+      "module": "tests.unit.test_grouping",
+      "tags": [
+        "diagnostics",
+        "parametrization",
+        "validation",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "two cases whose then narrates an outcome derived from an input",
+            "parts": [
+              {
+                "value": "two "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"].l.s"
+              },
+              {
+                "value": " whose then narrates an outcome derived from an input"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the cases are grouped",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "case",
+                "display": "cases",
+                "expression": "pg[\"Case\"].l.s"
+              },
+              {
+                "value": " are "
+              },
+              {
+                "term_id": "group",
+                "display": "grouped",
+                "expression": "pg[\"Group\"](\"grouped\")"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the grouping is refused",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the error first suggests parametrizing the expected outcome",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/test_grouping.py",
+        "line": 947
       },
       "story_ids": [],
       "pins": null
@@ -29372,7 +30681,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1270
+        "line": 1275
       },
       "story_ids": [],
       "pins": null
@@ -29478,7 +30787,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1286
+        "line": 1291
       },
       "story_ids": [],
       "pins": null
@@ -29584,7 +30893,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1329
+        "line": 1334
       },
       "story_ids": [],
       "pins": null
@@ -29695,7 +31004,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1411
+        "line": 1416
       },
       "story_ids": [],
       "pins": null
@@ -29834,7 +31143,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1763
+        "line": 1768
       },
       "story_ids": [],
       "pins": null
@@ -29965,7 +31274,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1819
+        "line": 1824
       },
       "story_ids": [],
       "pins": null
@@ -30104,7 +31413,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 1984
+        "line": 1989
       },
       "story_ids": [],
       "pins": null
@@ -30243,7 +31552,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2016
+        "line": 2021
       },
       "story_ids": [],
       "pins": null
@@ -30378,7 +31687,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2072
+        "line": 2077
       },
       "story_ids": [],
       "pins": null
@@ -30498,7 +31807,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2618
+        "line": 2623
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -30629,7 +31938,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2778
+        "line": 2783
       },
       "story_ids": [],
       "pins": null
@@ -30747,7 +32056,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/test_grouping.py",
-        "line": 2928
+        "line": 2933
       },
       "story_ids": [],
       "pins": null
@@ -31986,7 +33295,7 @@
       "scenario_ids": [
         "tests/integration/test_plugin.py::test_parametrized_test_as_table",
         "tests/integration/test_plugin.py::test_group_parametrized_false_emits_one_scenario_per_case",
-        "tests/unit/test_grouping.py::test_group_parametrized_any_failed_groups_as_failed",
+        "tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status[passed, failed, skipped-failed-None]",
         "tests/unit/test_grouping.py::test_group_parametrized_keeps_source_order",
         "tests/unit/test_grouping.py::test_a_formatted_param_cell_holds_the_text_the_step_narrated"
       ]

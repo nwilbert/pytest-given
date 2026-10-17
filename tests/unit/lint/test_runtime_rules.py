@@ -237,7 +237,7 @@ def _dead_term_findings(glossary, grouped=(), stories=()):
 
 @scenario(
     t'{pg["Narration lint"]} flags a {pg["Term"].l} referenced by no '
-    t'{pg["Scenario"].l} name, {pg["Step"].l} or {pg["Story"].l}',
+    t'{pg["Scenario title"].l}, {pg["Step"].l} or {pg["Story"].l}',
     stories=adopt_pytest_given,
 )
 def test_dead_term_flags_unreferenced_term() -> None:
