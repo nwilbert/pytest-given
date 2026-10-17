@@ -49,7 +49,7 @@ from pytest_given import FileGlossary
 g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
 ```
 
-The file needs at least one Markdown table (a GFM pipe table). By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, or `kind_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
+The file needs at least one Markdown table (a GFM pipe table). pytest-given reads the tables a GFM renderer shows, including one in a blockquote or a list but not one in a code or HTML block, and a cell missing from a row reads as empty. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, or `kind_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
 
 ```python
 g = FileGlossary('GLOSSARY.md', term_column='Term', definition_column='Meaning', kind_column='Kind')

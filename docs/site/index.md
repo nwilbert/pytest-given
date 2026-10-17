@@ -49,6 +49,10 @@ More and more tests aren't written by hand. A person describes a scenario, an AI
 
 pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary](guide/glossary.md) defines the terms your team uses, and the report highlights them wherever a test mentions them. [Domain Storytelling](guide/domain-storytelling.md) adds the big picture: stories of how the domain works, with the report showing which scenarios cover each sentence of a story.
 
+### Documents that stay true
+
+A design spec or a README can [cite](guide/citations.md) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run, and `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
+
 ## Example reports
 
 - **[Coffeeshop](examples/coffeeshop.html){ target=_blank }**: a tour of the core features.

@@ -128,6 +128,8 @@ The part after `#` names the target:
 | Tag | `#tag=<tag>` |
 | Story | `#view=stories&story=<story id>` |
 
+A link into the report can outlive what it names. When the report no longer has a scenario, tag, story or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.
+
 ## Narrated citations
 
 A scenario citation written as a `<details>` block carries the scenario's narration, folded under it. A reader sees what the scenario does where it is cited, and your pull request's diff shows the behavior change. A **narrated citation** looks like this:

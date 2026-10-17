@@ -20,7 +20,7 @@ Scenario titles, step text and glossary definitions can use a little Markdown. E
 | Text | Bold, italic, code | Newline | `<br>` | Where it shows |
 |---|---|---|---|---|
 | Scenario title | rendered | space | literal | HTML, Markdown, citations |
-| Step text | rendered | space | literal | HTML, Markdown |
+| Step text | rendered | space | literal | HTML, Markdown, narrated citations |
 | Glossary term definition | rendered | line break | line break | HTML: Glossary tab, term ref tooltip |
 | `FileGlossary` term and kind cells | removed: `**Guest**` reads as `Guest` | | literal | wherever the term shows |
 | Everything else | literal | | literal | |
