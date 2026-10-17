@@ -33,7 +33,7 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 - **Scenario tags are report metadata, not pytest marks.** `pytest -m <tag>` selects nothing. That is expected; the suite isn't broken. Filter tags through the JSON report, or read them in the Markdown output.
 - **Put a bare `--given-md` or `--given-json` last on the command line**, or use the `=PATH` form. Otherwise, a path-like argument right after the bare flag is taken as its output path, and that changes what runs.
 - **The Markdown report contains only scenarios.** The glossary and stories appear in the HTML report (`--given-html`) and in the JSON (`.glossary.terms[]`, `.stories[]`).
-- **A Markdown document citing the report** (`✅ [title](…#scenario=…)`) is kept current with `pytest-given citations`; repairing or writing a citation is the `pytest-given-citing` skill's job.
+- **Don't hand-edit a citation** (`✅ [title](…#scenario=…)` in a Markdown document): `pytest-given citations update` rewrites its glyph, link text, summary and narrated body from the report. Writing or repairing one is the `pytest-given-citing` skill's job. To learn why a scenario exists, `citations check --covering <node ID>` lists the documents that may cite it, and `--list` every document's report links.
 
 ## When to go to the code
 

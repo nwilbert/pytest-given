@@ -139,3 +139,46 @@ def test_pairs_script_dumps_each_narration_beside_its_test(tmp_path: Path) -> No
     assert 'then it is {size}  [attachments: log]' in dump
     assert '| size | status |' in dump
     assert '| 2 | failed |' in dump
+
+
+def test_pairs_script_leads_a_table_with_its_custom_case_ids(tmp_path: Path) -> None:
+    (tmp_path / 'tests').mkdir()
+    (tmp_path / 'tests' / 'test_demo.py').write_text(_DEMO_TEST, encoding='utf-8')
+    _write_report(
+        tmp_path,
+        ReportData(
+            metadata=_meta(),
+            scenarios=[
+                Scenario(
+                    id=NodeId('tests/test_demo.py::test_demo[1]'),
+                    narration=Narration(text='A demo scenario'),
+                    module='tests.test_demo',
+                    status='passed',
+                    source=SourceLocation(
+                        relpath='tests/test_demo.py', line=_DEMO_LINE
+                    ),
+                    parameters=ParameterTable(
+                        columns=[ParameterColumn(id='size', name='size', kind='param')],
+                        cases=[
+                            ParameterCase(
+                                id=NodeId('tests/test_demo.py::test_demo[1]'),
+                                values=[1],
+                            ),
+                            ParameterCase(
+                                id=NodeId('tests/test_demo.py::test_demo[edge]'),
+                                values=[2],
+                                custom_id=True,
+                            ),
+                        ],
+                    ),
+                )
+            ],
+        ),
+    )
+
+    _run('pairs.md', tmp_path, 'report.json', 'dump')
+
+    dump = (tmp_path / 'dump' / 'tests__test_demo.py.txt').read_text(encoding='utf-8')
+    assert '| case ID | size | status |' in dump
+    assert '| 1 | 1 | passed |' in dump
+    assert '| edge | 2 | passed |' in dump

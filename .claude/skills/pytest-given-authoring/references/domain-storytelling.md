@@ -24,9 +24,9 @@ Domain experts tell a **concrete case** ("Carol books rooms for her team", not "
 | A numbered story | `story(title, [sentence(...), ...])`, where the order is the sequence |
 | Several arrows under one number | one `clause(...)` per arrow chain inside a `sentence(...)` |
 | The emerging vocabulary | The glossary (see [glossaries.md](glossaries.md)) |
-| "Does the software do this?" | Scenario ↔ sentence coverage in the Stories tab |
+| "Which scenarios show this?" | Scenario ↔ sentence coverage in the Stories tab |
 
-pytest-given goes one step beyond the method. Binding scenarios with `@scenario(..., stories=...)` turns a story from a picture of shared understanding into a **claim backed by running tests**. Each sentence's coverage chip shows whether code demonstrably implements it.
+pytest-given goes one step beyond the method. Binding scenarios with `@scenario(..., stories=...)` links each sentence to the running tests that narrate it, so a reader can go from any part of the flow to its scenarios. A covered sentence means a step talks about it, not that the flow is fully tested.
 
 ## Greenfield workflow
 

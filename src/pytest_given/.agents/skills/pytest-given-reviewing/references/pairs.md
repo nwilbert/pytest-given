@@ -31,10 +31,15 @@ def step_lines(steps, depth=0):
 def table_lines(table):
     if not table:
         return
-    yield '| ' + ' | '.join([c['name'] for c in table['columns']] + ['status']) + ' |'
+    # A custom case ID leads the row, as in the report.
+    custom = any(case['custom_id'] for case in table['cases'])
+    names = ['case ID'] * custom + [c['name'] for c in table['columns']]
+    yield '| ' + ' | '.join(names + ['status']) + ' |'
     for case in table['cases']:
+        case_id = [case['id'].partition('[')[2][:-1]] * custom
         cells = [v['label'] if isinstance(v, dict) else v for v in case['values']]
-        yield '| ' + ' | '.join(str(cell) for cell in [*cells, case['status']]) + ' |'
+        row = [*case_id, *cells, case['status']]
+        yield '| ' + ' | '.join(str(cell) for cell in row) + ' |'
 
 
 report, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])

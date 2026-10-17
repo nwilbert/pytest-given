@@ -1,6 +1,6 @@
 # Writing scenarios
 
-When you decorate a test with `@scenario`, the goal is a report that reads as a truthful behavioral spec. The narration lint checks the structural part of these rules: [lint.md](lint.md) has its rules and what to do about a finding.
+When you decorate a test with `@scenario`, the goal is a report that reads as a truthful behavioral spec. The narration lint checks the structural part of these rules: [lint.md](lint.md) has its rules and what to do about a lint finding.
 
 ## What to decorate
 
