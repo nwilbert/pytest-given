@@ -106,9 +106,8 @@ def _report_check(result: CitationsResult, *, listed: bool) -> int:
     """The summary and exit code are the same listed or not: a finding on a
     link `--covering` leaves out still counts."""
     if listed:
-        for link in result.links:
-            if link.covered:
-                print('\n'.join(link.lines()))
+        for link in result.listed:
+            print('\n'.join(link.lines()))
     else:
         for finding in result.findings:
             print('\n'.join(finding.lines()))
@@ -116,10 +115,13 @@ def _report_check(result: CitationsResult, *, listed: bool) -> int:
         print('citations: every report link is current')
         return 0
     fixable = len(result.findings) - len(result.remaining)
-    left_out = sum(len(link.findings) for link in result.links if not link.covered)
     print(
         f'citations: {plural(len(result.findings), "finding")}'
-        + (f', {left_out} of them on a link --covering leaves out' if left_out else '')
+        + (
+            f', {result.left_out} of them left out by --covering'
+            if result.left_out
+            else ''
+        )
         + f'; `citations update` fixes {fixable}'
     )
     return 1

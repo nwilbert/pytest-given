@@ -313,7 +313,7 @@ def test_covering_still_counts_the_findings_it_leaves_out(
         ]
     with then('the summary counts the finding it left out'):
         assert out.splitlines()[-1] == (
-            'citations: 1 finding, 1 of them on a link --covering leaves out; '
+            'citations: 1 finding, 1 of them left out by --covering; '
             '`citations update` fixes 1'
         )
     with then('it exits 1 for that finding'):

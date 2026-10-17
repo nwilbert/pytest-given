@@ -10,11 +10,8 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     Scenario,
-    Sentence,
-    SentenceId,
     Status,
     Story,
-    StoryId,
     TermId,
     narration_of,
     param_id,
@@ -25,7 +22,7 @@ from pytest_given.report.citation_index import (
     Target,
     report_fragment,
 )
-from tests.unit.citation_reports import URL, report_, scenario_
+from tests.unit.citation_reports import URL, report_, scenario_, story_
 
 
 def _index(*scenarios: Scenario, stories: tuple[Story, ...] = ()) -> CitationIndex:
@@ -85,9 +82,8 @@ def test_a_tag_covers_the_tags_below_it_and_no_sibling_prefix() -> None:
 
 
 def test_a_story_sums_up_its_scenarios_and_reads_no_scenarios_when_empty() -> None:
-    sentence = Sentence(id=SentenceId(1), clauses=())
-    told = Story(id=StoryId('cancel'), title='Cancel a Booking', sentences=(sentence,))
-    empty = Story(id=StoryId('later'), title='Later', sentences=(sentence,))
+    told = story_('cancel', 'Cancel a Booking')
+    empty = story_('later', 'Later')
     index = _index(
         scenario_('t.py::test_a', stories=('cancel',)),
         scenario_('t.py::test_b', status='xfailed', stories=('cancel',)),
@@ -151,8 +147,7 @@ def test_a_per_case_title_writes_its_case_id_literally() -> None:
 
 
 def test_a_tag_and_a_story_title_are_written_literally() -> None:
-    sentence = Sentence(id=SentenceId(1), clauses=())
-    story = Story(id=StoryId('s'), title='Book a *suite*', sentences=(sentence,))
+    story = story_('s', 'Book a *suite*')
     index = _index(
         scenario_('t.py::test_a', tags=('a*b*',), stories=('s',)), stories=(story,)
     )
@@ -160,14 +155,6 @@ def test_a_tag_and_a_story_title_are_written_literally() -> None:
     story_before, _ = index.citation(Target('story', 's')).markdown_halves()
     assert tag_before == '✅ [a\\*b\\*]('
     assert story_before == '✅ [Book a \\*suite\\*]('
-
-
-def test_two_groups_of_one_function_are_each_cited_by_their_own_node_id() -> None:
-    index = _index(
-        scenario_('t.py::test_pour[a]', 'Pour a', grouped=True),
-        scenario_('t.py::test_pour[b]', 'Pour b', grouped=True),
-    )
-    assert set(index.scenarios) == {'t.py::test_pour[a]', 't.py::test_pour[b]'}
 
 
 @pytest.mark.parametrize(
@@ -217,3 +204,12 @@ def test_a_tag_citation_counts_what_under_prefix_matches() -> None:
             if any(under_prefix(key, tag) for key in scenario.tags)
         ]
         assert index.citation(Target('tag', tag)).summary == f'({len(matched)} ✅)'
+
+
+def test_a_target_counts_the_scenario_or_those_its_summary_counts() -> None:
+    pay = scenario_('t.py::test_pay', tags=('checkout/card',), stories=('s',))
+    refund = scenario_('t.py::test_refund', tags=('checkout/refund',))
+    index = _index(pay, refund, stories=(story_('s'),))
+    assert index.counted(Target('scenario', 't.py::test_pay')) == [pay]
+    assert index.counted(Target('tag', 'checkout')) == [pay, refund]
+    assert index.counted(Target('story', 's')) == [pay]

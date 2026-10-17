@@ -51,7 +51,6 @@ from pytest_given.report.html_renderer import (
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
-from tests.unit.citation_reports import report_, scenario_
 
 
 def _embedded_app_data(content: str) -> dict:
@@ -2513,21 +2512,6 @@ def test_a_report_without_a_url_carries_no_citations() -> None:
 def test_a_grouped_scenarios_base_node_id_opens_it() -> None:
     data = _embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['cited_scenario_ids'] == {'t.py::test_pour': 't.py::test_pour[water]'}
-
-
-def test_any_case_of_one_of_two_groups_opens_its_group() -> None:
-    report = report_(
-        scenario_(
-            't.py::test_pour[a]',
-            'Pour',
-            grouped=True,
-            other_cases=('t.py::test_pour[c]',),
-        ),
-        scenario_('t.py::test_pour[b]', 'Pour b', grouped=True),
-        report_url=None,
-    )
-    data = _embedded_app_data(render_html_string(report, None))
-    assert data['cited_scenario_ids'] == {'t.py::test_pour[c]': 't.py::test_pour[a]'}
 
 
 def test_the_search_box_matches_a_title_as_it_shows() -> None:

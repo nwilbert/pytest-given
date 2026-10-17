@@ -92,7 +92,6 @@ class CitationIndex:
         self._report = report
         self._story_scenarios = story_scenarios
         self.scenarios = _citable_scenarios(report)
-        self.cited_by_case = _cited_by_case(self.scenarios)
 
     @cached_property
     def tags(self) -> dict[str, list[Scenario]]:
@@ -130,41 +129,32 @@ class CitationIndex:
                     summary=None,
                 )
             case 'tag':
-                return _rollup(target.key, fragment, self.tags[target.key])
+                return _rollup(target.key, fragment, self.counted(target))
             case 'story':
                 title, told = self.stories[StoryId(target.key)]
                 return _rollup(title, fragment, told)
 
+    def counted(self, target: Target) -> list[Scenario]:
+        """The scenarios a resolved `target` names: a scenario itself, or those
+        a tag's or story's summary counts."""
+        match target.kind:
+            case 'scenario':
+                return [self.scenarios[NodeId(target.key)]]
+            case 'tag':
+                return self.tags[target.key]
+            case 'story':
+                return self.stories[StoryId(target.key)][1]
+
 
 def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
-    """Each scenario under the node ID a citation names it by.
-
-    A grouped scenario is cited as a whole, by its base node ID: its own `id`
-    is its first case's. Two groups of one function — a title differing per
-    case — would share that base, so each keeps its own id instead.
-    """
-    grouped_bases = Counter(
-        node_base(scenario.id)
-        for scenario in report.scenarios
-        if scenario.parameters is not None
-    )
-    cited: dict[NodeId, Scenario] = {}
-    for scenario in report.scenarios:
-        base = NodeId(node_base(scenario.id))
-        alone = scenario.parameters is not None and grouped_bases[base] == 1
-        cited[base if alone else scenario.id] = scenario
-    return cited
-
-
-def _cited_by_case(cited: Mapping[NodeId, Scenario]) -> dict[NodeId, NodeId]:
-    """The cited id of each later case of a group cited by its first case's id,
-    which no base node ID names."""
+    """Each scenario under the node ID a citation names it by: a grouped one as
+    a whole, by its base node ID, as its own `id` is its first case's. A title
+    is fixed at decoration, so a test function groups into one scenario."""
     return {
-        case.id: cited_id
-        for cited_id, scenario in cited.items()
-        if scenario.parameters is not None and cited_id == scenario.id
-        for case in scenario.parameters.cases
-        if case.id != cited_id
+        NodeId(node_base(scenario.id))
+        if scenario.parameters is not None
+        else scenario.id: scenario
+        for scenario in report.scenarios
     }
 
 

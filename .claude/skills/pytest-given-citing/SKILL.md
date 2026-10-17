@@ -26,7 +26,7 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 
 ## Finding what cites a scenario
 
-`citations check --list` prints every report link, `path:line: glyph kind key`, its findings indented under it. `--covering <node ID>` (repeatable) keeps the links that may cite that scenario: its own, a tag's or story's that counts it, and every link whose target is gone, which may name it under an old node ID. Run `update` first; once `check` is clean, the list is exact.
+`citations check --list` prints every report link, `path:line: glyph kind key`, its findings indented under it. `--covering <node ID>` (repeatable) keeps the links that may cite that scenario: its own, a tag's or story's that counts it, and every link it cannot resolve: a gone target may be the scenario under an old node ID, a mistyped citation anything. Run `update` first; once `check` is clean, the list is exact.
 
 ## Writing citations
 

@@ -287,8 +287,7 @@ def _render_context(
                     cited: scenario.id
                     for cited, scenario in citation_index.scenarios.items()
                     if cited != scenario.id
-                }
-                | citation_index.cited_by_case,
+                },
             }
         ),
         **_bundled_assets(),

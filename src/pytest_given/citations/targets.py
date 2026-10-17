@@ -98,8 +98,6 @@ class TargetResolver:
             return Target('scenario', key)
         if key in self._by_slug:
             return Target('scenario', self._by_slug[key])
-        if key in self.index.cited_by_case:
-            return Target('scenario', self.index.cited_by_case[NodeId(key)])
         base = node_base(key)
         if base != key and base in self.index.scenarios:
             return Target('scenario', base)

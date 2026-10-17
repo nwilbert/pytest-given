@@ -2,6 +2,7 @@
 held to a JSON report."""
 
 import re
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
@@ -14,15 +15,11 @@ from pytest_given.model import (
     PytestGivenError,
     ReportData,
     Scenario,
-    Sentence,
-    SentenceId,
-    Story,
-    StoryId,
     TermId,
     narration_of,
 )
 from tests.ubiquitous_language import pg
-from tests.unit.citation_reports import URL, report_, scenario_
+from tests.unit.citation_reports import URL, report_, scenario_, story_
 
 
 def _run(
@@ -34,12 +31,18 @@ def _run(
     name: str = 'doc.md',
     report_url: str | None = None,
     report_path: Path | None = None,
+    covering: Sequence[str] = (),
 ) -> tuple[CitationsResult, str]:
     path = tmp_path / name
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(document.encode('utf-8'))
     result = check_citations(
-        report, [path], report_url=report_url, report_path=report_path, update=update
+        report,
+        [path],
+        report_url=report_url,
+        report_path=report_path,
+        update=update,
+        covering=covering,
     )
     return result, path.read_bytes().decode('utf-8')
 
@@ -130,8 +133,8 @@ def test_a_citation_to_a_gone_target_is_marked_and_recovers(tmp_path: Path) -> N
 )
 def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> None:
     with given(
-        t'a {pg["Report"].l} where one test function groups into two '
-        t'{pg["Scenario"].l.s}, the first with the {pg["Case"].l.s} `[a]` and `[c]`'
+        t'a {pg["Report"].l} where the {pg["Case"].l.s} `[a]` and `[c]` of '
+        t'`test_pour` group into one {pg["Scenario"].l}'
     ):
         report = report_(
             scenario_(
@@ -139,8 +142,7 @@ def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> No
                 'Pour',
                 grouped=True,
                 other_cases=('t.py::test_pour[c]',),
-            ),
-            scenario_('t.py::test_pour[b]', 'Pour twice', grouped=True),
+            )
         )
     with given(t'a document citing the {pg["Case"].l} `[c]`'):
         document = f'✅ [Pour]({URL}#scenario=t.py::test_pour%5Bc%5D)\n'
@@ -148,11 +150,11 @@ def test_a_citation_of_any_case_cites_its_grouped_scenario(tmp_path: Path) -> No
     with when('the document is updated'):
         result, written = _run(tmp_path, document, report, update=True)
     with then(
-        t'the {pg["Citation"].l} names its {pg["Scenario"].l} by the first '
-        t'{pg["Case"].l}'
+        t'the {pg["Citation"].l} names its {pg["Scenario"].l} by the node ID of '
+        t'`test_pour`'
     ):
         attach('updated document', written)
-        assert written == f'✅ [Pour]({URL}#scenario=t.py::test_pour%5Ba%5D)\n'
+        assert written == f'✅ [Pour]({URL}#scenario=t.py::test_pour)\n'
     with then('no finding remains'):
         assert result.remaining == []
 
@@ -262,13 +264,7 @@ def _crossed_span() -> Scenario:
         (
             report_(
                 scenario_('t.py::test_a', stories=('s',)),
-                stories=(
-                    Story(
-                        id=StoryId('s'),
-                        title='Book a *suite*',
-                        sentences=(Sentence(id=SentenceId(1), clauses=()),),
-                    ),
-                ),
+                stories=(story_('s', 'Book a *suite*'),),
             ),
             'view=stories&story=s',
             'Book a \\*suite\\*',
@@ -745,18 +741,10 @@ def test_a_document_that_is_not_utf8_is_an_error(tmp_path: Path) -> None:
 # --- Listing ---
 
 
-def _story(story_id: str) -> Story:
-    return Story(
-        id=StoryId(story_id),
-        title=story_id,
-        sentences=(Sentence(id=SentenceId(1), clauses=()),),
-    )
-
-
 _COVERING_REPORT = report_(
     scenario_('t.py::test_pay', 'Pay by card', tags=('checkout/card',), stories=('s',)),
     scenario_('t.py::test_refund', 'Refund', tags=('checkout/refund',)),
-    stories=(_story('s'),),
+    stories=(story_('s'),),
 )
 
 
@@ -788,19 +776,11 @@ def test_covering_keeps_the_links_that_may_cite_the_scenario(
     ):
         report = _COVERING_REPORT
     with given(t'a document holding the {pg["Report link"].l} {link}'):
-        path = tmp_path / 'doc.md'
-        path.write_text(f'{link}\n', encoding='utf-8', newline='\n')
+        document = f'{link}\n'
     with when('its links are checked, covering `test_pay`'):
-        result = check_citations(
-            report,
-            [path],
-            report_url=None,
-            report_path=None,
-            update=False,
-            covering=['t.py::test_pay'],
-        )
+        result, _ = _run(tmp_path, document, report, covering=['t.py::test_pay'])
     with then(t'the {pg["Report link"].l} is kept: {kept}'):
-        assert [listed.covered for listed in result.links] == [kept]
+        assert [checked in result.listed for checked in result.links] == [kept]
 
 
 def test_every_report_link_is_listed_in_document_order(tmp_path: Path) -> None:
@@ -812,7 +792,7 @@ def test_every_report_link_is_listed_in_document_order(tmp_path: Path) -> None:
         f'✅ [search]({URL}#q=pay)\n'
     )
     result, _ = _run(tmp_path, document, report_(PAY))
-    assert [listed.lines()[0] for listed in result.links] == [
+    assert [listed.lines()[0] for listed in result.listed] == [
         f'{(tmp_path / "doc.md").as_posix()}:{line}: {head}'
         for line, head in [
             (1, '✅ scenario t.py::test_pay'),
@@ -821,7 +801,7 @@ def test_every_report_link_is_listed_in_document_order(tmp_path: Path) -> None:
             (5, '✅ #q=pay'),
         ]
     ]
-    assert all(listed.covered for listed in result.links)
+    assert result.listed == result.links
 
 
 def test_a_listed_link_names_its_target_as_the_document_writes_it(
@@ -876,39 +856,26 @@ def test_a_case_node_id_or_a_slug_names_its_grouped_scenario(
         f'✅ [Pour]({URL}#scenario=t.py::test_pour)\n'
         f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
     )
-    path = tmp_path / 'doc.md'
-    path.write_text(document, encoding='utf-8', newline='\n')
-    result = check_citations(
-        report,
-        [path],
-        report_url=None,
-        report_path=None,
-        update=False,
-        covering=[covering],
-    )
-    assert [listed.covered for listed in result.links] == [True, False]
+    result, _ = _run(tmp_path, document, report, covering=[covering])
+    assert [listed.named for listed in result.listed] == ['scenario t.py::test_pour']
 
 
-def test_several_covered_scenarios_keep_the_union(tmp_path: Path) -> None:
+def test_several_covered_scenarios_keep_the_union_and_count_what_they_leave_out(
+    tmp_path: Path,
+) -> None:
     report = report_(
         PAY, scenario_('t.py::test_refund', 'Refund'), scenario_('t.py::test_x', 'X')
     )
     document = (
         f'[a]({URL}#scenario=t.py::test_pay)\n'
         f'[b]({URL}#scenario=t.py::test_refund)\n'
-        f'[c]({URL}#scenario=t.py::test_x)\n'
+        f'✓ [X]({URL}#scenario=t.py::test_x)\n'
     )
-    path = tmp_path / 'doc.md'
-    path.write_text(document, encoding='utf-8', newline='\n')
-    result = check_citations(
-        report,
-        [path],
-        report_url=None,
-        report_path=None,
-        update=False,
-        covering=['t.py::test_pay', 't.py::test_refund'],
+    result, _ = _run(
+        tmp_path, document, report, covering=['t.py::test_pay', 't.py::test_refund']
     )
-    assert [listed.covered for listed in result.links] == [True, True, False]
+    assert [listed.line for listed in result.listed] == [1, 2]
+    assert result.left_out == 1
 
 
 def test_covering_a_scenario_the_report_lacks_is_an_error(tmp_path: Path) -> None:
@@ -920,11 +887,21 @@ def test_covering_a_scenario_the_report_lacks_is_an_error(tmp_path: Path) -> Non
             'closest by node ID: t.py::test_pay_by_card'
         ),
     ):
-        check_citations(
-            report,
-            [],
-            report_url=None,
-            report_path=None,
-            update=False,
-            covering=['t.py::test_pay_card'],
-        )
+        _run(tmp_path, '', report, covering=['t.py::test_pay_card'])
+
+
+def test_a_test_functions_node_id_covers_each_of_its_per_case_scenarios(
+    tmp_path: Path,
+) -> None:
+    report = report_(
+        scenario_('t.py::test_pour[a]', 'Pour [a]'),
+        scenario_('t.py::test_pour[b]', 'Pour [b]'),
+        PAY,
+    )
+    document = (
+        f'[a]({URL}#scenario=t.py::test_pour%5Ba%5D)\n'
+        f'[b]({URL}#scenario=t.py::test_pour%5Bb%5D)\n'
+        f'[pay]({URL}#scenario=t.py::test_pay)\n'
+    )
+    result, _ = _run(tmp_path, document, report, covering=['t.py::test_pour'])
+    assert [listed.line for listed in result.listed] == [1, 2]

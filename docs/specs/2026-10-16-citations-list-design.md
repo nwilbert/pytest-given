@@ -77,7 +77,8 @@ summary counts it — a tag through its prefixes too, so `#tag=spec` covers a sc
 is mistyped — is always kept: it may be the scenario under a name it no longer has.
 
 The node ID resolves as a scenario fragment does, so a case's node ID or a slug names its grouped
-scenario. One the report does not hold is an error (exit 2) listing the closest node IDs: the
+scenario; a test function's node ID also names each of its scenarios, one per case under
+`group_parametrized=False`, though no link names one so. One the report does not hold is an error (exit 2) listing the closest node IDs: the
 command was asked about something that does not exist, unlike a link whose target is gone.
 
 A link left out takes its findings with it. The summary still counts every finding, and says how
@@ -91,7 +92,7 @@ docs/specs/2026-10-07-citations-design.md:494: ✅ scenario tests/unit/citations
 docs/specs/2026-10-07-citations-design.md:495: ✅ scenario tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists
     scenario tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists is not in the report
         closest by node ID: tests/unit/citations/test_check.py::test_a_plain_link_claims_its_target_exists
-citations: 2 findings, 1 of them on a link --covering leaves out; `citations update` fixes 1
+citations: 2 findings, 1 of them left out by --covering; `citations update` fixes 1
 ```
 
 ### What `--covering` cannot find
@@ -107,14 +108,16 @@ exact; until then it lists what it cannot rule out.
 
 - `citations/check.py` — `_LinkCheck` records each report link as a `ReportLink` (path, line, the
   glyph as written or None, the target as written or the raw fragment, the resolved target or
-  None, its own findings, `covered`). A finding belongs to the link object rather than being
-  matched to it by `path:line`, since two links can share a line. `CitationsResult` gains `links`;
-  `findings` stays the flat list `update` and plain `check` read. `check_citations` takes
-  `covering: list[str]` (empty: every link covered), resolves each through `TargetResolver`, raises
-  `PytestGivenError` with suggestions for one the report lacks, and sets `covered` from
-  `CitationIndex.tags` and `.stories`.
+  None, its own findings). A finding belongs to the link object rather than being matched to it
+  by `path:line`, since two links can share a line. `CitationsResult` gains `links`, `listed` and
+  the `left_out` count; `findings` stays the flat list `update` and plain `check` read.
+  `check_citations` takes `covering: list[str]` (empty: every link listed), resolves each through
+  `TargetResolver`, raises `PytestGivenError` with suggestions for one the report lacks, and lists
+  the links whose resolved target counts one.
+- `report/citation_index.py` — `CitationIndex.counted(target)`, the scenarios a target names,
+  which a tag's or story's summary and `--covering` both count.
 - `cli/citations.py` — `--list` and `--covering` (`action='append'`) on the `check` parser alone;
-  `_report_check` prints the list branch and the summary's left-out count.
+  `_report_check` prints `listed` and the summary's left-out count.
 - `docs/site/cli.md` — the two options in the Citations section.
 - `docs/site/guide/citations.md` — under *Keeping the check accurate*: finding the documents that
   cite a changed scenario, and what `--covering` cannot find.
@@ -131,7 +134,7 @@ exact; until then it lists what it cannot rule out.
 
 - `tests/unit/citations/test_check.py` — `CitationsResult.links`: a link per citation and per
   plain report link, none for a link elsewhere or a plain link naming no target; each finding on
-  its own link, two links on one table row included; `covered` for a direct citation, a tag, a
+  its own link, two links on one table row included; `listed` for a direct citation, a tag, a
   prefix tag, a story, a case node ID and a slug passed as `covering`, an unresolved target and a
   mistyped citation; an unknown `covering` node ID raises with suggestions.
 - `tests/integration/test_cli_citations.py` — the `--list` line shape and exit codes; output

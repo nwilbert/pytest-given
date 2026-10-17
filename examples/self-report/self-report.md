@@ -90,7 +90,7 @@
   - 📎 output:
     ```
     docs/spec.md:2: ✅ scenario t.py::test_pay
-    citations: 1 finding, 1 of them on a link --covering leaves out; `citations update` fixes 1
+    citations: 1 finding, 1 of them left out by --covering; `citations update` fixes 1
     ```
 - **then** only the «citation» of `test_pay` is listed
 - **then** the summary counts the finding it left out
@@ -2384,17 +2384,17 @@
 ## ✓ A «citation» of any «case» cites the grouped «scenario» holding it
 `tests/unit/citations/test_check.py::test_a_citation_of_any_case_cites_its_grouped_scenario` · spec/citations
 
-- **given** a «report» where one test function groups into two «scenarios», the first with the «cases» `[a]` and `[c]`
+- **given** a «report» where the «cases» `[a]` and `[c]` of `test_pour` group into one «scenario»
 - **given** a document citing the «case» `[c]`
   - 📎 document:
     ```
     ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour%5Bc%5D)
     ```
 - **when** the document is updated
-- **then** the «citation» names its «scenario» by the first «case»
+- **then** the «citation» names its «scenario» by the node ID of `test_pour`
   - 📎 updated document:
     ```
-    ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour%5Ba%5D)
+    ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour)
     ```
 - **then** no finding remains
 

@@ -156,4 +156,4 @@ docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
 citations: every report link is current
 ```
 
-`--covering` keeps a report link to the scenario, and one to a tag or story whose summary counts it, a tag through its prefixes too. It also keeps every link whose target is not in the report, since that may be the scenario under a node ID it no longer has. Running `citations update` first repoints a renamed test whose title one scenario still has, so once the check is clean the list is exact. `--list` alone lists every report link, each with its findings under it.
+`--covering` keeps a report link to the scenario, and one to a tag or story whose summary counts it, a tag through its prefixes too. It also keeps every link it cannot resolve: one whose target is not in the report may be the scenario under a node ID it no longer has, and a mistyped citation may cite anything. Running `citations update` first repoints a renamed test whose title one scenario still has, so once the check is clean the list is exact. `--list` alone lists every report link, each with its findings under it.

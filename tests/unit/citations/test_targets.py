@@ -6,9 +6,9 @@ from urllib.parse import parse_qs
 import pytest
 
 from pytest_given.citations.targets import TargetResolver, parse_fragment
-from pytest_given.model import Scenario, Sentence, SentenceId, Story, StoryId
+from pytest_given.model import Scenario, Story
 from pytest_given.report import Target, report_fragment
-from tests.unit.citation_reports import report_, scenario_
+from tests.unit.citation_reports import report_, scenario_, story_
 
 
 def _resolver(*scenarios: Scenario, stories: tuple[Story, ...] = ()) -> TargetResolver:
@@ -49,8 +49,7 @@ def test_only_the_three_shapes_are_report_link_fragments(
 
 
 def test_the_current_keys_resolve_as_they_are() -> None:
-    sentence = Sentence(id=SentenceId(1), clauses=())
-    story = Story(id=StoryId('cancel'), title='Cancel', sentences=(sentence,))
+    story = story_('cancel', 'Cancel')
     resolver = _resolver(scenario_('t.py::test_a', tags=('spec/x',)), stories=(story,))
     for target in (
         Target('scenario', 't.py::test_a'),
@@ -75,30 +74,6 @@ def test_a_slug_or_a_case_suffix_resolves_to_the_cited_node_id() -> None:
         Target('scenario', 'pkg/test_pour.py::test_pour[fire]')
     ) == Target('scenario', 'pkg/test_pour.py::test_pour')
     assert resolver.resolve(Target('scenario', 'pkg/test_shop.py::test_gone')) is None
-
-
-def test_two_groups_of_one_function_resolve_by_no_shared_name() -> None:
-    resolver = _resolver(
-        scenario_('t.py::test_pour[a]', 'Pour a', grouped=True),
-        scenario_('t.py::test_pour[b]', 'Pour b', grouped=True),
-    )
-    assert resolver.resolve(Target('scenario', 't.py::test_pour[c]')) is None
-    assert resolver.resolve(Target('scenario', 't.py::test_pour')) is None
-
-
-def test_any_case_of_one_of_two_groups_resolves_to_its_group() -> None:
-    resolver = _resolver(
-        scenario_(
-            't.py::test_pour[a]',
-            'Pour',
-            grouped=True,
-            other_cases=('t.py::test_pour[c]',),
-        ),
-        scenario_('t.py::test_pour[b]', 'Pour b', grouped=True),
-    )
-    assert resolver.resolve(Target('scenario', 't.py::test_pour[c]')) == Target(
-        'scenario', 't.py::test_pour[a]'
-    )
 
 
 def test_scenarios_titled_matches_exactly_after_folding() -> None:
@@ -129,10 +104,7 @@ def test_suggestions_rank_by_node_id_and_by_title() -> None:
 
 
 def test_suggestions_for_a_tag_and_a_story() -> None:
-    sentence = Sentence(id=SentenceId(1), clauses=())
-    story = Story(
-        id=StoryId('cancel-a-booking'), title='Cancel a Booking', sentences=(sentence,)
-    )
+    story = story_('cancel-a-booking', 'Cancel a Booking')
     resolver = _resolver(
         scenario_('t.py::test_a', tags=('checkout',)), stories=(story,)
     )

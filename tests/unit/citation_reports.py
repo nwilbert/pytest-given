@@ -9,6 +9,8 @@ from pytest_given.model import (
     ParameterTable,
     ReportData,
     Scenario,
+    Sentence,
+    SentenceId,
     Status,
     Story,
     StoryId,
@@ -47,6 +49,14 @@ def scenario_(
         tags=list(tags),
         parameters=table,
         story_ids=tuple(StoryId(story) for story in stories),
+    )
+
+
+def story_(story_id: str, title: str | None = None) -> Story:
+    return Story(
+        id=StoryId(story_id),
+        title=story_id if title is None else title,
+        sentences=(Sentence(id=SentenceId(1), clauses=()),),
     )
 
 
