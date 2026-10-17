@@ -1,5 +1,7 @@
 # Narrated Citations — Design Spec
 
+✅ [spec/narrated-citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/narrated-citations) (5 ✅)
+
 ## Goal
 
 Let a citation of a scenario carry the scenario's narration, folded under it, so that:
@@ -13,7 +15,7 @@ Let a citation of a scenario carry the scenario's narration, folded under it, so
 
 ## Background
 
-A [citation](../2026-10-07-citations-design.md) states a scenario's title and status. What the
+A [citation](2026-10-07-citations-design.md) states a scenario's title and status. What the
 scenario does — its steps and parameter table — is one click away, in the HTML report. On GitHub
 that click leaves the document, and a pull request's diff never shows it: a test whose steps
 change while its title and status stay leaves every citation of it as it was.
@@ -22,7 +24,7 @@ The Markdown report already writes each scenario's narration as Markdown, and a 
 Markdown. HTML's `<details>` element folds content under a one-line `<summary>`, and GitHub, other
 CommonMark renderers and Python-Markdown sites all render it.
 
-This design builds on the [`markdown/` subpackage](../2026-10-16-markdown-subpackage-design.md),
+This design builds on the [`markdown/` subpackage](2026-10-16-markdown-subpackage-design.md),
 which lands first: the block reading it adds to is the one that design moves out of `citations/`.
 
 ## The narrated citation
@@ -154,7 +156,7 @@ repointing a renamed test by its title, `missing`, `failed` — plus its body an
   `<!-- prettier-ignore-start -->` and `<!-- prettier-ignore-end -->` around each block.
 
 `check --list` lists a narrated citation like a one-line scenario citation, and `--covering` keeps
-it by the same rule, as the [listing design](../2026-10-16-citations-list-design.md) sets out.
+it by the same rule, as the [listing design](2026-10-16-citations-list-design.md) sets out.
 
 ## Copying from the report
 
