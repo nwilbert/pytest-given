@@ -6,12 +6,14 @@ package reads Markdown by the same rules.
 """
 
 from .blocks import (
+    HtmlBlock,
     SourceLine,
     Span,
     Table,
     TableCell,
     TableRow,
     TextRun,
+    html_blocks,
     table_cell_spans,
     tables,
     text_runs,
@@ -21,6 +23,7 @@ from .plain_text import (
     LINE_BREAK,
     code_span_at,
     fold_whitespace,
+    plain_html_text,
     plain_link_text,
 )
 from .spans import (
@@ -37,6 +40,7 @@ __all__ = [
     'LINE_BREAK',
     'CodeSpan',
     'EmphasisSpan',
+    'HtmlBlock',
     'InlineSpan',
     'PlainSpan',
     'SourceLine',
@@ -47,7 +51,9 @@ __all__ = [
     'TextRun',
     'code_span_at',
     'fold_whitespace',
+    'html_blocks',
     'located_spans',
+    'plain_html_text',
     'plain_link_text',
     'read_spans',
     'table_cell_spans',

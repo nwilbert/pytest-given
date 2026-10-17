@@ -81,6 +81,20 @@ class TextRun:
 
 
 @dataclass(frozen=True)
+class HtmlBlock:
+    # Its lines, each past its container prefix and indent.
+    run: TextRun
+    # Equal for blocks in one document, list item or blockquote.
+    container: int
+    # The first line's continuation prefix: `>` and tabs kept, the rest spaces.
+    prefix: str
+    # Each source line's start offset, prefix included.
+    line_starts: tuple[int, ...]
+    # Past the last line's line break, or `len(source)`.
+    end: int
+
+
+@dataclass(frozen=True)
 class TableCell:
     # Source offsets. A cell GFM supplies to a short row is empty, at its end.
     start: int
@@ -121,11 +135,16 @@ def text_runs(source: str) -> Iterator[TextRun]:
     for block in _blocks(source):
         if isinstance(block, TextRun):
             yield block
-            continue
-        for row in (block.header, *block.rows):
-            for cell in row.cells:
-                cell_line = SourceLine(cell.start, cell.text, cell.end)
-                yield TextRun(row.line, (cell_line,), in_table_row=True)
+        elif isinstance(block, Table):
+            for row in (block.header, *block.rows):
+                for cell in row.cells:
+                    cell_line = SourceLine(cell.start, cell.text, cell.end)
+                    yield TextRun(row.line, (cell_line,), in_table_row=True)
+
+
+def html_blocks(source: str) -> list[HtmlBlock]:
+    """The HTML blocks a renderer reads, fences and code left out."""
+    return [block for block in _blocks(source) if isinstance(block, HtmlBlock)]
 
 
 def tables(source: str) -> list[Table]:
@@ -164,12 +183,37 @@ class SourceLine:
         return SourceLine(self.start + column, self.content[column:], self.end)
 
 
-def _blocks(source: str) -> Iterator[TextRun | Table]:
+def _blocks(source: str) -> Iterator[TextRun | Table | HtmlBlock]:
     lines = _source_lines(source)
     tokens = _block_parser().parse(source)
     rows: list[TableRow] = []
+    containers: list[int] = []
     for index, token in enumerate(tokens):
+        if token.nesting == -1:
+            containers.pop()
+        elif token.nesting == 1:
+            containers.append(index)
         match token.type:
+            case 'html_block':
+                assert token.map is not None
+                first, last = token.map
+                html_lines = lines[first:last]
+                run = TextRun(
+                    first + 1,
+                    tuple(
+                        line.after(column)
+                        for line, column in zip(
+                            html_lines, token.meta['columns'], strict=True
+                        )
+                    ),
+                )
+                yield HtmlBlock(
+                    run,
+                    containers[-1] if containers else -1,
+                    token.meta['prefix'],
+                    tuple(line.start for line in html_lines),
+                    lines[last].start if last < len(lines) else len(source),
+                )
             case 'tr_open':
                 # markdown-it does not say where a cell sits in its row, so
                 # the row is split again, as its table rule splits one.
@@ -229,9 +273,9 @@ type _BlockRule = Callable[[StateBlock, int, int, bool], bool]
 
 
 def _recording(rule: _BlockRule) -> _BlockRule:
-    """`rule`, recording on each inline token it makes the column each line's
-    text starts at, past the line's container prefix and indent: markdown-it
-    knows it while the rule runs, but its tokens do not say."""
+    """`rule`, recording on each inline or HTML block token it makes the column
+    each line's text starts at, past the line's container prefix and indent:
+    markdown-it knows it while the rule runs, but its tokens do not say."""
 
     def recorded(state: StateBlock, start: int, end: int, silent: bool) -> bool:
         made = len(state.tokens)
@@ -243,6 +287,12 @@ def _recording(rule: _BlockRule) -> _BlockRule:
                     token.meta['columns'] = [
                         _column(state, line) for line in range(*token.map)
                     ]
+                elif token.type == 'html_block':
+                    assert token.map is not None
+                    token.meta['columns'] = [
+                        _column(state, line) for line in range(*token.map)
+                    ]
+                    token.meta['prefix'] = _prefix(state, token.map[0])
         return matched
 
     return recorded
@@ -255,6 +305,14 @@ def _column(state: StateBlock, line: int) -> int:
     return text_start - (state.src.rfind('\n', 0, text_start) + 1)
 
 
+def _prefix(state: StateBlock, line: int) -> str:
+    """The line's characters before the block's text, as a continuation line
+    would write them."""
+    end = state.bMarks[line] + min(state.tShift[line], state.blkIndent)
+    before = state.src[state.src.rfind('\n', 0, end) + 1 : end]
+    return ''.join(char if char in '>\t' else ' ' for char in before)
+
+
 @functools.cache
 def _block_parser() -> MarkdownIt:
     # The preset stops reading blocks nested 20 deep; a renderer does not.
@@ -262,7 +320,7 @@ def _block_parser() -> MarkdownIt:
     parser.enable('table').disable('inline')
     ruler = parser.block.ruler
     for rule in list(ruler.__rules__):
-        if rule.name in ('paragraph', 'heading', 'lheading', 'table'):
+        if rule.name in ('paragraph', 'heading', 'lheading', 'table', 'html_block'):
             # Given no options, `at` drops the blocks the rule may interrupt.
             ruler.at(rule.name, _recording(rule.fn), {'alt': rule.alt})
     return parser

@@ -2,10 +2,13 @@
 parser: what a backslash escapes, where a code span ends, and what breaks a
 line."""
 
+import html
 import re
 
 # A line ending in any of CommonMark's spellings.
 LINE_BREAK = re.compile(r'\r\n|\r|\n')
+
+_HTML_TAG = re.compile(r'</?[A-Za-z][^>]*>')
 
 # What a backslash escapes in CommonMark.
 ASCII_PUNCTUATION = frozenset('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
@@ -31,6 +34,12 @@ def plain_link_text(written: str, *, in_table_row: bool = False) -> str:
             out.append(char)
             index += 1
     return fold_whitespace(''.join(out))
+
+
+def plain_html_text(written: str) -> str:
+    """The text HTML renders: tags dropped, character references resolved,
+    whitespace folded."""
+    return fold_whitespace(html.unescape(_HTML_TAG.sub('', written)))
 
 
 def fold_whitespace(text: str) -> str:

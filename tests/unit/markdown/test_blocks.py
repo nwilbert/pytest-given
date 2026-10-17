@@ -4,7 +4,7 @@ the source."""
 import pytest
 from markdown_it import MarkdownIt
 
-from pytest_given.markdown import table_cell_spans, tables, text_runs
+from pytest_given.markdown import html_blocks, table_cell_spans, tables, text_runs
 
 
 @pytest.mark.parametrize(
@@ -126,3 +126,43 @@ def test_a_slice_of_a_run_stays_placed_in_the_source(start: int, end: int) -> No
     assert piece.text == run.text[start:end]
     assert piece.span(0, len(piece.text)) == run.span(start, end)
     assert piece.line == run.line_at(start)
+
+
+@pytest.mark.parametrize(
+    ('source', 'container', 'prefix'),
+    [
+        ('<details>\n<summary>x</summary>\n', -1, ''),
+        ('- <details>\n  <summary>x</summary>\n', 1, '  '),
+        ('> - <details>\n>   <summary>x</summary>\n', 2, '>   '),
+    ],
+)
+def test_html_blocks_are_read_with_their_container_and_prefix(
+    source: str, container: int, prefix: str
+) -> None:
+    [block] = html_blocks(source)
+    assert block.run.text.startswith('<details>')
+    assert block.run.line == 1
+    assert block.line_starts[0] == 0
+    assert block.prefix == prefix
+    assert block.container == container
+    assert block.end == len(source)
+    assert block.run.lines[1].content == '<summary>x</summary>'
+    assert block.line_starts[1] == source.index('\n') + 1
+
+
+def test_html_blocks_in_one_container_share_it() -> None:
+    opening, closing = html_blocks('<details>\n\n- x\n\n</details>\n')
+    assert opening.container == closing.container == -1
+    assert opening.end == len('<details>\n')
+    inside, after = html_blocks('- <b>\n\n<i>\n')
+    assert inside.container != after.container
+
+
+def test_an_html_block_in_a_fence_is_none() -> None:
+    assert html_blocks('```\n<details>\n```\n') == []
+
+
+def test_text_runs_and_tables_skip_html_blocks() -> None:
+    source = '<details>\n\ntext\n\n| a |\n|---|\n| 1 |\n\n</details>\n'
+    assert [run.text for run in text_runs(source)] == ['text', ' a ', ' 1 ']
+    assert len(tables(source)) == 1
