@@ -13,6 +13,14 @@ from collections.abc import Callable, Iterable, Sequence
 from string import Formatter
 from typing import Literal, assert_never
 
+from ..markdown import (
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
+    located_spans,
+    read_spans,
+)
 from .schema import (
     Narration,
     NarrationLiteral,
@@ -22,14 +30,6 @@ from .schema import (
     NarrationValue,
 )
 from .steps import PartIndex
-from .text import (
-    CodeSpan,
-    EmphasisSpan,
-    InlineSpan,
-    PlainSpan,
-    located_spans,
-    read_spans,
-)
 
 type InterpolatedPart = NarrationValue | NarrationPlaceholder | NarrationTermRef
 type NarrationPiece = InlineSpan | InterpolatedPart

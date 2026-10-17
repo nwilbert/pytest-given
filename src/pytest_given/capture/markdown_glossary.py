@@ -1,27 +1,21 @@
 """The GFM pipe tables in a Markdown document, read into glossary rows.
 
-markdown-it-py finds the tables, so a table counts where a renderer shows one
-and a cell a row leaves out reads as empty. Column selection accepts a header
-name (case-insensitive) or a 0-based index.
+A table counts where a renderer shows one, and a cell a row leaves out reads
+as empty. Column selection accepts a header name (case-insensitive) or a
+0-based index.
 """
 
-# A suite with no file glossary never loads markdown-it.
-__lazy_modules__ = ['markdown_it']
-
-import functools
-from collections.abc import Iterator
 from dataclasses import dataclass
 
-from markdown_it import MarkdownIt
-
-from ..model import (
+from ..markdown import (
     CodeSpan,
     EmphasisSpan,
     InlineSpan,
     PlainSpan,
-    PytestGivenError,
     read_spans,
+    tables,
 )
+from ..model import PytestGivenError
 
 type ColumnSpec = int | str
 
@@ -46,18 +40,18 @@ def parse_glossary_tables(
     specs = (term_column, definition_column) + (
         () if kind_column is None else (kind_column,)
     )
-    for table in _tables(text):
-        if _addresses_another_table(specs, table.header):
+    for table in tables(text):
+        header = table.header.contents
+        if _addresses_another_table(specs, header):
             continue
         saw_table = True
-        term_idx = _resolve_column(term_column, table.header)
-        definition_idx = _resolve_column(definition_column, table.header)
+        term_idx = _resolve_column(term_column, header)
+        definition_idx = _resolve_column(definition_column, header)
         kind_idx = (
-            _resolve_column(kind_column, table.header)
-            if kind_column is not None
-            else None
+            _resolve_column(kind_column, header) if kind_column is not None else None
         )
-        for line, cells in table.rows:
+        for row in table.rows:
+            cells = row.contents
             kind_value = (
                 _strip_emphasis(cells[kind_idx]) if kind_idx is not None else ''
             )
@@ -66,7 +60,7 @@ def parse_glossary_tables(
                     term=_strip_emphasis(cells[term_idx]),
                     definition=cells[definition_idx],
                     kind=kind_value or None,
-                    line=line,
+                    line=row.line,
                 )
             )
     if not rows:
@@ -77,41 +71,6 @@ def parse_glossary_tables(
             'needs a header row followed by a |---|---| separator row).'
         )
     return rows
-
-
-@dataclass(frozen=True)
-class _Table:
-    header: list[str]
-    # Each data row's line and its cells, as many as the header has.
-    rows: list[tuple[int, list[str]]]
-
-
-def _tables(text: str) -> Iterator[_Table]:
-    rows: list[tuple[int, list[str]]] = []
-    cells: list[str] | None = None
-    for token in _block_parser().parse(text):
-        match token.type:
-            case 'table_open':
-                rows = []
-            case 'tr_open':
-                assert token.map is not None
-                cells = []
-                rows.append((token.map[0] + 1, cells))
-            case 'inline' if cells is not None:
-                cells.append(token.content)
-            case 'tr_close':
-                cells = None
-            case 'table_close':
-                (_, header), *body = rows
-                yield _Table(header, body)
-
-
-@functools.cache
-def _block_parser() -> MarkdownIt:
-    # The preset stops reading blocks nested 20 deep; a renderer does not.
-    return (
-        MarkdownIt('commonmark', {'maxNesting': 100}).enable('table').disable('inline')
-    )
 
 
 def _strip_emphasis(cell: str) -> str:

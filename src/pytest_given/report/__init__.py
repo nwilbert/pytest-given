@@ -13,13 +13,7 @@ from .citation_index import (
     Target,
     report_fragment,
 )
-from .link_text import (
-    ASCII_PUNCTUATION,
-    code_span_at,
-    fold_whitespace,
-    link_text,
-    plain_link_text,
-)
+from .link_text import link_text
 from .sinks import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
@@ -40,7 +34,6 @@ from .text import CITATION_GLYPH, STATUS_GLYPH
 from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [
-    'ASCII_PUNCTUATION',
     'CITATION_GLYPH',
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
@@ -58,12 +51,9 @@ __all__ = [
     'Target',
     'Theme',
     'build_scenario_slug_index',
-    'code_span_at',
     'detect_commit_sha',
     'emit_sinks',
-    'fold_whitespace',
     'link_text',
-    'plain_link_text',
     'report_fragment',
     'resolve_source_link_template',
     'resolve_theme',

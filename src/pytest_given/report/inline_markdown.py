@@ -10,8 +10,14 @@ from collections.abc import Callable
 
 from markupsafe import escape
 
-from ..model import CodeSpan, EmphasisSpan, InlineSpan, PlainSpan, read_spans
-from .text import NEWLINE
+from ..markdown import (
+    LINE_BREAK,
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
+    read_spans,
+)
 
 # Re-admit an author's escaped <br> / <br/> / <br /> (any case) as a real break.
 _BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
@@ -45,4 +51,4 @@ def _escaped(text: str) -> str:
 
 
 def _with_breaks(text: str) -> str:
-    return NEWLINE.sub('<br>', _BR.sub('<br>', _escaped(text)))
+    return LINE_BREAK.sub('<br>', _BR.sub('<br>', _escaped(text)))

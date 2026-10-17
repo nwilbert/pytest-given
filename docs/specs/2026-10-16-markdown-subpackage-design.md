@@ -36,14 +36,14 @@ the glossary takes markdown-it's cell content, citations the cell's span in the 
 ### Package and dependency direction
 
 `src/pytest_given/markdown/` imports the standard library and markdown-it-py, and nothing else
-from the package. `model/` imports it; so may every package above `model/`.
+from the package. Every other package may import it; the direction among them stays as it is.
 
 ```
 markdown/                  the leaf — reading Markdown: block structure, tables, inline spans
-model/                     on markdown/ — schema, serde, errors, shared text rules
-capture/  lint/  report/   each on model/ and markdown/, never on each other
-grouping/                  on model/ + capture/ (and markdown/)
-citations/                 on model/ + report/ (and markdown/)
+model/                     schema, serde, errors, shared text rules
+capture/  lint/  report/   each on model/ only, never on each other
+grouping/                  on model/ + capture/
+citations/                 on model/ + report/
 plugin/   cli/             the entry points
 ```
 
@@ -61,31 +61,45 @@ paragraph's, heading's and table cell's text with its source offsets (today `_in
 type Span = tuple[int, int]
 
 @dataclass(frozen=True)
+class SourceLine:
+    start: int                # source offset of `content`
+    content: str              # the line, or the part of it past a container prefix
+    end: int                  # where the source line ends, before its line break
+
+@dataclass(frozen=True)
 class TextRun:
-    text: str                 # a paragraph's lines joined by `\n`, container prefixes left out
-    offsets: list[int]        # where each character sits in the source, one more for the end
     line: int                 # 1-based, the source's, of the run's first line
+    lines: tuple[SourceLine, ...]
     in_table_row: bool = False
+
+    @cached_property
+    def text(self) -> str: ...            # the lines joined by `\n`
+    @cached_property
+    def offsets(self) -> list[int]: ...   # where each character sits, one more for the end
 
     def span(self, start: int, end: int) -> Span: ...
     def line_at(self, index: int) -> int: ...
+    def slice(self, start: int, end: int) -> TextRun: ...   # still placed in the source
 
 def text_runs(source: str) -> Iterator[TextRun]: ...
-def source_span(offsets: Sequence[int], start: int, end: int) -> Span: ...
 ```
 
 `text_runs` yields every run, in document order: whether one could hold a link (`](` in it) is
 the link scanner's question, so that filter stays in citations. A run's `line_at` replaces the
-scanner's bisect over line starts: a run's lines are consecutive source lines.
+scanner's bisect over line starts: a run's lines are consecutive source lines. `offsets` is built
+on first use, since most runs hold no link. A `MarkdownLink` holds its trailing text as a slice of
+its run, so placing a summary in it is the run's `span`, not a copy of the run's offsets.
 
 **Tables** — one reader, built on the same parse as the runs:
 
 ```python
 @dataclass(frozen=True)
 class TableCell:
-    start: int          # source offset; a cell GFM supplies to a short row is empty, start == end
-    end: int
+    start: int          # source offset; a cell GFM supplies to a short row is empty, at its end
     text: str           # as written, container prefix left out
+
+    @property
+    def end(self) -> int: ...
 
     @property
     def content(self) -> str:
@@ -95,6 +109,9 @@ class TableCell:
 class TableRow:
     line: int                        # 1-based, the source's
     cells: tuple[TableCell, ...]     # exactly as many as the header, as GFM fits a row
+
+    @property
+    def contents(self) -> list[str]: ...
 
 @dataclass(frozen=True)
 class Table:
@@ -111,7 +128,8 @@ short row is an empty run, which holds no link.
 
 **Inline reading** — `read_spans`, `located_spans` and the span types from `model/text.py`;
 `ASCII_PUNCTUATION`, `code_span_at`, `plain_link_text` and `fold_whitespace` from
-`report/link_text.py`.
+`report/link_text.py`; `LINE_BREAK`, CommonMark's line endings, which the block reader splits
+the source at and the renderers fold, from `report/text.py`'s `NEWLINE`.
 
 ### What stays
 

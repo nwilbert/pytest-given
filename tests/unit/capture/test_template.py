@@ -13,14 +13,13 @@ from pytest_given.capture.template import (
     parse_tstring,
     resolve_template_parts,
 )
+from pytest_given.markdown import CodeSpan, PlainSpan
 from pytest_given.model import (
-    CodeSpan,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
-    PlainSpan,
     PytestGivenError,
     TermId,
     narration_text,

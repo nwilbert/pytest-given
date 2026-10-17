@@ -4,20 +4,16 @@ report shows."""
 import re
 from collections.abc import Callable
 
+from ..markdown import LINE_BREAK, CodeSpan, EmphasisSpan, InlineSpan, PlainSpan
 from ..model import (
-    CodeSpan,
-    EmphasisSpan,
-    InlineSpan,
     Narration,
     NarrationPiece,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
-    PlainSpan,
     placeholder_token,
     read_narration,
 )
-from .text import NEWLINE
 
 # What CommonMark or GFM give inline meaning: a link, emphasis,
 # strikethrough, a code span, raw HTML, an entity, a table cell, GitHub math —
@@ -66,7 +62,7 @@ def code_span_markdown(text: str, *, in_table_row: bool = False) -> str:
 
 
 def one_line(text: str) -> str:
-    return NEWLINE.sub(' ', text)
+    return LINE_BREAK.sub(' ', text)
 
 
 def _edge_text(piece: NarrationPiece) -> str:

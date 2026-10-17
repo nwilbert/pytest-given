@@ -1,36 +1,27 @@
 """Inline links in a Markdown document, with the source span of every part
 `pytest-given citations update` may rewrite.
 
-markdown-it-py reads the block structure — which text is a paragraph, heading
-or table cell, and which is code or HTML — with its block rules wrapped to
-record where each line of that text starts. The inline links are read here,
-because no Markdown parser reports where a link's text and destination, or the
-characters around it, sit in the source — and an update must change those
-bytes and no others.
+`markdown/` reads the block structure, placing each paragraph's, heading's and
+table cell's text in the source. The inline links are read here, because no
+Markdown parser reports where a link's text and destination, or the characters
+around it, sit in the source — and an update must change those bytes and no
+others.
 """
 
-# A CLI command that checks no citations never loads markdown-it.
-__lazy_modules__ = ['markdown_it']
-
-import bisect
-import functools
 import html
-import itertools
 import re
-from collections.abc import Callable, Collection, Iterator, Sequence
+from collections.abc import Collection, Iterator
 from dataclasses import dataclass
 from html.entities import html5
-from typing import TYPE_CHECKING, NamedTuple
+from typing import NamedTuple
 
-from markdown_it import MarkdownIt
-
-from ..report import ASCII_PUNCTUATION, code_span_at
-
-if TYPE_CHECKING:
-    from markdown_it.rules_block import StateBlock
-    from markdown_it.token import Token
-
-type Span = tuple[int, int]
+from ..markdown import (
+    ASCII_PUNCTUATION,
+    Span,
+    TextRun,
+    code_span_at,
+    text_runs,
+)
 
 VARIATION_SELECTOR = '\ufe0f'
 
@@ -62,18 +53,21 @@ class MarkdownLink:
     text_span: Span
     url: str
     url_span: Span
-    trailing: str
-    trailing_offsets: tuple[int, ...]
+    trailing_run: TextRun
     in_table_row: bool
     glyph: Glyph | None
 
     @property
+    def trailing(self) -> str:
+        return self.trailing_run.text
+
+    @property
     def end(self) -> int:
         """Just past the link's closing `)`."""
-        return self.trailing_offsets[0]
+        return self.trailing_run.offsets[0]
 
     def trailing_span(self, start: int, end: int) -> Span:
-        return _span(self.trailing_offsets, start, end)
+        return self.trailing_run.span(start, end)
 
     @property
     def destination(self) -> str:
@@ -96,13 +90,13 @@ class MarkdownLink:
 def scan_links(source: str, glyphs: Collection[str] = ()) -> list[MarkdownLink]:
     """Every inline link outside code and HTML blocks, in document order. A
     reference-style link is none, and neither is an image."""
-    lines = _source_lines(source)
-    line_starts = [line.start for line in lines]
     longest_first = sorted(glyphs, key=len, reverse=True)
     return [
         link
-        for run in _inline_runs(source, lines)
-        for link in _links_in(run, line_starts, longest_first)
+        for run in text_runs(source)
+        # A link's text always runs into its destination.
+        if '](' in run.text
+        for link in _links_in(run, longest_first)
     ]
 
 
@@ -122,181 +116,6 @@ def _unescaped(token: str) -> str:
     # Not `html.unescape`, which also reads `&notit;` as `¬it;`: CommonMark
     # resolves only a whole entity name.
     return html5.get(token[1:], token) if token.startswith('&') else token
-
-
-# --- Block structure ---
-
-
-@dataclass(frozen=True)
-class _Line:
-    """A source line, or the part of one a block's inline text takes up."""
-
-    start: int
-    content: str
-    # Where the source line ends, before its line break.
-    end: int
-
-    def after(self, column: int) -> _Line:
-        return _Line(self.start + column, self.content[column:], self.end)
-
-
-@dataclass(frozen=True)
-class _Run:
-    """Inline content: a paragraph's lines joined by `\\n` without their
-    container prefixes, a heading, or a table cell. `offsets[i]` is where
-    `text[i]` sits in the source; one more entry marks the end."""
-
-    text: str
-    offsets: list[int]
-    in_table_row: bool = False
-
-    @classmethod
-    def of_lines(cls, lines: list[_Line], *, in_table_row: bool = False) -> _Run:
-        parts: list[str] = []
-        offsets: list[int] = []
-        for number, line in enumerate(lines):
-            if number:
-                parts.append('\n')
-                offsets.append(lines[number - 1].end)
-            parts.append(line.content)
-            offsets.extend(range(line.start, line.start + len(line.content)))
-        offsets.append(lines[-1].start + len(lines[-1].content))
-        return cls(''.join(parts), offsets, in_table_row)
-
-    def span(self, start: int, end: int) -> Span:
-        return _span(self.offsets, start, end)
-
-
-def _span(offsets: Sequence[int], start: int, end: int) -> Span:
-    if end == start:
-        return (offsets[start], offsets[start])
-    return (offsets[start], offsets[end - 1] + 1)
-
-
-def _inline_runs(source: str, lines: list[_Line]) -> Iterator[_Run]:
-    tokens = _block_parser().parse(source)
-    cells: Iterator[_Line] = iter(())
-    for index, token in enumerate(tokens):
-        if token.type != 'inline':
-            continue
-        opener = tokens[index - 1]
-        if opener.type in ('th_open', 'td_open'):
-            # markdown-it does not say where a cell sits in its row, so the
-            # row is split again at its first cell, and each cell markdown-it
-            # reads takes the next: a cell past the header's is dropped.
-            if tokens[index - 2].type == 'tr_open':
-                cells = _cells(_text_lines(token, lines)[0])
-            cell = next(cells, None)
-            if cell is not None and '](' in cell.content:
-                yield _Run.of_lines([cell], in_table_row=True)
-        # A link's text always runs into its destination.
-        elif '](' in token.content:
-            text = _text_lines(token, lines)
-            if opener.type == 'heading_open' and opener.markup.startswith('#'):
-                text[0] = _past_hashes(text[0], opener.markup)
-            yield _Run.of_lines(text)
-
-
-def _text_lines(token: Token, lines: list[_Line]) -> list[_Line]:
-    assert token.map is not None
-    return [
-        line.after(column)
-        for line, column in zip(
-            lines[slice(*token.map)], token.meta['columns'], strict=True
-        )
-    ]
-
-
-def _cells(row: _Line) -> Iterator[_Line]:
-    for start, end in table_cell_spans(row.content):
-        yield _Line(row.start + start, row.content[start:end], row.start + end)
-
-
-def table_cell_spans(row: str) -> list[Span]:
-    """Each cell's span in a GFM table row, its outer pipes left out. A pipe
-    right after a backslash is the cell's, escaped backslash or code span
-    around it or not: GFM splits the row before it reads any inline syntax."""
-    pipes = [
-        index
-        for index, char in enumerate(row)
-        if char == '|' and row[index - 1 : index] != '\\'
-    ]
-    edges = [-1, *pipes, len(row)]
-    spans = [(left + 1, right) for left, right in itertools.pairwise(edges)]
-    if spans and not row[: spans[0][1]].strip():
-        spans = spans[1:]
-    if spans and not row[spans[-1][0] :].strip():
-        spans = spans[:-1]
-    return spans
-
-
-def _past_hashes(line: _Line, hashes: str) -> _Line:
-    """An ATX heading's text, past its opening hashes and the space after."""
-    rest = line.content[len(hashes) :]
-    return line.after(len(hashes) + len(rest) - len(rest.lstrip(' \t')))
-
-
-type _BlockRule = Callable[[StateBlock, int, int, bool], bool]
-
-
-def _recording(rule: _BlockRule) -> _BlockRule:
-    """`rule`, recording on each inline token it makes the column each line's
-    text starts at, past the line's container prefix and indent: markdown-it
-    knows it while the rule runs, but its tokens do not say."""
-
-    def recorded(state: StateBlock, start: int, end: int, silent: bool) -> bool:
-        made = len(state.tokens)
-        matched = rule(state, start, end, silent)
-        if matched and not silent:
-            for token in state.tokens[made:]:
-                if token.type == 'inline':
-                    assert token.map is not None
-                    token.meta['columns'] = [
-                        _column(state, line) for line in range(*token.map)
-                    ]
-        return matched
-
-    return recorded
-
-
-def _column(state: StateBlock, line: int) -> int:
-    # Normalizing the source rewrites line breaks, and NULs one for one, so
-    # a column within a line of it is one in the source line too.
-    text_start = state.bMarks[line] + state.tShift[line]
-    return text_start - (state.src.rfind('\n', 0, text_start) + 1)
-
-
-@functools.cache
-def _block_parser() -> MarkdownIt:
-    # The preset stops reading blocks nested 20 deep; a renderer does not.
-    parser = MarkdownIt('commonmark', {'maxNesting': 100})
-    parser.enable('table').disable('inline')
-    ruler = parser.block.ruler
-    for rule in list(ruler.__rules__):
-        if rule.name in ('paragraph', 'heading', 'lheading', 'table'):
-            # Given no options, `at` drops the blocks the rule may interrupt.
-            ruler.at(rule.name, _recording(rule.fn), {'alt': rule.alt})
-    return parser
-
-
-# Every line break markdown-it reads, so its line numbers are the source's.
-_LINE_BREAK = re.compile(r'\r\n|\r|\n')
-
-
-def _source_lines(source: str) -> list[_Line]:
-    lines: list[_Line] = []
-    start = 0
-    for line_break in _LINE_BREAK.finditer(source):
-        lines.append(
-            _Line(start, source[start : line_break.start()], line_break.start())
-        )
-        start = line_break.end()
-    if start < len(source):
-        lines.append(_Line(start, source[start:], len(source)))
-    return lines
-
-
-# --- Inline structure ---
 
 
 @dataclass
@@ -326,9 +145,7 @@ _INLINE_HTML = re.compile(
 )
 
 
-def _links_in(
-    run: _Run, line_starts: list[int], glyphs: list[str]
-) -> Iterator[MarkdownLink]:
+def _links_in(run: TextRun, glyphs: list[str]) -> Iterator[MarkdownLink]:
     text = run.text
     openers: list[_Opener] = []
     index = 0
@@ -353,9 +170,7 @@ def _links_in(
                 index += 1
                 continue
             if not opener.image:
-                yield _link(
-                    run, opener.position, index, destination, line_starts, glyphs
-                )
+                yield _link(run, opener.position, index, destination, glyphs)
                 # Links do not nest: no earlier bracket can open one now.
                 for earlier in openers:
                     earlier.active = earlier.image and earlier.active
@@ -417,11 +232,10 @@ def _skip_space(text: str, position: int) -> int:
 
 
 def _link(
-    run: _Run,
+    run: TextRun,
     open_index: int,
     close_index: int,
     destination: _Destination,
-    line_starts: list[int],
     glyphs: list[str],
 ) -> MarkdownLink:
     text = run.text
@@ -430,19 +244,18 @@ def _link(
     next_line_end = -1 if line_end == -1 else text.find('\n', line_end + 1)
     trailing_end = len(text) if next_line_end == -1 else next_line_end
     return MarkdownLink(
-        line=bisect.bisect_right(line_starts, run.offsets[open_index]),
+        line=run.line_at(open_index),
         text=text[open_index + 1 : close_index],
         text_span=run.span(open_index + 1, close_index),
         url=text[destination.url_start : destination.url_end],
         url_span=run.span(destination.url_start, destination.url_end),
-        trailing=text[after:trailing_end],
-        trailing_offsets=tuple(run.offsets[after : trailing_end + 1]),
+        trailing_run=run.slice(after, trailing_end),
         in_table_row=run.in_table_row,
         glyph=_glyph_before(run, open_index, glyphs),
     )
 
 
-def _glyph_before(run: _Run, open_index: int, glyphs: list[str]) -> Glyph | None:
+def _glyph_before(run: TextRun, open_index: int, glyphs: list[str]) -> Glyph | None:
     """The glyph leading the link at `open_index`: across any whitespace, and
     itself at the start of the content or after whitespace or `(` — so a
     question mark ending a sentence is never read as one."""

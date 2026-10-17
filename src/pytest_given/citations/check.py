@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Literal, NamedTuple
 from urllib.parse import SplitResult, unquote, urlsplit
 
+from ..markdown import fold_whitespace, plain_link_text
 from ..model import STATUSES, PytestGivenError, ReportData, ReportUrl
 from ..report import (
     CITATION_GLYPH,
@@ -17,9 +18,7 @@ from ..report import (
     STATUS_GLYPH,
     SUMMARY_SEPARATOR,
     Target,
-    fold_whitespace,
     link_text,
-    plain_link_text,
     report_fragment,
 )
 from .markdown_links import VARIATION_SELECTOR, Glyph, MarkdownLink, scan_links

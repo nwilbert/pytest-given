@@ -13,7 +13,7 @@ from markdown_it import MarkdownIt
 from markdown_it.token import Token
 
 from pytest_given.citations.markdown_links import scan_links
-from pytest_given.report.link_text import fold_whitespace, plain_link_text
+from pytest_given.markdown import fold_whitespace, plain_link_text
 
 _ROOT = Path(__file__).parents[3]
 _FIXTURE = 'tests/unit/citations/fixtures/citation-forms.md'

@@ -6,8 +6,9 @@ from collections.abc import Iterable, Mapping
 from functools import cached_property
 from urllib.parse import parse_qsl
 
+from ..markdown import fold_whitespace
 from ..model import NodeId, ReportData, StoryId, node_base
-from ..report import CitationIndex, Target, build_scenario_slug_index, fold_whitespace
+from ..report import CitationIndex, Target, build_scenario_slug_index
 
 
 def parse_fragment(fragment: str) -> Target | None:

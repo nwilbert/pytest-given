@@ -41,17 +41,20 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 
 ## Architecture
 
-`src/pytest_given/` is six library subpackages plus two entry points, with a
+`src/pytest_given/` is seven library subpackages plus two entry points, with a
 strict dependency direction (convention, not lint-enforced):
 
 ```
-model/                     the leaf — schema, serde, errors, shared text rules
+markdown/                  the leaf — reading Markdown: blocks, tables, inline spans
+model/                     schema, serde, errors, shared text rules
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
 citations/                 on model/ + report/
-plugin/   cli/             the entry points; may import all six, and hold
-                           nothing the six could
+plugin/   cli/             the entry points; may import all seven, and hold
+                           nothing the seven could
 ```
+
+Every package may import `markdown/`, which imports none of them.
 
 What no filename tells you:
 

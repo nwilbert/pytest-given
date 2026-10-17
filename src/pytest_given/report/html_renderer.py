@@ -20,14 +20,13 @@ from typing import TypedDict
 import jinja2
 from markupsafe import Markup, escape
 
+from ..markdown import CodeSpan, EmphasisSpan, PlainSpan
 from ..model import (
     AttachmentRef,
     ClausePart,
     ClauseTermRef,
     ClauseWord,
-    CodeSpan,
     ColumnId,
-    EmphasisSpan,
     Glossary,
     GlossaryTerm,
     Narration,
@@ -36,7 +35,6 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     ParameterColumn,
-    PlainSpan,
     ReportData,
     Scenario,
     SourceLocation,

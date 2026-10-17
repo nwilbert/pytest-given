@@ -1,12 +1,8 @@
 """Wording helpers the renderers and view builders share."""
 
-import re
 from typing import Literal
 
 from ..model import Status
-
-# A line break in any of its spellings, which every one-line rendering folds.
-NEWLINE = re.compile(r'\r\n|\r|\n')
 
 # How a status is marked, wherever it is shown.
 STATUS_GLYPH: dict[Status, str] = {

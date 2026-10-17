@@ -22,7 +22,7 @@ The Markdown report already writes each scenario's narration as Markdown, and a 
 Markdown. HTML's `<details>` element folds content under a one-line `<summary>`, and GitHub, other
 CommonMark renderers and Python-Markdown sites all render it.
 
-This design builds on the [`markdown/` subpackage](2026-10-16-markdown-subpackage-design.md),
+This design builds on the [`markdown/` subpackage](../2026-10-16-markdown-subpackage-design.md),
 which lands first: the block reading it adds to is the one that design moves out of `citations/`.
 
 ## The narrated citation

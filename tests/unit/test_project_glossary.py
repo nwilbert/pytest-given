@@ -4,7 +4,8 @@ GFM does: a row wider than its header lost its tail to an unescaped `|`."""
 from pathlib import Path
 
 from markdown_it import MarkdownIt
-from markdown_it.rules_block.table import escapedSplit
+
+from pytest_given.markdown import table_cell_spans
 
 _GLOSSARY = Path(__file__).parents[2] / 'GLOSSARY.md'
 
@@ -34,5 +35,4 @@ def test_every_glossary_row_is_as_wide_as_its_header() -> None:
 def _written_cells(row: str) -> int:
     # markdown-it fits every row's tokens to its header, so the row is split
     # again the way its table rule splits one.
-    cells = escapedSplit(row.strip())
-    return len(cells) - (cells[0] == '') - (len(cells) > 1 and cells[-1] == '')
+    return len(table_cell_spans(row))

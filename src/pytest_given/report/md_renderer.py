@@ -4,6 +4,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from ..markdown import LINE_BREAK
 from ..model import (
     Attachment,
     AttachmentRef,
@@ -22,7 +23,7 @@ from ..model import (
     plural,
 )
 from .markdown_writer import code_span_markdown, literal_markdown, narration_markdown
-from .text import NEWLINE, STATUS_GLYPH, STATUS_LABEL
+from .text import STATUS_GLYPH, STATUS_LABEL
 
 
 def render_md(report: ReportData, *, with_lines: bool = True) -> str:
@@ -234,7 +235,7 @@ def _text(text: str) -> str:
     of the block (the tail dedents into a stray paragraph); ``<br>`` renders
     the break in place without corrupting the surrounding structure.
     """
-    return NEWLINE.sub('<br>', literal_markdown(text))
+    return LINE_BREAK.sub('<br>', literal_markdown(text))
 
 
 def _cell(value: object) -> str:

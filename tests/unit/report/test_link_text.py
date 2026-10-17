@@ -3,6 +3,7 @@ and read back as the title it renders."""
 
 import pytest
 
+from pytest_given.markdown import fold_whitespace, plain_link_text
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -12,7 +13,7 @@ from pytest_given.model import (
     TermId,
     narration_of,
 )
-from pytest_given.report.link_text import fold_whitespace, link_text, plain_link_text
+from pytest_given.report.link_text import link_text
 
 
 def test_a_tag_or_story_title_is_link_text_written_literally() -> None:
@@ -59,15 +60,3 @@ def test_written_text_reads_back_as_the_title(
     written = link_text(title, in_table_row=in_table_row)
     text = title if isinstance(title, str) else title.text
     assert plain_link_text(written, in_table_row=in_table_row) == fold_whitespace(text)
-
-
-def test_a_hand_written_text_without_escapes_reads_as_the_title() -> None:
-    assert plain_link_text('snake_case & friends') == 'snake_case & friends'
-
-
-def test_an_unpaired_backtick_reads_literally() -> None:
-    assert plain_link_text('one ` tick') == 'one ` tick'
-
-
-def test_text_wrapped_across_lines_folds_to_one() -> None:
-    assert plain_link_text('a long\n   title') == 'a long title'
