@@ -5,14 +5,15 @@ leaves every file as it was.
 
 import itertools
 import re
+from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Literal, NamedTuple
+from typing import Literal, NamedTuple, Protocol
 from urllib.parse import SplitResult, unquote, urlsplit
 
-from ..markdown import fold_whitespace, plain_link_text
+from ..markdown import Span, fold_whitespace, plain_html_text, plain_link_text
 from ..model import (
     STATUSES,
     NodeId,
@@ -26,15 +27,24 @@ from ..report import (
     NO_SCENARIOS_SUMMARY,
     STATUS_GLYPH,
     SUMMARY_SEPARATOR,
+    Citation,
     Target,
     link_text,
     report_fragment,
 )
 from .markdown_links import VARIATION_SELECTOR, Glyph, MarkdownLink, scan_links
+from .narrated import LooseDetails, NarratedCitation, scan_narrated
 from .targets import TargetResolver, parse_fragment
 
 type FindingKind = Literal[
-    'repointed', 'fragment', 'missing', 'stale', 'failed', 'mistyped', 'stray-summary'
+    'repointed',
+    'fragment',
+    'missing',
+    'stale',
+    'failed',
+    'mistyped',
+    'stray-summary',
+    'stray-narration',
 ]
 
 
@@ -272,15 +282,61 @@ def _check_document(
     resolver: TargetResolver,
     location: _ReportLocation,
 ) -> tuple[list[ReportLink], list[_Edit]]:
-    links: list[ReportLink] = []
+    """A narrated citation's body is rewritten whole, so no link in it is
+    read."""
     edits: list[_Edit] = []
-    for link in scan_links(text, _READ_GLYPHS):
-        fragment = _report_fragment(link.destination, path, location)
-        if fragment is not None:
-            checked = _LinkCheck(path, link, resolver, edits).run(fragment)
-            if checked is not None:
-                links.append(checked)
+    found = scan_narrated(text, _READ_GLYPHS)
+    narrated = [block for block in found if isinstance(block, NarratedCitation)]
+    links = [
+        _mistyped_details(path, loose, fragment)
+        for loose in found
+        if isinstance(loose, LooseDetails)
+        and (fragment := _report_fragment(loose.href, path, location)) is not None
+    ]
+    line_break = _first_line_break(text)
+    bodies = [citation.body_span for citation in narrated]
+    checks: list[_NarratedCheck | _MarkdownCheck] = [
+        *(
+            _NarratedCheck(path, citation, resolver, edits, line_break)
+            for citation in narrated
+        ),
+        *(
+            _MarkdownCheck(path, link, resolver, edits)
+            for link in scan_links(text, _READ_GLYPHS)
+            if not any(start <= link.text_span[0] < end for start, end in bodies)
+        ),
+    ]
+    for check in checks:
+        fragment = _report_fragment(check.link.destination, path, location)
+        if fragment is not None and (checked := check.run(fragment)) is not None:
+            links.append(checked)
+    links.sort(key=lambda link: link.line)
     return links, edits
+
+
+def _first_line_break(text: str) -> str:
+    """What an update ends each line it writes with: the document's own."""
+    end = text.find('\n')
+    return '\r\n' if end > 0 and text[end - 1] == '\r' else '\n'
+
+
+def _mistyped_details(path: Path, loose: LooseDetails, fragment: str) -> ReportLink:
+    return ReportLink(
+        path=path,
+        line=loose.line,
+        glyph=None,
+        named=f'#{fragment}',
+        resolved=None,
+        findings=(
+            CitationFinding(
+                path=path,
+                line=loose.line,
+                kind='mistyped',
+                message=f'a <details> block cites the report, but {loose.reason}',
+                fixed_by_update=False,
+            ),
+        ),
+    )
 
 
 def _report_fragment(url: str, document: Path, location: _ReportLocation) -> str | None:
@@ -296,21 +352,42 @@ def _report_fragment(url: str, document: Path, location: _ReportLocation) -> str
     return fragment if location.names_report(link, document) else None
 
 
+class _CitingLink(Protocol):
+    """A report link in either shape a document writes one."""
+
+    @property
+    def line(self) -> int: ...
+
+    @property
+    def glyph(self) -> Glyph | None: ...
+
+    @property
+    def text_span(self) -> Span: ...
+
+    @property
+    def destination(self) -> str: ...
+
+    @property
+    def fragment_span(self) -> Span | None: ...
+
+
 @dataclass
-class _LinkCheck:
+class _LinkCheck[L: _CitingLink](ABC):
+    """The rules every report link is held to; a link shape reads and writes
+    its link text in its own markup."""
+
     path: Path
-    link: MarkdownLink
+    link: L
     resolver: TargetResolver
     edits: list[_Edit]
-    findings: list[CitationFinding] = field(default_factory=list)
+    findings: list[CitationFinding] = field(default_factory=list, init=False)
 
     def run(self, fragment: str) -> ReportLink | None:
         """The link checked, or None for a plain link naming no target — not
         a report link, as a glossary term's is not."""
-        glyph = self.link.glyph
         target = parse_fragment(fragment)
         if target is None:
-            if glyph is None:
+            if self.link.glyph is None:
                 return None
             self._find(
                 'mistyped',
@@ -318,9 +395,29 @@ class _LinkCheck:
                 'tag or story',
             )
             return self._checked(f'#{fragment}', None)
-        written_title = plain_link_text(
-            self.link.text, in_table_row=self.link.in_table_row
-        )
+        return self._checked(_named(target), self._check_target(target))
+
+    @abstractmethod
+    def _written_title(self) -> str:
+        """The link text as the title it is compared with."""
+
+    @abstractmethod
+    def _titled(self, written_title: str) -> list[NodeId]:
+        """The scenarios a link text of `written_title` may name."""
+
+    @abstractmethod
+    def _shown_title(self, citation: Citation) -> str:
+        """The citation's title as `_written_title` reads it."""
+
+    @abstractmethod
+    def _link_text(self, citation: Citation) -> str: ...
+
+    @abstractmethod
+    def _check_summary(self, citation: Citation) -> None: ...
+
+    def _check_target(self, target: Target) -> Target | None:
+        glyph = self.link.glyph
+        written_title = self._written_title()
         resolved = self._resolve_and_repoint(target, glyph, written_title)
         if resolved is None:
             self._find(
@@ -332,7 +429,7 @@ class _LinkCheck:
                 self._mark_missing(glyph)
         elif glyph is not None:
             self._check_citation(resolved, glyph, written_title)
-        return self._checked(_named(target), resolved)
+        return resolved
 
     def _checked(self, named: str, resolved: Target | None) -> ReportLink:
         glyph = self.link.glyph
@@ -363,7 +460,7 @@ class _LinkCheck:
             return resolved
         if glyph is None or target.kind != 'scenario':
             return None
-        titled = self.resolver.scenarios_titled(written_title)
+        titled = self._titled(written_title)
         if len(titled) != 1:
             return None
         resolved = Target('scenario', titled[0])
@@ -378,52 +475,27 @@ class _LinkCheck:
 
     def _check_citation(self, target: Target, glyph: Glyph, written_title: str) -> None:
         citation = self.resolver.index.citation(target)
-        link = self.link
         if glyph.bare != citation.glyph:
             self._fix(
                 'stale glyph',
-                f'{glyph.text} → {citation.glyph}',
                 _Edit(*glyph.span, citation.glyph),
+                f'{glyph.text} → {citation.glyph}',
             )
-        if written_title != fold_whitespace(citation.title_text):
+        shown_title = self._shown_title(citation)
+        if written_title != shown_title:
             self._fix(
                 'stale link text',
-                f'{written_title} → {citation.title_text}',
-                _Edit(
-                    *link.text_span,
-                    link_text(citation.title, in_table_row=link.in_table_row),
-                ),
+                _Edit(*self.link.text_span, self._link_text(citation)),
+                f'{written_title} → {shown_title}',
             )
-        match citation.summary, _SUMMARY.match(link.trailing):
-            case None, re.Match() as written:
-                self._find(
-                    'stray-summary',
-                    f'a scenario citation takes no summary: {written.group(1)}',
-                )
-            case str() as summary, None:
-                self._fix(
-                    'missing summary',
-                    f'→ {summary}',
-                    _Edit(link.end, link.end, f' {summary}'),
-                )
-            case str() as summary, re.Match() as written if (
-                written.group(1).replace(VARIATION_SELECTOR, '') != summary
-            ):
-                self._fix(
-                    'stale summary',
-                    f'{written.group(1)} → {summary}',
-                    _Edit(*link.trailing_span(*written.span(1)), summary),
-                )
+        self._check_summary(citation)
         if citation.state == 'failed':
             self._find('failed', f'cited {target.kind} fails: {citation.title_text}')
 
     def _mark_missing(self, glyph: Glyph) -> None:
-        link = self.link
         missing = CITATION_GLYPH['missing']
         if glyph.bare != missing:
             self.edits.append(_Edit(*glyph.span, missing))
-        if summary := _SUMMARY.match(link.trailing):
-            self.edits.append(_Edit(*link.trailing_span(0, summary.end()), ''))
 
     def _repoint(
         self, kind: FindingKind, message: str, old: Target, new: Target
@@ -433,15 +505,15 @@ class _LinkCheck:
         new_fragment = report_fragment(new)
         self._fix(
             message,
-            f'#{report_fragment(old)} → #{new_fragment}',
             _Edit(*span, new_fragment),
+            f'#{report_fragment(old)} → #{new_fragment}',
             kind=kind,
         )
 
     def _fix(
-        self, message: str, detail: str, edit: _Edit, *, kind: FindingKind = 'stale'
+        self, message: str, edit: _Edit, *details: str, kind: FindingKind = 'stale'
     ) -> None:
-        self._find(kind, message, detail, fixed=True)
+        self._find(kind, message, *details, fixed=True)
         self.edits.append(edit)
 
     def _find(
@@ -457,6 +529,141 @@ class _LinkCheck:
                 fixed_by_update=fixed,
             )
         )
+
+
+class _MarkdownCheck(_LinkCheck[MarkdownLink]):
+    def _written_title(self) -> str:
+        return plain_link_text(self.link.text, in_table_row=self.link.in_table_row)
+
+    def _titled(self, written_title: str) -> list[NodeId]:
+        return self.resolver.scenarios_titled(written_title)
+
+    def _shown_title(self, citation: Citation) -> str:
+        return fold_whitespace(citation.title_text)
+
+    def _link_text(self, citation: Citation) -> str:
+        return link_text(citation.title, in_table_row=self.link.in_table_row)
+
+    def _check_summary(self, citation: Citation) -> None:
+        link = self.link
+        match citation.summary, _SUMMARY.match(link.trailing):
+            case None, re.Match() as written:
+                self._find(
+                    'stray-summary',
+                    f'a scenario citation takes no summary: {written.group(1)}',
+                )
+            case str() as summary, None:
+                self._fix(
+                    'missing summary',
+                    _Edit(link.end, link.end, f' {summary}'),
+                    f'→ {summary}',
+                )
+            case str() as summary, re.Match() as written if (
+                written.group(1).replace(VARIATION_SELECTOR, '') != summary
+            ):
+                self._fix(
+                    'stale summary',
+                    _Edit(*link.trailing_span(*written.span(1)), summary),
+                    f'{written.group(1)} → {summary}',
+                )
+
+    def _mark_missing(self, glyph: Glyph) -> None:
+        super()._mark_missing(glyph)
+        link = self.link
+        if summary := _SUMMARY.match(link.trailing):
+            self.edits.append(_Edit(*link.trailing_span(0, summary.end()), ''))
+
+
+@dataclass
+class _NarratedCheck(_LinkCheck[NarratedCitation]):
+    """A scenario citation's rules, written as HTML, plus its opening tag and
+    body; only a scenario has a narration to write."""
+
+    line_break: str
+
+    def _written_title(self) -> str:
+        return plain_html_text(self.link.text)
+
+    def _titled(self, written_title: str) -> list[NodeId]:
+        return self.resolver.scenarios_shown_as(written_title)
+
+    def _shown_title(self, citation: Citation) -> str:
+        return plain_html_text(citation.html_link_text)
+
+    def _link_text(self, citation: Citation) -> str:
+        return citation.html_link_text
+
+    def _check_summary(self, citation: Citation) -> None:
+        """A scenario citation takes none."""
+
+    def _check_target(self, target: Target) -> Target | None:
+        if target.kind != 'scenario':
+            self._find(
+                'stray-narration', f'a {target.kind} citation takes no narration'
+            )
+            return self.resolver.resolve(target)
+        resolved = super()._check_target(target)
+        self._check_opening_tag()
+        if resolved is not None:
+            self._check_body(resolved)
+        return resolved
+
+    def _check_opening_tag(self) -> None:
+        tag = self.link.opening_tag
+        attribute = _MARKDOWN_ATTRIBUTE.search(tag)
+        if attribute is None:
+            start = end = len('<details')
+        elif attribute['value'] in {'1', '"1"', "'1'"}:
+            return
+        else:
+            start, end = attribute.span()
+        offset = self.link.opening_tag_span[0]
+        self._fix(
+            'stale opening tag',
+            _Edit(offset + start, offset + end, _MARKDOWN_1),
+            f'{tag} → {tag[:start]}{_MARKDOWN_1}{tag[end:]}',
+        )
+
+    def _check_body(self, target: Target) -> None:
+        """Compared past its container prefixes, line breaks normalized;
+        written back under the prefix, with the document's line break."""
+        written = self.link.body
+        expected = f'\n{self.resolver.index.narration(target)}\n'
+        if written == expected:
+            return
+        written_line, expected_line = next(
+            pair
+            for pair in itertools.zip_longest(written.split('\n'), expected.split('\n'))
+            if pair[0] != pair[1]
+        )
+        prefix = self.link.prefix
+        self._fix(
+            'stale narration',
+            _Edit(
+                *self.link.body_span,
+                ''.join(
+                    f'{prefix + line if line else prefix.rstrip()}{self.line_break}'
+                    for line in expected.split('\n')
+                ),
+            ),
+            f'written: {_body_line(written_line)}',
+            f'expected: {_body_line(expected_line)}',
+        )
+
+
+_MARKDOWN_1 = ' markdown="1"'
+_MARKDOWN_ATTRIBUTE = re.compile(
+    r"""\smarkdown"""
+    r"""(?:\s*=\s*(?P<value>"[^"]*"|'[^']*'|[^\s"'=<>`]+))?"""
+    r"""(?=[\s/>])""",
+    re.IGNORECASE,
+)
+
+
+def _body_line(line: str | None) -> str:
+    if line is None:
+        return '(end of body)'
+    return line or '(blank line)'
 
 
 def _named(target: Target) -> str:

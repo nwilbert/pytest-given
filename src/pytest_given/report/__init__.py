@@ -9,6 +9,7 @@ lives — importing this package must not drag argparse in behind it.
 from .citation_index import (
     NO_SCENARIOS_SUMMARY,
     SUMMARY_SEPARATOR,
+    Citation,
     CitationIndex,
     Target,
     report_fragment,
@@ -45,6 +46,7 @@ __all__ = [
     'STATUS_GLYPH',
     'SUMMARY_SEPARATOR',
     'THEME_HELP',
+    'Citation',
     'CitationIndex',
     'RenderedFile',
     'RenderedSinks',

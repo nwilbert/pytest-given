@@ -6,9 +6,9 @@ from collections.abc import Iterable, Mapping
 from functools import cached_property
 from urllib.parse import parse_qsl
 
-from ..markdown import fold_whitespace
+from ..markdown import fold_whitespace, plain_html_text
 from ..model import NodeId, ReportData, StoryId, node_base
-from ..report import CitationIndex, Target, build_scenario_slug_index
+from ..report import CitationIndex, Target, build_scenario_slug_index, html_link_text
 
 
 def parse_fragment(fragment: str) -> Target | None:
@@ -57,6 +57,11 @@ class TargetResolver:
     def scenarios_titled(self, title: str) -> list[NodeId]:
         return self._by_title.get(title, [])
 
+    def scenarios_shown_as(self, text: str) -> list[NodeId]:
+        """The scenarios whose title renders as `text` in HTML, as a narrated
+        citation's link text does."""
+        return self._by_shown_title.get(text, [])
+
     def suggestions(self, target: Target, link_title: str) -> list[str]:
         """The closest targets the report does hold, for a target it lacks —
         suggestions only: `citations update` never writes one."""
@@ -84,6 +89,14 @@ class TargetResolver:
                     title=link_title,
                     id_by_title=self._story_by_title,
                 )
+
+    @cached_property
+    def _by_shown_title(self) -> dict[str, list[NodeId]]:
+        shown: dict[str, list[NodeId]] = {}
+        for cited, scenario in self.index.scenarios.items():
+            text = plain_html_text(html_link_text(scenario.narration))
+            shown.setdefault(text, []).append(cited)
+        return shown
 
     @cached_property
     def _scenario_by_title(self) -> dict[str, NodeId]:

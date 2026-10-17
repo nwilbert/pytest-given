@@ -2434,6 +2434,73 @@
 | ✅ \[Gone\](https://example.org/report.html#scenario=t.py::test_gone) | True |
 | ✅ \[search\](https://example.org/report.html#q=pay) | True |
 
+## ✓ `citations update` writes a «narrated citation»'s body from the «report»
+`tests/unit/citations/test_check.py::test_update_writes_a_narrated_citations_body` · spec/narrated-citations
+
+- **given** a «report» whose «scenario» has two steps
+- **given** a document holding a «narrated citation» of it, copied with an empty body
+    - 📎 document:
+        ```
+        Paying:
+        
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+        
+        </details>
+        ```
+- **when** the document is updated
+- **then** its body holds the scenario's narration between blank lines
+    - 📎 updated document:
+        ```
+        Paying:
+        
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+        
+        - **given** a card
+        - **then** it is paid
+        
+        </details>
+        ```
+- **then** no finding remains
+
+## ✓ `citations check` reports a «narrated citation» whose body differs from the «report»
+`tests/unit/citations/test_check.py::test_check_reports_a_stale_narrated_body` · spec/narrated-citations
+
+- **given** a «report» whose «scenario» ends in "it is paid"
+- **given** a document whose «narrated citation» of it still ends in "it is charged"
+    - 📎 document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
+        
+        - **given** a card
+        - **then** it is charged
+        
+        </details>
+        ```
+- **when** the document is checked
+- **then** one stale narration is the only «finding»
+- **then** it names the first line that differs, written and expected
+
+## ✓ A «narrated citation» of a tag or story is a «finding» `update` leaves
+`tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves` · spec/narrated-citations
+
+- **given** a «report» with the tag `checkout`
+- **given** a document with a «narrated citation» of the tag, its glyph and body stale
+    - 📎 document:
+        ```
+        <details markdown="1">
+        <summary>❌ <a href="https://example.org/report.html#tag=checkout">checkout</a></summary>
+        
+        The checkout.
+        
+        </details>
+        ```
+- **when** the document is updated
+- **then** a stray narration is the only «finding», one `update` cannot fix
+- **then** the document is left as written
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 

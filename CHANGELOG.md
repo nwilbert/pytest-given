@@ -16,6 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - Markdown documents, such as design specs, can [cite](https://nwilbert.github.io/pytest-given/dev/guide/citations/) scenarios, tags and stories as links into the published HTML report: `--given-report-url` or the `given_report_url` setting sets the report's URL and gives it buttons that copy a citation, `pytest-given citations check` and `pytest-given citations update` keep a document's citations in line with a JSON report, and the bundled `pytest-given-citing` skill writes citations and repairs the ones `pytest-given citations update` cannot.
+- A scenario citation written as a `<details markdown="1">` block carries the scenario's narration, which `citations update` writes and `citations check` holds to the report.
 - `pytest-given citations check --list` prints every report link with its findings, and `--covering` narrows the list to the links that [cite a scenario](https://nwilbert.github.io/pytest-given/dev/guide/citations/#finding-the-citations-of-a-changed-scenario).
 - When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.
 - A [term ref](https://nwilbert.github.io/pytest-given/dev/guide/glossary/#term-refs) can show a noun's plural or a verb's -s form with `.s`: `room.s` reads *Rooms*, `room.l.s` reads *rooms*, and `room('suite').s` reads *suites*.

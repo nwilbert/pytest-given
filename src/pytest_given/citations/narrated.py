@@ -90,6 +90,7 @@ def scan_narrated(
 
 _OPENS = re.compile(r'<details(?=[\s>])', re.IGNORECASE)
 _CLOSES = re.compile(r'</details\s*>', re.IGNORECASE)
+_SUMMARY_THEN_CLOSE = re.compile(r'</summary>[ \t]*</details\s*>', re.IGNORECASE)
 _ANCHOR = re.compile(r'<a\b[^>]*>', re.IGNORECASE)
 _PLAIN_ANCHOR = re.compile(r'<a href="[^"\n]*">', re.IGNORECASE)
 _ANY_HREF = re.compile(
@@ -107,7 +108,9 @@ def _shape(glyph_pattern: str) -> re.Pattern[str]:
         r'(?P<tag><details(?:\s[^>]*)?>)\s*<summary>'
         rf'\s*(?P<glyph>(?:{glyph_pattern}){VARIATION_SELECTOR}?)\s+'
         r'<a href="(?P<href>[^"\n]*)">(?P<text>(?:(?!</a>).)*)</a>'
-        r'\s*</summary>\s*(?P<close></details\s*>)?\s*\Z',
+        # A closing tag the block holds starts its own line, where an update
+        # writes the body above it.
+        r'\s*</summary>(?:[ \t]*(?:\r\n?|\n)\s*(?P<close></details\s*>))?\s*\Z',
         re.IGNORECASE | re.DOTALL,
     )
 
@@ -172,6 +175,8 @@ def _loose(block: HtmlBlock, summary_glyph: re.Pattern[str]) -> LooseDetails | N
         reason = 'its <a> takes attributes besides href'
     elif _after_anchor(text, anchor.end()).strip():
         reason = 'text follows </a>'
+    elif _SUMMARY_THEN_CLOSE.search(text):
+        reason = 'its </details> is not on a line of its own'
     else:
         reason = 'its summary is not the glyph, a space and the link alone'
     return LooseDetails(

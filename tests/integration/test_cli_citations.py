@@ -29,6 +29,9 @@ def _write_report(tmp_path: Path, *, report_url: str | None = URL) -> Path:
                         'id': 't.py::test_pay',
                         'narration': {'text': 'Pay by card'},
                         'module': 'm',
+                        'steps': [
+                            {'phase': 'then', 'narration': {'text': 'it is paid'}}
+                        ],
                     },
                     {
                         'id': 't.py::test_refund',
@@ -227,6 +230,30 @@ def test_a_verb_is_required() -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(['citations'])
     assert excinfo.value.code == 2
+
+
+def _narrated(body: str) -> str:
+    return (
+        '<details markdown="1">\n'
+        f'<summary>✅ <a href="{URL}#scenario=t.py::test_pay">Pay by card</a>'
+        f'</summary>\n{body}</details>\n'
+    )
+
+
+def test_update_fills_a_narrated_citations_empty_body(tmp_path: Path) -> None:
+    report = _write_report(tmp_path)
+    doc = _doc(tmp_path, _narrated('\n'))
+    assert main(['citations', 'update', str(doc), '--report', str(report)]) == 0
+    assert doc.read_text(encoding='utf-8') == _narrated('\n- **then** it is paid\n\n')
+
+
+def test_check_exits_1_on_a_stale_narrated_body(tmp_path: Path, capsys) -> None:
+    report = _write_report(tmp_path)
+    doc = _doc(tmp_path, _narrated('\n- **then** it is charged\n\n'))
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 1
+    out = capsys.readouterr().out
+    assert f'{doc.as_posix()}:2: stale narration' in out
+    assert 'written: - **then** it is charged' in out
 
 
 # --- Listing ---

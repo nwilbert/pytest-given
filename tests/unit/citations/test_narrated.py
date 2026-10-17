@@ -64,6 +64,17 @@ def test_a_block_holding_its_own_closing_tag_has_an_empty_zero_width_body() -> N
     assert found.body_span == (start, start)
 
 
+def test_a_closing_tag_on_the_summarys_line_is_loose() -> None:
+    source = f'<details>\n{SUMMARY}</details>\n'
+    assert scan_narrated(source, GLYPHS) == [
+        LooseDetails(
+            line=2,
+            href='r.html#scenario=t::a',
+            reason='its </details> is not on a line of its own',
+        )
+    ]
+
+
 def test_a_closing_tag_in_a_fenced_body_block_is_body() -> None:
     source = f'<details>\n{SUMMARY}\n\n```\n</details>\n```\n\n</details>\n'
     found = _only_citation(source)
