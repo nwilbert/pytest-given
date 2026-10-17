@@ -1064,6 +1064,7 @@
 <li><strong>Breaking.</strong> <code>FileGlossary</code>'s <code>description_column</code> is now <code>definition_column</code>, the word the rest of the glossary API uses: rename the keyword.</li>
 <li><strong>Breaking.</strong> A handle's <code>.low</code> form is now <code>.l</code>, and lowercases only capitalized words, so an acronym keeps its case (<code>LLM Call</code> reads <em>LLM call</em>): replace <code>.low</code> with <code>.l</code>.</li>
 <li><strong>Breaking.</strong> Glossary definitions no longer render <code>__bold__</code>, and <code>FileGlossary</code> no longer unwraps it in term and kind cells: write <code>**bold**</code>.</li>
+<li><strong>Breaking.</strong> A title or step whose code span, bold or italics holds a value, placeholder or term ref raises <code>PytestGivenError</code>, and so do asterisks meant literally around one, as in <code>t'**/{d}/**'</code>: keep the span within the text beside it, and put a literal <code>*</code> in a code span of its own.</li>
 <li>The Glossary view counts a term ref reading as the term's S-form as the term itself, so <code>room('rooms')</code> and <code>book('books')</code> no longer appear among the term's other forms.</li>
 <li>The Glossary tab lists every term's called forms, an instance or another wording alike, under one "Other forms" label.</li>
 <li>Glossary definitions render code inside bold and no longer italicize between spaced asterisks.</li>

@@ -1130,7 +1130,7 @@
 <li><strong>One level:</strong> bold and italic can contain code, but nothing else. Code comes first, so the <code>*</code> in <code>*matches `*.py`*</code> doesn't end the italic. Otherwise spans never overlap: the first one to close wins.</li>
 <li><strong>Everything else is literal</strong>, including unmatched markers and backslashes. There is no escape syntax: to show a marker, put it in a code span.</li>
 </ul>
-<p>Markdown is read only in the text you write, never in a value or a term ref. In <code>t'**{guest} books**'</code>, neither <code>**</code> has a partner in its own text, so both show as written. A value such as <code>'*'</code> is always just an asterisk.</p>
+<p>Markdown is read only in the text you write, never in a value or a term ref: a value such as <code>'*'</code> is always just an asterisk. So a span can't hold one. <code>t'**{guest}** books'</code> or <code>t'`run {command}`'</code> raises <code>PytestGivenError</code>, since its markers would show as written. Keep the span within the text beside it, as in <code>t'`run` {command}'</code>.</p>
 <h2 id="template-placeholders">Template placeholders<a class="headerlink" href="#template-placeholders" title="Permanent link">&para;</a></h2>
 <p><code>pytest_given.Template</code> only accepts plain names: <code>{name}</code>, <code>{name:spec}</code>, <code>{name!conv}</code>. Attribute access (<code>{obj.attr}</code>), indexing (<code>{d[key]}</code>) and other expressions (<code>{x + 1}</code>) raise <code>PytestGivenError</code> when the <code>Template</code> is created.</p>
 <p>Instead, parametrize by the attribute values directly, or move the step into the test body and use a t-string, which allows any expression.</p>
