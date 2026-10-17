@@ -1020,7 +1020,7 @@
 <p><code>--given-lint</code> checks the scenarios of a test run for steps whose text doesn't match their code. It checks the steps that actually ran, so steps from decorated helpers, fixtures, and <code>when_then</code> are all handled correctly.</p>
 <p>When the lint is off, it costs nothing: pytest-given records nothing extra, and the reports are exactly the same as with the lint on.</p>
 <h2 id="rules">Rules<a class="headerlink" href="#rules" title="Permanent link">&para;</a></h2>
-<p>Each rule has a default severity. A <code>warn</code> finding is printed in the terminal summary. An <code>error</code> finding is printed too, and also fails the run.</p>
+<p>Each rule has a default severity. A <code>warn</code> lint finding is printed in the terminal summary. An <code>error</code> lint finding is printed too, and also fails the run.</p>
 <table>
 <thead>
 <tr>
@@ -1078,7 +1078,7 @@
 </tbody>
 </table>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>Change a rule's severity with <code>given_lint_rules</code>. Skip findings for specific tests with <code>given_lint_ignore</code>: each entry is a node-id pattern (with <code>*</code> wildcards), optionally limited to one rule with a <code>rule-id:</code> prefix.</p>
+<p>Change a rule's severity with <code>given_lint_rules</code>. Skip lint findings for specific tests with <code>given_lint_ignore</code>: each entry is a node-id pattern (with <code>*</code> wildcards), optionally limited to one rule with a <code>rule-id:</code> prefix.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[tool.pytest]</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">given_lint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">given_lint_rules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
@@ -1090,15 +1090,15 @@
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="s2">"tests/unit/test_math.py::test_constant_is_stable"</span><span class="p">,</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">]</span>
 </code></pre></div>
-<p>An ignore entry that no longer matches any finding causes a <code>stale-ignore</code> error. This keeps the list from growing out of date.</p>
+<p>An ignore entry that no longer matches any lint finding causes a <code>stale-ignore</code> error. This keeps the list from growing out of date.</p>
 <p>To turn the lint on or off for a single run, pass <code>--given-lint</code> or <code>--no-given-lint</code>. Both override the <code>given_lint</code> setting.</p>
 <h2 id="output">Output<a class="headerlink" href="#output" title="Permanent link">&para;</a></h2>
-<p>Each finding is printed on one line, with its severity, rule, test, message, and source location:</p>
+<p>Each lint finding is printed on one line, with its severity, rule, test, message, and source location:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>============= pytest-given: narration lint (2 findings, 1 error) ==============
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>ERROR empty-step     tests/test_shop.py::test_buy   given 'a coin' has no code (test_shop.py:12)
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>WARN  missing-phase  tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
 </code></pre></div>
-<p>A run with no findings prints only the separator, <code>pytest-given: narration lint (no findings)</code>, so a clean run is told apart from one where the lint is off.</p>
+<p>A run with no lint findings prints only the separator, <code>pytest-given: narration lint (no findings)</code>, so a clean run is told apart from one where the lint is off.</p>
 
 
 

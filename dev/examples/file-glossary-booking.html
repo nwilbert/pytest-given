@@ -1685,9 +1685,6 @@ span.param-highlight {
   display: inline-flex; align-items: center; vertical-align: middle;
 }
 .anchor-link svg { display: block; }
-
-
-.anchor-link + .anchor-link { margin-left: 0; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
 .header:hover .anchor-link { opacity: 0.6; }
@@ -1696,14 +1693,58 @@ span.param-highlight {
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 
+.anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 
 
 
-.nav-group:hover .citation-copy { opacity: 0.6; }
-.citation-copy:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.nav-group:hover .nav-group-citation { opacity: 0.6; }
 .nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
 .nav-group-citation-absent { visibility: hidden; }
 .nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }
+
+
+
+
+
+
+
+.copy-menu-trigger.copy-menu-open { opacity: 1 !important; color: var(--color-accent); }
+.copy-menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
+  animation: copy-menu-in 120ms ease-out;
+}
+.copy-menu[hidden], .copy-menu-item[hidden] { display: none; }
+.copy-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 5px var(--space-md) 5px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.copy-menu-item svg { flex-shrink: 0; color: var(--text-muted); }
+.copy-menu-item:hover { background: var(--bg-hover); }
+.copy-menu-item:focus-visible { outline: none; background: var(--color-accent-tint); color: var(--color-accent); }
+.copy-menu-item:focus-visible svg { color: var(--color-accent); }
+.copy-menu-separator { height: 1px; margin: var(--space-xs) var(--space-sm); background: var(--border); }
+@keyframes copy-menu-in {
+  from { opacity: 0; transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copy-menu { animation: none; }
+}
 
 
 </style>
@@ -1715,6 +1756,8 @@ span.param-highlight {
       <symbol id="icon-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
       <symbol id="icon-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g></symbol>
       <symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g></symbol>
+      <symbol id="icon-narrated" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12V3l5 5 5-5v9"/><path d="M18.5 3v9"/><path d="m15 9 3.5 3.5L22 9"/><path d="M2 17h20"/><path d="M2 21.5h12"/></g></symbol>
     </svg>
   <header class="topbar"><div class="topbar-title" title="File Glossary Example">File Glossary Example</div>
     <nav class="frame-nav" role="tablist" aria-label="Report views">
@@ -1801,11 +1844,11 @@ span.param-highlight {
               <span class="nav-group-count" x-text="group.count"></span>
             </button>
             
-            <button type="button" class="anchor-link citation-copy nav-group-citation"
+            <button type="button" class="anchor-link nav-group-citation"
                     title="Copy Markdown citation. pytest-given citations check and update keep it current." aria-label="Copy Markdown citation"
                     x-show="view === 'tags'"
                     :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
-                    @click.stop="copyCitation('tag', group.id, $event)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+                    @click.stop="copyCitation('tag', group.id, $el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
             
           </div>
         </template>
@@ -1859,7 +1902,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="scenario-title">A Guest booking an available room receives a Confirmation</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=file_glossary_booking/book_available_room" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="0" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=file_glossary_booking/book_available_room" data-citation-kind="scenario" data-citation-key="0" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1904,7 +1947,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-1" :aria-expanded="!!expandedScenarios[1]" :aria-label="(expandedScenarios[1] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(1)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span></button>
         <span class="scenario-title">A Guest cannot book an unavailable room</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=file_glossary_booking/book_unavailable_room" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="1" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=file_glossary_booking/book_unavailable_room" data-citation-kind="scenario" data-citation-key="1" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1977,7 +2020,7 @@ span.param-highlight {
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Book a Room<button type="button" class="anchor-link" title="Copy link" data-anchor="view=stories&amp;story=book-a-room" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="story" data-citation-key="book-a-room" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button></div>
+            <div class="header-title">Book a Room<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=stories&amp;story=book-a-room" data-citation-kind="story" data-citation-key="book-a-room" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></div>
             <div class="header-context meta-list"><span>3 sentences</span><span>2 scenarios</span></div>
             <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
                     @click="clearSentenceHighlights()">Deselect</button>
@@ -2224,7 +2267,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Guest<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=guest" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Guest<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=guest" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A person making a room reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2288,7 +2331,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Room<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=room" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Room<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=room" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2339,7 +2382,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="confirmation" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Confirmation<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirmation" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Confirmation<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirmation" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A notification acknowledging a successful reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2403,7 +2446,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="book" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">book<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=book" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">book<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=book" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2467,7 +2510,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="cancellation-policy" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Cancellation Policy<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=cancellation-policy" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Cancellation Policy<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=cancellation-policy" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">The rules governing <strong>how</strong> and <strong>when</strong> a booking may be cancelled.<br>Applies to every <code>Room</code> rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2511,7 +2554,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="overbooking" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Overbooking<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=overbooking" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Overbooking<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=overbooking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2552,6 +2595,19 @@ span.param-highlight {
   <span class="term-tip-def"></span>
 </div>
 
+
+<!-- The menu a scenario card's or story header's copy button opens;
+     positioned by app.js beside the button that opened it. One shared node,
+     as the tooltip is: a menu per card would repeat its markup hundreds of
+     times. The narrated citation is a scenario's alone. -->
+<div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg>Copy link</button>
+  <div class="copy-menu-separator" role="separator"></div>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="Copy Markdown citation. pytest-given citations check and update keep it current."><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>Copy citation</button>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in."><svg width="14" height="14" aria-hidden="true"><use href="#icon-narrated"/></svg>Copy narrated citation</button>
+</div>
+
+
 <!-- Names the parts of an arriving link this report no longer has. The live
      region stays put so the message inserted into it is announced; the
      countdown bar's animation is the timer, so hovering or focusing the
@@ -2574,7 +2630,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-11T16:09:11.534208+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"scenario\":[[\"\\u2705 [A Guest booking an available room receives a Confirmation](\",\"#scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room)\"],[\"\\u2705 [A Guest cannot book an unavailable room](\",\"#scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room)\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-11T16:09:11.534208+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -2625,6 +2681,34 @@ function deserializeStory(params) {
 
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
+}
+
+
+
+
+function fillCitation(template, row) {
+  const [glyph, fragment, title, htmlTitle = title] = row;
+  const slots = { glyph, fragment, title, html_title: htmlTitle };
+  return template.map((part, position) => (position % 2 ? slots[part] : part)).join('');
+}
+
+
+
+
+function placeBeside(el, anchor, { left, gap, below }) {
+  const margin = 6;
+  const box = el.getBoundingClientRect();
+  const under = anchor.bottom + gap;
+  const over = anchor.top - box.height - gap;
+  const fitsUnder = under + box.height <= window.innerHeight - margin;
+  const top = below ? (fitsUnder ? under : over) : (over < margin ? under : over);
+  el.style.left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin)) + 'px';
+  el.style.top = top + 'px';
+}
+
+function markCopyMenuClosed(trigger) {
+  trigger.classList.remove('copy-menu-open');
+  trigger.setAttribute('aria-expanded', 'false');
 }
 
 
@@ -2778,6 +2862,9 @@ function reportApp() {
 
   let visibleCache = null;
   let termCountCache = null;
+
+  let copyMenu = null;
+  let copyMenuTrigger = null;
   return {
     search: '',
 
@@ -2876,6 +2963,7 @@ function reportApp() {
 
 
       part.querySelectorAll('.anchor-copied').forEach(el => el.classList.remove('anchor-copied'));
+      part.querySelectorAll('.copy-menu-open').forEach(markCopyMenuClosed);
 
 
       part.querySelectorAll('.scenario-tag').forEach(el => {
@@ -3283,18 +3371,111 @@ function reportApp() {
     },
 
 
-    copyAnchor(hashString, event) {
-      this._copyAndFlash(window.location.href.split('#')[0] + '#' + hashString, event.currentTarget);
+    copyAnchor(btn) {
+      this._copyAndFlash(window.location.href.split('#')[0] + '#' + btn.dataset.anchor, btn);
     },
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
 
 
-    copyCitation(kind, key, event) {
+
+    copyCitation(kind, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
       const halves = lookup(citations[kind], key, null);
-      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], event.currentTarget);
+      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
+    },
+    _copyScenarioCitation(form, key, btn) {
+      const citations = window.__REPORT_DATA__.citations;
+      const row = lookup(citations.scenario, key, null);
+      if (row) this._copyAndFlash(fillCitation(citations.templates[form], row), btn);
+    },
+
+
+
+    toggleCopyMenu(trigger) {
+      const reopening = copyMenuTrigger !== trigger;
+      this._closeCopyMenu(!reopening);
+      if (!reopening) return;
+      copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      copyMenu.hidden = false;
+      copyMenuTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      trigger.classList.add('copy-menu-open');
+      this._placeCopyMenu(copyMenu, trigger);
+      this._copyMenuItems(copyMenu)[0].focus({ preventScroll: true });
+    },
+
+
+
+
+    _initCopyMenu() {
+      const menu = document.getElementById('copy-menu');
+      if (!menu) return;
+      copyMenu = menu;
+      menu.addEventListener('click', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item) this._copyMenuEntry(item.dataset.copyEntry);
+      });
+      menu.addEventListener('keydown', (event) => this._copyMenuKey(menu, event));
+
+
+      menu.addEventListener('pointermove', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item && item !== document.activeElement) item.focus();
+      });
+      document.addEventListener('pointerdown', (event) => {
+        if (!copyMenuTrigger || menu.contains(event.target) || copyMenuTrigger.contains(event.target)) return;
+        this._closeCopyMenu(false);
+      }, true);
+      const dismiss = () => this._closeCopyMenu(false);
+      window.addEventListener('scroll', dismiss, { capture: true, passive: true });
+      window.addEventListener('resize', dismiss);
+    },
+    _copyMenuEntry(entry) {
+      const trigger = copyMenuTrigger;
+      this._closeCopyMenu(true);
+      const { citationKind: kind, citationKey: key } = trigger.dataset;
+      if (entry === 'link') this.copyAnchor(trigger);
+      else if (kind === 'scenario') this._copyScenarioCitation(entry, key, trigger);
+      else this.copyCitation(kind, key, trigger);
+    },
+
+
+    _copyMenuKey(menu, event) {
+      const items = this._copyMenuItems(menu);
+      const index = items.indexOf(document.activeElement);
+      const moveTo = (next) => items[(next + items.length) % items.length].focus();
+      switch (event.key) {
+        case 'Escape':
+        case 'Tab': this._closeCopyMenu(true); break;
+        case 'ArrowDown': moveTo(index + 1); break;
+        case 'ArrowUp': moveTo(index - 1); break;
+        case 'Home': moveTo(0); break;
+        case 'End': moveTo(items.length - 1); break;
+        default: return;
+      }
+      event.preventDefault();
+    },
+    _copyMenuItems(menu) {
+      return [...menu.querySelectorAll('[data-copy-entry]')].filter(item => !item.hidden);
+    },
+
+
+    _placeCopyMenu(menu, trigger) {
+      const button = trigger.getBoundingClientRect();
+      const box = menu.getBoundingClientRect();
+      const icon = menu.querySelector('[data-copy-entry] svg').getBoundingClientRect();
+      const iconCenter = icon.left - box.left + icon.width / 2;
+      placeBeside(menu, button, { left: button.left + button.width / 2 - iconCenter, gap: 2, below: true });
+    },
+    _closeCopyMenu(refocus) {
+      if (!copyMenuTrigger) return;
+      const trigger = copyMenuTrigger;
+      copyMenuTrigger = null;
+      copyMenu.hidden = true;
+      markCopyMenuClosed(trigger);
+      if (refocus) trigger.focus({ preventScroll: true });
     },
 
 
@@ -3438,6 +3619,7 @@ function reportApp() {
         this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
+      this._initCopyMenu();
       this._initParamHover();
       this._initPhaseHover();
     },
@@ -3570,16 +3752,7 @@ function reportApp() {
         defEl.hidden = !def;
         tip.hidden = false;
         const pillRect = pill.getBoundingClientRect();
-        const tipRect = tip.getBoundingClientRect();
-        const margin = 6;
-        let top = pillRect.top - tipRect.height - margin;
-        if (top < margin) top = pillRect.bottom + margin;  // flip below if clipped
-        let left = pillRect.left;
-        const maxLeft = window.innerWidth - tipRect.width - margin;
-        if (left > maxLeft) left = maxLeft;
-        if (left < margin) left = margin;
-        tip.style.top = top + 'px';
-        tip.style.left = left + 'px';
+        placeBeside(tip, pillRect, { left: pillRect.left, gap: 6, below: false });
       });
       document.addEventListener('pointerout', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
