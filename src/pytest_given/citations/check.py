@@ -163,6 +163,14 @@ def check_citations(
         links.extend(document_links)
         if update and edits:
             edited[path] = _apply(text, edits)
+    # A mistyped URL or path matches no link, and every link it misses would
+    # otherwise read as current.
+    if not links:
+        raise PytestGivenError(
+            f'No document links to the report at {location}: --report-url, or the '
+            'URL the report stores, and --report-path must name where the '
+            'documents link it.'
+        )
     updated = [path for path, text in edited.items() if text != texts[path]]
     for path in updated:
         path.write_bytes(edited[path].encode('utf-8'))
@@ -183,6 +191,14 @@ class _ReportLocation:
         self.path = path
         # A document links the report by the same few paths, again and again.
         self._resolved: dict[Path, Path] = {}
+
+    def __str__(self) -> str:
+        return ' or '.join(
+            [
+                *([] if self.url is None else [self.url.geturl()]),
+                *([] if self.path is None else [self.path.as_posix()]),
+            ]
+        )
 
     def names_report(self, link: SplitResult, document: Path) -> bool:
         if link.scheme or link.netloc:

@@ -408,6 +408,9 @@ _EXAMPLES = (
     ),
 )
 _EXAMPLE_REPORTS = (*(example.slug for example in _EXAMPLES), 'self-report')
+# The reports a document cites: `pytest-given citations` refuses one that no
+# document links, so a report the docs only embed stays out.
+_CITED_REPORTS = ('hotel-booking', 'self-report')
 
 
 def _run_citations(
@@ -438,7 +441,7 @@ def citations(session: nox.Session) -> None:
     """Hold the documents' citations to the committed reports. A cited failure
     fails it, so a site page cites nothing an example fails on purpose."""
     _sync(session, include_project=True)
-    for slug in _EXAMPLE_REPORTS:
+    for slug in _CITED_REPORTS:
         _run_citations(session, 'check', slug)
 
 
@@ -490,7 +493,8 @@ def _regenerate_examples(session: nox.Session) -> None:
             *extra,
             success_codes=[0, 1],
         )
-        _run_citations(session, 'update', slug)
+        if slug in _CITED_REPORTS:
+            _run_citations(session, 'update', slug)
     session.log(
         'Note: coffeeshop and hotel-booking have intentional failures for failure '
         'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '

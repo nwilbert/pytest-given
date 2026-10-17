@@ -94,6 +94,31 @@ def test_the_citations_exit_code_says_whether_a_finding_remains(
         assert (doc.read_text(encoding='utf-8') != _CITATIONS[citation]) == rewritten
 
 
+@scenario(
+    t'`citations` refuses documents that never link the {pg["Report"].l}, rather '
+    t'than passing them',
+    tags=['spec/citations', 'versions/0.5.0'],
+)
+def test_documents_that_never_link_the_report_are_refused(
+    tmp_path: Path, capsys
+) -> None:
+    with given(t'a document whose {pg["Citation"].l} links another URL'):
+        document = (
+            '✅ [Pay by card](https://example.org/dev/report.html'
+            '#scenario=t.py::test_pay)\n'
+        )
+        doc = _doc(tmp_path, document)
+        attach('document', document)
+    with given(t'a JSON {pg["Report"].l} served from {URL}'):
+        report = _write_report(tmp_path, report_url=URL)
+    with when('`pytest-given citations check` runs on the document'):
+        rc = main(['citations', 'check', str(doc), '--report', str(report)])
+    with then('it exits 2, as for a report it cannot read'):
+        assert rc == 2
+    with then('the error names the URL it looked for'):
+        assert f'No document links to the report at {URL}' in capsys.readouterr().err
+
+
 def test_check_exits_0_when_every_citation_is_current(tmp_path: Path, capsys) -> None:
     report = _write_report(tmp_path)
     _doc(tmp_path, f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n')

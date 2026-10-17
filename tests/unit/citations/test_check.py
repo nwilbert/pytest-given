@@ -51,6 +51,8 @@ def _run(
 
 
 PAY = scenario_('t.py::test_pay', 'Pay by card')
+# A link to the report, so that a document is checked rather than refused.
+CURRENT = f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
 
 
 # --- The self-report's scenarios ---
@@ -393,8 +395,12 @@ def test_a_summary_after_several_spaces_is_rewritten_in_place(
 @pytest.mark.parametrize('url', ['http://[oops/r.html#scenario=a', 'r%00.html#tag=a'])
 def test_a_link_no_url_parser_reads_is_no_report_link(tmp_path: Path, url: str) -> None:
     result, _ = _run(
-        tmp_path, f'✅ [x]({url})\n', report_(PAY), report_path=tmp_path / 'r.html'
+        tmp_path,
+        f'✅ [x]({url})\n{CURRENT}',
+        report_(PAY),
+        report_path=tmp_path / 'r.html',
     )
+    assert [link.line for link in result.links] == [2]
     assert result.findings == []
 
 
@@ -552,16 +558,18 @@ def test_a_site_root_link_resolves_against_the_report_url(tmp_path: Path) -> Non
     assert [f.kind for f in result.findings] == ['stale']
     result, _ = _run(
         tmp_path,
-        document,
+        f'{document}✅ [Pay by card](report.html#scenario=t.py::test_pay)\n',
         report_(PAY, report_url=None),
         report_path=tmp_path / 'report.html',
     )
+    assert [link.line for link in result.links] == [2]
     assert result.findings == []
 
 
 def test_without_a_report_path_relative_links_are_ordinary(tmp_path: Path) -> None:
-    document = '✓ [Pay by card](examples/r.html#scenario=t.py::test_pay)\n'
+    document = f'✓ [Pay by card](examples/r.html#scenario=t.py::test_pay)\n{CURRENT}'
     result, _ = _run(tmp_path, document, report_(PAY))
+    assert [link.line for link in result.links] == [2]
     assert result.findings == []
 
 
@@ -570,10 +578,12 @@ def test_links_elsewhere_are_ordinary(tmp_path: Path) -> None:
         '✓ [other](https://other.org/r.html#scenario=t.py::test_pay)\n'
         '✓ [same page](#scenario=t.py::test_pay)\n'
         '✓ [another file](other.html#scenario=t.py::test_pay)\n'
+        f'{CURRENT}'
     )
     result, _ = _run(
         tmp_path, document, report_(PAY), report_path=tmp_path / 'examples' / 'r.html'
     )
+    assert [link.line for link in result.links] == [4]
     assert result.findings == []
 
 
@@ -582,6 +592,19 @@ def test_the_report_url_flag_overrides_the_stored_one(tmp_path: Path) -> None:
     document = f'✓ [Pay by card]({other}#scenario=t.py::test_pay)\n'
     result, _ = _run(tmp_path, document, report_(PAY), report_url=other)
     assert [f.kind for f in result.findings] == ['stale']
+
+
+def test_documents_that_never_link_the_report_are_an_error(tmp_path: Path) -> None:
+    document = '✓ [Pay by card](https://other.org/r.html#scenario=t.py::test_pay)\n'
+    report_path = tmp_path / 'examples' / 'r.html'
+    with pytest.raises(
+        PytestGivenError,
+        match=re.escape(
+            f'No document links to the report at {URL} or {report_path.as_posix()}'
+        ),
+    ):
+        _run(tmp_path, document, report_(PAY), update=True, report_path=report_path)
+    assert (tmp_path / 'doc.md').read_text(encoding='utf-8') == document
 
 
 def test_neither_report_url_nor_report_path_is_an_error(tmp_path: Path) -> None:
@@ -635,8 +658,10 @@ def test_code_is_never_read(tmp_path: Path) -> None:
     document = (
         f'```\n✓ [old]({URL}#scenario=t.py::test_gone)\n```\n'
         f'`✓ [old]({URL}#tag=gone)`\n'
+        f'{CURRENT}'
     )
     result, _ = _run(tmp_path, document, report_(PAY))
+    assert [link.line for link in result.links] == [5]
     assert result.findings == []
 
 

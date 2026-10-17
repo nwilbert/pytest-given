@@ -33,7 +33,7 @@ pytest-given citations update …   # same arguments
 
 A directory is searched recursively for `*.md`. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (`pytest -m pytest_given --given-json=report.json`). `--report-url` defaults to the URL stored in the report (`--given-report-url`); `--report-path` names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.
 
-`check` writes nothing and exits 1 on any citation finding; `update` exits 1 when a citation finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, or when neither a report URL nor a report path is known.
+`check` writes nothing and exits 1 on any citation finding; `update` exits 1 when a citation finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, when neither a report URL nor a report path is known, or when no document links the report, as a mistyped URL or path would otherwise pass every document.
 
 `check` takes two more options, which leave its summary and exit code as they are:
 
