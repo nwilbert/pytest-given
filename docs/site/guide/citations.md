@@ -195,7 +195,7 @@ If you commit the reports instead, write the JSON and HTML report together whene
 These habits keep `pytest-given citations check` from failing on a document nothing is wrong with, or from skipping a citation it should check:
 
 - **Run pytest from the same rootdir.** A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.
-- **Use a plain report link for a scenario whose title contains a per-run value**, such as a temporary path. Its citation's link text would be stale after every run.
+- **Use a plain report link for a scenario whose title contains a per-run value**, such as a temporary path. Its citation's link text would be stale after every run, and so would a narrated citation's body when any step or attachment contains one.
 - **Cite a tag that belongs to one piece of work**, like `spec/<slug>`. A broad area tag's summary changes with every new scenario, so link it with a plain report link.
 - **Leave the glyph and link unformatted.** In `**✅** […](…)` or `✅ *[…](…)*` pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.
 - **On a versioned docs site, link the report relatively**, as in `../examples/report.html#tag=…`, so each version of a page opens its own version's report. Pass `--report-path`, where your docs build puts the report, so the commands recognize these links.
@@ -216,7 +216,7 @@ These habits keep `pytest-given citations check` from failing on a document noth
 
 ### Finding the citations of a changed scenario
 
-A citation states a scenario's title and status, not what it does. When a test's behavior changes while its title and status stay, every citation of it still reads ✅ and the check stays silent, though the sentence citing it may no longer hold. List the report links that may cite it, and reread each sentence:
+A citation states a scenario's title and status, and a narrated citation its narration too, but neither states what the test body does. When the body changes while the title, status and narration stay, every citation of it still reads current and the check stays silent, though the sentence citing it may no longer hold. List the report links that may cite it, and reread each sentence:
 
 ```bash
 pytest-given citations update docs/ README.md --report report.json
