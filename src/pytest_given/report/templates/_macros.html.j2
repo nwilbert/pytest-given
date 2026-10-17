@@ -52,8 +52,8 @@
       times in a large report — are defined once per page and drawn by
       `icon`. The citation icon is the Markdown mark's "M↓" without its box,
       which leaves too little room for the letters at 14px: it copies a line
-      of Markdown, not a URL. The narrated citation's is the `<details>` block
-      it copies: a disclosure triangle on the summary line above the body. -#}
+      of Markdown, not a URL. The narrated citation's is the same mark, raised
+      above two lines of the body it folds: still Markdown, with more of it. -#}
   {%- macro icon_sprite() -%}
     <svg class="svg-sprite" aria-hidden="true">
       <symbol id="icon-link" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g></symbol>
@@ -62,7 +62,7 @@
       {%- if citations %}
       <symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol>
       <symbol id="icon-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g></symbol>
-      <symbol id="icon-narrated" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5v7l5-3.5Z"/><path d="M12 8h9"/><path d="M8 15h13"/><path d="M8 19.5h9"/></g></symbol>
+      <symbol id="icon-narrated" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12V3l5 5 5-5v9"/><path d="M18.5 3v9"/><path d="m15 9 3.5 3.5L22 9"/><path d="M2 17h20"/><path d="M2 21.5h12"/></g></symbol>
       {%- endif %}
     </svg>
   {%- endmacro -%}
