@@ -13,7 +13,7 @@ from .citation_index import (
     Target,
     report_fragment,
 )
-from .link_text import link_text
+from .link_text import html_link_text, link_text
 from .md_renderer import narration_body_md
 from .sinks import (
     DEFAULT_HTML_PATH,
@@ -54,6 +54,7 @@ __all__ = [
     'build_scenario_slug_index',
     'detect_commit_sha',
     'emit_sinks',
+    'html_link_text',
     'link_text',
     'narration_body_md',
     'report_fragment',

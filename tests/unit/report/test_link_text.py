@@ -8,12 +8,14 @@ from pytest_given.model import (
     Narration,
     NarrationLiteral,
     NarrationPart,
+    NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     TermId,
     narration_of,
+    param_id,
 )
-from pytest_given.report.link_text import link_text
+from pytest_given.report.link_text import html_link_text, link_text
 
 
 def test_a_tag_or_story_title_is_link_text_written_literally() -> None:
@@ -60,3 +62,22 @@ def test_written_text_reads_back_as_the_title(
     written = link_text(title, in_table_row=in_table_row)
     text = title if isinstance(title, str) else title.text
     assert plain_link_text(written, in_table_row=in_table_row) == fold_whitespace(text)
+
+
+def test_html_link_text_renders_spans_and_escapes_the_rest() -> None:
+    assert (
+        html_link_text(Narration(text='Pay `x` & **more** <now>'))
+        == 'Pay <code>x</code> &amp; <strong>more</strong> &lt;now&gt;'
+    )
+
+
+def test_html_link_text_shows_pieces_plainly_and_folds_line_breaks() -> None:
+    title = narration_of(
+        [
+            NarrationLiteral(value='A\nb '),
+            NarrationTermRef(term_id=TermId('guest'), display='<guest>'),
+            NarrationValue(rendered='[x]', expression=''),
+            NarrationPlaceholder(name='liquid', column_id=param_id('liquid')),
+        ]
+    )
+    assert html_link_text(title) == 'A b &lt;guest&gt;[x]{liquid}'

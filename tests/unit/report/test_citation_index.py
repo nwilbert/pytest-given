@@ -16,6 +16,7 @@ from pytest_given.model import (
     narration_of,
     param_id,
 )
+from pytest_given.report import narration_body_md
 from pytest_given.report.citation_index import (
     Citation,
     CitationIndex,
@@ -213,3 +214,22 @@ def test_a_target_counts_the_scenario_or_those_its_summary_counts() -> None:
     assert index.counted(Target('scenario', 't.py::test_pay')) == [pay]
     assert index.counted(Target('tag', 'checkout')) == [pay, refund]
     assert index.counted(Target('story', 's')) == [pay]
+
+
+def test_narrated_halves_wrap_the_report_url() -> None:
+    scenario = scenario_('t.py::test_pay', 'Pay by card')
+    citation = _index(scenario).citation(Target('scenario', 't.py::test_pay'))
+    before, after = citation.narrated_halves()
+    assert before + URL + after == (
+        '<details markdown="1">\n'
+        f'<summary>✅ <a href="{URL}#scenario=t.py::test_pay">Pay by card</a></summary>'
+        '\n\n</details>'
+    )
+
+
+def test_narration_is_the_scenarios_markdown_body() -> None:
+    grouped = scenario_('t.py::test_pour[water]', grouped=True)
+    index = _index(grouped)
+    assert index.narration(Target('scenario', 't.py::test_pour')) == (
+        narration_body_md(grouped)
+    )

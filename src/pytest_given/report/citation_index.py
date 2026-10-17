@@ -19,7 +19,8 @@ from ..model import (
     rolled_up_status,
 )
 from .coverage import build_coverage_map
-from .link_text import link_text
+from .link_text import html_link_text, link_text
+from .md_renderer import narration_body_md
 from .story_view import scenarios_by_story
 from .text import CITATION_GLYPH, CitationState
 
@@ -58,6 +59,11 @@ class Citation:
     def title_text(self) -> str:
         return self.title if isinstance(self.title, str) else self.title.text
 
+    @property
+    def html_link_text(self) -> str:
+        assert isinstance(self.title, Narration)
+        return html_link_text(self.title)
+
     def markdown_halves(self) -> tuple[str, str]:
         """The one-line citation a copy button puts on the clipboard, either
         side of the report URL — which a page citing thousands of targets
@@ -66,6 +72,14 @@ class Citation:
         return (
             f'{self.glyph} [{link_text(self.title)}](',
             f'#{self.fragment}){summary}',
+        )
+
+    def narrated_halves(self) -> tuple[str, str]:
+        """The `<details>` block's text either side of the report URL, the
+        narration left for the caller to put between its blank lines."""
+        return (
+            f'<details markdown="1">\n<summary>{self.glyph} <a href="',
+            f'#{self.fragment}">{self.html_link_text}</a></summary>\n\n</details>',
         )
 
 
@@ -133,6 +147,11 @@ class CitationIndex:
             case 'story':
                 title, told = self.stories[StoryId(target.key)]
                 return _rollup(title, fragment, told)
+
+    def narration(self, target: Target) -> str:
+        """The Markdown body of a narrated citation of a scenario `target`."""
+        assert target.kind == 'scenario'
+        return narration_body_md(self.scenarios[NodeId(target.key)])
 
     def counted(self, target: Target) -> list[Scenario]:
         """The scenarios a resolved `target` names: a scenario itself, or those
