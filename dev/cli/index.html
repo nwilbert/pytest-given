@@ -1014,6 +1014,11 @@
 </code></pre></div>
 <p>A directory is searched recursively for <code>*.md</code>. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (<code>pytest -m pytest_given --given-json=report.json</code>). <code>--report-url</code> defaults to the URL stored in the report (<code>--given-report-url</code>); <code>--report-path</code> names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.</p>
 <p><code>check</code> writes nothing and exits 1 on any finding; <code>update</code> exits 1 when a finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, or when neither a report URL nor a report path is known.</p>
+<p><code>check</code> takes two more options, which leave its summary and exit code as they are:</p>
+<ul>
+<li><code>--list</code> prints every report link on a line of its own, <code>path:line: glyph kind key</code> (<code>link</code> in place of the glyph for a plain report link), with its findings indented under it.</li>
+<li><code>--covering NODE_ID</code> narrows that list to the links that <a href="../guide/citations/#finding-the-citations-of-a-changed-scenario">may cite the scenario</a>, and implies <code>--list</code>. Repeat it for several scenarios. A test function's node ID covers each of its scenarios, one per case under <code>group_parametrized=False</code>. It exits 2 when the report holds no scenario of that node ID.</li>
+</ul>
 <p>The same command also installs the agent skills with <code>pytest-given skills install</code>; see <a href="../ai-agents/#agent-skills">Agent skills</a>.</p>
 
 

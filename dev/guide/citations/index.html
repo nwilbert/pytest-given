@@ -1194,6 +1194,17 @@
 <li><strong>Leave the glyph and link unformatted.</strong> In <code>**✅** […](…)</code> or <code>✅ *[…](…)*</code> pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.</li>
 <li><strong>On a versioned docs site, link the report relatively</strong>, as in <code>../examples/report.html#tag=…</code>, so each version of a page opens its own version's report. Pass <code>--report-path</code>, where your docs build puts the report, so the commands recognize these links.</li>
 </ul>
+<h3 id="finding-the-citations-of-a-changed-scenario">Finding the citations of a changed scenario<a class="headerlink" href="#finding-the-citations-of-a-changed-scenario" title="Permanent link">&para;</a></h3>
+<p>A citation states a scenario's title and status, not what it does. When a test's behavior changes while its title and status stay, every citation of it still reads ✅ and the check stays silent, though the sentence citing it may no longer hold. List the report links that may cite it, and reread each sentence:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span>--covering<span class="w"> </span>tests/test_checkout.py::test_pay_by_card
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>docs/specs/checkout.md:3: ✅ tag spec/checkout
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>citations: every report link is current
+</code></pre></div>
+<p><code>--covering</code> keeps a report link to the scenario, and one to a tag or story whose summary counts it, a tag through its prefixes too. It also keeps every link it cannot resolve: one whose target is not in the report may be the scenario under a node ID it no longer has, and a mistyped citation may cite anything. Running <code>citations update</code> first repoints a renamed test whose title one scenario still has, so once the check is clean the list is exact. <code>--list</code> alone lists every report link, each with its findings under it.</p>
 
 
 
