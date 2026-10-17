@@ -1696,14 +1696,58 @@ span.param-highlight {
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 
+.anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 
 
 
-.nav-group:hover .citation-copy { opacity: 0.6; }
-.citation-copy:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.nav-group:hover .nav-group-citation { opacity: 0.6; }
 .nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
 .nav-group-citation-absent { visibility: hidden; }
 .nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }
+
+
+
+
+
+
+
+.copy-menu-trigger.copy-menu-open { opacity: 1 !important; color: var(--color-accent); }
+.copy-menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
+  animation: copy-menu-in 120ms ease-out;
+}
+.copy-menu[hidden], .copy-menu-item[hidden] { display: none; }
+.copy-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 5px var(--space-md) 5px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.copy-menu-item svg { flex-shrink: 0; color: var(--text-muted); }
+.copy-menu-item:hover { background: var(--bg-hover); }
+.copy-menu-item:focus-visible { outline: none; background: var(--color-accent-tint); color: var(--color-accent); }
+.copy-menu-item:focus-visible svg { color: var(--color-accent); }
+.copy-menu-separator { height: 1px; margin: var(--space-xs) var(--space-sm); background: var(--border); }
+@keyframes copy-menu-in {
+  from { opacity: 0; transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copy-menu { animation: none; }
+}
 
 
 :root { --param-color-0: #307400; }
@@ -1721,6 +1765,8 @@ span.param-highlight {
       <symbol id="icon-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
       <symbol id="icon-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g></symbol>
       <symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g></symbol>
+      <symbol id="icon-narrated" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5v7l5-3.5Z"/><path d="M12 8h9"/><path d="M8 15h13"/><path d="M8 19.5h9"/></g></symbol>
     </svg>
   <header class="topbar"><div class="topbar-title" title="Hotel Booking Example">Hotel Booking Example</div>
     <nav class="frame-nav" role="tablist" aria-label="Report views">
@@ -1807,11 +1853,11 @@ span.param-highlight {
               <span class="nav-group-count" x-text="group.count"></span>
             </button>
             
-            <button type="button" class="anchor-link citation-copy nav-group-citation"
+            <button type="button" class="anchor-link nav-group-citation"
                     title="Copy Markdown citation. pytest-given citations check and update keep it current." aria-label="Copy Markdown citation"
                     x-show="view === 'tags'"
                     :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
-                    @click.stop="copyCitation('tag', group.id, $event)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+                    @click.stop="copyCitation('tag', group.id, $el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
             
           </div>
         </template>
@@ -1865,7 +1911,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="scenario-title">A search offers only the available rooms</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=hotel_booking/pick_suite" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="0" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=hotel_booking/pick_suite" data-citation-kind="scenario" data-citation-key="0" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1903,7 +1949,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L197">examples/hotel-booking/test_hotel_booking.py:197</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L197">examples/hotel-booking/test_hotel_booking.py:197</a></div>
       
     </div>
     </div>
@@ -1916,7 +1962,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-1" :aria-expanded="!!expandedScenarios[1]" :aria-label="(expandedScenarios[1] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(1)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span></button>
         <span class="scenario-title">A paid booking is confirmed to every guest</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=hotel_booking/complete_booking" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="1" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=hotel_booking/complete_booking" data-citation-kind="scenario" data-citation-key="1" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1962,7 +2008,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L219">examples/hotel-booking/test_hotel_booking.py:219</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L219">examples/hotel-booking/test_hotel_booking.py:219</a></div>
       
     </div>
     </div>
@@ -1975,7 +2021,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-2" :aria-expanded="!!expandedScenarios[2]" :aria-label="(expandedScenarios[2] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(2)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span></button>
         <span class="scenario-title">A declined payment leaves the booking pending</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=hotel_booking/payment_declined" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="2" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=hotel_booking/payment_declined" data-citation-kind="scenario" data-citation-key="2" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
@@ -1985,7 +2031,7 @@ span.param-highlight {
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">33ms</span>
+        <span class="scenario-duration">37ms</span>
       </span>
     </div>
 
@@ -2132,7 +2178,7 @@ E     + unsupported payment method</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L258">examples/hotel-booking/test_hotel_booking.py:258</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L258">examples/hotel-booking/test_hotel_booking.py:258</a></div>
       
     </div>
     </div>
@@ -2145,7 +2191,7 @@ E     + unsupported payment method</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-3" :aria-expanded="!!expandedScenarios[3]" :aria-label="(expandedScenarios[3] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(3)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span></button>
         <span class="scenario-title">Cancelling a paid booking refunds it and notifies the guest</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=hotel_booking/cancel_booking" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="3" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=hotel_booking/cancel_booking" data-citation-kind="scenario" data-citation-key="3" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2179,7 +2225,7 @@ E     + unsupported payment method</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L312">examples/hotel-booking/test_hotel_booking.py:312</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L312">examples/hotel-booking/test_hotel_booking.py:312</a></div>
       
     </div>
     </div>
@@ -2192,13 +2238,13 @@ E     + unsupported payment method</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-4" :aria-expanded="!!expandedScenarios[4]" :aria-label="(expandedScenarios[4] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(4)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span></button>
         <span class="scenario-title">Rebooking restores a cancelled booking</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=hotel_booking/rebook_cancelled_booking" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="4" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=hotel_booking/rebook_cancelled_booking" data-citation-kind="scenario" data-citation-key="4" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
         
         <span class="scenario-status xfailed">⊗ expected failure</span>
-        <span class="scenario-duration">4ms</span>
+        <span class="scenario-duration">3ms</span>
       </span>
     </div>
 
@@ -2233,7 +2279,7 @@ E     + unsupported payment method</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L331">examples/hotel-booking/test_hotel_booking.py:331</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L331">examples/hotel-booking/test_hotel_booking.py:331</a></div>
       
     </div>
     </div>
@@ -2246,7 +2292,7 @@ E     + unsupported payment method</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-5" :aria-expanded="!!expandedScenarios[5]" :aria-label="(expandedScenarios[5] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(5)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span></button>
         <span class="scenario-title">A booking can be cancelled only before its guest checks in</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=hotel_booking/check_in_then_cancel" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="5" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=hotel_booking/check_in_then_cancel" data-citation-kind="scenario" data-citation-key="5" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
@@ -2292,7 +2338,7 @@ E     + unsupported payment method</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L351">examples/hotel-booking/test_hotel_booking.py:351</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L351">examples/hotel-booking/test_hotel_booking.py:351</a></div>
       
     </div>
     </div>
@@ -2344,7 +2390,7 @@ E     + unsupported payment method</pre></div>
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Book a Group Trip<button type="button" class="anchor-link" title="Copy link" data-anchor="view=stories&amp;story=book-a-group-trip" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="story" data-citation-key="book-a-group-trip" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button></div>
+            <div class="header-title">Book a Group Trip<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=stories&amp;story=book-a-group-trip" data-citation-kind="story" data-citation-key="book-a-group-trip" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></div>
             <div class="header-context meta-list"><span>8 sentences</span><span>4 scenarios</span></div>
             <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
                     @click="clearSentenceHighlights()">Deselect</button>
@@ -2684,7 +2730,7 @@ E     + unsupported payment method</pre></div>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L102">examples/hotel-booking/test_hotel_booking.py:102</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L102">examples/hotel-booking/test_hotel_booking.py:102</a></div>
         
       </div>
       <div data-story-id="cancel-a-booking" x-show="selectedStory === $el.dataset.storyId"
@@ -2694,7 +2740,7 @@ E     + unsupported payment method</pre></div>
         
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">Cancel a Booking<button type="button" class="anchor-link" title="Copy link" data-anchor="view=stories&amp;story=cancel-a-booking" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="story" data-citation-key="cancel-a-booking" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button></div>
+            <div class="header-title">Cancel a Booking<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=stories&amp;story=cancel-a-booking" data-citation-kind="story" data-citation-key="cancel-a-booking" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></div>
             <div class="header-context meta-list"><span>4 sentences</span><span>3 scenarios</span></div>
             <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
                     @click="clearSentenceHighlights()">Deselect</button>
@@ -2880,7 +2926,7 @@ E     + unsupported payment method</pre></div>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L145">examples/hotel-booking/test_hotel_booking.py:145</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L145">examples/hotel-booking/test_hotel_booking.py:145</a></div>
         
       </div>
       
@@ -2995,7 +3041,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="organizer" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Organizer<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=organizer" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Organizer<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=organizer" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Person booking accommodation on behalf of a group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3031,7 +3077,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
                 
               </div>
             </div>
@@ -3053,7 +3099,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Guest<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=guest" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Guest<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=guest" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Individual traveler in the group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3093,7 +3139,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L80">examples/hotel-booking/test_hotel_booking.py:80</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L80">examples/hotel-booking/test_hotel_booking.py:80</a></div>
                 
               </div>
             </div>
@@ -3115,7 +3161,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="booking-system" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Booking System<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=booking-system" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Booking System<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=booking-system" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Automated reservation back-end.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3146,7 +3192,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
                 
               </div>
             </div>
@@ -3181,7 +3227,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Room<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=room" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Room<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=room" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3217,7 +3263,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L83">examples/hotel-booking/test_hotel_booking.py:83</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L83">examples/hotel-booking/test_hotel_booking.py:83</a></div>
                 
               </div>
             </div>
@@ -3239,7 +3285,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="booking" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Booking<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=booking" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Booking<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=booking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A reservation for one or more rooms.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3270,7 +3316,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L84">examples/hotel-booking/test_hotel_booking.py:84</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L84">examples/hotel-booking/test_hotel_booking.py:84</a></div>
                 
               </div>
             </div>
@@ -3292,7 +3338,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="payment" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Payment<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=payment" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Payment<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=payment" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Money transferred for a booking.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3323,7 +3369,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
                 
               </div>
             </div>
@@ -3345,7 +3391,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="confirmation" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Confirmation<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirmation" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Confirmation<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirmation" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Notification of a successful booking.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3376,7 +3422,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
                 
               </div>
             </div>
@@ -3398,7 +3444,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="loyalty-points" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">loyalty points<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=loyalty-points" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">loyalty points<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=loyalty-points" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def"><span class="entry-def-badge" >Undefined</span></div>
@@ -3420,7 +3466,7 @@ E     + unsupported payment method</pre></div>
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L130">examples/hotel-booking/test_hotel_booking.py:130</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L130">examples/hotel-booking/test_hotel_booking.py:130</a></div>
                 
               </div>
             </div>
@@ -3455,7 +3501,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="confirm" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">confirm<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirm" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">confirm<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirm" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Guarantee a paid booking so its rooms are held for arrival.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3484,7 +3530,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
                 
               </div>
             </div>
@@ -3506,7 +3552,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="decline" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">decline<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=decline" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">decline<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=decline" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Refuse a payment, leaving its booking pending.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3528,7 +3574,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L93">examples/hotel-booking/test_hotel_booking.py:93</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L93">examples/hotel-booking/test_hotel_booking.py:93</a></div>
                 
               </div>
             </div>
@@ -3550,7 +3596,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="cancel" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">cancel<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=cancel" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">cancel<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=cancel" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Withdraw a booking before arrival.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3579,7 +3625,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L95">examples/hotel-booking/test_hotel_booking.py:95</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L95">examples/hotel-booking/test_hotel_booking.py:95</a></div>
                 
               </div>
             </div>
@@ -3601,7 +3647,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="refund" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">refund<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=refund" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">refund<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=refund" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Return the payment for a cancelled booking.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3630,7 +3676,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L96">examples/hotel-booking/test_hotel_booking.py:96</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L96">examples/hotel-booking/test_hotel_booking.py:96</a></div>
                 
               </div>
             </div>
@@ -3652,7 +3698,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="rebook" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">rebook<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=rebook" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">rebook<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=rebook" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Restore a cancelled booking for the same rooms and dates.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -3688,7 +3734,7 @@ E     + unsupported payment method</pre></div>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L97">examples/hotel-booking/test_hotel_booking.py:97</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L97">examples/hotel-booking/test_hotel_booking.py:97</a></div>
                 
               </div>
             </div>
@@ -3710,7 +3756,7 @@ E     + unsupported payment method</pre></div>
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="redeems" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">redeems<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=redeems" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">redeems<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=redeems" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def"><span class="entry-def-badge" >Undefined</span></div>
@@ -3732,7 +3778,7 @@ E     + unsupported payment method</pre></div>
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/4df53c5d5379a5a55da87381a940e91533202efd/examples/hotel-booking/test_hotel_booking.py#L129">examples/hotel-booking/test_hotel_booking.py:129</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/hotel-booking/test_hotel_booking.py#L129">examples/hotel-booking/test_hotel_booking.py:129</a></div>
                 
               </div>
             </div>
@@ -3758,6 +3804,19 @@ E     + unsupported payment method</pre></div>
   <span class="term-tip-def"></span>
 </div>
 
+
+<!-- The menu a scenario card's or story header's copy button opens;
+     positioned by app.js beside the button that opened it. One shared node, as the tooltip is: a menu per card would
+     repeat its markup hundreds of times. The narrated citation is a
+     scenario's alone. -->
+<div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg>Copy link</button>
+  <div class="copy-menu-separator" role="separator"></div>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="Copy Markdown citation. pytest-given citations check and update keep it current."><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>Copy citation</button>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in."><svg width="14" height="14" aria-hidden="true"><use href="#icon-narrated"/></svg>Copy narrated citation</button>
+</div>
+
+
 <!-- Names the parts of an arriving link this report no longer has. The live
      region stays put so the message inserted into it is announced; the
      countdown bar's animation is the timer, so hovering or focusing the
@@ -3780,7 +3839,7 @@ E     + unsupported payment method</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-14T20:36:19.556047+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"rebook\",\"canonical\":\"rebook\",\"kind\":\"activity\",\"definition\":\"Restore a cancelled booking for the same rooms and dates.\",\"definition_html\":\"Restore a cancelled booking for the same rooms and dates.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A search offers only the available rooms\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A paid booking is confirmed to every guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\",\"ticket/HB-17\"],\"status\":\"failed\",\"search_text\":\"A declined payment leaves the booking pending\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Cancelling a paid booking refunds it and notifies the guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"xfailed\",\"search_text\":\"Rebooking restores a cancelled booking\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\"],\"status\":\"passed\",\"search_text\":\"A booking can be cancelled only before its guest checks in\"}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"rebook\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"rebook\":[\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\":{\"cancel-a-booking\":[4]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\",\"cancel-a-booking:4\":\"Cancel a Booking, sentence 4: Alice asks to rebook Booking\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/rebook_cancelled_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html\",\"scenario\":[[\"\\u2705 [A search offers only the available rooms](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite)\"],[\"\\u2705 [A paid booking is confirmed to every guest](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking)\"],[\"\\u274c [A declined payment leaves the booking pending](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined)\"],[\"\\u2705 [Cancelling a paid booking refunds it and notifies the guest](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking)\"],[\"\\ud83d\\udd35 [Rebooking restores a cancelled booking](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking)\"],[\"\\u2705 [A booking can be cancelled only before its guest checks in](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel)\"]],\"tag\":{\"error-handling\":[\"\\u274c [error-handling](\",\"#tag=error-handling) (1 \\u2705 \\u00b7 1 \\u274c)\"],\"ticket\":[\"\\u274c [ticket](\",\"#tag=ticket) (1 \\u274c)\"],\"ticket/HB-17\":[\"\\u274c [ticket/HB-17](\",\"#tag=ticket/HB-17) (1 \\u274c)\"]},\"story\":{\"book-a-group-trip\":[\"\\u274c [Book a Group Trip](\",\"#view=stories&story=book-a-group-trip) (3 \\u2705 \\u00b7 1 \\u274c)\"],\"cancel-a-booking\":[\"\\ud83d\\udd35 [Cancel a Booking](\",\"#view=stories&story=cancel-a-booking) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"]}},\"cited_scenario_ids\":{\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-17T12:08:57.563133+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"rebook\",\"canonical\":\"rebook\",\"kind\":\"activity\",\"definition\":\"Restore a cancelled booking for the same rooms and dates.\",\"definition_html\":\"Restore a cancelled booking for the same rooms and dates.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A search offers only the available rooms\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A paid booking is confirmed to every guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\",\"ticket/HB-17\"],\"status\":\"failed\",\"search_text\":\"A declined payment leaves the booking pending\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Cancelling a paid booking refunds it and notifies the guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"xfailed\",\"search_text\":\"Rebooking restores a cancelled booking\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\"],\"status\":\"passed\",\"search_text\":\"A booking can be cancelled only before its guest checks in\"}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"rebook\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"rebook\":[\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\":{\"cancel-a-booking\":[4]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\",\"cancel-a-booking:4\":\"Cancel a Booking, sentence 4: Alice asks to rebook Booking\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/rebook_cancelled_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html\",\"scenario\":[[\"\\u2705 [A search offers only the available rooms](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite)\"],[\"\\u2705 [A paid booking is confirmed to every guest](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking)\"],[\"\\u274c [A declined payment leaves the booking pending](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined)\"],[\"\\u2705 [Cancelling a paid booking refunds it and notifies the guest](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking)\"],[\"\\ud83d\\udd35 [Rebooking restores a cancelled booking](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking)\"],[\"\\u2705 [A booking can be cancelled only before its guest checks in](\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel)\"]],\"narrated\":[[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite\\\">A search offers only the available rooms<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking\\\">A paid booking is confirmed to every guest<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u274c <a href=\\\"\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined\\\">A declined payment leaves the booking pending<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\\\">Cancelling a paid booking refunds it and notifies the guest<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\ud83d\\udd35 <a href=\\\"\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\\\">Rebooking restores a cancelled booking<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\\\">A booking can be cancelled only before its guest checks in<\/a><\/summary>\\n\\n<\/details>\"]],\"tag\":{\"error-handling\":[\"\\u274c [error-handling](\",\"#tag=error-handling) (1 \\u2705 \\u00b7 1 \\u274c)\"],\"ticket\":[\"\\u274c [ticket](\",\"#tag=ticket) (1 \\u274c)\"],\"ticket/HB-17\":[\"\\u274c [ticket/HB-17](\",\"#tag=ticket/HB-17) (1 \\u274c)\"]},\"story\":{\"book-a-group-trip\":[\"\\u274c [Book a Group Trip](\",\"#view=stories&story=book-a-group-trip) (3 \\u2705 \\u00b7 1 \\u274c)\"],\"cancel-a-booking\":[\"\\ud83d\\udd35 [Cancel a Booking](\",\"#view=stories&story=cancel-a-booking) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"]}},\"cited_scenario_ids\":{\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3831,6 +3890,11 @@ function deserializeStory(params) {
 
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
+}
+
+
+function escapeAttribute(value) {
+  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
 }
 
 
@@ -3984,6 +4048,8 @@ function reportApp() {
 
   let visibleCache = null;
   let termCountCache = null;
+
+  let copyMenuTrigger = null;
   return {
     search: '',
 
@@ -4082,6 +4148,10 @@ function reportApp() {
 
 
       part.querySelectorAll('.anchor-copied').forEach(el => el.classList.remove('anchor-copied'));
+      part.querySelectorAll('.copy-menu-open').forEach((el) => {
+        el.classList.remove('copy-menu-open');
+        el.setAttribute('aria-expanded', 'false');
+      });
 
 
       part.querySelectorAll('.scenario-tag').forEach(el => {
@@ -4489,18 +4559,118 @@ function reportApp() {
     },
 
 
-    copyAnchor(hashString, event) {
-      this._copyAndFlash(window.location.href.split('#')[0] + '#' + hashString, event.currentTarget);
+    copyAnchor(btn) {
+      this._copyAndFlash(window.location.href.split('#')[0] + '#' + btn.dataset.anchor, btn);
     },
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
 
 
-    copyCitation(kind, key, event) {
+    copyCitation(kind, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
       const halves = lookup(citations[kind], key, null);
-      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], event.currentTarget);
+      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
+    },
+
+
+    copyNarratedCitation(key, btn) {
+      const citations = window.__REPORT_DATA__.citations;
+      const halves = lookup(citations.narrated, key, null);
+      if (halves) this._copyAndFlash(halves[0] + escapeAttribute(citations.report_url) + halves[1], btn);
+    },
+
+
+
+    toggleCopyMenu(trigger) {
+      const reopening = copyMenuTrigger !== trigger;
+      this._closeCopyMenu(!reopening);
+      if (!reopening) return;
+      const menu = document.getElementById('copy-menu');
+      menu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      menu.hidden = false;
+      copyMenuTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      trigger.classList.add('copy-menu-open');
+      this._placeCopyMenu(menu, trigger);
+      this._copyMenuItems(menu)[0].focus({ preventScroll: true });
+    },
+
+
+
+
+    _initCopyMenu() {
+      const menu = document.getElementById('copy-menu');
+      if (!menu) return;
+      menu.addEventListener('click', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item) this._copyMenuEntry(item.dataset.copyEntry);
+      });
+      menu.addEventListener('keydown', (event) => this._copyMenuKey(menu, event));
+
+
+      menu.addEventListener('pointermove', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item && item !== document.activeElement) item.focus();
+      });
+      document.addEventListener('pointerdown', (event) => {
+        if (!copyMenuTrigger || menu.contains(event.target) || copyMenuTrigger.contains(event.target)) return;
+        this._closeCopyMenu(false);
+      }, true);
+      const dismiss = () => this._closeCopyMenu(false);
+      window.addEventListener('scroll', dismiss, { capture: true, passive: true });
+      window.addEventListener('resize', dismiss);
+    },
+    _copyMenuEntry(entry) {
+      const trigger = copyMenuTrigger;
+      this._closeCopyMenu(true);
+      const { citationKind: kind, citationKey: key } = trigger.dataset;
+      if (entry === 'link') this.copyAnchor(trigger);
+      else if (entry === 'citation') this.copyCitation(kind, key, trigger);
+      else this.copyNarratedCitation(key, trigger);
+    },
+
+
+    _copyMenuKey(menu, event) {
+      const items = this._copyMenuItems(menu);
+      const index = items.indexOf(document.activeElement);
+      const moveTo = (next) => items[(next + items.length) % items.length].focus();
+      switch (event.key) {
+        case 'Escape':
+        case 'Tab': this._closeCopyMenu(true); break;
+        case 'ArrowDown': moveTo(index + 1); break;
+        case 'ArrowUp': moveTo(index - 1); break;
+        case 'Home': moveTo(0); break;
+        case 'End': moveTo(items.length - 1); break;
+        default: return;
+      }
+      event.preventDefault();
+    },
+    _copyMenuItems(menu) {
+      return [...menu.querySelectorAll('[data-copy-entry]')].filter(item => !item.hidden);
+    },
+
+
+    _placeCopyMenu(menu, trigger) {
+      const margin = 6;
+      const button = trigger.getBoundingClientRect();
+      const box = menu.getBoundingClientRect();
+      const icon = menu.querySelector('[data-copy-entry] svg').getBoundingClientRect();
+      const iconCenter = icon.left - box.left + icon.width / 2;
+      const left = button.left + button.width / 2 - iconCenter;
+      let top = button.bottom + 2;
+      if (top + box.height > window.innerHeight - margin) top = button.top - box.height - 2;
+      menu.style.left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin)) + 'px';
+      menu.style.top = top + 'px';
+    },
+    _closeCopyMenu(refocus) {
+      if (!copyMenuTrigger) return;
+      const trigger = copyMenuTrigger;
+      copyMenuTrigger = null;
+      document.getElementById('copy-menu').hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.classList.remove('copy-menu-open');
+      if (refocus) trigger.focus({ preventScroll: true });
     },
 
 
@@ -4644,6 +4814,7 @@ function reportApp() {
         this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
+      this._initCopyMenu();
       this._initParamHover();
       this._initPhaseHover();
     },

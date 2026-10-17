@@ -74,6 +74,7 @@ type CitationHalves = tuple[str, str]
 class CitationData(TypedDict):
     report_url: str
     scenario: list[CitationHalves]
+    narrated: list[CitationHalves]
     tag: dict[str, CitationHalves]
     story: dict[str, CitationHalves]
 
@@ -400,6 +401,10 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
         'report_url': report_url,
         # `index.scenarios` holds every scenario, in the report's order.
         'scenario': [halves('scenario', cited) for cited in index.scenarios],
+        'narrated': [
+            index.citation(Target('scenario', cited)).narrated_halves()
+            for cited in index.scenarios
+        ],
         'tag': {tag: halves('tag', tag) for tag in index.tags},
         'story': {story_id: halves('story', story_id) for story_id in index.stories},
     }

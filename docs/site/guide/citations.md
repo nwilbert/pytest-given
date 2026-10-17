@@ -110,7 +110,7 @@ given_report_url = "https://docs.example.org/report.html"
 
 Then write the HTML report as usual, for example with `pytest --given-html`. To set the URL for one run instead, pass `--given-report-url=URL`. The URL is also stored in the JSON report, so `pytest-given report` re-renders the buttons from it, and the `pytest-given citations` commands know which links point at the report.
 
-The report now shows a **Copy citation** entry in the copy menu on scenario cards, story headers and Tags sidebar rows. The copied link uses the configured URL rather than the address you opened the report at, so you can copy citations from a local report and still get links to the published one. Scenario cards also offer **Copy narrated citation**, for a [narrated citation](#narrated-citations). Without the setting, there is no such entry.
+The copy button on a scenario card or story header then opens a menu: **Copy link**, **Copy citation** and, on a scenario card, **Copy narrated citation**, for a [narrated citation](#narrated-citations). On a Tags sidebar row, the button copies the tag's citation directly. A citation links to the configured URL rather than the address you opened the report at, so you can copy citations from a local report and still get links to the published one. Without the setting, the copy button copies a link, as **Copy link** does, and Tags sidebar rows have none.
 
 ### Writing it by hand
 

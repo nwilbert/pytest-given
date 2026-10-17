@@ -61,7 +61,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, citation_button, citation_title, icon, icon_sprite, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -186,11 +186,11 @@
               <span class="nav-group-count" x-text="group.count"></span>
             </button>
             {% if citations %}
-            <button type="button" class="anchor-link citation-copy nav-group-citation"
+            <button type="button" class="anchor-link nav-group-citation"
                     title="{{ citation_title }}" aria-label="Copy Markdown citation"
                     x-show="view === 'tags'"
                     :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
-                    @click.stop="copyCitation('tag', group.id, $event)">{{ icon('citation') }}</button>
+                    @click.stop="copyCitation('tag', group.id, $el)">{{ icon('citation') }}</button>
             {% endif %}
           </div>
         </template>
@@ -245,7 +245,7 @@
       <div style="display:flex; align-items:center;">
         {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ loop.index0 }}" :aria-expanded="!!expandedScenarios[{{ loop.index0 }}]" :aria-label="(expandedScenarios[{{ loop.index0 }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ loop.index0 }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ loop.index0 }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="scenario-title">{{ scenario.narration | narration }}</span>
-        {{ anchor_link('scenario=' ~ scenario_slugs[scenario.id]) }}{{ citation_button('scenario', loop.index0) }}
+        {{ copy_button('scenario', loop.index0, 'scenario=' ~ scenario_slugs[scenario.id]) }}
       </div>
       <span class="scenario-meta">
         {#- Cap visible tags so a long tag list can't crowd out the title:
@@ -424,7 +424,7 @@
         {% set total_scns = story_scns | length %}
         <div class="header">
           <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
-            <div class="header-title">{{ story.title }}{{ anchor_link('view=stories&story=' ~ story.id) }}{{ citation_button('story', story.id) }}</div>
+            <div class="header-title">{{ story.title }}{{ copy_button('story', story.id, 'view=stories&story=' ~ story.id) }}</div>
             <div class="header-context meta-list"><span>{{ story.sentences | length | plural('sentence') }}</span><span>{{ total_scns | plural('scenario') }}</span></div>
             <button class="collapse-all-btn" x-show="anySentencesHighlighted" x-cloak
                     @click="clearSentenceHighlights()">Deselect</button>
@@ -670,6 +670,19 @@
   <span class="term-tip-name"></span>
   <span class="term-tip-def"></span>
 </div>
+
+{% if citations %}
+<!-- The menu a scenario card's or story header's copy button opens;
+     positioned by app.js beside the button that opened it. One shared node, as the tooltip is: a menu per card would
+     repeat its markup hundreds of times. The narrated citation is a
+     scenario's alone. -->
+<div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link">{{ icon('link') }}Copy link</button>
+  <div class="copy-menu-separator" role="separator"></div>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="{{ citation_title }}">{{ icon('citation') }}Copy citation</button>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in.">{{ icon('narrated') }}Copy narrated citation</button>
+</div>
+{% endif %}
 
 <!-- Names the parts of an arriving link this report no longer has. The live
      region stays put so the message inserted into it is announced; the

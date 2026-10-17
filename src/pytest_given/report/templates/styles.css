@@ -1662,13 +1662,57 @@ span.param-highlight {
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* Revealed on keyboard focus, since a button at opacity 0 would otherwise be
+   focused unseen. */
+.anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 /* A tag row reveals its citation button on hover, as a header does. The
    button sits after the count, so the counts shift left as one column; on the
-   untagged row, which has nothing to cite, it keeps its place unseen.
-   Revealed on keyboard focus too, since a button at opacity 0 would otherwise
-   be focused unseen. */
-.nav-group:hover .citation-copy { opacity: 0.6; }
-.citation-copy:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
+   untagged row, which has nothing to cite, it keeps its place unseen. */
+.nav-group:hover .nav-group-citation { opacity: 0.6; }
 .nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
 .nav-group-citation-absent { visibility: hidden; }
 .nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }
+
+/* === Copy menu ===
+   A sheet of the card's own surface, lifted by the tooltip's shadow. Its
+   button stays lit in the accent while the menu is open, so the menu reads
+   as that button's. The rule separates the link from the two citations,
+   which copy Markdown. Keyboard focus takes the accent tint, a pointer's
+   hover the plainer row hover, as in the sidebar. */
+.copy-menu-trigger.copy-menu-open { opacity: 1 !important; color: var(--color-accent); }
+.copy-menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
+  animation: copy-menu-in 120ms ease-out;
+}
+.copy-menu[hidden], .copy-menu-item[hidden] { display: none; }
+.copy-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 5px var(--space-md) 5px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.copy-menu-item svg { flex-shrink: 0; color: var(--text-muted); }
+.copy-menu-item:hover { background: var(--bg-hover); }
+.copy-menu-item:focus-visible { outline: none; background: var(--color-accent-tint); color: var(--color-accent); }
+.copy-menu-item:focus-visible svg { color: var(--color-accent); }
+.copy-menu-separator { height: 1px; margin: var(--space-xs) var(--space-sm); background: var(--border); }
+@keyframes copy-menu-in {
+  from { opacity: 0; transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copy-menu { animation: none; }
+}

@@ -50,7 +50,7 @@ def add_report_parser(
         '--report-url',
         default='',
         help=(
-            "The report's public URL, for its copy-citation buttons (default: "
+            "The report's public URL, for the citations it copies (default: "
             'the one stored in the report)'
         ),
     )

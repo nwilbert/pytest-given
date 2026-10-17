@@ -41,7 +41,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Glossary definitions render code inside bold and no longer italicize between spaced asterisks.
 - The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.
 - A per-case scenario title highlights its case ID as a value, and the JSON report records it as a value part.
-- The HTML report's top bar and term ref underlines are visually tidied.
+- The HTML report's top bar and term ref underlines are visually tidied, and a scenario card's or story header's copy buttons merge into one copy button with a menu.
 - The error for a varying t-string expression in a `then` of a grouped parametrized scenario suggests parametrizing an expected outcome as its own column.
 - The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
 - The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants, writes out each parameter-table row's expected outcome instead of deriving it from an input, and asks the user before adding a glossary term.

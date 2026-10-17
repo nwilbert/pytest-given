@@ -102,7 +102,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=None,
         help=(
             'The public URL the HTML report will be served from. The report then '
-            'shows copy-citation buttons linking there, and `pytest-given '
+            'copies citations linking there, and `pytest-given '
             'citations` reads links to it. Overrides the given_report_url ini for '
             'one run.'
         ),

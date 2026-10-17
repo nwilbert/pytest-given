@@ -13,7 +13,7 @@ The CLI takes its settings from flags only, never from your pytest config, and i
 
 `--theme=light|dark|auto` sets the theme the report opens in, like `--given-theme`. The default is `auto`.
 
-`--report-url` sets the URL the report's copy-citation buttons link to, like `--given-report-url`, in place of the one stored in the JSON file: render a report this way for each place it is served from.
+`--report-url` sets the URL the citations copied from the report link to, like `--given-report-url`, in place of the one stored in the JSON file: render a report this way for each place it is served from.
 
 Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md` or `.markdown` file name: `-o report.md` needs no `--format`.
 

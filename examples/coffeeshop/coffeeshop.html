@@ -1696,14 +1696,58 @@ span.param-highlight {
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 
+.anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 
 
 
-.nav-group:hover .citation-copy { opacity: 0.6; }
-.citation-copy:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.nav-group:hover .nav-group-citation { opacity: 0.6; }
 .nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
 .nav-group-citation-absent { visibility: hidden; }
 .nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }
+
+
+
+
+
+
+
+.copy-menu-trigger.copy-menu-open { opacity: 1 !important; color: var(--color-accent); }
+.copy-menu {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-tip);
+  animation: copy-menu-in 120ms ease-out;
+}
+.copy-menu[hidden], .copy-menu-item[hidden] { display: none; }
+.copy-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 5px var(--space-md) 5px var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.copy-menu-item svg { flex-shrink: 0; color: var(--text-muted); }
+.copy-menu-item:hover { background: var(--bg-hover); }
+.copy-menu-item:focus-visible { outline: none; background: var(--color-accent-tint); color: var(--color-accent); }
+.copy-menu-item:focus-visible svg { color: var(--color-accent); }
+.copy-menu-separator { height: 1px; margin: var(--space-xs) var(--space-sm); background: var(--border); }
+@keyframes copy-menu-in {
+  from { opacity: 0; transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copy-menu { animation: none; }
+}
 
 
 :root { --param-color-0: #307400; }
@@ -1733,6 +1777,8 @@ span.param-highlight {
       <symbol id="icon-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
       <symbol id="icon-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g></symbol>
       <symbol id="icon-citation" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18V6l5 5.5L12 6v12"/><path d="M18.5 6v12"/><path d="m14.5 14 4 4 4-4"/></g></symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></g></symbol>
+      <symbol id="icon-narrated" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5v7l5-3.5Z"/><path d="M12 8h9"/><path d="M8 15h13"/><path d="M8 19.5h9"/></g></symbol>
     </svg>
   <header class="topbar"><div class="topbar-title" title="Coffee Shop Example">Coffee Shop Example</div>
     
@@ -1799,11 +1845,11 @@ span.param-highlight {
               <span class="nav-group-count" x-text="group.count"></span>
             </button>
             
-            <button type="button" class="anchor-link citation-copy nav-group-citation"
+            <button type="button" class="anchor-link nav-group-citation"
                     title="Copy Markdown citation. pytest-given citations check and update keep it current." aria-label="Copy Markdown citation"
                     x-show="view === 'tags'"
                     :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
-                    @click.stop="copyCitation('tag', group.id, $event)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+                    @click.stop="copyCitation('tag', group.id, $el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
             
           </div>
         </template>
@@ -1857,7 +1903,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="scenario-title">Basic scenario with when/then and a JSON attachment</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/buy_coffee" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="0" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/buy_coffee" data-citation-kind="scenario" data-citation-key="0" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
@@ -1902,7 +1948,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L32">examples/coffeeshop/test_coffeeshop.py:32</a></div>
       
     </div>
     </div>
@@ -1915,7 +1961,7 @@ span.param-highlight {
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-1" :aria-expanded="!!expandedScenarios[1]" :aria-label="(expandedScenarios[1] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(1)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span></button>
         <span class="scenario-title">Plain text attachment</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/text_attachment" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="1" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/text_attachment" data-citation-kind="scenario" data-citation-key="1" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -1958,7 +2004,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L44">examples/coffeeshop/test_coffeeshop.py:44</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L44">examples/coffeeshop/test_coffeeshop.py:44</a></div>
       
     </div>
     </div>
@@ -1971,7 +2017,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-2" :aria-expanded="!!expandedScenarios[2]" :aria-label="(expandedScenarios[2] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(2)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span></button>
         <span class="scenario-title">Generator fixture with <code>yield</code> and <em>teardown</em></span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/generator_fixture" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="2" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/generator_fixture" data-citation-kind="scenario" data-citation-key="2" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2001,7 +2047,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L55">examples/coffeeshop/test_coffeeshop.py:55</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L55">examples/coffeeshop/test_coffeeshop.py:55</a></div>
       
     </div>
     </div>
@@ -2014,7 +2060,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-3" :aria-expanded="!!expandedScenarios[3]" :aria-label="(expandedScenarios[3] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(3)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span></button>
         <span class="scenario-title">Parametrized test (renders as a parameter table)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/pricing" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="3" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/pricing" data-citation-kind="scenario" data-citation-key="3" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="pricing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">pricing</button>
@@ -2022,7 +2068,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status xfailed">⊗ expected failure</span>
-        <span class="scenario-duration">119ms</span>
+        <span class="scenario-duration">82ms</span>
       </span>
     </div>
 
@@ -2206,7 +2252,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L64">examples/coffeeshop/test_coffeeshop.py:64</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L64">examples/coffeeshop/test_coffeeshop.py:64</a></div>
       
     </div>
     </div>
@@ -2219,7 +2265,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-4" :aria-expanded="!!expandedScenarios[4]" :aria-label="(expandedScenarios[4] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(4)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span></button>
         <span class="scenario-title">Parametrize value surfaced as a given (Annotated)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/annotated_given_label" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="4" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/annotated_given_label" data-citation-kind="scenario" data-citation-key="4" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2294,7 +2340,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L93">examples/coffeeshop/test_coffeeshop.py:93</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L93">examples/coffeeshop/test_coffeeshop.py:93</a></div>
       
     </div>
     </div>
@@ -2307,7 +2353,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-5" :aria-expanded="!!expandedScenarios[5]" :aria-label="(expandedScenarios[5] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(5)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span></button>
         <span class="scenario-title">T-string with a non-parametrize value (neutral highlight)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/neutral_highlight" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="5" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/neutral_highlight" data-citation-kind="scenario" data-citation-key="5" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2339,7 +2385,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L105">examples/coffeeshop/test_coffeeshop.py:105</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L105">examples/coffeeshop/test_coffeeshop.py:105</a></div>
       
     </div>
     </div>
@@ -2352,7 +2398,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-6" :aria-expanded="!!expandedScenarios[6]" :aria-label="(expandedScenarios[6] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(6)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[6] }"></span></button>
         <span class="scenario-title">Brew <span class="param-color-2" data-param="cup_size" data-subst="cup_size">{cup_size}</span> ml (templated scenario title)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/brew" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="6" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/brew" data-citation-kind="scenario" data-citation-key="6" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2425,7 +2471,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L116">examples/coffeeshop/test_coffeeshop.py:116</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L116">examples/coffeeshop/test_coffeeshop.py:116</a></div>
       
     </div>
     </div>
@@ -2438,7 +2484,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-7" :aria-expanded="!!expandedScenarios[7]" :aria-label="(expandedScenarios[7] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(7)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[7] }"></span></button>
         <span class="scenario-title">Serve a <span class="value-highlight">200</span> ml cup (one scenario per case) [<span class="value-highlight">200</span>]</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/serve[200]" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="7" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/serve[200]" data-citation-kind="scenario" data-citation-key="7" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2468,7 +2514,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L126">examples/coffeeshop/test_coffeeshop.py:126</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L126">examples/coffeeshop/test_coffeeshop.py:126</a></div>
       
     </div>
     </div>
@@ -2481,7 +2527,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-8" :aria-expanded="!!expandedScenarios[8]" :aria-label="(expandedScenarios[8] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(8)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[8] }"></span></button>
         <span class="scenario-title">Serve a <span class="value-highlight">400</span> ml cup (one scenario per case) [<span class="value-highlight">400</span>]</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/serve[400]" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="8" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/serve[400]" data-citation-kind="scenario" data-citation-key="8" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -2513,7 +2559,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L126">examples/coffeeshop/test_coffeeshop.py:126</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L126">examples/coffeeshop/test_coffeeshop.py:126</a></div>
       
     </div>
     </div>
@@ -2526,7 +2572,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-9" :aria-expanded="!!expandedScenarios[9]" :aria-label="(expandedScenarios[9] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(9)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[9] }"></span></button>
         <span class="scenario-title">Brew a <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span> coffee (per-case columns)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/flavor_columns" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="9" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/flavor_columns" data-citation-kind="scenario" data-citation-key="9" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="pricing" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">pricing</button>
@@ -2685,7 +2731,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L144">examples/coffeeshop/test_coffeeshop.py:144</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L144">examples/coffeeshop/test_coffeeshop.py:144</a></div>
       
     </div>
     </div>
@@ -2698,7 +2744,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-10" :aria-expanded="!!expandedScenarios[10]" :aria-label="(expandedScenarios[10] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(10)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[10] }"></span></button>
         <span class="scenario-title">Helper functions can record their own steps</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/buy_with_validation" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="10" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/buy_with_validation" data-citation-kind="scenario" data-citation-key="10" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
@@ -2765,7 +2811,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L191">examples/coffeeshop/test_coffeeshop.py:191</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L191">examples/coffeeshop/test_coffeeshop.py:191</a></div>
       
     </div>
     </div>
@@ -2778,7 +2824,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-11" :aria-expanded="!!expandedScenarios[11]" :aria-label="(expandedScenarios[11] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(11)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[11] }"></span></button>
         <span class="scenario-title">Top-level <code>given</code> block and deeply nested steps</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/complex_order" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="11" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/complex_order" data-citation-kind="scenario" data-citation-key="11" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
@@ -2876,7 +2922,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L207">examples/coffeeshop/test_coffeeshop.py:207</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L207">examples/coffeeshop/test_coffeeshop.py:207</a></div>
       
     </div>
     </div>
@@ -2889,7 +2935,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-12" :aria-expanded="!!expandedScenarios[12]" :aria-label="(expandedScenarios[12] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(12)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[12] }"></span></button>
         <span class="scenario-title">An expected error, narrated as when + then (when_then)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/sold_out_is_rejected" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="12" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/sold_out_is_rejected" data-citation-kind="scenario" data-citation-key="12" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
@@ -2927,7 +2973,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L244">examples/coffeeshop/test_coffeeshop.py:244</a></div>
       
     </div>
     </div>
@@ -2940,7 +2986,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-13" :aria-expanded="!!expandedScenarios[13]" :aria-label="(expandedScenarios[13] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(13)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[13] }"></span></button>
         <span class="scenario-title">Many tags (the report collapses them behind a +N pill)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/discounted_purchase" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="13" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/discounted_purchase" data-citation-kind="scenario" data-citation-key="13" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="checkout" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">checkout</button>
@@ -2986,7 +3032,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L261">examples/coffeeshop/test_coffeeshop.py:261</a></div>
       
     </div>
     </div>
@@ -2999,13 +3045,13 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-14" :aria-expanded="!!expandedScenarios[14]" :aria-label="(expandedScenarios[14] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(14)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[14] }"></span></button>
         <span class="scenario-title">Failure rendering (intentionally failing)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/failing" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="14" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/failing" data-citation-kind="scenario" data-citation-key="14" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">73ms</span>
+        <span class="scenario-duration">47ms</span>
       </span>
     </div>
 
@@ -3080,7 +3126,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L277">examples/coffeeshop/test_coffeeshop.py:277</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L277">examples/coffeeshop/test_coffeeshop.py:277</a></div>
       
     </div>
     </div>
@@ -3093,7 +3139,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-15" :aria-expanded="!!expandedScenarios[15]" :aria-label="(expandedScenarios[15] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(15)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[15] }"></span></button>
         <span class="scenario-title">Skipped scenario rendering</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/skipped" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="15" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/skipped" data-citation-kind="scenario" data-citation-key="15" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -3117,7 +3163,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L283">examples/coffeeshop/test_coffeeshop.py:283</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L283">examples/coffeeshop/test_coffeeshop.py:283</a></div>
       
     </div>
     </div>
@@ -3130,7 +3176,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-16" :aria-expanded="!!expandedScenarios[16]" :aria-label="(expandedScenarios[16] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(16)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[16] }"></span></button>
         <span class="scenario-title">Loyalty card earns a free coffee (planned feature)</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/loyalty_card_free_coffee" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="16" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/loyalty_card_free_coffee" data-citation-kind="scenario" data-citation-key="16" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         <button type="button" class="btn-reset scenario-tag" data-tag="loyalty" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">loyalty</button>
@@ -3138,7 +3184,7 @@ Total:        $2.00</pre></div>
         
         
         <span class="scenario-status xfailed">⊗ expected failure</span>
-        <span class="scenario-duration">72ms</span>
+        <span class="scenario-duration">47ms</span>
       </span>
     </div>
 
@@ -3222,7 +3268,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L294">examples/coffeeshop/test_coffeeshop.py:294</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L294">examples/coffeeshop/test_coffeeshop.py:294</a></div>
       
     </div>
     </div>
@@ -3235,7 +3281,7 @@ Total:        $2.00</pre></div>
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-17" :aria-expanded="!!expandedScenarios[17]" :aria-label="(expandedScenarios[17] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(17)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[17] }"></span></button>
         <span class="scenario-title">All cases skipped</span>
-        <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=coffeeshop/parametrized_all_skipped" @click.stop="copyAnchor($el.dataset.anchor, $event)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button><button type="button" class="anchor-link citation-copy" title="Copy Markdown citation. pytest-given citations check and update keep it current." data-citation-kind="scenario" data-citation-key="17" @click.stop="copyCitation($el.dataset.citationKind, $el.dataset.citationKey, $event)" aria-label="Copy Markdown citation"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+        <button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="scenario=coffeeshop/parametrized_all_skipped" data-citation-kind="scenario" data-citation-key="17" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
       </div>
       <span class="scenario-meta">
         
@@ -3302,7 +3348,7 @@ Total:        $2.00</pre></div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a9c52ac342f389e36b41210b33aba3f5affc2770/examples/coffeeshop/test_coffeeshop.py#L305">examples/coffeeshop/test_coffeeshop.py:305</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/254a2bb22975335cef8c379b0958304ef5f11ce8/examples/coffeeshop/test_coffeeshop.py#L305">examples/coffeeshop/test_coffeeshop.py:305</a></div>
       
     </div>
     </div>
@@ -3330,6 +3376,19 @@ Total:        $2.00</pre></div>
   <span class="term-tip-def"></span>
 </div>
 
+
+<!-- The menu a scenario card's or story header's copy button opens;
+     positioned by app.js beside the button that opened it. One shared node, as the tooltip is: a menu per card would
+     repeat its markup hundreds of times. The narrated citation is a
+     scenario's alone. -->
+<div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg>Copy link</button>
+  <div class="copy-menu-separator" role="separator"></div>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="Copy Markdown citation. pytest-given citations check and update keep it current."><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>Copy citation</button>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in."><svg width="14" height="14" aria-hidden="true"><use href="#icon-narrated"/></svg>Copy narrated citation</button>
+</div>
+
+
 <!-- Names the parts of an arriving link this report no longer has. The live
      region stays put so the message inserted into it is announced; the
      countdown bar's animation is the timer, so hovering or focusing the
@@ -3352,7 +3411,7 @@ Total:        $2.00</pre></div>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-14T19:57:07.317585+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"search_text\":\"Basic scenario with when/then and a JSON attachment\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Plain text attachment\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Generator fixture with yield and teardown\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"xfailed\",\"search_text\":\"Parametrized test (renders as a parameter table)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Parametrize value surfaced as a given (Annotated)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"T-string with a non-parametrize value (neutral highlight)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Brew {cup_size} ml (templated scenario title)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Serve a 200 ml cup (one scenario per case) [200]\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Serve a 400 ml cup (one scenario per case) [400]\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"search_text\":\"Brew a {flavor} coffee (per-case columns)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"search_text\":\"Helper functions can record their own steps\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"search_text\":\"Top-level given block and deeply nested steps\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"search_text\":\"An expected error, narrated as when + then (when_then)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"search_text\":\"Many tags (the report collapses them behind a +N pill)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"search_text\":\"Failure rendering (intentionally failing)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"search_text\":\"Skipped scenario rendering\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"loyalty\"],\"status\":\"xfailed\",\"search_text\":\"Loyalty card earns a free coffee (planned feature)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"search_text\":\"All cases skipped\"}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":{},\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":{},\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":{},\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":{},\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":{},\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":{},\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":{},\"examples/coffeeshop/test_coffeeshop.py::test_failing\":{},\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":{},\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/loyalty_card_free_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html\",\"scenario\":[[\"\\u2705 [Basic scenario with when/then and a JSON attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee)\"],[\"\\u2705 [Plain text attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_text_attachment)\"],[\"\\u2705 [Generator fixture with `yield` and *teardown*](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_generator_fixture)\"],[\"\\ud83d\\udd35 [Parametrized test (renders as a parameter table)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_pricing)\"],[\"\\u2705 [Parametrize value surfaced as a given (Annotated)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label)\"],[\"\\u2705 [T-string with a non-parametrize value (neutral highlight)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight)\"],[\"\\u2705 [Brew {cup_size} ml (templated scenario title)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_brew)\"],[\"\\u2705 [Serve a 200 ml cup (one scenario per case) \\\\[200\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B200%5D)\"],[\"\\u2705 [Serve a 400 ml cup (one scenario per case) \\\\[400\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B400%5D)\"],[\"\\u2705 [Brew a {flavor} coffee (per-case columns)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_flavor_columns)\"],[\"\\u2705 [Helper functions can record their own steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation)\"],[\"\\u2705 [Top-level `given` block and deeply nested steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_complex_order)\"],[\"\\u2705 [An expected error, narrated as when + then (when_then)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected)\"],[\"\\u2705 [Many tags (the report collapses them behind a +N pill)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase)\"],[\"\\u274c [Failure rendering (intentionally failing)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_failing)\"],[\"\\ud83d\\udfe0 [Skipped scenario rendering](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_skipped)\"],[\"\\ud83d\\udd35 [Loyalty card earns a free coffee (planned feature)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee)\"],[\"\\ud83d\\udfe0 [All cases skipped](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped)\"]],\"tag\":{\"checkout\":[\"\\u2705 [checkout](\",\"#tag=checkout) (5 \\u2705)\"],\"discounts\":[\"\\u2705 [discounts](\",\"#tag=discounts) (2 \\u2705)\"],\"inventory\":[\"\\u2705 [inventory](\",\"#tag=inventory) (1 \\u2705)\"],\"loyalty\":[\"\\ud83d\\udd35 [loyalty](\",\"#tag=loyalty) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"pricing\":[\"\\ud83d\\udd35 [pricing](\",\"#tag=pricing) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"ticket\":[\"\\u2705 [ticket](\",\"#tag=ticket) (3 \\u2705)\"],\"ticket/CS-42\":[\"\\u2705 [ticket/CS-42](\",\"#tag=ticket/CS-42) (2 \\u2705)\"],\"ticket/CS-7\":[\"\\u2705 [ticket/CS-7](\",\"#tag=ticket/CS-7) (1 \\u2705)\"],\"validation\":[\"\\u2705 [validation](\",\"#tag=validation) (2 \\u2705)\"]},\"story\":{}},\"cited_scenario_ids\":{\"examples/coffeeshop/test_coffeeshop.py::test_pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\",\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-17T12:08:56.831954+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":null,\"scenarios\":[{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\"],\"status\":\"passed\",\"search_text\":\"Basic scenario with when/then and a JSON attachment\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Plain text attachment\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Generator fixture with yield and teardown\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"xfailed\",\"search_text\":\"Parametrized test (renders as a parameter table)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Parametrize value surfaced as a given (Annotated)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"T-string with a non-parametrize value (neutral highlight)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Brew {cup_size} ml (templated scenario title)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Serve a 200 ml cup (one scenario per case) [200]\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Serve a 400 ml cup (one scenario per case) [400]\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"module\":\"test_coffeeshop\",\"tags\":[\"pricing\"],\"status\":\"passed\",\"search_text\":\"Brew a {flavor} coffee (per-case columns)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"search_text\":\"Helper functions can record their own steps\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"ticket/CS-7\"],\"status\":\"passed\",\"search_text\":\"Top-level given block and deeply nested steps\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"validation\",\"ticket/CS-42\"],\"status\":\"passed\",\"search_text\":\"An expected error, narrated as when + then (when_then)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"module\":\"test_coffeeshop\",\"tags\":[\"checkout\",\"loyalty\",\"discounts\",\"pricing\",\"inventory\"],\"status\":\"passed\",\"search_text\":\"Many tags (the report collapses them behind a +N pill)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"failed\",\"search_text\":\"Failure rendering (intentionally failing)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"search_text\":\"Skipped scenario rendering\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"module\":\"test_coffeeshop\",\"tags\":[\"loyalty\"],\"status\":\"xfailed\",\"search_text\":\"Loyalty card earns a free coffee (planned feature)\"},{\"id\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\",\"module\":\"test_coffeeshop\",\"tags\":[],\"status\":\"skipped\",\"search_text\":\"All cases skipped\"}],\"story_ids\":[],\"term_ids\":[],\"term_scenarios\":{},\"scenario_sentences\":{\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\":{},\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\":{},\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\":{},\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\":{},\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\":{},\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\":{},\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\":{},\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\":{},\"examples/coffeeshop/test_coffeeshop.py::test_failing\":{},\"examples/coffeeshop/test_coffeeshop.py::test_skipped\":{},\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\":{},\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"coffeeshop/buy_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\",\"coffeeshop/text_attachment\":\"examples/coffeeshop/test_coffeeshop.py::test_text_attachment\",\"coffeeshop/generator_fixture\":\"examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\",\"coffeeshop/pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\",\"coffeeshop/annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"coffeeshop/neutral_highlight\":\"examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\",\"coffeeshop/brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"coffeeshop/serve[200]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[200]\",\"coffeeshop/serve[400]\":\"examples/coffeeshop/test_coffeeshop.py::test_serve[400]\",\"coffeeshop/flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"coffeeshop/buy_with_validation\":\"examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\",\"coffeeshop/complex_order\":\"examples/coffeeshop/test_coffeeshop.py::test_complex_order\",\"coffeeshop/sold_out_is_rejected\":\"examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\",\"coffeeshop/discounted_purchase\":\"examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\",\"coffeeshop/failing\":\"examples/coffeeshop/test_coffeeshop.py::test_failing\",\"coffeeshop/skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_skipped\",\"coffeeshop/loyalty_card_free_coffee\":\"examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\",\"coffeeshop/parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html\",\"scenario\":[[\"\\u2705 [Basic scenario with when/then and a JSON attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee)\"],[\"\\u2705 [Plain text attachment](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_text_attachment)\"],[\"\\u2705 [Generator fixture with `yield` and *teardown*](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_generator_fixture)\"],[\"\\ud83d\\udd35 [Parametrized test (renders as a parameter table)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_pricing)\"],[\"\\u2705 [Parametrize value surfaced as a given (Annotated)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label)\"],[\"\\u2705 [T-string with a non-parametrize value (neutral highlight)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight)\"],[\"\\u2705 [Brew {cup_size} ml (templated scenario title)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_brew)\"],[\"\\u2705 [Serve a 200 ml cup (one scenario per case) \\\\[200\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B200%5D)\"],[\"\\u2705 [Serve a 400 ml cup (one scenario per case) \\\\[400\\\\]](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B400%5D)\"],[\"\\u2705 [Brew a {flavor} coffee (per-case columns)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_flavor_columns)\"],[\"\\u2705 [Helper functions can record their own steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation)\"],[\"\\u2705 [Top-level `given` block and deeply nested steps](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_complex_order)\"],[\"\\u2705 [An expected error, narrated as when + then (when_then)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected)\"],[\"\\u2705 [Many tags (the report collapses them behind a +N pill)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase)\"],[\"\\u274c [Failure rendering (intentionally failing)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_failing)\"],[\"\\ud83d\\udfe0 [Skipped scenario rendering](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_skipped)\"],[\"\\ud83d\\udd35 [Loyalty card earns a free coffee (planned feature)](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee)\"],[\"\\ud83d\\udfe0 [All cases skipped](\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped)\"]],\"narrated\":[[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee\\\">Basic scenario with when/then and a JSON attachment<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_text_attachment\\\">Plain text attachment<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_generator_fixture\\\">Generator fixture with <code>yield<\/code> and <em>teardown<\/em><\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\ud83d\\udd35 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_pricing\\\">Parametrized test (renders as a parameter table)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label\\\">Parametrize value surfaced as a given (Annotated)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight\\\">T-string with a non-parametrize value (neutral highlight)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_brew\\\">Brew {cup_size} ml (templated scenario title)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B200%5D\\\">Serve a 200 ml cup (one scenario per case) [200]<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_serve%5B400%5D\\\">Serve a 400 ml cup (one scenario per case) [400]<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_flavor_columns\\\">Brew a {flavor} coffee (per-case columns)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation\\\">Helper functions can record their own steps<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_complex_order\\\">Top-level <code>given<\/code> block and deeply nested steps<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected\\\">An expected error, narrated as when + then (when_then)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u2705 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase\\\">Many tags (the report collapses them behind a +N pill)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\u274c <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_failing\\\">Failure rendering (intentionally failing)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\ud83d\\udfe0 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_skipped\\\">Skipped scenario rendering<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\ud83d\\udd35 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee\\\">Loyalty card earns a free coffee (planned feature)<\/a><\/summary>\\n\\n<\/details>\"],[\"<details markdown=\\\"1\\\">\\n<summary>\\ud83d\\udfe0 <a href=\\\"\",\"#scenario=examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped\\\">All cases skipped<\/a><\/summary>\\n\\n<\/details>\"]],\"tag\":{\"checkout\":[\"\\u2705 [checkout](\",\"#tag=checkout) (5 \\u2705)\"],\"discounts\":[\"\\u2705 [discounts](\",\"#tag=discounts) (2 \\u2705)\"],\"inventory\":[\"\\u2705 [inventory](\",\"#tag=inventory) (1 \\u2705)\"],\"loyalty\":[\"\\ud83d\\udd35 [loyalty](\",\"#tag=loyalty) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"pricing\":[\"\\ud83d\\udd35 [pricing](\",\"#tag=pricing) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"],\"ticket\":[\"\\u2705 [ticket](\",\"#tag=ticket) (3 \\u2705)\"],\"ticket/CS-42\":[\"\\u2705 [ticket/CS-42](\",\"#tag=ticket/CS-42) (2 \\u2705)\"],\"ticket/CS-7\":[\"\\u2705 [ticket/CS-7](\",\"#tag=ticket/CS-7) (1 \\u2705)\"],\"validation\":[\"\\u2705 [validation](\",\"#tag=validation) (2 \\u2705)\"]},\"story\":{}},\"cited_scenario_ids\":{\"examples/coffeeshop/test_coffeeshop.py::test_pricing\":\"examples/coffeeshop/test_coffeeshop.py::test_pricing[a-euro-short]\",\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label\":\"examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_brew\":\"examples/coffeeshop/test_coffeeshop.py::test_brew[200]\",\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns\":\"examples/coffeeshop/test_coffeeshop.py::test_flavor_columns[vanilla]\",\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped\":\"examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped[1]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3403,6 +3462,11 @@ function deserializeStory(params) {
 
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
+}
+
+
+function escapeAttribute(value) {
+  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
 }
 
 
@@ -3556,6 +3620,8 @@ function reportApp() {
 
   let visibleCache = null;
   let termCountCache = null;
+
+  let copyMenuTrigger = null;
   return {
     search: '',
 
@@ -3654,6 +3720,10 @@ function reportApp() {
 
 
       part.querySelectorAll('.anchor-copied').forEach(el => el.classList.remove('anchor-copied'));
+      part.querySelectorAll('.copy-menu-open').forEach((el) => {
+        el.classList.remove('copy-menu-open');
+        el.setAttribute('aria-expanded', 'false');
+      });
 
 
       part.querySelectorAll('.scenario-tag').forEach(el => {
@@ -4061,18 +4131,118 @@ function reportApp() {
     },
 
 
-    copyAnchor(hashString, event) {
-      this._copyAndFlash(window.location.href.split('#')[0] + '#' + hashString, event.currentTarget);
+    copyAnchor(btn) {
+      this._copyAndFlash(window.location.href.split('#')[0] + '#' + btn.dataset.anchor, btn);
     },
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
 
 
-    copyCitation(kind, key, event) {
+    copyCitation(kind, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
       const halves = lookup(citations[kind], key, null);
-      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], event.currentTarget);
+      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
+    },
+
+
+    copyNarratedCitation(key, btn) {
+      const citations = window.__REPORT_DATA__.citations;
+      const halves = lookup(citations.narrated, key, null);
+      if (halves) this._copyAndFlash(halves[0] + escapeAttribute(citations.report_url) + halves[1], btn);
+    },
+
+
+
+    toggleCopyMenu(trigger) {
+      const reopening = copyMenuTrigger !== trigger;
+      this._closeCopyMenu(!reopening);
+      if (!reopening) return;
+      const menu = document.getElementById('copy-menu');
+      menu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      menu.hidden = false;
+      copyMenuTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      trigger.classList.add('copy-menu-open');
+      this._placeCopyMenu(menu, trigger);
+      this._copyMenuItems(menu)[0].focus({ preventScroll: true });
+    },
+
+
+
+
+    _initCopyMenu() {
+      const menu = document.getElementById('copy-menu');
+      if (!menu) return;
+      menu.addEventListener('click', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item) this._copyMenuEntry(item.dataset.copyEntry);
+      });
+      menu.addEventListener('keydown', (event) => this._copyMenuKey(menu, event));
+
+
+      menu.addEventListener('pointermove', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item && item !== document.activeElement) item.focus();
+      });
+      document.addEventListener('pointerdown', (event) => {
+        if (!copyMenuTrigger || menu.contains(event.target) || copyMenuTrigger.contains(event.target)) return;
+        this._closeCopyMenu(false);
+      }, true);
+      const dismiss = () => this._closeCopyMenu(false);
+      window.addEventListener('scroll', dismiss, { capture: true, passive: true });
+      window.addEventListener('resize', dismiss);
+    },
+    _copyMenuEntry(entry) {
+      const trigger = copyMenuTrigger;
+      this._closeCopyMenu(true);
+      const { citationKind: kind, citationKey: key } = trigger.dataset;
+      if (entry === 'link') this.copyAnchor(trigger);
+      else if (entry === 'citation') this.copyCitation(kind, key, trigger);
+      else this.copyNarratedCitation(key, trigger);
+    },
+
+
+    _copyMenuKey(menu, event) {
+      const items = this._copyMenuItems(menu);
+      const index = items.indexOf(document.activeElement);
+      const moveTo = (next) => items[(next + items.length) % items.length].focus();
+      switch (event.key) {
+        case 'Escape':
+        case 'Tab': this._closeCopyMenu(true); break;
+        case 'ArrowDown': moveTo(index + 1); break;
+        case 'ArrowUp': moveTo(index - 1); break;
+        case 'Home': moveTo(0); break;
+        case 'End': moveTo(items.length - 1); break;
+        default: return;
+      }
+      event.preventDefault();
+    },
+    _copyMenuItems(menu) {
+      return [...menu.querySelectorAll('[data-copy-entry]')].filter(item => !item.hidden);
+    },
+
+
+    _placeCopyMenu(menu, trigger) {
+      const margin = 6;
+      const button = trigger.getBoundingClientRect();
+      const box = menu.getBoundingClientRect();
+      const icon = menu.querySelector('[data-copy-entry] svg').getBoundingClientRect();
+      const iconCenter = icon.left - box.left + icon.width / 2;
+      const left = button.left + button.width / 2 - iconCenter;
+      let top = button.bottom + 2;
+      if (top + box.height > window.innerHeight - margin) top = button.top - box.height - 2;
+      menu.style.left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin)) + 'px';
+      menu.style.top = top + 'px';
+    },
+    _closeCopyMenu(refocus) {
+      if (!copyMenuTrigger) return;
+      const trigger = copyMenuTrigger;
+      copyMenuTrigger = null;
+      document.getElementById('copy-menu').hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.classList.remove('copy-menu-open');
+      if (refocus) trigger.focus({ preventScroll: true });
     },
 
 
@@ -4216,6 +4386,7 @@ function reportApp() {
         this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
+      this._initCopyMenu();
       this._initParamHover();
       this._initPhaseHover();
     },

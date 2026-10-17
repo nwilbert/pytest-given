@@ -2504,6 +2504,19 @@ def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
     assert lines('story') == {}
 
 
+def test_citation_data_carries_each_scenarios_narrated_halves() -> None:
+    url = 'https://example.org/report.html'
+    data = _embedded_app_data(render_html_string(_citable_report(url), None))
+    before, after = data['citations']['narrated'][0]
+
+    assert before + url + after == (
+        '<details markdown="1">\n'
+        f'<summary>✅ <a href="{url}#scenario=t.py::test_pour">Pour</a></summary>\n'
+        '\n'
+        '</details>'
+    )
+
+
 def test_a_report_without_a_url_carries_no_citations() -> None:
     data = _embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['citations'] is None

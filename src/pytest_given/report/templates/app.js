@@ -50,6 +50,11 @@ function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
+// For a value written into a double-quoted HTML attribute.
+function escapeAttribute(value) {
+  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
+}
+
 // `#scenario=` takes the slug the copy-link button writes or the node ID a
 // citation writes — a grouped scenario's without its first case's `[…]`. Any
 // case's node ID opens its group too, as `citations check` reads it.
@@ -201,6 +206,8 @@ function reportApp() {
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
   let termCountCache = null;
+  // The button whose copy menu is open, or null.
+  let copyMenuTrigger = null;
   return {
     search: '',
     // Modules is the only axis every report has: a suite may carry no tags and
@@ -299,6 +306,10 @@ function reportApp() {
       // Likewise the tick a copy just set, which the copy's timer clears only
       // on the original.
       part.querySelectorAll('.anchor-copied').forEach(el => el.classList.remove('anchor-copied'));
+      part.querySelectorAll('.copy-menu-open').forEach((el) => {
+        el.classList.remove('copy-menu-open');
+        el.setAttribute('aria-expanded', 'false');
+      });
       // A tag here shows the active filter but toggles nothing, so it is not
       // announced as a pressed toggle. Dropped before Alpine sees the clone.
       part.querySelectorAll('.scenario-tag').forEach(el => {
@@ -706,18 +717,118 @@ function reportApp() {
     },
     // Copies the link without visiting it: writing it into the address bar
     // would overwrite the history entry holding the current filters.
-    copyAnchor(hashString, event) {
-      this._copyAndFlash(window.location.href.split('#')[0] + '#' + hashString, event.currentTarget);
+    copyAnchor(btn) {
+      this._copyAndFlash(window.location.href.split('#')[0] + '#' + btn.dataset.anchor, btn);
     },
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
     // Python renders the line either side of the report's public URL — the
     // setting's, never `window.location`.
-    copyCitation(kind, key, event) {
+    copyCitation(kind, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
       const halves = lookup(citations[kind], key, null);
-      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], event.currentTarget);
+      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
+    },
+    // The URL lands in the block's `href`; `citations check` resolves the
+    // character references when it reads the block back.
+    copyNarratedCitation(key, btn) {
+      const citations = window.__REPORT_DATA__.citations;
+      const halves = lookup(citations.narrated, key, null);
+      if (halves) this._copyAndFlash(halves[0] + escapeAttribute(citations.report_url) + halves[1], btn);
+    },
+    // A second click on the button that opened the menu closes it. The first
+    // entry takes focus, as a menu button's should, so the arrow keys work at
+    // once whether the menu was opened by click or by keyboard.
+    toggleCopyMenu(trigger) {
+      const reopening = copyMenuTrigger !== trigger;
+      this._closeCopyMenu(!reopening);
+      if (!reopening) return;
+      const menu = document.getElementById('copy-menu');
+      menu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      menu.hidden = false;
+      copyMenuTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      trigger.classList.add('copy-menu-open');
+      this._placeCopyMenu(menu, trigger);
+      this._copyMenuItems(menu)[0].focus({ preventScroll: true });
+    },
+    // Wired once, delegated like the tooltip. A press outside is caught in
+    // the capture phase because most controls here stop their click from
+    // bubbling; the menu is placed in viewport coordinates, so a scroll or
+    // resize closes it rather than leaving it behind.
+    _initCopyMenu() {
+      const menu = document.getElementById('copy-menu');
+      if (!menu) return;
+      menu.addEventListener('click', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item) this._copyMenuEntry(item.dataset.copyEntry);
+      });
+      menu.addEventListener('keydown', (event) => this._copyMenuKey(menu, event));
+      // The pointer carries focus with it, so the arrow keys go on from the
+      // entry it rests on and the menu never shows two entries lit.
+      menu.addEventListener('pointermove', (event) => {
+        const item = event.target.closest('[data-copy-entry]');
+        if (item && item !== document.activeElement) item.focus();
+      });
+      document.addEventListener('pointerdown', (event) => {
+        if (!copyMenuTrigger || menu.contains(event.target) || copyMenuTrigger.contains(event.target)) return;
+        this._closeCopyMenu(false);
+      }, true);
+      const dismiss = () => this._closeCopyMenu(false);
+      window.addEventListener('scroll', dismiss, { capture: true, passive: true });
+      window.addEventListener('resize', dismiss);
+    },
+    _copyMenuEntry(entry) {
+      const trigger = copyMenuTrigger;
+      this._closeCopyMenu(true);
+      const { citationKind: kind, citationKey: key } = trigger.dataset;
+      if (entry === 'link') this.copyAnchor(trigger);
+      else if (entry === 'citation') this.copyCitation(kind, key, trigger);
+      else this.copyNarratedCitation(key, trigger);
+    },
+    // Tab closes the menu onto its button rather than moving on from the
+    // menu's place at the end of the page.
+    _copyMenuKey(menu, event) {
+      const items = this._copyMenuItems(menu);
+      const index = items.indexOf(document.activeElement);
+      const moveTo = (next) => items[(next + items.length) % items.length].focus();
+      switch (event.key) {
+        case 'Escape':
+        case 'Tab': this._closeCopyMenu(true); break;
+        case 'ArrowDown': moveTo(index + 1); break;
+        case 'ArrowUp': moveTo(index - 1); break;
+        case 'Home': moveTo(0); break;
+        case 'End': moveTo(items.length - 1); break;
+        default: return;
+      }
+      event.preventDefault();
+    },
+    _copyMenuItems(menu) {
+      return [...menu.querySelectorAll('[data-copy-entry]')].filter(item => !item.hidden);
+    },
+    // Below the button, flipped above where the viewport ends first, with the
+    // first entry's icon right under the button's own.
+    _placeCopyMenu(menu, trigger) {
+      const margin = 6;
+      const button = trigger.getBoundingClientRect();
+      const box = menu.getBoundingClientRect();
+      const icon = menu.querySelector('[data-copy-entry] svg').getBoundingClientRect();
+      const iconCenter = icon.left - box.left + icon.width / 2;
+      const left = button.left + button.width / 2 - iconCenter;
+      let top = button.bottom + 2;
+      if (top + box.height > window.innerHeight - margin) top = button.top - box.height - 2;
+      menu.style.left = Math.max(margin, Math.min(left, window.innerWidth - box.width - margin)) + 'px';
+      menu.style.top = top + 'px';
+    },
+    _closeCopyMenu(refocus) {
+      if (!copyMenuTrigger) return;
+      const trigger = copyMenuTrigger;
+      copyMenuTrigger = null;
+      document.getElementById('copy-menu').hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.classList.remove('copy-menu-open');
+      if (refocus) trigger.focus({ preventScroll: true });
     },
     // Only flip to the "copied" state once the text is actually on the
     // clipboard, or the icon would claim a success that never happened.
@@ -861,6 +972,7 @@ function reportApp() {
         this.goToScenarioFresh(link.dataset.gotoScenario);
       });
       this._initTermTooltip();
+      this._initCopyMenu();
       this._initParamHover();
       this._initPhaseHover();
     },

@@ -473,9 +473,9 @@ class Metadata:
     # also feeds the `{project}` source-link variable; renderers fall back to it
     # when no title is configured.
     title: str | None = None
-    # The public URL the HTML report is served from: where its copy-citation
-    # buttons link, and what `pytest-given citations` reads report links
-    # against. None leaves the report without the buttons.
+    # The public URL the HTML report is served from: where the citations it
+    # copies link, and what `pytest-given citations` reads report links
+    # against. None leaves the report copying links alone.
     report_url: ReportUrl | None = None
 
 
