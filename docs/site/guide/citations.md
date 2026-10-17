@@ -27,10 +27,10 @@ And a [narrated citation](#narrated-citations) of a scenario:
     - 📎 document:
         ```
         Paying:
-        
+
         <details markdown="1">
         <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
-        
+
         </details>
         ```
 - **when** the document is updated
@@ -38,13 +38,13 @@ And a [narrated citation](#narrated-citations) of a scenario:
     - 📎 updated document:
         ```
         Paying:
-        
+
         <details markdown="1">
         <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
-        
+
         - **given** a card
         - **then** it is paid
-        
+
         </details>
         ```
 - **then** no finding remains
@@ -143,7 +143,7 @@ A scenario citation written as a `<details>` block carries the scenario's narrat
 </details>
 ```
 
-The citation is in the `<summary>`: the glyph, then an `<a href>` with the [report link](#writing-it-by-hand) as its only attribute and the title as its link text, written as HTML. Everything below it, down to `</details>` on a line of its own, is the body. Only a scenario can be narrated, not a tag or a story.
+The citation is in the `<summary>`: the glyph, then an `<a href>` with the [report link](#writing-it-by-hand) as its only attribute and the title as its link text, written as HTML. Everything below it, down to `</details>` on a line of its own, is the body. The block needs a blank line above it: `check` reports one that continues the HTML above it, such as another narrated citation's `</details>`, as mistyped. Only a scenario can be narrated, not a tag or a story.
 
 The body reads as the scenario's section of the Markdown report (`--given-md`), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.
 
@@ -197,19 +197,20 @@ These habits keep `pytest-given citations check` from failing on a document noth
 - **Cite a tag that belongs to one piece of work**, like `spec/<slug>`. A broad area tag's summary changes with every new scenario, so link it with a plain report link.
 - **Leave the glyph and link unformatted.** In `**✅** […](…)` or `✅ *[…](…)*` pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.
 - **On a versioned docs site, link the report relatively**, as in `../examples/report.html#tag=…`, so each version of a page opens its own version's report. Pass `--report-path`, where your docs build puts the report, so the commands recognize these links.
-
 - **Keep a Markdown formatter off narrated citations.** Prettier pads table columns and a two-space list-indent rule reindents nested steps, so `check` then reports the body stale. Wrap each block in ignore comments:
 
-    ```markdown
-    <!-- prettier-ignore-start -->
-    <details markdown="1">
-    <summary>…</summary>
+```markdown
+<!-- prettier-ignore-start -->
 
-    …
+<details markdown="1">
+<summary>…</summary>
 
-    </details>
-    <!-- prettier-ignore-end -->
-    ```
+…
+
+</details>
+
+<!-- prettier-ignore-end -->
+```
 
 ### Finding the citations of a changed scenario
 

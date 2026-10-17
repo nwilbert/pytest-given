@@ -753,6 +753,31 @@ def test_a_multiline_attachment_cell_shows_the_column_name_and_fences_below() ->
     assert '| 350 | machine state |\n\n- **350** — machine state:\n' in md
 
 
+@pytest.mark.parametrize(
+    'report',
+    [
+        _report_with_step(
+            Step(
+                phase='then',
+                narration=Narration(text='result'),
+                attachments=[Attachment(label='Doc', content='line1\n\nline2')],
+            )
+        ),
+        _report_with(_attachment_table(short=None, long='line1\n\nline2')),
+    ],
+    ids=['step', 'table'],
+)
+def test_an_empty_line_in_a_fenced_attachment_carries_no_indent(
+    report: ReportData,
+) -> None:
+    """An editor strips trailing whitespace, so an indented empty line would
+    leave a narrated citation's body stale for good."""
+    lines = render_md(report).splitlines()
+    [line1] = [index for index, line in enumerate(lines) if line.endswith(' line1')]
+    assert lines[line1 + 1] == ''
+    assert [line for line in lines if line != line.rstrip()] == []
+
+
 def test_a_block_key_leaves_out_a_param_value_too_long_to_inline() -> None:
     """The key names the row in a bullet; a multiline value there turns it into
     a `<br>`-strung wall that repeats the table instead of pointing into it."""

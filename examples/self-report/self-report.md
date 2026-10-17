@@ -103,10 +103,10 @@
     - 📎 suite:
         ```
         from pytest_given import Glossary, scenario, given, when, then
-        
+
         g = Glossary()
         guest = g.actor('Guest')
-        
+
         @scenario("Check in", tags=["smoke"])
         def test_check_in():
             with given(t"a {guest} at the desk"):
@@ -127,18 +127,18 @@
 - **given** a suite that nests across phases and mistypes a term
     - 📎 suite:
         ```
-        
+
             from pytest_given import Glossary, given, scenario, when
-        
+
             g = Glossary()
             g.actor('Guest')
-        
+
             @scenario('nested across phases')
             def test_nest():
                 with given('a machine'):
                     with when('it brews'):
                         pass
-        
+
             @scenario('a mistyped term')
             def test_lookup():
                 with given('a guest'):
@@ -164,12 +164,12 @@
         ```
         import pytest
         from pytest_given import scenario, given, then
-        
+
         @pytest.fixture
         @given("a prepared value")
         def value():
             return 42
-        
+
         @scenario("Fixture test")
         def test_fixture(value):
             with then(f"value is {value}"):
@@ -188,13 +188,13 @@
         import time
         import pytest
         from pytest_given import scenario, given, then
-        
+
         @pytest.fixture
         @given("a slow arrangement")
         def slow():
             time.sleep(0.5)
             return 1
-        
+
         @scenario("Quick body")
         def test_quick(slow):
             with then("it is one"):
@@ -212,7 +212,7 @@
         ```
         import pytest
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Param test", tags=["math"])
         @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
         def test_add(a, b, expected):
@@ -257,7 +257,7 @@
         ```
         import pytest
         from pytest_given import scenario, when
-        
+
         @scenario("Brew")
         @pytest.mark.parametrize("cup_size", [200, 350])
         def test_brew(cup_size):
@@ -276,7 +276,7 @@
     - 📎 suite:
         ```
         from pytest_given import scenario, then
-        
+
         @scenario("Brew")
         def test_brew():
             with then("it brews"):
@@ -310,12 +310,12 @@
         ```
         import pytest
         from pytest_given import scenario, given, then
-        
+
         @pytest.fixture
         def resource():
             yield 1
             raise RuntimeError("teardown boom")
-        
+
         @scenario("Teardown-failed")
         def test_a(resource):
             with given("a resource"):
@@ -344,13 +344,13 @@
     ```
     import pytest
     from pytest_given import scenario, given, then, attach
-    
+
     @pytest.fixture
     @given("a thing")
     def thing():
         yield 1
         with given("a late step"): pass
-    
+
     @scenario("Teardown raises")
     def test_use(thing):
         with then("it is one"):
@@ -361,13 +361,13 @@
     ```
     import pytest
     from pytest_given import scenario, given, then, attach
-    
+
     @pytest.fixture
     @given("a thing")
     def thing():
         yield 1
         attach("late", "data")
-    
+
     @scenario("Teardown raises")
     def test_use(thing):
         with then("it is one"):
@@ -393,12 +393,12 @@
     ```
     import pytest
     from pytest_given import scenario, then, given
-    
+
     @pytest.fixture
     @given("a coin is inserted")
     def coin():
         return 2
-    
+
     @scenario("uses the fixture")
     def test_use(coin):
         with then("the coin is 2"):
@@ -409,12 +409,12 @@
     ```
     import pytest
     from pytest_given import scenario, then, when
-    
+
     @pytest.fixture
     @when("a coin is inserted")
     def coin():
         return 2
-    
+
     @scenario("uses the fixture")
     def test_use(coin):
         with then("the coin is 2"):
@@ -425,12 +425,12 @@
     ```
     import pytest
     from pytest_given import scenario, then, then
-    
+
     @pytest.fixture
     @then("a coin is inserted")
     def coin():
         return 2
-    
+
     @scenario("uses the fixture")
     def test_use(coin):
         with then("the coin is 2"):
@@ -445,7 +445,7 @@
         ```
         import pytest
         from pytest_given import scenario, given, then
-        
+
         @scenario("Planned")
         @pytest.mark.xfail(reason="not implemented yet")
         def test_planned():
@@ -472,14 +472,14 @@
     - 📎 suite:
         ```
         from pytest_given import Glossary, scenario, sentence, story, when
-        
+
         g = Glossary()
         guest = g.actor('Guest')
         search = g.activity('search')
         room = g.work_object('Room')
         a = story('Book', [sentence(guest, search, room)])
         b = story('Stay', [sentence(guest, search, room)])
-        
+
         @scenario('both', stories=[a, b])
         def test_both():
             with when(t'the {guest} does a {search} for a {room}'):
@@ -496,13 +496,13 @@
     - 📎 suite:
         ```
         from pytest_given import Glossary, given, scenario, sentence, story
-        
+
         g = Glossary()
         guest = g.actor('Guest')
         search = g.activity('search')
         room = g.work_object('Room')
         story('Unread', [sentence(guest, search, room)])
-        
+
         @scenario('x')
         def test_x():
             with given('something'):
@@ -518,7 +518,7 @@
     - 📎 suite:
         ```
         from pytest_given import Glossary, given, scenario, sentence, story
-        
+
         g = Glossary()
         guest = g.actor('Guest')
         search = g.activity('search')
@@ -527,7 +527,7 @@
             sentence(guest('Alice'), search, room),
             sentence(guest('Bob'), search, room),
             sentence(guest, search, room)])
-        
+
         @scenario('x', stories=s, pins=s[1])
         def test_x():
             with given('a pinned step', pins=s[2]):
@@ -545,14 +545,14 @@
     - 📎 suite:
         ```
         from pytest_given import Glossary, given, scenario, sentence, story
-        
+
         g = Glossary()
         guest = g.actor('Guest')
         search = g.activity('search')
         room = g.work_object('Room')
         a = story('Book', [sentence(guest, search, room)])
         b = story('Stay', [sentence(guest, search, room)])
-        
+
         @scenario('x', stories=a)
         def test_x():
             with given('thing', pins=b[1]):
@@ -569,28 +569,28 @@
         ```
         import pytest
         from pytest_given import Glossary, given, scenario, sentence, story
-        
+
         g = Glossary()
         guest = g.actor('Guest')
         search = g.activity('search')
         room = g.work_object('Room')
         a = story('Book', [sentence(guest, search, room)])
         b = story('Stay', [sentence(guest, search, room)])
-        
+
         @pytest.fixture(scope='module')
         @given('a module-scoped arrangement')
         def wide():
             with given('an inner step', pins=a[1]):
                 pass
             yield 1
-        
+
         def test_unannotated(wide):
             assert wide == 1
-        
+
         @scenario('first', stories=a)
         def test_first(wide):
             pass
-        
+
         @scenario('second', stories=b)
         def test_second(wide):
             pass
@@ -607,17 +607,17 @@
         from typing import Annotated
         import pytest
         from pytest_given import Glossary, given, scenario, sentence, story
-        
+
         g = Glossary()
         guest = g.actor('Guest')
         search = g.activity('search')
         room = g.work_object('Room')
         s = story('Book', [sentence(guest, search, room)])
-        
+
         @pytest.fixture
         def room_number():
             return 7
-        
+
         @scenario('x', stories=s)
         def test_x(room_number: Annotated[int, given('a room', pins=s[1])]):
             pass
@@ -648,11 +648,11 @@
         from typing import Annotated
         import pytest
         from pytest_given import scenario, given, when, Template
-        
+
         @pytest.fixture
         def room():
             return 101
-        
+
         @scenario('a room is booked')
         def test_it(room: Annotated[int, given(Template('room {room} is free'))]):
             with when('it is booked'):
@@ -682,10 +682,10 @@
 - **given** a suite with one «scenario»
     - 📎 suite:
         ```
-        
+
             import pytest
             from pytest_given import scenario, given, when, then
-        
+
             @scenario('Buy coffee')
             def test_buy():
                 with given('a machine'):
@@ -735,10 +735,10 @@
 - **given** a suite whose narration varies across parametrize cases
     - 📎 suite:
         ```
-        
+
         import pytest
         from pytest_given import scenario, when
-        
+
         @pytest.mark.parametrize('cup_size', [200, 350])
         @scenario('Brew')
         def test_brew(cup_size):
@@ -782,7 +782,7 @@
         ```
         import pytest
         from pytest_given import scenario, then, Template
-        
+
         @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
         @pytest.mark.parametrize('cup_size', [200, 300])
         def test_brew(cup_size):
@@ -801,7 +801,7 @@
         ```
         import pytest
         from pytest_given import scenario, then
-        
+
         @scenario("Brew")
         @pytest.mark.parametrize('cup_size', [200, 300])
         def test_brew(cup_size):
@@ -819,18 +819,18 @@
         ```
         import pytest
         from pytest_given import scenario, then
-        
+
         @scenario("Brew")
         def test_brew():
             with then("it brews"):
                 assert True
-        
+
         @scenario("Pour")
         @pytest.mark.parametrize('cup_size', [200, 350])
         def test_pour(cup_size):
             with then(t"it pours {cup_size} ml"):
                 assert cup_size
-        
+
         def test_plain():
             assert True
         ```
@@ -845,7 +845,7 @@
     - 📎 GLOSSARY.md:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -856,10 +856,10 @@
         ```
         from pytest_given import scenario, when, story, sentence
         from conftest import g
-        
+
         book = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])
-        
-        
+
+
         @scenario('Guest searches', stories=book)
         def test_guest_searches():
             with when(t'{g["Guest"]} {g["search"]("searches for")} a {g["Room"]}'):
@@ -875,9 +875,9 @@
 - **given** a suite with one flawed «step»
     - 📎 suite:
         ```
-        
+
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Empty given")
         def test_empty_given():
             with given("a value"):
@@ -897,9 +897,9 @@
 - **given** a suite whose given «step» has an empty body
     - 📎 suite:
         ```
-        
+
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Empty given")
         def test_empty_given():
             with given("a value"):
@@ -918,9 +918,9 @@
 - **given** a suite whose «steps» are all sound
     - 📎 suite:
         ```
-        
+
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Clean")
         def test_clean():
             with given("a value"):
@@ -941,9 +941,9 @@
 - **given** a suite whose given «step» has an empty body
     - 📎 suite:
         ```
-        
+
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Empty given")
         def test_empty_given():
             with given("a value"):
@@ -976,9 +976,9 @@
 
 - **a flawed step, , reported** — test file:
     ```
-    
+
     from pytest_given import scenario, given, when, then
-    
+
     @scenario("Empty given")
     def test_empty_given():
         with given("a value"):
@@ -991,9 +991,9 @@
 
 - **a flawed step, \*::test_empty_given, suppressed** — test file:
     ```
-    
+
     from pytest_given import scenario, given, when, then
-    
+
     @scenario("Empty given")
     def test_empty_given():
         with given("a value"):
@@ -1006,9 +1006,9 @@
 
 - **a flawed step, empty-step: \*::test_empty_given, suppressed** — test file:
     ```
-    
+
     from pytest_given import scenario, given, when, then
-    
+
     @scenario("Empty given")
     def test_empty_given():
         with given("a value"):
@@ -1021,9 +1021,9 @@
 
 - **a clean step, \*::test_nothing, stale** — test file:
     ```
-    
+
     from pytest_given import scenario, given, when, then
-    
+
     @scenario("Clean")
     def test_clean():
         with given("a value"):
@@ -1040,9 +1040,9 @@
 - **given** a suite with one flawed «step»
     - 📎 suite:
         ```
-        
+
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Empty given")
         def test_empty_given():
             with given("a value"):
@@ -1063,9 +1063,9 @@
 - **given** a suite whose lint would fail, under a stale ignore entry
     - 📎 suite:
         ```
-        
+
         from pytest_given import scenario, given, when, then
-        
+
         @scenario("Empty given")
         def test_empty_given():
             with given("a value"):
@@ -1178,7 +1178,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1195,7 +1195,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1212,7 +1212,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1229,7 +1229,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1246,7 +1246,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1263,7 +1263,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1431,7 +1431,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1448,7 +1448,7 @@
     - 📎 Glossary file:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest  | A person booking. |
@@ -1671,7 +1671,7 @@
     - 📎 Markdown document:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest | A person booking. |
@@ -1687,14 +1687,14 @@
     - 📎 Markdown document:
         ```
         # Glossary
-        
+
         | Term | Meaning |
         |------|---------|
         | Guest | A person booking. |
         | Room  | A bookable room. |
-        
+
         ## More
-        
+
         | Term | Meaning |
         |---|---|
         | Search | Look up. |
@@ -1739,7 +1739,7 @@
         |---|---|
         | Fake | nope |
         ```
-        
+
         | Term | Meaning |
         |---|---|
         | Real | yes |
@@ -1765,14 +1765,14 @@
 - **no pipe table, {}, found no Markdown pipe table** — Markdown document:
     ```
     # Just a heading
-    
+
     No tables here.
     ```
 
 - **one pipe table, {'term_column': 'Nope'}, column 'Nope' not found** — Markdown document:
     ```
     # Glossary
-    
+
     | Term | Meaning |
     |------|---------|
     | Guest | A person booking. |
@@ -1782,7 +1782,7 @@
 - **one pipe table, {'definition_column': 5}, column index 5 is out of range** — Markdown document:
     ```
     # Glossary
-    
+
     | Term | Meaning |
     |------|---------|
     | Guest | A person booking. |
@@ -1816,7 +1816,7 @@
         | Term | Meaning |
         |---|---|
         | Code | no |
-    
+
     | Term | Meaning |
     |---|---|
     | Real | yes |
@@ -1827,7 +1827,7 @@
     | Term | Meaning |
     |---|
     | Odd | no |
-    
+
     | Term | Meaning |
     |---|---|
     | Real | yes |
@@ -1890,7 +1890,7 @@
         ```
         This line has a | in it but no separator follows.
         Next line is not a separator.
-        
+
         | Term | Meaning |
         |---|---|
         | Real | yes |
@@ -2442,10 +2442,10 @@
     - 📎 document:
         ```
         Paying:
-        
+
         <details markdown="1">
         <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
-        
+
         </details>
         ```
 - **when** the document is updated
@@ -2453,13 +2453,13 @@
     - 📎 updated document:
         ```
         Paying:
-        
+
         <details markdown="1">
         <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
-        
+
         - **given** a card
         - **then** it is paid
-        
+
         </details>
         ```
 - **then** no finding remains
@@ -2473,10 +2473,10 @@
         ```
         <details markdown="1">
         <summary>✅ <a href="https://example.org/report.html#scenario=t.py::test_pay">Pay by card</a></summary>
-        
+
         - **given** a card
         - **then** it is charged
-        
+
         </details>
         ```
 - **when** the document is checked
@@ -2492,9 +2492,9 @@
         ```
         <details markdown="1">
         <summary>❌ <a href="https://example.org/report.html#tag=checkout">checkout</a></summary>
-        
+
         The checkout.
-        
+
         </details>
         ```
 - **when** the document is updated
@@ -2980,10 +2980,10 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✓ Buy coffee
         `tests/t.py::test_buy` · billing, happy-path
-        
+
         - **given** a machine
         - **when** I insert \$2
         - **then** I get a coffee
@@ -2997,10 +2997,10 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✓ line one line two
         `tests/t.py::test_x`
-        
+
         - **when** act one act two
         ```
 - **then** the heading reads on one line
@@ -3015,10 +3015,10 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✓ Nest
         `tests/t.py::test_nest`
-        
+
         - **when** outer
             - **when** inner
         ```
@@ -3032,10 +3032,10 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✓ ignored
         `tests/t.py::test_parts`
-        
+
         - **when** a «Guest»42{amount}
         ```
 
@@ -3048,12 +3048,12 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✓ Pricing · 2 cases
         `tests/t.py::test_price`
-        
+
         - **when** insert
-        
+
         | euros | expect |
         |---|---|
         | 1 | False |
@@ -3079,12 +3079,12 @@
 - **passed, passed, \| coin \|** — Rendered Markdown:
     ```
     # pytest-given — proj
-    
+
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
-    
+
     - **when** act
-    
+
     | coin |
     |---|
     | euro |
@@ -3094,12 +3094,12 @@
 - **skipped, skipped, \| coin \|** — Rendered Markdown:
     ```
     # pytest-given — proj
-    
+
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
-    
+
     - **when** act
-    
+
     | coin |
     |---|
     | euro |
@@ -3109,12 +3109,12 @@
 - **failed, failed, \| coin \|** — Rendered Markdown:
     ```
     # pytest-given — proj
-    
+
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
-    
+
     - **when** act
-    
+
     | coin |
     |---|
     | euro |
@@ -3124,12 +3124,12 @@
 - **passed, skipped, \| coin \| \|** — Rendered Markdown:
     ```
     # pytest-given — proj
-    
+
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
-    
+
     - **when** act
-    
+
     | coin | |
     |---|---|
     | euro | ✓ |
@@ -3139,12 +3139,12 @@
 - **passed, failed, \| coin \| \|** — Rendered Markdown:
     ```
     # pytest-given — proj
-    
+
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
-    
+
     - **when** act
-    
+
     | coin | |
     |---|---|
     | euro | ✓ |
@@ -3183,12 +3183,12 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✗ Sold out
         `tests/t.py::test_sold_out`
-        
+
         - **then** reports sold out
-        
+
         > ValueError: not sold out
         > test_shop.py:88 in test_sold_out
         ```
@@ -3203,10 +3203,10 @@
     - 📎 Rendered Markdown:
         ````
         # pytest-given — proj
-        
+
         ## ✓ Multi
         `tests/t.py::test_multiline`
-        
+
         - **then** result
             - 📎 Doc:
                 ```
@@ -3224,10 +3224,10 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ○ Later · skipped
         `tests/t.py::test_skip` — reason: needs fixture data
-        
+
         - **when** act
         ```
 
@@ -3239,24 +3239,24 @@
     - 📎 Rendered Markdown:
         ```
         # pytest-given — proj
-        
+
         ## ✓ Att · 3 cases
         `tests/t.py::test_att`
-        
+
         - **when** act
-        
+
         | case ID | hours |
         |---|---|
         | 11 | 5 |
         |  | 11 |
         | 3 | 3 |
-        
+
         - **11 (row 1)** — failed:
             > clash
-        
+
         - **11 (row 2)** — failed:
             > clash
-        
+
         - **3** — failed:
             > clash
         ```

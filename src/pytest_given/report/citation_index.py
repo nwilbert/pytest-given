@@ -75,8 +75,8 @@ class Citation:
         )
 
     def narrated_halves(self) -> tuple[str, str]:
-        """The `<details>` block's text either side of the report URL, the
-        narration left for the caller to put between its blank lines."""
+        """The `<details>` block's text either side of the report URL, its
+        body empty for `citations update` to fill."""
         return (
             f'<details markdown="1">\n<summary>{self.glyph} <a href="',
             f'#{self.fragment}">{self.html_link_text}</a></summary>\n\n</details>',

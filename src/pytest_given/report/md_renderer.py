@@ -194,7 +194,7 @@ def _case_attachment_blocks(
             continue
         lines.append('')
         lines.append(f'- **{key}** — {_text(column.name)}:')
-        lines.extend(f'{_INDENT}{line}' for line in _fenced(value.content))
+        lines.extend(_indented(_fenced(value.content), _INDENT))
     return lines
 
 
@@ -242,6 +242,12 @@ def _fenced(content: str) -> list[str]:
     return [fence, *content.splitlines(), fence]
 
 
+def _indented(lines: list[str], indent: str) -> list[str]:
+    """An empty line stays empty: an editor strips trailing whitespace, which
+    would leave a narrated citation of the scenario stale."""
+    return [f'{indent}{line}' if line else '' for line in lines]
+
+
 def _text(text: str) -> str:
     """*text* shown literally, on a single Markdown line: newlines fold to
     ``<br>`` after the escaping, which would otherwise show it as text.
@@ -278,7 +284,7 @@ def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
     body_indent = item_indent + _INDENT
     return [
         f'{item_indent}- 📎 {label}:',
-        *(f'{body_indent}{line}' for line in _fenced(attachment.content)),
+        *_indented(_fenced(attachment.content), body_indent),
     ]
 
 

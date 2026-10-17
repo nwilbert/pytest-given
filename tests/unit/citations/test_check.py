@@ -1268,6 +1268,24 @@ def test_a_details_block_citing_the_report_in_another_shape_is_mistyped(
     )
 
 
+def test_a_narrated_citation_without_a_blank_line_above_it_is_mistyped(
+    tmp_path: Path,
+) -> None:
+    document = _block(FILLED) + _block(FILLED)
+    result, written = _run(tmp_path, document, report_(PAID), update=True)
+    assert [(f.line, f.kind, f.message) for f in result.findings] == [
+        (
+            9,
+            'mistyped',
+            (
+                'a <details> block cites the report, but a blank line must '
+                'separate it from the HTML above it'
+            ),
+        )
+    ]
+    assert written == document
+
+
 def test_a_narrated_citation_is_listed_and_covered_as_a_one_line_one(
     tmp_path: Path,
 ) -> None:

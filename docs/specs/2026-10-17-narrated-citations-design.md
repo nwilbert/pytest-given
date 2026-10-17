@@ -93,7 +93,8 @@ before it leaves the first unclosed. A block that also holds its `</details>`, o
 
 A `<details>` block whose summary holds a glyph and a link into the report in any other shape — an
 `<a>` with attributes besides `href`, text after `</a>` — or that no `</details>` in its container
-closes is a `mistyped` finding, so a narrated citation never goes unchecked unseen. Any other `<details>` block is the author's and is left
+closes is a `mistyped` finding, and so is such a `<details>` line inside a larger HTML block, with
+no blank line above it, so a narrated citation never goes unchecked unseen. Any other `<details>` block is the author's and is left
 alone.
 
 ## What the body holds

@@ -25,7 +25,7 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 | Stale narration or opening tag (a narrated citation) | Run `citations update`: it rewrites the body from the report and adds `markdown="1"` to the opening tag. |
 | Summary after a scenario citation | Delete it, unless the author wrote it as prose — then reword it so it no longer reads as a summary. |
 | `stray-narration` (a tag or story written as a narrated citation) | Rewrite it as a one-line citation. Only a scenario has a narration. |
-| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. For a `<details>` block: the summary shape above, `</details>` on its own line. |
+| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. For a `<details>` block: a blank line above it, the summary shape under Writing citations, and a `</details>` closing it on its own line. |
 | Target not in the report | Rule out the report first: a partial run, or one from another rootdir (node IDs are relative to it), loses many targets at once. Then follow [references/repair.md](references/repair.md). |
 
 ## Finding what cites a scenario

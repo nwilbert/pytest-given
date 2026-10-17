@@ -44,7 +44,7 @@ def test_whitespace_and_line_breaks_between_the_tags_are_one_space() -> None:
         '</summary>\n\nbody\n\n</details>\n'
     )
     found = _only_citation(source)
-    assert found.glyph.text == '✅️' or found.glyph.text == '✅'
+    assert found.glyph.text == '✅️'
     assert found.text == 'A\nB'
     assert _slice(source, found.text_span) == 'A\nB'
 
@@ -96,6 +96,42 @@ def test_two_in_a_row_leave_the_first_unclosed() -> None:
     assert isinstance(first, LooseDetails)
     assert first.reason == 'no </details> closes it'
     assert isinstance(second, NarratedCitation)
+
+
+BURIED = LooseDetails(
+    line=6,
+    href='r.html#scenario=t::a',
+    reason='a blank line must separate it from the HTML above it',
+)
+
+
+def test_a_details_line_inside_a_larger_html_block_is_loose() -> None:
+    copied = f'<details markdown="1">\n{SUMMARY}\n\n</details>\n'
+    first, second = scan_narrated(copied + copied, GLYPHS)
+    assert isinstance(first, NarratedCitation)
+    assert first.body == ''
+    assert second == BURIED
+
+
+def test_a_details_line_after_a_prettier_ignore_comment_is_loose() -> None:
+    wrapped = (
+        '<!-- prettier-ignore-start -->\n'
+        f'<details markdown="1">\n{SUMMARY}\n\n</details>\n'
+        '<!-- prettier-ignore-end -->\n'
+    )
+    first, second = scan_narrated(wrapped + wrapped, GLYPHS)
+    assert isinstance(first, NarratedCitation)
+    assert first.body == ''
+    assert second == LooseDetails(line=9, href=BURIED.href, reason=BURIED.reason)
+
+
+def test_an_authors_details_line_inside_a_larger_html_block_is_ignored() -> None:
+    source = (
+        f'<details>\n{SUMMARY}\n\n</details>\n'
+        '<details>\n<summary>Notes</summary>\n\n</details>\n'
+        '<details>\n<summary>✅ no link</summary>\n\n</details>\n'
+    )
+    assert len(scan_narrated(source, GLYPHS)) == 1
 
 
 def test_an_anchor_with_other_attributes_is_loose() -> None:

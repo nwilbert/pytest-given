@@ -1653,9 +1653,6 @@ span.param-highlight {
   display: inline-flex; align-items: center; vertical-align: middle;
 }
 .anchor-link svg { display: block; }
-/* A pair's own padding already spaces its icons as the margin plus padding
-   spaces the first from the title; a second margin would widen that gap. */
-.anchor-link + .anchor-link { margin-left: 0; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
 .header:hover .anchor-link { opacity: 0.6; }

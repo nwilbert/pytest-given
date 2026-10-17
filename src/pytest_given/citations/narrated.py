@@ -63,28 +63,18 @@ def scan_narrated(
     glyph_pattern = '|'.join(map(re.escape, longest_first)) or '(?!)'
     shape = _shape(glyph_pattern)
     summary_glyph = re.compile(rf'<summary[^>]*>\s*(?:{glyph_pattern})', re.IGNORECASE)
+    buried = re.compile(
+        rf'\n<details(?:\s[^>]*)?>\s*<summary[^>]*>\s*(?:{glyph_pattern})',
+        re.IGNORECASE,
+    )
     blocks = html_blocks(source)
     found: list[NarratedCitation | LooseDetails] = []
     for index, block in enumerate(blocks):
-        text = block.run.text
-        if not _OPENS.match(text):
-            continue
-        parts = shape.match(text)
-        if parts is None:
-            if loose := _loose(block, summary_glyph):
-                found.append(loose)
-            continue
-        closing = None if parts['close'] else _closing(blocks, index)
-        if parts['close'] is None and closing is None:
-            found.append(
-                LooseDetails(
-                    line=block.run.line_at(parts.start('href')),
-                    href=_resolve(parts['href']),
-                    reason='no </details> closes it',
-                )
-            )
-            continue
-        found.append(_citation(source, block, parts, closing))
+        if _OPENS.match(block.run.text) and (
+            read := _read(source, blocks, index, shape, summary_glyph)
+        ):
+            found.append(read)
+        found.extend(_buried(block, buried))
     return found
 
 
@@ -113,6 +103,46 @@ def _shape(glyph_pattern: str) -> re.Pattern[str]:
         r'\s*</summary>(?:[ \t]*(?:\r\n?|\n)\s*(?P<close></details\s*>))?\s*\Z',
         re.IGNORECASE | re.DOTALL,
     )
+
+
+def _read(
+    source: str,
+    blocks: list[HtmlBlock],
+    index: int,
+    shape: re.Pattern[str],
+    summary_glyph: re.Pattern[str],
+) -> NarratedCitation | LooseDetails | None:
+    block = blocks[index]
+    parts = shape.match(block.run.text)
+    if parts is None:
+        return _loose(block, summary_glyph)
+    closing = None if parts['close'] else _closing(blocks, index)
+    if parts['close'] is None and closing is None:
+        return LooseDetails(
+            line=block.run.line_at(parts.start('href')),
+            href=_resolve(parts['href']),
+            reason='no </details> closes it',
+        )
+    return _citation(source, block, parts, closing)
+
+
+def _buried(block: HtmlBlock, buried: re.Pattern[str]) -> list[LooseDetails]:
+    """A citing `<details>` line past the block's first, which every reader
+    takes for more of the block above it, not a block of its own."""
+    text = block.run.text
+    found: list[LooseDetails] = []
+    for opening in buried.finditer(text):
+        anchor = _ANCHOR.search(text, opening.end())
+        href = _ANY_HREF.search(anchor.group()) if anchor else None
+        if anchor and href:
+            found.append(
+                LooseDetails(
+                    line=block.run.line_at(anchor.start()),
+                    href=_href_value(href),
+                    reason='a blank line must separate it from the HTML above it',
+                )
+            )
+    return found
 
 
 def _closing(blocks: list[HtmlBlock], opening: int) -> HtmlBlock | None:
@@ -181,9 +211,13 @@ def _loose(block: HtmlBlock, summary_glyph: re.Pattern[str]) -> LooseDetails | N
         reason = 'its summary is not the glyph, a space and the link alone'
     return LooseDetails(
         line=block.run.line_at(anchor.start()),
-        href=_resolve(next(group for group in href.groups() if group is not None)),
+        href=_href_value(href),
         reason=reason,
     )
+
+
+def _href_value(href: re.Match[str]) -> str:
+    return _resolve(next(group for group in href.groups() if group is not None))
 
 
 def _after_anchor(text: str, start: int) -> str:
