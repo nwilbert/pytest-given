@@ -73,7 +73,7 @@ def test_missing_phase_fires_on_passed_two_phase_scenario() -> None:
     ):
         findings = _runtime(grouped=[two_phase])
     with then(
-        t'one missing-phase {pg["Finding"].l} names the absent when and the '
+        t'one missing-phase {pg["Lint finding"].l} names the absent when and the '
         t'{pg["Scenario"].l} source'
     ):
         [finding] = findings
@@ -154,7 +154,7 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
             _runtime(grouped=scenarios, glossary=glossary), 'tag-shadows-term'
         )
     with then(
-        t'a single warn {pg["Finding"].l} names the {pg["Tag"].l} and the '
+        t'a single warn {pg["Lint finding"].l} names the {pg["Tag"].l} and the '
         t'{pg["Term"].l} it shadows, counting the scenarios and naming one'
     ):
         [finding] = findings
@@ -248,7 +248,7 @@ def test_dead_term_flags_unreferenced_term() -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _dead_term_findings(glossary)
-    with then(t'the {pg["Finding"].l} names the unreferenced {pg["Term"].l}'):
+    with then(t'the {pg["Lint finding"].l} names the unreferenced {pg["Term"].l}'):
         [finding] = findings
         assert finding.subject == 'ghost-term'
         assert finding.message == (

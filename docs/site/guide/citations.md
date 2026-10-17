@@ -165,7 +165,7 @@ It rewrites what the report now says:
 - the fragment of any report link that uses a scenario's slug or a `[case]`, to its node ID;
 - the node ID of a renamed test, when exactly one scenario still has the citation's title.
 
-It can't fix everything. These stay as findings for you to resolve, and the command exits 1:
+It can't fix everything. These stay as citation findings for you to resolve, and the command exits 1:
 
 - **A target that is no longer in the report.** The citation's glyph becomes `❓`, its URL and text stay, and it recovers on its own once the target is back.
 - **A cited target that fails.** The document claims something that doesn't hold right now: fix the code, or change what the document says.
@@ -176,7 +176,7 @@ The bundled [`pytest-given-citing` skill](../ai-agents.md#agent-skills) walks an
 
 ## Checking in CI
 
-`pytest-given citations check` takes the same arguments, writes nothing, and exits 1 on any finding, including what `pytest-given citations update` would rewrite:
+`pytest-given citations check` takes the same arguments, writes nothing, and exits 1 on any citation finding, including what `pytest-given citations update` would rewrite:
 
 ```bash
 pytest --given-json=report.json --given-html=report.html

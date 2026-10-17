@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-17T11:49:02.172813+00:00",
+    "timestamp": "2026-10-17T12:39:02.493306+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "f9dd5c3eec03560cfcc83a81ec553eab54431c91",
+    "commit_sha": "62ffceede4465b8d45bcd05ed74235a5378c8670",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 122,
+      "duration_ms": 130,
       "steps": [
         {
           "phase": "given",
@@ -117,15 +117,15 @@
     {
       "id": "tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains[check-current-readable-0-False]",
       "narration": {
-        "text": "The `citations` exit code says whether a finding remains, so CI can gate on it",
+        "text": "The `citations` exit code says whether a citation finding remains, so CI can gate on it",
         "parts": [
           {
             "value": "The `citations` exit code says whether a "
           },
           {
-            "term_id": "finding",
-            "display": "finding",
-            "expression": "pg[\"Finding\"].l"
+            "term_id": "citation-finding",
+            "display": "citation finding",
+            "expression": "pg[\"Citation finding\"].l"
           },
           {
             "value": " remains, so CI can gate on it"
@@ -137,7 +137,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -429,7 +429,7 @@
         "spec/citations-list"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -744,7 +744,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -930,7 +930,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 97,
+      "duration_ms": 105,
       "steps": [
         {
           "phase": "given",
@@ -1012,7 +1012,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -1250,7 +1250,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 547,
+      "duration_ms": 551,
       "steps": [
         {
           "phase": "given",
@@ -1378,7 +1378,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -1564,7 +1564,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 93,
       "steps": [
         {
           "phase": "given",
@@ -1750,7 +1750,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -1817,7 +1817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -1927,7 +1927,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2026,7 +2026,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2096,7 +2096,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2216,7 +2216,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -2351,7 +2351,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 131,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -2479,7 +2479,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 94,
+      "duration_ms": 114,
       "steps": [
         {
           "phase": "given",
@@ -2649,7 +2649,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -2766,7 +2766,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 158,
+      "duration_ms": 179,
       "steps": [
         {
           "phase": "given",
@@ -2839,7 +2839,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -3011,7 +3011,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3150,7 +3150,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3295,7 +3295,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -3448,7 +3448,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -3593,7 +3593,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -3740,7 +3740,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 137,
+      "duration_ms": 140,
       "steps": [
         {
           "phase": "given",
@@ -3933,7 +3933,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -4062,7 +4062,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 119,
+      "duration_ms": 129,
       "steps": [
         {
           "phase": "given",
@@ -4248,7 +4248,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -4342,7 +4342,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -4427,7 +4427,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -4504,7 +4504,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -4586,7 +4586,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -4678,7 +4678,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -4763,7 +4763,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4870,7 +4870,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 159,
+      "duration_ms": 173,
       "steps": [
         {
           "phase": "given",
@@ -4969,7 +4969,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -5083,7 +5083,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -5236,7 +5236,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -5310,7 +5310,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -5459,7 +5459,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 380,
+      "duration_ms": 395,
       "steps": [
         {
           "phase": "given",
@@ -5618,7 +5618,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -5694,7 +5694,7 @@
     {
       "id": "tests/integration/test_plugin_lint.py::test_enabled_error_finding_fails_the_run",
       "narration": {
-        "text": "An error-severity finding fails the run",
+        "text": "An error-severity lint finding fails the run",
         "parts": [
           {
             "value": "An error-"
@@ -5708,9 +5708,9 @@
             "value": " "
           },
           {
-            "term_id": "finding",
-            "display": "finding",
-            "expression": "pg[\"Finding\"].l"
+            "term_id": "lint-finding",
+            "display": "lint finding",
+            "expression": "pg[\"Lint finding\"].l"
           },
           {
             "value": " fails the run"
@@ -5720,7 +5720,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -5825,7 +5825,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -5945,7 +5945,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -6018,15 +6018,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the finding is printed anyway",
+            "text": "the lint finding is printed anyway",
             "parts": [
               {
                 "value": "the "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " is printed anyway"
@@ -6055,15 +6055,15 @@
     {
       "id": "tests/integration/test_plugin_lint.py::test_an_ignore_entry_suppresses_what_it_matches[a flawed step--reported]",
       "narration": {
-        "text": "An ignore entry suppresses the findings it matches, and one that matches nothing fails the run",
+        "text": "An ignore entry suppresses the lint findings it matches, and one that matches nothing fails the run",
         "parts": [
           {
             "value": "An ignore entry suppresses the "
           },
           {
-            "term_id": "finding",
-            "display": "findings",
-            "expression": "pg[\"Finding\"].l.s"
+            "term_id": "lint-finding",
+            "display": "lint findings",
+            "expression": "pg[\"Lint finding\"].l.s"
           },
           {
             "value": " it matches, and one that matches nothing fails the run"
@@ -6075,7 +6075,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 105,
+      "duration_ms": 103,
       "steps": [
         {
           "phase": "given",
@@ -6152,15 +6152,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "an unsuppressed finding is reported as an error",
+            "text": "an unsuppressed lint finding is reported as an error",
             "parts": [
               {
                 "value": "an unsuppressed "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " is reported as an error"
@@ -6305,7 +6305,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -6399,15 +6399,15 @@
     {
       "id": "tests/integration/test_plugin_lint.py::test_lint_error_does_not_mask_a_more_specific_exit_code",
       "narration": {
-        "text": "An error finding leaves a more specific exit code alone",
+        "text": "An error lint finding leaves a more specific exit code alone",
         "parts": [
           {
             "value": "An error "
           },
           {
-            "term_id": "finding",
-            "display": "finding",
-            "expression": "pg[\"Finding\"].l"
+            "term_id": "lint-finding",
+            "display": "lint finding",
+            "expression": "pg[\"Lint finding\"].l"
           },
           {
             "value": " leaves a more specific exit code alone"
@@ -6417,7 +6417,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -6450,15 +6450,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the lint still reports the stale entry as an error finding",
+            "text": "the lint still reports the stale entry as an error lint finding",
             "parts": [
               {
                 "value": "the lint still reports the stale entry as an error "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               }
             ]
           },
@@ -6513,7 +6513,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 87,
       "steps": [
         {
           "phase": "given",
@@ -6566,7 +6566,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_lint.py",
-        "line": 474
+        "line": 476
       },
       "story_ids": [],
       "pins": null
@@ -7994,7 +7994,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8309,7 +8309,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8401,7 +8401,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8595,7 +8595,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -9046,7 +9046,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -9514,7 +9514,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -18033,7 +18033,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -19255,7 +19255,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -19502,7 +19502,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -19843,7 +19843,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -19976,7 +19976,7 @@
         "spec/citations-list"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -20440,15 +20440,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "one stale narration is the only finding",
+            "text": "one stale narration is the only citation finding",
             "parts": [
               {
                 "value": "one stale narration is the only "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
               }
             ]
           },
@@ -20483,7 +20483,7 @@
     {
       "id": "tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves",
       "narration": {
-        "text": "A narrated citation of a tag or story is a finding `update` leaves",
+        "text": "A narrated citation of a tag or story is a citation finding `update` leaves",
         "parts": [
           {
             "value": "A "
@@ -20497,9 +20497,9 @@
             "value": " of a tag or story is a "
           },
           {
-            "term_id": "finding",
-            "display": "finding",
-            "expression": "pg[\"Finding\"].l"
+            "term_id": "citation-finding",
+            "display": "citation finding",
+            "expression": "pg[\"Citation finding\"].l"
           },
           {
             "value": " `update` leaves"
@@ -20579,15 +20579,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a stray narration is the only finding, one `update` cannot fix",
+            "text": "a stray narration is the only citation finding, one `update` cannot fix",
             "parts": [
               {
                 "value": "a stray narration is the only "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
               },
               {
                 "value": ", one `update` cannot fix"
@@ -20710,15 +20710,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "an empty-step finding points at the step line",
+            "text": "an empty-step lint finding points at the step line",
             "parts": [
               {
                 "value": "an empty-step "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " points at the "
@@ -20863,15 +20863,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a then-without-check finding reports the unchecked then",
+            "text": "a then-without-check lint finding reports the unchecked then",
             "parts": [
               {
                 "value": "a then-without-check "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " reports the unchecked then"
@@ -20890,7 +20890,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 266
+        "line": 268
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -20985,15 +20985,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a conditional-check finding reports the guarded then",
+            "text": "a conditional-check lint finding reports the guarded then",
             "parts": [
               {
                 "value": "a conditional-check "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " reports the guarded then"
@@ -21035,7 +21035,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 354
+        "line": 358
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -21136,15 +21136,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the warn findings say {messages}",
+            "text": "the warn lint findings say {messages}",
             "parts": [
               {
                 "value": "the warn "
               },
               {
-                "term_id": "finding",
-                "display": "findings",
-                "expression": "pg[\"Finding\"].l.s"
+                "term_id": "lint-finding",
+                "display": "lint findings",
+                "expression": "pg[\"Lint finding\"].l.s"
               },
               {
                 "value": " say "
@@ -21234,7 +21234,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 603
+        "line": 607
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -21329,15 +21329,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a warn finding points at the then and says no when acts",
+            "text": "a warn lint finding points at the then and says no when acts",
             "parts": [
               {
                 "value": "a warn "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " points at the then and says no when acts"
@@ -21356,7 +21356,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 751
+        "line": 755
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -21389,7 +21389,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -21451,15 +21451,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a warn finding names the interpolation the body ignores",
+            "text": "a warn lint finding names the interpolation the body ignores",
             "parts": [
               {
                 "value": "a warn "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " names the interpolation the body ignores"
@@ -21478,7 +21478,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 931
+        "line": 937
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -21572,15 +21572,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "one missing-phase finding names the absent when and the scenario source",
+            "text": "one missing-phase lint finding names the absent when and the scenario source",
             "parts": [
               {
                 "value": "one missing-phase "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " names the absent when and the "
@@ -21749,15 +21749,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a single warn finding names the tag and the term it shadows, counting the scenarios and naming one",
+            "text": "a single warn lint finding names the tag and the term it shadows, counting the scenarios and naming one",
             "parts": [
               {
                 "value": "a single warn "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " names the "
@@ -21907,15 +21907,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the finding names the unreferenced term",
+            "text": "the lint finding names the unreferenced term",
             "parts": [
               {
                 "value": "the "
               },
               {
-                "term_id": "finding",
-                "display": "finding",
-                "expression": "pg[\"Finding\"].l"
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
               },
               {
                 "value": " names the unreferenced "
@@ -25211,7 +25211,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 156,
       "steps": [
         {
           "phase": "given",
@@ -26855,7 +26855,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1152
+        "line": 1177
       },
       "story_ids": [],
       "pins": null
@@ -26949,7 +26949,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1182
+        "line": 1207
       },
       "story_ids": [],
       "pins": null
@@ -27070,7 +27070,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1253
+        "line": 1278
       },
       "story_ids": [],
       "pins": null
@@ -28528,7 +28528,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -31154,13 +31154,23 @@
         }
       },
       {
+        "id": "citation-finding",
+        "kind": null,
+        "canonical": "Citation finding",
+        "definition": "One problem `pytest-given citations check` reports on one *Report link*: its kind (`stale`, `missing`, `failed`, `mistyped`, \u2026), the document location and a message. `citations update` fixes the kinds it can, such as a stale glyph, link text or narration.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 64
+        }
+      },
+      {
         "id": "theme",
         "kind": null,
         "canonical": "Theme",
         "definition": "The HTML report's colour scheme \u2014 `light`, `dark`, or `auto` (follow the viewer's system). The `given_theme` config sets the default a report opens in; a viewer's own choice from the report's theme control, once made, wins over it in that browser.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 64
+          "line": 65
         }
       },
       {
@@ -31170,7 +31180,7 @@
         "definition": "The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog once the *Report* model is built. It enforces the structural subset of the narration conventions \u2014 it cannot check whether a *Step*'s text is semantically true.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 70
+          "line": 71
         }
       },
       {
@@ -31180,17 +31190,17 @@
         "definition": "One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source. The catalog in `lint/base.py` is data, so severities, config validation and docs stay in sync with one table.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 71
+          "line": 72
         }
       },
       {
-        "id": "finding",
+        "id": "lint-finding",
         "kind": null,
-        "canonical": "Finding",
+        "canonical": "Lint finding",
         "definition": "One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 72
+          "line": 73
         }
       },
       {
@@ -31200,7 +31210,7 @@
         "definition": "A *Lint rule*'s level \u2014 `off`, `warn` or `error` \u2014 defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary; an `off` rule is not evaluated at all.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 73
+          "line": 74
         }
       },
       {
@@ -31210,7 +31220,7 @@
         "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.activity(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 83
+          "line": 84
         }
       },
       {
@@ -31220,7 +31230,7 @@
         "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from clause *slot* positions when no explicit `kind_column` is configured.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 84
+          "line": 85
         }
       },
       {
@@ -31230,7 +31240,7 @@
         "definition": "A term handed over before its kind is settled \u2014 what `g('foo')` and `g['foo']` on a code glossary return, and every *file glossary* lookup. The handle is the same `TermHandle` the typed registrations (`g.actor(...)` and friends) hand back; `declared_kind is None` is what marks the deferral. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 85
+          "line": 86
         }
       },
       {
@@ -31240,7 +31250,7 @@
         "definition": "A registered glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str | None`, `None` when undefined).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 86
+          "line": 87
         }
       },
       {
@@ -31250,7 +31260,7 @@
         "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of four surface forms: **bare** (`room` \u2014 the canonical display), **`.l`** (`room.l` \u2014 capitalized words lowercased, acronyms kept), **`.s`** (`room.s` \u2014 the *S-form*), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). `.l` and `.s` also apply to a called form and chain (`room.l.s` reads *rooms*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 87
+          "line": 88
         }
       },
       {
@@ -31260,7 +31270,7 @@
         "definition": "A term's name with the regular English -s ending, from the `.s` handle form: the plural of an Actor or Work Object (*rooms*), the third person singular of an Activity (*books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies, but an acronym takes a plain -s (*APIs*); anything else, such as *people* or *checks in*, needs the called form. The Glossary tab counts an S-form reference, in any case, as the term itself \u2014 not an *instance* or an *inflection*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 88
+          "line": 89
         }
       },
       {
@@ -31270,7 +31280,7 @@
         "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind color in the report.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 89
+          "line": 90
         }
       },
       {
@@ -31280,7 +31290,7 @@
         "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind color in the report.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 90
+          "line": 91
         }
       },
       {
@@ -31290,7 +31300,7 @@
         "definition": "A glossary term for what an actor does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept inflections: calling `search('searches for')` records *searches for* as a surface form of the canonical *search*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 91
+          "line": 92
         }
       },
       {
@@ -31300,7 +31310,7 @@
         "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ClauseTermRef` inside a clause.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 92
+          "line": 93
         }
       },
       {
@@ -31310,7 +31320,7 @@
         "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). The Glossary tab lists a term's instances under *Other forms*, with its other surface forms.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 93
+          "line": 94
         }
       },
       {
@@ -31320,7 +31330,7 @@
         "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*). The Glossary tab lists it under *Other forms*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 94
+          "line": 95
         }
       },
       {
@@ -31330,7 +31340,7 @@
         "definition": "A named flow modeled as a sequence of sentences. Constructed by `story('Title', [sentence(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 95
+          "line": 96
         }
       },
       {
@@ -31340,7 +31350,7 @@
         "definition": "What Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. One row in a story, numbered by its position (1..N, never set by hand) and optionally named with `sentence(..., name='cancel')`, a name that stays put when rows are inserted. Constructed by `sentence(...)`. Usually one clause, built implicitly; several when the sentence has several arrows under one number.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 96
+          "line": 97
         }
       },
       {
@@ -31350,7 +31360,7 @@
         "definition": "The two-variant union making up a clause's prose (`ClausePart` = `ClauseTermRef` or `ClauseWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare clause word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 97
+          "line": 98
         }
       },
       {
@@ -31360,7 +31370,7 @@
         "definition": "One linear walk through a sentence's arrows, a node/edge alternation starting actor \u2192 verb \u2192 noun, constructed by `clause(...)`. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 98
+          "line": 99
         }
       },
       {
@@ -31370,7 +31380,7 @@
         "definition": "A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both clause validation and *kind inference*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 99
+          "line": 100
         }
       },
       {
@@ -31380,7 +31390,7 @@
         "definition": "The link between a scenario (or step) and story sentences. `@scenario(stories=...)` names the stories a scenario is narration-matched against; a *pin* (`pins=` on `@scenario` or on `given`/`when`/`then`) binds sentences explicitly, in any story, whether `stories=` names it or not.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 100
+          "line": 101
         }
       },
       {
@@ -31390,7 +31400,7 @@
         "definition": "What a *sentence handle* passed to `pins=` is recorded as, the way a term handle in narration is recorded as a *term ref*: a `Pin` naming a story and a sentence number. A pin binds explicitly and replaces narration matching \u2014 a step pin for that step, a scenario pin (`@scenario(pins=...)`) for every step of the scenario, which then covers its own pins plus its steps'. `pins=[]` pins nothing but still opts out of narration matching. A pin reaches under-anchored sentences too.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 101
+          "line": 102
         }
       },
       {
@@ -31400,7 +31410,7 @@
         "definition": "The \"did this scenario touch that sentence\" relation. Computed by the *A_refs \u2286 S* rule: a sentence is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A *pin* covers its sentences directly instead, regardless of narration or term count.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 102
+          "line": 103
         }
       },
       {
@@ -31410,7 +31420,7 @@
         "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story sentences; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any sentence stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 103
+          "line": 104
         }
       },
       {
@@ -31420,7 +31430,7 @@
         "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence). Shown in the report's *Uncategorized* bucket.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 104
+          "line": 105
         }
       },
       {
@@ -31430,7 +31440,7 @@
         "definition": "A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 105
+          "line": 106
         }
       },
       {
@@ -31440,7 +31450,7 @@
         "definition": "Person who writes the application code and \u2014 together with the *Agent* \u2014 the scenarios; curates the glossary with the *Domain Expert*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 113
+          "line": 114
         }
       },
       {
@@ -31450,7 +31460,7 @@
         "definition": "Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 114
+          "line": 115
         }
       },
       {
@@ -31460,7 +31470,7 @@
         "definition": "AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 115
+          "line": 116
         }
       }
     ]

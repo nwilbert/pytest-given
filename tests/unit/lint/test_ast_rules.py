@@ -11,7 +11,7 @@ import pytest
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.lint import DEFAULTS
 from pytest_given.lint.ast_rules import run_ast_rules
-from pytest_given.lint.base import RawFinding, RuleId
+from pytest_given.lint.base import RawLintFinding, RuleId
 from pytest_given.model import (
     Narration,
     NarrationPlaceholder,
@@ -28,7 +28,7 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
 
 def _ast_rules(
     scenarios: list[Scenario], rootdir: Path, enabled: Container[RuleId] = DEFAULTS
-) -> list[RawFinding]:
+) -> list[RawLintFinding]:
     """`run_ast_rules` with every catalogued rule enabled.
 
     The runner takes the enabled set so an `off` rule never runs; these tests
@@ -121,7 +121,9 @@ def test_empty_step_fires_on_pass_only_body(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([empty], tmp_path)
-    with then(t'an empty-step {pg["Finding"].l} points at the {pg["Step"].l} line'):
+    with then(
+        t'an empty-step {pg["Lint finding"].l} points at the {pg["Step"].l} line'
+    ):
         [finding] = findings
         assert finding.rule == RuleId('empty-step')
         assert finding.subject == 'test_x.py::test_a'
@@ -288,7 +290,9 @@ def test_then_without_check_fires(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([unchecked], tmp_path)
-    with then(t'a then-without-check {pg["Finding"].l} reports the unchecked then'):
+    with then(
+        t'a then-without-check {pg["Lint finding"].l} reports the unchecked then'
+    ):
         [finding] = findings
         assert finding.rule == RuleId('then-without-check')
         assert finding.message == ("then 'it is one' contains no assertion")
@@ -376,7 +380,7 @@ def test_conditional_check_fires_on_assert_only_under_an_if(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _ast_rules([guarded], tmp_path)
-    with then(t'a conditional-check {pg["Finding"].l} reports the guarded then'):
+    with then(t'a conditional-check {pg["Lint finding"].l} reports the guarded then'):
         [finding] = findings
         assert finding.rule == RuleId('conditional-check')
         assert finding.location == SourceLocation(relpath='test_x.py', line=with_line)
@@ -635,7 +639,7 @@ def test_check_outside_then_flags_an_assert_only_outside_a_then(
         findings = _rule_findings(
             _ast_rules([checking], tmp_path), 'check-outside-then'
         )
-    with then(t'the warn {pg["Finding"].l.s} say {messages}'):
+    with then(t'the warn {pg["Lint finding"].l.s} say {messages}'):
         assert [finding.message for finding in findings] == messages
         assert all(DEFAULTS[finding.rule] == 'warn' for finding in findings)
 
@@ -777,7 +781,9 @@ def test_action_in_then_fires_when_no_when_exists(tmp_path) -> None:
         pins=adopt_pytest_given['flag'],
     ):
         findings = _rule_findings(_ast_rules([folded], tmp_path), 'action-in-then')
-    with then(t'a warn {pg["Finding"].l} points at the then and says no when acts'):
+    with then(
+        t'a warn {pg["Lint finding"].l} points at the then and says no when acts'
+    ):
         [finding] = findings
         assert DEFAULTS[finding.rule] == 'warn'
         assert finding.subject == 'test_x.py::test_a'
@@ -955,7 +961,9 @@ def test_unused_interpolation_fires_on_unused_bare_identifier(tmp_path) -> None:
         findings = _rule_findings(
             _ast_rules([unused], tmp_path), 'unused-interpolation'
         )
-    with then(t'a warn {pg["Finding"].l} names the interpolation the body ignores'):
+    with then(
+        t'a warn {pg["Lint finding"].l} names the interpolation the body ignores'
+    ):
         [finding] = findings
         assert DEFAULTS[finding.rule] == 'warn'
         assert finding.message == (

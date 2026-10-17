@@ -10,9 +10,9 @@ from .base import (
     DEFAULTS,
     LEVELS,
     STALE_IGNORE,
-    Finding,
     Level,
-    RawFinding,
+    LintFinding,
+    RawLintFinding,
     RuleId,
     Severity,
 )
@@ -118,7 +118,9 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
     return entries
 
 
-def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding]:
+def apply_config(
+    findings: list[RawLintFinding], config: LintConfig
+) -> list[LintFinding]:
     """Resolve raw rule findings against the configuration, in report order.
 
     Rules configured ``off`` are dropped *before* ignore matching, so an entry
@@ -133,7 +135,7 @@ def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding
     """
     effective = config.effective
     used: set[int] = set()
-    kept: list[Finding] = []
+    kept: list[LintFinding] = []
     for raw in findings:
         level = effective[raw.rule]
         if level == 'off':
@@ -149,7 +151,7 @@ def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding
             kept.append(_resolved(raw, level))
     kept.sort(key=_report_order)
     kept.extend(
-        Finding(
+        LintFinding(
             rule=STALE_IGNORE,
             severity='error',
             subject=entry.raw,
@@ -162,11 +164,11 @@ def apply_config(findings: list[RawFinding], config: LintConfig) -> list[Finding
     return kept
 
 
-def _resolved(raw: RawFinding, level: Severity) -> Finding:
-    return Finding(**vars(raw), severity=level)
+def _resolved(raw: RawLintFinding, level: Severity) -> LintFinding:
+    return LintFinding(**vars(raw), severity=level)
 
 
-def _report_order(finding: Finding) -> tuple[int, str, int, str, str]:
+def _report_order(finding: LintFinding) -> tuple[int, str, int, str, str]:
     relpath = finding.location.relpath if finding.location is not None else ''
     line = finding.location.line if finding.location is not None else 0
     return (

@@ -1,6 +1,6 @@
 """Unit tests for the lint findings' terminal presentation (`lint/summary.py`)."""
 
-from pytest_given.lint import Finding, error_count, summary_rows, summary_title
+from pytest_given.lint import LintFinding, error_count, summary_rows, summary_title
 from pytest_given.lint.base import RuleId, Severity
 from pytest_given.model import SourceLocation
 
@@ -11,8 +11,8 @@ def _finding(
     subject: str = 'tests/t.py::test_a',
     message: str = 'has no code',
     location: SourceLocation | None = None,
-) -> Finding:
-    return Finding(
+) -> LintFinding:
+    return LintFinding(
         rule=RuleId(rule),
         severity=severity,
         subject=subject,

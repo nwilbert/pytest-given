@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ..model import Glossary, Scenario, Story
 from .ast_rules import AST_RULE_IDS, run_ast_rules
-from .base import DEFAULTS, Finding, RuleId
+from .base import DEFAULTS, LintFinding, RuleId
 from .config import LintConfig, apply_config
 from .runtime_rules import RUNTIME_RULE_IDS, run_runtime_rules
 
@@ -25,7 +25,7 @@ def run_lint(
     stories: list[Story],
     rootdir: Path,
     config: LintConfig,
-) -> list[Finding]:
+) -> list[LintFinding]:
     """Every enabled rule, resolved against the configuration, in report order.
 
     The two runners and `apply_config` compose in exactly one way: severities

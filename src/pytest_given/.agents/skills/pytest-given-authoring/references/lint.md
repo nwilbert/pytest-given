@@ -1,6 +1,6 @@
 # The narration lint
 
-The narration lint enforces the structural part of the rules in [scenarios.md](scenarios.md). Turn it on with `pytest --given-lint` or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns an ini-enabled lint off for one run. A *warn* finding prints in the terminal summary. Only an *error* finding fails the run. A run with no findings says so.
+The narration lint enforces the structural part of the rules in [scenarios.md](scenarios.md). Turn it on with `pytest --given-lint` or `given_lint = true` in `[tool.pytest]`; `--no-given-lint` turns an ini-enabled lint off for one run. A *warn* lint finding prints in the terminal summary. Only an *error* lint finding fails the run. A run with no lint findings says so.
 
 | Rule | Default | Catches |
 |---|---|---|
@@ -16,6 +16,6 @@ The narration lint enforces the structural part of the rules in [scenarios.md](s
 
 You can override each rule's severity with the `given_lint_rules` ini. That and the rest of the setup are in the project documentation at <https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/>.
 
-**A `then-without-check` finding on a step that does check is usually a naming problem.** The rule only recognizes an assertion helper by its `assert` prefix. So rename `check_totals` to `assert_totals` before you reach for the ignore list. A third-party matcher with another name (`result.stdout.fnmatch_lines(...)`) needs a real `assert` next to it, or an ignore entry.
+**A `then-without-check` lint finding on a step that does check is usually a naming problem.** The rule only recognizes an assertion helper by its `assert` prefix. So rename `check_totals` to `assert_totals` before you reach for the ignore list. A third-party matcher with another name (`result.stdout.fnmatch_lines(...)`) needs a real `assert` next to it, or an ignore entry.
 
 **Treat a `missing-phase` warning as a prompt to restructure, not to suppress.** It nearly always marks a hidden `when`. Apply the constructor rule under [Phase structure](scenarios.md#phase-structure), or show a parametrized input as `Annotated[..., given(Template('…'))]` so the inline block can narrate the action. A `given_lint_ignore` entry (`missing-phase: <node-id glob>`) is only for an honestly two-phase scenario, and it costs more than it seems. An entry that suppresses nothing is a `stale-ignore` error, which can't be downgraded or ignored. So `pytest tests/one_file.py --given-lint` fails whenever the selection skips the suppressed test.

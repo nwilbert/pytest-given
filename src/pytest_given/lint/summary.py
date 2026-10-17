@@ -6,14 +6,14 @@ can (see its docstring). Everything here renders the sequence it is handed.
 """
 
 from ..model import location_suffix, plural
-from .base import Finding
+from .base import LintFinding
 
 
-def error_count(findings: list[Finding]) -> int:
+def error_count(findings: list[LintFinding]) -> int:
     return sum(1 for finding in findings if finding.severity == 'error')
 
 
-def summary_title(findings: list[Finding]) -> str:
+def summary_title(findings: list[LintFinding]) -> str:
     """The separator headline: how much was found, and how much of it fails."""
     if not findings:
         return 'pytest-given: narration lint (no findings)'
@@ -24,7 +24,7 @@ def summary_title(findings: list[Finding]) -> str:
     )
 
 
-def summary_rows(findings: list[Finding]) -> list[str]:
+def summary_rows(findings: list[LintFinding]) -> list[str]:
     """One aligned row per finding: severity, rule, subject, message, location.
 
     Rule and subject are padded to the widest in *this* run rather than to a

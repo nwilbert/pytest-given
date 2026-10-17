@@ -18,7 +18,7 @@ Adopt selectively: decorate the tests that assert behavior, and leave plumbing (
 Four [Agent Skills](https://agentskills.io) ship in the wheel, under `pytest_given/.agents/skills/`:
 
 - **`pytest-given-authoring`** — a slim router plus on-demand guides for writing truthful scenarios, glossaries, and domain stories.
-- **`pytest-given-citing`** — keeping the scenario, tag and story citations in Markdown documents current: triaging `pytest-given citations check` findings, repairing a citation whose target is gone, and writing new ones.
+- **`pytest-given-citing`** — keeping the scenario, tag and story citations in Markdown documents current: triaging `pytest-given citations check` citation findings, repairing a citation whose target is gone, and writing new ones.
 - **`pytest-given-navigating`** — exploring a codebase through its rendered reports instead of grepping test bodies.
 - **`pytest-given-reviewing`** — a layered review of narrated tests: the narration lint as the structural gate, a semantic audit of step text against step bodies, a completeness audit of what the report leaves out, then a hygiene pass over the glossary, tags and stories.
 

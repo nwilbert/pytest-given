@@ -25,7 +25,7 @@ from .base import (
     EMPTY_STEP,
     THEN_WITHOUT_CHECK,
     UNUSED_INTERPOLATION,
-    RawFinding,
+    RawLintFinding,
     RuleId,
 )
 
@@ -39,7 +39,7 @@ type _BodyNode = ast.With | ast.FunctionDef | ast.AsyncFunctionDef
 
 def run_ast_rules(
     scenarios: list[Scenario], rootdir: Path, enabled: Container[RuleId]
-) -> list[RawFinding]:
+) -> list[RawLintFinding]:
     """Run the `enabled` AST-surface rules over every step with a source anchor.
 
     Each file is parsed once (cached across scenarios) and every anchored step
@@ -57,7 +57,7 @@ def run_ast_rules(
     if not step_rules and not scenario_rules:
         return []
     indexes: dict[str, dict[int, _BodyNode] | None] = {}
-    findings: list[RawFinding] = []
+    findings: list[RawLintFinding] = []
     for scenario in scenarios:
         scan = _scan_scenario(scenario, rootdir, indexes)
         for resolved in scan.steps:
@@ -189,7 +189,7 @@ def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
     return index
 
 
-def _empty_step(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
+def _empty_step(resolved: _Resolved, scan: _Scan) -> Iterable[RawLintFinding]:
     """Rule `empty-step`: the step's body contains no executable code.
 
     Nested steps count as content for their parent (only leaves fire), and a
@@ -208,7 +208,7 @@ def _empty_step(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
         yield _step_finding(EMPTY_STEP, scan, resolved, 'contains only attach() calls')
 
 
-def _then_without_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
+def _then_without_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawLintFinding]:
     """Rule `then-without-check`: a `then` body contains no assertion.
 
     A parent whose nested `then` child checks passes (the walk sees the whole
@@ -219,7 +219,7 @@ def _then_without_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding
         yield _step_finding(THEN_WITHOUT_CHECK, scan, resolved, 'contains no assertion')
 
 
-def _conditional_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
+def _conditional_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawLintFinding]:
     """Rule `conditional-check`: a `then` checks, but only under a branch or
     loop, so a run can pass it having checked nothing.
 
@@ -240,7 +240,7 @@ def _conditional_check(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]
         )
 
 
-def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
+def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawLintFinding]:
     """Rule `check-outside-then`: an `assert` sits in a `given` or `when` body.
 
     `when_then` bodies are exempt — the shared body belongs to the pair's
@@ -259,7 +259,7 @@ def _check_outside_then(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding
         )
 
 
-def _unused_interpolation(resolved: _Resolved, scan: _Scan) -> Iterable[RawFinding]:
+def _unused_interpolation(resolved: _Resolved, scan: _Scan) -> Iterable[RawLintFinding]:
     """Rule `unused-interpolation`: a t-string step interpolates a bare
     identifier its body never uses.
 
@@ -301,7 +301,7 @@ def _unused_interpolation(resolved: _Resolved, scan: _Scan) -> Iterable[RawFindi
             )
 
 
-def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
+def _action_in_then(scan: _Scan) -> Iterable[RawLintFinding]:
     """Rule `action-in-then` (per scenario): a `then` assertion contains a
     call, and no `when` step acts.
 
@@ -338,8 +338,8 @@ def _action_in_then(scan: _Scan) -> Iterable[RawFinding]:
             return
 
 
-type _StepRule = Callable[[_Resolved, _Scan], Iterable[RawFinding]]
-type _ScenarioRule = Callable[[_Scan], Iterable[RawFinding]]
+type _StepRule = Callable[[_Resolved, _Scan], Iterable[RawLintFinding]]
+type _ScenarioRule = Callable[[_Scan], Iterable[RawLintFinding]]
 
 # Keyed by rule id, so `run_ast_rules` can drop the ones that are off before
 # it parses anything.
@@ -360,7 +360,7 @@ AST_RULE_IDS = frozenset(_STEP_RULES) | frozenset(_SCENARIO_RULES)
 
 def _step_finding(
     rule: RuleId, scan: _Scan, resolved: _Resolved, problem: str
-) -> RawFinding:
+) -> RawLintFinding:
     return _anchored_finding(
         rule,
         scan,
@@ -371,8 +371,8 @@ def _step_finding(
 
 def _anchored_finding(
     rule: RuleId, scan: _Scan, resolved: _Resolved, text: str
-) -> RawFinding:
-    return RawFinding(
+) -> RawLintFinding:
+    return RawLintFinding(
         rule=rule,
         subject=scan.scenario.id,
         location=resolved.source,

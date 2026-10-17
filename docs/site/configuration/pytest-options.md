@@ -16,7 +16,7 @@ The checks, however, always run. Every run builds the report, even if it doesn't
 | `--given-report-url=URL` | unset | The public URL the HTML report will be served from, such as its page on your docs site. The report then shows copy buttons that put a Markdown [citation](../guide/citations.md) linking there on the clipboard, and `pytest-given citations` checks links to it. Ini setting: `given_report_url`. |
 | `--given-source-link=PRESET` | `none` | An editor preset (`vscode`, `cursor`, `zed`, `pycharm`, `github`) or a URL template. **HTML only.** Adds a clickable file:line link to each scenario card, story panel, and expanded glossary term. Ini setting: `given_source_link`. See [Source links](source-links.md). |
 | `--given-all-frames` | off | Keep pytest's and pytest-given's internal frames (`pluggy`, `_pytest`, pytest-given) in failure tracebacks. See [Traceback frames](source-links.md#traceback-frames). |
-| `--given-lint` / `--no-given-lint` | `false` | Turn the narration lint on or off. A finding with severity `error` fails the run. Ini setting: `given_lint`; both flags override it. See [Narration lint](narration-lint.md). |
+| `--given-lint` / `--no-given-lint` | `false` | Turn the narration lint on or off. A lint finding with severity `error` fails the run. Ini setting: `given_lint`; both flags override it. See [Narration lint](narration-lint.md). |
 | `--given-theme=light\|dark\|auto` | `auto` | The theme the HTML report opens in. `auto` follows the viewer's system setting. The report's own Light / Dark / System switch overrides it in each browser. Ini setting: `given_theme`. |
 
 ## Flag order

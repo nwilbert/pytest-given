@@ -61,6 +61,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Report link** | A Markdown link to a scenario, tag or story in the HTML *Report*: the report's URL with a `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<story id>` fragment. Without a glyph it is a plain one, which claims only that its target exists. |
 | **Citation** | A *Report link* led by a status glyph, citing a scenario, tag or story from a Markdown document: `✅ [title](<report URL>#scenario=…)`, and for a tag or story a summary after it, `(5 ✅ · 2 🔵)`. `pytest-given citations check` holds its glyph, link text and summary to a JSON *Report*; `citations update` rewrites them, and marks a target the report lacks `❓`. |
 | **Narrated citation** | A *Citation* of a scenario written as a `<details markdown="1">` block, the citation in its `<summary>` and the scenario's Markdown narration in its body, which `citations update` writes and `citations check` holds to the *Report*. |
+| **Citation finding** | One problem `pytest-given citations check` reports on one *Report link*: its kind (`stale`, `missing`, `failed`, `mistyped`, …), the document location and a message. `citations update` fixes the kinds it can, such as a stale glyph, link text or narration. |
 | **Theme** | The HTML report's colour scheme — `light`, `dark`, or `auto` (follow the viewer's system). The `given_theme` config sets the default a report opens in; a viewer's own choice from the report's theme control, once made, wins over it in that browser. |
 
 ## Narration lint
@@ -69,7 +70,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 |---|---|
 | **Narration lint** | The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog once the *Report* model is built. It enforces the structural subset of the narration conventions — it cannot check whether a *Step*'s text is semantically true. |
 | **Lint rule** | One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source. The catalog in `lint/base.py` is data, so severities, config validation and docs stay in sync with one table. |
-| **Finding** | One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender. |
+| **Lint finding** | One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender. |
 | **Severity** | A *Lint rule*'s level — `off`, `warn` or `error` — defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary; an `off` rule is not evaluated at all. |
 
 ## Domain Storytelling

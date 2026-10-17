@@ -1,6 +1,6 @@
 ---
 name: pytest-given-citing
-description: Use when `pytest-given citations check` reports a finding, or when citing pytest-given scenarios, tags or stories from a Markdown document such as a design spec
+description: Use when `pytest-given citations check` reports a citation finding, or when citing pytest-given scenarios, tags or stories from a Markdown document such as a design spec
 ---
 
 # Citing pytest-given scenarios
@@ -14,11 +14,11 @@ A **narrated citation** is a scenario citation written as a `<details>` block, i
 
 A **plain report link** has no glyph: it keeps its own wording and claims only that its target exists.
 
-`pytest-given citations check DOCS… --report report.json` verifies every report link; `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while any other finding remains. Both read the JSON report of a run of **every** scenario — `pytest -m pytest_given --given-json=report.json` — and take a target the run left out as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or `--report-url` names; a relative link counts only with `--report-path`, where the HTML report sits in the repository.
+`pytest-given citations check DOCS… --report report.json` verifies every report link; `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while any other citation finding remains. Both read the JSON report of a run of **every** scenario — `pytest -m pytest_given --given-json=report.json` — and take a target the run left out as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or `--report-url` names; a relative link counts only with `--report-path`, where the HTML report sits in the repository.
 
 ## Triage
 
-| Finding | What to do |
+| Citation finding | What to do |
 |---|---|
 | Stale glyph or text; stale or missing summary; slug or `[case]` in a fragment; a renamed test whose title one scenario still has | Run `citations update`. |
 | Cited target fails | The document claims what doesn't hold now. Fix the code, or, if the claim itself is outdated, tell the human: the prose is theirs. |
@@ -30,7 +30,7 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 
 ## Finding what cites a scenario
 
-`citations check --list` prints every report link, `path:line: glyph kind key`, its findings indented under it. `--covering <node ID>` (repeatable) keeps the links that may cite that scenario: its own, a tag's or story's that counts it, and every link it cannot resolve: a gone target may be the scenario under an old node ID, a mistyped citation anything. Run `update` first; once `check` is clean, the list is exact.
+`citations check --list` prints every report link, `path:line: glyph kind key`, its citation findings indented under it. `--covering <node ID>` (repeatable) keeps the links that may cite that scenario: its own, a tag's or story's that counts it, and every link it cannot resolve: a gone target may be the scenario under an old node ID, a mistyped citation anything. Run `update` first; once `check` is clean, the list is exact.
 
 ## Writing citations
 

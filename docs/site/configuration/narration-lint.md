@@ -6,7 +6,7 @@ When the lint is off, it costs nothing: pytest-given records nothing extra, and 
 
 ## Rules
 
-Each rule has a default severity. A `warn` finding is printed in the terminal summary. An `error` finding is printed too, and also fails the run.
+Each rule has a default severity. A `warn` lint finding is printed in the terminal summary. An `error` lint finding is printed too, and also fails the run.
 
 | Rule | Default | Catches |
 |------|---------|---------|
@@ -22,7 +22,7 @@ Each rule has a default severity. A `warn` finding is printed in the terminal su
 
 ## Configuration
 
-Change a rule's severity with `given_lint_rules`. Skip findings for specific tests with `given_lint_ignore`: each entry is a node-id pattern (with `*` wildcards), optionally limited to one rule with a `rule-id:` prefix.
+Change a rule's severity with `given_lint_rules`. Skip lint findings for specific tests with `given_lint_ignore`: each entry is a node-id pattern (with `*` wildcards), optionally limited to one rule with a `rule-id:` prefix.
 
 ```toml
 [tool.pytest]
@@ -37,13 +37,13 @@ given_lint_ignore = [
 ]
 ```
 
-An ignore entry that no longer matches any finding causes a `stale-ignore` error. This keeps the list from growing out of date.
+An ignore entry that no longer matches any lint finding causes a `stale-ignore` error. This keeps the list from growing out of date.
 
 To turn the lint on or off for a single run, pass `--given-lint` or `--no-given-lint`. Both override the `given_lint` setting.
 
 ## Output
 
-Each finding is printed on one line, with its severity, rule, test, message, and source location:
+Each lint finding is printed on one line, with its severity, rule, test, message, and source location:
 
 ```
 ============= pytest-given: narration lint (2 findings, 1 error) ==============
@@ -51,4 +51,4 @@ ERROR empty-step     tests/test_shop.py::test_buy   given 'a coin' has no code (
 WARN  missing-phase  tests/test_shop.py::test_idle  missing: when (test_shop.py:31)
 ```
 
-A run with no findings prints only the separator, `pytest-given: narration lint (no findings)`, so a clean run is told apart from one where the lint is off.
+A run with no lint findings prints only the separator, `pytest-given: narration lint (no findings)`, so a clean run is told apart from one where the lint is off.

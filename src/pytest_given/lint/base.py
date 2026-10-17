@@ -1,7 +1,7 @@
 """Shared lint vocabulary: the finding models and the rule catalog.
 
-Rules emit `RawFinding`s; `config.apply_config` is the only thing that turns
-one into a `Finding`, which is why severity narrows to what can actually be
+Rules emit `RawLintFinding`s; `config.apply_config` is the only thing that turns
+one into a `LintFinding`, which is why severity narrows to what can actually be
 printed. Rule ids are constants so a typo is an import-time NameError.
 """
 
@@ -45,7 +45,7 @@ DEFAULTS: dict[RuleId, Level] = {
 
 
 @dataclass(frozen=True, kw_only=True)
-class RawFinding:
+class RawLintFinding:
     """What a rule emits, before configured severities and ignores apply."""
 
     rule: RuleId
@@ -55,12 +55,12 @@ class RawFinding:
 
 
 @dataclass(frozen=True, kw_only=True)
-class Finding(RawFinding):
+class LintFinding(RawLintFinding):
     """A raw finding resolved against the configuration, ready to print.
 
-    Extends `RawFinding` rather than restating its four fields: the `**vars()`
+    Extends `RawLintFinding` rather than restating its four fields: the `**vars()`
     splat that builds one then supplies exactly the base's fields by
-    construction, so a field added to `RawFinding` cannot be silently dropped
+    construction, so a field added to `RawLintFinding` cannot be silently dropped
     on the way through `_resolved`.
     """
 

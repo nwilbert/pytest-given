@@ -993,7 +993,7 @@ def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
         attach('document', document)
     with when('the document is checked'):
         result, _ = _run(tmp_path, document, report)
-    with then(t'one stale narration is the only {pg["Finding"].l}'):
+    with then(t'one stale narration is the only {pg["Citation finding"].l}'):
         assert [(f.kind, f.message) for f in result.findings] == [
             ('stale', 'stale narration')
         ]
@@ -1005,7 +1005,7 @@ def test_check_reports_a_stale_narrated_body(tmp_path: Path) -> None:
 
 
 @scenario(
-    t'A {pg["Narrated citation"].l} of a tag or story is a {pg["Finding"].l} '
+    t'A {pg["Narrated citation"].l} of a tag or story is a {pg["Citation finding"].l} '
     t'`update` leaves',
     tags=['spec/narrated-citations'],
 )
@@ -1023,7 +1023,8 @@ def test_a_narrated_tag_citation_is_a_finding_update_leaves(tmp_path: Path) -> N
     with when('the document is updated'):
         result, written = _run(tmp_path, document, report, update=True)
     with then(
-        t'a stray narration is the only {pg["Finding"].l}, one `update` cannot fix'
+        t'a stray narration is the only {pg["Citation finding"].l}, '
+        t'one `update` cannot fix'
     ):
         assert [(f.kind, f.fixed_by_update) for f in result.findings] == [
             ('stray-narration', False)

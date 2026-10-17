@@ -62,8 +62,8 @@ _CITATIONS = {
 
 
 @scenario(
-    t'The `citations` exit code says whether a {pg["Finding"].l} remains, so CI '
-    t'can gate on it',
+    t'The `citations` exit code says whether a {pg["Citation finding"].l} '
+    t'remains, so CI can gate on it',
     tags=['spec/citations'],
 )
 @pytest.mark.parametrize(

@@ -116,7 +116,7 @@ def test_an_error_finding_shows_in_the_summary_line(pytester):
 
 
 @scenario(
-    t'An error-{pg["Severity"].l} {pg["Finding"].l} fails the run',
+    t'An error-{pg["Severity"].l} {pg["Lint finding"].l} fails the run',
     stories=adopt_pytest_given,
 )
 def test_enabled_error_finding_fails_the_run(pytester):
@@ -177,7 +177,7 @@ def test_warn_override_prints_but_does_not_fail(pytester):
     with then('the run still passes'):
         result.assert_outcomes(passed=1)
         assert result.ret == 0
-    with then(t'the {pg["Finding"].l} is printed anyway'):
+    with then(t'the {pg["Lint finding"].l} is printed anyway'):
         # One fnmatch pattern means "some line matches"; the assert says the
         # same thing, and `then-without-check` can see it.
         assert any(
@@ -201,7 +201,7 @@ _IGNORE_SUITES = {'a flawed step': EMPTY_GIVEN, 'a clean step': CLEAN}
 
 
 @scenario(
-    t'An ignore entry suppresses the {pg["Finding"].l.s} it matches, and one that '
+    t'An ignore entry suppresses the {pg["Lint finding"].l.s} it matches, and one that '
     t'matches nothing fails the run',
     tags=['validation'],
 )
@@ -228,7 +228,7 @@ def test_an_ignore_entry_suppresses_what_it_matches(pytester, suite, entry, outc
         out = result.stdout.str()
     with then(t'the lint outcome is {outcome}, and only a suppressed run passes'):
         assert (result.ret == 0) == (outcome == 'suppressed')
-    with then(t'an unsuppressed {pg["Finding"].l} is reported as an error'):
+    with then(t'an unsuppressed {pg["Lint finding"].l} is reported as an error'):
         assert ('ERROR' in out and 'empty-step' in out) == (outcome == 'reported')
     with then('an entry that suppressed nothing is reported as stale'):
         assert ('stale-ignore' in out and 'suppressed no finding' in out) == (
@@ -450,7 +450,7 @@ def test_removed_phase_check_ini_key_is_unknown(pytester):
     assert 'Unknown config option: given_phase_check' in result.stdout.str()
 
 
-@scenario(t'An error {pg["Finding"].l} leaves a more specific exit code alone')
+@scenario(t'An error {pg["Lint finding"].l} leaves a more specific exit code alone')
 def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
     with given('a suite whose lint would fail, under a stale ignore entry'):
         attach('suite', EMPTY_GIVEN)
@@ -460,7 +460,9 @@ def test_lint_error_does_not_mask_a_more_specific_exit_code(pytester):
         pytester.makepyfile(test_sample=EMPTY_GIVEN)
     with when('the suite runs deselected, so nothing is collected'):
         result = pytester.runpytest_inprocess('-k', 'no-such-test')
-    with then(t'the lint still reports the stale entry as an error {pg["Finding"].l}'):
+    with then(
+        t'the lint still reports the stale entry as an error {pg["Lint finding"].l}'
+    ):
         result.stdout.fnmatch_lines(
             ['*narration lint (1 finding, 1 error)*', '*ERROR*stale-ignore*']
         )

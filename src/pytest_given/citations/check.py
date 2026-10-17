@@ -36,7 +36,7 @@ from .markdown_links import VARIATION_SELECTOR, Glyph, MarkdownLink, scan_links
 from .narrated import LooseDetails, NarratedCitation, scan_narrated
 from .targets import TargetResolver, parse_fragment
 
-type FindingKind = Literal[
+type CitationFindingKind = Literal[
     'repointed',
     'fragment',
     'missing',
@@ -52,7 +52,7 @@ type FindingKind = Literal[
 class CitationFinding:
     path: Path
     line: int
-    kind: FindingKind
+    kind: CitationFindingKind
     message: str
     details: tuple[str, ...] = ()
     fixed_by_update: bool
@@ -498,7 +498,7 @@ class _LinkCheck[L: _CitingLink](ABC):
             self.edits.append(_Edit(*glyph.span, missing))
 
     def _repoint(
-        self, kind: FindingKind, message: str, old: Target, new: Target
+        self, kind: CitationFindingKind, message: str, old: Target, new: Target
     ) -> None:
         span = self.link.fragment_span
         assert span is not None
@@ -511,13 +511,21 @@ class _LinkCheck[L: _CitingLink](ABC):
         )
 
     def _fix(
-        self, message: str, edit: _Edit, *details: str, kind: FindingKind = 'stale'
+        self,
+        message: str,
+        edit: _Edit,
+        *details: str,
+        kind: CitationFindingKind = 'stale',
     ) -> None:
         self._find(kind, message, *details, fixed=True)
         self.edits.append(edit)
 
     def _find(
-        self, kind: FindingKind, message: str, *details: str, fixed: bool = False
+        self,
+        kind: CitationFindingKind,
+        message: str,
+        *details: str,
+        fixed: bool = False,
     ) -> None:
         self.findings.append(
             CitationFinding(

@@ -8,7 +8,7 @@
 - **then** the command succeeds
 - **then** the copy buttons' «citations» link the `/1.0/` URL
 
-## ✓ The `citations` exit code says whether a «finding» remains, so CI can gate on it · 5 cases
+## ✓ The `citations` exit code says whether a «citation finding» remains, so CI can gate on it · 5 cases
 `tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations
 
 - **given** a document with a «citation» that is {citation}
@@ -891,7 +891,7 @@
 - **then** the run passes and says nothing about the lint
 - **then** no step source is recorded, so the AST surface costs nothing
 
-## ✓ An error-«severity» «finding» fails the run
+## ✓ An error-«severity» «lint finding» fails the run
 `tests/integration/test_plugin_lint.py::test_enabled_error_finding_fails_the_run`
 
 - **given** a suite whose given «step» has an empty body
@@ -955,16 +955,16 @@
         ```
 - **when** the suite runs with that «lint rule» set to warn
 - **then** the run still passes
-- **then** the «finding» is printed anyway
+- **then** the «lint finding» is printed anyway
 
-## ✓ An ignore entry suppresses the «findings» it matches, and one that matches nothing fails the run · 4 cases
+## ✓ An ignore entry suppresses the «lint findings» it matches, and one that matches nothing fails the run · 4 cases
 `tests/integration/test_plugin_lint.py::test_an_ignore_entry_suppresses_what_it_matches` · validation
 
 - **given** a suite with {suite}
     - 📎 test file — *see parameter table*
 - **when** the suite runs with the lint and given_lint_ignore={entry}
 - **then** the lint outcome is {outcome}, and only a suppressed run passes
-- **then** an unsuppressed «finding» is reported as an error
+- **then** an unsuppressed «lint finding» is reported as an error
 - **then** an entry that suppressed nothing is reported as stale
 
 | suite | test file | entry | outcome |
@@ -1057,7 +1057,7 @@
 - **when** the suite runs with the lint disabled by ini but on by flag
 - **then** the lint runs and its error finding fails the run
 
-## ✓ An error «finding» leaves a more specific exit code alone
+## ✓ An error «lint finding» leaves a more specific exit code alone
 `tests/integration/test_plugin_lint.py::test_lint_error_does_not_mask_a_more_specific_exit_code`
 
 - **given** a suite whose lint would fail, under a stale ignore entry
@@ -1076,7 +1076,7 @@
                 assert x == 2
         ```
 - **when** the suite runs deselected, so nothing is collected
-- **then** the lint still reports the stale entry as an error «finding»
+- **then** the lint still reports the stale entry as an error «lint finding»
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
 
 ## ✓ A failure inside the lint keeps the «report» it was handed
@@ -2480,10 +2480,10 @@
         </details>
         ```
 - **when** the document is checked
-- **then** one stale narration is the only «finding»
+- **then** one stale narration is the only «citation finding»
 - **then** it names the first line that differs, written and expected
 
-## ✓ A «narrated citation» of a tag or story is a «finding» `update` leaves
+## ✓ A «narrated citation» of a tag or story is a «citation finding» `update` leaves
 `tests/unit/citations/test_check.py::test_a_narrated_tag_citation_is_a_finding_update_leaves` · spec/narrated-citations
 
 - **given** a «report» with the tag `checkout`
@@ -2498,7 +2498,7 @@
         </details>
         ```
 - **when** the document is updated
-- **then** a stray narration is the only «finding», one `update` cannot fix
+- **then** a stray narration is the only «citation finding», one `update` cannot fix
 - **then** the document is left as written
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
@@ -2512,7 +2512,7 @@
                 pass
         ```
 - **when** the AST «lint rules» parse that source
-- **then** an empty-step «finding» points at the «step» line
+- **then** an empty-step «lint finding» points at the «step» line
 - **then** its «severity» is error
 
 ## ✓ «Narration lint» flags a then «step» that checks nothing
@@ -2527,7 +2527,7 @@
                 handlers[0](x)
         ```
 - **when** the AST «lint rules» parse that source
-- **then** a then-without-check «finding» reports the unchecked then
+- **then** a then-without-check «lint finding» reports the unchecked then
 
 ## ✓ «Narration lint» flags a then «step» that checks only on some runs
 `tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if`
@@ -2541,7 +2541,7 @@
                     assert records[entry['index']] == expected
         ```
 - **when** the AST «lint rules» parse that source
-- **then** a conditional-check «finding» reports the guarded then
+- **then** a conditional-check «lint finding» reports the guarded then
 - **then** its «severity» is warn
 
 ## ✓ «Narration lint» flags an assert outside a then «step» · 3 cases
@@ -2550,7 +2550,7 @@
 - **given** a {phase} «step» whose body asserts
     - 📎 step body — *see parameter table*
 - **when** the AST «lint rules» parse that source
-- **then** the warn «findings» say {messages}
+- **then** the warn «lint findings» say {messages}
 
 | phase | step body | messages |
 |---|---|---|
@@ -2595,7 +2595,7 @@
                 assert brew(machine) == 'coffee'
         ```
 - **when** the AST «lint rules» parse that source
-- **then** a warn «finding» points at the then and says no when acts
+- **then** a warn «lint finding» points at the then and says no when acts
 
 ## ✓ «Narration lint» flags a «narration» interpolating a name the body never uses
 `tests/unit/lint/test_ast_rules.py::test_unused_interpolation_fires_on_unused_bare_identifier`
@@ -2608,14 +2608,14 @@
                 cup = make_cup()
         ```
 - **when** the AST «lint rules» parse that source
-- **then** a warn «finding» names the interpolation the body ignores
+- **then** a warn «lint finding» names the interpolation the body ignores
 
 ## ✓ «Narration lint» flags a passed «scenario» that skips a «phase»
 `tests/unit/lint/test_runtime_rules.py::test_missing_phase_fires_on_passed_two_phase_scenario`
 
 - **given** a passed «scenario» narrating only given and then
 - **when** the runtime «lint rules» run
-- **then** one missing-phase «finding» names the absent when and the «scenario» source
+- **then** one missing-phase «lint finding» names the absent when and the «scenario» source
 - **then** its «severity» is the catalog default, warn
 
 ## ✓ «Narration lint» flags a «tag» that duplicates a «term»
@@ -2624,14 +2624,14 @@
 - **given** a «glossary» defining one «term»
 - **given** two scenarios carrying that word as a «tag»
 - **when** the runtime «lint rules» run
-- **then** a single warn «finding» names the «tag» and the «term» it shadows, counting the scenarios and naming one
+- **then** a single warn «lint finding» names the «tag» and the «term» it shadows, counting the scenarios and naming one
 
 ## ✓ «Narration lint» flags a «term» referenced by no «scenario» name, «step» or «story»
 `tests/unit/lint/test_runtime_rules.py::test_dead_term_flags_unreferenced_term`
 
 - **given** a «glossary» holding one unreferenced «term»
 - **when** the runtime «lint rules» run over no scenarios and no stories
-- **then** the «finding» names the unreferenced «term»
+- **then** the «lint finding» names the unreferenced «term»
 - **then** its «severity» is off — the rule is opt-in
 
 ## ✓ «Narration lint» counts a «term» named only in the second «clause» of a «sentence» as referenced

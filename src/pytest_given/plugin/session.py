@@ -23,7 +23,7 @@ from ..capture import (
     restore_capture_state,
 )
 from ..grouping import group_parametrized
-from ..lint import Finding, error_count, run_lint, summary_rows, summary_title
+from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
 from ..model import (
     Glossary,
     Metadata,
@@ -286,7 +286,7 @@ def _write_error(
 
 
 def _write_lint_findings(
-    terminalreporter: pytest.TerminalReporter, findings: list[Finding] | None
+    terminalreporter: pytest.TerminalReporter, findings: list[LintFinding] | None
 ) -> None:
     if findings is None:
         return

@@ -25,7 +25,7 @@ from ..capture import (
 from ..capture import (
     scenario_marker as capture_scenario_marker,
 )
-from ..lint import Finding, LintConfig
+from ..lint import LintConfig, LintFinding
 from ..model import NodeId, ParamInfo, ReportUrl
 from ..report import SinkConfig
 
@@ -48,7 +48,7 @@ class SessionOutcome:
     lint_error: str | None = None
     md_stdout: str | None = None
     # None when the lint did not run, so a clean run can still say it ran.
-    findings: list[Finding] | None = None
+    findings: list[LintFinding] | None = None
 
 
 @dataclass(kw_only=True)

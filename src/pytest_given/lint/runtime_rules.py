@@ -18,7 +18,7 @@ from ..model import (
     iter_narrations,
     iter_steps,
 )
-from .base import DEAD_TERM, MISSING_PHASE, TAG_SHADOWS_TERM, RawFinding, RuleId
+from .base import DEAD_TERM, MISSING_PHASE, TAG_SHADOWS_TERM, RawLintFinding, RuleId
 
 
 def run_runtime_rules(
@@ -26,7 +26,7 @@ def run_runtime_rules(
     glossary: Glossary | None,
     stories: list[Story],
     enabled: Container[RuleId],
-) -> list[RawFinding]:
+) -> list[RawLintFinding]:
     """Every `enabled` rule here, evaluated over the grouped scenario list —
     once per logical scenario."""
     context = _Context(grouped=grouped, glossary=glossary, stories=stories)
@@ -48,13 +48,13 @@ class _Context:
     stories: list[Story]
 
 
-def _missing_phase_findings(context: _Context) -> list[RawFinding]:
+def _missing_phase_findings(context: _Context) -> list[RawLintFinding]:
     """Rule `missing-phase`: a passed scenario lacks a Given, When, or Then.
 
     Non-passed scenarios are skipped — a skipped one records no steps and a
     failed one may be missing a phase only because it aborted mid-body.
     """
-    findings: list[RawFinding] = []
+    findings: list[RawLintFinding] = []
     for scenario in context.grouped:
         if scenario.status != 'passed':
             continue
@@ -62,7 +62,7 @@ def _missing_phase_findings(context: _Context) -> list[RawFinding]:
         missing = [phase for phase in PHASES if phase not in present]
         if missing:
             findings.append(
-                RawFinding(
+                RawLintFinding(
                     rule=MISSING_PHASE,
                     subject=scenario.id,
                     location=scenario.source,
@@ -87,7 +87,7 @@ class _ShadowingTag:
     scenarios: set[NodeId] = field(default_factory=set)
 
 
-def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
+def _tag_shadows_term_findings(context: _Context) -> list[RawLintFinding]:
     """Rule `tag-shadows-term`: a scenario tag duplicates a glossary term.
 
     One finding per unique tag (subject = tag slug) — the fix is renaming the
@@ -113,12 +113,12 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
                     tag=tag, term=term, example=scenario.id
                 )
             shadow.scenarios.add(scenario.id)
-    findings: list[RawFinding] = []
+    findings: list[RawLintFinding] = []
     for slug, shadow in shadowing.items():
         count = len(shadow.scenarios)
         noun = 'scenario' if count == 1 else 'scenarios'
         findings.append(
-            RawFinding(
+            RawLintFinding(
                 rule=TAG_SHADOWS_TERM,
                 subject=slug,
                 location=None,
@@ -132,7 +132,7 @@ def _tag_shadows_term_findings(context: _Context) -> list[RawFinding]:
     return findings
 
 
-def _dead_term_findings(context: _Context) -> list[RawFinding]:
+def _dead_term_findings(context: _Context) -> list[RawLintFinding]:
     """Rule `dead-term`: a glossary term is referenced by no scenario title, no
     step and no story. Default `off`: for a file-backed glossary, unreferenced
     terms are often intentionally present (documented behavior)."""
@@ -152,7 +152,7 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
                     if isinstance(ref, ClauseTermRef):
                         referenced.add(ref.term_id)
     return [
-        RawFinding(
+        RawLintFinding(
             rule=DEAD_TERM,
             subject=term.id,
             location=term.source,
@@ -168,7 +168,7 @@ def _dead_term_findings(context: _Context) -> list[RawFinding]:
 
 # Keyed by rule id so `run_runtime_rules` skips a disabled rule entirely —
 # `dead-term`, off by default, walks every narration part and every clause.
-_RUNTIME_RULES: dict[RuleId, Callable[[_Context], list[RawFinding]]] = {
+_RUNTIME_RULES: dict[RuleId, Callable[[_Context], list[RawLintFinding]]] = {
     MISSING_PHASE: _missing_phase_findings,
     TAG_SHADOWS_TERM: _tag_shadows_term_findings,
     DEAD_TERM: _dead_term_findings,
