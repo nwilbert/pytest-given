@@ -1,6 +1,7 @@
 """What a citation of each kind says — glyph, link text, fragment, summary —
 and which scenarios, tags and stories a report holds to cite."""
 
+import re
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -69,18 +70,58 @@ class Citation:
         side of the report URL — which a page citing thousands of targets
         carries once."""
         summary = f' {self.summary}' if self.summary else ''
-        return (
-            f'{self.glyph} [{link_text(self.title)}](',
-            f'#{self.fragment}){summary}',
+        return _markdown_halves(
+            self.glyph, link_text(self.title), self.fragment, summary
         )
 
-    def narrated_halves(self) -> tuple[str, str]:
-        """The `<details>` block's text either side of the report URL, its
-        body empty for `citations update` to fill."""
-        return (
-            f'<details markdown="1">\n<summary>{self.glyph} <a href="',
-            f'#{self.fragment}">{self.html_link_text}</a></summary>\n\n</details>',
-        )
+    def scenario_row(self) -> list[str]:
+        """What `scenario_citation_templates` leave to fill: glyph, fragment,
+        title, and the HTML title only where it differs from the Markdown."""
+        title = link_text(self.title)
+        html_title = self.html_link_text
+        return [
+            self.glyph,
+            self.fragment,
+            title,
+            *([html_title] if html_title != title else []),
+        ]
+
+
+type CitationTemplate = list[str]
+
+
+def scenario_citation_templates() -> dict[str, CitationTemplate]:
+    """Each form a scenario citation is copied in, as literal text and slot
+    names alternating, so a page carries the forms once and each scenario only
+    its `scenario_row`. The slots: `glyph`, `fragment`, `title`, `html_title`,
+    `url`, and `url_attribute` — the URL escaped for an attribute value."""
+    glyph, fragment, title, html_title, url, url_attribute = (
+        f'\0{slot}\0'
+        for slot in ('glyph', 'fragment', 'title', 'html_title', 'url', 'url_attribute')
+    )
+    markdown = _markdown_halves(glyph, title, fragment, '')
+    narrated = _narrated_halves(glyph, html_title, fragment)
+    return {
+        'scenario': _SLOT.split(url.join(markdown)),
+        'narrated': _SLOT.split(url_attribute.join(narrated)),
+    }
+
+
+_SLOT = re.compile(r'\0(\w+)\0')
+
+
+def _markdown_halves(
+    glyph: str, title: str, fragment: str, summary: str
+) -> tuple[str, str]:
+    return (f'{glyph} [{title}](', f'#{fragment}){summary}')
+
+
+def _narrated_halves(glyph: str, html_title: str, fragment: str) -> tuple[str, str]:
+    """The `<details>` block, its body empty for `citations update` to fill."""
+    return (
+        f'<details markdown="1">\n<summary>{glyph} <a href="',
+        f'#{fragment}">{html_title}</a></summary>\n\n</details>',
+    )
 
 
 def report_fragment(target: Target) -> str:

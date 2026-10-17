@@ -55,6 +55,16 @@ function escapeAttribute(value) {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
 }
 
+// A scenario citation template alternates literal text and slot names. The
+// row is `scenario_row`'s: glyph, fragment, title, and an HTML title only
+// where it differs. The URL lands in a narrated block's `href` escaped;
+// `citations check` resolves the character references when it reads it back.
+function fillCitation(template, row, url) {
+  const [glyph, fragment, title, htmlTitle = title] = row;
+  const slots = { glyph, fragment, title, html_title: htmlTitle, url, url_attribute: escapeAttribute(url) };
+  return template.map((part, position) => (position % 2 ? slots[part] : part)).join('');
+}
+
 // `#scenario=` takes the slug the copy-link button writes or the node ID a
 // citation writes — a grouped scenario's without its first case's `[…]`. Any
 // case's node ID opens its group too, as `citations check` reads it.
@@ -723,19 +733,25 @@ function reportApp() {
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
-    // Python renders the line either side of the report's public URL — the
-    // setting's, never `window.location`.
+    // Python renders a tag's or story's line either side of the report's
+    // public URL — the setting's, never `window.location` — and a scenario's
+    // forms as templates its row fills.
     copyCitation(kind, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
+      if (kind === 'scenario') {
+        this._copyScenarioCitation('scenario', key, btn);
+        return;
+      }
       const halves = lookup(citations[kind], key, null);
       if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
     },
-    // The URL lands in the block's `href`; `citations check` resolves the
-    // character references when it reads the block back.
     copyNarratedCitation(key, btn) {
+      this._copyScenarioCitation('narrated', key, btn);
+    },
+    _copyScenarioCitation(form, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
-      const halves = lookup(citations.narrated, key, null);
-      if (halves) this._copyAndFlash(halves[0] + escapeAttribute(citations.report_url) + halves[1], btn);
+      const row = lookup(citations.scenario, key, null);
+      if (row) this._copyAndFlash(fillCitation(citations.templates[form], row, citations.report_url), btn);
     },
     // A second click on the button that opened the menu closes it. The first
     // entry takes focus, as a menu button's should, so the arrow keys work at

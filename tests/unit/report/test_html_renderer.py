@@ -35,6 +35,11 @@ from pytest_given.model import (
     report_from_dict,
     report_to_dict,
 )
+from pytest_given.report.citation_index import (
+    CitationIndex,
+    Target,
+    scenario_citation_templates,
+)
 from pytest_given.report.html_renderer import (
     _BLOCK_COMMENT,
     _COMMENT_LINE,
@@ -2494,9 +2499,6 @@ def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
         return {key: line(halves) for key, halves in citations[kind].items()}
 
     assert citations['report_url'] == url
-    assert [line(halves) for halves in citations['scenario']] == [
-        f'✅ [Pour]({url}#scenario=t.py::test_pour)'
-    ]
     assert lines('tag') == {
         'spec': f'✅ [spec]({url}#tag=spec) (1 ✅)',
         'spec/x': f'✅ [spec/x]({url}#tag=spec/x) (1 ✅)',
@@ -2504,17 +2506,16 @@ def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
     assert lines('story') == {}
 
 
-def test_citation_data_carries_each_scenarios_narrated_halves() -> None:
-    url = 'https://example.org/report.html'
-    data = _embedded_app_data(render_html_string(_citable_report(url), None))
-    before, after = data['citations']['narrated'][0]
-
-    assert before + url + after == (
-        '<details markdown="1">\n'
-        f'<summary>✅ <a href="{url}#scenario=t.py::test_pour">Pour</a></summary>\n'
-        '\n'
-        '</details>'
-    )
+def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() -> None:
+    report = _citable_report('https://example.org/report.html')
+    data = _embedded_app_data(render_html_string(report, None))
+    citations = data['citations']
+    index = CitationIndex.of(report)
+    assert citations['templates'] == scenario_citation_templates()
+    assert citations['scenario'] == [
+        index.citation(Target('scenario', cited)).scenario_row()
+        for cited in index.scenarios
+    ]
 
 
 def test_a_report_without_a_url_carries_no_citations() -> None:

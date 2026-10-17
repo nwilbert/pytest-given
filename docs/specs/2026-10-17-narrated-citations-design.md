@@ -183,9 +183,12 @@ body empty:
 </details>
 ```
 
-`citations update` fills the body. The HTML report carries each scenario's summary line, either side
-of the report URL as a one-line citation's halves are, and no narration: a body per scenario would
-grow the report by its whole narration a second time.
+`citations update` fills the body. The HTML report carries no narration — a body per scenario
+would grow the report by its whole narration a second time — and writes a scenario's citations
+from templates: each copied form once per page, as literal text around named slots, and per
+scenario only its row — glyph, fragment, Markdown title, and HTML title where it differs. Rendered
+whole per scenario, the one-line and narrated forms would repeat the fragment, the glyph and the
+block's tags thousands of times.
 
 The menu's look is the builder's, held to the report's tokens and verified in Playwright: it opens
 on click or Enter, closes on Escape, on a click outside and after a copy, and keeps the copied
@@ -201,10 +204,11 @@ flash the buttons show today.
   existing `_LinkCheck` rules and the findings above, `FindingKind` gaining `stray-narration`.
 - `report/md_renderer.py` — the narration body as its own function, which `render_md` builds a
   scenario's section around; four-space nesting.
-- `report/citation_index.py` — `Citation` gains the summary line's halves and the link text as HTML,
-  through `inline_markdown.py`'s span rendering.
-- `report/html_renderer.py`, `templates/`, `app.js` — the narrated halves in the citation data; the
-  copy menu replacing the copy-link and citation buttons.
+- `report/citation_index.py` — `Citation` gains the link text as HTML, through `inline_markdown.py`'s
+  span rendering, and a scenario's row; the scenario citation templates, built by the same code as
+  `markdown_halves`.
+- `report/html_renderer.py`, `templates/`, `app.js` — the templates and rows in the citation data;
+  the copy menu replacing the copy-link and citation buttons.
 - `GLOSSARY.md` — a **Narrated citation** row beside **Citation**.
 
 ## Documentation

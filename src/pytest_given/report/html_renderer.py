@@ -47,7 +47,13 @@ from ..model import (
     plural,
     read_narration,
 )
-from .citation_index import CitationIndex, Target, TargetKind
+from .citation_index import (
+    CitationIndex,
+    CitationTemplate,
+    Target,
+    TargetKind,
+    scenario_citation_templates,
+)
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
 from .inline_markdown import render_definition, render_span
@@ -73,8 +79,8 @@ type CitationHalves = tuple[str, str]
 
 class CitationData(TypedDict):
     report_url: str
-    scenario: list[CitationHalves]
-    narrated: list[CitationHalves]
+    templates: dict[str, CitationTemplate]
+    scenario: list[list[str]]
     tag: dict[str, CitationHalves]
     story: dict[str, CitationHalves]
 
@@ -386,10 +392,11 @@ def _piece_text(piece: NarrationPiece) -> str:
 
 
 def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | None:
-    """Each copy button's citation line, either side of the report URL, keyed
-    as the page finds it: a scenario by its card's position, a tag at every
-    level of the tree `app.js` builds, a story by id. Only a report with a
-    public URL shows the buttons, so only it carries the weight."""
+    """What each copy button copies, keyed as the page finds it: a scenario's
+    row for the templates by its card's position, a tag's line either side of
+    the report URL at every level of the tree `app.js` builds, a story's by id.
+    Only a report with a public URL shows the buttons, so only it carries the
+    weight."""
     report_url = report.metadata.report_url
     if report_url is None:
         return None
@@ -399,10 +406,10 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
 
     return {
         'report_url': report_url,
+        'templates': scenario_citation_templates(),
         # `index.scenarios` holds every scenario, in the report's order.
-        'scenario': [halves('scenario', cited) for cited in index.scenarios],
-        'narrated': [
-            index.citation(Target('scenario', cited)).narrated_halves()
+        'scenario': [
+            index.citation(Target('scenario', cited)).scenario_row()
             for cited in index.scenarios
         ],
         'tag': {tag: halves('tag', tag) for tag in index.tags},
