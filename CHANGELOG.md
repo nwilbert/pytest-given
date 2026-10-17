@@ -32,6 +32,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** `FileGlossary`'s `description_column` is now `definition_column`, the word the rest of the glossary API uses: rename the keyword.
 - **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
 - **Breaking.** Glossary definitions no longer render `__bold__`, and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
+- **Breaking.** A title or step whose code span, bold or italics holds a value, placeholder or term ref raises `PytestGivenError`, and so do asterisks meant literally around one, as in `t'**/{d}/**'`: keep the span within the text beside it, and put a literal `*` in a code span of its own.
 - The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear among the term's other forms.
 - The Glossary tab lists every term's called forms, an instance or another wording alike, under one "Other forms" label.
 - Glossary definitions render code inside bold and no longer italicize between spaced asterisks.

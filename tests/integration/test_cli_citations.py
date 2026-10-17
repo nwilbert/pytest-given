@@ -78,7 +78,7 @@ def test_the_citations_exit_code_says_whether_a_finding_remains(
         report = _write_report(tmp_path)
         if report_state == 'unreadable':
             report.write_text('{not json', encoding='utf-8')
-    with when(t'`pytest-given citations {command}` runs on the document'):
+    with when(t'`pytest-given citations` {command} runs on the document'):
         rc = main(['citations', command, str(doc), '--report', str(report)])
     with then(t'it exits {exit_code}'):
         assert rc == exit_code

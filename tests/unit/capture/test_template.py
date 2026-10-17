@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from pathlib import Path
 from string import templatelib
 from typing import Annotated, Any, cast
@@ -13,14 +14,17 @@ from pytest_given.capture.template import (
     resolve_template_parts,
 )
 from pytest_given.model import (
+    CodeSpan,
     Narration,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    PlainSpan,
     PytestGivenError,
     TermId,
     narration_text,
+    read_narration,
 )
 from tests.ubiquitous_language import pg
 
@@ -112,6 +116,15 @@ def test_template_escape_braces_round_trip() -> None:
     assert _rendered(Template('escaped {{name}} literal'), {}) == (
         'escaped {name} literal'
     )
+
+
+def test_template_reads_a_span_across_escaped_braces() -> None:
+    narration = narration_from(Template('use `{{name}}` here'))
+    assert read_narration(narration) == [
+        PlainSpan('use '),
+        CodeSpan('{name}'),
+        PlainSpan(' here'),
+    ]
 
 
 def test_template_unclosed_brace_raises_value_error() -> None:
@@ -401,3 +414,51 @@ def test_resolve_template_parts_rejects_a_part_template_cannot_produce() -> None
         resolve_template_parts([ref], {})
     with pytest.raises(AssertionError):
         resolve_template_parts([cast(Any, object())], {})
+
+
+@scenario(
+    t'A span holding a value, a placeholder or a {pg["Term ref"].l} is refused',
+    tags=['validation'],
+)
+def test_a_span_holding_a_value_is_refused(glossary: Glossary) -> None:
+    with given(
+        t'a code span around a t-string value, bold around a {pg["Term ref"].l} '
+        t'and italics around a `Template` placeholder'
+    ):
+        command = 'check'
+        guest = glossary.actor('Guest')
+        code_span = t'`pytest-given citations {command}` runs'
+        bold = t'**{guest}** books'
+        italics = 'a *{size}* cup'
+    with when('the narration of each is built'):
+        refusals = [
+            _refusal(narration_from, code_span),
+            _refusal(narration_from, bold),
+            _refusal(Template, italics),
+        ]
+    with then('each is refused, naming the part its span holds'):
+        assert '{command} in a code span' in refusals[0]
+        assert '{guest} in bold' in refusals[1]
+        assert '{size} in italics' in refusals[2]
+    with then('each says the span would not render'):
+        assert all('span would not render' in refusal for refusal in refusals)
+
+
+def _refusal[T](build: Callable[[T], object], text: T) -> str:
+    with pytest.raises(PytestGivenError) as refusal:
+        build(text)
+    return str(refusal.value)
+
+
+def test_a_tstring_title_refuses_a_span_around_a_value() -> None:
+    nights = 3
+    with pytest.raises(PytestGivenError, match=r'\{nights\} in a code span'):
+        scenario(t'Stays `{nights}` nights')
+
+
+def test_a_refusal_names_the_part_as_written() -> None:
+    width = 'wide'
+    with pytest.raises(PytestGivenError, match=r'\{width!r:>8\} in bold'):
+        narration_from(t'**{width!r:>8}** cup')
+    with pytest.raises(PytestGivenError, match=r'\{size:>5\} in italics'):
+        Template('a *{size:>5}* cup')

@@ -14,7 +14,7 @@
 - **given** a document with a «citation» that is {citation}
   - 📎 document — *see parameter table*
 - **given** a JSON «report» that is {report_state}
-- **when** \`pytest-given citations {command}\` runs on the document
+- **when** `pytest-given citations` {command} runs on the document
 - **then** it exits {exit_code}
 - **then** the document was rewritten: {rewritten}
 
@@ -2279,6 +2279,14 @@
 - **given** a «deferred term» from a «file glossary»
 - **when** it is interpolated into a t-string step
 - **then** the step carries a single «term ref»
+
+## ✓ A span holding a value, a placeholder or a «term ref» is refused
+`tests/unit/capture/test_template.py::test_a_span_holding_a_value_is_refused` · validation
+
+- **given** a code span around a t-string value, bold around a «term ref» and italics around a `Template` placeholder
+- **when** the narration of each is built
+- **then** each is refused, naming the part its span holds
+- **then** each says the span would not render
 
 ## ✓ `citations update` rewrites a stale «citation» to its target's glyph, text and summary
 `tests/unit/citations/test_check.py::test_update_rewrites_a_stale_citation` · spec/citations

@@ -11,7 +11,7 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 
 from collections.abc import Callable, Iterable, Sequence
 from string import Formatter
-from typing import assert_never
+from typing import Literal, assert_never
 
 from .schema import (
     Narration,
@@ -22,11 +22,17 @@ from .schema import (
     NarrationValue,
 )
 from .steps import PartIndex
-from .text import InlineSpan, read_spans
-
-type NarrationPiece = (
-    InlineSpan | NarrationValue | NarrationPlaceholder | NarrationTermRef
+from .text import (
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
+    located_spans,
+    read_spans,
 )
+
+type InterpolatedPart = NarrationValue | NarrationPlaceholder | NarrationTermRef
+type NarrationPiece = InlineSpan | InterpolatedPart
 
 _FORMATTER = Formatter()
 
@@ -85,6 +91,42 @@ def read_narration(narration: Narration) -> list[NarrationPiece]:
         else:
             pieces.append(part)
     return pieces
+
+
+type SpanKind = Literal['a code span', 'bold', 'italics']
+
+# What every value, placeholder and term ref reads as, so whether a span holds
+# one never depends on a value only a run knows.
+_STAND_IN = 'x'
+
+
+def spanned_part(
+    parts: Sequence[NarrationPart],
+) -> tuple[SpanKind, InterpolatedPart] | None:
+    """The first span that reading the text whole would open around a value, a
+    placeholder or a term ref, and the part it holds — the span `read_narration`
+    leaves as written, its markers having no partner within one literal."""
+    whole = ''
+    held: dict[int, InterpolatedPart] = {}
+    for part in parts:
+        if isinstance(part, NarrationLiteral):
+            whole += part.value
+        else:
+            held[len(whole)] = part
+            whole += _STAND_IN
+    for span, chars in located_spans(whole):
+        if isinstance(span, PlainSpan):
+            continue
+        inside = next((part for at, part in held.items() if at in chars), None)
+        if inside is not None:
+            return _span_kind(span), inside
+    return None
+
+
+def _span_kind(span: CodeSpan | EmphasisSpan) -> SpanKind:
+    if isinstance(span, CodeSpan):
+        return 'a code span'
+    return 'bold' if span.strong else 'italics'
 
 
 def narration_of(parts: Iterable[NarrationPart]) -> Narration:

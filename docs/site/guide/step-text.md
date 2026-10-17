@@ -35,7 +35,7 @@ The rules follow CommonMark for the forms you usually write:
 - **One level:** bold and italic can contain code, but nothing else. Code comes first, so the `*` in ``*matches `*.py`*`` doesn't end the italic. Otherwise spans never overlap: the first one to close wins.
 - **Everything else is literal**, including unmatched markers and backslashes. There is no escape syntax: to show a marker, put it in a code span.
 
-Markdown is read only in the text you write, never in a value or a term ref. In `t'**{guest} books**'`, neither `**` has a partner in its own text, so both show as written. A value such as `'*'` is always just an asterisk.
+Markdown is read only in the text you write, never in a value or a term ref: a value such as `'*'` is always just an asterisk. So a span can't hold one. `t'**{guest}** books'` or ``t'`run {command}`'`` raises `PytestGivenError`, since its markers would show as written. Keep the span within the text beside it, as in ``t'`run` {command}'``.
 
 ## Template placeholders
 

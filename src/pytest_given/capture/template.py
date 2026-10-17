@@ -5,6 +5,7 @@ from collections.abc import Mapping, Sequence
 from string import Formatter, templatelib
 
 from ..model import (
+    InterpolatedPart,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -16,6 +17,7 @@ from ..model import (
     param_id,
     placeholder_value,
     render_interpolation,
+    spanned_part,
 )
 from .glossary import TermHandleBase
 
@@ -54,6 +56,31 @@ def reject_baked_values(
         )
 
 
+def reject_spanned_parts(parts: Sequence[NarrationPart]) -> None:
+    """Refuse a span whose markers sit on either side of a value, placeholder
+    or term ref: Markdown is read within each literal alone, so the span would
+    silently not render."""
+    spanned = spanned_part(parts)
+    if spanned is None:
+        return
+    kind, part = spanned
+    raise PytestGivenError(
+        f'narration puts {_as_written(part)} in {kind}, but Markdown is read '
+        f'only in the text around a value, placeholder or term ref, so that span '
+        f'would not render. Keep the span within the text beside it, or drop its '
+        f'markers.'
+    )
+
+
+def _as_written(part: InterpolatedPart) -> str:
+    if isinstance(part, NarrationTermRef):
+        return '{' + part.expression + '}'
+    name = part.name if isinstance(part, NarrationPlaceholder) else part.expression
+    conversion = f'!{part.conversion}' if part.conversion else ''
+    spec = f':{part.format_spec}' if part.format_spec else ''
+    return '{' + name + conversion + spec + '}'
+
+
 def narration_from(value: StepText | Narration) -> Narration:
     """Build a Narration from a plain string, a Template, a t-string, or an
     already-rendered Narration (which passes through unchanged — used for eager
@@ -64,7 +91,9 @@ def narration_from(value: StepText | Narration) -> Narration:
         # Through `narration_of` like the `Template` branch below, rather than
         # pairing text and parts by hand: one constructor, one place the
         # text-renders-its-parts invariant is established.
-        return narration_of(parse_tstring(value))
+        parts = parse_tstring(value)
+        reject_spanned_parts(parts)
+        return narration_of(parts)
     if isinstance(value, Template):
         # Text derived from the parts, never the raw template string: a
         # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
@@ -85,26 +114,35 @@ class Template:
     def __init__(self, template: str) -> None:
         self.template = template
         parts: list[NarrationPart] = []
+        # An escaped brace ends a literal of its own, so the text up to each
+        # placeholder is joined back: each literal is read for spans alone.
+        text = ''
         for literal, name, spec, conversion in _FORMATTER.parse(template):
-            if literal:
-                parts.append(NarrationLiteral(value=literal))
-            if name is not None:
-                if not name.isidentifier():
-                    raise PytestGivenError(
-                        f'pytest_given.Template only supports bare identifiers '
-                        f'as placeholders; got {name!r}. For attribute access '
-                        f'or expressions, use a t-string in the test body '
-                        f'(where the value is in scope).'
-                    )
-                parts.append(
-                    NarrationPlaceholder(
-                        name=name,
-                        column_id=param_id(name),
-                        format_spec=spec or '',
-                        conversion=conversion,
-                    )
+            text += literal
+            if name is None:
+                continue
+            if not name.isidentifier():
+                raise PytestGivenError(
+                    f'pytest_given.Template only supports bare identifiers '
+                    f'as placeholders; got {name!r}. For attribute access '
+                    f'or expressions, use a t-string in the test body '
+                    f'(where the value is in scope).'
                 )
+            if text:
+                parts.append(NarrationLiteral(value=text))
+                text = ''
+            parts.append(
+                NarrationPlaceholder(
+                    name=name,
+                    column_id=param_id(name),
+                    format_spec=spec or '',
+                    conversion=conversion,
+                )
+            )
+        if text:
+            parts.append(NarrationLiteral(value=text))
         self.parts: tuple[NarrationPart, ...] = tuple(parts)
+        reject_spanned_parts(self.parts)
 
     def get_identifiers(self) -> list[str]:
         return [p.name for p in self.parts if isinstance(p, NarrationPlaceholder)]

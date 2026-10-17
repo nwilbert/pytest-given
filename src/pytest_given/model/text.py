@@ -14,6 +14,7 @@ coverage instance ids all derive the same way.
 """
 
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from .errors import PytestGivenError
@@ -86,26 +87,33 @@ type InlineSpan = PlainSpan | CodeSpan | EmphasisSpan
 def read_spans(text: str, *, before: str = '', after: str = '') -> list[InlineSpan]:
     """`text` as plain text, code spans, and bold or italic holding only those.
     `before` and `after`, the neighbouring text, flank its edges unread."""
+    return [span for span, _ in located_spans(text, before=before, after=after)]
+
+
+def located_spans(
+    text: str, *, before: str = '', after: str = ''
+) -> Iterator[tuple[InlineSpan, range]]:
+    """Each span `read_spans` reads, with the characters of `text` it spans."""
     if '*' not in text and '`' not in text:
-        return [*_plain(text)]
+        yield from _located_plain(text, 0, len(text))
+        return
     # A marker before the text stays one, so no span opens to touch it.
     prefix = before[-1:] if before.endswith(('*', '`')) else _neighbour(before[-1:])
     padded = f'{prefix}{text}{_neighbour(after[:1])}'
-    spans: list[InlineSpan] = []
     end = 0
     for match in _SPAN.finditer(padded, len(prefix)):
         start = match.start() - len(prefix)
-        spans.extend(_plain(text[end:start]))
+        yield from _located_plain(text, end, start)
+        end = match.end() - len(prefix)
         code, strong, italic = match.groups()
         if code is not None:
-            spans.append(CodeSpan(code[1:-1]))
+            yield CodeSpan(code[1:-1]), range(start, end)
         else:
             inner = strong if strong is not None else italic
             assert inner is not None
-            spans.append(EmphasisSpan(strong is not None, tuple(_code_spans(inner))))
-        end = match.end() - len(prefix)
-    spans.extend(_plain(text[end:]))
-    return spans
+            span = EmphasisSpan(strong is not None, tuple(_code_spans(inner)))
+            yield span, range(start, end)
+    yield from _located_plain(text, end, len(text))
 
 
 # A lone backtick, never one of a run, so no two code spans touch.
@@ -158,3 +166,10 @@ def _code_spans(text: str) -> list[PlainSpan | CodeSpan]:
 
 def _plain(text: str) -> list[PlainSpan]:
     return [PlainSpan(text)] if text else []
+
+
+def _located_plain(
+    text: str, start: int, end: int
+) -> Iterator[tuple[InlineSpan, range]]:
+    if start < end:
+        yield PlainSpan(text[start:end]), range(start, end)

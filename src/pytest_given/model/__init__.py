@@ -13,6 +13,7 @@ from .errors import (
     placeholder_mismatch,
 )
 from .narration import (
+    InterpolatedPart,
     NarrationPiece,
     narration_of,
     narration_text,
@@ -21,6 +22,7 @@ from .narration import (
     read_narration,
     rebuilt,
     render_interpolation,
+    spanned_part,
 )
 from .report_url import ReportUrl, resolve_report_url
 from .runtime import (
@@ -123,6 +125,7 @@ __all__ = [
     'Glossary',
     'GlossaryTerm',
     'InlineSpan',
+    'InterpolatedPart',
     'JsonObject',
     'Metadata',
     'Narration',
@@ -189,5 +192,6 @@ __all__ = [
     'rolled_up_status',
     's_form',
     'snapshot_param_value',
+    'spanned_part',
     'walk_steps',
 ]
