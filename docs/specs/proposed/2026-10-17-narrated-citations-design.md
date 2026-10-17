@@ -61,16 +61,17 @@ every scenario under it.
 The summary's parts are a scenario citation's, written as HTML:
 
 - **Glyph** — the scenario's status, as a one-line citation's; `❓` for a target not in the report.
-- **`href`** — the report link, its fragment `scenario=<node ID>`. The report location rules are a
+- **`href`** — the report link, its fragment `scenario=<node ID>`, in double quotes and read with
+  its character references resolved, as any attribute value is. The report location rules are a
   one-line citation's: an absolute URL under `given_report_url`, or a relative one resolving to
   `--report-path`. A docs build rewrites a relative `href` exactly as it rewrites a Markdown link's
   destination (Zensical prefixes both with `../` for its directory URLs), so a relative link stays
   right in both forms.
 - **Link text** — the scenario title as the HTML report's inline Markdown renders it: escaped, its
-  spans as `<strong>`, `<em>` and `<code>`, a term ref as its plain display text. It is compared
-  with entities resolved, tags dropped and whitespace folded, the counterpart of resolving
-  backslash escapes in a Markdown link's text, so a hand-written title without `<code>` stays
-  current.
+  spans as `<strong>`, `<em>` and `<code>`, a term ref as its plain display text. Written and
+  expected are compared as the text they render to — tags dropped, character references resolved,
+  whitespace folded — so a hand-written title without `<code>` stays current. Repointing a renamed
+  test by its title compares the same text.
 - **No summary** — a scenario citation takes none.
 
 ### Where it is read
@@ -82,14 +83,15 @@ to keep a narrated citation at the top level on a Python-Markdown site.
 
 An HTML block is a narrated citation when it holds a `<details>` tag, then a `<summary>` holding a
 glyph and an `<a href>` that names the report, and nothing else; whitespace between them, a line
-break included, is read as one space. Its body runs to the next HTML block at the same depth that
-starts with `</details>`; a `</details>` inside a fenced block in the body is code, not a closing
-tag. A block that also holds its `</details>` — no blank line after `</summary>` — has an empty
+break included, is read as one space. Its body runs to the next HTML block in the same container
+— the document, or the same list item or blockquote — that starts with `</details>`; a
+`</details>` inside a fenced block in the body is code, not a closing tag, and a `<details>` block
+before it leaves the first unclosed. A block that also holds its `</details>` — no blank line after `</summary>` — has an empty
 body. Links in the body are not read: the body is the citation's, rewritten whole.
 
 A `<details>` block whose summary holds a glyph and a link into the report in any other shape — an
-`<a>` with attributes besides `href`, text after `</a>` — is a `mistyped` finding, so a narrated
-citation never goes unchecked unseen. Any other `<details>` block is the author's and is left
+`<a>` with attributes besides `href`, text after `</a>` — or that no `</details>` in its container
+closes is a `mistyped` finding, so a narrated citation never goes unchecked unseen. Any other `<details>` block is the author's and is left
 alone.
 
 ## What the body holds
@@ -102,8 +104,8 @@ What the Markdown report writes for the scenario below its source anchor line:
 It leaves out:
 
 - **the heading** — the summary replaces it;
-- **the source anchor line** — its line number would change the document on every edit above the
-  test;
+- **the subtitle line** — the source anchor, with the tags and any skip or xfail reason beside it:
+  its line number would change the document on every edit above the test;
 - **errors** — a scenario's error block and a failed or xfailed case's block below the table. A failing
   citation is already a `failed` finding, and error text — paths, addresses — differs between runs.
 
@@ -135,7 +137,9 @@ repointing a renamed test by its title, `missing`, `failed` — plus its body an
 - **Character for character** — the body is compared with the narration exactly, its line breaks
   normalized: a document checked out with CRLF line endings is not stale for them. `update` writes
   the narration with the line break the document's first line uses, and each line under the
-  container prefix of the opening tag's line (a list item's indent, a blockquote's `> `).
+  continuation prefix of the opening tag's line (a list item's indent, a blockquote's `> `), a
+  blank line under that prefix with its trailing whitespace dropped (`>` in a blockquote, where an
+  empty line would end it). The body is compared with those prefixes left out.
 - **The stale-narration detail** names the first line that differs, written and expected, rather
   than a diff: the fix is always `update`, and the document's own diff shows the change once it ran.
 - **An empty body** — a block copied from the report — is stale narration like any other, so `check`
@@ -143,7 +147,7 @@ repointing a renamed test by its title, `missing`, `failed` — plus its body an
 - **A failed scenario** keeps its narration current: its body is rewritten as for any status, and
   its `failed` finding stays.
 - **A tag or story** in a narrated citation is a finding `update` cannot fix: it would have to drop
-  the author's body or keep a block with nothing to narrate.
+  the author's body or keep a block with nothing to narrate. Nothing else of the block is checked.
 - **A Markdown formatter** rewrites a narrated body — Prettier pads table columns, a list-indent
   rule set to two spaces reindents nested steps — and `check` then reports it stale. A document
   with narrated citations has its formatter skip them, such as with Prettier's
@@ -186,8 +190,8 @@ flash the buttons show today.
 
 ## Implementation touch points
 
-- `markdown/` — the block walk yields HTML blocks too: each block's source lines, its nesting depth
-  and the container prefix of its first line.
+- `markdown/` — the block walk yields HTML blocks too: each block's source lines, its container
+  and its first line's continuation prefix.
 - `citations/` — a reader of narrated citations over those HTML blocks, beside `markdown_links.py`'s
   link reader, giving the same parts a `MarkdownLink` gives — glyph, link text, `href`, each with
   its source span — plus the opening tag's and the body's spans; `check.py` checks them with the
@@ -220,12 +224,13 @@ flash the buttons show today.
 
 ## Test coverage
 
-- `tests/unit/markdown/` — HTML blocks in the walk, with depth and container prefix, in a list item
-  and a blockquote.
+- `tests/unit/markdown/` — HTML blocks in the walk, with container and continuation prefix, in a
+  list item and a blockquote.
 - `tests/unit/citations/` — reading a narrated citation: its parts and spans; whitespace and a
   line break between the tags; a block holding its own `</details>`; a `</details>` in a fenced
-  body block; an author's `<details>` left alone. Checking one: each finding in the table, a
-  current one silent, CRLF line endings, a body under a list item's indent and a blockquote's `> `;
+  body block; an unclosed block; an author's `<details>` left alone. Checking one: each finding in
+  the table, a current one silent, a title with a code span current, CRLF line endings, a body under
+  a list item's indent and a blockquote's `> `;
   listed by `check --list` and kept by `--covering` as a one-line citation is.
 - `tests/unit/report/` — the body leaves out heading, anchor and errors; four-space nesting.
 - `tests/integration/test_cli_citations.py` — `update` fills an empty body, `check` exits 1 on a
