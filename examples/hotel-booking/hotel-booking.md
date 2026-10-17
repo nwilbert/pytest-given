@@ -43,8 +43,8 @@
 | gift card | partial balance | ✗ |
 
 - **gift card, partial balance** — failed:
-  > assert 'unsupported payment method' == 'partial balance'
-  > test_hotel_booking.py:293 in test_payment_declined
+    > assert 'unsupported payment method' == 'partial balance'
+    > test_hotel_booking.py:293 in test_payment_declined
 
 ## ✓ Cancelling a paid booking refunds it and notifies the guest
 `examples/hotel-booking/test_hotel_booking.py::test_cancel_booking`

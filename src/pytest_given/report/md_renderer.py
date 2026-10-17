@@ -34,6 +34,12 @@ def render_md(report: ReportData, *, with_lines: bool = True) -> str:
     return '\n\n'.join(blocks) + '\n'
 
 
+def narration_body_md(scenario: Scenario) -> str:
+    """The steps and, for a grouped scenario, the parameter table: the
+    narration without heading, subtitle or any error block."""
+    return '\n'.join(_body_lines(scenario, with_errors=False))
+
+
 def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
     glyph = STATUS_GLYPH[scenario.status]
     suffix = ''
@@ -55,10 +61,7 @@ def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
         subtitle += f' — expected to fail: {_text(scenario.xfail_reason)}'
     lines.append(subtitle)
     lines.append('')
-    lines.extend(_step_md(step, depth=0) for step in scenario.steps)
-    if scenario.parameters is not None:
-        lines.append('')
-        lines.append(_param_table_md(scenario.parameters))
+    lines.extend(_body_lines(scenario, with_errors=True))
     # After the steps and the table, where the HTML renderer puts it. A
     # grouped scenario never carries one — its cases do, and `_param_table_md`
     # renders those below the table instead.
@@ -66,6 +69,14 @@ def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
         lines.append('')
         lines.extend(_error_lines(scenario.error))
     return '\n'.join(lines)
+
+
+def _body_lines(scenario: Scenario, *, with_errors: bool) -> list[str]:
+    lines = [_step_md(step, depth=0) for step in scenario.steps]
+    if scenario.parameters is not None:
+        lines.append('')
+        lines.append(_param_table_md(scenario.parameters, with_errors=with_errors))
+    return lines
 
 
 def _source_md(scenario: Scenario, with_lines: bool) -> str:
@@ -83,7 +94,7 @@ def _source_md(scenario: Scenario, with_lines: bool) -> str:
     return f'{located}{path_sep}{name}'
 
 
-def _param_table_md(table: ParameterTable) -> str:
+def _param_table_md(table: ParameterTable, *, with_errors: bool) -> str:
     """The parameter table, plus a fenced block per attachment cell too big to inline.
 
     Long cells follow the split `_attachment_lines` uses: short single-line
@@ -123,7 +134,8 @@ def _param_table_md(table: ParameterTable) -> str:
     for row, (case, key) in enumerate(zip(table.cases, keys, strict=True), start=1):
         if counts[key] > 1:
             key = f'{key} (row {row})'
-        blocks.extend(_case_error_block(key, case))
+        if with_errors:
+            blocks.extend(_case_error_block(key, case))
         blocks.extend(_case_attachment_blocks(table, case, key))
     return '\n'.join([header, separator, *rows, *blocks])
 
@@ -140,7 +152,7 @@ def _case_error_block(key: str, case: ParameterCase) -> list[str]:
     return [
         '',
         f'- **{key}** — {STATUS_LABEL[case.status]}:',
-        *_error_lines(case.error, '  '),
+        *_error_lines(case.error, _INDENT),
     ]
 
 
@@ -182,7 +194,7 @@ def _case_attachment_blocks(
             continue
         lines.append('')
         lines.append(f'- **{key}** — {_text(column.name)}:')
-        lines.extend(f'  {line}' for line in _fenced(value.content))
+        lines.extend(f'{_INDENT}{line}' for line in _fenced(value.content))
     return lines
 
 
@@ -203,6 +215,9 @@ def _case_key(table: ParameterTable, case: ParameterCase, row: int) -> str:
 
 
 _MAX_INLINE = 72
+
+# Four spaces, so a nested block is a child under any list marker width.
+_INDENT = '    '
 
 
 def _fits_inline(content: str) -> bool:
@@ -243,7 +258,7 @@ def _cell(value: object) -> str:
 
 
 def _step_md(step: Step, depth: int) -> str:
-    indent = '  ' * depth
+    indent = _INDENT * depth
     lines = [f'{indent}- **{step.phase}** {_narration_md(step.narration)}']
     for attachment in step.attachments:
         lines.extend(_attachment_lines(attachment, indent))
@@ -253,15 +268,16 @@ def _step_md(step: Step, depth: int) -> str:
 
 def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
     label = _text(attachment.label)
+    item_indent = indent + _INDENT
     if isinstance(attachment, AttachmentRef):
         # A promoted attachment carries no content — the payload is in the
         # column its badge points at.
-        return [f'{indent}  - 📎 {label} — *see parameter table*']
+        return [f'{item_indent}- 📎 {label} — *see parameter table*']
     if _fits_inline(attachment.content):
-        return [f'{indent}  - 📎 {label} — {code_span_markdown(attachment.content)}']
-    body_indent = f'{indent}    '
+        return [f'{item_indent}- 📎 {label} — {code_span_markdown(attachment.content)}']
+    body_indent = item_indent + _INDENT
     return [
-        f'{indent}  - 📎 {label}:',
+        f'{item_indent}- 📎 {label}:',
         *(f'{body_indent}{line}' for line in _fenced(attachment.content)),
     ]
 

@@ -14,6 +14,7 @@ from .citation_index import (
     report_fragment,
 )
 from .link_text import link_text
+from .md_renderer import narration_body_md
 from .sinks import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
@@ -54,6 +55,7 @@ __all__ = [
     'detect_commit_sha',
     'emit_sinks',
     'link_text',
+    'narration_body_md',
     'report_fragment',
     'resolve_source_link_template',
     'resolve_theme',

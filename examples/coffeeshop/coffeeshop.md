@@ -6,26 +6,26 @@
 - **given** a coffee machine
 - **when** I insert \$2
 - **then** I get a coffee
-  - 📎 Machine state:
-    ```
-    {
-      "coffees": 9,
-      "price": 2,
-      "water_ml": 1000
-    }
-    ```
+    - 📎 Machine state:
+        ```
+        {
+          "coffees": 9,
+          "price": 2,
+          "water_ml": 1000
+        }
+        ```
 
 ## ✓ Plain text attachment
 `examples/coffeeshop/test_coffeeshop.py::test_text_attachment`
 
 - **given** a coffee machine
 - **given** a printed receipt
-  - 📎 Receipt:
-    ```
-    Coffee x1     $2.00
-    ----------------
-    Total:        $2.00
-    ```
+    - 📎 Receipt:
+        ```
+        Coffee x1     $2.00
+        ----------------
+        Total:        $2.00
+        ```
 - **when** the total line is read back
 - **then** it shows the \$2.00 total
 
@@ -51,8 +51,8 @@
 | happy-hour | 1.5 | True | ⊗ |
 
 - **happy-hour** — expected failure:
-  > assert False == True
-  > test_coffeeshop.py:90 in test_pricing
+    > assert False == True
+    > test_coffeeshop.py:90 in test_pricing
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label`
@@ -107,7 +107,7 @@
 
 - **given** a coffee machine
 - **given** the machine is primed for {flavor}
-  - 📎 brew log — *see parameter table*
+    - 📎 brew log — *see parameter table*
 - **when** I brew a {flavor} coffee
 - **then** the drink costs {price} euros
 
@@ -117,43 +117,43 @@
 | mocha | brew log | 3 |
 
 - **vanilla** — brew log:
-  ```
-  00:00  purge vanilla line, 40 ml at 92.8C
-  00:04  dose 18.5 g, grind 12, hopper: vanilla
-  00:09  pre-infuse at 3.0 bar for 4.0 s
-  00:13  ramp to 9.0 bar
-  00:27  stop at 36.0 g yield, ratio 1:1.95
-  00:31  purge group head, vanilla residue cleared
-  ```
+    ```
+    00:00  purge vanilla line, 40 ml at 92.8C
+    00:04  dose 18.5 g, grind 12, hopper: vanilla
+    00:09  pre-infuse at 3.0 bar for 4.0 s
+    00:13  ramp to 9.0 bar
+    00:27  stop at 36.0 g yield, ratio 1:1.95
+    00:31  purge group head, vanilla residue cleared
+    ```
 
 - **mocha** — brew log:
-  ```
-  00:00  purge mocha line, 40 ml at 92.8C
-  00:04  dose 18.5 g, grind 12, hopper: mocha
-  00:09  pre-infuse at 3.0 bar for 4.0 s
-  00:13  ramp to 9.0 bar
-  00:27  stop at 36.0 g yield, ratio 1:1.95
-  00:31  purge group head, mocha residue cleared
-  ```
+    ```
+    00:00  purge mocha line, 40 ml at 92.8C
+    00:04  dose 18.5 g, grind 12, hopper: mocha
+    00:09  pre-infuse at 3.0 bar for 4.0 s
+    00:13  ramp to 9.0 bar
+    00:27  stop at 36.0 g yield, ratio 1:1.95
+    00:31  purge group head, mocha residue cleared
+    ```
 
 ## ✓ Helper functions can record their own steps
 `examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation` · checkout, validation, ticket/CS-42
 
 - **given** a coffee machine
 - **when** I insert \$2
-  - **when** the coin is validated for \$2
-  - **when** the balance is updated
+    - **when** the coin is validated for \$2
+    - **when** the balance is updated
 - **then** the coin is accepted
 - **then** a coffee is dispensed
-  - **then** the machine state is consistent
-    - 📎 Final state:
-      ```
-      {
-        "coffees": 9,
-        "price": 2,
-        "water_ml": 1000
-      }
-      ```
+    - **then** the machine state is consistent
+        - 📎 Final state:
+            ```
+            {
+              "coffees": 9,
+              "price": 2,
+              "water_ml": 1000
+            }
+            ```
 
 ## ✓ Top-level `given` block and deeply nested steps
 `examples/coffeeshop/test_coffeeshop.py::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
@@ -161,29 +161,29 @@
 - **given** a coffee machine
 - **given** a loyalty card with 5 points
 - **when** I place a large order
-  - **when** I select 3 coffees
-  - **when** I apply loyalty discount
-    - **when** the loyalty card is validated
-    - **when** the discount is calculated
+    - **when** I select 3 coffees
+    - **when** I apply loyalty discount
+        - **when** the loyalty card is validated
+        - **when** the discount is calculated
 - **then** the order is processed correctly
-  - **then** the coffee count is updated
-  - **then** the loyalty points are deducted
-    - **then** the remaining points are valid
-      - 📎 Loyalty state:
+    - **then** the coffee count is updated
+    - **then** the loyalty points are deducted
+        - **then** the remaining points are valid
+            - 📎 Loyalty state:
+                ```
+                {
+                  "points": 2
+                }
+                ```
+- **then** the machine state is consistent
+    - 📎 Final machine state:
         ```
         {
-          "points": 2
+          "coffees": 7,
+          "price": 2,
+          "water_ml": 1000
         }
         ```
-- **then** the machine state is consistent
-  - 📎 Final machine state:
-    ```
-    {
-      "coffees": 7,
-      "price": 2,
-      "water_ml": 1000
-    }
-    ```
 
 ## ✓ An expected error, narrated as when + then (when_then)
 `examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42

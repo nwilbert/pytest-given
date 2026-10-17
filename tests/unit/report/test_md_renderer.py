@@ -26,6 +26,7 @@ from pytest_given.model import (
     TracebackFrame,
     report_to_dict,
 )
+from pytest_given.report import narration_body_md
 from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
 
@@ -203,7 +204,7 @@ def test_nested_steps_indent() -> None:
     with then('the child bullet indents under its parent'):
         attach('Rendered Markdown', md)
         assert '- **when** outer' in md
-        assert '  - **when** inner' in md
+        assert '    - **when** inner' in md
 
 
 @scenario(
@@ -258,7 +259,7 @@ def test_attachment_renders_under_step() -> None:
         ],
     )
     md = render_md(_report(scn))
-    assert '  - 📎 State — `{"n": 9}`' in md
+    assert '    - 📎 State — `{"n": 9}`' in md
 
 
 def test_single_case_heading_says_one_case_not_one_cases() -> None:
@@ -431,7 +432,7 @@ def test_single_line_attachment_renders_inline() -> None:
         ],
     )
     md = render_md(_report(scn))
-    assert '  - 📎 S — `x=1`' in md
+    assert '    - 📎 S — `x=1`' in md
 
 
 @scenario(
@@ -457,10 +458,10 @@ def test_multiline_attachment_renders_fenced_block() -> None:
         t'the {pg["Attachment"].l} content sits in an indented fence, not inline'
     ):
         attach('Rendered Markdown', md)
-        assert '  - 📎 Doc:' in md
-        assert '\n    ```\n' in md
-        assert '\n    line1\n' in md
-        assert '\n    line2\n' in md
+        assert '    - 📎 Doc:' in md
+        assert '\n        ```\n' in md
+        assert '\n        line1\n' in md
+        assert '\n        line2\n' in md
         assert '— `line1' not in md
 
 
@@ -478,10 +479,10 @@ def test_carriage_return_attachment_renders_fenced_block() -> None:
         ],
     )
     md = render_md(_report(scn))
-    assert '  - 📎 Doc:' in md
-    assert '\n    ```\n' in md
-    assert '\n    line1\n' in md
-    assert '\n    line2\n' in md
+    assert '    - 📎 Doc:' in md
+    assert '\n        ```\n' in md
+    assert '\n        line1\n' in md
+    assert '\n        line2\n' in md
     assert '— `line1' not in md
     assert '\r' not in md
 
@@ -501,7 +502,7 @@ def test_attachment_with_triple_backtick_uses_longer_fence() -> None:
     )
     md = render_md(_report(scn))
     assert '````' in md
-    assert '\n    ````\n' in md
+    assert '\n        ````\n' in md
 
 
 def test_failing_case_renders_its_error_below_the_table() -> None:
@@ -543,8 +544,8 @@ def test_failing_case_renders_its_error_below_the_table() -> None:
     md = render_md(_report(scn))
     assert '| token | ✗ |' in md
     assert '- **token** — failed:' in md
-    assert '  > assert 0 == 1' in md
-    assert '  > test_shop.py:12 in test_price' in md
+    assert '    > assert 0 == 1' in md
+    assert '    > test_shop.py:12 in test_price' in md
     # Below the table, never inside it.
     assert md.index('| token | ✗ |') < md.index('- **token** — failed:')
 
@@ -892,7 +893,7 @@ def test_a_long_single_line_attachment_cell_fences_below_the_table() -> None:
     payload = '{"id": "ch_3PmZ", "amount": 250, ' + '"x": "y", ' * 30 + '"end": true}'
     md = render_md(_report_with(_attachment_table(short=payload, long=None)))
     assert '| 350 | machine state |' in md
-    assert f'- **350** — machine state:\n  ```\n  {payload}\n  ```' in md
+    assert f'- **350** — machine state:\n    ```\n    {payload}\n    ```' in md
 
 
 def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
@@ -1176,3 +1177,98 @@ def test_notes_sharing_a_key_add_their_row() -> None:
         assert '- **11 (row 2)** — failed:' in md
     with then('the note with a key of its own keeps it bare'):
         assert '- **3** — failed:' in md
+
+
+@scenario(
+    t'The Markdown {pg["Report"].l} nests steps by four spaces',
+    tags=['spec/narrated-citations'],
+)
+def test_nested_steps_and_attachments_indent_by_four_spaces() -> None:
+    with given(t'a {pg["Step"].l} with a child whose attachment is multi-line'):
+        scn = Scenario(
+            id='tests/t.py::test_nest',
+            narration=Narration(text='Nest'),
+            module='tests/t.py',
+            steps=[
+                Step(
+                    phase='given',
+                    narration=Narration(text='a'),
+                    children=[
+                        Step(
+                            phase='and',
+                            narration=Narration(text='b'),
+                            attachments=[Attachment(label='out', content='x\ny')],
+                        )
+                    ],
+                )
+            ],
+        )
+    with when(t'the Markdown {pg["Report"].l} is rendered'):
+        lines = render_md(_report(scn)).splitlines()
+    with then('each level, its attachment and the attachment fence indent four more'):
+        assert '- **given** a' in lines
+        assert '    - **and** b' in lines
+        assert '        - 📎 out:' in lines
+        assert '            ```' in lines
+
+
+def _failed_case_scenario() -> Scenario:
+    return Scenario(
+        id='tests/t.py::test_price',
+        narration=Narration(text='Pricing'),
+        module='tests/t.py',
+        status='failed',
+        tags=['pricing'],
+        skip_reason='no till',
+        steps=[Step(phase='when', narration=Narration(text='insert'))],
+        parameters=ParameterTable(
+            columns=[
+                ParameterColumn(id='coin', name='coin', kind='param'),
+                ParameterColumn(id='attachment:0', name='doc', kind='attachment'),
+            ],
+            cases=[
+                ParameterCase(
+                    id=NodeId('t.py::test_x[1]'),
+                    values=['euro', Attachment(label='doc', content='a\nb')],
+                    status='passed',
+                ),
+                ParameterCase(
+                    id=NodeId('t.py::test_x[2]'),
+                    values=['token', None],
+                    status='failed',
+                    error=ErrorInfo(message='assert 0 == 1'),
+                ),
+            ],
+        ),
+    )
+
+
+def test_a_note_below_the_parameter_table_indents_its_block_by_four_spaces() -> None:
+    lines = render_md(_report(_failed_case_scenario())).splitlines()
+    note = lines.index('- **euro** — doc:')
+    assert lines[note + 1] == '    ```'
+    assert '    > assert 0 == 1' in lines
+
+
+@scenario(
+    t"A {pg['Narrated citation'].l}'s body is the scenario's Markdown narration "
+    t'without heading, anchor line or errors',
+    tags=['spec/narrated-citations'],
+)
+def test_the_narration_body_leaves_out_heading_subtitle_and_errors() -> None:
+    with given(
+        t'a failed grouped {pg["Scenario"].l} with a tag, a skip reason and a '
+        t'failed case'
+    ):
+        scn = _failed_case_scenario()
+    with when(t'its narration body is taken'):
+        body = narration_body_md(scn)
+    with then(t'it holds the steps and the {pg["Parameter table"].l} only'):
+        assert body.startswith('- **')
+        assert '| coin |' in body
+        assert '## ' not in body
+        assert '`tests/t.py' not in body
+        assert '> ' not in body
+        assert not body.endswith('\n')
+    with then(t'the full Markdown {pg["Report"].l} contains it verbatim'):
+        assert body in render_md(_report(scn))

@@ -12,7 +12,7 @@
 `tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations
 
 - **given** a document with a «citation» that is {citation}
-  - 📎 document — *see parameter table*
+    - 📎 document — *see parameter table*
 - **given** a JSON «report» that is {report_state}
 - **when** `pytest-given citations` {command} runs on the document
 - **then** it exits {exit_code}
@@ -27,51 +27,51 @@
 | stale | document | unreadable | update | 2 | False |
 
 - **current, readable, check, 0, False** — document:
-  ```
-  ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
-  ```
+    ```
+    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+    ```
 
 - **stale, readable, check, 1, False** — document:
-  ```
-  ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
-  ```
+    ```
+    ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+    ```
 
 - **stale, readable, update, 0, True** — document:
-  ```
-  ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
-  ```
+    ```
+    ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+    ```
 
 - **of a gone scenario, readable, update, 1, True** — document:
-  ```
-  ✅ [Gone](https://example.org/report.html#scenario=t.py::test_gone)
-  ```
+    ```
+    ✅ [Gone](https://example.org/report.html#scenario=t.py::test_gone)
+    ```
 
 - **stale, unreadable, update, 2, False** — document:
-  ```
-  ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
-  ```
+    ```
+    ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+    ```
 
 ## ✓ `citations check --list` prints every «report link», its findings under it
 `tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings` · spec/citations-list
 
 - **given** a document with two «citations», one of them stale, and a plain «report link»
-  - 📎 document:
-    ```
-    # Paying
-    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and ✓ [Refund](https://example.org/report.html#scenario=t.py::test_refund)
-    See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)
-    ```
+    - 📎 document:
+        ```
+        # Paying
+        ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and ✓ [Refund](https://example.org/report.html#scenario=t.py::test_refund)
+        See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)
+        ```
 - **given** a JSON «report» of its scenarios
 - **when** `pytest-given citations check --list` runs on the document
-  - 📎 output:
-    ```
-    docs/spec.md:2: ✅ scenario t.py::test_pay
-    docs/spec.md:2: ✓ scenario t.py::test_refund
-        stale glyph
-            ✓ → ✅
-    docs/spec.md:3: link scenario t.py::test_refund
-    citations: 1 finding; `citations update` fixes 1
-    ```
+    - 📎 output:
+        ```
+        docs/spec.md:2: ✅ scenario t.py::test_pay
+        docs/spec.md:2: ✓ scenario t.py::test_refund
+            stale glyph
+                ✓ → ✅
+        docs/spec.md:3: link scenario t.py::test_refund
+        citations: 1 finding; `citations update` fixes 1
+        ```
 - **then** each «report link» is a line, with each finding indented under its own
 - **then** it exits 1 for the finding
 
@@ -79,19 +79,19 @@
 `tests/integration/test_cli_citations.py::test_covering_still_counts_the_findings_it_leaves_out` · spec/citations-list
 
 - **given** a document whose stale «citation» cites `test_refund`, not `test_pay`
-  - 📎 document:
-    ```
-    # Paying
-    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and ✓ [Refund](https://example.org/report.html#scenario=t.py::test_refund)
-    See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)
-    ```
+    - 📎 document:
+        ```
+        # Paying
+        ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and ✓ [Refund](https://example.org/report.html#scenario=t.py::test_refund)
+        See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)
+        ```
 - **given** a JSON «report» of its scenarios
 - **when** `pytest-given citations check --covering` names `test_pay`
-  - 📎 output:
-    ```
-    docs/spec.md:2: ✅ scenario t.py::test_pay
-    citations: 1 finding, 1 of them left out by --covering; `citations update` fixes 1
-    ```
+    - 📎 output:
+        ```
+        docs/spec.md:2: ✅ scenario t.py::test_pay
+        citations: 1 finding, 1 of them left out by --covering; `citations update` fixes 1
+        ```
 - **then** only the «citation» of `test_pay` is listed
 - **then** the summary counts the finding it left out
 - **then** it exits 1 for that finding
@@ -100,22 +100,22 @@
 `tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
 
 - **given** a «scenario» with a «tag», whose «step» names a «glossary» term
-  - 📎 suite:
-    ```
-    from pytest_given import Glossary, scenario, given, when, then
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    
-    @scenario("Check in", tags=["smoke"])
-    def test_check_in():
-        with given(t"a {guest} at the desk"):
-            keys = 0
-        with when("the desk hands over a key"):
-            keys += 1
-        with then("the guest holds one key"):
-            assert keys == 1
-    ```
+    - 📎 suite:
+        ```
+        from pytest_given import Glossary, scenario, given, when, then
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        
+        @scenario("Check in", tags=["smoke"])
+        def test_check_in():
+            with given(t"a {guest} at the desk"):
+                keys = 0
+            with when("the desk hands over a key"):
+                keys += 1
+            with then("the guest holds one key"):
+                assert keys == 1
+        ```
 - **when** the suite runs with --given-json
 - **then** the test passes
 - **then** the «scenario» carries its title, its «tag» and its three «steps»
@@ -125,25 +125,25 @@
 `tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test` · validation
 
 - **given** a suite that nests across phases and mistypes a term
-  - 📎 suite:
-    ```
-    
-        from pytest_given import Glossary, given, scenario, when
-    
-        g = Glossary()
-        g.actor('Guest')
-    
-        @scenario('nested across phases')
-        def test_nest():
-            with given('a machine'):
-                with when('it brews'):
-                    pass
-    
-        @scenario('a mistyped term')
-        def test_lookup():
-            with given('a guest'):
-                g['Gust']
-    ```
+    - 📎 suite:
+        ```
+        
+            from pytest_given import Glossary, given, scenario, when
+        
+            g = Glossary()
+            g.actor('Guest')
+        
+            @scenario('nested across phases')
+            def test_nest():
+                with given('a machine'):
+                    with when('it brews'):
+                        pass
+        
+            @scenario('a mistyped term')
+            def test_lookup():
+                with given('a guest'):
+                    g['Gust']
+        ```
 - **when** the suite runs with --given-json
 - **then** both scenarios fail
 - **then** each failure ends on its own test function
@@ -160,21 +160,21 @@
 `tests/integration/test_plugin.py::test_step_fixture_appears_as_given_step`
 
 - **given** a «scenario» consuming a «step fixture»
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, given, then
-    
-    @pytest.fixture
-    @given("a prepared value")
-    def value():
-        return 42
-    
-    @scenario("Fixture test")
-    def test_fixture(value):
-        with then(f"value is {value}"):
-            assert value == 42
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, given, then
+        
+        @pytest.fixture
+        @given("a prepared value")
+        def value():
+            return 42
+        
+        @scenario("Fixture test")
+        def test_fixture(value):
+            with then(f"value is {value}"):
+                assert value == 42
+        ```
 - **when** the suite runs with --given-json
 - **then** the test passes
 - **then** the «step» from the fixture leads the recorded steps
@@ -183,23 +183,23 @@
 `tests/integration/test_plugin.py::test_a_scenario_is_timed_from_past_its_step_fixture_setup`
 
 - **given** a «scenario» whose «step fixture» takes half a second
-  - 📎 suite:
-    ```
-    import time
-    import pytest
-    from pytest_given import scenario, given, then
-    
-    @pytest.fixture
-    @given("a slow arrangement")
-    def slow():
-        time.sleep(0.5)
-        return 1
-    
-    @scenario("Quick body")
-    def test_quick(slow):
-        with then("it is one"):
-            assert slow == 1
-    ```
+    - 📎 suite:
+        ```
+        import time
+        import pytest
+        from pytest_given import scenario, given, then
+        
+        @pytest.fixture
+        @given("a slow arrangement")
+        def slow():
+            time.sleep(0.5)
+            return 1
+        
+        @scenario("Quick body")
+        def test_quick(slow):
+            with then("it is one"):
+                assert slow == 1
+        ```
 - **when** the suite runs with --given-json
 - **then** the test passes
 - **then** the recorded duration leaves out the half second of setup
@@ -208,19 +208,19 @@
 `tests/integration/test_plugin.py::test_parametrized_test_as_table` · parametrization
 
 - **given** a «parametrized scenario» over two «cases»
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, given, when, then
-    
-    @scenario("Param test", tags=["math"])
-    @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
-    def test_add(a, b, expected):
-        with given(t"a={a} and b={b}"):
-            pass
-        with then(t"sum is {expected}"):
-            assert a + b == expected
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Param test", tags=["math"])
+        @pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (2, 3, 5)])
+        def test_add(a, b, expected):
+            with given(t"a={a} and b={b}"):
+                pass
+            with then(t"sum is {expected}"):
+                assert a + b == expected
+        ```
 - **when** the suite runs with --given-json
 - **then** both cases pass
 - **then** the two runs collapse into one «scenario»
@@ -253,17 +253,17 @@
 `tests/integration/test_plugin.py::test_a_grouping_error_discards_the_previous_report` · validation
 
 - **given** a suite whose narration varies across parametrize cases
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, when
-    
-    @scenario("Brew")
-    @pytest.mark.parametrize("cup_size", [200, 350])
-    def test_brew(cup_size):
-        with when(f"it brews {cup_size} ml"):
-            assert cup_size > 0
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, when
+        
+        @scenario("Brew")
+        @pytest.mark.parametrize("cup_size", [200, 350])
+        def test_brew(cup_size):
+            with when(f"it brews {cup_size} ml"):
+                assert cup_size > 0
+        ```
 - **given** a «report» on disk from a previous run
 - **when** the suite runs with those output flags
 - **then** the run says no report was written, naming the file
@@ -273,15 +273,15 @@
 `tests/integration/test_plugin.py::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
-  - 📎 suite:
-    ```
-    from pytest_given import scenario, then
-    
-    @scenario("Brew")
-    def test_brew():
-        with then("it brews"):
-            assert True
-    ```
+    - 📎 suite:
+        ```
+        from pytest_given import scenario, then
+        
+        @scenario("Brew")
+        def test_brew():
+            with then("it brews"):
+                assert True
+        ```
 - **when** the suite runs with a misspelled «source link» preset
 - **then** the run ends as a usage error, naming the flag the user typed
 - **then** no test ran
@@ -306,23 +306,23 @@
 `tests/integration/test_plugin.py::test_fixture_teardown_failure_fails_the_scenario`
 
 - **given** a «scenario» whose fixture raises after its yield
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, given, then
-    
-    @pytest.fixture
-    def resource():
-        yield 1
-        raise RuntimeError("teardown boom")
-    
-    @scenario("Teardown-failed")
-    def test_a(resource):
-        with given("a resource"):
-            value = resource
-        with then("it is one"):
-            assert value == 1
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, given, then
+        
+        @pytest.fixture
+        def resource():
+            yield 1
+            raise RuntimeError("teardown boom")
+        
+        @scenario("Teardown-failed")
+        def test_a(resource):
+            with given("a resource"):
+                value = resource
+            with then("it is one"):
+                assert value == 1
+        ```
 - **when** the suite runs with --given-json
 - **then** pytest counts the test passed and its teardown an error
 - **then** the «report» marks the «scenario» failed with the teardown error
@@ -331,7 +331,7 @@
 `tests/integration/test_plugin.py::test_step_fixture_teardown_refuses_steps_and_attachments` · validation
 
 - **given** a «step fixture» that adds a {late} after its yield
-  - 📎 suite — *see parameter table*
+    - 📎 suite — *see parameter table*
 - **when** the suite runs
 - **then** the test passes but its teardown errors with a PytestGivenError
 
@@ -341,44 +341,44 @@
 | attachment | suite |
 
 - **step** — suite:
-  ```
-  import pytest
-  from pytest_given import scenario, given, then, attach
-  
-  @pytest.fixture
-  @given("a thing")
-  def thing():
-      yield 1
-      with given("a late step"): pass
-  
-  @scenario("Teardown raises")
-  def test_use(thing):
-      with then("it is one"):
-          assert thing == 1
-  ```
+    ```
+    import pytest
+    from pytest_given import scenario, given, then, attach
+    
+    @pytest.fixture
+    @given("a thing")
+    def thing():
+        yield 1
+        with given("a late step"): pass
+    
+    @scenario("Teardown raises")
+    def test_use(thing):
+        with then("it is one"):
+            assert thing == 1
+    ```
 
 - **attachment** — suite:
-  ```
-  import pytest
-  from pytest_given import scenario, given, then, attach
-  
-  @pytest.fixture
-  @given("a thing")
-  def thing():
-      yield 1
-      attach("late", "data")
-  
-  @scenario("Teardown raises")
-  def test_use(thing):
-      with then("it is one"):
-          assert thing == 1
-  ```
+    ```
+    import pytest
+    from pytest_given import scenario, given, then, attach
+    
+    @pytest.fixture
+    @given("a thing")
+    def thing():
+        yield 1
+        attach("late", "data")
+    
+    @scenario("Teardown raises")
+    def test_use(thing):
+        with then("it is one"):
+            assert thing == 1
+    ```
 
 ## ✓ A fixture takes only `@given`, never `@when` or `@then` · 3 cases
 `tests/integration/test_plugin.py::test_a_fixture_takes_only_given` · validation
 
 - **given** a fixture decorated with @{decorator}
-  - 📎 suite — *see parameter table*
+    - 📎 suite — *see parameter table*
 - **when** the suite runs
 - **then** the decorator is {outcome}
 - **then** a refusal is a PytestGivenError that points at @given
@@ -390,70 +390,70 @@
 | then | suite | refused |
 
 - **given, accepted** — suite:
-  ```
-  import pytest
-  from pytest_given import scenario, then, given
-  
-  @pytest.fixture
-  @given("a coin is inserted")
-  def coin():
-      return 2
-  
-  @scenario("uses the fixture")
-  def test_use(coin):
-      with then("the coin is 2"):
-          assert coin == 2
-  ```
+    ```
+    import pytest
+    from pytest_given import scenario, then, given
+    
+    @pytest.fixture
+    @given("a coin is inserted")
+    def coin():
+        return 2
+    
+    @scenario("uses the fixture")
+    def test_use(coin):
+        with then("the coin is 2"):
+            assert coin == 2
+    ```
 
 - **when, refused** — suite:
-  ```
-  import pytest
-  from pytest_given import scenario, then, when
-  
-  @pytest.fixture
-  @when("a coin is inserted")
-  def coin():
-      return 2
-  
-  @scenario("uses the fixture")
-  def test_use(coin):
-      with then("the coin is 2"):
-          assert coin == 2
-  ```
+    ```
+    import pytest
+    from pytest_given import scenario, then, when
+    
+    @pytest.fixture
+    @when("a coin is inserted")
+    def coin():
+        return 2
+    
+    @scenario("uses the fixture")
+    def test_use(coin):
+        with then("the coin is 2"):
+            assert coin == 2
+    ```
 
 - **then, refused** — suite:
-  ```
-  import pytest
-  from pytest_given import scenario, then, then
-  
-  @pytest.fixture
-  @then("a coin is inserted")
-  def coin():
-      return 2
-  
-  @scenario("uses the fixture")
-  def test_use(coin):
-      with then("the coin is 2"):
-          assert coin == 2
-  ```
+    ```
+    import pytest
+    from pytest_given import scenario, then, then
+    
+    @pytest.fixture
+    @then("a coin is inserted")
+    def coin():
+        return 2
+    
+    @scenario("uses the fixture")
+    def test_use(coin):
+        with then("the coin is 2"):
+            assert coin == 2
+    ```
 
 ## ✓ A «scenario» that fails as expected keeps its steps, error and reason under its own status
 `tests/integration/test_plugin.py::test_marked_expected_failure_is_xfailed`
 
 - **given** a «scenario» marked xfail whose body fails
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, given, then
-    
-    @scenario("Planned")
-    @pytest.mark.xfail(reason="not implemented yet")
-    def test_planned():
-        with given("a value"):
-            value = 1
-        with then("it is two"):
-            assert value == 2
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, given, then
+        
+        @scenario("Planned")
+        @pytest.mark.xfail(reason="not implemented yet")
+        def test_planned():
+            with given("a value"):
+                value = 1
+            with then("it is two"):
+                assert value == 2
+        ```
 - **when** the suite runs with --given-json
 - **then** pytest counts the test xfailed
 - **then** the «report» marks the «scenario» xfailed with its reason, its steps and the error that broke it
@@ -469,22 +469,22 @@
 `tests/integration/test_plugin.py::test_scenario_matched_against_two_stories`
 
 - **given** a «scenario» binding two «stories» whose «sentence» its «narration» fits
-  - 📎 suite:
-    ```
-    from pytest_given import Glossary, scenario, sentence, story, when
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    a = story('Book', [sentence(guest, search, room)])
-    b = story('Stay', [sentence(guest, search, room)])
-    
-    @scenario('both', stories=[a, b])
-    def test_both():
-        with when(t'the {guest} does a {search} for a {room}'):
-            pass
-    ```
+    - 📎 suite:
+        ```
+        from pytest_given import Glossary, scenario, sentence, story, when
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [sentence(guest, search, room)])
+        b = story('Stay', [sentence(guest, search, room)])
+        
+        @scenario('both', stories=[a, b])
+        def test_both():
+            with when(t'the {guest} does a {search} for a {room}'):
+                pass
+        ```
 - **when** the suite runs with --given-json
 - **then** the test passes
 - **then** the «scenario» «binds» both «stories» and covers the «sentence» of each
@@ -493,21 +493,21 @@
 `tests/integration/test_plugin.py::test_a_declared_story_no_scenario_covers_appears`
 
 - **given** a suite declaring a «story» that no «scenario» names or «pins»
-  - 📎 suite:
-    ```
-    from pytest_given import Glossary, given, scenario, sentence, story
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    story('Unread', [sentence(guest, search, room)])
-    
-    @scenario('x')
-    def test_x():
-        with given('something'):
-            pass
-    ```
+    - 📎 suite:
+        ```
+        from pytest_given import Glossary, given, scenario, sentence, story
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        story('Unread', [sentence(guest, search, room)])
+        
+        @scenario('x')
+        def test_x():
+            with given('something'):
+                pass
+        ```
 - **when** the suite runs with --given-json
 - **then** the report lists the «story», its «sentence» covered by nothing
 
@@ -515,26 +515,26 @@
 `tests/integration/test_plugin.py::test_a_pinned_scenario_still_counts_its_step_pins`
 
 - **given** a «scenario» pinning one «sentence», whose «steps» pin a second and narrate a third
-  - 📎 suite:
-    ```
-    from pytest_given import Glossary, given, scenario, sentence, story
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    s = story('Book', [
-        sentence(guest('Alice'), search, room),
-        sentence(guest('Bob'), search, room),
-        sentence(guest, search, room)])
-    
-    @scenario('x', stories=s, pins=s[1])
-    def test_x():
-        with given('a pinned step', pins=s[2]):
-            pass
-        with given(t'the {guest} does a {search} for a {room}'):
-            pass
-    ```
+    - 📎 suite:
+        ```
+        from pytest_given import Glossary, given, scenario, sentence, story
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        s = story('Book', [
+            sentence(guest('Alice'), search, room),
+            sentence(guest('Bob'), search, room),
+            sentence(guest, search, room)])
+        
+        @scenario('x', stories=s, pins=s[1])
+        def test_x():
+            with given('a pinned step', pins=s[2]):
+                pass
+            with given(t'the {guest} does a {search} for a {room}'):
+                pass
+        ```
 - **when** the suite runs with --given-json
 - **then** the «scenario» covers both pinned «sentences» and not the one its narration would match
 
@@ -542,22 +542,22 @@
 `tests/integration/test_plugin.py::test_a_step_pin_into_a_story_outside_stories_covers_it`
 
 - **given** a «step» pinning a «story» its «scenario» does not name
-  - 📎 suite:
-    ```
-    from pytest_given import Glossary, given, scenario, sentence, story
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    a = story('Book', [sentence(guest, search, room)])
-    b = story('Stay', [sentence(guest, search, room)])
-    
-    @scenario('x', stories=a)
-    def test_x():
-        with given('thing', pins=b[1]):
-            pass
-    ```
+    - 📎 suite:
+        ```
+        from pytest_given import Glossary, given, scenario, sentence, story
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [sentence(guest, search, room)])
+        b = story('Stay', [sentence(guest, search, room)])
+        
+        @scenario('x', stories=a)
+        def test_x():
+            with given('thing', pins=b[1]):
+                pass
+        ```
 - **when** the suite runs with --given-json
 - **then** the «scenario» passes and covers the pinned «sentence», in the «story» it did not name
 
@@ -565,36 +565,36 @@
 `tests/integration/test_plugin.py::test_a_wide_fixture_pin_counts_in_every_scenario_it_reaches`
 
 - **given** a module-scoped «step fixture» pinning a «sentence», set up first by an unannotated test
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import Glossary, given, scenario, sentence, story
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    a = story('Book', [sentence(guest, search, room)])
-    b = story('Stay', [sentence(guest, search, room)])
-    
-    @pytest.fixture(scope='module')
-    @given('a module-scoped arrangement')
-    def wide():
-        with given('an inner step', pins=a[1]):
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import Glossary, given, scenario, sentence, story
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        a = story('Book', [sentence(guest, search, room)])
+        b = story('Stay', [sentence(guest, search, room)])
+        
+        @pytest.fixture(scope='module')
+        @given('a module-scoped arrangement')
+        def wide():
+            with given('an inner step', pins=a[1]):
+                pass
+            yield 1
+        
+        def test_unannotated(wide):
+            assert wide == 1
+        
+        @scenario('first', stories=a)
+        def test_first(wide):
             pass
-        yield 1
-    
-    def test_unannotated(wide):
-        assert wide == 1
-    
-    @scenario('first', stories=a)
-    def test_first(wide):
-        pass
-    
-    @scenario('second', stories=b)
-    def test_second(wide):
-        pass
-    ```
+        
+        @scenario('second', stories=b)
+        def test_second(wide):
+            pass
+        ```
 - **when** the suite runs with --given-json
 - **then** every test passes, and both «scenarios» cover the pinned «sentence», whichever «story» they name
 
@@ -602,26 +602,26 @@
 `tests/integration/test_plugin.py::test_a_pin_on_a_given_annotation_pins_its_step`
 
 - **given** a «scenario» whose «given annotation» on a «plain fixture» carries a «pin»
-  - 📎 suite:
-    ```
-    from typing import Annotated
-    import pytest
-    from pytest_given import Glossary, given, scenario, sentence, story
-    
-    g = Glossary()
-    guest = g.actor('Guest')
-    search = g.activity('search')
-    room = g.work_object('Room')
-    s = story('Book', [sentence(guest, search, room)])
-    
-    @pytest.fixture
-    def room_number():
-        return 7
-    
-    @scenario('x', stories=s)
-    def test_x(room_number: Annotated[int, given('a room', pins=s[1])]):
-        pass
-    ```
+    - 📎 suite:
+        ```
+        from typing import Annotated
+        import pytest
+        from pytest_given import Glossary, given, scenario, sentence, story
+        
+        g = Glossary()
+        guest = g.actor('Guest')
+        search = g.activity('search')
+        room = g.work_object('Room')
+        s = story('Book', [sentence(guest, search, room)])
+        
+        @pytest.fixture
+        def room_number():
+            return 7
+        
+        @scenario('x', stories=s)
+        def test_x(room_number: Annotated[int, given('a room', pins=s[1])]):
+            pass
+        ```
 - **when** the suite runs
 - **then** the annotation's «step» carries the «pin»
 
@@ -643,21 +643,21 @@
 `tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario` · parametrization, validation
 
 - **given** a `Template` «given annotation» on a «plain fixture» parameter
-  - 📎 suite:
-    ```
-    from typing import Annotated
-    import pytest
-    from pytest_given import scenario, given, when, Template
-    
-    @pytest.fixture
-    def room():
-        return 101
-    
-    @scenario('a room is booked')
-    def test_it(room: Annotated[int, given(Template('room {room} is free'))]):
-        with when('it is booked'):
-            pass
-    ```
+    - 📎 suite:
+        ```
+        from typing import Annotated
+        import pytest
+        from pytest_given import scenario, given, when, Template
+        
+        @pytest.fixture
+        def room():
+            return 101
+        
+        @scenario('a room is booked')
+        def test_it(room: Annotated[int, given(Template('room {room} is free'))]):
+            with when('it is booked'):
+                pass
+        ```
 - **when** the suite runs with an HTML «report»
 - **then** the scenario errors, naming the parameter and the fix
 - **then** the HTML «report» is still written
@@ -680,21 +680,21 @@
 `tests/integration/test_plugin.py::test_no_output_flags_writes_nothing`
 
 - **given** a suite with one «scenario»
-  - 📎 suite:
-    ```
-    
-        import pytest
-        from pytest_given import scenario, given, when, then
-    
-        @scenario('Buy coffee')
-        def test_buy():
-            with given('a machine'):
-                pass
-            with when('I insert money'):
-                pass
-            with then('I get coffee'):
-                assert True
-    ```
+    - 📎 suite:
+        ```
+        
+            import pytest
+            from pytest_given import scenario, given, when, then
+        
+            @scenario('Buy coffee')
+            def test_buy():
+                with given('a machine'):
+                    pass
+                with when('I insert money'):
+                    pass
+                with then('I get coffee'):
+                    assert True
+        ```
 - **when** the suite runs with no output flag
 - **then** the run passes
 - **then** no report directory appears in the default location
@@ -733,18 +733,18 @@
 `tests/integration/test_plugin.py::test_a_rejected_form_fails_the_run_and_writes_no_sink` · parametrization, validation
 
 - **given** a suite whose narration varies across parametrize cases
-  - 📎 suite:
-    ```
-    
-    import pytest
-    from pytest_given import scenario, when
-    
-    @pytest.mark.parametrize('cup_size', [200, 350])
-    @scenario('Brew')
-    def test_brew(cup_size):
-        with when(f'the machine brews {cup_size} ml'):
-            pass
-    ```
+    - 📎 suite:
+        ```
+        
+        import pytest
+        from pytest_given import scenario, when
+        
+        @pytest.mark.parametrize('cup_size', [200, 350])
+        @scenario('Brew')
+        def test_brew(cup_size):
+            with when(f'the machine brews {cup_size} ml'):
+                pass
+        ```
 - **when** the suite runs with all three output flags
 - **then** the run fails, naming the offending form
 - **then** not one report file is written, and no traceback escapes
@@ -778,17 +778,17 @@
 `tests/integration/test_plugin.py::test_group_parametrized_false_emits_one_scenario_per_case` · parametrization
 
 - **given** a «parametrized scenario» over two «cases» that declines the «grouping»
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, then, Template
-    
-    @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
-    @pytest.mark.parametrize('cup_size', [200, 300])
-    def test_brew(cup_size):
-        with then('it brews'):
-            assert cup_size
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, then, Template
+        
+        @scenario(Template('Brew {cup_size} ml'), group_parametrized=False)
+        @pytest.mark.parametrize('cup_size', [200, 300])
+        def test_brew(cup_size):
+            with then('it brews'):
+                assert cup_size
+        ```
 - **when** the suite runs with --given-json
 - **then** both cases pass
 - **then** each «case» is its own «scenario», titled with its id, with no «parameter table»
@@ -797,17 +797,17 @@
 `tests/integration/test_plugin.py::test_bare_run_still_enforces_the_grouping_rules` · parametrization, validation
 
 - **given** a suite whose f-string narration records no parts
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, then
-    
-    @scenario("Brew")
-    @pytest.mark.parametrize('cup_size', [200, 300])
-    def test_brew(cup_size):
-        with then(f'it brews {cup_size} ml'):
-            assert cup_size
-    ```
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, then
+        
+        @scenario("Brew")
+        @pytest.mark.parametrize('cup_size', [200, 300])
+        def test_brew(cup_size):
+            with then(f'it brews {cup_size} ml'):
+                assert cup_size
+        ```
 - **when** the suite runs with no output flag
 - **then** the run still fails, naming the offending form
 
@@ -815,25 +815,25 @@
 `tests/integration/test_plugin.py::test_the_marker_selects_the_scenarios_alone`
 
 - **given** a suite with a «scenario», a «parametrized scenario» and a plain test
-  - 📎 suite:
-    ```
-    import pytest
-    from pytest_given import scenario, then
-    
-    @scenario("Brew")
-    def test_brew():
-        with then("it brews"):
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import scenario, then
+        
+        @scenario("Brew")
+        def test_brew():
+            with then("it brews"):
+                assert True
+        
+        @scenario("Pour")
+        @pytest.mark.parametrize('cup_size', [200, 350])
+        def test_pour(cup_size):
+            with then(t"it pours {cup_size} ml"):
+                assert cup_size
+        
+        def test_plain():
             assert True
-    
-    @scenario("Pour")
-    @pytest.mark.parametrize('cup_size', [200, 350])
-    def test_pour(cup_size):
-        with then(t"it pours {cup_size} ml"):
-            assert cup_size
-    
-    def test_plain():
-        assert True
-    ```
+        ```
 - **when** the suite runs with -m pytest_given
 - **then** the «scenario» and every «case» run
 - **then** the plain test is deselected
@@ -842,29 +842,29 @@
 `tests/integration/test_plugin_file_glossary.py::test_file_glossary_kinds_resolved_in_report`
 
 - **given** a «file glossary» of «kindless» «terms» and a «story» whose «sentence» uses them
-  - 📎 GLOSSARY.md:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
-  - 📎 test_file.py:
-    ```
-    from pytest_given import scenario, when, story, sentence
-    from conftest import g
-    
-    book = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])
-    
-    
-    @scenario('Guest searches', stories=book)
-    def test_guest_searches():
-        with when(t'{g["Guest"]} {g["search"]("searches for")} a {g["Room"]}'):
-            pass
-    ```
+    - 📎 GLOSSARY.md:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
+    - 📎 test_file.py:
+        ```
+        from pytest_given import scenario, when, story, sentence
+        from conftest import g
+        
+        book = story('Book a room', [sentence(g['Guest'], g['search'], g['Room'])])
+        
+        
+        @scenario('Guest searches', stories=book)
+        def test_guest_searches():
+            with when(t'{g["Guest"]} {g["search"]("searches for")} a {g["Room"]}'):
+                pass
+        ```
 - **when** the suite runs with --given-json
 - **then** the scenario passes
 - **then** each «term» in the «report» takes the kind of its «slot»: actor, activity, object
@@ -873,20 +873,20 @@
 `tests/integration/test_plugin_lint.py::test_disabled_by_default_records_no_sources_and_reports_nothing`
 
 - **given** a suite with one flawed «step»
-  - 📎 suite:
-    ```
-    
-    from pytest_given import scenario, given, when, then
-    
-    @scenario("Empty given")
-    def test_empty_given():
-        with given("a value"):
-            pass
-        with when("computing"):
-            x = 2
-        with then("it is two"):
-            assert x == 2
-    ```
+    - 📎 suite:
+        ```
+        
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Empty given")
+        def test_empty_given():
+            with given("a value"):
+                pass
+            with when("computing"):
+                x = 2
+            with then("it is two"):
+                assert x == 2
+        ```
 - **when** the suite runs without the lint flag
 - **then** the run passes and says nothing about the lint
 - **then** no step source is recorded, so the AST surface costs nothing
@@ -895,20 +895,20 @@
 `tests/integration/test_plugin_lint.py::test_enabled_error_finding_fails_the_run`
 
 - **given** a suite whose given «step» has an empty body
-  - 📎 suite:
-    ```
-    
-    from pytest_given import scenario, given, when, then
-    
-    @scenario("Empty given")
-    def test_empty_given():
-        with given("a value"):
-            pass
-        with when("computing"):
-            x = 2
-        with then("it is two"):
-            assert x == 2
-    ```
+    - 📎 suite:
+        ```
+        
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Empty given")
+        def test_empty_given():
+            with given("a value"):
+                pass
+            with when("computing"):
+                x = 2
+            with then("it is two"):
+                assert x == 2
+        ```
 - **when** the suite runs with the lint enabled
 - **then** the run exits failed, naming the «lint rule» and the step
 
@@ -916,20 +916,20 @@
 `tests/integration/test_plugin_lint.py::test_enabled_clean_suite_exits_zero_and_captures_sources`
 
 - **given** a suite whose «steps» are all sound
-  - 📎 suite:
-    ```
-    
-    from pytest_given import scenario, given, when, then
-    
-    @scenario("Clean")
-    def test_clean():
-        with given("a value"):
-            x = 1
-        with when("it is doubled"):
-            x = x * 2
-        with then("it is two"):
-            assert x == 2
-    ```
+    - 📎 suite:
+        ```
+        
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Clean")
+        def test_clean():
+            with given("a value"):
+                x = 1
+            with when("it is doubled"):
+                x = x * 2
+            with then("it is two"):
+                assert x == 2
+        ```
 - **when** the suite runs with the lint enabled
 - **then** the run passes
 - **then** the summary says the lint ran and found nothing
@@ -939,20 +939,20 @@
 `tests/integration/test_plugin_lint.py::test_warn_override_prints_but_does_not_fail`
 
 - **given** a suite whose given «step» has an empty body
-  - 📎 suite:
-    ```
-    
-    from pytest_given import scenario, given, when, then
-    
-    @scenario("Empty given")
-    def test_empty_given():
-        with given("a value"):
-            pass
-        with when("computing"):
-            x = 2
-        with then("it is two"):
-            assert x == 2
-    ```
+    - 📎 suite:
+        ```
+        
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Empty given")
+        def test_empty_given():
+            with given("a value"):
+                pass
+            with when("computing"):
+                x = 2
+            with then("it is two"):
+                assert x == 2
+        ```
 - **when** the suite runs with that «lint rule» set to warn
 - **then** the run still passes
 - **then** the «finding» is printed anyway
@@ -961,7 +961,7 @@
 `tests/integration/test_plugin_lint.py::test_an_ignore_entry_suppresses_what_it_matches` · validation
 
 - **given** a suite with {suite}
-  - 📎 test file — *see parameter table*
+    - 📎 test file — *see parameter table*
 - **when** the suite runs with the lint and given_lint_ignore={entry}
 - **then** the lint outcome is {outcome}, and only a suppressed run passes
 - **then** an unsuppressed «finding» is reported as an error
@@ -975,70 +975,6 @@
 | a clean step | test file | \*::test_nothing | stale |
 
 - **a flawed step, , reported** — test file:
-  ```
-  
-  from pytest_given import scenario, given, when, then
-  
-  @scenario("Empty given")
-  def test_empty_given():
-      with given("a value"):
-          pass
-      with when("computing"):
-          x = 2
-      with then("it is two"):
-          assert x == 2
-  ```
-
-- **a flawed step, \*::test_empty_given, suppressed** — test file:
-  ```
-  
-  from pytest_given import scenario, given, when, then
-  
-  @scenario("Empty given")
-  def test_empty_given():
-      with given("a value"):
-          pass
-      with when("computing"):
-          x = 2
-      with then("it is two"):
-          assert x == 2
-  ```
-
-- **a flawed step, empty-step: \*::test_empty_given, suppressed** — test file:
-  ```
-  
-  from pytest_given import scenario, given, when, then
-  
-  @scenario("Empty given")
-  def test_empty_given():
-      with given("a value"):
-          pass
-      with when("computing"):
-          x = 2
-      with then("it is two"):
-          assert x == 2
-  ```
-
-- **a clean step, \*::test_nothing, stale** — test file:
-  ```
-  
-  from pytest_given import scenario, given, when, then
-  
-  @scenario("Clean")
-  def test_clean():
-      with given("a value"):
-          x = 1
-      with when("it is doubled"):
-          x = x * 2
-      with then("it is two"):
-          assert x == 2
-  ```
-
-## ✓ Either «narration lint» flag overrides the ini for one run
-`tests/integration/test_plugin_lint.py::test_the_flag_overrides_the_ini_in_both_directions`
-
-- **given** a suite with one flawed «step»
-  - 📎 suite:
     ```
     
     from pytest_given import scenario, given, when, then
@@ -1052,6 +988,70 @@
         with then("it is two"):
             assert x == 2
     ```
+
+- **a flawed step, \*::test_empty_given, suppressed** — test file:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+
+- **a flawed step, empty-step: \*::test_empty_given, suppressed** — test file:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Empty given")
+    def test_empty_given():
+        with given("a value"):
+            pass
+        with when("computing"):
+            x = 2
+        with then("it is two"):
+            assert x == 2
+    ```
+
+- **a clean step, \*::test_nothing, stale** — test file:
+    ```
+    
+    from pytest_given import scenario, given, when, then
+    
+    @scenario("Clean")
+    def test_clean():
+        with given("a value"):
+            x = 1
+        with when("it is doubled"):
+            x = x * 2
+        with then("it is two"):
+            assert x == 2
+    ```
+
+## ✓ Either «narration lint» flag overrides the ini for one run
+`tests/integration/test_plugin_lint.py::test_the_flag_overrides_the_ini_in_both_directions`
+
+- **given** a suite with one flawed «step»
+    - 📎 suite:
+        ```
+        
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Empty given")
+        def test_empty_given():
+            with given("a value"):
+                pass
+            with when("computing"):
+                x = 2
+            with then("it is two"):
+                assert x == 2
+        ```
 - **when** the suite runs with the lint enabled by ini but off by flag
 - **then** the lint does not run
 - **when** the suite runs with the lint disabled by ini but on by flag
@@ -1061,20 +1061,20 @@
 `tests/integration/test_plugin_lint.py::test_lint_error_does_not_mask_a_more_specific_exit_code`
 
 - **given** a suite whose lint would fail, under a stale ignore entry
-  - 📎 suite:
-    ```
-    
-    from pytest_given import scenario, given, when, then
-    
-    @scenario("Empty given")
-    def test_empty_given():
-        with given("a value"):
-            pass
-        with when("computing"):
-            x = 2
-        with then("it is two"):
-            assert x == 2
-    ```
+    - 📎 suite:
+        ```
+        
+        from pytest_given import scenario, given, when, then
+        
+        @scenario("Empty given")
+        def test_empty_given():
+            with given("a value"):
+                pass
+            with when("computing"):
+                x = 2
+            with then("it is two"):
+                assert x == 2
+        ```
 - **when** the suite runs deselected, so nothing is collected
 - **then** the lint still reports the stale entry as an error «finding»
 - **then** the run keeps NO_TESTS_COLLECTED rather than reporting a test failure
@@ -1175,16 +1175,16 @@
 `tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive`
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** the same «term» is looked up in three different cases
 - **then** every lookup resolves to one handle type and the same id
 
@@ -1192,16 +1192,16 @@
 `tests/unit/capture/test_file_glossary.py::test_handles_are_memoized`
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** the same «term» is looked up twice
 - **then** both lookups return the one memoized handle
 
@@ -1209,16 +1209,16 @@
 `tests/unit/capture/test_file_glossary.py::test_terms_start_kindless`
 
 - **given** a Markdown glossary file with no kind column
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** a «file glossary» loads it
 - **then** each «term» is «kindless» until «kind inference» runs
 
@@ -1226,16 +1226,16 @@
 `tests/unit/capture/test_file_glossary.py::test_unknown_name_raises_with_suggestion` · diagnostics, validation
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** a misspelt «term» is looked up
 - **then** a PytestGivenError is raised with a spelling hint
 
@@ -1243,16 +1243,16 @@
 `tests/unit/capture/test_file_glossary.py::test_usable_inline_in_sentence`
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** its handles build a «sentence»
 - **then** each slot becomes a «term ref»
 
@@ -1260,16 +1260,16 @@
 `tests/unit/capture/test_file_glossary.py::test_call_overrides_display`
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** a handle is called to name an «instance»
 - **then** the «term ref» carries the overridden display
 
@@ -1277,14 +1277,14 @@
 `tests/unit/capture/test_file_glossary.py::test_explicit_kind_column`
 
 - **given** a Markdown glossary with an explicit Kind column
-  - 📎 Glossary file:
-    ```
-    | Term | Meaning | Kind |
-    |---|---|---|
-    | Guest | x | Actor |
-    | Room | y | Work Object |
-    | book | z | Activity |
-    ```
+    - 📎 Glossary file:
+        ```
+        | Term | Meaning | Kind |
+        |---|---|---|
+        | Guest | x | Actor |
+        | Room | y | Work Object |
+        | book | z | Activity |
+        ```
 - **when** the «file glossary» reads the Kind column
 - **then** kinds come straight from the file, not «kind inference»
 
@@ -1292,13 +1292,13 @@
 `tests/unit/capture/test_file_glossary.py::test_kind_column_by_integer_index`
 
 - **given** a Markdown glossary with the kind in the third column
-  - 📎 Glossary file:
-    ```
-    | Term | Meaning | Kind |
-    |---|---|---|
-    | Guest | x | Actor |
-    | Room | y | Work Object |
-    ```
+    - 📎 Glossary file:
+        ```
+        | Term | Meaning | Kind |
+        |---|---|---|
+        | Guest | x | Actor |
+        | Room | y | Work Object |
+        ```
 - **when** the «file glossary» selects the kind column by index
 - **then** the kinds are read from that column
 
@@ -1306,12 +1306,12 @@
 `tests/unit/capture/test_file_glossary.py::test_work_object_underscore_alias`
 
 - **given** a glossary whose Kind cell says work_object
-  - 📎 Glossary file:
-    ```
-    | Term | Meaning | Kind |
-    |---|---|---|
-    | Room | y | work_object |
-    ```
+    - 📎 Glossary file:
+        ```
+        | Term | Meaning | Kind |
+        |---|---|---|
+        | Room | y | work_object |
+        ```
 - **when** the «file glossary» parses the kind
 - **then** it normalizes to the «work object» kind
 
@@ -1319,12 +1319,12 @@
 `tests/unit/capture/test_file_glossary.py::test_unrecognized_kind_value_raises` · diagnostics, validation
 
 - **given** a glossary whose Kind cell holds an unknown value
-  - 📎 Glossary file:
-    ```
-    | Term | Meaning | Kind |
-    |---|---|---|
-    | Guest | x | Wizard |
-    ```
+    - 📎 Glossary file:
+        ```
+        | Term | Meaning | Kind |
+        |---|---|---|
+        | Guest | x | Wizard |
+        ```
 - **when** the «file glossary» loads the file
 - **then** a PytestGivenError names the unrecognized kind
 
@@ -1339,12 +1339,12 @@
 `tests/unit/capture/test_file_glossary.py::test_empty_id_term_cell_raises` · diagnostics, validation
 
 - **given** a row whose «term» cell has no id-able characters
-  - 📎 Glossary file:
-    ```
-    | Term | Meaning |
-    |---|---|
-    | @#$ | some definition |
-    ```
+    - 📎 Glossary file:
+        ```
+        | Term | Meaning |
+        |---|---|
+        | @#$ | some definition |
+        ```
 - **when** the «file glossary» loads the file
 - **then** a PytestGivenError is raised with file:line context
 
@@ -1353,7 +1353,7 @@
 
 - **given** a glossary file with {problem}
 - **given** that file on disk as bad.md
-  - 📎 Glossary file — *see parameter table*
+    - 📎 Glossary file — *see parameter table*
 - **when** a «file glossary» loads it
 - **then** a PytestGivenError names the file before the problem: {message}
 
@@ -1364,28 +1364,28 @@
 | no Term column | Glossary file | bad.md: column 'Term' |
 
 - **no table, bad.md: found no Markdown pipe table** — Glossary file:
-  ```
-  # no table here
-  ```
+    ```
+    # no table here
+    ```
 
 - **a header but no data rows, bad.md: the glossary file's Markdown table has no data rows** — Glossary file:
-  ```
-  | Term | Meaning |
-  |---|---|
-  ```
+    ```
+    | Term | Meaning |
+    |---|---|
+    ```
 
 - **no Term column, bad.md: column 'Term'** — Glossary file:
-  ```
-  | Word | Meaning |
-  |---|---|
-  | Guest | x |
-  ```
+    ```
+    | Word | Meaning |
+    |---|---|
+    | Guest | x |
+    ```
 
 ## ✓ Duplicate rows for one «term» collapse only when identical · 2 cases
 `tests/unit/capture/test_file_glossary.py::test_duplicate_rows_collapse_only_when_identical` · validation
 
 - **given** two rows for one «term», with identical definitions: {identical}
-  - 📎 Glossary file — *see parameter table*
+    - 📎 Glossary file — *see parameter table*
 - **when** the «file glossary» loads the file
 - **then** the rows yield {outcome}
 - **then** a refusal points at the second row as the conflict
@@ -1396,31 +1396,31 @@
 | False | Glossary file | refused |
 
 - **True, one term** — Glossary file:
-  ```
-  | Term | Meaning |
-  |---|---|
-  | Guest | First definition. |
-  | Guest | First definition. |
-  ```
+    ```
+    | Term | Meaning |
+    |---|---|
+    | Guest | First definition. |
+    | Guest | First definition. |
+    ```
 
 - **False, refused** — Glossary file:
-  ```
-  | Term | Meaning |
-  |---|---|
-  | Guest | First definition. |
-  | Guest | Second definition. |
-  ```
+    ```
+    | Term | Meaning |
+    |---|---|
+    | Guest | First definition. |
+    | Guest | Second definition. |
+    ```
 
 ## ✓ A blank definition normalizes to «undefined»
 `tests/unit/capture/test_file_glossary.py::test_blank_definition_cell_normalizes_to_none`
 
 - **given** a row whose definition cell is blank
-  - 📎 Glossary file:
-    ```
-    | Term | Meaning |
-    |---|---|
-    | Guest |   |
-    ```
+    - 📎 Glossary file:
+        ```
+        | Term | Meaning |
+        |---|---|
+        | Guest |   |
+        ```
 - **when** the «file glossary» parses it
 - **then** the «term» definition is None, i.e. «undefined»
 
@@ -1428,16 +1428,16 @@
 `tests/unit/capture/test_file_glossary.py::test_file_glossary_call_known_name_returns_handle`
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** a known «term» is looked up by call
 - **then** a «deferred term» is returned
 
@@ -1445,16 +1445,16 @@
 `tests/unit/capture/test_file_glossary.py::test_file_glossary_call_unknown_name_raises` · validation
 
 - **given** a «file glossary» loaded from a Markdown file
-  - 📎 Glossary file:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest  | A person booking. |
-    | Room   | A bookable room. |
-    | search | Look up options. |
-    ```
+    - 📎 Glossary file:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest  | A person booking. |
+        | Room   | A bookable room. |
+        | search | Look up options. |
+        ```
 - **when** an unknown name is called
 - **then** a PytestGivenError is raised
 - **then** no new «term» was created
@@ -1668,15 +1668,15 @@
 `tests/unit/capture/test_markdown_glossary.py::test_parses_default_columns`
 
 - **given** a Markdown document with one pipe table
-  - 📎 Markdown document:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest | A person booking. |
-    | Room  | A bookable room. |
-    ```
+    - 📎 Markdown document:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest | A person booking. |
+        | Room  | A bookable room. |
+        ```
 - **when** the parser reads it into rows for a «file glossary»
 - **then** each row carries a «term», definition and source line
 
@@ -1684,21 +1684,21 @@
 `tests/unit/capture/test_markdown_glossary.py::test_merges_multiple_tables`
 
 - **given** a document containing two separate pipe tables
-  - 📎 Markdown document:
-    ```
-    # Glossary
-    
-    | Term | Meaning |
-    |------|---------|
-    | Guest | A person booking. |
-    | Room  | A bookable room. |
-    
-    ## More
-    
-    | Term | Meaning |
-    |---|---|
-    | Search | Look up. |
-    ```
+    - 📎 Markdown document:
+        ```
+        # Glossary
+        
+        | Term | Meaning |
+        |------|---------|
+        | Guest | A person booking. |
+        | Room  | A bookable room. |
+        
+        ## More
+        
+        | Term | Meaning |
+        |---|---|
+        | Search | Look up. |
+        ```
 - **when** the parser reads the whole document
 - **then** every table contributes its «term» rows
 
@@ -1706,12 +1706,12 @@
 `tests/unit/capture/test_markdown_glossary.py::test_column_by_header_name_case_insensitive`
 
 - **given** a table with custom, differently-cased header names
-  - 📎 Markdown document:
-    ```
-    | Word | Note | Role |
-    |---|---|---|
-    | Guest | x | Actor |
-    ```
+    - 📎 Markdown document:
+        ```
+        | Word | Note | Role |
+        |---|---|---|
+        | Guest | x | Actor |
+        ```
 - **when** the parser selects columns by header name
 - **then** the named columns are matched case-insensitively
 
@@ -1719,12 +1719,12 @@
 `tests/unit/capture/test_markdown_glossary.py::test_escaped_pipe_in_cell`
 
 - **given** cells containing escaped pipe characters (\\\|)
-  - 📎 Markdown document:
-    ```
-    | Term | Meaning |
-    |---|---|
-    | A\|B | pipe\|here |
-    ```
+    - 📎 Markdown document:
+        ```
+        | Term | Meaning |
+        |---|---|
+        | A\|B | pipe\|here |
+        ```
 - **when** the parser splits the row
 - **then** the escaped pipe survives as a literal pipe
 
@@ -1732,18 +1732,18 @@
 `tests/unit/capture/test_markdown_glossary.py::test_skips_tables_in_fenced_code_blocks`
 
 - **given** a fenced code block that contains a look-alike table
-  - 📎 Markdown document:
-    ````
-    ```
-    | Term | Meaning |
-    |---|---|
-    | Fake | nope |
-    ```
-    
-    | Term | Meaning |
-    |---|---|
-    | Real | yes |
-    ````
+    - 📎 Markdown document:
+        ````
+        ```
+        | Term | Meaning |
+        |---|---|
+        | Fake | nope |
+        ```
+        
+        | Term | Meaning |
+        |---|---|
+        | Real | yes |
+        ````
 - **when** the parser reads the document
 - **then** only the real table outside the fence contributes rows
 
@@ -1751,7 +1751,7 @@
 `tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused` · diagnostics, validation
 
 - **given** a Markdown document with {document}
-  - 📎 Markdown document — *see parameter table*
+    - 📎 Markdown document — *see parameter table*
 - **given** the columns selected as {columns}, the rest left at their defaults
 - **when** the parser reads the document
 - **then** a PytestGivenError says {message}
@@ -1763,37 +1763,37 @@
 | one pipe table | Markdown document | {'definition_column': 5} | column index 5 is out of range |
 
 - **no pipe table, {}, found no Markdown pipe table** — Markdown document:
-  ```
-  # Just a heading
-  
-  No tables here.
-  ```
+    ```
+    # Just a heading
+    
+    No tables here.
+    ```
 
 - **one pipe table, {'term_column': 'Nope'}, column 'Nope' not found** — Markdown document:
-  ```
-  # Glossary
-  
-  | Term | Meaning |
-  |------|---------|
-  | Guest | A person booking. |
-  | Room  | A bookable room. |
-  ```
+    ```
+    # Glossary
+    
+    | Term | Meaning |
+    |------|---------|
+    | Guest | A person booking. |
+    | Room  | A bookable room. |
+    ```
 
 - **one pipe table, {'definition_column': 5}, column index 5 is out of range** — Markdown document:
-  ```
-  # Glossary
-  
-  | Term | Meaning |
-  |------|---------|
-  | Guest | A person booking. |
-  | Room  | A bookable room. |
-  ```
+    ```
+    # Glossary
+    
+    | Term | Meaning |
+    |------|---------|
+    | Guest | A person booking. |
+    | Room  | A bookable room. |
+    ```
 
 ## ✓ A «file glossary» reads the tables a GFM renderer shows, and no others · 4 cases
 `tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows`
 
 - **given** a Markdown document with {document}
-  - 📎 Markdown document — *see parameter table*
+    - 📎 Markdown document — *see parameter table*
 - **when** the parser reads the document
 - **then** it reads the term and definition rows {rows}
 
@@ -1805,40 +1805,40 @@
 | a data row narrower than its header | Markdown document | \[('Short', '')\] |
 
 - **a table in a blockquote, \[('Quoted', 'yes')\]** — Markdown document:
-  ```
-  > | Term | Meaning |
-  > |---|---|
-  > | Quoted | yes |
-  ```
+    ```
+    > | Term | Meaning |
+    > |---|---|
+    > | Quoted | yes |
+    ```
 
 - **a table in an indented code block, \[('Real', 'yes')\]** — Markdown document:
-  ```
-      | Term | Meaning |
-      |---|---|
-      | Code | no |
-  
-  | Term | Meaning |
-  |---|---|
-  | Real | yes |
-  ```
+    ```
+        | Term | Meaning |
+        |---|---|
+        | Code | no |
+    
+    | Term | Meaning |
+    |---|---|
+    | Real | yes |
+    ```
 
 - **a separator row narrower than its header, \[('Real', 'yes')\]** — Markdown document:
-  ```
-  | Term | Meaning |
-  |---|
-  | Odd | no |
-  
-  | Term | Meaning |
-  |---|---|
-  | Real | yes |
-  ```
+    ```
+    | Term | Meaning |
+    |---|
+    | Odd | no |
+    
+    | Term | Meaning |
+    |---|---|
+    | Real | yes |
+    ```
 
 - **a data row narrower than its header, \[('Short', '')\]** — Markdown document:
-  ```
-  | Term | Meaning |
-  |---|---|
-  | Short |
-  ```
+    ```
+    | Term | Meaning |
+    |---|---|
+    | Short |
+    ```
 
 ## ✓ A «term» cell is read as its plain text, with emphasis unwrapped · 6 cases
 `tests/unit/capture/test_markdown_glossary.py::test_a_term_cell_is_read_as_its_plain_text`
@@ -1860,12 +1860,12 @@
 `tests/unit/capture/test_markdown_glossary.py::test_strips_emphasis_from_kind_cell`
 
 - **given** a Kind cell written with bold emphasis
-  - 📎 Markdown document:
-    ```
-    | Term | Meaning | Kind |
-    |---|---|---|
-    | Guest | x | **Actor** |
-    ```
+    - 📎 Markdown document:
+        ```
+        | Term | Meaning | Kind |
+        |---|---|---|
+        | Guest | x | **Actor** |
+        ```
 - **when** the parser reads the kind cell
 - **then** the kind is unwrapped to plain text
 
@@ -1873,12 +1873,12 @@
 `tests/unit/capture/test_markdown_glossary.py::test_leaves_definition_markdown_intact`
 
 - **given** a definition cell rich with inline code
-  - 📎 Markdown document:
-    ```
-    | Term | Meaning |
-    |---|---|
-    | Scenario | A test decorated with `@scenario(...)`. |
-    ```
+    - 📎 Markdown document:
+        ```
+        | Term | Meaning |
+        |---|---|
+        | Scenario | A test decorated with `@scenario(...)`. |
+        ```
 - **when** the parser reads the row
 - **then** the definition keeps its markup for the tooltip
 
@@ -1886,15 +1886,15 @@
 `tests/unit/capture/test_markdown_glossary.py::test_pipe_line_without_separator_is_skipped`
 
 - **given** prose containing a stray pipe, then a real table
-  - 📎 Markdown document:
-    ```
-    This line has a | in it but no separator follows.
-    Next line is not a separator.
-    
-    | Term | Meaning |
-    |---|---|
-    | Real | yes |
-    ```
+    - 📎 Markdown document:
+        ```
+        This line has a | in it but no separator follows.
+        Next line is not a separator.
+        
+        | Term | Meaning |
+        |---|---|
+        | Real | yes |
+        ```
 - **when** the parser reads the document
 - **then** only the real pipe table produces rows
 
@@ -2338,16 +2338,16 @@
 
 - **given** a «report» where the tag `checkout` has a passed and an xfailed «scenario»
 - **given** a document citing the tag under another name, as all passed
-  - 📎 document:
-    ```
-    ✅ [Checkout](https://example.org/report.html#tag=checkout) (1 ✅)
-    ```
+    - 📎 document:
+        ```
+        ✅ [Checkout](https://example.org/report.html#tag=checkout) (1 ✅)
+        ```
 - **when** the document is updated
 - **then** its glyph, text and summary read what the report says
-  - 📎 updated document:
-    ```
-    🔵 [checkout](https://example.org/report.html#tag=checkout) (1 ✅ · 1 🔵)
-    ```
+    - 📎 updated document:
+        ```
+        🔵 [checkout](https://example.org/report.html#tag=checkout) (1 ✅ · 1 🔵)
+        ```
 - **then** no finding remains
 
 ## ✓ A plain «report link» claims only that its target exists
@@ -2355,10 +2355,10 @@
 
 - **given** a «report» whose one «scenario» fails
 - **given** a document linking it, and a deleted test, in its own words
-  - 📎 document:
-    ```
-    See [how paying works](https://example.org/report.html#scenario=t.py::test_pay) and [refunds](https://example.org/report.html#scenario=t.py::test_refund).
-    ```
+    - 📎 document:
+        ```
+        See [how paying works](https://example.org/report.html#scenario=t.py::test_pay) and [refunds](https://example.org/report.html#scenario=t.py::test_refund).
+        ```
 - **when** the document is updated
 - **then** only the link to the deleted test is a finding
 - **then** the document is left as written
@@ -2367,16 +2367,16 @@
 `tests/unit/citations/test_check.py::test_a_citation_to_a_gone_target_is_marked_and_recovers` · spec/citations
 
 - **given** a «citation» of a passing «scenario»
-  - 📎 document:
-    ```
-    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
-    ```
+    - 📎 document:
+        ```
+        ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+        ```
 - **when** it is updated against a «report» that lacks the scenario
 - **then** it is marked ❓, keeping its target and text
-  - 📎 marked document:
-    ```
-    ❓ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
-    ```
+    - 📎 marked document:
+        ```
+        ❓ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+        ```
 - **then** it stays a finding
 - **when** it is updated once the «report» holds the scenario again
 - **then** it reads as current again
@@ -2386,16 +2386,16 @@
 
 - **given** a «report» where the «cases» `[a]` and `[c]` of `test_pour` group into one «scenario»
 - **given** a document citing the «case» `[c]`
-  - 📎 document:
-    ```
-    ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour%5Bc%5D)
-    ```
+    - 📎 document:
+        ```
+        ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour%5Bc%5D)
+        ```
 - **when** the document is updated
 - **then** the «citation» names its «scenario» by the node ID of `test_pour`
-  - 📎 updated document:
-    ```
-    ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour)
-    ```
+    - 📎 updated document:
+        ```
+        ✅ [Pour](https://example.org/report.html#scenario=t.py::test_pour)
+        ```
 - **then** no finding remains
 
 ## ✓ A «citation» keeps the emphasis its «scenario title» renders with
@@ -2403,16 +2403,16 @@
 
 - **given** a «report» whose «scenario title» sets a word in bold
 - **given** a document with a placeholder «citation» of it
-  - 📎 document:
-    ```
-    ? [](https://example.org/report.html#scenario=t.py::test_book)
-    ```
+    - 📎 document:
+        ```
+        ? [](https://example.org/report.html#scenario=t.py::test_book)
+        ```
 - **when** the document is updated
 - **then** its link text sets the word in bold too
-  - 📎 updated document:
-    ```
-    ✅ [Books a **suite**](https://example.org/report.html#scenario=t.py::test_book)
-    ```
+    - 📎 updated document:
+        ```
+        ✅ [Books a **suite**](https://example.org/report.html#scenario=t.py::test_book)
+        ```
 
 ## ✓ `--covering` keeps each «report link» whose target counts the «scenario», and each it cannot rule out · 9 cases
 `tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario` · spec/citations-list
@@ -2438,12 +2438,12 @@
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 
 - **given** a given «step» whose body is only `pass`
-  - 📎 step body:
-    ```
-    def test_a():
-        with given('a value'):
-            pass
-    ```
+    - 📎 step body:
+        ```
+        def test_a():
+            with given('a value'):
+                pass
+        ```
 - **when** the AST «lint rules» parse that source
 - **then** an empty-step «finding» points at the «step» line
 - **then** its «severity» is error
@@ -2452,13 +2452,13 @@
 `tests/unit/lint/test_ast_rules.py::test_then_without_check_fires`
 
 - **given** a then «step» whose body only calls
-  - 📎 step body:
-    ```
-    def test_a():
-        with then('it is one'):
-            x = compute()
-            handlers[0](x)
-    ```
+    - 📎 step body:
+        ```
+        def test_a():
+            with then('it is one'):
+                x = compute()
+                handlers[0](x)
+        ```
 - **when** the AST «lint rules» parse that source
 - **then** a then-without-check «finding» reports the unchecked then
 
@@ -2466,13 +2466,13 @@
 `tests/unit/lint/test_ast_rules.py::test_conditional_check_fires_on_assert_only_under_an_if`
 
 - **given** a then «step» whose only assert sits under an `if`
-  - 📎 step body:
-    ```
-    def test_a():
-        with then('a cached entry points at its record'):
-            if 'index' in entry:
-                assert records[entry['index']] == expected
-    ```
+    - 📎 step body:
+        ```
+        def test_a():
+            with then('a cached entry points at its record'):
+                if 'index' in entry:
+                    assert records[entry['index']] == expected
+        ```
 - **when** the AST «lint rules» parse that source
 - **then** a conditional-check «finding» reports the guarded then
 - **then** its «severity» is warn
@@ -2481,7 +2481,7 @@
 `tests/unit/lint/test_ast_rules.py::test_check_outside_then_flags_an_assert_only_outside_a_then`
 
 - **given** a {phase} «step» whose body asserts
-  - 📎 step body — *see parameter table*
+    - 📎 step body — *see parameter table*
 - **when** the AST «lint rules» parse that source
 - **then** the warn «findings» say {messages}
 
@@ -2492,41 +2492,41 @@
 | then | step body | \[\] |
 
 - **given, \["assert inside given 'a stocked machine'"\]** — step body:
-  ```
-  def test_a():
-      with given('a stocked machine'):
-          machine = stock()
-          assert machine['coffees'] > 0
-  ```
+    ```
+    def test_a():
+        with given('a stocked machine'):
+            machine = stock()
+            assert machine['coffees'] > 0
+    ```
 
 - **when, \["assert inside when 'a stocked machine'"\]** — step body:
-  ```
-  def test_a():
-      with when('a stocked machine'):
-          machine = stock()
-          assert machine['coffees'] > 0
-  ```
+    ```
+    def test_a():
+        with when('a stocked machine'):
+            machine = stock()
+            assert machine['coffees'] > 0
+    ```
 
 - **then, \[\]** — step body:
-  ```
-  def test_a():
-      with then('a stocked machine'):
-          machine = stock()
-          assert machine['coffees'] > 0
-  ```
+    ```
+    def test_a():
+        with then('a stocked machine'):
+            machine = stock()
+            assert machine['coffees'] > 0
+    ```
 
 ## ✓ «Narration lint» flags a then «step» that folds in the action
 `tests/unit/lint/test_ast_rules.py::test_action_in_then_fires_when_no_when_exists`
 
 - **given** a «scenario» with no when, acting inside its then
-  - 📎 step body:
-    ```
-    def test_a():
-        with given('a machine'):
-            machine = stock()
-        with then('it brews'):
-            assert brew(machine) == 'coffee'
-    ```
+    - 📎 step body:
+        ```
+        def test_a():
+            with given('a machine'):
+                machine = stock()
+            with then('it brews'):
+                assert brew(machine) == 'coffee'
+        ```
 - **when** the AST «lint rules» parse that source
 - **then** a warn «finding» points at the then and says no when acts
 
@@ -2534,12 +2534,12 @@
 `tests/unit/lint/test_ast_rules.py::test_unused_interpolation_fires_on_unused_bare_identifier`
 
 - **given** a given «step» whose body never loads the name
-  - 📎 step body:
-    ```
-    def test_a():
-        with given(t'a {size} ml cup'):
-            cup = make_cup()
-    ```
+    - 📎 step body:
+        ```
+        def test_a():
+            with given(t'a {size} ml cup'):
+                cup = make_cup()
+        ```
 - **when** the AST «lint rules» parse that source
 - **then** a warn «finding» names the interpolation the body ignores
 
@@ -2694,127 +2694,127 @@
 `tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «report» whose «story» and «scenario» reference «instances» of an actor and a work object, and an «inflection»
-  - 📎 Report data:
-    ```
-    {
-      "metadata": {
-        "project": "p",
-        "timestamp": "t",
-        "pytest_version": "8",
-        "plugin_version": "0",
-        "commit_sha": null,
-        "title": null,
-        "report_url": null
-      },
-      "scenarios": [
+    - 📎 Report data:
+        ```
         {
-          "id": "t",
-          "narration": {
-            "text": "s",
-            "parts": []
+          "metadata": {
+            "project": "p",
+            "timestamp": "t",
+            "pytest_version": "8",
+            "plugin_version": "0",
+            "commit_sha": null,
+            "title": null,
+            "report_url": null
           },
-          "module": "m",
-          "tags": [],
-          "status": "passed",
-          "duration_ms": 0,
-          "steps": [
+          "scenarios": [
             {
-              "phase": "when",
+              "id": "t",
               "narration": {
-                "text": "x",
-                "parts": [
-                  {
-                    "term_id": "guest",
-                    "display": "Alice",
-                    "expression": ""
-                  },
-                  {
-                    "term_id": "search",
-                    "display": "searches",
-                    "expression": ""
-                  },
-                  {
-                    "term_id": "room",
-                    "display": "Deluxe Suite",
-                    "expression": ""
-                  }
-                ]
+                "text": "s",
+                "parts": []
               },
-              "children": [],
-              "attachments": [],
-              "pins": null,
-              "fixture_name": null
-            }
-          ],
-          "parameters": null,
-          "error": null,
-          "skip_reason": null,
-          "xfail_reason": null,
-          "source": null,
-          "story_ids": [
-            "book"
-          ],
-          "pins": null
-        }
-      ],
-      "glossary": {
-        "terms": [
-          {
-            "id": "guest",
-            "kind": "actor",
-            "canonical": "Guest",
-            "definition": null,
-            "source": null
-          },
-          {
-            "id": "room",
-            "kind": "object",
-            "canonical": "Room",
-            "definition": null,
-            "source": null
-          },
-          {
-            "id": "search",
-            "kind": "activity",
-            "canonical": "search",
-            "definition": null,
-            "source": null
-          }
-        ]
-      },
-      "stories": [
-        {
-          "id": "book",
-          "title": "Book",
-          "sentences": [
-            {
-              "id": 1,
-              "clauses": [
+              "module": "m",
+              "tags": [],
+              "status": "passed",
+              "duration_ms": 0,
+              "steps": [
                 {
-                  "parts": [
-                    {
-                      "term_id": "guest",
-                      "display": "Alice"
-                    },
-                    {
-                      "term_id": "search",
-                      "display": "searches for"
-                    },
-                    {
-                      "term_id": "room",
-                      "display": "Deluxe Suite"
-                    }
-                  ]
+                  "phase": "when",
+                  "narration": {
+                    "text": "x",
+                    "parts": [
+                      {
+                        "term_id": "guest",
+                        "display": "Alice",
+                        "expression": ""
+                      },
+                      {
+                        "term_id": "search",
+                        "display": "searches",
+                        "expression": ""
+                      },
+                      {
+                        "term_id": "room",
+                        "display": "Deluxe Suite",
+                        "expression": ""
+                      }
+                    ]
+                  },
+                  "children": [],
+                  "attachments": [],
+                  "pins": null,
+                  "fixture_name": null
                 }
               ],
-              "name": null
+              "parameters": null,
+              "error": null,
+              "skip_reason": null,
+              "xfail_reason": null,
+              "source": null,
+              "story_ids": [
+                "book"
+              ],
+              "pins": null
             }
           ],
-          "source": null
+          "glossary": {
+            "terms": [
+              {
+                "id": "guest",
+                "kind": "actor",
+                "canonical": "Guest",
+                "definition": null,
+                "source": null
+              },
+              {
+                "id": "room",
+                "kind": "object",
+                "canonical": "Room",
+                "definition": null,
+                "source": null
+              },
+              {
+                "id": "search",
+                "kind": "activity",
+                "canonical": "search",
+                "definition": null,
+                "source": null
+              }
+            ]
+          },
+          "stories": [
+            {
+              "id": "book",
+              "title": "Book",
+              "sentences": [
+                {
+                  "id": 1,
+                  "clauses": [
+                    {
+                      "parts": [
+                        {
+                          "term_id": "guest",
+                          "display": "Alice"
+                        },
+                        {
+                          "term_id": "search",
+                          "display": "searches for"
+                        },
+                        {
+                          "term_id": "room",
+                          "display": "Deluxe Suite"
+                        }
+                      ]
+                    }
+                  ],
+                  "name": null
+                }
+              ],
+              "source": null
+            }
+          ]
         }
-      ]
-    }
-    ```
+        ```
 - **when** the «glossary» aggregations are built
 - **then** the actor and the work object collect their «instances»
 - **then** the activity collects its «inflection» but not its canonical form
@@ -2881,12 +2881,12 @@
 
 - **given** a «scenario title» with a bold word and a code span
 - **when** the HTML, the Markdown «report» and a «citation» show it
-  - 📎 outputs:
-    ```
-    Books a <strong>suite</strong> with <code>late_checkout</code>
-    ## ✓ Books a **suite** with `late_checkout`
-    ✅ [Books a **suite** with `late_checkout`](
-    ```
+    - 📎 outputs:
+        ```
+        Books a <strong>suite</strong> with <code>late_checkout</code>
+        ## ✓ Books a **suite** with `late_checkout`
+        ✅ [Books a **suite** with `late_checkout`](
+        ```
 - **then** the HTML renders the word bold and the code as code
 - **then** the Markdown keeps the same markers, so a viewer renders the same
 
@@ -2895,12 +2895,12 @@
 
 - **given** a «scenario title» whose `**` markers enclose a «term ref»
 - **when** the HTML, the Markdown «report» and a «citation» show it
-  - 📎 outputs:
-    ```
-    **Guest books**
-    ## ✓ \*\*«Guest» books\*\*
-    ✅ [\*\*Guest books\*\*](
-    ```
+    - 📎 outputs:
+        ```
+        **Guest books**
+        ## ✓ \*\*«Guest» books\*\*
+        ✅ [\*\*Guest books\*\*](
+        ```
 - **then** the HTML shows both markers as written
 - **then** the Markdown escapes them, so a viewer shows them as written
 
@@ -2910,32 +2910,32 @@
 - **given** a «report» holding a passed «scenario» with three steps
 - **when** the Markdown «report» is rendered
 - **then** the heading is checked and each «step» is a phase bullet
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✓ Buy coffee
-    `tests/t.py::test_buy` · billing, happy-path
-    
-    - **given** a machine
-    - **when** I insert \$2
-    - **then** I get a coffee
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✓ Buy coffee
+        `tests/t.py::test_buy` · billing, happy-path
+        
+        - **given** a machine
+        - **when** I insert \$2
+        - **then** I get a coffee
+        ```
 
 ## ✓ A line break in a «scenario title» or «step» reads as a space in the Markdown «report»
 `tests/unit/report/test_md_renderer.py::test_a_newline_in_a_title_or_step_reads_as_a_space`
 
 - **given** a «scenario» whose title, and a value in its «step», break across lines
 - **when** the Markdown «report» is rendered
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✓ line one line two
-    `tests/t.py::test_x`
-    
-    - **when** act one act two
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✓ line one line two
+        `tests/t.py::test_x`
+        
+        - **when** act one act two
+        ```
 - **then** the heading reads on one line
 - **then** so does the «step» bullet
 
@@ -2945,16 +2945,16 @@
 - **given** a «scenario» whose when «step» has a nested child
 - **when** the Markdown «report» is rendered
 - **then** the child bullet indents under its parent
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✓ Nest
-    `tests/t.py::test_nest`
-    
-    - **when** outer
-      - **when** inner
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✓ Nest
+        `tests/t.py::test_nest`
+        
+        - **when** outer
+            - **when** inner
+        ```
 
 ## ✓ Structured «narration» renders «terms», values and placeholders
 `tests/unit/report/test_md_renderer.py::test_narration_parts_resolve_terms_and_values`
@@ -2962,15 +2962,15 @@
 - **given** a «step» whose «narration» carries a «term ref», a value and a placeholder
 - **when** the Markdown «report» is rendered
 - **then** the «term ref» renders in guillemets, the value verbatim and the placeholder in braces
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✓ ignored
-    `tests/t.py::test_parts`
-    
-    - **when** a «Guest»42{amount}
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✓ ignored
+        `tests/t.py::test_parts`
+        
+        - **when** a «Guest»42{amount}
+        ```
 
 ## ✓ A «parametrized scenario» renders its «parameter table»
 `tests/unit/report/test_md_renderer.py::test_parametrized_scenario_renders_table` · parametrization
@@ -2978,20 +2978,20 @@
 - **given** a «parametrized scenario» with a two-«case» «parameter table»
 - **when** the Markdown «report» is rendered
 - **then** the heading counts the cases and the «parameter table» lists each row
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✓ Pricing · 2 cases
-    `tests/t.py::test_price`
-    
-    - **when** insert
-    
-    | euros | expect |
-    |---|---|
-    | 1 | False |
-    | 2 | True |
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✓ Pricing · 2 cases
+        `tests/t.py::test_price`
+        
+        - **when** insert
+        
+        | euros | expect |
+        |---|---|
+        | 1 | False |
+        | 2 | True |
+        ```
 
 ## ✓ The «parameter table» shows a status column only when its cases differ in status · 5 cases
 `tests/unit/report/test_md_renderer.py::test_param_table_shows_status_column_only_when_case_statuses_differ` · parametrization
@@ -2999,7 +2999,7 @@
 - **given** a «parameter table» whose first «case» is {first_status} and whose second is {second_status}
 - **when** the Markdown «report» is rendered
 - **then** the table header reads {header}
-  - 📎 Rendered Markdown — *see parameter table*
+    - 📎 Rendered Markdown — *see parameter table*
 
 | first_status | second_status | header | Rendered Markdown |
 |---|---|---|---|
@@ -3010,121 +3010,121 @@
 | passed | failed | \| coin \| \| | Rendered Markdown |
 
 - **passed, passed, \| coin \|** — Rendered Markdown:
-  ```
-  # pytest-given — proj
-  
-  ## ✓ Att · 2 cases
-  `tests/t.py::test_att`
-  
-  - **when** act
-  
-  | coin |
-  |---|
-  | euro |
-  | token |
-  ```
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Att · 2 cases
+    `tests/t.py::test_att`
+    
+    - **when** act
+    
+    | coin |
+    |---|
+    | euro |
+    | token |
+    ```
 
 - **skipped, skipped, \| coin \|** — Rendered Markdown:
-  ```
-  # pytest-given — proj
-  
-  ## ✓ Att · 2 cases
-  `tests/t.py::test_att`
-  
-  - **when** act
-  
-  | coin |
-  |---|
-  | euro |
-  | token |
-  ```
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Att · 2 cases
+    `tests/t.py::test_att`
+    
+    - **when** act
+    
+    | coin |
+    |---|
+    | euro |
+    | token |
+    ```
 
 - **failed, failed, \| coin \|** — Rendered Markdown:
-  ```
-  # pytest-given — proj
-  
-  ## ✓ Att · 2 cases
-  `tests/t.py::test_att`
-  
-  - **when** act
-  
-  | coin |
-  |---|
-  | euro |
-  | token |
-  ```
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Att · 2 cases
+    `tests/t.py::test_att`
+    
+    - **when** act
+    
+    | coin |
+    |---|
+    | euro |
+    | token |
+    ```
 
 - **passed, skipped, \| coin \| \|** — Rendered Markdown:
-  ```
-  # pytest-given — proj
-  
-  ## ✓ Att · 2 cases
-  `tests/t.py::test_att`
-  
-  - **when** act
-  
-  | coin | |
-  |---|---|
-  | euro | ✓ |
-  | token | ○ |
-  ```
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Att · 2 cases
+    `tests/t.py::test_att`
+    
+    - **when** act
+    
+    | coin | |
+    |---|---|
+    | euro | ✓ |
+    | token | ○ |
+    ```
 
 - **passed, failed, \| coin \| \|** — Rendered Markdown:
-  ```
-  # pytest-given — proj
-  
-  ## ✓ Att · 2 cases
-  `tests/t.py::test_att`
-  
-  - **when** act
-  
-  | coin | |
-  |---|---|
-  | euro | ✓ |
-  | token | ✗ |
-  ```
+    ```
+    # pytest-given — proj
+    
+    ## ✓ Att · 2 cases
+    `tests/t.py::test_att`
+    
+    - **when** act
+    
+    | coin | |
+    |---|---|
+    | euro | ✓ |
+    | token | ✗ |
+    ```
 
 ## ✓ A failed «scenario» ends with a minimal error digest
 `tests/unit/report/test_md_renderer.py::test_failing_scenario_renders_a_minimal_error`
 
 - **given** a failed «scenario» carrying a two-line error and an internal frame
-  - 📎 Error record:
-    ```
-    {
-      "message": "ValueError: not sold out\nassert 1 == 0",
-      "frames": [
+    - 📎 Error record:
+        ```
         {
-          "path": "/x/_pytest/runner.py",
-          "lineno": 1,
-          "func": "run",
-          "code": "",
-          "is_internal": true
-        },
-        {
-          "path": "/x/tests/test_shop.py",
-          "lineno": 88,
-          "func": "test_sold_out",
-          "code": "buy(m)",
-          "is_internal": false
+          "message": "ValueError: not sold out\nassert 1 == 0",
+          "frames": [
+            {
+              "path": "/x/_pytest/runner.py",
+              "lineno": 1,
+              "func": "run",
+              "code": "",
+              "is_internal": true
+            },
+            {
+              "path": "/x/tests/test_shop.py",
+              "lineno": 88,
+              "func": "test_sold_out",
+              "code": "buy(m)",
+              "is_internal": false
+            }
+          ],
+          "error_tail": null
         }
-      ],
-      "error_tail": null
-    }
-    ```
+        ```
 - **when** the Markdown «report» is rendered
 - **then** the heading is crossed and the error follows the steps
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✗ Sold out
-    `tests/t.py::test_sold_out`
-    
-    - **then** reports sold out
-    
-    > ValueError: not sold out
-    > test_shop.py:88 in test_sold_out
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✗ Sold out
+        `tests/t.py::test_sold_out`
+        
+        - **then** reports sold out
+        
+        > ValueError: not sold out
+        > test_shop.py:88 in test_sold_out
+        ```
 - **then** only the first message line and the non-internal frame are quoted
 
 ## ✓ A multi-line «attachment» renders as a fenced block
@@ -3133,20 +3133,20 @@
 - **given** a «step» carrying a multi-line «attachment»
 - **when** the Markdown «report» is rendered
 - **then** the «attachment» content sits in an indented fence, not inline
-  - 📎 Rendered Markdown:
-    ````
-    # pytest-given — proj
-    
-    ## ✓ Multi
-    `tests/t.py::test_multiline`
-    
-    - **then** result
-      - 📎 Doc:
-        ```
-        line1
-        line2
-        ```
-    ````
+    - 📎 Rendered Markdown:
+        ````
+        # pytest-given — proj
+        
+        ## ✓ Multi
+        `tests/t.py::test_multiline`
+        
+        - **then** result
+            - 📎 Doc:
+                ```
+                line1
+                line2
+                ```
+        ````
 
 ## ✓ A skipped scenario shows its skip reason
 `tests/unit/report/test_md_renderer.py::test_skipped_scenario_shows_reason`
@@ -3154,47 +3154,62 @@
 - **given** a skipped «scenario» with a reason
 - **when** the Markdown «report» is rendered
 - **then** the heading is marked skipped and the reason follows the node ID
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ○ Later · skipped
-    `tests/t.py::test_skip` — reason: needs fixture data
-    
-    - **when** act
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ○ Later · skipped
+        `tests/t.py::test_skip` — reason: needs fixture data
+        
+        - **when** act
+        ```
 
 ## ✓ Failure notes below a «parameter table» that would share a key add their row number
 `tests/unit/report/test_md_renderer.py::test_notes_sharing_a_key_add_their_row`
 
 - **given** three failed «cases»: one with the custom ID 11, one with no ID whose value is 11, and one with the ID 3
 - **when** the Markdown «report» is rendered
-  - 📎 Rendered Markdown:
-    ```
-    # pytest-given — proj
-    
-    ## ✓ Att · 3 cases
-    `tests/t.py::test_att`
-    
-    - **when** act
-    
-    | case ID | hours |
-    |---|---|
-    | 11 | 5 |
-    |  | 11 |
-    | 3 | 3 |
-    
-    - **11 (row 1)** — failed:
-      > clash
-    
-    - **11 (row 2)** — failed:
-      > clash
-    
-    - **3** — failed:
-      > clash
-    ```
+    - 📎 Rendered Markdown:
+        ```
+        # pytest-given — proj
+        
+        ## ✓ Att · 3 cases
+        `tests/t.py::test_att`
+        
+        - **when** act
+        
+        | case ID | hours |
+        |---|---|
+        | 11 | 5 |
+        |  | 11 |
+        | 3 | 3 |
+        
+        - **11 (row 1)** — failed:
+            > clash
+        
+        - **11 (row 2)** — failed:
+            > clash
+        
+        - **3** — failed:
+            > clash
+        ```
 - **then** the two notes keyed 11 each add their row number
 - **then** the note with a key of its own keeps it bare
+
+## ✓ The Markdown «report» nests steps by four spaces
+`tests/unit/report/test_md_renderer.py::test_nested_steps_and_attachments_indent_by_four_spaces` · spec/narrated-citations
+
+- **given** a «step» with a child whose attachment is multi-line
+- **when** the Markdown «report» is rendered
+- **then** each level, its attachment and the attachment fence indent four more
+
+## ✓ A «narrated citation»'s body is the scenario's Markdown narration without heading, anchor line or errors
+`tests/unit/report/test_md_renderer.py::test_the_narration_body_leaves_out_heading_subtitle_and_errors` · spec/narrated-citations
+
+- **given** a failed grouped «scenario» with a tag, a skip reason and a failed case
+- **when** its narration body is taken
+- **then** it holds the steps and the «parameter table» only
+- **then** the full Markdown «report» contains it verbatim
 
 ## ✓ The JSON report carries each «sentence»'s «coverage»
 `tests/unit/report/test_sinks.py::test_json_sink_carries_per_sentence_coverage`

@@ -29,6 +29,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+- The Markdown report indents nested steps and attachments by four spaces.
 - **Breaking.** `@scenario`'s first parameter is now `title`: replace `@scenario(name=...)` with `@scenario(title=...)`; a positional title is unaffected.
 - **Breaking.** `FileGlossary`'s `description_column` is now `definition_column`, the word the rest of the glossary API uses: rename the keyword.
 - **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
