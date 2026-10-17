@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-17T07:51:55.516102+00:00",
+    "timestamp": "2026-10-17T09:43:41.534161+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "e3c94b627b3d7138c281be1b77d08d63ea43123e",
+    "commit_sha": "8513df267cec614d83074dfaf2fd72fea52b4085",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -32,7 +32,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 124,
+      "duration_ms": 121,
       "steps": [
         {
           "phase": "given",
@@ -137,7 +137,7 @@
         "spec/citations"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -401,7 +401,303 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 56
+        "line": 61
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings",
+      "narration": {
+        "text": "`citations check --list` prints every report link, its findings under it",
+        "parts": [
+          {
+            "value": "`citations check --list` prints every "
+          },
+          {
+            "term_id": "report-link",
+            "display": "report link",
+            "expression": "pg[\"Report link\"].l"
+          },
+          {
+            "value": ", its findings under it"
+          }
+        ]
+      },
+      "module": "tests.integration.test_cli_citations",
+      "tags": [
+        "spec/citations-list"
+      ],
+      "status": "passed",
+      "duration_ms": 6,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document with two citations, one of them stale, and a plain report link",
+            "parts": [
+              {
+                "value": "a document with two "
+              },
+              {
+                "term_id": "citation",
+                "display": "citations",
+                "expression": "pg[\"Citation\"].l.s"
+              },
+              {
+                "value": ", one of them stale, and a plain "
+              },
+              {
+                "term_id": "report-link",
+                "display": "report link",
+                "expression": "pg[\"Report link\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "# Paying\n\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and \u2713 [Refund](https://example.org/report.html#scenario=t.py::test_refund)\nSee [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a JSON report of its scenarios",
+            "parts": [
+              {
+                "value": "a JSON "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " of its scenarios"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given citations check --list` runs on the document",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "output",
+              "content": "docs/spec.md:2: \u2705 scenario t.py::test_pay\ndocs/spec.md:2: \u2713 scenario t.py::test_refund\n    stale glyph\n        \u2713 \u2192 \u2705\ndocs/spec.md:3: link scenario t.py::test_refund\ncitations: 1 finding; `citations update` fixes 1\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each report link is a line, with each finding indented under its own",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "report-link",
+                "display": "report link",
+                "expression": "pg[\"Report link\"].l"
+              },
+              {
+                "value": " is a line, with each finding indented under its own"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it exits 1 for the finding",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_citations.py",
+        "line": 243
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_cli_citations.py::test_covering_still_counts_the_findings_it_leaves_out",
+      "narration": {
+        "text": "`--covering` leaves report links out of the list but still counts their findings",
+        "parts": [
+          {
+            "value": "`--covering` leaves "
+          },
+          {
+            "term_id": "report-link",
+            "display": "report links",
+            "expression": "pg[\"Report link\"].l.s"
+          },
+          {
+            "value": " out of the list but still counts their findings"
+          }
+        ]
+      },
+      "module": "tests.integration.test_cli_citations",
+      "tags": [
+        "spec/citations-list"
+      ],
+      "status": "passed",
+      "duration_ms": 2,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document whose stale citation cites `test_refund`, not `test_pay`",
+            "parts": [
+              {
+                "value": "a document whose stale "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " cites `test_refund`, not `test_pay`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "# Paying\n\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and \u2713 [Refund](https://example.org/report.html#scenario=t.py::test_refund)\nSee [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a JSON report of its scenarios",
+            "parts": [
+              {
+                "value": "a JSON "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " of its scenarios"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "`pytest-given citations check --covering` names `test_pay`",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "output",
+              "content": "docs/spec.md:2: \u2705 scenario t.py::test_pay\ncitations: 1 finding, 1 of them on a link --covering leaves out; `citations update` fixes 1\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the citation of `test_pay` is listed",
+            "parts": [
+              {
+                "value": "only the "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " of `test_pay` is listed"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the summary counts the finding it left out",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it exits 1 for that finding",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_cli_citations.py",
+        "line": 280
       },
       "story_ids": [],
       "pins": null
@@ -448,7 +744,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 55,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -634,7 +930,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 103,
+      "duration_ms": 95,
       "steps": [
         {
           "phase": "given",
@@ -716,7 +1012,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -825,7 +1121,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -954,7 +1250,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 548,
+      "duration_ms": 546,
       "steps": [
         {
           "phase": "given",
@@ -1082,7 +1378,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1268,7 +1564,7 @@
         "spec/parameter-table-case-ids"
       ],
       "status": "passed",
-      "duration_ms": 88,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -1454,7 +1750,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -1521,7 +1817,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1631,7 +1927,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -1800,7 +2096,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -1920,7 +2216,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -2183,7 +2479,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 83,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -2353,7 +2649,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2470,7 +2766,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 162,
+      "duration_ms": 180,
       "steps": [
         {
           "phase": "given",
@@ -2543,7 +2839,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2715,7 +3011,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -2854,7 +3150,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2999,7 +3295,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -3152,7 +3448,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -3297,7 +3593,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -3444,7 +3740,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 137,
       "steps": [
         {
           "phase": "given",
@@ -3637,7 +3933,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 123,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -3766,7 +4062,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 127,
+      "duration_ms": 118,
       "steps": [
         {
           "phase": "given",
@@ -3952,7 +4248,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -4046,7 +4342,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -4131,7 +4427,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -4208,7 +4504,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 77,
       "steps": [
         {
           "phase": "given",
@@ -4290,7 +4586,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -4382,7 +4678,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -4467,7 +4763,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -4574,7 +4870,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 163,
+      "duration_ms": 161,
       "steps": [
         {
           "phase": "given",
@@ -4787,7 +5083,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -4940,7 +5236,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5014,7 +5310,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5163,7 +5459,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 384,
+      "duration_ms": 361,
       "steps": [
         {
           "phase": "given",
@@ -5322,7 +5618,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5424,7 +5720,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5529,7 +5825,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -5649,7 +5945,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -5779,7 +6075,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 106,
+      "duration_ms": 97,
       "steps": [
         {
           "phase": "given",
@@ -6009,7 +6305,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -6121,7 +6417,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -6217,7 +6513,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 86,
+      "duration_ms": 80,
       "steps": [
         {
           "phase": "given",
@@ -8105,7 +8401,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8478,7 +8774,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -18087,7 +18383,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 45
+        "line": 44
       },
       "story_ids": [],
       "pins": null
@@ -18145,7 +18441,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 89
+        "line": 88
       },
       "story_ids": [],
       "pins": null
@@ -18290,7 +18586,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 135
+        "line": 134
       },
       "story_ids": [],
       "pins": null
@@ -18358,7 +18654,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 173
+        "line": 172
       },
       "story_ids": [],
       "pins": null
@@ -18414,7 +18710,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 240
+        "line": 239
       },
       "story_ids": [],
       "pins": null
@@ -18645,7 +18941,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 280
+        "line": 279
       },
       "story_ids": [],
       "pins": null
@@ -18739,7 +19035,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 338
+        "line": 337
       },
       "story_ids": [],
       "pins": null
@@ -18838,7 +19134,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 381
+        "line": 380
       },
       "story_ids": [],
       "pins": null
@@ -18931,7 +19227,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_template.py",
-        "line": 419
+        "line": 418
       },
       "story_ids": [],
       "pins": null
@@ -19653,6 +19949,256 @@
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 160
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)-True]",
+      "narration": {
+        "text": "`--covering` keeps each report link whose target counts the scenario, and each it cannot rule out",
+        "parts": [
+          {
+            "value": "`--covering` keeps each "
+          },
+          {
+            "term_id": "report-link",
+            "display": "report link",
+            "expression": "pg[\"Report link\"].l"
+          },
+          {
+            "value": " whose target counts the "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].l"
+          },
+          {
+            "value": ", and each it cannot rule out"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations-list"
+      ],
+      "status": "passed",
+      "duration_ms": 9,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report where `test_pay` is tagged `checkout/card` and in a story, `test_refund` tagged `checkout/refund`",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " where `test_pay` is tagged `checkout/card` and in a "
+              },
+              {
+                "term_id": "story",
+                "display": "story",
+                "expression": "pg[\"Story\"].l"
+              },
+              {
+                "value": ", `test_refund` tagged `checkout/refund`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document holding the report link {link}",
+            "parts": [
+              {
+                "value": "a document holding the "
+              },
+              {
+                "term_id": "report-link",
+                "display": "report link",
+                "expression": "pg[\"Report link\"].l"
+              },
+              {
+                "value": " "
+              },
+              {
+                "name": "link",
+                "column_id": "link",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "its links are checked, covering `test_pay`",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the report link is kept: {kept}",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "report-link",
+                "display": "report link",
+                "expression": "pg[\"Report link\"].l"
+              },
+              {
+                "value": " is kept: "
+              },
+              {
+                "name": "kept",
+                "column_id": "kept",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "link",
+            "name": "link",
+            "kind": "param"
+          },
+          {
+            "id": "kept",
+            "name": "kept",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)-True]",
+            "values": [
+              "\u2705 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[[paying](https://example.org/report.html#scenario=t.py::test_pay)-True]",
+            "values": [
+              "[paying](https://example.org/report.html#scenario=t.py::test_pay)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [Refund](https://example.org/report.html#scenario=t.py::test_refund)-False]",
+            "values": [
+              "\u2705 [Refund](https://example.org/report.html#scenario=t.py::test_refund)",
+              false
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [checkout/card](https://example.org/report.html#tag=checkout/card) (1 \\u2705)-True]",
+            "values": [
+              "\u2705 [checkout/card](https://example.org/report.html#tag=checkout/card) (1 \u2705)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [checkout](https://example.org/report.html#tag=checkout) (2 \\u2705)-True]",
+            "values": [
+              "\u2705 [checkout](https://example.org/report.html#tag=checkout) (2 \u2705)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [checkout/refund](https://example.org/report.html#tag=checkout/refund) (1 \\u2705)-False]",
+            "values": [
+              "\u2705 [checkout/refund](https://example.org/report.html#tag=checkout/refund) (1 \u2705)",
+              false
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [s](https://example.org/report.html#view=stories&story=s) (1 \\u2705)-True]",
+            "values": [
+              "\u2705 [s](https://example.org/report.html#view=stories&story=s) (1 \u2705)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [Gone](https://example.org/report.html#scenario=t.py::test_gone)-True]",
+            "values": [
+              "\u2705 [Gone](https://example.org/report.html#scenario=t.py::test_gone)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario[\\u2705 [search](https://example.org/report.html#q=pay)-True]",
+            "values": [
+              "\u2705 [search](https://example.org/report.html#q=pay)",
+              true
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 763
       },
       "story_ids": [],
       "pins": null
@@ -24246,7 +24792,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 146,
+      "duration_ms": 141,
       "steps": [
         {
           "phase": "given",

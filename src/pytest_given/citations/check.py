@@ -5,13 +5,21 @@ leaves every file as it was.
 
 import itertools
 import re
-from dataclasses import dataclass
+from collections.abc import Sequence
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, NamedTuple
 from urllib.parse import SplitResult, unquote, urlsplit
 
 from ..markdown import fold_whitespace, plain_link_text
-from ..model import STATUSES, PytestGivenError, ReportData, ReportUrl
+from ..model import (
+    STATUSES,
+    NodeId,
+    PytestGivenError,
+    ReportData,
+    ReportUrl,
+    StoryId,
+)
 from ..report import (
     CITATION_GLYPH,
     NO_SCENARIOS_SUMMARY,
@@ -45,12 +53,43 @@ class CitationFinding:
         ]
 
 
+@dataclass(frozen=True, kw_only=True)
+class ReportLink:
+    """A citation or plain report link, holding its own findings — matching
+    them by `path:line` would mix up two links on one line. `target` is what
+    the fragment names as written, None for a mistyped citation's."""
+
+    path: Path
+    line: int
+    glyph: str | None
+    target: Target | None
+    fragment: str
+    findings: tuple[CitationFinding, ...]
+    covered: bool
+
+    def lines(self) -> list[str]:
+        named = (
+            f'#{self.fragment}'
+            if self.target is None
+            else f'{self.target.kind} {self.target.key}'
+        )
+        lines = [f'{self.path.as_posix()}:{self.line}: {self.glyph or "link"} {named}']
+        for finding in self.findings:
+            lines.append(f'    {finding.message}')
+            lines.extend(f'        {detail}' for detail in finding.details)
+        return lines
+
+
 @dataclass(frozen=True)
 class CitationsResult:
-    """Every finding, and the documents an update rewrote."""
+    """Every report link, and the documents an update rewrote."""
 
-    findings: list[CitationFinding]
+    links: list[ReportLink]
     updated: list[Path]
+
+    @property
+    def findings(self) -> list[CitationFinding]:
+        return [finding for link in self.links for finding in link.findings]
 
     @property
     def remaining(self) -> list[CitationFinding]:
@@ -83,7 +122,10 @@ def check_citations(
     report_url: ReportUrl | None,
     report_path: Path | None,
     update: bool,
+    covering: Sequence[str] = (),
 ) -> CitationsResult:
+    """`covering` names scenarios by any name a report link may give them; a
+    link is `covered` when it may cite one — every link, when it names none."""
     location = _ReportLocation(
         report_url or report.metadata.report_url,
         None if report_path is None else report_path.resolve(),
@@ -95,18 +137,19 @@ def check_citations(
             'point at the report.'
         )
     resolver = TargetResolver(report)
+    covers = _Covering(resolver, covering)
     texts = {path: _read(path) for path in documents}
-    findings: list[CitationFinding] = []
+    links: list[ReportLink] = []
     edited: dict[Path, str] = {}
     for path, text in texts.items():
-        document_findings, edits = _check_document(path, text, resolver, location)
-        findings.extend(document_findings)
+        document_links, edits = _check_document(path, text, resolver, location, covers)
+        links.extend(document_links)
         if update and edits:
             edited[path] = _apply(text, edits)
     updated = [path for path, text in edited.items() if text != texts[path]]
     for path in updated:
         path.write_bytes(edited[path].encode('utf-8'))
-    return CitationsResult(findings=findings, updated=updated)
+    return CitationsResult(links=links, updated=updated)
 
 
 class _ReportLocation:
@@ -133,6 +176,43 @@ class _ReportLocation:
         if joined not in self._resolved:
             self._resolved[joined] = joined.resolve()
         return self._resolved[joined] == self.path
+
+
+class _Covering:
+    """Whether a link's resolved target may cite a scenario `covering` names: is
+    it, or a tag — through its prefixes — or story counting it. A link that
+    resolves to nothing may be one under a name it no longer has."""
+
+    def __init__(self, resolver: TargetResolver, covering: Sequence[str]) -> None:
+        self._index = resolver.index
+        self._all = not covering
+        self._cited: set[NodeId] = set()
+        for node_id in covering:
+            named = Target('scenario', node_id)
+            resolved = resolver.resolve(named)
+            if resolved is None:
+                raise PytestGivenError(
+                    '; '.join(
+                        [
+                            f'{_named(named)} is not in the report',
+                            *resolver.suggestions(named, ''),
+                        ]
+                    )
+                )
+            self._cited.add(NodeId(resolved.key))
+        self._ids = {self._index.scenarios[cited].id for cited in self._cited}
+
+    def __call__(self, resolved: Target | None) -> bool:
+        if self._all or resolved is None:
+            return True
+        match resolved.kind:
+            case 'scenario':
+                return resolved.key in self._cited
+            case 'tag':
+                counted = self._index.tags[resolved.key]
+            case 'story':
+                _, counted = self._index.stories[StoryId(resolved.key)]
+        return any(scenario.id in self._ids for scenario in counted)
 
 
 class _Edit(NamedTuple):
@@ -169,15 +249,21 @@ def _read(path: Path) -> str:
 
 
 def _check_document(
-    path: Path, text: str, resolver: TargetResolver, location: _ReportLocation
-) -> tuple[list[CitationFinding], list[_Edit]]:
-    findings: list[CitationFinding] = []
+    path: Path,
+    text: str,
+    resolver: TargetResolver,
+    location: _ReportLocation,
+    covers: _Covering,
+) -> tuple[list[ReportLink], list[_Edit]]:
+    links: list[ReportLink] = []
     edits: list[_Edit] = []
     for link in scan_links(text, _READ_GLYPHS):
         fragment = _report_fragment(link.destination, path, location)
         if fragment is not None:
-            _LinkCheck(path, link, resolver, findings, edits).run(fragment)
-    return findings, edits
+            checked = _LinkCheck(path, link, resolver, edits).run(fragment, covers)
+            if checked is not None:
+                links.append(checked)
+    return links, edits
 
 
 def _report_fragment(url: str, document: Path, location: _ReportLocation) -> str | None:
@@ -198,20 +284,23 @@ class _LinkCheck:
     path: Path
     link: MarkdownLink
     resolver: TargetResolver
-    findings: list[CitationFinding]
     edits: list[_Edit]
+    findings: list[CitationFinding] = field(default_factory=list)
 
-    def run(self, fragment: str) -> None:
+    def run(self, fragment: str, covers: _Covering) -> ReportLink | None:
+        """The link checked, or None for a plain link naming no target — not
+        a report link, as a glossary term's is not."""
         glyph = self.link.glyph
         target = parse_fragment(fragment)
         if target is None:
-            if glyph is not None:
-                self._find(
-                    'mistyped',
-                    f'citation links the report, but #{fragment} names no scenario, '
-                    'tag or story',
-                )
-            return
+            if glyph is None:
+                return None
+            self._find(
+                'mistyped',
+                f'citation links the report, but #{fragment} names no scenario, '
+                'tag or story',
+            )
+            return self._checked(None, fragment, covers(None))
         written_title = plain_link_text(
             self.link.text, in_table_row=self.link.in_table_row
         )
@@ -226,6 +315,21 @@ class _LinkCheck:
                 self._mark_missing(glyph)
         elif glyph is not None:
             self._check_citation(resolved, glyph, written_title)
+        return self._checked(target, fragment, covers(resolved))
+
+    def _checked(
+        self, target: Target | None, fragment: str, covered: bool
+    ) -> ReportLink:
+        glyph = self.link.glyph
+        return ReportLink(
+            path=self.path,
+            line=self.link.line,
+            glyph=None if glyph is None else glyph.text,
+            target=target,
+            fragment=fragment,
+            findings=tuple(self.findings),
+            covered=covered,
+        )
 
     def _resolve_and_repoint(
         self, target: Target, glyph: Glyph | None, written_title: str

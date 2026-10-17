@@ -29,7 +29,12 @@ def _write_report(tmp_path: Path, *, report_url: str | None = URL) -> Path:
                         'id': 't.py::test_pay',
                         'narration': {'text': 'Pay by card'},
                         'module': 'm',
-                    }
+                    },
+                    {
+                        'id': 't.py::test_refund',
+                        'narration': {'text': 'Refund'},
+                        'module': 'm',
+                    },
                 ],
             }
         ),
@@ -221,4 +226,158 @@ def test_a_bad_report_url_flag_exits_2(tmp_path: Path) -> None:
 def test_a_verb_is_required() -> None:
     with pytest.raises(SystemExit) as excinfo:
         main(['citations'])
+    assert excinfo.value.code == 2
+
+
+# --- Listing ---
+
+_LISTED = (
+    '# Paying\n'
+    f'✅ [Pay by card]({URL}#scenario=t.py::test_pay) and '
+    f'✓ [Refund]({URL}#scenario=t.py::test_refund)\n'
+    f'See [refunds]({URL}#scenario=t.py::test_refund) and '
+    f'[elsewhere](https://other.org/)\n'
+)
+
+
+@scenario(
+    t'`citations check --list` prints every {pg["Report link"].l}, its findings '
+    t'under it',
+    tags=['spec/citations-list'],
+)
+def test_check_list_prints_every_report_link_with_its_findings(
+    tmp_path: Path, capsys, monkeypatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    with given(
+        t'a document with two {pg["Citation"].l.s}, one of them stale, and a plain '
+        t'{pg["Report link"].l}'
+    ):
+        doc = _doc(tmp_path, _LISTED).relative_to(tmp_path)
+        attach('document', _LISTED)
+    with given(t'a JSON {pg["Report"].l} of its scenarios'):
+        report = _write_report(tmp_path)
+    with when('`pytest-given citations check --list` runs on the document'):
+        rc = main(['citations', 'check', '--list', str(doc), '--report', str(report)])
+        out = capsys.readouterr().out
+        attach('output', out)
+    with then(
+        t'each {pg["Report link"].l} is a line, with each finding indented under '
+        t'its own'
+    ):
+        assert out.splitlines() == [
+            f'{doc.as_posix()}:2: ✅ scenario t.py::test_pay',
+            f'{doc.as_posix()}:2: ✓ scenario t.py::test_refund',
+            '    stale glyph',
+            '        ✓ → ✅',
+            f'{doc.as_posix()}:3: link scenario t.py::test_refund',
+            'citations: 1 finding; `citations update` fixes 1',
+        ]
+    with then('it exits 1 for the finding'):
+        assert rc == 1
+
+
+@scenario(
+    t'`--covering` leaves {pg["Report link"].l.s} out of the list but still counts '
+    t'their findings',
+    tags=['spec/citations-list'],
+)
+def test_covering_still_counts_the_findings_it_leaves_out(
+    tmp_path: Path, capsys, monkeypatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    with given(
+        t'a document whose stale {pg["Citation"].l} cites `test_refund`, not `test_pay`'
+    ):
+        doc = _doc(tmp_path, _LISTED).relative_to(tmp_path)
+        attach('document', _LISTED)
+    with given(t'a JSON {pg["Report"].l} of its scenarios'):
+        report = _write_report(tmp_path)
+    with when('`pytest-given citations check --covering` names `test_pay`'):
+        rc = main(
+            [
+                'citations',
+                'check',
+                '--covering',
+                't.py::test_pay',
+                str(doc),
+                '--report',
+                str(report),
+            ]
+        )
+        out = capsys.readouterr().out
+        attach('output', out)
+    with then(t'only the {pg["Citation"].l} of `test_pay` is listed'):
+        assert out.splitlines()[:-1] == [
+            f'{doc.as_posix()}:2: ✅ scenario t.py::test_pay'
+        ]
+    with then('the summary counts the finding it left out'):
+        assert out.splitlines()[-1] == (
+            'citations: 1 finding, 1 of them on a link --covering leaves out; '
+            '`citations update` fixes 1'
+        )
+    with then('it exits 1 for that finding'):
+        assert rc == 1
+
+
+def test_list_of_current_links_exits_0(tmp_path: Path, capsys) -> None:
+    doc = _doc(tmp_path, f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n')
+    report = _write_report(tmp_path)
+    rc = main(['citations', 'check', '--list', str(doc), '--report', str(report)])
+    assert rc == 0
+    assert capsys.readouterr().out.splitlines() == [
+        f'{doc.as_posix()}:1: ✅ scenario t.py::test_pay',
+        'citations: every report link is current',
+    ]
+
+
+def test_a_repeated_covering_lists_the_links_of_each(tmp_path: Path, capsys) -> None:
+    doc = _doc(tmp_path, _LISTED)
+    report = _write_report(tmp_path)
+    rc = main(
+        [
+            'citations',
+            'check',
+            str(doc),
+            '--report',
+            str(report),
+            '--covering',
+            't.py::test_pay',
+            '--covering',
+            't.py::test_refund',
+        ]
+    )
+    assert rc == 1
+    out = capsys.readouterr().out
+    assert out.count(f'{doc.as_posix()}:') == 3
+    assert out.splitlines()[-1] == 'citations: 1 finding; `citations update` fixes 1'
+
+
+def test_covering_an_unknown_scenario_exits_2(tmp_path: Path, capsys) -> None:
+    doc = _doc(tmp_path, _LISTED)
+    report = _write_report(tmp_path)
+    rc = main(
+        [
+            'citations',
+            'check',
+            str(doc),
+            '--report',
+            str(report),
+            '--covering',
+            't.py::test_pai',
+        ]
+    )
+    assert rc == 2
+    assert capsys.readouterr().err == (
+        'Error: scenario t.py::test_pai is not in the report; '
+        'closest by node ID: t.py::test_pay, t.py::test_refund\n'
+    )
+
+
+@pytest.mark.parametrize('option', [['--list'], ['--covering', 't.py::test_pay']])
+def test_update_takes_neither_listing_option(tmp_path: Path, option) -> None:
+    doc = _doc(tmp_path, _LISTED)
+    report = _write_report(tmp_path)
+    with pytest.raises(SystemExit) as excinfo:
+        main(['citations', 'update', *option, str(doc), '--report', str(report)])
     assert excinfo.value.code == 2

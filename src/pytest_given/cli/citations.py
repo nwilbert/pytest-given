@@ -28,7 +28,12 @@ def add_citations_parser(
         ('update', 'Rewrite stale citations, then report what remains'),
     ):
         verb_parser = verbs.add_parser(verb, help=help_text)
-        verb_parser.set_defaults(handler=run_citations, update=verb == 'update')
+        verb_parser.set_defaults(
+            handler=run_citations,
+            update=verb == 'update',
+            list_links=False,
+            covering=None,
+        )
         verb_parser.add_argument(
             'documents',
             nargs='+',
@@ -55,10 +60,31 @@ def add_citations_parser(
                 'so relative links to it are read too'
             ),
         )
+        if verb == 'check':
+            _add_listing_options(verb_parser)
+
+
+def _add_listing_options(check_parser: argparse.ArgumentParser) -> None:
+    check_parser.add_argument(
+        '--list',
+        dest='list_links',
+        action='store_true',
+        help='Print every report link, each with its findings under it',
+    )
+    check_parser.add_argument(
+        '--covering',
+        action='append',
+        metavar='NODE_ID',
+        help=(
+            'List only the links that may cite this scenario (implies --list); '
+            'repeatable'
+        ),
+    )
 
 
 def run_citations(args: argparse.Namespace) -> int:
     report_file: Path = args.report
+    covering: list[str] = args.covering or []
     try:
         result = check_citations(
             report_from_dict(read_report_json(report_file), report_file.as_posix()),
@@ -66,23 +92,35 @@ def run_citations(args: argparse.Namespace) -> int:
             report_url=resolve_report_url(args.report_url, '--report-url'),
             report_path=args.report_path,
             update=args.update,
+            covering=covering,
         )
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2
-    return _report_update(result) if args.update else _report_check(result)
+    if args.update:
+        return _report_update(result)
+    return _report_check(result, listed=args.list_links or bool(covering))
 
 
-def _report_check(result: CitationsResult) -> int:
-    for finding in result.findings:
-        print('\n'.join(finding.lines()))
+def _report_check(result: CitationsResult, *, listed: bool) -> int:
+    """The summary and exit code are the same listed or not: a finding on a
+    link `--covering` leaves out still counts."""
+    if listed:
+        for link in result.links:
+            if link.covered:
+                print('\n'.join(link.lines()))
+    else:
+        for finding in result.findings:
+            print('\n'.join(finding.lines()))
     if not result.findings:
         print('citations: every report link is current')
         return 0
     fixable = len(result.findings) - len(result.remaining)
+    left_out = sum(len(link.findings) for link in result.links if not link.covered)
     print(
-        f'citations: {plural(len(result.findings), "finding")}; '
-        f'`citations update` fixes {fixable}'
+        f'citations: {plural(len(result.findings), "finding")}'
+        + (f', {left_out} of them on a link --covering leaves out' if left_out else '')
+        + f'; `citations update` fixes {fixable}'
     )
     return 1
 

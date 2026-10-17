@@ -51,6 +51,51 @@
   ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
   ```
 
+## ✓ `citations check --list` prints every «report link», its findings under it
+`tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings` · spec/citations-list
+
+- **given** a document with two «citations», one of them stale, and a plain «report link»
+  - 📎 document:
+    ```
+    # Paying
+    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and ✓ [Refund](https://example.org/report.html#scenario=t.py::test_refund)
+    See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)
+    ```
+- **given** a JSON «report» of its scenarios
+- **when** `pytest-given citations check --list` runs on the document
+  - 📎 output:
+    ```
+    docs/spec.md:2: ✅ scenario t.py::test_pay
+    docs/spec.md:2: ✓ scenario t.py::test_refund
+        stale glyph
+            ✓ → ✅
+    docs/spec.md:3: link scenario t.py::test_refund
+    citations: 1 finding; `citations update` fixes 1
+    ```
+- **then** each «report link» is a line, with each finding indented under its own
+- **then** it exits 1 for the finding
+
+## ✓ `--covering` leaves «report links» out of the list but still counts their findings
+`tests/integration/test_cli_citations.py::test_covering_still_counts_the_findings_it_leaves_out` · spec/citations-list
+
+- **given** a document whose stale «citation» cites `test_refund`, not `test_pay`
+  - 📎 document:
+    ```
+    # Paying
+    ✅ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay) and ✓ [Refund](https://example.org/report.html#scenario=t.py::test_refund)
+    See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [elsewhere](https://other.org/)
+    ```
+- **given** a JSON «report» of its scenarios
+- **when** `pytest-given citations check --covering` names `test_pay`
+  - 📎 output:
+    ```
+    docs/spec.md:2: ✅ scenario t.py::test_pay
+    citations: 1 finding, 1 of them on a link --covering leaves out; `citations update` fixes 1
+    ```
+- **then** only the «citation» of `test_pay` is listed
+- **then** the summary counts the finding it left out
+- **then** it exits 1 for that finding
+
 ## ✓ A «scenario» reaches the «report» with its «tags» and «term refs»
 `tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
 
@@ -2368,6 +2413,26 @@
     ```
     ✅ [Books a **suite**](https://example.org/report.html#scenario=t.py::test_book)
     ```
+
+## ✓ `--covering` keeps each «report link» whose target counts the «scenario», and each it cannot rule out · 9 cases
+`tests/unit/citations/test_check.py::test_covering_keeps_the_links_that_may_cite_the_scenario` · spec/citations-list
+
+- **given** a «report» where `test_pay` is tagged `checkout/card` and in a «story», `test_refund` tagged `checkout/refund`
+- **given** a document holding the «report link» {link}
+- **when** its links are checked, covering `test_pay`
+- **then** the «report link» is kept: {kept}
+
+| link | kept |
+|---|---|
+| ✅ \[Pay by card\](https://example.org/report.html#scenario=t.py::test_pay) | True |
+| \[paying\](https://example.org/report.html#scenario=t.py::test_pay) | True |
+| ✅ \[Refund\](https://example.org/report.html#scenario=t.py::test_refund) | False |
+| ✅ \[checkout/card\](https://example.org/report.html#tag=checkout/card) (1 ✅) | True |
+| ✅ \[checkout\](https://example.org/report.html#tag=checkout) (2 ✅) | True |
+| ✅ \[checkout/refund\](https://example.org/report.html#tag=checkout/refund) (1 ✅) | False |
+| ✅ \[s\](https://example.org/report.html#view=stories\&story=s) (1 ✅) | True |
+| ✅ \[Gone\](https://example.org/report.html#scenario=t.py::test_gone) | True |
+| ✅ \[search\](https://example.org/report.html#q=pay) | True |
 
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`

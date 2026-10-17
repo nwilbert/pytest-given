@@ -740,3 +740,191 @@ def test_a_document_that_is_not_utf8_is_an_error(tmp_path: Path) -> None:
         check_citations(
             report_(PAY), [path], report_url=None, report_path=None, update=False
         )
+
+
+# --- Listing ---
+
+
+def _story(story_id: str) -> Story:
+    return Story(
+        id=StoryId(story_id),
+        title=story_id,
+        sentences=(Sentence(id=SentenceId(1), clauses=()),),
+    )
+
+
+_COVERING_REPORT = report_(
+    scenario_('t.py::test_pay', 'Pay by card', tags=('checkout/card',), stories=('s',)),
+    scenario_('t.py::test_refund', 'Refund', tags=('checkout/refund',)),
+    stories=(_story('s'),),
+)
+
+
+@scenario(
+    t'`--covering` keeps each {pg["Report link"].l} whose target counts the '
+    t'{pg["Scenario"].l}, and each it cannot rule out',
+    tags=['spec/citations-list'],
+)
+@pytest.mark.parametrize(
+    ('link', 'kept'),
+    [
+        (f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)', True),
+        (f'[paying]({URL}#scenario=t.py::test_pay)', True),
+        (f'✅ [Refund]({URL}#scenario=t.py::test_refund)', False),
+        (f'✅ [checkout/card]({URL}#tag=checkout/card) (1 ✅)', True),
+        (f'✅ [checkout]({URL}#tag=checkout) (2 ✅)', True),
+        (f'✅ [checkout/refund]({URL}#tag=checkout/refund) (1 ✅)', False),
+        (f'✅ [s]({URL}#view=stories&story=s) (1 ✅)', True),
+        (f'✅ [Gone]({URL}#scenario=t.py::test_gone)', True),
+        (f'✅ [search]({URL}#q=pay)', True),
+    ],
+)
+def test_covering_keeps_the_links_that_may_cite_the_scenario(
+    tmp_path: Path, link: str, kept: bool
+) -> None:
+    with given(
+        t'a {pg["Report"].l} where `test_pay` is tagged `checkout/card` and in a '
+        t'{pg["Story"].l}, `test_refund` tagged `checkout/refund`'
+    ):
+        report = _COVERING_REPORT
+    with given(t'a document holding the {pg["Report link"].l} {link}'):
+        path = tmp_path / 'doc.md'
+        path.write_text(f'{link}\n', encoding='utf-8', newline='\n')
+    with when('its links are checked, covering `test_pay`'):
+        result = check_citations(
+            report,
+            [path],
+            report_url=None,
+            report_path=None,
+            update=False,
+            covering=['t.py::test_pay'],
+        )
+    with then(t'the {pg["Report link"].l} is kept: {kept}'):
+        assert [listed.covered for listed in result.links] == [kept]
+
+
+def test_every_report_link_is_listed_in_document_order(tmp_path: Path) -> None:
+    document = (
+        f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
+        f'[see]({URL}#view=stories&story=gone) and [elsewhere](https://other.org/r)\n'
+        f'[the glossary]({URL}#view=glossary&term=guest)\n'
+        f'? [x]({URL}#tag=x)\n'
+        f'✅ [search]({URL}#q=pay)\n'
+    )
+    result, _ = _run(tmp_path, document, report_(PAY))
+    assert [listed.lines()[0] for listed in result.links] == [
+        f'{(tmp_path / "doc.md").as_posix()}:{line}: {head}'
+        for line, head in [
+            (1, '✅ scenario t.py::test_pay'),
+            (2, 'link story gone'),
+            (4, '? tag x'),
+            (5, '✅ #q=pay'),
+        ]
+    ]
+    assert all(listed.covered for listed in result.links)
+
+
+def test_a_listed_link_names_its_target_as_the_document_writes_it(
+    tmp_path: Path,
+) -> None:
+    report = report_(scenario_('pkg/test_shop.py::test_buy', 'Buy'))
+    result, _ = _run(tmp_path, f'✅\ufe0f [Buy]({URL}#scenario=shop/buy)\n', report)
+    (listed,) = result.links
+    assert listed.lines() == [
+        f'{(tmp_path / "doc.md").as_posix()}:1: ✅\ufe0f scenario shop/buy',
+        (
+            "    scenario fragment names 'shop/buy', which a report link names as "
+            "'pkg/test_shop.py::test_buy'"
+        ),
+        '        #scenario=shop/buy → #scenario=pkg/test_shop.py::test_buy',
+    ]
+
+
+def test_each_finding_sits_on_its_own_link_two_on_one_row_included(
+    tmp_path: Path,
+) -> None:
+    document = (
+        '| a | b |\n|---|---|\n'
+        f'| ✓ [Pay by card]({URL}#scenario=t.py::test_pay) '
+        f'| ✅ [Gone]({URL}#scenario=t.py::test_gone) |\n'
+    )
+    result, _ = _run(tmp_path, document, report_(PAY))
+    assert [
+        [finding.message for finding in listed.findings] for listed in result.links
+    ] == [['stale glyph'], ['scenario t.py::test_gone is not in the report']]
+    assert result.findings == [
+        finding for listed in result.links for finding in listed.findings
+    ]
+
+
+@pytest.mark.parametrize(
+    'covering', ['t.py::test_pour[b]', 't.py::test_pour', 't/pour']
+)
+def test_a_case_node_id_or_a_slug_names_its_grouped_scenario(
+    tmp_path: Path, covering: str
+) -> None:
+    report = report_(
+        scenario_(
+            't.py::test_pour[a]',
+            'Pour',
+            grouped=True,
+            other_cases=('t.py::test_pour[b]',),
+        ),
+        PAY,
+    )
+    document = (
+        f'✅ [Pour]({URL}#scenario=t.py::test_pour)\n'
+        f'✅ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
+    )
+    path = tmp_path / 'doc.md'
+    path.write_text(document, encoding='utf-8', newline='\n')
+    result = check_citations(
+        report,
+        [path],
+        report_url=None,
+        report_path=None,
+        update=False,
+        covering=[covering],
+    )
+    assert [listed.covered for listed in result.links] == [True, False]
+
+
+def test_several_covered_scenarios_keep_the_union(tmp_path: Path) -> None:
+    report = report_(
+        PAY, scenario_('t.py::test_refund', 'Refund'), scenario_('t.py::test_x', 'X')
+    )
+    document = (
+        f'[a]({URL}#scenario=t.py::test_pay)\n'
+        f'[b]({URL}#scenario=t.py::test_refund)\n'
+        f'[c]({URL}#scenario=t.py::test_x)\n'
+    )
+    path = tmp_path / 'doc.md'
+    path.write_text(document, encoding='utf-8', newline='\n')
+    result = check_citations(
+        report,
+        [path],
+        report_url=None,
+        report_path=None,
+        update=False,
+        covering=['t.py::test_pay', 't.py::test_refund'],
+    )
+    assert [listed.covered for listed in result.links] == [True, True, False]
+
+
+def test_covering_a_scenario_the_report_lacks_is_an_error(tmp_path: Path) -> None:
+    report = report_(scenario_('t.py::test_pay_by_card', 'Pay by card'))
+    with pytest.raises(
+        PytestGivenError,
+        match=re.escape(
+            'scenario t.py::test_pay_card is not in the report; '
+            'closest by node ID: t.py::test_pay_by_card'
+        ),
+    ):
+        check_citations(
+            report,
+            [],
+            report_url=None,
+            report_path=None,
+            update=False,
+            covering=['t.py::test_pay_card'],
+        )

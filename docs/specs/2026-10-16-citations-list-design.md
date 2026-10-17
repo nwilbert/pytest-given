@@ -1,5 +1,7 @@
 # Listing Report Links — Design Spec
 
+✅ [spec/citations-list](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/citations-list) (3 ✅)
+
 ## Goal
 
 Let `pytest-given citations check` show every report link it holds to the report, not only the
@@ -148,5 +150,5 @@ exact; until then it lists what it cannot rule out.
   reading its list.
 - A JSON output: the line format is stable and parseable.
 - Attributing a citation of a renamed test's old node ID to its new one; the acceptance-criteria
-  extension in the [citations design](../2026-10-07-citations-design.md) binds scenarios to a spec
+  extension in the [citations design](2026-10-07-citations-design.md) binds scenarios to a spec
   by name and would make the lookup exact.

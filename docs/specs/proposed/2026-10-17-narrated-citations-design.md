@@ -149,8 +149,8 @@ repointing a renamed test by its title, `missing`, `failed` — plus its body an
   with narrated citations has its formatter skip them, such as with Prettier's
   `<!-- prettier-ignore-start -->` and `<!-- prettier-ignore-end -->` around each block.
 
-If the [listing design](2026-10-16-citations-list-design.md) has landed, `check --list` lists a
-narrated citation like a one-line scenario citation, and `--covering` keeps it by the same rule.
+`check --list` lists a narrated citation like a one-line scenario citation, and `--covering` keeps
+it by the same rule, as the [listing design](../2026-10-16-citations-list-design.md) sets out.
 
 ## Copying from the report
 
@@ -225,7 +225,8 @@ flash the buttons show today.
 - `tests/unit/citations/` — reading a narrated citation: its parts and spans; whitespace and a
   line break between the tags; a block holding its own `</details>`; a `</details>` in a fenced
   body block; an author's `<details>` left alone. Checking one: each finding in the table, a
-  current one silent, CRLF line endings, a body under a list item's indent and a blockquote's `> `.
+  current one silent, CRLF line endings, a body under a list item's indent and a blockquote's `> `;
+  listed by `check --list` and kept by `--covering` as a one-line citation is.
 - `tests/unit/report/` — the body leaves out heading, anchor and errors; four-space nesting.
 - `tests/integration/test_cli_citations.py` — `update` fills an empty body, `check` exits 1 on a
   stale one.

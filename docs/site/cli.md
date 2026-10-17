@@ -35,5 +35,10 @@ A directory is searched recursively for `*.md`. Neither command runs tests: both
 
 `check` writes nothing and exits 1 on any finding; `update` exits 1 when a finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, or when neither a report URL nor a report path is known.
 
+`check` takes two more options, which leave its summary and exit code as they are:
+
+- `--list` prints every report link on a line of its own, `path:line: glyph kind key` (`link` in place of the glyph for a plain report link), with its findings indented under it.
+- `--covering NODE_ID` narrows that list to the links that [may cite the scenario](guide/citations.md#finding-the-citations-of-a-changed-scenario), and implies `--list`. Repeat it for several scenarios. It exits 2 when the report holds no scenario of that node ID.
+
 The same command also installs the agent skills with `pytest-given skills install`; see [Agent skills](ai-agents.md#agent-skills).
 

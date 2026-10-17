@@ -24,6 +24,10 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 | Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. |
 | Target not in the report | Rule out the report first: a partial run, or one from another rootdir (node IDs are relative to it), loses many targets at once. Then follow [references/repair.md](references/repair.md). |
 
+## Finding what cites a scenario
+
+`citations check --list` prints every report link, `path:line: glyph kind key`, its findings indented under it. `--covering <node ID>` (repeatable) keeps the links that may cite that scenario: its own, a tag's or story's that counts it, and every link whose target is gone, which may name it under an old node ID. Run `update` first; once `check` is clean, the list is exact.
+
 ## Writing citations
 
 You cannot click a copy button. Write a placeholder — a typed `?` glyph and empty text — and let `update` fill it:
