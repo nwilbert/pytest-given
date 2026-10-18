@@ -1017,7 +1017,7 @@
 <p><code>check</code> takes two more options, which leave its summary and exit code as they are:</p>
 <ul>
 <li><code>--list</code> prints every report link on a line of its own, <code>path:line: glyph kind key</code> (<code>link</code> in place of the glyph for a plain report link), with its citation findings indented under it.</li>
-<li><code>--covering NODE_ID</code> narrows that list to the links that <a href="../guide/citations/#finding-the-citations-of-a-changed-scenario">may cite the scenario</a>, and implies <code>--list</code>. Repeat it for several scenarios. A test function's node ID covers each of its scenarios, one per case under <code>group_parametrized=False</code>. It exits 2 when the report holds no scenario of that node ID.</li>
+<li><code>--covering NODE_ID</code> narrows that list to the links that <a href="../guide/citations/#finding-the-citations-of-a-scenario">may cite the scenario</a>, and implies <code>--list</code>. Repeat it for several scenarios. A test function's node ID covers each of its scenarios, one per case under <code>group_parametrized=False</code>. It exits 2 when the report holds no scenario of that node ID.</li>
 </ul>
 <p>The same command also installs the agent skills with <code>pytest-given skills install</code>; see <a href="../ai-agents/#agent-skills">Agent skills</a>.</p>
 
