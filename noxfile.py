@@ -410,15 +410,16 @@ _EXAMPLES = (
 _EXAMPLE_REPORTS = (*(example.slug for example in _EXAMPLES), 'self-report')
 # The reports a document cites: `pytest-given citations` refuses one that no
 # document links, so a report the docs only embed stays out.
-_CITED_REPORTS = ('hotel-booking', 'self-report')
+_CITED_REPORTS = ('coffeeshop', 'hotel-booking', 'self-report')
 
 
 def _run_citations(
     session: nox.Session, verb: Literal['check', 'update'], slug: str
 ) -> None:
     """Hold the documents citing one report to it: the site's pages, which link
-    it relatively, and for the self-report the specs, which link the hosted
-    one."""
+    it relatively, for the self-report the specs, which link the hosted one,
+    and for coffeeshop the README, which links the `/latest/` one like its
+    other links into the site."""
     report = f'examples/{slug}/{slug}-data.json'
     session.run(
         'pytest-given',
@@ -433,6 +434,16 @@ def _run_citations(
     if slug == 'self-report':
         session.run(
             'pytest-given', 'citations', verb, 'docs/specs/', '--report', report
+        )
+    if slug == 'coffeeshop':
+        session.run(
+            'pytest-given',
+            'citations',
+            verb,
+            'README.md',
+            '--report',
+            report,
+            f'--report-url={_examples_url("latest")}/{slug}.html',
         )
 
 

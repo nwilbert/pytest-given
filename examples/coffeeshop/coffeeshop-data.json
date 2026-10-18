@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-18T10:35:18.366984+00:00",
+    "timestamp": "2026-10-18T18:03:29.396666+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "2e57a6d139a1f44aa1eaafe4f5b5bfd45236baad",
+    "commit_sha": "af994c6d931af0efcd61ee6664b1f4fdbe31c983",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -12,7 +12,7 @@
     {
       "id": "examples/coffeeshop/test_coffeeshop.py::test_buy_coffee",
       "narration": {
-        "text": "Basic scenario with when/then and a JSON attachment",
+        "text": "Buying a coffee takes one from the machine",
         "parts": []
       },
       "module": "test_coffeeshop",
@@ -25,7 +25,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -36,7 +36,7 @@
         {
           "phase": "when",
           "narration": {
-            "text": "I insert $2",
+            "text": "I buy a coffee",
             "parts": []
           },
           "children": [],
@@ -47,7 +47,7 @@
         {
           "phase": "then",
           "narration": {
-            "text": "I get a coffee",
+            "text": "the machine has 9 coffees left",
             "parts": []
           },
           "children": [],
@@ -87,7 +87,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -141,7 +141,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 44
+        "line": 41
       },
       "story_ids": [],
       "pins": null
@@ -197,7 +197,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 55
+        "line": 52
       },
       "story_ids": [],
       "pins": null
@@ -213,12 +213,12 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 81,
+      "duration_ms": 80,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -409,7 +409,7 @@
                 },
                 {
                   "path": "examples/coffeeshop/test_coffeeshop.py",
-                  "lineno": 90,
+                  "lineno": 87,
                   "func": "test_pricing",
                   "code": "    assert purchase_allowed == expect",
                   "is_internal": false
@@ -426,7 +426,7 @@
       "xfail_reason": "happy-hour pricing not implemented yet",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 64
+        "line": 61
       },
       "story_ids": [],
       "pins": null
@@ -445,7 +445,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -534,7 +534,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 93
+        "line": 90
       },
       "story_ids": [],
       "pins": null
@@ -553,7 +553,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -624,7 +624,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 105
+        "line": 102
       },
       "story_ids": [],
       "pins": null
@@ -656,7 +656,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -747,7 +747,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 116
+        "line": 113
       },
       "story_ids": [],
       "pins": null
@@ -791,7 +791,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -854,7 +854,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 126
+        "line": 123
       },
       "story_ids": [],
       "pins": null
@@ -898,7 +898,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -972,7 +972,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 126
+        "line": 123
       },
       "story_ids": [],
       "pins": null
@@ -1006,7 +1006,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1146,7 +1146,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 144
+        "line": 141
       },
       "story_ids": [],
       "pins": null
@@ -1169,7 +1169,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1272,7 +1272,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 191
+        "line": 188
       },
       "story_ids": [],
       "pins": null
@@ -1296,7 +1296,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1448,7 +1448,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 207
+        "line": 204
       },
       "story_ids": [],
       "pins": null
@@ -1471,7 +1471,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1519,7 +1519,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 244
+        "line": 241
       },
       "story_ids": [],
       "pins": null
@@ -1544,7 +1544,7 @@
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1603,7 +1603,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 261
+        "line": 258
       },
       "story_ids": [],
       "pins": null
@@ -1617,12 +1617,12 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 46,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1732,7 +1732,7 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 280,
+            "lineno": 277,
             "func": "test_failing",
             "code": "    assert machine['coffees'] == 20",
             "is_internal": false
@@ -1744,7 +1744,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 277
+        "line": 274
       },
       "story_ids": [],
       "pins": null
@@ -1766,7 +1766,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 283
+        "line": 280
       },
       "story_ids": [],
       "pins": null
@@ -1782,12 +1782,12 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 46,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
           "narration": {
-            "text": "a coffee machine",
+            "text": "a coffee machine with 10 coffees",
             "parts": []
           },
           "children": [],
@@ -1908,14 +1908,14 @@
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 300,
+            "lineno": 297,
             "func": "test_loyalty_card_free_coffee",
             "code": "    price_paid = pay_with_loyalty_card(machine, card)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": false
           },
           {
             "path": "examples/coffeeshop/test_coffeeshop.py",
-            "lineno": 291,
+            "lineno": 288,
             "func": "pay_with_loyalty_card",
             "code": "    raise NotImplementedError('the machine does not read loyalty cards yet')",
             "is_internal": false
@@ -1927,7 +1927,7 @@
       "xfail_reason": "loyalty cards not implemented yet",
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 294
+        "line": 291
       },
       "story_ids": [],
       "pins": null
@@ -1977,7 +1977,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/coffeeshop/test_coffeeshop.py",
-        "line": 305
+        "line": 302
       },
       "story_ids": [],
       "pins": null

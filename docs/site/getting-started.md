@@ -22,16 +22,16 @@ from pytest_given import attach, given, scenario, then, when
 
 
 @pytest.fixture
-@given('a coffee machine')
+@given('a coffee machine with 10 coffees')
 def machine():
     return {'coffees': 10, 'price': 2}
 
 
-@scenario('Buy coffee', tags=['billing'])
+@scenario('Buying a coffee takes one from the machine', tags=['checkout'])
 def test_buy_coffee(machine):
-    with when('I insert $2'):
+    with when('I buy a coffee'):
         machine['coffees'] -= 1
-    with then('I get a coffee'):
+    with then('the machine has 9 coffees left'):
         assert machine['coffees'] == 9
         attach('Machine state', machine)
 ```
@@ -43,6 +43,10 @@ pytest --given-html
 ```
 
 This produces `given-report/report.html` — one file you can open directly in a browser.
+
+The same scenario opens the Coffeeshop example's report:
+
+✅ [Buying a coffee takes one from the machine](examples/coffeeshop.html#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee)
 
 To write the report without running your plain tests, see [Selecting scenarios](configuration/pytest-options.md#selecting-scenarios).
 

@@ -1,11 +1,11 @@
 # pytest-given — Coffee Shop Example
 
-## ✓ Basic scenario with when/then and a JSON attachment
+## ✓ Buying a coffee takes one from the machine
 `examples/coffeeshop/test_coffeeshop.py::test_buy_coffee` · checkout
 
-- **given** a coffee machine
-- **when** I insert \$2
-- **then** I get a coffee
+- **given** a coffee machine with 10 coffees
+- **when** I buy a coffee
+- **then** the machine has 9 coffees left
     - 📎 Machine state:
         ```
         {
@@ -18,7 +18,7 @@
 ## ✓ Plain text attachment
 `examples/coffeeshop/test_coffeeshop.py::test_text_attachment`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** a printed receipt
     - 📎 Receipt:
         ```
@@ -39,7 +39,7 @@
 ## ⊗ Parametrized test (renders as a parameter table) · 4 cases
 `examples/coffeeshop/test_coffeeshop.py::test_pricing` · pricing — expected to fail: happy-hour pricing not implemented yet
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **when** I insert \${euros}
 - **then** the purchase is allowed: {expect}
 
@@ -52,12 +52,12 @@
 
 - **happy-hour** — expected failure:
     > assert False == True
-    > test_coffeeshop.py:90 in test_pricing
+    > test_coffeeshop.py:87 in test_pricing
 
 ## ✓ Parametrize value surfaced as a given (Annotated) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py::test_annotated_given_label`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** an order for a {cup_size} ml cup
 - **when** I brew the cup
 - **then** the machine has one fewer coffee
@@ -70,7 +70,7 @@
 ## ✓ T-string with a non-parametrize value (neutral highlight)
 `examples/coffeeshop/test_coffeeshop.py::test_neutral_highlight`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** I have some coins in hand
 - **when** I insert \$5
 - **then** the machine has 9 coffees left
@@ -78,7 +78,7 @@
 ## ✓ Brew {cup_size} ml (templated scenario title) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py::test_brew`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **when** I brew a {cup_size} ml cup
 - **then** the tank is down {cup_size} ml and the machine has one fewer coffee
 
@@ -90,14 +90,14 @@
 ## ✓ Serve a 200 ml cup (one scenario per case) \[200\]
 `examples/coffeeshop/test_coffeeshop.py::test_serve`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **when** I order a 200 ml cup
 - **then** the tank is down 200 ml and the machine has one fewer coffee
 
 ## ✓ Serve a 400 ml cup (one scenario per case) \[400\]
 `examples/coffeeshop/test_coffeeshop.py::test_serve`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** the barista reaches for a takeaway cup
 - **when** I order a 400 ml cup
 - **then** the tank is down 400 ml and the machine has one fewer coffee
@@ -105,7 +105,7 @@
 ## ✓ Brew a {flavor} coffee (per-case columns) · 2 cases
 `examples/coffeeshop/test_coffeeshop.py::test_flavor_columns` · pricing
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** the machine is primed for {flavor}
     - 📎 brew log — *see parameter table*
 - **when** I brew a {flavor} coffee
@@ -139,7 +139,7 @@
 ## ✓ Helper functions can record their own steps
 `examples/coffeeshop/test_coffeeshop.py::test_buy_with_validation` · checkout, validation, ticket/CS-42
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **when** I insert \$2
     - **when** the coin is validated for \$2
     - **when** the balance is updated
@@ -158,7 +158,7 @@
 ## ✓ Top-level `given` block and deeply nested steps
 `examples/coffeeshop/test_coffeeshop.py::test_complex_order` · checkout, loyalty, discounts, ticket/CS-7
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** a loyalty card with 5 points
 - **when** I place a large order
     - **when** I select 3 coffees
@@ -188,7 +188,7 @@
 ## ✓ An expected error, narrated as when + then (when_then)
 `examples/coffeeshop/test_coffeeshop.py::test_sold_out_is_rejected` · checkout, validation, ticket/CS-42
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** a machine that has sold its last coffee
 - **when** a customer tries to buy a coffee
 - **then** the machine reports it is sold out
@@ -196,7 +196,7 @@
 ## ✓ Many tags (the report collapses them behind a +N pill)
 `examples/coffeeshop/test_coffeeshop.py::test_discounted_purchase` · checkout, loyalty, discounts, pricing, inventory
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** a loyalty card good for a \$1 discount
 - **when** I buy a coffee with the discount
 - **then** I pay \$1
@@ -205,11 +205,11 @@
 ## ✗ Failure rendering (intentionally failing)
 `examples/coffeeshop/test_coffeeshop.py::test_failing`
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **then** the machine has 20 coffees
 
 > assert 10 == 20
-> test_coffeeshop.py:280 in test_failing
+> test_coffeeshop.py:277 in test_failing
 
 ## ○ Skipped scenario rendering · skipped
 `examples/coffeeshop/test_coffeeshop.py::test_skipped` — reason: demonstrates skipped status
@@ -218,12 +218,12 @@
 ## ⊗ Loyalty card earns a free coffee (planned feature) · expected failure
 `examples/coffeeshop/test_coffeeshop.py::test_loyalty_card_free_coffee` · loyalty — expected to fail: loyalty cards not implemented yet
 
-- **given** a coffee machine
+- **given** a coffee machine with 10 coffees
 - **given** a loyalty card with nine stamps
 - **when** I buy a coffee with the card
 
 > the machine does not read loyalty cards yet
-> test_coffeeshop.py:291 in pay_with_loyalty_card
+> test_coffeeshop.py:288 in pay_with_loyalty_card
 
 ## ○ All cases skipped · skipped
 `examples/coffeeshop/test_coffeeshop.py::test_parametrized_all_skipped` — reason: awaiting fixture

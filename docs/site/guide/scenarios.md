@@ -55,7 +55,7 @@ Fixtures are setup, so **only `@given` is allowed** on a fixture. `@when` or `@t
 
 ```python
 @pytest.fixture
-@given('a coffee machine')
+@given('a coffee machine with 10 coffees')
 def machine():
     return {'coffees': 10, 'price': 2}
 ```

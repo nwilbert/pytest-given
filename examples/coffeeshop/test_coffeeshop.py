@@ -8,7 +8,7 @@ TANK_ML = 1000
 
 
 @pytest.fixture
-@given('a coffee machine')
+@given('a coffee machine with 10 coffees')
 def machine():
     return {'coffees': 10, 'price': 2, 'water_ml': TANK_ML}
 
@@ -29,14 +29,11 @@ def db():
     conn['open'] = False
 
 
-@scenario(
-    'Basic scenario with when/then and a JSON attachment',
-    tags=['checkout'],
-)
+@scenario('Buying a coffee takes one from the machine', tags=['checkout'])
 def test_buy_coffee(machine):
-    with when('I insert $2'):
+    with when('I buy a coffee'):
         machine['coffees'] -= 1
-    with then('I get a coffee'):
+    with then('the machine has 9 coffees left'):
         assert machine['coffees'] == 9
         attach('Machine state', machine)
 
