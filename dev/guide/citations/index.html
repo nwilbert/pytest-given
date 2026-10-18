@@ -1073,7 +1073,7 @@
 <p>Live, against this site's example reports:</p>
 <ul>
 <li>🔵 <a href="../../examples/hotel-booking.html#view=stories&amp;story=cancel-a-booking">Cancel a Booking</a> (2 ✅ · 1 🔵)</li>
-<li>✅ <a href="../../examples/self-report.html#tag=spec/citations">spec/citations</a> (7 ✅)</li>
+<li>✅ <a href="../../examples/self-report.html#tag=spec/citations">spec/citations</a> (10 ✅)</li>
 </ul>
 <p>And a <a href="#narrated-citations">narrated citation</a> of a scenario:</p>
 <details>
@@ -1205,6 +1205,7 @@
 </tr>
 </tbody>
 </table>
+<p>A link into the report can outlive what it names. When the report no longer has a scenario, tag, story or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.</p>
 <h2 id="narrated-citations">Narrated citations<a class="headerlink" href="#narrated-citations" title="Permanent link">&para;</a></h2>
 <p>A scenario citation written as a <code>&lt;details&gt;</code> block carries the scenario's narration, folded under it. A reader sees what the scenario does where it is cited, and your pull request's diff shows the behavior change. A <strong>narrated citation</strong> looks like this:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>&lt;details markdown="1"&gt;
@@ -1244,13 +1245,13 @@
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1"># then publish report.html at given_report_url</span>
 </code></pre></div>
-<p>Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.</p>
+<p>Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped <code>given_report_url</code>, the check exits 2 instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.</p>
 <p>If you commit the reports instead, write the JSON and HTML report together whenever you regenerate them, and let CI run only the check against the committed JSON. <a href="../../cli/#citations">Standalone CLI</a> lists the flags and exit codes.</p>
 <h2 id="keeping-the-check-accurate">Keeping the check accurate<a class="headerlink" href="#keeping-the-check-accurate" title="Permanent link">&para;</a></h2>
 <p>These habits keep <code>pytest-given citations check</code> from failing on a document nothing is wrong with, or from skipping a citation it should check:</p>
 <ul>
 <li><strong>Run pytest from the same rootdir.</strong> A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.</li>
-<li><strong>Use a plain report link for a scenario whose title contains a per-run value</strong>, such as a temporary path. Its citation's link text would be stale after every run.</li>
+<li><strong>Use a plain report link for a scenario whose title contains a per-run value</strong>, such as a temporary path. Its citation's link text would be stale after every run, and so would a narrated citation's body when any step or attachment contains one.</li>
 <li><strong>Cite a tag that belongs to one piece of work</strong>, like <code>spec/&lt;slug&gt;</code>. A broad area tag's summary changes with every new scenario, so link it with a plain report link.</li>
 <li><strong>Leave the glyph and link unformatted.</strong> In <code>**✅** […](…)</code> or <code>✅ *[…](…)*</code> pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.</li>
 <li><strong>On a versioned docs site, link the report relatively</strong>, as in <code>../examples/report.html#tag=…</code>, so each version of a page opens its own version's report. Pass <code>--report-path</code>, where your docs build puts the report, so the commands recognize these links.</li>
@@ -1268,7 +1269,7 @@
 <a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>&lt;!-- prettier-ignore-end --&gt;
 </code></pre></div>
 <h3 id="finding-the-citations-of-a-changed-scenario">Finding the citations of a changed scenario<a class="headerlink" href="#finding-the-citations-of-a-changed-scenario" title="Permanent link">&para;</a></h3>
-<p>A citation states a scenario's title and status, not what it does. When a test's behavior changes while its title and status stay, every citation of it still reads ✅ and the check stays silent, though the sentence citing it may no longer hold. List the report links that may cite it, and reread each sentence:</p>
+<p>A citation states a scenario's title and status, and a narrated citation its narration too, but neither states what the test body does. When the body changes while the title, status and narration stay, every citation of it still reads current and the check stays silent, though the sentence citing it may no longer hold. List the report links that may cite it, and reread each sentence:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span>--covering<span class="w"> </span>tests/test_checkout.py::test_pay_by_card

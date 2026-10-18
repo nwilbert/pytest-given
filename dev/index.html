@@ -1202,6 +1202,8 @@
 
 <h3 id="glossary-and-domain-storytelling">Glossary and Domain Storytelling<a class="headerlink" href="#glossary-and-domain-storytelling" title="Permanent link">&para;</a></h3>
 <p>pytest-given goes beyond JGiven by tying tests to the domain itself. A <a href="guide/glossary/">glossary</a> defines the terms your team uses, and the report highlights them wherever a test mentions them. <a href="guide/domain-storytelling/">Domain Storytelling</a> adds the big picture: stories of how the domain works, with the report showing which scenarios cover each sentence of a story.</p>
+<h3 id="documents-that-stay-true">Documents that stay true<a class="headerlink" href="#documents-that-stay-true" title="Permanent link">&para;</a></h3>
+<p>A design spec or a README can <a href="guide/citations/">cite</a> scenarios, tags and stories as links into the report, each led by its current status. <code>pytest-given citations update</code> keeps the citations in line with the latest run, and <code>pytest-given citations check</code> in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.</p>
 <h2 id="example-reports">Example reports<a class="headerlink" href="#example-reports" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="examples/coffeeshop.html" target="_blank">Coffeeshop</a></strong>: a tour of the core features.</li>
