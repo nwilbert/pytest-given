@@ -1675,9 +1675,10 @@ span.param-highlight {
    focused unseen. */
 .anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 /* A tag row reveals its copy button on hover, as a header does. A tight box,
-   so the row keeps its height and the button stays with the name it copies. */
+   so the row keeps its height; the wider margin keeps a header's 8px gap
+   between the name and the icon. */
 .nav-group:hover .nav-group-copy { opacity: 0.6; }
-.nav-group-copy { margin-left: 2px; padding: 2px; flex-shrink: 0; }
+.nav-group-copy { margin-left: 6px; padding: 2px; flex-shrink: 0; }
 .nav-group-active .nav-group-copy:not(.anchor-copied) { color: var(--color-accent); }
 
 /* === Copy menu ===

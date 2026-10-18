@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Changed
+
+- The HTML report's Tags sidebar copy button is visually tidied.
+
 ## [0.5.0] - 2026-10-18
 
 ### Added
