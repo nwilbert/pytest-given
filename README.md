@@ -86,6 +86,10 @@ More and more tests aren't written by hand. A person describes a scenario, an AI
 
 pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary](https://nwilbert.github.io/pytest-given/latest/guide/glossary/) defines the terms your team uses, and the report highlights them wherever a test mentions them. [Domain Storytelling](https://nwilbert.github.io/pytest-given/latest/guide/domain-storytelling/) adds the big picture: stories of how the domain works, with the report showing which scenarios cover each sentence of a story.
 
+### Documents that stay true
+
+A design spec or a README can [cite](https://nwilbert.github.io/pytest-given/latest/guide/citations/) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run, and `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
+
 ## Features
 
 - **[Step context managers](https://nwilbert.github.io/pytest-given/latest/guide/scenarios/)**: `with given(...)`, `when(...)`, `then(...)` blocks in plain pytest tests, nesting within a phase.
@@ -94,6 +98,7 @@ pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary
 - **[Glossary](https://nwilbert.github.io/pytest-given/latest/guide/glossary/)**: your domain's terms, declared in code or loaded from a `GLOSSARY.md`, rendered as highlighted term refs in the narration.
 - **[Domain Storytelling](https://nwilbert.github.io/pytest-given/latest/guide/domain-storytelling/)**: Domain Stories as sequences of sentences, and per-sentence coverage in the report.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
+- **[Citations](https://nwilbert.github.io/pytest-given/latest/guide/citations/)**: links from Markdown documents to scenarios, tags and stories, led by their status and checked against the latest run.
 - **[Agent skills](https://nwilbert.github.io/pytest-given/latest/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.
 
 The full reference — pytest options, source links, the standalone CLI — is on the [documentation site](https://nwilbert.github.io/pytest-given/latest/).
