@@ -104,6 +104,8 @@ resolve against `SinkConfig.source_root`, the rootdir of a live run:
   its tests in `tests/unit/test_skills_scripts.py` go. The notes under "Reading the dump" that
   still hold move into the reviewing `SKILL.md`: step fixtures, module-level values, one file per
   reviewer.
+- **Navigating skill:** "When to go to the code" names the flag for reading a scenario's
+  narration beside its body.
 - **Site:** a `--given-md-source` row in `docs/site/configuration/pytest-options.md`.
 - **CHANGELOG:** one entry under `[Unreleased]`, `Added`.
 - **Self-report:** one scenario stating the rule, a run with the flag whose Markdown shows the
