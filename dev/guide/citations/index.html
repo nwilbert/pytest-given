@@ -1194,7 +1194,7 @@
 <td>Tag or story citation</td>
 <td><code>✅ [spec/citations](…#tag=spec/citations) (10 ✅)</code></td>
 <td>glyph, link text and summary</td>
-<td><strong>Copy citation</strong> on a story header, or the copy button on a Tags sidebar row</td>
+<td><strong>Copy citation</strong> on a story header or a Tags sidebar row</td>
 </tr>
 <tr>
 <td><a href="#narrated-citations">Narrated citation</a></td>
@@ -1213,7 +1213,7 @@
 <p>A citation states what the report found, so <code>pytest-given citations check</code> fails when it is out of date or its target fails. A plain report link states only that its target exists, so its text is yours and it can sit inside your own sentence. You can also <a href="#writing-it-by-hand">write any of them by hand</a>.</p>
 <h3 id="copying-from-the-report">Copying from the report<a class="headerlink" href="#copying-from-the-report" title="Permanent link">&para;</a></h3>
 <p>The report offers the citation entries in the table only when <code>given_report_url</code> is set, as in <a href="#how-it-fits-together">step 1</a> above. To set it for one run instead, pass <code>--given-report-url=URL</code>. The URL is also stored in the JSON report, so <code>pytest-given report</code> re-renders the entries from it, and the <code>pytest-given citations</code> commands know which links point at the report.</p>
-<p>The copy button on a scenario card or story header opens a menu with these entries. On a Tags sidebar row, the button copies the tag's citation directly. A citation links to <code>given_report_url</code>, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. <strong>Copy link</strong> copies the address you opened the report at. Without the setting, it is all the copy button offers, and Tags sidebar rows have no button.</p>
+<p>The copy button on a scenario card, story header or Tags sidebar row opens a menu with these entries. A citation links to <code>given_report_url</code>, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. <strong>Copy link</strong> copies the address you opened the report at. Without the setting, it is all the copy button offers.</p>
 <h3 id="writing-it-by-hand">Writing it by hand<a class="headerlink" href="#writing-it-by-hand" title="Permanent link">&para;</a></h3>
 <p>Write <code>?</code> as the glyph, leave the link text empty, and let <code>pytest-given citations update</code> fill in the rest:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>? [](https://docs.example.org/report.html#scenario=tests/test_x.py::test_y)

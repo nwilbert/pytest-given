@@ -511,6 +511,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .nav-group-active .nav-group-name { font-weight: 600; }
 
 
+
+.nav-group + .nav-group-bucket { position: relative; margin-top: var(--space-md); }
+.nav-group + .nav-group-bucket::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--space-md) / 2 - 1px);
+  left: calc(var(--space-xs) + 1px);
+  right: calc(var(--space-xs) + 1px);
+  height: 1px;
+  background: var(--border);
+}
+
+
 .nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); font-variant-numeric: tabular-nums; }
 
 
@@ -519,7 +532,6 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 .nav-group-select {
-  flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
@@ -1696,11 +1708,9 @@ span.param-highlight {
 .anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
 
 
-
-.nav-group:hover .nav-group-citation { opacity: 0.6; }
-.nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
-.nav-group-citation-absent { visibility: hidden; }
-.nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }
+.nav-group:hover .nav-group-copy { opacity: 0.6; }
+.nav-group-copy { margin-left: 2px; padding: 2px; flex-shrink: 0; }
+.nav-group-active .nav-group-copy:not(.anchor-copied) { color: var(--color-accent); }
 
 
 
@@ -1721,7 +1731,7 @@ span.param-highlight {
   box-shadow: var(--shadow-tip);
   animation: copy-menu-in 120ms ease-out;
 }
-.copy-menu[hidden], .copy-menu-item[hidden] { display: none; }
+.copy-menu[hidden], .copy-menu-item[hidden], .copy-menu-separator[hidden] { display: none; }
 .copy-menu-item {
   display: flex;
   align-items: center;
@@ -1829,7 +1839,7 @@ span.param-highlight {
         <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
       </div>
       <div class="nav-tree"><template x-for="group in groups" :key="group.id">
-          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
+          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-bucket': group.bucket }"
                :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
             <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
                     :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
@@ -1841,15 +1851,16 @@ span.param-highlight {
                     :aria-pressed="isGroupActive(group)"
                     @click.stop="onGroupClick(group)">
               <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-count" x-text="group.count"></span>
             </button>
-            
-            <button type="button" class="anchor-link nav-group-citation"
-                    title="Copy Markdown citation. pytest-given citations check and update keep it current." aria-label="Copy Markdown citation"
+            <button type="button" class="anchor-link copy-menu-trigger nav-group-copy"
+                    aria-haspopup="menu" aria-expanded="false" data-citation-kind="tag"
                     x-show="view === 'tags'"
-                    :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
-                    @click.stop="copyCitation('tag', group.id, $el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg></button>
+                    :title="hasCitation('tag', group.id) ? 'Copy link or citation' : 'Copy link'"
+                    :aria-label="hasCitation('tag', group.id) ? 'Copy link or citation' : 'Copy link'"
+                    :data-anchor="tagAnchor(group.id)" :data-citation-key="group.id"
+                    @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button>
             
+            <span class="nav-group-count" x-text="group.count"></span>
           </div>
         </template>
       </div>
@@ -2596,13 +2607,14 @@ span.param-highlight {
 </div>
 
 
-<!-- The menu a scenario card's or story header's copy button opens;
+<!-- The menu a scenario card's, story header's or tag row's copy button opens;
      positioned by app.js beside the button that opened it. One shared node,
      as the tooltip is: a menu per card would repeat its markup hundreds of
-     times. The narrated citation is a scenario's alone. -->
+     times. The narrated citation is a scenario's alone, and the untagged
+     row, which no citation covers, has only its link. -->
 <div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg>Copy link</button>
-  <div class="copy-menu-separator" role="separator"></div>
+  <div class="copy-menu-separator" role="separator" data-copy-citations></div>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="Copy Markdown citation. pytest-given citations check and update keep it current."><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>Copy citation</button>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in."><svg width="14" height="14" aria-hidden="true"><use href="#icon-narrated"/></svg>Copy narrated citation</button>
 </div>
@@ -3116,6 +3128,7 @@ function reportApp() {
         const level = Object.values(kids).map(node => ({
           node, id: node.__id, name: label(node.__name), depth,
           hasChildren: Object.keys(node.__kids).length > 0, count: counts[node.__id],
+          bucket: node.__id === NO_TAGS || node.__id === NO_TERMS,
         }));
         for (const row of this._ordered(level, filters)) {
           if (visible) rows.push(row);
@@ -3136,10 +3149,13 @@ function reportApp() {
 
 
 
+
+
     _ordered(rows, filters) {
       const byCount = this.sortBy === 'count';
       return rows.sort((a, b) =>
-        (filters.includes(a.id) ? 0 : 1) - (filters.includes(b.id) ? 0 : 1)
+        a.bucket - b.bucket
+        || (filters.includes(a.id) ? 0 : 1) - (filters.includes(b.id) ? 0 : 1)
         || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
@@ -3374,6 +3390,11 @@ function reportApp() {
     copyAnchor(btn) {
       this._copyAndFlash(window.location.href.split('#')[0] + '#' + btn.dataset.anchor, btn);
     },
+
+
+    tagAnchor(tag) {
+      return 'tag=' + encodeURIComponent(tag).replace(/%2F|%3A/gi, decodeURIComponent);
+    },
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
@@ -3397,7 +3418,11 @@ function reportApp() {
       const reopening = copyMenuTrigger !== trigger;
       this._closeCopyMenu(!reopening);
       if (!reopening) return;
-      copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      const { citationKind: kind, citationKey: key } = trigger.dataset;
+      const cited = this.hasCitation(kind, key);
+      copyMenu.querySelector('[data-copy-citations]').hidden = !cited;
+      copyMenu.querySelector('[data-copy-entry="citation"]').hidden = !cited;
+      copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = !cited || kind !== 'scenario';
       copyMenu.hidden = false;
       copyMenuTrigger = trigger;
       trigger.setAttribute('aria-expanded', 'true');
