@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-18T07:05:35.395689+00:00",
+    "timestamp": "2026-10-18T09:54:45.971206+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.4.1",
-    "commit_sha": "e8cb50f49da4dfc1229982df755b2ccf4b25a2ae",
+    "commit_sha": "ea6ef648171cba92afa7019a06ea6d412ef992a9",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 121,
+      "duration_ms": 124,
       "steps": [
         {
           "phase": "given",
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -561,7 +561,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -707,7 +707,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -877,7 +877,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -1063,7 +1063,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 96,
+      "duration_ms": 99,
       "steps": [
         {
           "phase": "given",
@@ -1145,7 +1145,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1254,7 +1254,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -1383,7 +1383,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 547,
+      "duration_ms": 551,
       "steps": [
         {
           "phase": "given",
@@ -1511,7 +1511,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1698,7 +1698,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -1951,7 +1951,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -2061,7 +2061,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2160,7 +2160,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2230,7 +2230,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -2350,7 +2350,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -2485,7 +2485,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -2613,7 +2613,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 93,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -2783,7 +2783,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -2900,7 +2900,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 195,
       "steps": [
         {
           "phase": "given",
@@ -2973,7 +2973,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 75,
       "steps": [
         {
           "phase": "given",
@@ -3145,7 +3145,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -3284,7 +3284,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -3429,7 +3429,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 68,
       "steps": [
         {
           "phase": "given",
@@ -3582,7 +3582,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -3727,7 +3727,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -3874,7 +3874,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 137,
+      "duration_ms": 174,
       "steps": [
         {
           "phase": "given",
@@ -4067,7 +4067,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 93,
+      "duration_ms": 114,
       "steps": [
         {
           "phase": "given",
@@ -4196,7 +4196,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 115,
+      "duration_ms": 164,
       "steps": [
         {
           "phase": "given",
@@ -4382,7 +4382,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -4476,7 +4476,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -4563,7 +4563,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -4653,7 +4653,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -4745,7 +4745,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 85,
       "steps": [
         {
           "phase": "given",
@@ -4919,7 +4919,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -5004,7 +5004,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -5111,7 +5111,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 168,
       "steps": [
         {
           "phase": "given",
@@ -5324,7 +5324,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -5477,7 +5477,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -5553,7 +5553,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -5702,7 +5702,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 368,
+      "duration_ms": 401,
       "steps": [
         {
           "phase": "given",
@@ -5861,7 +5861,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -5963,7 +5963,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -6070,7 +6070,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -6190,7 +6190,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -6320,7 +6320,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 94,
+      "duration_ms": 103,
       "steps": [
         {
           "phase": "given",
@@ -6550,7 +6550,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -6662,7 +6662,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 21,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -6758,7 +6758,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 81,
+      "duration_ms": 87,
       "steps": [
         {
           "phase": "given",
@@ -8247,7 +8247,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8350,7 +8350,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -8467,7 +8467,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -8654,7 +8654,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -9767,7 +9767,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -9879,7 +9879,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -19538,7 +19538,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -19665,7 +19665,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -20465,7 +20465,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -21214,7 +21214,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -21582,7 +21582,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -21719,7 +21719,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -21917,7 +21917,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -22331,7 +22331,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 268
+        "line": 281
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -22478,7 +22478,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 358
+        "line": 371
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -22677,7 +22677,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 608
+        "line": 621
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -22799,7 +22799,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 756
+        "line": 769
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -22832,7 +22832,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -22921,7 +22921,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 938
+        "line": 951
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -26656,7 +26656,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 144,
+      "duration_ms": 146,
       "steps": [
         {
           "phase": "given",
@@ -32323,7 +32323,7 @@
         "id": "step",
         "kind": "object",
         "canonical": "Step",
-        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest, and each carries a phase, narration, attachments and children \u2014 but no status or error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*, which is where both renderers read it.",
+        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest, and each carries a phase, narration, attachments and children \u2014 but no status or error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 15
@@ -32333,7 +32333,7 @@
         "id": "narration",
         "kind": null,
         "canonical": "Narration",
-        "definition": "The human-readable text on a step or scenario title. A `Narration` bundles the flat rendered `text` with `parts` \u2014 empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces. The structured form lets the templatizer and renderer treat parametrize-bound values specially without regex tricks.",
+        "definition": "The human-readable text on a step or scenario title. A `Narration` bundles the flat rendered `text` with `parts` \u2014 empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 16
@@ -32363,7 +32363,7 @@
         "id": "tag",
         "kind": "object",
         "canonical": "Tag",
-        "definition": "Free-form string label attached via `@scenario(title, tags=[...])`. Used by the report's filter UI, where a `/` nests it (`ticket/ABC-123` under `ticket`) and selecting a prefix filters to every tag beneath it.",
+        "definition": "Free-form string label attached via `@scenario(title, tags=[...])`. A `/` nests it: `ticket/ABC-123` sits under `ticket`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 19
@@ -32403,7 +32403,7 @@
         "id": "case-id",
         "kind": null,
         "canonical": "Case ID",
-        "definition": "A *Case*'s pytest ID: its *Node ID*'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`; a *Parameter table* leads with its case IDs when any one is.",
+        "definition": "A *Case*'s pytest ID: its *Node ID*'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28
@@ -32413,7 +32413,7 @@
         "id": "parameter-table",
         "kind": "object",
         "canonical": "Parameter table",
-        "definition": "The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). Appears in the report below the grouped-template steps.",
+        "definition": "The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 29
@@ -32473,7 +32473,7 @@
         "id": "fixture-recording",
         "kind": "object",
         "canonical": "Fixture recording",
-        "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up. Stored keyed by fixture-instance identity. A generator fixture's teardown records nothing \u2014 it refuses steps and attachments.",
+        "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up. A generator fixture's teardown records nothing \u2014 it refuses steps and attachments.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 40
@@ -32493,7 +32493,7 @@
         "id": "collector",
         "kind": "actor",
         "canonical": "Collector",
-        "definition": "The per-session object accumulating scenarios, fixture recordings, and parameter info, published through a `ContextVar` so a nested run can displace and restore it.",
+        "definition": "The per-session object accumulating scenarios, fixture recordings, and parameter info.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 47
@@ -32503,7 +32503,7 @@
         "id": "active-scenario",
         "kind": null,
         "canonical": "Active scenario",
-        "definition": "The scenario currently being recorded into; tracked by node ID.",
+        "definition": "The scenario currently being recorded into.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 48
@@ -32513,7 +32513,7 @@
         "id": "node-id",
         "kind": null,
         "canonical": "Node ID",
-        "definition": "A pytest test identifier (e.g., `tests/test_x.py::test_y[a-b]`). Used as a key throughout the collector.",
+        "definition": "A pytest test identifier (e.g., `tests/test_x.py::test_y[a-b]`).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 49
@@ -32523,7 +32523,7 @@
         "id": "step-stack",
         "kind": "object",
         "canonical": "Step stack",
-        "definition": "The chain of currently-open steps; entered by `with given(...)`, popped on exit. Mirrored inside a fixture recording while a fixture body is running.",
+        "definition": "The chain of currently-open steps. A `with given(...)` pushes one, and leaving the block pops it.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 50
@@ -32573,7 +32573,7 @@
         "id": "source-link",
         "kind": null,
         "canonical": "Source link",
-        "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card, resolved from the `given_source_link` config \u2014 a preset name like `vscode` / `github`, or a raw URL template. Captured as a `SourceLocation` (POSIX relpath + 1-indexed line) from `pytest.Item.location` for a scenario, from the declaration site for a *Story* or *Term*. Disabled by default.",
+        "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card. It points at a scenario's test function, or at the declaration of a *Story* or *Term*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 60
@@ -32593,7 +32593,7 @@
         "id": "citation",
         "kind": null,
         "canonical": "Citation",
-        "definition": "A *Report link* led by a status glyph, citing a scenario, tag or story from a Markdown document: `\u2705 [title](<report URL>#scenario=\u2026)`, and for a tag or story a summary after it, `(5 \u2705 \u00b7 2 \ud83d\udd35)`. `pytest-given citations check` holds its glyph, link text and summary to a JSON *Report*; `citations update` rewrites them, and marks a target the report lacks `\u2753`.",
+        "definition": "A *Report link* led by its target's status glyph, citing a scenario, tag or story from a Markdown document: `\u2705 [title](<report URL>#scenario=\u2026)`. A tag or story citation adds a summary after it, `(5 \u2705 \u00b7 2 \ud83d\udd35)`. A target the *Report* lacks reads `\u2753`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 62
@@ -32603,7 +32603,7 @@
         "id": "narrated-citation",
         "kind": null,
         "canonical": "Narrated citation",
-        "definition": "A *Citation* of a scenario written as a `<details markdown=\"1\">` block, the citation in its `<summary>` and the scenario's Markdown narration in its body, which `citations update` writes and `citations check` holds to the *Report*.",
+        "definition": "A *Citation* of a scenario written as a `<details markdown=\"1\">` block, the citation in its `<summary>` and the scenario's Markdown narration in its body.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 63
@@ -32613,7 +32613,7 @@
         "id": "citation-finding",
         "kind": null,
         "canonical": "Citation finding",
-        "definition": "One problem `pytest-given citations check` reports on one *Report link*: its kind (`stale`, `missing`, `failed`, `mistyped`, \u2026), the document location and a message. `citations update` fixes the kinds it can, such as a stale glyph, link text or narration.",
+        "definition": "One problem `pytest-given citations check` reports on one *Report link*: its kind (`stale`, `missing`, `failed`, `mistyped`, \u2026), the document location and a message.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 64
@@ -32623,7 +32623,7 @@
         "id": "theme",
         "kind": null,
         "canonical": "Theme",
-        "definition": "The HTML report's colour scheme \u2014 `light`, `dark`, or `auto` (follow the viewer's system). The `given_theme` config sets the default a report opens in; a viewer's own choice from the report's theme control, once made, wins over it in that browser.",
+        "definition": "The HTML report's colour scheme \u2014 `light`, `dark`, or `auto` (follow the viewer's system).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 65
@@ -32633,7 +32633,7 @@
         "id": "narration-lint",
         "kind": "actor",
         "canonical": "Narration lint",
-        "definition": "The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog once the *Report* model is built. It enforces the structural subset of the narration conventions \u2014 it cannot check whether a *Step*'s text is semantically true.",
+        "definition": "The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog. It enforces the structural subset of the narration conventions \u2014 it cannot check whether a *Step*'s text is semantically true.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 71
@@ -32643,7 +32643,7 @@
         "id": "lint-rule",
         "kind": "object",
         "canonical": "Lint rule",
-        "definition": "One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source. The catalog in `lint/base.py` is data, so severities, config validation and docs stay in sync with one table.",
+        "definition": "One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 72
@@ -32663,7 +32663,7 @@
         "id": "severity",
         "kind": null,
         "canonical": "Severity",
-        "definition": "A *Lint rule*'s level \u2014 `off`, `warn` or `error` \u2014 defaulted by the catalog and overridable per rule via `given_lint_rules`. Only `error` fails the run; `warn` reports in the terminal summary; an `off` rule is not evaluated at all.",
+        "definition": "A *Lint rule*'s level \u2014 `off`, `warn` or `error`. Only `error` fails the run, `warn` reports in the terminal summary, and an `off` rule is not evaluated at all.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 74
@@ -32673,7 +32673,7 @@
         "id": "glossary",
         "kind": "object",
         "canonical": "Glossary",
-        "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it: `Glossary()`, with `.actor(...)`, `.work_object(...)`, `.activity(...)` registration methods and `g('foo')` (declare-or-get a kindless term, optional `definition=`) / `g['foo']` (get-only, raises on unknown) accessor forms.",
+        "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it in code: `Glossary()`, on which terms are registered.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 84
@@ -32683,7 +32683,7 @@
         "id": "file-glossary",
         "kind": null,
         "canonical": "File glossary",
-        "definition": "A glossary loaded from a Markdown file, via the `FileGlossary(path)` class. It parses all GFM pipe tables in the file into the same inner `Glossary` model; terms are accessed by name (`g['Guest']`, case-insensitive). *Kind inference* fills in term kinds post-collection from clause *slot* positions when no explicit `kind_column` is configured.",
+        "definition": "A glossary loaded from the GFM pipe tables of a Markdown file, via the `FileGlossary(path)` class.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 85
@@ -32703,7 +32703,7 @@
         "id": "term",
         "kind": null,
         "canonical": "Term",
-        "definition": "A registered glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition (`str | None`, `None` when undefined).",
+        "definition": "A registered glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 87
@@ -32723,7 +32723,7 @@
         "id": "s-form",
         "kind": null,
         "canonical": "S-form",
-        "definition": "A term's name with the regular English -s ending, from the `.s` handle form: the plural of an Actor or Work Object (*rooms*), the third person singular of an Activity (*books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies, but an acronym takes a plain -s (*APIs*); anything else, such as *people* or *checks in*, needs the called form. The Glossary tab counts an S-form reference, in any case, as the term itself \u2014 not an *instance* or an *inflection*.",
+        "definition": "A term's name with the regular English -s ending, from the `.s` handle form: the plural of an Actor or Work Object (*rooms*), the third person singular of an Activity (*books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies, but an acronym takes a plain -s (*APIs*); anything else, such as *people* or *checks in*, needs the called form. An S-form reference, in any case, is a reference to the term itself \u2014 not an *instance* or an *inflection*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 89
@@ -32733,7 +32733,7 @@
         "id": "actor",
         "kind": null,
         "canonical": "Actor",
-        "definition": "A glossary term for a participant in the domain (e.g., *Guest*). Carries the actor kind color in the report.",
+        "definition": "A glossary term for a participant in the domain (e.g., *Guest*).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 90
@@ -32743,7 +32743,7 @@
         "id": "work-object",
         "kind": null,
         "canonical": "Work Object",
-        "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*). Carries the work-object kind color in the report.",
+        "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 91
@@ -32773,7 +32773,7 @@
         "id": "instance",
         "kind": null,
         "canonical": "Instance",
-        "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). The Glossary tab lists a term's instances under *Other forms*, with its other surface forms.",
+        "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 94
@@ -32783,7 +32783,7 @@
         "id": "inflection",
         "kind": null,
         "canonical": "Inflection",
-        "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*). The Glossary tab lists it under *Other forms*.",
+        "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 95
@@ -32793,7 +32793,7 @@
         "id": "story",
         "kind": "object",
         "canonical": "Story",
-        "definition": "A named flow modeled as a sequence of sentences. Constructed by `story('Title', [sentence(...), ...])`. Stories are first-class report tabs and the unit of coverage.",
+        "definition": "A named flow modeled as a sequence of sentences. Constructed by `story('Title', [sentence(...), ...])`. Stories are the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 96
@@ -32833,7 +32833,7 @@
         "id": "slot",
         "kind": null,
         "canonical": "Slot",
-        "definition": "A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots. Slots drive both clause validation and *kind inference*.",
+        "definition": "A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 100
@@ -32883,7 +32883,7 @@
         "id": "kindless",
         "kind": null,
         "canonical": "Kindless",
-        "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence). Shown in the report's *Uncategorized* bucket.",
+        "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 105
@@ -32893,7 +32893,7 @@
         "id": "undefined",
         "kind": null,
         "canonical": "Undefined",
-        "definition": "A term with `definition is None`; surfaced by a badge and filter in the Glossary view. Orthogonal to *kindless*.",
+        "definition": "A term with `definition is None`. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 106
