@@ -109,31 +109,16 @@ def test_a_line_no_function_holds_leaves_a_reason(tmp_path: Path) -> None:
     )
 
 
-def test_a_scenario_without_a_source_leaves_a_reason(tmp_path: Path) -> None:
-    sourceless = Scenario(
-        id=NodeId('test_x'),
-        narration=Narration(text='A scenario'),
-        module='m',
-        status='passed',
-    )
-
-    sources = read_function_sources([sourceless], tmp_path)
-
-    assert sources[sourceless.id] == UnreadableSource(
-        reason='the scenario has no source location'
-    )
-
-
 def test_scenarios_sharing_a_file_each_get_their_function(tmp_path: Path) -> None:
     _write(tmp_path, 'tests/test_a.py', _TESTS)
     helper = _scenario('tests/test_a.py', 4, 'make_test')
-    test = _scenario('tests/test_a.py', 13, 'test_async')
+    inner = _scenario('tests/test_a.py', 5, 'test_inner')
 
-    sources = read_function_sources([helper, test], tmp_path)
+    sources = read_function_sources([helper, inner], tmp_path)
 
     helper_source = sources[helper.id]
     assert isinstance(helper_source, FunctionSource)
-    assert helper_source.lines[0] == 'def make_test():'
-    test_source = sources[test.id]
-    assert isinstance(test_source, FunctionSource)
-    assert test_source.first_line == 12
+    assert (helper_source.first_line, len(helper_source.lines)) == (4, 6)
+    inner_source = sources[inner.id]
+    assert isinstance(inner_source, FunctionSource)
+    assert (inner_source.first_line, len(inner_source.lines)) == (5, 3)

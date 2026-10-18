@@ -7,6 +7,7 @@ source is a review aid, and losing it must not cost the run its report.
 
 import ast
 import tokenize
+from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
@@ -31,51 +32,44 @@ type SourceExcerpt = FunctionSource | UnreadableSource
 def read_function_sources(
     scenarios: Iterable[Scenario], root: Path
 ) -> dict[NodeId, SourceExcerpt]:
-    """Every scenario's test function, keyed by scenario id, each file read once."""
-    files: dict[str, _ParsedFile | UnreadableSource] = {}
-    excerpts: dict[NodeId, SourceExcerpt] = {}
+    """Every scenario's test function, keyed by scenario id. Read a file at a
+    time, so only the functions stay in memory, not every file's lines."""
+    by_file: dict[str, list[tuple[NodeId, int]]] = defaultdict(list)
     for scenario in scenarios:
-        if scenario.source is None:
-            excerpts[scenario.id] = UnreadableSource(
-                reason='the scenario has no source location'
-            )
-            continue
-        relpath, line = scenario.source.relpath, scenario.source.line
-        if relpath not in files:
-            files[relpath] = _parse(root / relpath, relpath)
-        parsed = files[relpath]
-        if isinstance(parsed, UnreadableSource):
-            excerpts[scenario.id] = parsed
-        else:
-            excerpts[scenario.id] = parsed.function_at(line) or UnreadableSource(
-                reason=f'no function holds {relpath}:{line}'
+        assert scenario.source is not None, 'a live run gives every scenario a source'
+        by_file[scenario.source.relpath].append((scenario.id, scenario.source.line))
+    excerpts: dict[NodeId, SourceExcerpt] = {}
+    for relpath, anchors in by_file.items():
+        functions = _functions(root, relpath)
+        for scenario_id, line in anchors:
+            excerpts[scenario_id] = (
+                functions
+                if isinstance(functions, UnreadableSource)
+                else _innermost(functions, relpath, line)
             )
     return excerpts
 
 
-@dataclass(frozen=True)
-class _ParsedFile:
-    lines: list[str]
-    # (first line, last line) of each function, decorators included.
-    spans: list[tuple[int, int]]
-
-    def function_at(self, line: int) -> FunctionSource | None:
-        """The innermost function holding `line`: a test defined inside a
-        helper resolves to the test, not the helper."""
-        holding = [(start, end) for start, end in self.spans if start <= line <= end]
-        if not holding:
-            return None
-        start, end = min(holding, key=lambda span: span[1] - span[0])
-        return FunctionSource(
-            first_line=start, lines=tuple(self.lines[start - 1 : end])
-        )
+def _innermost(
+    functions: list[FunctionSource], relpath: str, line: int
+) -> SourceExcerpt:
+    """The functions holding a line nest, so the shortest is the innermost: a
+    test defined inside a helper resolves to the test, not the helper."""
+    holding = [
+        function
+        for function in functions
+        if function.first_line <= line < function.first_line + len(function.lines)
+    ]
+    if not holding:
+        return UnreadableSource(reason=f'no function holds {relpath}:{line}')
+    return min(holding, key=lambda function: len(function.lines))
 
 
-def _parse(path: Path, relpath: str) -> _ParsedFile | UnreadableSource:
+def _functions(root: Path, relpath: str) -> list[FunctionSource] | UnreadableSource:
     # `tokenize.open` decodes as Python does, honoring an encoding declaration,
     # and folds every newline to `\n`, the only line break `ast` counts.
     try:
-        with tokenize.open(path) as file:
+        with tokenize.open(root / relpath) as file:
             text = file.read()
     except OSError, SyntaxError, ValueError:
         return UnreadableSource(reason=f'{relpath} could not be read')
@@ -83,10 +77,15 @@ def _parse(path: Path, relpath: str) -> _ParsedFile | UnreadableSource:
         tree = ast.parse(text)
     except SyntaxError:
         return UnreadableSource(reason=f'{relpath} does not parse')
-    spans: list[tuple[int, int]] = []
+    lines = text.split('\n')
+    functions: list[FunctionSource] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
             assert node.end_lineno is not None, 'ast.parse sets every end position'
             first = min([node.lineno, *(dec.lineno for dec in node.decorator_list)])
-            spans.append((first, node.end_lineno))
-    return _ParsedFile(lines=text.split('\n'), spans=spans)
+            functions.append(
+                FunctionSource(
+                    first_line=first, lines=tuple(lines[first - 1 : node.end_lineno])
+                )
+            )
+    return functions

@@ -93,8 +93,8 @@ def _scenario_md(
 
 
 def _source_lines(excerpt: SourceExcerpt) -> list[str]:
-    """The test function, each line under its number in the file. The numbers
-    show whatever `with_lines` says: a reviewer cites `file:line` from them."""
+    """The test function, each line under its number in the file — even with
+    `with_lines` off, since a reviewer cites `file:line` from them."""
     if not isinstance(excerpt, FunctionSource):
         return [f'*Test source not shown: {_text(excerpt.reason)}.*']
     last = excerpt.first_line + len(excerpt.lines) - 1
@@ -103,7 +103,7 @@ def _source_lines(excerpt: SourceExcerpt) -> list[str]:
         f'{number:>{width}}  {line}' if line else f'{number:>{width}}'
         for number, line in enumerate(excerpt.lines, start=excerpt.first_line)
     ]
-    return _fenced(numbered, info='python')
+    return _fenced('\n'.join(numbered), info='python')
 
 
 def _body_lines(scenario: Scenario, *, with_errors: bool) -> list[str]:
@@ -229,7 +229,7 @@ def _case_attachment_blocks(
             continue
         lines.append('')
         lines.append(f'- **{key}** — {_text(column.name)}:')
-        lines.extend(_indented(_fenced(value.content.splitlines()), _INDENT))
+        lines.extend(_indented(_fenced(value.content), _INDENT))
     return lines
 
 
@@ -270,13 +270,11 @@ def _fits_inline(content: str) -> bool:
     )
 
 
-def _fenced(lines: list[str], info: str = '') -> list[str]:
-    """`lines` wrapped in a fence long enough to survive their own backticks."""
-    longest_run = max(
-        (len(run) for line in lines for run in re.findall(r'`+', line)), default=0
-    )
+def _fenced(content: str, info: str = '') -> list[str]:
+    """`content` wrapped in a fence long enough to survive its own backticks."""
+    longest_run = max((len(run) for run in re.findall(r'`+', content)), default=0)
     fence = '`' * max(3, longest_run + 1)
-    return [fence + info, *lines, fence]
+    return [fence + info, *content.splitlines(), fence]
 
 
 def _indented(lines: list[str], indent: str) -> list[str]:
@@ -321,7 +319,7 @@ def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
     body_indent = item_indent + _INDENT
     return [
         f'{item_indent}- 📎 {label}:',
-        *_indented(_fenced(attachment.content.splitlines()), body_indent),
+        *_indented(_fenced(attachment.content), body_indent),
     ]
 
 
