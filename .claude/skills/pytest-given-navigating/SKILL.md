@@ -24,9 +24,7 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
        | .narration.text + " — " + .source.relpath + ":" + (.source.line|tostring)' report.json
 ```
 
-- By status: `select(.status == "failed")`. The message and frames are in `.error`. But a **parametrized scenario's `.error` is `null`**: its failures are in each case's `.parameters.cases[].error`. The reference's recipe reads both.
-- By term: `select([.. | .term_id? // empty] | index("waitlist"))`. The search is recursive, because steps nest and a term ref at any depth counts. Term ids are slugs (`Late fee` becomes `late-fee`; the rule is in the reference).
-- By story: read the story's `scenario_ids` in `.coverage[]`. Don't use `.story_ids`, which misses a scenario that only pins the story. Story ids are slugs too.
+The reference has recipes by status, words, term, tag and story. Use them rather than writing your own: a parametrized scenario keeps its failures per case, term refs nest at any depth, and `.story_ids` misses a scenario that only pins a story.
 
 ## Traps
 
