@@ -11,20 +11,20 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 <!-- --8<-- [start:site] -->
 
-## [Unreleased]
+## [0.5.0] - 2026-10-18
 
 ### Added
 
-- Markdown documents, such as design specs, can [cite](https://nwilbert.github.io/pytest-given/dev/guide/citations/) scenarios, tags and stories as links into the published HTML report: `--given-report-url` or the `given_report_url` setting sets the report's URL and gives it buttons that copy a citation, `pytest-given citations check` and `pytest-given citations update` keep a document's citations in line with a JSON report, a scenario's narration in a `<details markdown="1">` block included, `citations check --list` prints every report link with its findings, narrowed by `--covering` to the links that [cite a scenario](https://nwilbert.github.io/pytest-given/dev/guide/citations/#finding-the-citations-of-a-scenario), and the bundled `pytest-given-citing` skill writes citations and repairs the ones `citations update` cannot.
+- Markdown documents, such as design specs, can [cite](https://nwilbert.github.io/pytest-given/0.5/guide/citations/) scenarios, tags and stories as links into the published HTML report: `--given-report-url` or the `given_report_url` setting sets the report's URL and gives it buttons that copy a citation, `pytest-given citations check` and `pytest-given citations update` keep a document's citations in line with a JSON report, a scenario's narration in a `<details markdown="1">` block included, `citations check --list` prints every report link with its findings, narrowed by `--covering` to the links that [cite a scenario](https://nwilbert.github.io/pytest-given/0.5/guide/citations/#finding-the-citations-of-a-scenario), and the bundled `pytest-given-citing` skill writes citations and repairs the ones `citations update` cannot.
 - When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.
-- A [term ref](https://nwilbert.github.io/pytest-given/dev/guide/glossary/#term-refs) can show a noun's plural or a verb's -s form with `.s`: `room.s` reads *Rooms*, `room.l.s` reads *rooms*, and `room('suite').s` reads *suites*.
-- Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` [runs the scenarios alone](https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/#selecting-scenarios), for example to measure their code coverage.
+- A [term ref](https://nwilbert.github.io/pytest-given/0.5/guide/glossary/#term-refs) can show a noun's plural or a verb's -s form with `.s`: `room.s` reads *Rooms*, `room.l.s` reads *rooms*, and `room('suite').s` reads *suites*.
+- Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` [runs the scenarios alone](https://nwilbert.github.io/pytest-given/0.5/configuration/pytest-options/#selecting-scenarios), for example to measure their code coverage.
 - `pytest-given report --report-url` re-renders a saved report for a URL other than the one stored in it.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
 - `--given-md-source` ends each scenario in the Markdown report with its test function, under its line numbers.
-- The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
+- The [narration lint](https://nwilbert.github.io/pytest-given/0.5/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 - Scenario titles and step text render `**bold**`, `*italic*` and `` `code` `` in the HTML report.
-- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case ID` column when any case ID is custom, and each case in the JSON report's `parameters.cases[]` carries its node ID as `id` and a `custom_id` flag.
+- A [parameter table](https://nwilbert.github.io/pytest-given/0.5/guide/parametrized/#grouping) starts with a `case ID` column when any case ID is custom, and each case in the JSON report's `parameters.cases[]` carries its node ID as `id` and a `custom_id` flag.
 - A Tags sidebar row in the HTML report has a copy button for the tag's link and citation.
 
 ### Changed
@@ -433,7 +433,8 @@ First public release.
 - Bundled authoring, navigating, and reviewing skills for AI agents, shipped in
   the wheel and version-matched to the plugin.
 
-[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/nwilbert/pytest-given/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0
