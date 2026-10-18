@@ -1057,6 +1057,7 @@
 <li><code>pytest-given report --report-url</code> re-renders a saved report for a URL other than the one stored in it.</li>
 <li>Each case in the JSON report's <code>parameters.cases[]</code> carries its node id as <code>id</code>.</li>
 <li>The <code>given_md_lines = false</code> setting, or <code>--no-given-md-lines</code> (<code>--no-lines</code> on <code>pytest-given report</code>), leaves the line number out of each Markdown scenario anchor.</li>
+<li><code>--given-md-source</code> ends each scenario in the Markdown report with its test function, under its line numbers, and the bundled <code>pytest-given-reviewing</code> skill uses it in place of its pairing script.</li>
 <li>The <a href="https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules">narration lint</a>'s <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
 <li>Scenario titles and step text render <code>**bold**</code>, <code>*italic*</code> and <code>`code`</code> in the HTML report.</li>
 <li>A <a href="https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping">parameter table</a> starts with a <code>case ID</code> column when any case ID is custom, flagged by each case's <code>custom_id</code> in the JSON report.</li>
@@ -1089,6 +1090,7 @@
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Notes below a parameter table in the Markdown report that would share a key add their row number.</li>
+<li>The narration lint checks a test file with an encoding declaration, such as <code># -*- coding: latin-1 -*-</code>, instead of skipping it.</li>
 </ul>
 <h2 id="041-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1">0.4.1</a> - 2026-10-04<a class="headerlink" href="#041-2026-10-04" title="Permanent link">&para;</a></h2>
 <h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>

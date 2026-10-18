@@ -1072,6 +1072,11 @@
 <td>Show the line in the <code>file.py:line::test_name</code> anchor under each Markdown heading. Off, the anchor is the node ID, so a Markdown diff doesn't show every anchor below an inserted test. Ini setting: <code>given_md_lines</code>; both flags override it.</td>
 </tr>
 <tr>
+<td><code>--given-md-source</code></td>
+<td>off</td>
+<td>End each Markdown scenario with its test function, decorators included, each line under its number in the file, for reviewing step text against step body. Only the test function is shown, not the step fixtures or helpers it uses. No ini setting.</td>
+</tr>
+<tr>
 <td><code>--given-title=TEXT</code></td>
 <td>rootdir name</td>
 <td>The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: <code>given_title</code>.</td>
