@@ -15,21 +15,17 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- Markdown documents, such as design specs, can [cite](https://nwilbert.github.io/pytest-given/dev/guide/citations/) scenarios, tags and stories as links into the published HTML report: `--given-report-url` or the `given_report_url` setting sets the report's URL and gives it buttons that copy a citation, `pytest-given citations check` and `pytest-given citations update` keep a document's citations in line with a JSON report, and the bundled `pytest-given-citing` skill writes citations and repairs the ones `pytest-given citations update` cannot.
-- A scenario citation written as a `<details markdown="1">` block carries the scenario's narration, which `citations update` writes and `citations check` holds to the report.
-- `pytest-given citations check` and `update` exit 2 when no document links the report, so a mistyped report URL or path fails rather than passes.
-- `pytest-given citations check --list` prints every report link with its findings, and `--covering` narrows the list to the links that [cite a scenario](https://nwilbert.github.io/pytest-given/dev/guide/citations/#finding-the-citations-of-a-scenario).
+- Markdown documents, such as design specs, can [cite](https://nwilbert.github.io/pytest-given/dev/guide/citations/) scenarios, tags and stories as links into the published HTML report: `--given-report-url` or the `given_report_url` setting sets the report's URL and gives it buttons that copy a citation, `pytest-given citations check` and `pytest-given citations update` keep a document's citations in line with a JSON report, a scenario's narration in a `<details markdown="1">` block included, `citations check --list` prints every report link with its findings, narrowed by `--covering` to the links that [cite a scenario](https://nwilbert.github.io/pytest-given/dev/guide/citations/#finding-the-citations-of-a-scenario), and the bundled `pytest-given-citing` skill writes citations and repairs the ones `citations update` cannot.
 - When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.
 - A [term ref](https://nwilbert.github.io/pytest-given/dev/guide/glossary/#term-refs) can show a noun's plural or a verb's -s form with `.s`: `room.s` reads *Rooms*, `room.l.s` reads *rooms*, and `room('suite').s` reads *suites*.
 - Every `@scenario` test carries the registered `pytest_given` marker, so `pytest -m pytest_given` [runs the scenarios alone](https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/#selecting-scenarios), for example to measure their code coverage.
 - `pytest-given report --report-url` re-renders a saved report for a URL other than the one stored in it.
-- Each case in the JSON report's `parameters.cases[]` carries its node id as `id`.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
-- `--given-md-source` ends each scenario in the Markdown report with its test function, under its line numbers, and the bundled `pytest-given-reviewing` skill uses it in place of its pairing script.
+- `--given-md-source` ends each scenario in the Markdown report with its test function, under its line numbers.
 - The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 - Scenario titles and step text render `**bold**`, `*italic*` and `` `code` `` in the HTML report.
-- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case ID` column when any case ID is custom, flagged by each case's `custom_id` in the JSON report.
-- A Tags sidebar row in the HTML report has a copy button beside the tag's name that copies the tag's link and, with a report URL, opens the copy menu with its citation.
+- A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case ID` column when any case ID is custom, and each case in the JSON report's `parameters.cases[]` carries its node ID as `id` and a `custom_id` flag.
+- A Tags sidebar row in the HTML report has a copy button for the tag's link and citation.
 
 ### Changed
 
@@ -37,24 +33,16 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** `@scenario`'s first parameter is now `title`: replace `@scenario(name=...)` with `@scenario(title=...)`; a positional title is unaffected.
 - **Breaking.** `FileGlossary`'s `description_column` is now `definition_column`, the word the rest of the glossary API uses: rename the keyword.
 - **Breaking.** A handle's `.low` form is now `.l`, and lowercases only capitalized words, so an acronym keeps its case (`LLM Call` reads *LLM call*): replace `.low` with `.l`.
-- **Breaking.** Glossary definitions no longer render `__bold__`, and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
+- **Breaking.** Glossary definitions render emphasis as CommonMark does, so `__bold__` no longer renders and `FileGlossary` no longer unwraps it in term and kind cells: write `**bold**`.
 - **Breaking.** A title or step whose code span, bold or italics holds a value, placeholder or term ref raises `PytestGivenError`, and so do asterisks meant literally around one, as in `t'**/{d}/**'`: keep the span within the text beside it, and put a literal `*` in a code span of its own.
-- The Glossary view counts a term ref reading as the term's S-form as the term itself, so `room('rooms')` and `book('books')` no longer appear among the term's other forms.
-- The Glossary tab lists every term's called forms, an instance or another wording alike, under one "Other forms" label.
-- Glossary definitions render code inside bold and no longer italicize between spaced asterisks.
-- The Markdown report and citations show every text literally but a title's or step's formatting, and a newline in a title or step as a space.
+- The Glossary tab lists a term's instances and other wordings under one "Other forms" label, leaving out a term ref that reads as its S-form.
+- The Markdown report and citations escape Markdown in all text except a title's or step's own formatting, and show a newline in a title or step as a space.
 - A per-case scenario title highlights its case ID as a value, and the JSON report records it as a value part.
-- The HTML report's top bar and term ref underlines are visually tidied, and a scenario card's or story header's copy buttons merge into one copy button with a menu, and the sidebar's untagged and no-terms rows sit last, under a rule.
-- The error for a varying t-string expression in a `then` of a grouped parametrized scenario suggests parametrizing an expected outcome as its own column.
-- The bundled skills are reworded in plainer language and present story coverage as a way to find scenarios, not a measure of test completeness.
-- The bundled `pytest-given-authoring` skill covers scenario titles, narrates each rule once where its test proves it, and shows how to narrate a call that returns normally, check "never called" with recorded calls, and interpolate values taken from constants, writes out each parameter-table row's expected outcome instead of deriving it from an input, and asks the user before adding a glossary term.
-- The bundled `pytest-given-reviewing` skill reviews titles as a list, flags a rule narrated at the wrong layer, a `then` that checks nothing or fails a row of its table, a stub that raises to prove "never called", an outcome derived from an input column and a missing glossary term, shows each scenario's recorded steps and custom case IDs beside its source, lists whether a pin or narration matching ties each scenario to its story sentence, lists the scenario titles by test file, and starts its completeness audit from what the project promises, design specs that cite the report included.
-- The bundled skills leave bold and italic in titles and steps to the user, keep custom case IDs for complex parameter-table rows, and search the JSON report's narration with its Markdown markers stripped.
-- The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep the lint rule catalog, the parameter-table guidance and the completeness and hygiene audits in reference files an agent loads only when its task needs them.
-- The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills keep a glossary definition to what its term is, and leave how tools treat the term to the docs.
+- The HTML report's top bar, term ref underlines, copy buttons and sidebar are visually tidied.
+- The bundled skills are reworded in plainer language and load their lint catalog, parameter-table guidance and audits from reference files only when a task needs them.
+- The bundled `pytest-given-authoring` skill covers scenario titles, parameter-table outcomes, custom case IDs and glossary definitions, and `pytest-given-reviewing` checks for each of them and starts its completeness audit from what the project promises.
 - A `--given-lint` run that finds nothing prints `pytest-given: narration lint (no findings)`.
-- The docs and error messages call `Annotated[..., given(...)]` on a test parameter a given annotation, and write node ID and case ID.
-- pytest-given now depends on markdown-it-py, which reads the tables of a `FileGlossary`'s file and the paragraphs, headings and table cells of the documents `pytest-given citations` checks.
+- pytest-given now depends on markdown-it-py.
 - `FileGlossary` reads the tables a GFM renderer shows, so it reads a table in a blockquote or list, skips one in an indented code or HTML block, and reads a cell missing from a row as empty instead of raising.
 
 ### Fixed
