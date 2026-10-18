@@ -171,7 +171,7 @@
             inner button is what the keyboard reaches, and stops propagation so
             the two do not both fire. -#}
         <template x-for="group in groups" :key="group.id">
-          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group) }"
+          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-bucket': group.bucket }"
                :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
             <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
                     :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
@@ -183,15 +183,23 @@
                     :aria-pressed="isGroupActive(group)"
                     @click.stop="onGroupClick(group)">
               <span class="nav-group-name" x-text="group.name"></span>
-              <span class="nav-group-count" x-text="group.count"></span>
             </button>
+            {#- A tag row's copy button sits beside its name, as a story's does
+                beside its title, and opens the same menu. -#}
             {% if citations %}
-            <button type="button" class="anchor-link nav-group-citation"
-                    title="{{ citation_title }}" aria-label="Copy Markdown citation"
+            <button type="button" class="anchor-link copy-menu-trigger nav-group-copy"
+                    aria-haspopup="menu" aria-expanded="false" data-citation-kind="tag"
                     x-show="view === 'tags'"
-                    :class="{ 'nav-group-citation-absent': !hasCitation('tag', group.id) }"
-                    @click.stop="copyCitation('tag', group.id, $el)">{{ icon('citation') }}</button>
+                    :title="hasCitation('tag', group.id) ? 'Copy link or citation' : 'Copy link'"
+                    :aria-label="hasCitation('tag', group.id) ? 'Copy link or citation' : 'Copy link'"
+                    :data-anchor="tagAnchor(group.id)" :data-citation-key="group.id"
+                    @click.stop="toggleCopyMenu($el)">{{ icon('copy') }}</button>
+            {% else %}
+            <button type="button" class="anchor-link nav-group-copy" title="Copy link" aria-label="Copy link"
+                    x-show="view === 'tags'" :data-anchor="tagAnchor(group.id)"
+                    @click.stop="copyAnchor($el)">{{ icon('link') }}</button>
             {% endif %}
+            <span class="nav-group-count" x-text="group.count"></span>
           </div>
         </template>
       </div>
@@ -672,13 +680,14 @@
 </div>
 
 {% if citations %}
-<!-- The menu a scenario card's or story header's copy button opens;
+<!-- The menu a scenario card's, story header's or tag row's copy button opens;
      positioned by app.js beside the button that opened it. One shared node,
      as the tooltip is: a menu per card would repeat its markup hundreds of
-     times. The narrated citation is a scenario's alone. -->
+     times. The narrated citation is a scenario's alone, and the untagged
+     row, which no citation covers, has only its link. -->
 <div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link">{{ icon('link') }}Copy link</button>
-  <div class="copy-menu-separator" role="separator"></div>
+  <div class="copy-menu-separator" role="separator" data-copy-citations></div>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="{{ citation_title }}">{{ icon('citation') }}Copy citation</button>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in.">{{ icon('narrated') }}Copy narrated citation</button>
 </div>

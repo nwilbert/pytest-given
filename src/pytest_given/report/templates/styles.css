@@ -477,6 +477,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 .nav-group-active .nav-group-toggle { color: var(--color-accent); }
 .nav-group-active .nav-group-count { color: var(--color-accent); opacity: 0.75; }
 .nav-group-active .nav-group-name { font-weight: 600; }
+/* The untagged and no-terms row names no tag or term, so it sits under a
+   rule, inset to the labels' column. On an axis with nothing else to
+   separate it from, it takes no rule. */
+.nav-group + .nav-group-bucket { position: relative; margin-top: var(--space-md); }
+.nav-group + .nav-group-bucket::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--space-md) / 2 - 1px);
+  left: calc(var(--space-xs) + 1px);
+  right: calc(var(--space-xs) + 1px);
+  height: 1px;
+  background: var(--border);
+}
 /* padding-left keeps a minimum gap from the group name even when a wrapped
    name fills the row and the auto margin collapses to zero. */
 .nav-group-count { font-size: var(--font-size-sm); color: var(--text-muted); margin-left: auto; padding-left: var(--space-sm); font-variant-numeric: tabular-nums; }
@@ -487,7 +500,6 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 /* The row's filter control, a sibling of the chevron button rather than a
    wrapper around it: buttons cannot nest. */
 .nav-group-select {
-  flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
@@ -1662,13 +1674,11 @@ span.param-highlight {
 /* Revealed on keyboard focus, since a button at opacity 0 would otherwise be
    focused unseen. */
 .anchor-link:focus-visible { opacity: 1; outline: 2px solid var(--color-accent); outline-offset: 1px; }
-/* A tag row reveals its citation button on hover, as a header does. The
-   button sits after the count, so the counts shift left as one column; on the
-   untagged row, which has nothing to cite, it keeps its place unseen. */
-.nav-group:hover .nav-group-citation { opacity: 0.6; }
-.nav-group-citation { margin-left: 2px; padding: 2px; flex-shrink: 0; }
-.nav-group-citation-absent { visibility: hidden; }
-.nav-group-active .nav-group-citation:not(.anchor-copied) { color: var(--color-accent); }
+/* A tag row reveals its copy button on hover, as a header does. A tight box,
+   so the row keeps its height and the button stays with the name it copies. */
+.nav-group:hover .nav-group-copy { opacity: 0.6; }
+.nav-group-copy { margin-left: 2px; padding: 2px; flex-shrink: 0; }
+.nav-group-active .nav-group-copy:not(.anchor-copied) { color: var(--color-accent); }
 
 /* === Copy menu ===
    A sheet of the card's own surface, lifted by the tooltip's shadow. Its
@@ -1689,7 +1699,7 @@ span.param-highlight {
   box-shadow: var(--shadow-tip);
   animation: copy-menu-in 120ms ease-out;
 }
-.copy-menu[hidden], .copy-menu-item[hidden] { display: none; }
+.copy-menu[hidden], .copy-menu-item[hidden], .copy-menu-separator[hidden] { display: none; }
 .copy-menu-item {
   display: flex;
   align-items: center;

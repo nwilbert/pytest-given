@@ -483,6 +483,7 @@ function reportApp() {
         const level = Object.values(kids).map(node => ({
           node, id: node.__id, name: label(node.__name), depth,
           hasChildren: Object.keys(node.__kids).length > 0, count: counts[node.__id],
+          bucket: node.__id === NO_TAGS || node.__id === NO_TERMS,
         }));
         for (const row of this._ordered(level, filters)) {
           if (visible) rows.push(row);
@@ -502,11 +503,14 @@ function reportApp() {
     // Selected groups pin to the top so what you filtered by stays in view:
     // arriving from the Glossary tab, the term you came for is the first row
     // rather than somewhere down the list. Below the pin the sort toggle
-    // decides, with ties alphabetical so the order stays stable.
+    // decides, with ties alphabetical so the order stays stable. The bucket
+    // of scenarios with no tags or no terms is not one of them, so it sits
+    // last whatever the sort, set apart from the real ones.
     _ordered(rows, filters) {
       const byCount = this.sortBy === 'count';
       return rows.sort((a, b) =>
-        (filters.includes(a.id) ? 0 : 1) - (filters.includes(b.id) ? 0 : 1)
+        a.bucket - b.bucket
+        || (filters.includes(a.id) ? 0 : 1) - (filters.includes(b.id) ? 0 : 1)
         || (byCount ? b.count - a.count : 0)
         || a.name.localeCompare(b.name));
     },
@@ -741,6 +745,11 @@ function reportApp() {
     copyAnchor(btn) {
       this._copyAndFlash(window.location.href.split('#')[0] + '#' + btn.dataset.anchor, btn);
     },
+    // Kept readable as `report_fragment` keeps a citation's: a nested tag's
+    // `/` and a `:` survive URLSearchParams unescaped.
+    tagAnchor(tag) {
+      return 'tag=' + encodeURIComponent(tag).replace(/%2F|%3A/gi, decodeURIComponent);
+    },
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
@@ -764,7 +773,11 @@ function reportApp() {
       const reopening = copyMenuTrigger !== trigger;
       this._closeCopyMenu(!reopening);
       if (!reopening) return;
-      copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = trigger.dataset.citationKind !== 'scenario';
+      const { citationKind: kind, citationKey: key } = trigger.dataset;
+      const cited = this.hasCitation(kind, key);
+      copyMenu.querySelector('[data-copy-citations]').hidden = !cited;
+      copyMenu.querySelector('[data-copy-entry="citation"]').hidden = !cited;
+      copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = !cited || kind !== 'scenario';
       copyMenu.hidden = false;
       copyMenuTrigger = trigger;
       trigger.setAttribute('aria-expanded', 'true');

@@ -108,7 +108,7 @@ pytest-given reads four kinds of link into the report:
 | Kind | Looks like | Kept current | From the report |
 |---|---|---|---|
 | Scenario citation | `✅ [title](…#scenario=…)` | glyph and link text | **Copy citation** on its scenario card |
-| Tag or story citation | `✅ [spec/citations](…#tag=spec/citations) (10 ✅)` | glyph, link text and summary | **Copy citation** on a story header, or the copy button on a Tags sidebar row |
+| Tag or story citation | `✅ [spec/citations](…#tag=spec/citations) (10 ✅)` | glyph, link text and summary | **Copy citation** on a story header or a Tags sidebar row |
 | [Narrated citation](#narrated-citations) | a `<details>` block around a scenario citation | glyph, link text and narration | **Copy narrated citation** on its scenario card |
 | Plain report link | `[your words](…#scenario=…)` | its fragment | **Copy link** on the published report. On a local report, **Copy citation** and delete the glyph and any summary. |
 
@@ -118,7 +118,7 @@ A citation states what the report found, so `pytest-given citations check` fails
 
 The report offers the citation entries in the table only when `given_report_url` is set, as in [step 1](#how-it-fits-together) above. To set it for one run instead, pass `--given-report-url=URL`. The URL is also stored in the JSON report, so `pytest-given report` re-renders the entries from it, and the `pytest-given citations` commands know which links point at the report.
 
-The copy button on a scenario card or story header opens a menu with these entries. On a Tags sidebar row, the button copies the tag's citation directly. A citation links to `given_report_url`, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. **Copy link** copies the address you opened the report at. Without the setting, it is all the copy button offers, and Tags sidebar rows have no button.
+The copy button on a scenario card, story header or Tags sidebar row opens a menu with these entries. A citation links to `given_report_url`, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. **Copy link** copies the address you opened the report at. Without the setting, it is all the copy button offers.
 
 ### Writing it by hand
 
