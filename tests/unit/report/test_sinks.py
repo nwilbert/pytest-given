@@ -19,6 +19,7 @@ from pytest_given.model import (
     Scenario,
     Sentence,
     SentenceId,
+    SourceLocation,
     Step,
     Story,
     StoryId,
@@ -213,3 +214,31 @@ def test_json_sink_replaces_incoming_coverage(tmp_path: Path) -> None:
     data = json.loads(rendered.files[0].text)
     covered = [row['sentence_id'] for row in data['coverage'] if row['scenario_ids']]
     assert covered == [1]
+
+
+def test_md_source_reads_the_test_files_under_the_source_root(tmp_path: Path) -> None:
+    """Under the source root, not the working directory, which pytester runs
+    happen to share with their rootdir."""
+    (tmp_path / 'test_a.py').write_text(
+        'def test_a():\n    assert True\n', encoding='utf-8', newline='\n'
+    )
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0'
+        ),
+        scenarios=[
+            Scenario(
+                id=NodeId('test_a.py::test_a'),
+                narration=Narration(text='A'),
+                module='test_a',
+                status='passed',
+                source=SourceLocation(relpath='test_a.py', line=1),
+            )
+        ],
+    )
+    config = SinkConfig(md_to_stdout=True, md_source=True, source_root=tmp_path)
+
+    rendered = sinks.render_sinks(report_to_dict(report), config)
+
+    assert rendered.md_stdout is not None
+    assert '1  def test_a():\n2      assert True\n```' in rendered.md_stdout

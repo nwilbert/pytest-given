@@ -12,7 +12,7 @@ pytest tests/test_booking.py --given-md --given-md-source
 ## Background
 
 The reviewing skill's semantic audit (layer 2) judges each step's text against the code under it.
-Today [pairs.md](../../src/pytest_given/.agents/skills/pytest-given-reviewing/references/pairs.md)
+Today the reviewing skill's `references/pairs.md`
 gets the two side by side with a 75-line script: it reads the JSON report, finds each test
 function with `ast`, and writes the recorded steps, the parameter table and the function into one
 dump file per test file. The script re-implements a cruder version of what the Markdown renderer

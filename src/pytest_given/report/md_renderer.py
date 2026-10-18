@@ -100,10 +100,13 @@ def _source_lines(excerpt: SourceExcerpt) -> list[str]:
     last = excerpt.first_line + len(excerpt.lines) - 1
     width = len(str(last))
     numbered = [
-        f'{number:>{width}}  {line}' if line else f'{number:>{width}}'
+        f'{number:>{width}}  {line}'.rstrip()
         for number, line in enumerate(excerpt.lines, start=excerpt.first_line)
     ]
-    return _fenced('\n'.join(numbered), info='python')
+    # Not `_fenced`: its `splitlines` would also break at a form feed or a
+    # U+2028 that `ast` reads as part of the line.
+    fence = _fence('\n'.join(numbered))
+    return [f'{fence}python', *numbered, fence]
 
 
 def _body_lines(scenario: Scenario, *, with_errors: bool) -> list[str]:
@@ -270,11 +273,15 @@ def _fits_inline(content: str) -> bool:
     )
 
 
-def _fenced(content: str, info: str = '') -> list[str]:
-    """`content` wrapped in a fence long enough to survive its own backticks."""
+def _fenced(content: str) -> list[str]:
+    fence = _fence(content)
+    return [fence, *content.splitlines(), fence]
+
+
+def _fence(content: str) -> str:
+    """A code fence long enough to survive `content`'s own backticks."""
     longest_run = max((len(run) for run in re.findall(r'`+', content)), default=0)
-    fence = '`' * max(3, longest_run + 1)
-    return [fence + info, *content.splitlines(), fence]
+    return '`' * max(3, longest_run + 1)
 
 
 def _indented(lines: list[str], indent: str) -> list[str]:

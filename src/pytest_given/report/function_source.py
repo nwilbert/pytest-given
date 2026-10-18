@@ -32,8 +32,7 @@ type SourceExcerpt = FunctionSource | UnreadableSource
 def read_function_sources(
     scenarios: Iterable[Scenario], root: Path
 ) -> dict[NodeId, SourceExcerpt]:
-    """Every scenario's test function, keyed by scenario id. Read a file at a
-    time, so only the functions stay in memory, not every file's lines."""
+    """Every scenario's test function, keyed by scenario id."""
     by_file: dict[str, list[tuple[NodeId, int]]] = defaultdict(list)
     for scenario in scenarios:
         assert scenario.source is not None, 'a live run gives every scenario a source'

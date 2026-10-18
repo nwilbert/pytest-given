@@ -148,6 +148,19 @@ def test_empty_step_fires_on_docstring_and_ellipsis_only_body(tmp_path) -> None:
     assert finding.rule == RuleId('empty-step')
 
 
+def test_a_file_with_an_encoding_declaration_is_linted(tmp_path) -> None:
+    src = (
+        '# -*- coding: latin-1 -*-\n'
+        'def test_a():\n'
+        "    with given('café'):\n"
+        '        pass\n'
+    )
+    (tmp_path / 'test_x.py').write_bytes(src.encode('latin-1'))
+    scenario = _scenario([_step('given', 'café', 3)])
+    [finding] = _ast_rules([scenario], tmp_path)
+    assert finding.rule == RuleId('empty-step')
+
+
 def test_empty_step_passes_with_real_statement(tmp_path) -> None:
     src = _write(
         tmp_path,

@@ -58,6 +58,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - Notes below a parameter table in the Markdown report that would share a key add their row number.
+- The narration lint checks a test file with an encoding declaration, such as `# -*- coding: latin-1 -*-`, instead of skipping it.
 
 ## [0.4.1] - 2026-10-04
 

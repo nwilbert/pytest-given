@@ -1295,7 +1295,7 @@ _BUY_SOURCE = FunctionSource(
         "@scenario('Buy coffee')",
         'def test_buy():',
         "    with given('a machine'):",
-        '',
+        '    ',
         '        assert 0 == 1',
     ),
 )
@@ -1339,3 +1339,11 @@ def test_without_sources_no_test_source_is_rendered() -> None:
     md = render_md(_report(_sourced_scenario()))
     assert '```python' not in md
     assert 'Test source' not in md
+
+
+def test_a_source_line_holding_a_unicode_line_separator_stays_one_line() -> None:
+    scn = _sourced_scenario()
+    line = f'x = "a{chr(0x2028)}b"'
+    source = FunctionSource(first_line=1, lines=(line,))
+    md = render_md(_report(scn), sources={scn.id: source})
+    assert f'```python\n1  {line}\n```' in md

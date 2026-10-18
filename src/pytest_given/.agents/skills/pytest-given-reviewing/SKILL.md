@@ -34,7 +34,7 @@ If Markdown documents cite the report, review the citations too: follow [referen
 
 **No base to compare with**, as on a branch that adopts pytest-given? Audit the whole suite. Start with the scenarios whose bodies the branch changed, then go through the rest file by file. `--given-md` needs no project setup, so run it yourself even when CI only writes other formats.
 
-Judge each scenario's step texts against their bodies with the rubric below. `pytest <test file> --given-md=<file> --given-md-source` prints them side by side: each scenario's narration ends with its test function, decorators included, under its line numbers, so you cite `file:line` straight from it. Only the test function is shown. A step with no `with` in the function was recorded by a step fixture, and a constant or helper the body uses is elsewhere in the file, so open the file before you judge a value. The rubric is complete on its own, so a reviewer you hand it to needs nothing else.
+Judge each scenario's step texts against their bodies with the rubric below. `pytest <test file> --given-md=<file> --given-md-source` prints them side by side: each scenario's narration ends with its test function, decorators included, under its line numbers, so you cite `file:line` straight from it. Only the test function is shown. A step with no `with` in the function was recorded by a step fixture or a decorated step helper the body calls, and a constant or helper the body uses is elsewhere in the file, so open the file before you judge a value. The rubric is complete on its own, so a reviewer you hand it to needs nothing else.
 
 **Step text may abstract, but it must never overstate.**
 

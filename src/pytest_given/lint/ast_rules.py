@@ -171,7 +171,7 @@ def _index_body_nodes(path: Path) -> dict[int, _BodyNode] | None:
     file cannot be read or parsed.
     """
     try:
-        tree = ast.parse(path.read_text(encoding='utf-8'))
+        tree = ast.parse(path.read_bytes())
     except OSError, SyntaxError, ValueError:
         return None
     index: dict[int, _BodyNode] = {}
