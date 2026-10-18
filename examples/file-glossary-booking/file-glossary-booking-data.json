@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-11T16:09:11.534208+00:00",
+    "timestamp": "2026-10-18T10:35:19.580869+00:00",
     "pytest_version": "9.1.1",
-    "plugin_version": "0.4.1",
-    "commit_sha": "ed077363928c2831dc5ae4db53407a5562eaed0c",
+    "plugin_version": "0.5.0",
+    "commit_sha": "2e57a6d139a1f44aa1eaafe4f5b5bfd45236baad",
     "title": "File Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html"
   },

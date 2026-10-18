@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-14T20:36:19.556047+00:00",
+    "timestamp": "2026-10-18T10:35:18.902575+00:00",
     "pytest_version": "9.1.1",
-    "plugin_version": "0.4.1",
-    "commit_sha": "4df53c5d5379a5a55da87381a940e91533202efd",
+    "plugin_version": "0.5.0",
+    "commit_sha": "2e57a6d139a1f44aa1eaafe4f5b5bfd45236baad",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 33,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
