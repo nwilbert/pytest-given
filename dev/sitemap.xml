@@ -4,34 +4,16 @@
         <loc>https://nwilbert.github.io/pytest-given/latest/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/getting-started/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/ai-agents/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/scenarios/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/changelog/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/step-text/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/parametrized/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/attachments/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/glossary/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/domain-storytelling/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/cli/</loc>
       </url>
       <url>
         <loc>https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/guide/citations/</loc>
-      </url>
-      <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/ai-agents/</loc>
       </url>
       <url>
         <loc>https://nwilbert.github.io/pytest-given/latest/configuration/pytest-options/</loc>
@@ -40,12 +22,30 @@
         <loc>https://nwilbert.github.io/pytest-given/latest/configuration/source-links/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/cli/</loc>
-      </url>
-      <url>
         <loc>https://nwilbert.github.io/pytest-given/latest/examples/</loc>
       </url>
       <url>
-        <loc>https://nwilbert.github.io/pytest-given/latest/changelog/</loc>
+        <loc>https://nwilbert.github.io/pytest-given/latest/getting-started/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/attachments/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/citations/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/domain-storytelling/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/glossary/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/parametrized/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/scenarios/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/guide/step-text/</loc>
       </url>
 </urlset>

@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.65">
+      <meta name="generator" content="zensical-0.0.69">
     
     
       
@@ -32,12 +32,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.40d3fdbb.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e15858d4.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.812a03bb.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b27955a4.min.css">
       
       
 
@@ -73,14 +73,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#changelog" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -946,10 +943,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#050-2026-10-18" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Unreleased
+        0.5.0 - 2026-10-18
       </span>
     </span>
   </a>
@@ -1031,8 +1028,10 @@
             <div class="md-content" data-md-component="content">
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
+
   
     <a href="https://github.com/nwilbert/pytest-given/edit/main/docs/site/changelog.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
@@ -1044,19 +1043,19 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="050-2026-10-18"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0">0.5.0</a> - 2026-10-18<a class="headerlink" href="#050-2026-10-18" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Markdown documents, such as design specs, can <a href="https://nwilbert.github.io/pytest-given/dev/guide/citations/">cite</a> scenarios, tags and stories as links into the published HTML report: <code>--given-report-url</code> or the <code>given_report_url</code> setting sets the report's URL and gives it buttons that copy a citation, <code>pytest-given citations check</code> and <code>pytest-given citations update</code> keep a document's citations in line with a JSON report, a scenario's narration in a <code>&lt;details markdown="1"&gt;</code> block included, <code>citations check --list</code> prints every report link with its findings, narrowed by <code>--covering</code> to the links that <a href="https://nwilbert.github.io/pytest-given/dev/guide/citations/#finding-the-citations-of-a-scenario">cite a scenario</a>, and the bundled <code>pytest-given-citing</code> skill writes citations and repairs the ones <code>citations update</code> cannot.</li>
+<li>Markdown documents, such as design specs, can <a href="https://nwilbert.github.io/pytest-given/0.5/guide/citations/">cite</a> scenarios, tags and stories as links into the published HTML report: <code>--given-report-url</code> or the <code>given_report_url</code> setting sets the report's URL and gives it buttons that copy a citation, <code>pytest-given citations check</code> and <code>pytest-given citations update</code> keep a document's citations in line with a JSON report, a scenario's narration in a <code>&lt;details markdown="1"&gt;</code> block included, <code>citations check --list</code> prints every report link with its findings, narrowed by <code>--covering</code> to the links that <a href="https://nwilbert.github.io/pytest-given/0.5/guide/citations/#finding-the-citations-of-a-scenario">cite a scenario</a>, and the bundled <code>pytest-given-citing</code> skill writes citations and repairs the ones <code>citations update</code> cannot.</li>
 <li>When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.</li>
-<li>A <a href="https://nwilbert.github.io/pytest-given/dev/guide/glossary/#term-refs">term ref</a> can show a noun's plural or a verb's -s form with <code>.s</code>: <code>room.s</code> reads <em>Rooms</em>, <code>room.l.s</code> reads <em>rooms</em>, and <code>room('suite').s</code> reads <em>suites</em>.</li>
-<li>Every <code>@scenario</code> test carries the registered <code>pytest_given</code> marker, so <code>pytest -m pytest_given</code> <a href="https://nwilbert.github.io/pytest-given/dev/configuration/pytest-options/#selecting-scenarios">runs the scenarios alone</a>, for example to measure their code coverage.</li>
+<li>A <a href="https://nwilbert.github.io/pytest-given/0.5/guide/glossary/#term-refs">term ref</a> can show a noun's plural or a verb's -s form with <code>.s</code>: <code>room.s</code> reads <em>Rooms</em>, <code>room.l.s</code> reads <em>rooms</em>, and <code>room('suite').s</code> reads <em>suites</em>.</li>
+<li>Every <code>@scenario</code> test carries the registered <code>pytest_given</code> marker, so <code>pytest -m pytest_given</code> <a href="https://nwilbert.github.io/pytest-given/0.5/configuration/pytest-options/#selecting-scenarios">runs the scenarios alone</a>, for example to measure their code coverage.</li>
 <li><code>pytest-given report --report-url</code> re-renders a saved report for a URL other than the one stored in it.</li>
 <li>The <code>given_md_lines = false</code> setting, or <code>--no-given-md-lines</code> (<code>--no-lines</code> on <code>pytest-given report</code>), leaves the line number out of each Markdown scenario anchor.</li>
 <li><code>--given-md-source</code> ends each scenario in the Markdown report with its test function, under its line numbers.</li>
-<li>The <a href="https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules">narration lint</a>'s <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
+<li>The <a href="https://nwilbert.github.io/pytest-given/0.5/configuration/narration-lint/#rules">narration lint</a>'s <code>conditional-check</code> rule (default <code>warn</code>) flags a <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>.</li>
 <li>Scenario titles and step text render <code>**bold**</code>, <code>*italic*</code> and <code>`code`</code> in the HTML report.</li>
-<li>A <a href="https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping">parameter table</a> starts with a <code>case ID</code> column when any case ID is custom, and each case in the JSON report's <code>parameters.cases[]</code> carries its node ID as <code>id</code> and a <code>custom_id</code> flag.</li>
+<li>A <a href="https://nwilbert.github.io/pytest-given/0.5/guide/parametrized/#grouping">parameter table</a> starts with a <code>case ID</code> column when any case ID is custom, and each case in the JSON report's <code>parameters.cases[]</code> carries its node ID as <code>id</code> and a <code>custom_id</code> flag.</li>
 <li>A Tags sidebar row in the HTML report has a copy button for the tag's link and citation.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
@@ -1517,7 +1516,7 @@
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -1529,10 +1528,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.c04ba553.min.js"></script>
+      <script src="../assets/javascripts/bundle.8b1c90bd.min.js"></script>
       
     
   </body>
