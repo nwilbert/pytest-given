@@ -27,7 +27,8 @@ The Markdown renderer can do the same with one flag, and the skill shrinks to a 
 
 With `--given-md-source`, each scenario's section ends with the test function's source, after the
 steps, the parameter table and any error block. The source is the function as written, decorators
-included, in a fenced `python` block, each line prefixed with its line number in the file:
+included, in a fenced `python` block, each line prefixed with its line number in the file. The
+fence outgrows any run of backticks in the source, as an attachment's does:
 
 ````markdown
 ## ✓ A booking that overlaps another is refused
@@ -58,8 +59,9 @@ included, in a fenced `python` block, each line prefixed with its line number in
 - **Line numbers always show**, whatever `given_md_lines` says. `given_md_lines = false` exists
   for committed Markdown reports, whose diffs shouldn't shift. Test source is a review aid, not
   something to commit, and a reviewer cites `file:line` from it.
-- **Source that can't be read doesn't fail the report.** When the file is missing or no function
-  holds the line, the section ends with a one-line note saying so in place of the code block.
+- **Source that can't be read doesn't fail the report.** When the file can't be read or parsed,
+  or no function holds the line, the section ends with a one-line note saying so in place of the
+  code block.
   Every other sink and scenario renders as usual.
 
 ### Where the source comes from
@@ -73,10 +75,11 @@ Instead, the renderer reads the test files from disk, as the HTML renderer's sou
 resolve against `SinkConfig.source_root`, the rootdir of a live run:
 
 - `SinkConfig` gains `md_source: bool`.
-- When it is set, the sink step reads each scenario's file from `source_root / source.relpath` and
-  extracts its function, and `render_md` takes the excerpts as a parameter. `render_md` stays a
-  pure function of its inputs, and reading files stays outside it, in a sibling of
-  `source_link.py`.
+- When it is set, the sink step reads each scenario's file from `source_root / source.relpath`,
+  once per file, and extracts its function, and `render_md` takes the excerpts as a parameter.
+  `render_md` stays a pure function of its inputs, and reading files stays outside it, in a
+  sibling of `source_link.py`. The sink step still writes nothing before every sink has
+  rendered.
 - The files are read at session finish, so the source is the code that just ran, unless a file
   changed during the run.
 
@@ -101,7 +104,8 @@ resolve against `SinkConfig.source_root`, the rootdir of a live run:
 - **Reviewing skill:** `pairs.md` is replaced by the flag. Layer 2 renders
   `pytest <test file> --given-md=<file> --given-md-source` once per test file and hands each file
   to a reviewer, which also splits the audit. The script, its "Run it from the rootdir" note and
-  its tests in `tests/unit/test_skills_scripts.py` go. The notes under "Reading the dump" that
+  `tests/unit/test_skills_scripts.py`, which tests only that script, go, and so does the
+  sentence in `AGENTS.md` that names it. The notes under "Reading the dump" that
   still hold move into the reviewing `SKILL.md`: step fixtures, module-level values, one file per
   reviewer.
 - **Navigating skill:** "When to go to the code" names the flag for reading a scenario's
