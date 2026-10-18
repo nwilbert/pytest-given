@@ -55,27 +55,34 @@ And a [narrated citation](#narrated-citations) of a scenario:
 
 Citations link to the HTML report you publish, but the `pytest-given citations` commands read a JSON report and run no tests. So a citation is only right if the two reports match: write both from the same run.
 
-1. **Run** the scenarios, writing both reports:
+1. **Configure** the public URL your HTML report will be served from, the `given_report_url` setting:
+
+    ```toml
+    [tool.pytest]
+    given_report_url = "https://docs.example.org/report.html"
+    ```
+
+2. **Run** the scenarios, writing both reports:
 
     ```bash
     pytest --given-json=report.json --given-html=report.html
     ```
 
-2. **Publish** `report.html` at the URL your citations link to, the `given_report_url` setting. How depends on your hosting; with a docs site, copy it in before the site build:
+3. **Publish** `report.html` at that URL. How depends on your hosting; with a docs site served from `https://docs.example.org/`, copy it in before the site build:
 
     ```bash
     cp report.html docs/report.html
     ```
 
-3. **Cite** scenarios, tags and stories by [copying a citation from the report](#copying-it-from-the-report), or by [writing one by hand](#writing-it-by-hand).
+4. **Cite** scenarios, tags and stories by [copying a citation from the report](#copying-it-from-the-report), or by [writing one by hand](#writing-it-by-hand).
 
-4. **Update** your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under `docs/` and the project's `README.md`:
+5. **Update** your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under `docs/` and the project's `README.md`:
 
     ```bash
     pytest-given citations update docs/ README.md --report report.json
     ```
 
-5. **Check** in CI that the documents match the report:
+6. **Check** in CI that the documents match the report:
 
     ```bash
     pytest-given citations check docs/ README.md --report report.json
