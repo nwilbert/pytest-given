@@ -1,0 +1,1388 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests.">
+      
+      
+      
+        <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/guide/citations/">
+      
+      
+        <link rel="prev" href="../../configuration/narration-lint/">
+      
+      
+        <link rel="next" href="../../ai-agents/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.svg">
+      <meta name="generator" content="zensical-0.0.69">
+    
+    
+      
+        <title>Citations - pytest-given</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.e15858d4.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.b27955a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
+    <div data-md-component="skip">
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="pytest-given" class="md-header__button md-logo" aria-label="pytest-given" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="pytest-given">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pytest-given
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Citations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun-moon" viewBox="0 0 24 24"><path d="M12 2v2M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715M16 12a4 4 0 0 0-4-4M19 5l-1.256 1.256M20 12h2"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/nwilbert/pytest-given" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  Getting started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+      
+    
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../scenarios/" class="md-tabs__link">
+          
+  
+  Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+      
+    
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../configuration/pytest-options/" class="md-tabs__link">
+          
+  
+  Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../examples/" class="md-tabs__link">
+        
+  
+  Examples
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../changelog/" class="md-tabs__link">
+        
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="pytest-given" class="md-nav__button md-logo" aria-label="pytest-given" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="pytest-given">
+
+    </a>
+    pytest-given
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/nwilbert/pytest-given" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Home
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Getting started
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Guide
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+            <label class="md-nav__title" for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Guide
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scenarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Scenarios & steps
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../step-text/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Step text & placeholders
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parametrized/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Parametrized scenarios
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attachments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Attachments
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain-storytelling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Domain Storytelling
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/narration-lint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Narration lint
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Citations
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Citations
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-fits-together" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        How it fits together
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glyphs-and-summaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Glyphs and summaries
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-report-link" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Adding a report link
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#narrated-citations" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Narrated citations
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#updating-citations" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Updating citations
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checking-in-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Checking in CI
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keeping-the-check-accurate" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Keeping the check accurate
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ai-agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Working with AI agents
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Reports
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_4">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Reports
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/pytest-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  pytest options
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/source-links/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Source links & tracebacks
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Standalone CLI
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Examples
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Changelog
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
+                
+                  
+
+  
+    <a href="https://github.com/nwilbert/pytest-given/edit/main/docs/site/guide/citations.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-file-pen" viewBox="0 0 24 24"><path d="M12.659 22H18a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v9.34"/><path d="M14 2v5a1 1 0 0 0 1 1h5M10.378 12.622a1 1 0 0 1 3 3.003L8.36 20.637a2 2 0 0 1-.854.506l-2.867.837a.5.5 0 0 1-.62-.62l.836-2.869a2 2 0 0 1 .506-.853z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="citations">Citations<a class="headerlink" href="#citations" title="Permanent link">&para;</a></h1>
+<p>A design spec, a README or any other Markdown document can link to a scenario, a tag or a story in the HTML report. pytest-given checks these links against the JSON report of a test run, so they keep pointing at something that exists, and keeps their text in line with what that run found.</p>
+<p>Such a link is a <strong>citation</strong> when it starts with a status glyph. pytest-given owns everything in it — the glyph, the link text and, for a tag or story, a summary of its scenarios — and <code>pytest-given citations update</code> keeps all of it current.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>✅ [<span class="nt">A renamed test keeps its citation</span>](<span class="na">https://example.org/report.html#scenario=tests/test_x.py::test_y</span>)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>🔵 [<span class="nt">Cancel a Booking</span>](<span class="na">https://example.org/report.html#view=stories&amp;story=cancel-a-booking</span>) (3 ✅ · 1 🔵)
+</code></pre></div>
+<p>Live, against this site's example reports:</p>
+<ul>
+<li>🔵 <a href="../../examples/hotel-booking.html#view=stories&amp;story=cancel-a-booking">Cancel a Booking</a> (2 ✅ · 1 🔵)</li>
+<li>✅ <a href="../../examples/self-report.html#tag=spec/citations">spec/citations</a> (10 ✅)</li>
+</ul>
+<p>A <a href="#narrated-citations">narrated citation</a> also folds in its scenario's narration:</p>
+<details>
+<summary>✅ <a href="../../examples/self-report.html#scenario=tests/unit/citations/test_check.py::test_update_writes_a_narrated_citations_body"><code>citations update</code> writes a narrated citation's body from the report</a></summary>
+<ul>
+<li><strong>given</strong> a «report» whose «scenario» has two steps</li>
+<li><strong>given</strong> a document holding a «narrated citation» of it, copied with an empty body<ul>
+<li>📎 document:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Paying:
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>&lt;details markdown="1"&gt;
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>&lt;summary&gt;✅ &lt;a href="https://example.org/report.html#scenario=t.py::test_pay"&gt;Pay by card&lt;/a&gt;&lt;/summary&gt;
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>&lt;/details&gt;
+</code></pre></div></li>
+</ul>
+</li>
+<li><strong>when</strong> the document is updated</li>
+<li><strong>then</strong> its body holds the scenario's narration between blank lines<ul>
+<li>📎 updated document:
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Paying:
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>&lt;details markdown="1"&gt;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>&lt;summary&gt;✅ &lt;a href="https://example.org/report.html#scenario=t.py::test_pay"&gt;Pay by card&lt;/a&gt;&lt;/summary&gt;
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>- **given** a card
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>- **then** it is paid
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>&lt;/details&gt;
+</code></pre></div></li>
+</ul>
+</li>
+<li><strong>then</strong> no finding remains</li>
+</ul>
+</details>
+<h2 id="how-it-fits-together">How it fits together<a class="headerlink" href="#how-it-fits-together" title="Permanent link">&para;</a></h2>
+<p>Citations link to the HTML report you publish, but the <code>pytest-given citations</code> commands read a JSON report and run no tests. So a citation is only right if the two reports match: write both from the same run.</p>
+<ol>
+<li>
+<p><strong>Configure</strong> the public URL your HTML report will be served from, the <code>given_report_url</code> setting:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[tool.pytest]</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">given_report_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"https://docs.example.org/report.html"</span>
+</code></pre></div>
+</li>
+<li>
+<p><strong>Run</strong> the scenarios, writing both reports:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pytest<span class="w"> </span>--given-json<span class="o">=</span>report.json<span class="w"> </span>--given-html<span class="o">=</span>report.html
+</code></pre></div>
+</li>
+<li>
+<p><strong>Publish</strong> <code>report.html</code> at that URL. How depends on your hosting; with a docs site served from <code>https://docs.example.org/</code>, copy it in before the site build:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cp<span class="w"> </span>report.html<span class="w"> </span>docs/report.html
+</code></pre></div>
+</li>
+<li>
+<p><strong>Cite</strong> scenarios, tags and stories by <a href="#copying-from-the-report">copying a citation from the report</a>, or by <a href="#writing-it-by-hand">writing one by hand</a>.</p>
+</li>
+<li>
+<p><strong>Update</strong> your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under <code>docs/</code> and the project's <code>README.md</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+</code></pre></div>
+</li>
+<li>
+<p><strong>Check</strong> in CI that the documents match the report:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+</code></pre></div>
+</li>
+</ol>
+<p>The run must include every scenario a document cites, because the commands can't tell a scenario the run left out from one that was deleted. Add the flags to your usual test run, or pass <code>-m pytest_given</code> to run only the scenarios. If you kept only the JSON report, <code>pytest-given report report.json -o report.html</code> renders the matching HTML from it.</p>
+<h2 id="glyphs-and-summaries">Glyphs and summaries<a class="headerlink" href="#glyphs-and-summaries" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Glyph</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅</td>
+<td>passed</td>
+</tr>
+<tr>
+<td>❌</td>
+<td>failed</td>
+</tr>
+<tr>
+<td>🟠</td>
+<td>skipped — or, for a story, no scenario yet</td>
+</tr>
+<tr>
+<td>🔵</td>
+<td>expected failure</td>
+</tr>
+<tr>
+<td>❓</td>
+<td>not in the report</td>
+</tr>
+</tbody>
+</table>
+<p>A tag or story reads <code>❌</code> if any of its scenarios failed, else <code>🔵</code> if any is an expected failure, else <code>✅</code> if any passed, else <code>🟠</code>.</p>
+<p>Its summary counts its scenarios per status, as in <code>(5 ✅ · 2 🔵)</code>, or reads <code>(no scenarios)</code> for a story nothing covers yet. A tag counts the scenarios below it too, as its link opens them: <code>spec</code> counts those tagged <code>spec/citations</code>. A scenario citation has no summary.</p>
+<h2 id="adding-a-report-link">Adding a report link<a class="headerlink" href="#adding-a-report-link" title="Permanent link">&para;</a></h2>
+<p>pytest-given reads four kinds of link into the report:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Looks like</th>
+<th>Kept current</th>
+<th>From the report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scenario citation</td>
+<td><code>✅ [title](…#scenario=…)</code></td>
+<td>glyph and link text</td>
+<td><strong>Copy citation</strong> on its scenario card</td>
+</tr>
+<tr>
+<td>Tag or story citation</td>
+<td><code>✅ [spec/citations](…#tag=spec/citations) (10 ✅)</code></td>
+<td>glyph, link text and summary</td>
+<td><strong>Copy citation</strong> on a story header or a Tags sidebar row</td>
+</tr>
+<tr>
+<td><a href="#narrated-citations">Narrated citation</a></td>
+<td>a <code>&lt;details&gt;</code> block around a scenario citation</td>
+<td>glyph, link text and narration</td>
+<td><strong>Copy narrated citation</strong> on its scenario card</td>
+</tr>
+<tr>
+<td>Plain report link</td>
+<td><code>[your words](…#scenario=…)</code></td>
+<td>its fragment</td>
+<td><strong>Copy link</strong> on the published report. On a local report, <strong>Copy citation</strong> and delete the glyph and any summary.</td>
+</tr>
+</tbody>
+</table>
+<p>A citation states what the report found, so <code>pytest-given citations check</code> fails when it is out of date or its target fails. A plain report link states only that its target exists, so its text is yours and it can sit inside your own sentence. You can also <a href="#writing-it-by-hand">write any of them by hand</a>.</p>
+<h3 id="copying-from-the-report">Copying from the report<a class="headerlink" href="#copying-from-the-report" title="Permanent link">&para;</a></h3>
+<p>The report offers the citation entries in the table only when <code>given_report_url</code> is set, as in <a href="#how-it-fits-together">step 1</a> above. To set it for one run instead, pass <code>--given-report-url=URL</code>. The URL is also stored in the JSON report, so <code>pytest-given report</code> re-renders the entries from it, and the <code>pytest-given citations</code> commands know which links point at the report.</p>
+<p>The copy button on a scenario card, story header or Tags sidebar row opens a menu with these entries. A citation links to <code>given_report_url</code>, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. <strong>Copy link</strong> copies the address you opened the report at. Without the setting, it is all the copy button offers.</p>
+<h3 id="writing-it-by-hand">Writing it by hand<a class="headerlink" href="#writing-it-by-hand" title="Permanent link">&para;</a></h3>
+<p>Write <code>?</code> as the glyph, leave the link text empty, and let <code>pytest-given citations update</code> fill in the rest:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>? [](https://docs.example.org/report.html#scenario=tests/test_x.py::test_y)
+</code></pre></div>
+<p>The part after <code>#</code> names the target:</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Fragment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scenario</td>
+<td><code>#scenario=&lt;node ID&gt;</code> — for a parametrized scenario, any case's node ID</td>
+</tr>
+<tr>
+<td>Tag</td>
+<td><code>#tag=&lt;tag&gt;</code></td>
+</tr>
+<tr>
+<td>Story</td>
+<td><code>#view=stories&amp;story=&lt;story id&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p>A plain report link takes the same URL, with no glyph and your own link text:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Rejecting [<span class="nt">divergent cases</span>](<span class="na">https://docs.example.org/report.html#scenario=tests/test_grouping.py::test_divergent_cases</span>) keeps the tree honest.
+</code></pre></div>
+<p>A link into the report can outlive what it names. When the report no longer has a scenario, tag, story or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.</p>
+<h2 id="narrated-citations">Narrated citations<a class="headerlink" href="#narrated-citations" title="Permanent link">&para;</a></h2>
+<p>A scenario citation written as a <code>&lt;details&gt;</code> block carries the scenario's narration, folded under it. A reader sees what the scenario does where it is cited, and your pull request's diff shows the behavior change. A <strong>narrated citation</strong> looks like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>&lt;details markdown="1"&gt;
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>&lt;summary&gt;✅ &lt;a href="https://example.org/report.html#scenario=tests/test_x.py::test_y"&gt;A renamed &lt;code&gt;test&lt;/code&gt; keeps its citation&lt;/a&gt;&lt;/summary&gt;
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">-</span><span class="w"> </span><span class="gs">**given**</span> a «citation» of <span class="sb">`test_y`</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">-</span><span class="w"> </span><span class="gs">**when**</span> the test is renamed
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">-</span><span class="w"> </span><span class="gs">**then**</span> <span class="sb">`citations update`</span> repoints it
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>&lt;/details&gt;
+</code></pre></div>
+<p>The citation is in the <code>&lt;summary&gt;</code>: the glyph, then an <code>&lt;a href="../…"&gt;</code> with the <a href="#writing-it-by-hand">report link</a> as its only attribute and the title as its link text, written as HTML. Everything below it, down to <code>&lt;/details&gt;</code> on a line of its own, is the body. The <code>&lt;summary&gt;</code> follows <code>&lt;details&gt;</code> with no blank line between, and the block needs a blank line above it: <code>check</code> reports a block that breaks either as mistyped, such as one that continues another narrated citation's <code>&lt;/details&gt;</code>. Only a scenario can be narrated, not a tag or a story.</p>
+<p>The body reads as the scenario's section of the Markdown report (<code>--given-md</code>), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.</p>
+<p>To add one, choose <strong>Copy narrated citation</strong> in the report's copy menu on a scenario card, paste it into your document, and run <code>pytest-given citations update</code>, which fills the empty body. From then on <code>update</code> rewrites the body to match the report, and <code>pytest-given citations check</code> fails when it differs, or when the opening tag lacks <code>markdown="1"</code>, which <code>update</code> adds, keeping any other attributes such as <code>open</code>.</p>
+<p>On a Python-Markdown site (MkDocs, Zensical), enable <code>md_in_html</code> and keep the block at the top level of the page, not inside a list item. GitHub renders it anywhere.</p>
+<h2 id="updating-citations">Updating citations<a class="headerlink" href="#updating-citations" title="Permanent link">&para;</a></h2>
+<p>Pass the documents or directories to update, and the JSON report from <a href="#how-it-fits-together">the run that wrote your HTML report</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+</code></pre></div>
+<p>It rewrites what the report now says:</p>
+<ul>
+<li>a citation's glyph, link text and summary;</li>
+<li>the fragment of any report link that uses a scenario's slug or a <code>[case]</code>, to its node ID;</li>
+<li>the node ID of a renamed test, when exactly one scenario still has the citation's title.</li>
+</ul>
+<p>It can't fix everything. These stay as citation findings for you to resolve, and the command exits 1:</p>
+<ul>
+<li><strong>A target that is no longer in the report.</strong> The citation's glyph becomes <code>❓</code>, its URL and text stay, and it recovers on its own once the target is back.</li>
+<li><strong>A cited target that fails.</strong> The document claims something that doesn't hold right now: fix the code, or change what the document says.</li>
+<li><strong>A summary after a scenario citation</strong>, which takes none.</li>
+<li><strong>A tag or story written as a narrated citation</strong>, which has no single narration.</li>
+</ul>
+<p>The bundled <a href="../../ai-agents/#agent-skills"><code>pytest-given-citing</code> skill</a> walks an agent through these.</p>
+<h2 id="checking-in-ci">Checking in CI<a class="headerlink" href="#checking-in-ci" title="Permanent link">&para;</a></h2>
+<p><code>pytest-given citations check</code> takes the same arguments, writes nothing, and exits 1 on any citation finding, including what <code>pytest-given citations update</code> would rewrite:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest<span class="w"> </span>--given-json<span class="o">=</span>report.json<span class="w"> </span>--given-html<span class="o">=</span>report.html
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># then publish report.html at given_report_url</span>
+</code></pre></div>
+<p>Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped <code>given_report_url</code>, the check exits 2 instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.</p>
+<p>If you commit the reports instead, write the JSON and HTML report together whenever you regenerate them, and let CI run only the check against the committed JSON. <a href="../../cli/#citations">Standalone CLI</a> lists the flags and exit codes.</p>
+<h2 id="keeping-the-check-accurate">Keeping the check accurate<a class="headerlink" href="#keeping-the-check-accurate" title="Permanent link">&para;</a></h2>
+<p>These habits keep <code>pytest-given citations check</code> from failing on a document nothing is wrong with, or from skipping a citation it should check:</p>
+<ul>
+<li><strong>Run pytest from the same rootdir.</strong> A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.</li>
+<li><strong>Use a plain report link for a scenario whose title contains a per-run value</strong>, such as a temporary path. Its citation's link text would be stale after every run, and so would a narrated citation's body when any step or attachment contains one.</li>
+<li><strong>Cite a tag that belongs to one piece of work</strong>, like <code>spec/&lt;slug&gt;</code>. A broad area tag's summary changes with every new scenario, so link it with a plain report link.</li>
+<li><strong>Leave the glyph and link unformatted.</strong> In <code>**✅** […](…)</code> or <code>✅ *[…](…)*</code> pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.</li>
+<li><strong>On a versioned docs site, link the report relatively</strong>, as in <code>../examples/report.html#tag=…</code>, so each version of a page opens its own version's report. A copied citation links <code>given_report_url</code>, so replace its URL up to the <code>#</code> with the relative path. Pass <code>--report-path</code>, where your docs build puts the report, so the commands recognize these links and keep them relative.</li>
+<li><strong>Keep a Markdown formatter off narrated citations.</strong> Prettier pads table columns and a two-space list-indent rule reindents nested steps, so <code>check</code> then reports the body stale. Wrap each block in ignore comments:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>&lt;!-- prettier-ignore-start --&gt;
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>&lt;details markdown="1"&gt;
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>&lt;summary&gt;…&lt;/summary&gt;
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>…
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>&lt;/details&gt;
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>&lt;!-- prettier-ignore-end --&gt;
+</code></pre></div>
+<h3 id="finding-the-citations-of-a-scenario">Finding the citations of a scenario<a class="headerlink" href="#finding-the-citations-of-a-scenario" title="Permanent link">&para;</a></h3>
+<p>To list the report links that may cite a scenario, pass its node ID to <code>--covering</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>--covering<span class="w"> </span>tests/test_checkout.py::test_pay_by_card
+</code></pre></div>
+<p>It prints each link's file, line, glyph and target:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>docs/specs/checkout.md:3: ✅ tag spec/checkout
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>citations: every report link is current
+</code></pre></div>
+<p>The list includes links to a tag or story whose summary counts the scenario. It also includes every link the check can't resolve, as one may cite the scenario under an old node ID. Run <code>citations update</code> first to repoint a renamed test, and the list is exact once the check is clean.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      
+    
+  </body>
+</html>
