@@ -1055,6 +1055,10 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The HTML report's Tags sidebar copy button is visually tidied.</li>
+</ul>
 <h2 id="050-2026-10-18"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0">0.5.0</a> - 2026-10-18<a class="headerlink" href="#050-2026-10-18" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1070,7 +1074,7 @@
 <li>A <a href="https://nwilbert.github.io/pytest-given/0.5/guide/parametrized/#grouping">parameter table</a> starts with a <code>case ID</code> column when any case ID is custom, and each case in the JSON report's <code>parameters.cases[]</code> carries its node ID as <code>id</code> and a <code>custom_id</code> flag.</li>
 <li>A Tags sidebar row in the HTML report has a copy button for the tag's link and citation.</li>
 </ul>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Markdown report indents nested steps and attachments by four spaces.</li>
 <li><strong>Breaking.</strong> <code>@scenario</code>'s first parameter is now <code>title</code>: replace <code>@scenario(name=...)</code> with <code>@scenario(title=...)</code>; a positional title is unaffected.</li>
@@ -1105,7 +1109,7 @@
 <li>Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.</li>
 <li>Scenarios that fail as expected (<code>xfail</code>) get their own <code>xfailed</code> status, with their reason, steps and error, in every report format.</li>
 </ul>
-<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The parameter table orders its columns the way the narration first shows them, and shows its status column only when the cases differ in status.</li>
 <li>The HTML report's Stories view shows each scenario as a full card that expands in place, and a tag clicked there opens the Scenarios view filtered by it.</li>
@@ -1144,7 +1148,7 @@
 <li>One scenario can document a flow that spans several stories: <code>@scenario(stories=[a, b])</code> lists it under each story in the Stories tab, and the Scenarios view's sentence filter names the story when a report has several.</li>
 <li>A sentence can be named (<code>sentence(..., name='checkout')</code>), so a pin can refer to it by name and survives reordering the story. The Stories timeline shows the name beside the sentence's coverage.</li>
 </ul>
-<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Breaking.</strong> Story vocabulary follows Domain Storytelling: a story is made of <em>sentences</em>, and <em>activity</em> is the verb kind. <code>activity()</code> is now <code>sentence()</code>, <code>path()</code> is now <code>clause()</code>, and <code>Glossary.verb()</code> is now <code>Glossary.activity()</code>. A file glossary's kind column says <code>activity</code> instead of <code>verb</code>, the report's <code>#activity-filter=</code> link parameter is now <code>#sentence-filter=</code>, and the HTML report says <em>Sentence</em> and <em>Activities</em> where it said <em>Activity</em> and <em>Verbs</em>.</li>
 <li><strong>Breaking.</strong> <code>@scenario(story=)</code> is now <code>stories=</code>.</li>
@@ -1198,7 +1202,7 @@
 <li>A selected activity in the Stories view offers <strong>Open in Scenarios</strong>, filtering
   the Scenarios view down to the scenarios covering it.</li>
 </ul>
-<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
+<h3 id="changed_4">Changed<a class="headerlink" href="#changed_4" title="Permanent link">&para;</a></h3>
 <h4 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>Breaking.</strong> <code>--given-lint</code> is a plain boolean flag: write <code>--given-lint</code> and
