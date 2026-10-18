@@ -25,7 +25,7 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 ```
 
 - By status: `select(.status == "failed")`. The message and frames are in `.error`. But a **parametrized scenario's `.error` is `null`**: its failures are in each case's `.parameters.cases[].error`. The reference's recipe reads both.
-- By term: `select([.. | .term_id? // empty] | index("waitlist"))`. The search is recursive, because steps nest and a term ref at any depth counts. Term ids are slugs: the name in lowercase, with every non-alphanumeric character replaced by `-` (`Late fee` becomes `late-fee`).
+- By term: `select([.. | .term_id? // empty] | index("waitlist"))`. The search is recursive, because steps nest and a term ref at any depth counts. Term ids are slugs: the name in lowercase, with each run of non-alphanumeric characters replaced by `-` (`Late fee` becomes `late-fee`).
 - By story: read the story's `scenario_ids` in `.coverage[]`. Don't use `.story_ids`, which misses a scenario that only pins the story. Story ids are slugs too.
 
 ## Traps
@@ -37,6 +37,6 @@ jq -r '.scenarios[] | select(.tags | index("validation"))
 
 ## When to go to the code
 
-Go to the code to change behavior, or to check one scenario's narration against its body. Jump straight to the scenario's `source.relpath` and `source.line` from the JSON, or to the ``file.py:line::test_name`` line under each Markdown heading (``file.py::test_name`` in a project that sets `given_md_lines = false`; add `--given-md-lines` for the line), instead of searching for it.
+Go to the code to change behavior, or to check one scenario's narration against its body. Jump straight to the scenario's `source.relpath` and `source.line` from the JSON, or to the ``file.py:line::test_name`` line under each Markdown heading, instead of searching for it. A project that sets `given_md_lines = false` shows only ``file.py::test_name``; add `--given-md-lines` for the line.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

@@ -45,7 +45,7 @@ Name a story in `stories=` only when a step can match or pin one of its sentence
 What this means when you write:
 
 - **Only step narration counts.** Term refs in the `@scenario` title never count. A scenario whose title names both actors stays uncovered until the same term refs appear in a `given`, `when` or `then`.
-- **Only the term counts, not its wording.** `room`, `room.l.s` and `room('Deluxe Suite')` are the same term ref, and so are `select` and `select.s`. The instance in the step above is narration, not a condition. To matching, two sentences that differ only by instance are the same sentence. Give one of them a term the other lacks, or pin (see below).
+- **Only the term counts, not its wording.** `room`, `room.l.s` and `room('Deluxe Suite')` are the same term ref, and so are `select` and `select.s`. The instance in the step above is narration, not a condition. For matching, two sentences that differ only by instance are the same sentence. Give one of them a term the other lacks, or pin (see below).
 - **Two sentences are covered together when one's terms are a subset of the other's.** The test is "sentence terms ⊆ step terms". So a step that covers `organizer · adds · guest · booking` also covers an `organizer · adds · guest` sentence, whatever that sentence meant. Narration can never tell the two apart. When two sentences turn out nested like this, you have three options: give the narrower one a term the wider one lacks (a different activity usually works), merge them, or accept the shared chip. A pin on the covering step also separates them, because it reaches only the sentences it names.
 - **Adding a term to a sentence makes it harder to cover.** Every covering step then has to carry that term too. So editing a story can silently uncover a scenario that used to cover it. A pinned step is not affected.
 
@@ -64,7 +64,7 @@ A step can also **pin** sentences: `given(text, pins=book_a_group_trip['confirm'
 
 **Pin by name, not by number.** Sentence numbers are positions. Inserting a sentence renumbers every sentence after it, and `the_story[5]` then silently points at a different sentence. Name each sentence you pin (`sentence(..., name='confirm')`) and pin `the_story['confirm']`.
 
-An uncovered sentence is a signal, not an error: no scenario narrates it yet. Story coverage is for finding the scenarios behind a part of the flow, not for measuring how completely the suite tests it; a covered sentence only means a step talks about it. For that, measure the code coverage of `pytest -m pytest_given`.
+An uncovered sentence is a signal, not an error: no scenario narrates it yet. Story coverage helps you find the scenarios behind a part of the flow. A covered sentence only means a step talks about it, not that the flow is tested. To measure that, use the code coverage of `pytest -m pytest_given`.
 
 ## When a story is worth writing
 

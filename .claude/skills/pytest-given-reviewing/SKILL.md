@@ -26,11 +26,11 @@ Lint the whole suite, not just the tests a change touches. A `given_lint_ignore`
 
 `warn` lint findings print in the summary, an `error` lint finding fails the run, and a clean run prints `narration lint (no findings)`. The rule catalog, and when an ignored `missing-phase` is justified, are in the authoring skill's [lint.md](../pytest-given-authoring/references/lint.md). A lint finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review.
 
-If Markdown documents cite the report, run `pytest-given citations check` too, and hand its citation findings to the `pytest-given-citing` skill. Where a cited scenario's title or behavior changed, run `citations update`, then `citations check --covering <node ID>`, and reread each sentence it lists, unresolved links included: the claim may no longer hold. A narrated citation's body is the behavior its document claims: read it against the prose around it.
+If Markdown documents cite the report, review the citations too: follow [references/citations.md](references/citations.md).
 
 ## 2. Semantic audit: step text against step body
 
-**Reviewing a change? Diff the Markdown report first.** Render `pytest <selection> --no-given-md-lines --given-md=<file>` at the base and at the head of the change, or use a committed report, and diff the two. For a saved JSON report, `pytest-given report <file> --format md --no-lines` does the same. The Markdown has no timestamps or commit SHAs, so the diff shows exactly how the described behavior changed, and it tells you what to audit. Read it in both directions. Changed narration means its body needs another check. Changed step *bodies* with no change in the narration are the typical sign of drift: the behavior changed, but the spec didn't.
+**Reviewing a change? Diff the Markdown report first.** Render `pytest <selection> --no-given-md-lines --given-md=<file>` at the base and at the head of the change, or use a committed report, and diff the two. For a saved JSON report, `pytest-given report <file> --format md --no-lines` does the same. The Markdown has no timestamps or commit SHAs, so the diff shows exactly how the described behavior changed, and it tells you what to audit. Compare it with the code diff in both directions. Changed narration means its body needs another check. A changed step *body* under unchanged narration is the typical sign of drift: the behavior changed, but the spec didn't.
 
 **No base to compare with**, as on a branch that adopts pytest-given? Audit the whole suite. Start with the scenarios whose bodies the branch changed, then go through the rest file by file. `--given-md` needs no project setup, so run it yourself even when CI only writes other formats.
 
@@ -41,16 +41,16 @@ Judge each scenario's step texts against their bodies with the rubric below. [re
 - **Values:** a quantity, date or amount in the text must match the body. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes. A literal copied from a constant goes stale when the constant changes; ask for the interpolation (`{BATCH_SIZE}`) instead.
 - **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title is a claim about every item it covers. Assertions on a sample overstate it, like "each slot becomes a term ref" backed by checks on two of three slots. Fix it by asserting the rest or by narrowing the text.
 - **Outcomes:** everything a `then` claims must be asserted in it. "…and recorded in the ledger" without such an assertion describes behavior nobody checked. So does a `then` that sets the value it asserts, or asserts a constant. The lint doesn't catch these, because the step contains an `assert`. Nor does it catch "never called" backed by a stub that raises: if the code catches the error, nothing checks the claim. Ask for recorded calls asserted in the `then`. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row.
-- **Raises:** the `then` of an expected raise may restate the message that `match=` pins in domain terms, but it must not claim more than the pin checks. Say the `then` promises that the message names the offender, offers a hint or includes a file:line. If the regex also passes without that detail, the pin is too weak, and the claim is unchecked even if the code delivers it today. For example, `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. A pin with alternatives (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch: sibling scenarios that narrate *different* refusals then all pass on one generic message. Pin what tells this refusal apart from the others.
+- **Raises:** the `then` of an expected raise may restate the pinned message in domain terms, but it must not claim more than `match=` checks. When the `then` promises that the message names the offender, offers a hint or includes a file:line, the regex must fail without that detail. Otherwise the claim is unchecked, even if the code delivers it today. For example, `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. A pin with alternatives (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch: sibling scenarios that narrate *different* refusals all pass on one generic message. Pin what tells this refusal apart from the others.
 - **Expected failures:** an `xfail` mark without `strict=True` (and without the `xfail_strict` ini) stays on a scenario quietly once the behavior works. A later regression then shows up as an expected failure. Ask for `strict=True`.
 - **Actions:** what the `when` names must be what its body calls. A common drift: the `when` text reads like more arrangement, but its body also performs the action, so the action appears nowhere in the report. Move the setup into a `given`.
 - **Vocabulary:** a term ref puts the ubiquitous language right next to the code it describes. So each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. `File glossary` over a `FileGlossary` call matches by design, since term names are natural language and the definition spells out the class. But `Reservation` over code that only knows `Booking` is language drift. A term ref must also *mean* its term. One chosen just for its word (`Kindless` in "not kindless inference") sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
 
-For a large suite, split the audit: one reviewer per test file, each returning findings. Use a subagent where the harness and the user allow it. A cheap, fast model is enough, because the rubric only needs the one file. Otherwise, audit file by file yourself. Check a sample of the subagents' findings yourself before you report them. Only layer 2 can be split by file. Title twins, rules narrated at the wrong layer, and reading the titles as a list all need the whole suite, so the coordinating reviewer does those.
+For a large suite, split layer 2 by test file: one reviewer per file, each returning findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only the one file. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
 
 ## 3. Completeness audit: what the report doesn't say
 
-Layers 1 and 2 ask whether the narration is true. Neither catches a report that is true line by line but leaves out what matters. When the question is "does this capture the essentials?", for example on a branch adopting pytest-given or for a feature's first scenarios, start from the implementation instead and follow [references/completeness.md](references/completeness.md).
+Layers 1 and 2 ask whether the narration is true. Neither catches a report that is true line by line but leaves out what matters. When the question is "does this capture the essentials?", for example on a branch adopting pytest-given or for a feature's first scenarios, start from the project's promises and its implementation instead, and follow [references/completeness.md](references/completeness.md).
 
 ## 4. Glossary, tags, stories
 
@@ -60,7 +60,7 @@ When the change touches the glossary, tags or stories, or the review audits them
 
 For each finding, give the file:line, what the narration claims, what the body actually does, and why it matters. Rank findings in this order, most serious first:
 
-1. **False claims:** overstatement found in layer 2, a glossary row stating behavior that no scenario demonstrates or that a scenario contradicts, a pin whose sentence the body never exercises. A false spec misleads every future reader.
+1. **False claims:** overstatement found in layer 2, a glossary row stating behavior that no scenario demonstrates or that a scenario contradicts, a pin whose sentence the body never exercises, a citation that contradicts its prose. A false spec misleads every future reader.
 2. **Language drift:** a drifting vocabulary does damage slowly instead of lying outright.
 3. **Behavior without a scenario:** silence understates, which misleads less than a false claim.
 4. **Glossary, tag and story hygiene** (layer 4).
@@ -73,7 +73,13 @@ jq -r '.scenarios | group_by(.source.relpath)[]
        | .[0].source.relpath, (.[] | "  " + .narration.text)' report.json
 ```
 
-Flag a title that can't be understood without its steps, that is a question or a phrase instead of a statement of the rule, that breaks sentence case (a code identifier at the start keeps its case), that ends in a period, that carries a status note, or that uses bold or italic nobody asked for. Also flag two titles that don't tell their scenarios apart. Such twins are often worded differently, so group the titles that state the same rule and compare their test files. The usual pair is a unit test and an integration test. Say which of the two should keep the scenario: the one whose body proves the title. The authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) has the rules under "Scenario titles".
+Flag a title that:
+
+- can't be understood without its steps,
+- is a question or a phrase, not a statement of the rule,
+- breaks sentence case (a code identifier at the start keeps its case), ends in a period, carries a status note, or uses bold or italic nobody asked for.
+
+Also flag twins: two titles that don't tell their scenarios apart. Twins are often worded differently, so group the titles that state the same rule and compare their test files. The usual pair is a unit test and an integration test. Say which one keeps the scenario: the one whose body proves the title. The authoring skill's [scenarios.md](../pytest-given-authoring/references/scenarios.md) has the rules under "Scenario titles".
 
 Parameter tables are part of the document too. Flag these:
 

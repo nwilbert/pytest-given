@@ -66,7 +66,7 @@ Every handle offers the same four forms, whether you captured it (`guest = g.act
 ## Naming terms
 
 - **Term names are natural language, not class names.** Name the concept the way a person would say it (`File glossary`, `Clause part`), and spell out the implementing class (`FileGlossary`, `ClausePart`) in the definition. A one-word term may match its class name only when the class name is already the natural word. A multi-word CamelCase name never is.
-- **Renaming or removing a term is a code change, not just a doc edit.** A term's slug is its lookup key: the name in lowercase, with every non-alphanumeric character replaced by `-`. So `File glossary` and `FileGlossary` are *different* keys, and a rename breaks every `g['Old name']` reference. Search for the old name, update the references, and re-render the reports. Rename the implementation too: if the code keeps the old name, you create exactly the language drift the vocabulary rule forbids (see [scenarios.md](scenarios.md)). Adding a term is always safe.
+- **Renaming or removing a term is a code change, not just a doc edit.** A term's slug is its lookup key: the name in lowercase, with each run of non-alphanumeric characters replaced by `-`. So `File glossary` and `FileGlossary` are *different* keys, and a rename breaks every `g['Old name']` reference. Search for the old name, update the references, and re-render the reports. Rename the implementation too: if the code keeps the old name, you create exactly the language drift the vocabulary rule forbids (see [scenarios.md](scenarios.md)). Adding a term is always safe.
 
 ## Kinds
 
