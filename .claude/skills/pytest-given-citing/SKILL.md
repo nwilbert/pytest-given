@@ -33,7 +33,11 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 
 ## Writing citations
 
-Cite only where the user asks. What a citing passage must get right is in the authoring skill's [references/citations.md](../pytest-given-authoring/references/citations.md).
+Citations are optional. A document such as a spec uses them to tie its prose to the code and to show the rules it describes at work. Cite only where the user asks. Where a passage cites:
+
+- The cited scenario must not contradict the prose that cites it.
+- The citations cover all the logic the passage describes: every case, not just one.
+- If the project has a glossary, the passage uses its terms consistently, as the cited scenarios do.
 
 You cannot click a copy button. Write a placeholder — a typed `?` glyph and empty text — and let `update` fill it:
 

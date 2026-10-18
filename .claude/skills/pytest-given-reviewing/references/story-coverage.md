@@ -1,13 +1,9 @@
 # Story coverage from the JSON report
 
-`--given-md` has no Stories section, and the Stories tab is HTML. So read coverage from the top-level `coverage[]` of the JSON report. It has one `{story_id, sentence_id, tracked, scenario_ids}` record per sentence, computed by the same code as the Stories tab. Don't recompute it from `steps[]`.
+`--given-md` has no Stories section, and the Stories tab is HTML. So read coverage from the top-level `coverage[]` of the JSON report, and don't recompute it from `steps[]`. Its shape and the query for uncovered sentences are in the navigating skill's [report-json.md](../../pytest-given-navigating/references/report-json.md). Review adds two queries:
 
 ```bash
 pytest <selection> --given-json=report.json
-
-# uncovered sentences: tracked, and no scenario covers them
-jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
-       | .story_id + "#" + (.sentence_id|tostring)' report.json
 
 # untracked sentences: the report can say nothing about them
 jq -r '.coverage[] | select(.tracked | not)

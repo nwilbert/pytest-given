@@ -1,6 +1,14 @@
 # Authoring stories
 
-A domain story models a flow as a sequence of sentences: who does what with what. It works at the actor level, above individual scenarios. The report's Stories tab shows each story as a timeline, with coverage for each sentence computed from the scenarios that implement it. (For the method behind the feature, see [domain-storytelling.md](domain-storytelling.md).)
+A domain story models a flow as a sequence of sentences: who does what with what. It works at the actor level, above individual scenarios. The report's Stories tab shows each story as a timeline, with coverage for each sentence computed from the scenarios that implement it.
+
+## The method
+
+The story grammar is a code version of **Domain Storytelling**, a collaborative modeling technique. Its home is [domainstorytelling.org](https://domainstorytelling.org/), with a quick-start guide, the book by Hofer and Schwentner, and the modeling tool Egon.io. Domain experts tell a **concrete case** ("Carol books rooms for her team", not "users can book rooms"). A moderator records it as numbered sentences, and the group reads it back to check it: a wrong sentence sounds wrong.
+
+- **Actors** are people, roles or systems that act, like an organizer or a booking system. **Work objects** are what actors work with and pass around, like a booking or a payment. **Activities** are what an actor does. These are the glossary's term kinds.
+- **Pick one granularity per story**, from a whole process to the detail of one step. `@scenario(stories=...)` can bind a coarse and a fine story of the same flow. Each story is matched separately: a step covers a sentence in each only if it names the terms of both.
+- **Say whether a story is as-is or to-be:** how work happens today, or how it should happen after the change.
 
 ## What a story is
 
@@ -49,16 +57,7 @@ What this means when you write:
 - **Two sentences are covered together when one's terms are a subset of the other's.** The test is "sentence terms ⊆ step terms". So a step that covers `organizer · adds · guest · booking` also covers an `organizer · adds · guest` sentence, whatever that sentence meant. Narration can never tell the two apart. When two sentences turn out nested like this, you have three options: give the narrower one a term the wider one lacks (a different activity usually works), merge them, or accept the shared chip. A pin on the covering step also separates them, because it reaches only the sentences it names.
 - **Adding a term to a sentence makes it harder to cover.** Every covering step then has to carry that term too. So editing a story can silently uncover a scenario that used to cover it. A pinned step is not affected.
 
-**Check coverage after you change a sentence or a covering step.** Read it from the JSON report instead of working out the rule yourself:
-
-```bash
-pytest <selection> --given-json=report.json
-# tracked sentences no scenario covers, as story#sentence
-jq -r '.coverage[] | select(.tracked and .scenario_ids == [])
-       | .story_id + "#" + (.sentence_id|tostring)' report.json
-```
-
-`coverage[]` holds `{story_id, sentence_id, tracked, scenario_ids}` for each sentence, computed by the same code as the Stories tab. `tracked: false` is the "not coverage-tracked" chip. The full shape is in the navigating skill's `references/report-json.md`.
+**Check coverage after you change a sentence or a covering step.** Read it from the `coverage[]` of `pytest <selection> --given-json=report.json` instead of working out the rule yourself. Its shape and the query for uncovered sentences are in the navigating skill's [report-json.md](../../pytest-given-navigating/references/report-json.md).
 
 A step can also **pin** sentences: `given(text, pins=book_a_group_trip['confirm'])` takes a sentence handle or a list of them. A pin *replaces* narration matching for that step. The step covers exactly the sentences the pin names, in any story. `pins=[]` turns matching off for a step. Only a pin can cover a sentence with fewer than two terms. Pin when the sentence is phrased at a higher level than the vocabulary the step narrates, such as a process-level sentence implemented by a technical test. Pin it on the one step that demonstrates it. `@scenario(pins=...)` pins the whole scenario: none of its steps is matched by narration, and the steps' own pins are added. `@scenario(pins=[])` keeps only the steps' pins.
 
