@@ -48,7 +48,7 @@ Choose the target as in a repair: read its steps and body against the prose that
 - Narrate a scenario where the document states the behavior it demonstrates: a reader sees its steps, and a diff shows them change. A one-line citation only points at it.
 - To narrate, write a `<details markdown="1">` block: a `<summary>` of the glyph and an `<a href="…#scenario=…">` with no other attribute, `</summary>` ending its line, a blank line, an empty body, `</details>` on its own line. `update` fills the body with the scenario's `--given-md` narration and rewrites it whole from then on, so write your own prose outside the block. On a Python-Markdown site, keep the block at the top level. Keep formatters off it (Prettier: `<!-- prettier-ignore-start -->` … `<!-- prettier-ignore-end -->`).
 - Write the glyph and link bare: `**✅**` or `*[…](…)*` no longer reads as a citation.
-- On a versioned docs site, link the report relatively (`../examples/report.html#tag=…`), so each version's page opens its own report.
+- On a versioned docs site, link the report relatively (`../examples/report.html#tag=…`), so each version's page opens its own report. A copied citation links `given_report_url`: replace its URL up to the `#`.
 - To cite a piece of work as a whole, give it one tag (`spec/<slug>`) and cite that. Don't cite a broad area tag, whose summary every later scenario changes: link it with a plain report link.
 - Link a scenario whose title interpolates a per-run value (a temporary path) with a plain report link: its citation would be stale on every run. Narrate one only if no step or attachment holds such a value either.
 

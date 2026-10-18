@@ -2,10 +2,7 @@
 
 A design spec, a README or any other Markdown document can link to a scenario, a tag or a story in the HTML report. pytest-given checks these links against the JSON report of a test run, so they keep pointing at something that exists, and keeps their text in line with what that run found.
 
-It reads two kinds of report link:
-
-- A **citation** starts with a status glyph: `✅ [title](…)`. pytest-given owns everything in it — the glyph, the link text and, for a tag or story, a summary of its scenarios — and `pytest-given citations update` keeps all of it current.
-- A **plain report link** has no glyph, so it can sit inside your own sentence: "rejecting [divergent cases](…#scenario=…) keeps the tree honest". pytest-given only checks that its target still exists and never touches its text.
+Such a link is a **citation** when it starts with a status glyph. pytest-given owns everything in it — the glyph, the link text and, for a tag or story, a summary of its scenarios — and `pytest-given citations update` keeps all of it current.
 
 ```markdown
 ✅ [A renamed test keeps its citation](https://example.org/report.html#scenario=tests/test_x.py::test_y)
@@ -17,7 +14,7 @@ Live, against this site's example reports:
 - 🔵 [Cancel a Booking](../examples/hotel-booking.html#view=stories&story=cancel-a-booking) (2 ✅ · 1 🔵)
 - ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (10 ✅)
 
-And a [narrated citation](#narrated-citations) of a scenario:
+A [narrated citation](#narrated-citations) also folds in its scenario's narration:
 
 <details markdown="1">
 <summary>✅ <a href="../examples/self-report.html#scenario=tests/unit/citations/test_check.py::test_update_writes_a_narrated_citations_body"><code>citations update</code> writes a narrated citation's body from the report</a></summary>
@@ -74,7 +71,7 @@ Citations link to the HTML report you publish, but the `pytest-given citations` 
     cp report.html docs/report.html
     ```
 
-4. **Cite** scenarios, tags and stories by [copying a citation from the report](#copying-it-from-the-report), or by [writing one by hand](#writing-it-by-hand).
+4. **Cite** scenarios, tags and stories by [copying a citation from the report](#copying-from-the-report), or by [writing one by hand](#writing-it-by-hand).
 
 5. **Update** your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under `docs/` and the project's `README.md`:
 
@@ -104,20 +101,24 @@ A tag or story reads `❌` if any of its scenarios failed, else `🔵` if any is
 
 Its summary counts its scenarios per status, as in `(5 ✅ · 2 🔵)`, or reads `(no scenarios)` for a story nothing covers yet. A tag counts the scenarios below it too, as its link opens them: `spec` counts those tagged `spec/citations`. A scenario citation has no summary.
 
-## Adding a citation
+## Adding a report link
 
-### Copying it from the report
+pytest-given reads four kinds of link into the report:
 
-Set `given_report_url` to the public URL your HTML report is served from, such as where CI publishes it:
+| Kind | Looks like | Kept current | From the report |
+|---|---|---|---|
+| Scenario citation | `✅ [title](…#scenario=…)` | glyph and link text | **Copy citation** on its scenario card |
+| Tag or story citation | `✅ [spec/citations](…#tag=spec/citations) (10 ✅)` | glyph, link text and summary | **Copy citation** on a story header, or the copy button on a Tags sidebar row |
+| [Narrated citation](#narrated-citations) | a `<details>` block around a scenario citation | glyph, link text and narration | **Copy narrated citation** on its scenario card |
+| Plain report link | `[your words](…#scenario=…)` | its fragment | **Copy link** on the published report. On a local report, **Copy citation** and delete the glyph and any summary. |
 
-```toml
-[tool.pytest]
-given_report_url = "https://docs.example.org/report.html"
-```
+A citation states what the report found, so `pytest-given citations check` fails when it is out of date or its target fails. A plain report link states only that its target exists, so its text is yours and it can sit inside your own sentence. You can also [write any of them by hand](#writing-it-by-hand).
 
-Then write the HTML report as usual, for example with `pytest --given-html`. To set the URL for one run instead, pass `--given-report-url=URL`. The URL is also stored in the JSON report, so `pytest-given report` re-renders the buttons from it, and the `pytest-given citations` commands know which links point at the report.
+### Copying from the report
 
-The copy button on a scenario card or story header then opens a menu: **Copy link**, **Copy citation** and, on a scenario card, **Copy narrated citation**, for a [narrated citation](#narrated-citations). On a Tags sidebar row, the button copies the tag's citation directly. A citation links to the configured URL rather than the address you opened the report at, so you can copy citations from a local report and still get links to the published one. Without the setting, the copy button copies a link, as **Copy link** does, and Tags sidebar rows have none.
+The report offers the citation entries in the table only when `given_report_url` is set, as in [step 1](#how-it-fits-together) above. To set it for one run instead, pass `--given-report-url=URL`. The URL is also stored in the JSON report, so `pytest-given report` re-renders the entries from it, and the `pytest-given citations` commands know which links point at the report.
+
+The copy button on a scenario card or story header opens a menu with these entries. On a Tags sidebar row, the button copies the tag's citation directly. A citation links to `given_report_url`, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. **Copy link** copies the address you opened the report at. Without the setting, it is all the copy button offers, and Tags sidebar rows have no button.
 
 ### Writing it by hand
 
@@ -134,6 +135,12 @@ The part after `#` names the target:
 | Scenario | `#scenario=<node ID>` — for a parametrized scenario, any case's node ID |
 | Tag | `#tag=<tag>` |
 | Story | `#view=stories&story=<story id>` |
+
+A plain report link takes the same URL, with no glyph and your own link text:
+
+```markdown
+Rejecting [divergent cases](https://docs.example.org/report.html#scenario=tests/test_grouping.py::test_divergent_cases) keeps the tree honest.
+```
 
 A link into the report can outlive what it names. When the report no longer has a scenario, tag, story or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.
 
@@ -205,7 +212,7 @@ These habits keep `pytest-given citations check` from failing on a document noth
 - **Use a plain report link for a scenario whose title contains a per-run value**, such as a temporary path. Its citation's link text would be stale after every run, and so would a narrated citation's body when any step or attachment contains one.
 - **Cite a tag that belongs to one piece of work**, like `spec/<slug>`. A broad area tag's summary changes with every new scenario, so link it with a plain report link.
 - **Leave the glyph and link unformatted.** In `**✅** […](…)` or `✅ *[…](…)*` pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.
-- **On a versioned docs site, link the report relatively**, as in `../examples/report.html#tag=…`, so each version of a page opens its own version's report. Pass `--report-path`, where your docs build puts the report, so the commands recognize these links.
+- **On a versioned docs site, link the report relatively**, as in `../examples/report.html#tag=…`, so each version of a page opens its own version's report. A copied citation links `given_report_url`, so replace its URL up to the `#` with the relative path. Pass `--report-path`, where your docs build puts the report, so the commands recognize these links and keep them relative.
 - **Keep a Markdown formatter off narrated citations.** Prettier pads table columns and a two-space list-indent rule reindents nested steps, so `check` then reports the body stale. Wrap each block in ignore comments:
 
 ```markdown
@@ -221,15 +228,16 @@ These habits keep `pytest-given citations check` from failing on a document noth
 <!-- prettier-ignore-end -->
 ```
 
-### Finding the citations of a changed scenario
+### Finding the citations of a scenario
 
-A citation states a scenario's title and status, and a narrated citation its narration too, but neither states what the test body does. When the body changes while the title, status and narration stay, every citation of it still reads current and the check stays silent, though the sentence citing it may no longer hold. List the report links that may cite it, and reread each sentence:
+To list the report links that may cite a scenario, pass its node ID to `--covering`:
 
 ```bash
-pytest-given citations update docs/ README.md --report report.json
 pytest-given citations check docs/ README.md --report report.json \
     --covering tests/test_checkout.py::test_pay_by_card
 ```
+
+It prints each link's file, line, glyph and target:
 
 ```
 docs/specs/checkout.md:3: ✅ tag spec/checkout
@@ -237,4 +245,4 @@ docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
 citations: every report link is current
 ```
 
-`--covering` keeps a report link to the scenario, and one to a tag or story whose summary counts it, a tag through its prefixes too. It also keeps every link it cannot resolve: one whose target is not in the report may be the scenario under a node ID it no longer has, and a mistyped citation may cite anything. Running `citations update` first repoints a renamed test whose title one scenario still has, so once the check is clean the list is exact. `--list` alone lists every report link, each with its findings under it.
+The list includes links to a tag or story whose summary counts the scenario. It also includes every link the check can't resolve, as one may cite the scenario under an old node ID. Run `citations update` first to repoint a renamed test, and the list is exact once the check is clean.

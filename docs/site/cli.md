@@ -38,7 +38,7 @@ A directory is searched recursively for `*.md`. Neither command runs tests: both
 `check` takes two more options, which leave its summary and exit code as they are:
 
 - `--list` prints every report link on a line of its own, `path:line: glyph kind key` (`link` in place of the glyph for a plain report link), with its citation findings indented under it.
-- `--covering NODE_ID` narrows that list to the links that [may cite the scenario](guide/citations.md#finding-the-citations-of-a-changed-scenario), and implies `--list`. Repeat it for several scenarios. A test function's node ID covers each of its scenarios, one per case under `group_parametrized=False`. It exits 2 when the report holds no scenario of that node ID.
+- `--covering NODE_ID` narrows that list to the links that [may cite the scenario](guide/citations.md#finding-the-citations-of-a-scenario), and implies `--list`. Repeat it for several scenarios. A test function's node ID covers each of its scenarios, one per case under `group_parametrized=False`. It exits 2 when the report holds no scenario of that node ID.
 
 The same command also installs the agent skills with `pytest-given skills install`; see [Agent skills](ai-agents.md#agent-skills).
 
