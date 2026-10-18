@@ -34,7 +34,7 @@ If Markdown documents cite the report, review the citations too: follow [referen
 
 **No base to compare with**, as on a branch that adopts pytest-given? Audit the whole suite. Start with the scenarios whose bodies the branch changed, then go through the rest file by file. `--given-md` needs no project setup, so run it yourself even when CI only writes other formats.
 
-Judge each scenario's step texts against their bodies with the rubric below. [references/pairs.md](references/pairs.md) prints them side by side, one file per test file. The rubric is complete on its own, so a reviewer you hand it to needs nothing else.
+Judge each scenario's step texts against their bodies with the rubric below. `pytest <test file> --given-md=<file> --given-md-source` prints them side by side: each scenario's narration ends with its test function, decorators included, under its line numbers, so you cite `file:line` straight from it. Only the test function is shown. A step with no `with` in the function was recorded by a step fixture, and a constant or helper the body uses is elsewhere in the file, so open the file before you judge a value. The rubric is complete on its own, so a reviewer you hand it to needs nothing else.
 
 **Step text may abstract, but it must never overstate.**
 
@@ -46,7 +46,7 @@ Judge each scenario's step texts against their bodies with the rubric below. [re
 - **Actions:** what the `when` names must be what its body calls. A common drift: the `when` text reads like more arrangement, but its body also performs the action, so the action appears nowhere in the report. Move the setup into a `given`.
 - **Vocabulary:** a term ref puts the ubiquitous language right next to the code it describes. So each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. `File glossary` over a `FileGlossary` call matches by design, since term names are natural language and the definition spells out the class. But `Reservation` over code that only knows `Booking` is language drift. A term ref must also *mean* its term. One chosen just for its word (`Kindless` in "not kindless inference") sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
 
-For a large suite, split layer 2 by test file: one reviewer per file, each returning findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only the one file. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
+For a large suite, split layer 2 by test file: hand each reviewer one test file's Markdown and the rubric, nothing else, and have it return findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only the one file. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
 
 ## 3. Completeness audit: what the report doesn't say
 

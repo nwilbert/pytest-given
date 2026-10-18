@@ -35,6 +35,6 @@ The reference has recipes by status, words, term, tag and story. Use them rather
 
 ## When to go to the code
 
-Go to the code to change behavior, or to check one scenario's narration against its body. Jump straight to the scenario's `source.relpath` and `source.line` from the JSON, or to the ``file.py:line::test_name`` line under each Markdown heading, instead of searching for it. A project that sets `given_md_lines = false` shows only ``file.py::test_name``; add `--given-md-lines` for the line.
+Go to the code to change behavior, or to check one scenario's narration against its body. Jump straight to the scenario's `source.relpath` and `source.line` from the JSON, or to the ``file.py:line::test_name`` line under each Markdown heading, instead of searching for it. A project that sets `given_md_lines = false` shows only ``file.py::test_name``; add `--given-md-lines` for the line. To read a scenario's narration beside its body, add `--given-md-source`: each scenario then ends with its test function.
 
 *These files are installed by `pytest-given skills install` and overwritten on reinstall — don't edit them in place.*

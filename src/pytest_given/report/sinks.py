@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 from ..model import PytestGivenError, ReportData, ReportUrl, report_from_dict
+from .function_source import read_function_sources
 from .html_renderer import render_html_string
 from .md_renderer import render_md
 from .story_view import build_coverage_records
@@ -47,6 +48,8 @@ class SinkConfig:
     is the rootdir a live run's source paths are relative to; None for a saved
     report, which does not carry it. `report_url` replaces the report's own in
     the HTML, for a saved report re-rendered to be served elsewhere.
+    `md_source` reads the test functions from under `source_root`, so only a
+    live run sets it.
     """
 
     json_path: Path | None = None
@@ -54,6 +57,7 @@ class SinkConfig:
     md_path: Path | None = None
     md_to_stdout: bool = False
     md_lines: bool = True
+    md_source: bool = False
     source_link_template: str | None = None
     source_root: Path | None = None
     theme: Theme = DEFAULT_THEME
@@ -140,7 +144,7 @@ def emit_sinks(
 def render_sinks(
     report_dict: dict[str, Any], config: SinkConfig, source: str | None = None
 ) -> RenderedSinks:
-    """Render the configured sinks to text. Nothing here touches the filesystem.
+    """Render the configured sinks to text. Nothing here writes to the filesystem.
 
     Takes only the serialized report and deserializes it here, so the JSON sink
     writes the dict itself while the other two render from a copy that has been
@@ -170,7 +174,11 @@ def render_sinks(
         )
     md_stdout: str | None = None
     if config.md_path is not None or config.md_to_stdout:
-        md = render_md(report, with_lines=config.md_lines)
+        sources = None
+        if config.md_source:
+            assert config.source_root is not None, 'md_source needs a live run'
+            sources = read_function_sources(report.scenarios, config.source_root)
+        md = render_md(report, with_lines=config.md_lines, sources=sources)
         if config.md_to_stdout:
             md_stdout = md
         if config.md_path is not None:

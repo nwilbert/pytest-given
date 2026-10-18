@@ -2,6 +2,7 @@
 
 import re
 from collections import Counter
+from collections.abc import Mapping
 from pathlib import Path
 
 from ..markdown import LINE_BREAK
@@ -11,6 +12,7 @@ from ..model import (
     CellValue,
     ErrorInfo,
     Narration,
+    NodeId,
     ParameterCase,
     ParameterColumn,
     ParameterTable,
@@ -22,15 +24,27 @@ from ..model import (
     node_base,
     plural,
 )
+from .function_source import FunctionSource, SourceExcerpt
 from .markdown_writer import code_span_markdown, literal_markdown, narration_markdown
 from .text import STATUS_GLYPH, STATUS_LABEL
 
 
-def render_md(report: ReportData, *, with_lines: bool = True) -> str:
-    """Render the report model to an agent-facing Markdown string."""
+def render_md(
+    report: ReportData,
+    *,
+    with_lines: bool = True,
+    sources: Mapping[NodeId, SourceExcerpt] | None = None,
+) -> str:
+    """Render the report model to an agent-facing Markdown string.
+
+    `sources`, when given, holds every scenario's test function, which then
+    ends its section.
+    """
     name = report.metadata.title or report.metadata.project
     blocks = [_heading(1, f'pytest-given — {_text(name)}')]
-    blocks.extend(_scenario_md(scenario, with_lines) for scenario in report.scenarios)
+    blocks.extend(
+        _scenario_md(scenario, with_lines, sources) for scenario in report.scenarios
+    )
     return '\n\n'.join(blocks) + '\n'
 
 
@@ -40,7 +54,11 @@ def narration_body_md(scenario: Scenario) -> str:
     return '\n'.join(_body_lines(scenario, with_errors=False))
 
 
-def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
+def _scenario_md(
+    scenario: Scenario,
+    with_lines: bool,
+    sources: Mapping[NodeId, SourceExcerpt] | None,
+) -> str:
     glyph = STATUS_GLYPH[scenario.status]
     suffix = ''
     # A grouped scenario counts its cases instead: an all-skipped group has
@@ -68,7 +86,24 @@ def _scenario_md(scenario: Scenario, with_lines: bool) -> str:
     if scenario.error is not None:
         lines.append('')
         lines.extend(_error_lines(scenario.error))
+    if sources is not None:
+        lines.append('')
+        lines.extend(_source_lines(sources[scenario.id]))
     return '\n'.join(lines)
+
+
+def _source_lines(excerpt: SourceExcerpt) -> list[str]:
+    """The test function, each line under its number in the file. The numbers
+    show whatever `with_lines` says: a reviewer cites `file:line` from them."""
+    if not isinstance(excerpt, FunctionSource):
+        return [f'*Test source not shown: {_text(excerpt.reason)}.*']
+    last = excerpt.first_line + len(excerpt.lines) - 1
+    width = len(str(last))
+    numbered = [
+        f'{number:>{width}}  {line}' if line else f'{number:>{width}}'
+        for number, line in enumerate(excerpt.lines, start=excerpt.first_line)
+    ]
+    return _fenced(numbered, info='python')
 
 
 def _body_lines(scenario: Scenario, *, with_errors: bool) -> list[str]:
@@ -194,7 +229,7 @@ def _case_attachment_blocks(
             continue
         lines.append('')
         lines.append(f'- **{key}** — {_text(column.name)}:')
-        lines.extend(_indented(_fenced(value.content), _INDENT))
+        lines.extend(_indented(_fenced(value.content.splitlines()), _INDENT))
     return lines
 
 
@@ -235,11 +270,13 @@ def _fits_inline(content: str) -> bool:
     )
 
 
-def _fenced(content: str) -> list[str]:
-    """`content` wrapped in a fence long enough to survive its own backticks."""
-    longest_run = max((len(run) for run in re.findall(r'`+', content)), default=0)
+def _fenced(lines: list[str], info: str = '') -> list[str]:
+    """`lines` wrapped in a fence long enough to survive their own backticks."""
+    longest_run = max(
+        (len(run) for line in lines for run in re.findall(r'`+', line)), default=0
+    )
     fence = '`' * max(3, longest_run + 1)
-    return [fence, *content.splitlines(), fence]
+    return [fence + info, *lines, fence]
 
 
 def _indented(lines: list[str], indent: str) -> list[str]:
@@ -284,7 +321,7 @@ def _attachment_lines(attachment: StepAttachment, indent: str) -> list[str]:
     body_indent = item_indent + _INDENT
     return [
         f'{item_indent}- 📎 {label}:',
-        *_indented(_fenced(attachment.content), body_indent),
+        *_indented(_fenced(attachment.content.splitlines()), body_indent),
     ]
 
 

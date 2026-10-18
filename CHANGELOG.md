@@ -25,6 +25,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given report --report-url` re-renders a saved report for a URL other than the one stored in it.
 - Each case in the JSON report's `parameters.cases[]` carries its node id as `id`.
 - The `given_md_lines = false` setting, or `--no-given-md-lines` (`--no-lines` on `pytest-given report`), leaves the line number out of each Markdown scenario anchor.
+- `--given-md-source` ends each scenario in the Markdown report with its test function, under its line numbers, and the bundled `pytest-given-reviewing` skill uses it in place of its pairing script.
 - The [narration lint](https://nwilbert.github.io/pytest-given/dev/configuration/narration-lint/#rules)'s `conditional-check` rule (default `warn`) flags a `then` whose checks all sit under an `if`, a loop, a `match` or an `except`.
 - Scenario titles and step text render `**bold**`, `*italic*` and `` `code` `` in the HTML report.
 - A [parameter table](https://nwilbert.github.io/pytest-given/dev/guide/parametrized/#grouping) starts with a `case ID` column when any case ID is custom, flagged by each case's `custom_id` in the JSON report.

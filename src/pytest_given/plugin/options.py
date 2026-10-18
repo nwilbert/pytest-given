@@ -75,6 +75,15 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         ),
     )
     group.addoption(
+        '--given-md-source',
+        action='store_true',
+        default=False,
+        help=(
+            "End each Markdown scenario with its test function's source, under "
+            'its line numbers, for reviewing step text against step body.'
+        ),
+    )
+    group.addoption(
         '--given-all-frames',
         action='store_true',
         default=False,
@@ -283,6 +292,7 @@ def _resolve_sinks(
             md_path=Path(md_opt) if md_opt is not None and md_opt != '-' else None,
             md_to_stdout=md_opt == '-',
             md_lines=md_lines,
+            md_source=bool(config.getoption('given_md_source')),
             source_link_template=source_link_template,
             source_root=config.rootpath,
             theme=theme,

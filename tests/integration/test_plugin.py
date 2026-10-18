@@ -3419,6 +3419,39 @@ def test_given_md_lines_flag_wins_over_the_ini(
     assert anchor_end in md_path.read_text(encoding='utf-8')
 
 
+@scenario(
+    t'`--given-md-source` ends each {pg["Scenario"].l} of the Markdown '
+    t'{pg["Report"].l} with its test function, under its line numbers',
+    tags=['versions/0.5.0'],
+)
+def test_given_md_source_shows_the_test_function(pytester: pytest.Pytester) -> None:
+    with given(t'a suite with one {pg["Scenario"].l}'):
+        pytester.makepyfile(_SUITE)
+        md_path = pytester.path / 'out.md'
+    with when('the suite runs with --given-md and --given-md-source'):
+        pytester.runpytest(f'--given-md={md_path}', '--given-md-source')
+    with then(
+        t'the {pg["Narration"].l} is followed by the test function, decorator '
+        t'included, each line numbered as in the file'
+    ):
+        md = md_path.read_text(encoding='utf-8')
+        attach('Rendered Markdown', md)
+        assert md.endswith(
+            '- **then** I get coffee\n'
+            '\n'
+            '```python\n'
+            " 4  @scenario('Buy coffee')\n"
+            ' 5  def test_buy():\n'
+            " 6      with given('a machine'):\n"
+            ' 7          pass\n'
+            " 8      with when('I insert money'):\n"
+            ' 9          pass\n'
+            "10      with then('I get coffee'):\n"
+            '11          assert True\n'
+            '```\n'
+        )
+
+
 @scenario(t'`--given-html` alone writes no JSON {pg["Report"].l}')
 def test_given_html_alone_writes_no_json(pytester: pytest.Pytester) -> None:
     with given(t'a suite with one {pg["Scenario"].l}'):

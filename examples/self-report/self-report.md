@@ -726,6 +726,35 @@
 - **when** the suite runs with --given-md
 - **then** the anchor is the node ID, without a line number
 
+## ✓ `--given-md-source` ends each «scenario» of the Markdown «report» with its test function, under its line numbers
+`tests/integration/test_plugin.py::test_given_md_source_shows_the_test_function` · versions/0.5.0
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with --given-md and --given-md-source
+- **then** the «narration» is followed by the test function, decorator included, each line numbered as in the file
+    - 📎 Rendered Markdown:
+        ````
+        # pytest-given — test_given_md_source_shows_the_test_function0
+
+        ## ✓ Buy coffee
+        `test_given_md_source_shows_the_test_function.py:4::test_buy`
+
+        - **given** a machine
+        - **when** I insert money
+        - **then** I get coffee
+
+        ```python
+         4  @scenario('Buy coffee')
+         5  def test_buy():
+         6      with given('a machine'):
+         7          pass
+         8      with when('I insert money'):
+         9          pass
+        10      with then('I get coffee'):
+        11          assert True
+        ```
+        ````
+
 ## ✓ `--given-html` alone writes no JSON «report»
 `tests/integration/test_plugin.py::test_given_html_alone_writes_no_json`
 

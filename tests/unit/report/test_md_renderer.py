@@ -1,4 +1,5 @@
 import html
+from dataclasses import replace
 
 import pytest
 from markdown_it import MarkdownIt
@@ -26,6 +27,7 @@ from pytest_given.model import (
     TracebackFrame,
     report_to_dict,
 )
+from pytest_given.report.function_source import FunctionSource, UnreadableSource
 from pytest_given.report.md_renderer import narration_body_md, render_md
 from tests.ubiquitous_language import pg
 
@@ -1273,3 +1275,67 @@ def test_the_narration_body_leaves_out_heading_subtitle_and_errors() -> None:
         assert not body.endswith('\n')
     with then(t'the full Markdown {pg["Report"].l} contains it verbatim'):
         assert body in render_md(_report(scn))
+
+
+def _sourced_scenario() -> Scenario:
+    return Scenario(
+        id=NodeId('tests/t.py::test_buy'),
+        narration=Narration(text='Buy coffee'),
+        module='tests/t.py',
+        status='failed',
+        source=SourceLocation(relpath='tests/t.py', line=9),
+        steps=[Step(phase='given', narration=Narration(text='a machine'))],
+        error=ErrorInfo(message='assert 0 == 1'),
+    )
+
+
+_BUY_SOURCE = FunctionSource(
+    first_line=9,
+    lines=(
+        "@scenario('Buy coffee')",
+        'def test_buy():',
+        "    with given('a machine'):",
+        '',
+        '        assert 0 == 1',
+    ),
+)
+
+
+def test_the_test_source_ends_the_section_with_line_numbers() -> None:
+    scn = _sourced_scenario()
+    lines = render_md(_report(scn), sources={scn.id: _BUY_SOURCE}).splitlines()
+    fence = lines.index('```python')
+    assert lines[fence - 2] == '> assert 0 == 1'
+    assert lines[fence + 1 : fence + 7] == [
+        " 9  @scenario('Buy coffee')",
+        '10  def test_buy():',
+        "11      with given('a machine'):",
+        '12',
+        '13          assert 0 == 1',
+        '```',
+    ]
+
+
+def test_the_test_source_shows_its_line_numbers_without_anchor_lines() -> None:
+    scn = _sourced_scenario()
+    md = render_md(_report(scn), with_lines=False, sources={scn.id: _BUY_SOURCE})
+    assert '`tests/t.py::test_buy`' in md
+    assert '10  def test_buy():' in md
+
+
+def test_unreadable_test_source_ends_the_section_with_a_note() -> None:
+    scn = replace(_sourced_scenario(), error=None, status='passed')
+    md = render_md(
+        _report(scn),
+        sources={scn.id: UnreadableSource(reason='tests/t_x.py could not be read')},
+    )
+    assert md.endswith(
+        '- **given** a machine\n\n'
+        '*Test source not shown: tests/t_x.py could not be read.*\n'
+    )
+
+
+def test_without_sources_no_test_source_is_rendered() -> None:
+    md = render_md(_report(_sourced_scenario()))
+    assert '```python' not in md
+    assert 'Test source' not in md
