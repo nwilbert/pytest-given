@@ -24,7 +24,10 @@ mistake shipped to PyPI is permanent.
       release's `/<major.minor>/`, so they keep showing the pages as released.
 - [ ] Update the link references at the bottom of `CHANGELOG.md`: point
       `[Unreleased]` at the new tag, and add a line for the new version.
-- [ ] Land it on `main` and wait for CI to go green. Releases can only be
+- [ ] Run `uv run nox -s examples self_report`. The reports record the plugin
+      version, and the release's docs publish them as its example reports.
+- [ ] Commit the bump, the changelog and the regenerated reports as one commit,
+      land it on `main`, and wait for CI to go green. Releases can only be
       dispatched from `main`.
 - [ ] Actions → **Compat** → Run workflow on `main`, and wait for both jobs to
       go green. It runs `nox -s compat` — the suite on every supported Python,
