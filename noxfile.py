@@ -515,6 +515,20 @@ def _regenerate_examples(session: nox.Session) -> None:
     )
 
 
+@nox.session
+def bdd_example(session: nox.Session) -> None:
+    """Run the pytest-bdd contrast, which has no report. A session of its own, so
+    pytest-bdd's plugin joins no other run."""
+    _sync(session, 'bdd', include_project=True)
+    session.run(
+        'pytest',
+        'examples/pytest-bdd',
+        '--gherkin-terminal-reporter',
+        '-vv',
+        '--no-header',
+    )
+
+
 _DOCS_SITE = Path('docs/site')
 _REPORT_TEMPLATES = Path('src/pytest_given/report/templates')
 _REPORT_FONTS = _REPORT_TEMPLATES / 'fonts'

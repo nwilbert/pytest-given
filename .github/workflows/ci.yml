@@ -33,6 +33,7 @@ jobs:
       - run: uv tool install --python 3.14 nox
       - run: nox -s test
       - run: nox -s coverage
+      - run: nox -s bdd_example
 
   # The suite imports from `src/`, so it cannot see a packaging regression. This
   # builds the artifacts and drives the installed wheel from outside the project,
