@@ -44,7 +44,7 @@ pytest --given-html
 
 This produces `given-report/report.html` — one file you can open directly in a browser.
 
-The same scenario opens the Coffeeshop example's report:
+The Coffeeshop example's report shows this same scenario:
 
 ✅ [Buying a coffee takes one from the machine](examples/coffeeshop.html#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee)
 

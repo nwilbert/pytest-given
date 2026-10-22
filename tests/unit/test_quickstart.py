@@ -11,12 +11,17 @@ _PYTHON_BLOCK = re.compile(r'^```python\n(.*?)^```', re.MULTILINE | re.DOTALL)
 
 # The quick start cites the coffeeshop scenario as its rendered report, so the
 # snippet must be that scenario's code.
-@pytest.mark.parametrize('document', ['README.md', 'docs/site/getting-started.md'])
+@pytest.mark.parametrize(
+    'document', ['README.md', 'docs/site/getting-started.md', 'docs/site/bdd.md']
+)
 def test_quick_start_scenario_is_the_coffeeshop_one(document: str) -> None:
     text = (_ROOT / document).read_text(encoding='utf-8')
-    snippet = _PYTHON_BLOCK.search(text)
-    assert snippet is not None
-    assert _scenario_dump(snippet.group(1)) == _scenario_dump(
+    [snippet] = [
+        block
+        for block in _PYTHON_BLOCK.findall(text)
+        if 'def test_buy_coffee(' in block
+    ]
+    assert _scenario_dump(snippet) == _scenario_dump(
         _EXAMPLE.read_text(encoding='utf-8')
     )
 

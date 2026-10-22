@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- A BDD page on the documentation site compares pytest-given with Gherkin tools such as pytest-bdd and behave.
+
 ### Changed
 
 - The HTML report's Tags sidebar copy button is visually tidied.

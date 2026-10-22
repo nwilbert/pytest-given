@@ -1,46 +1,20 @@
-# The README scenario in pytest-bdd
+# Behavior-driven development
 
-The quick start's coffee scenario, written for [pytest-bdd](https://pytest-bdd.readthedocs.io/) to contrast the two approaches. It is not a pytest-given example: this folder narrates nothing and has no report.
+Behavior-driven development (BDD) tools such as [Cucumber](https://cucumber.io/), [behave](https://behave.readthedocs.io/) and [pytest-bdd](https://pytest-bdd.readthedocs.io/) describe behavior in [Gherkin](https://cucumber.io/docs/gherkin/), a plain-language format of `Given`, `When` and `Then` lines kept in `.feature` files. This page writes the [quick start](getting-started.md)'s coffee scenario for pytest-bdd and compares the two approaches, how they group scenarios, and their reports.
 
-pytest-bdd starts from a Gherkin `.feature` file, [`coffee.feature`](coffee.feature):
+pytest-bdd starts from a Gherkin `.feature` file, [`coffee.feature`](https://github.com/nwilbert/pytest-given/blob/main/examples/pytest-bdd/coffee.feature):
 
 ```gherkin
-Feature: Coffee machine
-
-  @checkout
-  Scenario: Buying a coffee takes one from the machine
-    Given a coffee machine with 10 coffees
-    When I buy a coffee
-    Then the machine has 9 coffees left
+--8<-- "examples/pytest-bdd/coffee.feature"
 ```
 
-Python step definitions, in [`test_coffee.py`](test_coffee.py), bind each line to code by matching its text:
+Python step definitions, in [`test_coffee.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/pytest-bdd/test_coffee.py), bind each line to code by matching its text:
 
 ```python
-from pytest_bdd import given, parsers, scenarios, then, when
-
-scenarios('coffee.feature')
-
-
-@given(
-    parsers.parse('a coffee machine with {coffees:d} coffees'),
-    target_fixture='machine',
-)
-def machine(coffees):
-    return {'coffees': coffees, 'price': 2}
-
-
-@when('I buy a coffee')
-def buy_coffee(machine):
-    machine['coffees'] -= 1
-
-
-@then(parsers.parse('the machine has {coffees:d} coffees left'))
-def coffees_left(machine, coffees):
-    assert machine['coffees'] == coffees
+--8<-- "examples/pytest-bdd/test_coffee.py"
 ```
 
-The same scenario in pytest-given, as the [README](../../README.md#quick-start) writes it, is one test:
+The same scenario in pytest-given, as the quick start writes it, is one test:
 
 ```python
 @pytest.fixture
@@ -66,14 +40,38 @@ def test_buy_coffee(machine):
 - **How the test reads.** A pytest-bdd scenario's code is spread over step functions that any feature file may reuse. A pytest-given test reads top-down as one pytest function, with fixtures, parametrize and the debugger working as usual.
 - **Who reads it, and when.** A feature file can be written and agreed on before any code exists, which suits stakeholders who write the specification. pytest-given's readable form is the report, which comes out of a test run and shows each step's outcome and attachments.
 
+## Above the scenarios: rules and stories
+
+Both approaches can group scenarios under something larger, but they group them by different ideas.
+
+Gherkin's `Rule` keyword sits between a feature and its scenarios. It comes from [Example Mapping](https://cucumber.io/docs/bdd/example-mapping), a short conversation held before a user story is built. The team writes the user story on a yellow card, the rules it must follow on blue cards, concrete examples of each rule on green cards, and open questions on red ones. Each rule then becomes a `Rule:`, and each example a scenario under it:
+
+```gherkin
+Feature: Coffee machine
+
+  Rule: A coffee can only be bought while the machine has stock
+
+    Scenario: Buying a coffee takes one from the machine
+      ...
+
+    Scenario: An empty machine refuses the sale
+      ...
+```
+
+pytest-given has no rules. [Domain Storytelling](guide/domain-storytelling.md) plays a similar part above the scenarios. A domain story is a numbered list of sentences, who does what with what, written in code from glossary terms. A scenario links to stories with `stories=`, and the report shows which scenarios cover each sentence.
+
+- **What it captures.** A rule is a constraint the behavior must respect, and its scenarios are examples of it. A domain story is a flow through the domain, and each of its scenarios details one part of that flow.
+- **How a scenario joins.** A Gherkin scenario belongs to the rule it stands under in the feature file, so it has at most one. A pytest-given scenario can join several stories. The sentences it covers are matched from its steps' term refs, or stated with pins.
+- **What it spans.** Example Mapping works on one user story at a time, a unit of planned work. A domain story describes how the domain works, across as many features as the flow touches.
+
 ## Running it
 
-`uv run nox -s bdd_example` runs it. In that run:
+In the pytest-given repository, `uv run nox -s bdd_example` runs the [pytest-bdd example](https://github.com/nwilbert/pytest-given/tree/main/examples/pytest-bdd). In that run:
 
 1. When pytest imports `test_coffee.py`, `scenarios('coffee.feature')` reads the feature file and generates one test per scenario, here `test_buying_a_coffee_takes_one_from_the_machine`.
 2. That test walks the scenario's lines in order and looks up a step definition for each by its text. `a coffee machine with 10 coffees` matches the `@given` pattern, which parses `10` into the `coffees` argument. Through `target_fixture`, the step's return value becomes the `machine` fixture.
 3. The `@when` and `@then` steps take `machine` like any fixture, and the `then` step's `assert` decides the outcome. A line that matches no step definition fails the test with `StepDefinitionNotFoundError`.
-4. The `@checkout` tag becomes a pytest mark, so `-m checkout` selects the scenario. `conftest.py` registers that mark, since pytest warns about an unregistered one.
+4. The `@checkout` tag becomes a pytest mark, so `-m checkout` selects the scenario. The example's [`conftest.py`](https://github.com/nwilbert/pytest-given/blob/main/examples/pytest-bdd/conftest.py) registers that mark, since pytest warns about an unregistered one.
 
 The session passes `--gherkin-terminal-reporter`, so the output replays the scenario's lines:
 
@@ -88,7 +86,7 @@ Feature: Coffee machine
 
 ## The reports
 
-pytest-bdd renders no HTML itself. It writes a Cucumber JSON file (`--cucumberjson`), and third-party tools turn that into a report. The best known is [cucumber-reporting](https://github.com/damianszczepanik/cucumber-reporting), which also backs Jenkins' Cucumber Reports plugin. Its [live demo](https://damianszczepanik.github.io/cucumber-html-reports/overview-features.html) shows a typical report. pytest-given renders its own report, and the [Coffeeshop report](https://nwilbert.github.io/pytest-given/latest/examples/coffeeshop.html#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee) opens on this same scenario.
+pytest-bdd renders no HTML itself. It writes Cucumber JSON (`--cucumberjson`), a format Cucumber itself now calls legacy in favor of [Cucumber Messages](https://github.com/cucumber/messages), and third-party tools turn that into a report. The best known is [cucumber-reporting](https://github.com/damianszczepanik/cucumber-reporting), which also backs Jenkins' Cucumber Reports plugin. Its [live demo](https://damianszczepanik.github.io/cucumber-html-reports/overview-features.html) shows a typical report. pytest-given, by contrast, renders its HTML report itself, with no extra tool. The [Coffeeshop report](examples/coffeeshop.html#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee) shows this same scenario.
 
 - **What the report is for.** A Cucumber report is a dashboard over the feature files. Its tables and charts count steps and scenarios by status, per feature and per tag, with trends across builds. pytest-given's report is for reading the scenarios themselves, browsable by tag, glossary term or module.
 - **What a step shows.** A Cucumber report shows each step's keyword, text and duration, plus its attachments. A pytest-given step shows its narration, with term refs and interpolated values, its nested steps, and its attachments.
@@ -110,7 +108,7 @@ def machine(context, coffees):
 
 behave is its own runner rather than a pytest plugin, so its scenarios run apart from pytest's tests, fixtures and plugins. Everything under [What differs](#what-differs) applies to it as well.
 
-behave renders no HTML itself either. Third-party formatters add it:
+behave renders no HTML itself either. For an HTML report, it needs one of these third-party formatters:
 
 | Formatter | What it writes | Example |
 |---|---|---|

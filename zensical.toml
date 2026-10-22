@@ -28,6 +28,7 @@ nav = [
     { "Standalone CLI" = "cli.md" },
   ] },
   { "Examples" = "examples.md" },
+  { "BDD" = "bdd.md" },
   { "Changelog" = "changelog.md" },
 ]
 
