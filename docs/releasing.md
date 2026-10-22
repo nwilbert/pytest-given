@@ -13,6 +13,9 @@ mistake shipped to PyPI is permanent.
 
 ### 1. Prepare the bump
 
+- [ ] Drop each `exclude-newer-package` exemption in `pyproject.toml` whose
+      locked version is now older than the `exclude-newer` cooldown. One still
+      younger stays, or the upgrade below would roll its fix back.
 - [ ] Upgrade the locked dependencies with `uv lock --upgrade`, run `uv run nox`,
       and land the result as its own commit before the bump. Skim the
       changelogs of what moved — a new ruff rule or a pytest deprecation is
