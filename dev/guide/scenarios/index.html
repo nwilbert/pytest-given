@@ -297,6 +297,22 @@
   
   
     <li class="md-tabs__item">
+      <a href="../../bdd/" class="md-tabs__link">
+        
+  
+  BDD
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../../changelog/" class="md-tabs__link">
         
   
@@ -982,6 +998,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../../bdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  BDD
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../changelog/" class="md-nav__link">
         
   
@@ -1063,7 +1105,7 @@
 <h3 id="on-fixtures">On fixtures<a class="headerlink" href="#on-fixtures" title="Permanent link">&para;</a></h3>
 <p>Fixtures are setup, so <strong>only <code>@given</code> is allowed</strong> on a fixture. <code>@when</code> or <code>@then</code> on a fixture raises an error when the fixture runs:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nd">@given</span><span class="p">(</span><span class="s1">'a coffee machine'</span><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nd">@given</span><span class="p">(</span><span class="s1">'a coffee machine with 10 coffees'</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">machine</span><span class="p">():</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="p">{</span><span class="s1">'coffees'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">'price'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
 </code></pre></div>

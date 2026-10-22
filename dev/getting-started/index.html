@@ -297,6 +297,22 @@
   
   
     <li class="md-tabs__item">
+      <a href="../bdd/" class="md-tabs__link">
+        
+  
+  BDD
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../changelog/" class="md-tabs__link">
         
   
@@ -896,6 +912,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../bdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  BDD
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../changelog/" class="md-nav__link">
         
   
@@ -955,16 +997,16 @@
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nd">@given</span><span class="p">(</span><span class="s1">'a coffee machine'</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nd">@given</span><span class="p">(</span><span class="s1">'a coffee machine with 10 coffees'</span><span class="p">)</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">machine</span><span class="p">():</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">return</span> <span class="p">{</span><span class="s1">'coffees'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">'price'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">'Buy coffee'</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">'billing'</span><span class="p">])</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">'Buying a coffee takes one from the machine'</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s1">'checkout'</span><span class="p">])</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_buy_coffee</span><span class="p">(</span><span class="n">machine</span><span class="p">):</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="s1">'I insert $2'</span><span class="p">):</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="s1">'I buy a coffee'</span><span class="p">):</span>
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="n">machine</span><span class="p">[</span><span class="s1">'coffees'</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="k">with</span> <span class="n">then</span><span class="p">(</span><span class="s1">'I get a coffee'</span><span class="p">):</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="k">with</span> <span class="n">then</span><span class="p">(</span><span class="s1">'the machine has 9 coffees left'</span><span class="p">):</span>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="k">assert</span> <span class="n">machine</span><span class="p">[</span><span class="s1">'coffees'</span><span class="p">]</span> <span class="o">==</span> <span class="mi">9</span>
 <a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="n">attach</span><span class="p">(</span><span class="s1">'Machine state'</span><span class="p">,</span> <span class="n">machine</span><span class="p">)</span>
 </code></pre></div>
@@ -972,6 +1014,8 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pytest<span class="w"> </span>--given-html
 </code></pre></div>
 <p>This produces <code>given-report/report.html</code> — one file you can open directly in a browser.</p>
+<p>The Coffeeshop example's report shows this same scenario:</p>
+<p>✅ <a href="../examples/coffeeshop.html#scenario=examples/coffeeshop/test_coffeeshop.py::test_buy_coffee">Buying a coffee takes one from the machine</a></p>
 <p>To write the report without running your plain tests, see <a href="../configuration/pytest-options/#selecting-scenarios">Selecting scenarios</a>.</p>
 <p>Next: <a href="../guide/scenarios/">Scenarios &amp; steps</a> for the full API, or the <a href="../examples/coffeeshop.html">Coffeeshop report</a> to see what a finished report looks like.</p>
 
