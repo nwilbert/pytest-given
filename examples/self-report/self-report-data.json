@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-23T11:59:13.198392+00:00",
+    "timestamp": "2026-10-23T12:01:13.294483+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "525a874b2ecaefc293070eab7b76421b15159f34",
+    "commit_sha": "6fba2be3f2ac4ef27f994c5902185d68d5a3748b",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -1484,7 +1484,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 528,
+      "duration_ms": 531,
       "steps": [
         {
           "phase": "given",
@@ -1612,7 +1612,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -2331,7 +2331,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -2714,7 +2714,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -2884,7 +2884,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -3074,7 +3074,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -3246,7 +3246,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3828,7 +3828,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -4297,7 +4297,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -4577,7 +4577,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -4863,7 +4863,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -5214,7 +5214,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -5321,7 +5321,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -5763,7 +5763,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -5912,7 +5912,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 144,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -6280,7 +6280,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -6530,7 +6530,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -6968,7 +6968,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -19719,7 +19719,99 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 67
+        "line": 74
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_update_refuses_a_document_that_changed_while_it_ran",
+      "narration": {
+        "text": "`citations update` refuses a document that changed while it ran",
+        "parts": [
+          {
+            "value": "`citations update` refuses a document that changed while it ran"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/citations",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a stale citation to rewrite",
+            "parts": [
+              {
+                "value": "a stale "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " to rewrite"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2753 [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "another writer saves the document while the update analyzes it",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the update refuses, saying the document changed",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the concurrent edit survives on disk",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 100
       },
       "story_ids": [],
       "pins": null
@@ -19838,7 +19930,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 93
+        "line": 173
       },
       "story_ids": [],
       "pins": null
@@ -20003,7 +20095,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 116
+        "line": 196
       },
       "story_ids": [],
       "pins": null
@@ -20181,7 +20273,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 140
+        "line": 220
       },
       "story_ids": [],
       "pins": null
@@ -20315,7 +20407,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 173
+        "line": 253
       },
       "story_ids": [],
       "pins": null
@@ -20503,7 +20595,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 196
+        "line": 276
       },
       "story_ids": [],
       "pins": null
@@ -20638,7 +20730,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 552
+        "line": 632
       },
       "story_ids": [],
       "pins": null
@@ -20889,7 +20981,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 822
+        "line": 902
       },
       "story_ids": [],
       "pins": null
@@ -21031,7 +21123,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1026
+        "line": 1106
       },
       "story_ids": [],
       "pins": null
@@ -21176,7 +21268,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1049
+        "line": 1129
       },
       "story_ids": [],
       "pins": null
@@ -21387,7 +21479,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1076
+        "line": 1156
       },
       "story_ids": [],
       "pins": null
@@ -21602,7 +21694,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1134
+        "line": 1214
       },
       "story_ids": [],
       "pins": null
@@ -21758,7 +21850,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1171
+        "line": 1251
       },
       "story_ids": [],
       "pins": null
@@ -21900,7 +21992,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1233
+        "line": 1313
       },
       "story_ids": [],
       "pins": null
@@ -22098,7 +22190,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1274
+        "line": 1354
       },
       "story_ids": [],
       "pins": null
@@ -22268,7 +22360,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1367
+        "line": 1447
       },
       "story_ids": [],
       "pins": null

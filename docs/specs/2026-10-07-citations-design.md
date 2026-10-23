@@ -1,6 +1,6 @@
 # Citations — Design Spec
 
-✅ [spec/citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/citations) (10 ✅)
+✅ [spec/citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/citations) (11 ✅)
 
 ## Goal
 

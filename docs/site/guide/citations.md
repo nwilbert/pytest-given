@@ -12,7 +12,7 @@ Such a link is a **citation** when it starts with a status glyph. pytest-given o
 Live, against this site's example reports:
 
 - 🔵 [Cancel a Booking](../examples/hotel-booking.html#view=stories&story=cancel-a-booking) (2 ✅ · 1 🔵)
-- ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (10 ✅)
+- ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (11 ✅)
 
 A [narrated citation](#narrated-citations) also folds in its scenario's narration:
 

@@ -2389,6 +2389,18 @@
         ```
 - **then** no finding remains
 
+## ✓ `citations update` refuses a document that changed while it ran
+`tests/unit/citations/test_check.py::test_update_refuses_a_document_that_changed_while_it_ran` · spec/citations, versions/0.5.0
+
+- **given** a stale «citation» to rewrite
+    - 📎 document:
+        ```
+        ❓ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+        ```
+- **when** another writer saves the document while the update analyzes it
+- **then** the update refuses, saying the document changed
+- **then** the concurrent edit survives on disk
+
 ## ✓ A plain «report link» claims only that its target exists
 `tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists` · spec/citations, versions/0.5.0
 

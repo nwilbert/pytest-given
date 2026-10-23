@@ -172,6 +172,16 @@ def check_citations(
             'documents link it.'
         )
     updated = [path for path, text in edited.items() if text != texts[path]]
+    # An update writes the text it analyzed, so a document another writer
+    # saved under this run would lose that save. Refused before a single byte
+    # is written, so the run is all-or-nothing across its documents.
+    changed = [path for path in updated if _read(path) != texts[path]]
+    if changed:
+        raise PytestGivenError(
+            f'{", ".join(path.as_posix() for path in changed)} changed while '
+            'citations ran; nothing was written — re-run the update against '
+            'what is on disk now.'
+        )
     for path in updated:
         path.write_bytes(edited[path].encode('utf-8'))
     return CitationsResult(

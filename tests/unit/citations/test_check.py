@@ -8,7 +8,14 @@ from pathlib import Path
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
-from pytest_given.citations import CitationsResult, check_citations, markdown_documents
+from pytest_given.citations import (
+    CitationsResult,
+    check_citations,
+    markdown_documents,
+)
+from pytest_given.citations import (
+    check as check_module,
+)
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -88,6 +95,79 @@ def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
         assert written == f'🔵 [checkout]({URL}#tag=checkout) (1 ✅ · 1 🔵)\n'
     with then('no finding remains'):
         assert result.remaining == []
+
+
+@scenario(
+    t'`citations update` refuses a document that changed while it ran',
+    tags=['spec/citations', 'versions/0.5.0'],
+)
+def test_update_refuses_a_document_that_changed_while_it_ran(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An update writes the text it analyzed, so a document another writer
+    saved under it would lose that save — the one outcome worse than writing
+    nothing. Refused before a single byte is written."""
+    with given(t'a stale {pg["Citation"].l} to rewrite'):
+        report = report_(PAY)
+        document = f'❓ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
+        attach('document', document)
+    with when('another writer saves the document while the update analyzes it'):
+        real_check = check_module._check_document
+
+        def _check_with_a_concurrent_writer(
+            path: Path, text: str, resolver: object, location: object
+        ) -> object:
+            links_and_edits = real_check(path, text, resolver, location)
+            path.write_bytes((text + 'a concurrent edit\n').encode('utf-8'))
+            return links_and_edits
+
+        monkeypatch.setattr(
+            check_module, '_check_document', _check_with_a_concurrent_writer
+        )
+        try:
+            _run(tmp_path, document, report, update=True)
+            error: str | None = None
+        except PytestGivenError as caught:
+            error = str(caught)
+    with then('the update refuses, saying the document changed'):
+        assert error is not None
+        assert 'changed while citations ran' in error
+    with then('the concurrent edit survives on disk'):
+        on_disk = (tmp_path / 'doc.md').read_bytes().decode('utf-8')
+        assert on_disk == document + 'a concurrent edit\n'
+
+
+def test_update_writes_no_document_at_all_when_one_changed_under_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """All-or-nothing across the documents of one run: writing the ones that
+    did not change would leave the tree half-updated."""
+    report = report_(PAY)
+    stale = f'❓ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
+    doc_a = tmp_path / 'a.md'
+    doc_b = tmp_path / 'b.md'
+    doc_a.write_bytes(stale.encode('utf-8'))
+    doc_b.write_bytes(stale.encode('utf-8'))
+    real_check = check_module._check_document
+
+    def _one_concurrent_writer(
+        path: Path, text: str, resolver: object, location: object
+    ) -> object:
+        links_and_edits = real_check(path, text, resolver, location)
+        if path == doc_a:
+            path.write_bytes((text + 'a concurrent edit\n').encode('utf-8'))
+        return links_and_edits
+
+    monkeypatch.setattr(check_module, '_check_document', _one_concurrent_writer)
+    with pytest.raises(PytestGivenError, match='changed while citations ran'):
+        check_citations(
+            report,
+            [doc_a, doc_b],
+            report_url=None,
+            report_path=None,
+            update=True,
+        )
+    assert doc_b.read_bytes() == stale.encode('utf-8')
 
 
 @scenario(
