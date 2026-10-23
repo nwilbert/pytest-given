@@ -58,6 +58,24 @@ from pytest_given.report.html_renderer import (
 from tests.ubiquitous_language import adopt_pytest_given, pg
 from tests.unit.report.app_data import embedded_app_data
 
+_DEFAULT_METADATA = {
+    'project': 'p',
+    'timestamp': 't',
+    'pytest_version': '9',
+    'plugin_version': '0.1',
+}
+
+
+def _report(payload: dict) -> ReportData:
+    """A report read from its serialized form: the metadata every test below
+    already agrees on, plus whatever this one says. `report_from_dict` takes
+    the dict directly, so no test writes one to a file just to read it back;
+    `metadata` merges key by key, so a test overrides only what it cares
+    about."""
+    report = {'scenarios': []} | payload
+    report['metadata'] = _DEFAULT_METADATA | payload.get('metadata', {})
+    return report_from_dict(report)
+
 
 def render_html(
     report: ReportData,
@@ -133,22 +151,17 @@ def test_narration_filter_flanks_a_literal_s_edge_by_the_part_beside_it() -> Non
 
 
 def test_render_produces_html_file(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'test-proj',
-                    'timestamp': '2026-04-09T00:00:00Z',
-                    'pytest_version': '9.0',
-                    'plugin_version': '0.1.0',
-                },
-                'scenarios': [],
-            }
-        )
-    )
+    payload = {
+        'metadata': {
+            'project': 'test-proj',
+            'timestamp': '2026-04-09T00:00:00Z',
+            'pytest_version': '9.0',
+            'plugin_version': '0.1.0',
+        },
+        'scenarios': [],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     assert html_path.exists()
     content = html_path.read_text(encoding='utf-8')
     assert 'test-proj' in content
@@ -156,43 +169,32 @@ def test_render_produces_html_file(tmp_path: Path) -> None:
 
 
 def test_render_includes_scenario_data(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
+                'id': 'test.py::test_x',
+                'narration': _narration('My Scenario'),
+                'module': 'test_mod',
+                'tags': ['billing'],
+                'status': 'passed',
+                'duration_ms': 10,
+                'steps': [
                     {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('My Scenario'),
-                        'module': 'test_mod',
-                        'tags': ['billing'],
+                        'phase': 'given',
+                        'narration': _narration('a thing'),
                         'status': 'passed',
-                        'duration_ms': 10,
-                        'steps': [
-                            {
-                                'phase': 'given',
-                                'narration': _narration('a thing'),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
-                        'parameters': None,
+                        'children': [],
+                        'attachments': [],
                         'error': None,
                     }
                 ],
+                'parameters': None,
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'My Scenario' in content
     assert 'billing' in content
@@ -201,53 +203,36 @@ def test_render_includes_scenario_data(tmp_path: Path) -> None:
 
 def test_render_attachments_and_errors(tmp_path: Path) -> None:
     """Renderer handles steps with attachments and errors."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
+                'id': 'test.py::test_x',
+                'narration': _narration('Err Scenario'),
+                'module': 'test_mod',
+                'tags': [],
+                'status': 'failed',
+                'duration_ms': 5,
+                'steps': [
                     {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('Err Scenario'),
-                        'module': 'test_mod',
-                        'tags': [],
+                        'phase': 'then',
+                        'narration': _narration('check value'),
                         'status': 'failed',
-                        'duration_ms': 5,
-                        'steps': [
+                        'children': [
                             {
                                 'phase': 'then',
-                                'narration': _narration('check value'),
-                                'status': 'failed',
-                                'children': [
-                                    {
-                                        'phase': 'then',
-                                        'narration': _narration('nested check'),
-                                        'status': 'passed',
-                                        'children': [],
-                                        'attachments': [],
-                                        'error': None,
-                                    }
-                                ],
-                                'attachments': [
-                                    {
-                                        'label': 'debug log',
-                                        'content': 'some log output',
-                                    }
-                                ],
-                                'error': {
-                                    'message': 'assert 1 == 2',
-                                    'frames': [],
-                                    'error_tail': '- 1\n+ 2',
-                                },
+                                'narration': _narration('nested check'),
+                                'status': 'passed',
+                                'children': [],
+                                'attachments': [],
+                                'error': None,
                             }
                         ],
-                        'parameters': None,
+                        'attachments': [
+                            {
+                                'label': 'debug log',
+                                'content': 'some log output',
+                            }
+                        ],
                         'error': {
                             'message': 'assert 1 == 2',
                             'frames': [],
@@ -255,11 +240,17 @@ def test_render_attachments_and_errors(tmp_path: Path) -> None:
                         },
                     }
                 ],
+                'parameters': None,
+                'error': {
+                    'message': 'assert 1 == 2',
+                    'frames': [],
+                    'error_tail': '- 1\n+ 2',
+                },
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'debug log' in content
     assert 'some log output' in content
@@ -277,7 +268,7 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
         t'a {pg["Report"].l} holding a {pg["Parametrized scenario"].l} '
         t'with a {pg["Parameter table"].l} of the columns euros and expect'
     ):
-        report = report_from_dict(_parametrized_report())
+        report = _report(_parametrized_report())
     with when(
         t'the {pg["Renderer"].l} renders the HTML page',
         pins=adopt_pytest_given['render'],
@@ -294,12 +285,6 @@ def test_render_parametrized_step_with_structured_narration(tmp_path: Path) -> N
 
 def _parametrized_report() -> dict[str, object]:
     return {
-        'metadata': {
-            'project': 'p',
-            'timestamp': 't',
-            'pytest_version': '9',
-            'plugin_version': '0.1',
-        },
         'scenarios': [
             {
                 'id': 'test.py::test_p',
@@ -360,7 +345,7 @@ def _parametrized_report() -> dict[str, object]:
 
 def test_param_coloring_classes_and_theme_rules(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(_parametrized_report()), html_path)
+    render_html(_report(_parametrized_report()), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
     assert re.search(r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content)
@@ -392,74 +377,63 @@ def test_render_grouped_placeholder_drops_format_spec_and_conversion(
     column varies, not how a value prints. Conversion and format spec are
     per-value details applied in the concrete per-case rows, so they are
     dropped from the collapsed slot."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
+                'id': 'i',
+                'narration': _narration('n'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'error': None,
+                'parameters': {
+                    'columns': [
+                        {'id': 'n', 'name': 'n', 'kind': 'param'},
+                        {'id': 'obj', 'name': 'obj', 'kind': 'param'},
+                    ],
+                    'cases': [
+                        {
+                            'id': 't.py::test_x[4]',
+                            'values': [7, 'hi'],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
+                        },
+                    ],
                 },
-                'scenarios': [
+                'steps': [
                     {
-                        'id': 'i',
-                        'narration': _narration('n'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'error': None,
-                        'parameters': {
-                            'columns': [
-                                {'id': 'n', 'name': 'n', 'kind': 'param'},
-                                {'id': 'obj', 'name': 'obj', 'kind': 'param'},
-                            ],
-                            'cases': [
+                        'phase': 'when',
+                        'narration': _narration(
+                            '{n} {obj}',
+                            [
                                 {
-                                    'id': 't.py::test_x[4]',
-                                    'values': [7, 'hi'],
-                                    'custom_id': False,
-                                    'status': 'passed',
-                                    'error': None,
+                                    'name': 'n',
+                                    'column_id': 'n',
+                                    'format_spec': '03d',
+                                    'conversion': None,
+                                },
+                                {'value': ' '},
+                                {
+                                    'name': 'obj',
+                                    'column_id': 'obj',
+                                    'format_spec': '',
+                                    'conversion': 'r',
                                 },
                             ],
-                        },
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    '{n} {obj}',
-                                    [
-                                        {
-                                            'name': 'n',
-                                            'column_id': 'n',
-                                            'format_spec': '03d',
-                                            'conversion': None,
-                                        },
-                                        {'value': ' '},
-                                        {
-                                            'name': 'obj',
-                                            'column_id': 'obj',
-                                            'format_spec': '',
-                                            'conversion': 'r',
-                                        },
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
+                        ),
+                        'status': 'passed',
+                        'children': [],
+                        'attachments': [],
+                        'error': None,
                     }
                 ],
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '{n}' in content
     assert '{obj}' in content
@@ -471,97 +445,75 @@ def test_render_plain_str_step_with_empty_parts_escapes_braces(
     tmp_path: Path,
 ) -> None:
     """A plain-string step renders verbatim, with no regex pass over braces."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
+                'id': 'i',
+                'narration': _narration('n'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'parameters': None,
+                'error': None,
+                'steps': [
                     {
-                        'id': 'i',
-                        'narration': _narration('n'),
-                        'module': 'm',
-                        'tags': [],
+                        'phase': 'when',
+                        'narration': _narration('config: {key: value}'),
                         'status': 'passed',
-                        'duration_ms': 0,
-                        'parameters': None,
+                        'children': [],
+                        'attachments': [],
                         'error': None,
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration('config: {key: value}'),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
                     }
                 ],
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'config: {key: value}' in content
 
 
 def test_render_value_part_uses_value_highlight_class(tmp_path: Path) -> None:
     """A NarrationValue (non-param t-string interpolation) gets .value-highlight."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
+                'id': 'i',
+                'narration': _narration('n'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'parameters': None,
+                'error': None,
+                'steps': [
                     {
-                        'id': 'i',
-                        'narration': _narration('n'),
-                        'module': 'm',
-                        'tags': [],
+                        'phase': 'when',
+                        'narration': _narration(
+                            'cost: 12.0',
+                            [
+                                {'value': 'cost: '},
+                                {
+                                    'rendered': '12.0',
+                                    'expression': 'price * 1.2',
+                                    'format_spec': '',
+                                    'conversion': None,
+                                },
+                            ],
+                        ),
                         'status': 'passed',
-                        'duration_ms': 0,
-                        'parameters': None,
+                        'children': [],
+                        'attachments': [],
                         'error': None,
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    'cost: 12.0',
-                                    [
-                                        {'value': 'cost: '},
-                                        {
-                                            'rendered': '12.0',
-                                            'expression': 'price * 1.2',
-                                            'format_spec': '',
-                                            'conversion': None,
-                                        },
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
                     }
                 ],
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'value-highlight' in content
     assert '12.0' in content
@@ -572,48 +524,37 @@ def test_render_escapes_script_close_in_report_data(tmp_path: Path) -> None:
     either path: the attachment payload is escaped as markup, and the narration
     the data blob carries is escaped on the way in — JSON escapes `</` in
     neither."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
+                'id': 'i',
+                'narration': _narration('</script><script>alert(1)</script>'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'parameters': None,
+                'error': None,
+                'steps': [
                     {
-                        'id': 'i',
-                        'narration': _narration('</script><script>alert(1)</script>'),
-                        'module': 'm',
-                        'tags': [],
+                        'phase': 'then',
+                        'narration': _narration('check'),
                         'status': 'passed',
-                        'duration_ms': 0,
-                        'parameters': None,
-                        'error': None,
-                        'steps': [
+                        'children': [],
+                        'attachments': [
                             {
-                                'phase': 'then',
-                                'narration': _narration('check'),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [
-                                    {
-                                        'label': 'payload',
-                                        'content': '</script><script>alert(1)</script>',
-                                    }
-                                ],
-                                'error': None,
+                                'label': 'payload',
+                                'content': '</script><script>alert(1)</script>',
                             }
                         ],
+                        'error': None,
                     }
                 ],
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Neither path lets the payload's own `</script>` through raw: the data
     # blob carries it escaped, the markup as an entity.
@@ -626,34 +567,23 @@ def test_render_escapes_script_close_in_node_id_blobs(tmp_path: Path) -> None:
     """A node ID carrying `</script>` (via a parametrize id) flows into the
     derived `__scenarioSlugs`/`__termScenarios` blobs, not just the report data;
     every inline-script blob must neutralize `</` the same way."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'tests/test_x.py::test_y[</script><img src=x>]',
-                        'narration': _narration('XSS'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'parameters': None,
-                        'error': None,
-                        'steps': [],
-                    }
-                ],
+                'id': 'tests/test_x.py::test_y[</script><img src=x>]',
+                'narration': _narration('XSS'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'parameters': None,
+                'error': None,
+                'steps': [],
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # No blob lets the id's `</script>` through raw.
     assert '</script><img' not in content
@@ -666,34 +596,23 @@ def test_render_escapes_comment_open_in_report_data(tmp_path: Path) -> None:
     after it reaches double-escaped state, where the template's own `</script>`
     stops terminating the element — swallowing the Alpine bundle and the rest of
     the document. A narration of `<!--<script>` is enough to trigger it."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'i',
-                        'narration': _narration('<!--<script>'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'parameters': None,
-                        'error': None,
-                        'steps': [],
-                    }
-                ],
+                'id': 'i',
+                'narration': _narration('<!--<script>'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'parameters': None,
+                'error': None,
+                'steps': [],
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # No raw `<!--` survives into the data blob; the escaped form carries the
     # same parsed value.
@@ -714,22 +633,11 @@ def test_neutralized_script_data_stays_valid_json() -> None:
 
 def test_render_self_contained(tmp_path: Path) -> None:
     """The output HTML has no external dependencies."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [],
-            }
-        )
-    )
+    payload = {
+        'scenarios': [],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<style>' in content
     assert '<script>' in content
@@ -764,17 +672,7 @@ def test_render_inlines_assets_without_their_comments() -> None:
     """The stylesheet and script comments explain the sources to a maintainer;
     a report carries the code alone. The vendored Alpine bundle is not ours to
     strip and keeps its licence line."""
-    report = report_from_dict(
-        {
-            'metadata': {
-                'project': 'p',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
-            'scenarios': [],
-        }
-    )
+    report = _report({})
     content = render_html_string(report, source_link_template=None)
     css_comments = _BLOCK_COMMENT.findall(
         (_TEMPLATES_DIR / 'styles.css').read_text('utf-8')
@@ -790,34 +688,23 @@ def test_render_inlines_assets_without_their_comments() -> None:
 
 def test_render_clickable_tag_badges(tmp_path: Path) -> None:
     """Tag badges on scenario cards include click handler for filtering."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('Tagged Scenario'),
-                        'module': 'test_mod',
-                        'tags': ['billing', 'happy-path'],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                    }
-                ],
+                'id': 'test.py::test_x',
+                'narration': _narration('Tagged Scenario'),
+                'module': 'test_mod',
+                'tags': ['billing', 'happy-path'],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # The tag rides in `data-tag` rather than in the click expression; see
     # test_report_data_never_lands_in_an_alpine_expression for why.
@@ -829,49 +716,38 @@ def test_render_clickable_tag_badges(tmp_path: Path) -> None:
 
 def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -> None:
     """Scenarios are collapsed by default; failed ones auto-expand."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
+                'id': 'test.py::test_pass',
+                'narration': _narration('Passing'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
+            },
+            {
+                'id': 'test.py::test_fail',
+                'narration': _narration('Failing'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'failed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': {
+                    'message': 'boom',
+                    'frames': [],
+                    'error_tail': None,
                 },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_pass',
-                        'narration': _narration('Passing'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                    },
-                    {
-                        'id': 'test.py::test_fail',
-                        'narration': _narration('Failing'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'failed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': {
-                            'message': 'boom',
-                            'frames': [],
-                            'error_tail': None,
-                        },
-                    },
-                ],
-            }
-        )
-    )
+            },
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'expandedScenarios' in content
     assert 'toggleScenario' in content
@@ -879,35 +755,24 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
 
 def _report_with_glossary(tmp_path: Path, *, terms: list[dict]) -> str:
     """Render a one-scenario report whose glossary carries `terms`."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('A scenario'),
-                        'module': 'test_mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                    }
-                ],
-                'glossary': {'terms': terms},
+                'id': 'test.py::test_x',
+                'narration': _narration('A scenario'),
+                'module': 'test_mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
             }
-        )
-    )
+        ],
+        'glossary': {'terms': terms},
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     return html_path.read_text(encoding='utf-8')
 
 
@@ -946,35 +811,24 @@ def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
 
 
 def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 't::x',
-                        'narration': _narration('Skipped one'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'skipped',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                        'skip_reason': 'awaiting fixture',
-                    }
-                ],
+                'id': 't::x',
+                'narration': _narration('Skipped one'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'skipped',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
+                'skip_reason': 'awaiting fixture',
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'awaiting fixture' in content
     assert 'reason-box skipped' in content
@@ -983,35 +837,24 @@ def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
 
 
 def test_render_skipped_without_reason_has_no_chevron(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 't::x',
-                        'narration': _narration('Skipped no reason'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'skipped',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                        'skip_reason': None,
-                    }
-                ],
+                'id': 't::x',
+                'narration': _narration('Skipped no reason'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'skipped',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
+                'skip_reason': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<span class="scenario-chevron-placeholder">' in content
     assert 'class="reason-box' not in content
@@ -1019,90 +862,74 @@ def test_render_skipped_without_reason_has_no_chevron(tmp_path: Path) -> None:
 
 def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) -> None:
     """Skipped parametrize cases render ○ (dot-skipped), not ✗ (dot-failed)."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 't::x',
-                        'narration': _narration('One skipped'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': {
-                            'columns': [{'id': 'n', 'name': 'n', 'kind': 'param'}],
-                            'cases': [
-                                {
-                                    'id': 't.py::test_x[5]',
-                                    'values': [1],
-                                    'custom_id': False,
-                                    'status': 'passed',
-                                    'error': None,
-                                },
-                                {
-                                    'id': 't.py::test_x[6]',
-                                    'values': [2],
-                                    'custom_id': False,
-                                    'status': 'skipped',
-                                    'error': None,
-                                },
-                            ],
+                'id': 't::x',
+                'narration': _narration('One skipped'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': {
+                    'columns': [{'id': 'n', 'name': 'n', 'kind': 'param'}],
+                    'cases': [
+                        {
+                            'id': 't.py::test_x[5]',
+                            'values': [1],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
                         },
-                        'error': None,
-                        'skip_reason': None,
-                    }
-                ],
+                        {
+                            'id': 't.py::test_x[6]',
+                            'values': [2],
+                            'custom_id': False,
+                            'status': 'skipped',
+                            'error': None,
+                        },
+                    ],
+                },
+                'error': None,
+                'skip_reason': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<span class="dot-skipped">○</span>' in content
     assert '<span class="dot-failed">✗</span>' not in content
 
 
 def test_renderer_emits_source_links_when_template_set(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'metadata': {
+            'project': 'p',
+            'timestamp': 't',
+            'pytest_version': '9',
+            'plugin_version': '0.1',
+            'commit_sha': None,
+        },
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                    'commit_sha': None,
-                },
-                'scenarios': [
-                    {
-                        'id': 'i',
-                        'narration': _narration('S'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                        'source': {'relpath': 'tests/test_x.py', 'line': 9},
-                    }
-                ],
+                'id': 'i',
+                'narration': _narration('S'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
+                'source': {'relpath': 'tests/test_x.py', 'line': 9},
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
     render_html(
-        report_from_dict(json.loads(json_path.read_text())),
+        _report(payload),
         html_path,
         source_link_template='vscode://file/{path}:{line}',
     )
@@ -1113,35 +940,24 @@ def test_renderer_emits_source_links_when_template_set(tmp_path: Path) -> None:
 
 
 def test_renderer_without_template_renders_plain_relpath(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'i',
-                        'narration': _narration('S'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                        'source': {'relpath': 'tests/test_x.py', 'line': 9},
-                    }
-                ],
+                'id': 'i',
+                'narration': _narration('S'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
+                'source': {'relpath': 'tests/test_x.py', 'line': 9},
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'tests/test_x.py:9' in content
     assert '<a href="vscode' not in content
@@ -1153,38 +969,27 @@ def test_render_includes_resolved_source_urls_when_template_set(tmp_path: Path) 
     level by injecting a single scenario whose URL we can confirm — confirming
     the maps were populated. Story/term URL maps are exercised in later tasks
     once the template emits their link blocks."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('My Scenario'),
-                        'module': 'test_mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                        'source': {'relpath': 'tests/test_x.py', 'line': 10},
-                    },
-                ],
-                'stories': [],
-                'glossary': None,
-            }
-        )
-    )
+                'id': 'test.py::test_x',
+                'narration': _narration('My Scenario'),
+                'module': 'test_mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
+                'source': {'relpath': 'tests/test_x.py', 'line': 10},
+            },
+        ],
+        'stories': [],
+        'glossary': None,
+    }
     html_path = tmp_path / 'report.html'
     render_html(
-        report_from_dict(json.loads(json_path.read_text())),
+        _report(payload),
         html_path,
         source_link_template='vscode://file/{path}:{line}',
     )
@@ -1197,35 +1002,24 @@ def test_renderer_skips_link_block_when_scenario_has_no_source(
     tmp_path: Path,
 ) -> None:
     """Older JSON without `source` simply doesn't render the link row."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'i',
-                        'narration': _narration('S'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                    }
-                ],
+                'id': 'i',
+                'narration': _narration('S'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': None,
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
     render_html(
-        report_from_dict(json.loads(json_path.read_text())),
+        _report(payload),
         html_path,
         source_link_template='vscode://file/{path}:{line}',
     )
@@ -1237,67 +1031,54 @@ def test_renderer_skips_link_block_when_scenario_has_no_source(
 
 def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
     """Crosshair hover needs every placeholder span tagged with its param name."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
+                'id': 'test.py::test_p',
+                'narration': _narration('Param scenario'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [
                     {
-                        'id': 'test.py::test_p',
-                        'narration': _narration('Param scenario'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    'I insert {euros}',
-                                    [
-                                        {'value': 'I insert '},
-                                        {
-                                            'name': 'euros',
-                                            'column_id': 'euros',
-                                            'format_spec': '',
-                                            'conversion': None,
-                                        },
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
-                        'parameters': {
-                            'columns': [
-                                {'id': 'euros', 'name': 'euros', 'kind': 'param'}
-                            ],
-                            'cases': [
+                        'phase': 'when',
+                        'narration': _narration(
+                            'I insert {euros}',
+                            [
+                                {'value': 'I insert '},
                                 {
-                                    'id': 't.py::test_x[7]',
-                                    'values': [1],
-                                    'custom_id': False,
-                                    'status': 'passed',
-                                    'error': None,
+                                    'name': 'euros',
+                                    'column_id': 'euros',
+                                    'format_spec': '',
+                                    'conversion': None,
                                 },
                             ],
-                        },
+                        ),
+                        'status': 'passed',
+                        'children': [],
+                        'attachments': [],
                         'error': None,
                     }
                 ],
+                'parameters': {
+                    'columns': [{'id': 'euros', 'name': 'euros', 'kind': 'param'}],
+                    'cases': [
+                        {
+                            'id': 't.py::test_x[7]',
+                            'values': [1],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
+                        },
+                    ],
+                },
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'data-param="euros"' in content
     # The placeholder span carries both class and data-param
@@ -1306,55 +1087,44 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
 
 def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
     """Crosshair hover needs every <th>/<td> tagged with the column's param name."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_p',
-                        'narration': _narration('Param scenario'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': {
-                            'columns': [
-                                {'id': 'euros', 'name': 'euros', 'kind': 'param'},
-                                {'id': 'expect', 'name': 'expect', 'kind': 'param'},
-                            ],
-                            'cases': [
-                                {
-                                    'id': 't.py::test_x[8]',
-                                    'values': [1, False],
-                                    'custom_id': False,
-                                    'status': 'passed',
-                                    'error': None,
-                                },
-                                {
-                                    'id': 't.py::test_x[9]',
-                                    'values': [2, True],
-                                    'custom_id': False,
-                                    'status': 'passed',
-                                    'error': None,
-                                },
-                            ],
+                'id': 'test.py::test_p',
+                'narration': _narration('Param scenario'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': {
+                    'columns': [
+                        {'id': 'euros', 'name': 'euros', 'kind': 'param'},
+                        {'id': 'expect', 'name': 'expect', 'kind': 'param'},
+                    ],
+                    'cases': [
+                        {
+                            'id': 't.py::test_x[8]',
+                            'values': [1, False],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
                         },
-                        'error': None,
-                    }
-                ],
+                        {
+                            'id': 't.py::test_x[9]',
+                            'values': [2, True],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
+                        },
+                    ],
+                },
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Header carries data-param
     assert 'data-param="euros"' in content
@@ -1373,47 +1143,36 @@ def test_render_param_table_none_value_as_text_not_blank(tmp_path: Path) -> None
     this case"), so it must render, not blank out. Regression guard for a
     drift where this renderer briefly blanked `None` cells while the
     Markdown renderer kept printing the literal text."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_none',
-                        'narration': _narration('None param'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'steps': [],
-                        'parameters': {
-                            'columns': [
-                                {'id': 'label', 'name': 'label', 'kind': 'param'},
-                            ],
-                            'cases': [
-                                {
-                                    'id': 't.py::test_x[10]',
-                                    'values': [None],
-                                    'custom_id': False,
-                                    'status': 'passed',
-                                    'error': None,
-                                },
-                            ],
+                'id': 'test.py::test_none',
+                'narration': _narration('None param'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'steps': [],
+                'parameters': {
+                    'columns': [
+                        {'id': 'label', 'name': 'label', 'kind': 'param'},
+                    ],
+                    'cases': [
+                        {
+                            'id': 't.py::test_x[10]',
+                            'values': [None],
+                            'custom_id': False,
+                            'status': 'passed',
+                            'error': None,
                         },
-                        'error': None,
-                    }
-                ],
+                    ],
+                },
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert re.search(r'<td[^>]*\bdata-param="label"[^>]*>\s*None\s*</td>', content)
 
@@ -1673,178 +1432,156 @@ def test_clause_part_filter_word_renders_clause_word_class():
 def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
     """render_html executes the stories-coverage rollup (lines 85, 90-107)
     when at least one scenario binds a story and the report has that story."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'glossary': {
+            'terms': [
+                {
+                    'id': 'guest',
+                    'kind': 'actor',
+                    'canonical': 'Guest',
+                    'definition': '',
+                },
+                {
+                    'id': 'search',
+                    'kind': 'activity',
+                    'canonical': 'search',
+                    'definition': '',
+                },
+                {
+                    'id': 'room',
+                    'kind': 'object',
+                    'canonical': 'Room',
+                    'definition': '',
+                },
+            ]
+        },
+        'stories': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'glossary': {
-                    'terms': [
-                        {
-                            'id': 'guest',
-                            'kind': 'actor',
-                            'canonical': 'Guest',
-                            'definition': '',
-                        },
-                        {
-                            'id': 'search',
-                            'kind': 'activity',
-                            'canonical': 'search',
-                            'definition': '',
-                        },
-                        {
-                            'id': 'room',
-                            'kind': 'object',
-                            'canonical': 'Room',
-                            'definition': '',
-                        },
-                    ]
-                },
-                'stories': [
+                'id': 'book-a-room',
+                'title': 'Book a Room',
+                'sentences': [
                     {
-                        'id': 'book-a-room',
-                        'title': 'Book a Room',
-                        'sentences': [
+                        'id': 1,
+                        'clauses': [
                             {
-                                'id': 1,
-                                'clauses': [
+                                'parts': [
                                     {
-                                        'parts': [
-                                            {
-                                                'term_id': 'guest',
-                                                'display': 'Guest',
-                                            },
-                                            {
-                                                'term_id': 'search',
-                                                'display': 'searches',
-                                            },
-                                            {
-                                                'term_id': 'room',
-                                                'display': 'Room',
-                                            },
-                                        ]
-                                    }
-                                ],
+                                        'term_id': 'guest',
+                                        'display': 'Guest',
+                                    },
+                                    {
+                                        'term_id': 'search',
+                                        'display': 'searches',
+                                    },
+                                    {
+                                        'term_id': 'room',
+                                        'display': 'Room',
+                                    },
+                                ]
                             }
                         ],
-                    }
-                ],
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_book',
-                        'narration': _narration('Book a room'),
-                        'module': 'mod',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 5,
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    'Guest searches Room',
-                                    [
-                                        {
-                                            'type': 'term_ref',
-                                            'term_id': 'guest',
-                                            'display': 'Guest',
-                                            'param_column': None,
-                                        },
-                                        {'value': ' '},
-                                        {
-                                            'type': 'term_ref',
-                                            'term_id': 'search',
-                                            'display': 'searches',
-                                            'param_column': None,
-                                        },
-                                        {'value': ' '},
-                                        {
-                                            'type': 'term_ref',
-                                            'term_id': 'room',
-                                            'display': 'Room',
-                                            'param_column': None,
-                                        },
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
-                        'parameters': None,
-                        'error': None,
-                        'story_ids': ['book-a-room'],
                     }
                 ],
             }
-        )
-    )
+        ],
+        'scenarios': [
+            {
+                'id': 'test.py::test_book',
+                'narration': _narration('Book a room'),
+                'module': 'mod',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 5,
+                'steps': [
+                    {
+                        'phase': 'when',
+                        'narration': _narration(
+                            'Guest searches Room',
+                            [
+                                {
+                                    'type': 'term_ref',
+                                    'term_id': 'guest',
+                                    'display': 'Guest',
+                                    'param_column': None,
+                                },
+                                {'value': ' '},
+                                {
+                                    'type': 'term_ref',
+                                    'term_id': 'search',
+                                    'display': 'searches',
+                                    'param_column': None,
+                                },
+                                {'value': ' '},
+                                {
+                                    'type': 'term_ref',
+                                    'term_id': 'room',
+                                    'display': 'Room',
+                                    'param_column': None,
+                                },
+                            ],
+                        ),
+                        'status': 'passed',
+                        'children': [],
+                        'attachments': [],
+                        'error': None,
+                    }
+                ],
+                'parameters': None,
+                'error': None,
+                'story_ids': ['book-a-room'],
+            }
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert html_path.exists()
     assert 'Book a Room' in content
 
 
 def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'glossary': {
+            'terms': [
+                {
+                    'id': 'guest',
+                    'kind': 'actor',
+                    'canonical': 'Guest',
+                    'definition': '',
+                    'source': None,
+                },
+            ],
+        },
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'glossary': {
-                    'terms': [
-                        {
-                            'id': 'guest',
-                            'kind': 'actor',
-                            'canonical': 'Guest',
-                            'definition': '',
-                            'source': None,
-                        },
-                    ],
-                },
-                'scenarios': [
+                'id': 'test.py::test_x',
+                'narration': _narration('My Scenario'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 1,
+                'steps': [
                     {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('My Scenario'),
-                        'module': 'm',
-                        'tags': [],
+                        'phase': 'when',
+                        'narration': _narration(
+                            'Guest',
+                            [
+                                {'term_id': 'guest', 'display': 'Guest'},
+                            ],
+                        ),
                         'status': 'passed',
-                        'duration_ms': 1,
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    'Guest',
-                                    [
-                                        {'term_id': 'guest', 'display': 'Guest'},
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
-                        'parameters': None,
+                        'children': [],
+                        'attachments': [],
                         'error': None,
                     }
                 ],
+                'parameters': None,
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert embedded_app_data(content)['term_scenarios'] == {
         'guest': ['test.py::test_x']
@@ -1907,14 +1644,13 @@ def test_render_round_trips_glossary_through_serde(tmp_path: Path) -> None:
         glossary=g,
     )
 
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(json.dumps(report_to_dict(report)))
-    rt = report_from_dict(json.loads(json_path.read_text()))
+    serialized = report_to_dict(report)
+    rt = report_from_dict(serialized)
     assert rt.glossary is not None
     assert {t.id for t in rt.glossary.terms} == {'guest', 'search', 'room'}
 
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(rt, html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'term-ref-actor' in content
     assert 'term-ref-activity' in content
@@ -1924,28 +1660,17 @@ def test_render_glossary_all_uncategorized_hides_kind_ui(tmp_path: Path) -> None
     """When every term is uncategorized, the kind machinery is pure noise:
     no 'Show kinds' sidebar section and no 'Uncategorized' kind header. The
     terms themselves still render as a flat list."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'glossary': {
-                    'terms': [
-                        {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
-                        {'id': 'gadget', 'kind': None, 'canonical': 'Gadget'},
-                    ],
-                },
-                'scenarios': [],
-            }
-        )
-    )
+    payload = {
+        'glossary': {
+            'terms': [
+                {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
+                {'id': 'gadget', 'kind': None, 'canonical': 'Gadget'},
+            ],
+        },
+        'scenarios': [],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Kind filter section is gone.
     assert 'Show kinds' not in content
@@ -1960,28 +1685,17 @@ def test_render_glossary_with_categorized_terms_keeps_kind_ui(tmp_path: Path) ->
     """When at least one term is categorized, the kind machinery stays: the
     'Show kinds' sidebar section and the 'Uncategorized' header for the
     remaining kindless terms both render."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'glossary': {
-                    'terms': [
-                        {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
-                        {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
-                    ],
-                },
-                'scenarios': [],
-            }
-        )
-    )
+    payload = {
+        'glossary': {
+            'terms': [
+                {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
+                {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
+            ],
+        },
+        'scenarios': [],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'Show kinds' in content
     assert 'kind-title kind-kindless' in content
@@ -1996,28 +1710,17 @@ def test_render_glossary_all_uncategorized_header_omits_kind_breakdown(
     """With every term uncategorized, the header context collapses to just the
     term count — the '0 actors · 0 work objects · 0 activities · N uncategorized'
     breakdown is noise and is dropped."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
-            {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'glossary': {
-                    'terms': [
-                        {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
-                        {'id': 'gadget', 'kind': None, 'canonical': 'Gadget'},
-                    ],
-                },
-                'scenarios': [],
-            }
-        )
-    )
+    payload = {
+        'glossary': {
+            'terms': [
+                {'id': 'widget', 'kind': None, 'canonical': 'Widget'},
+                {'id': 'gadget', 'kind': None, 'canonical': 'Gadget'},
+            ],
+        },
+        'scenarios': [],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '2 terms' in content
     # These phrases only ever appear in the header breakdown.
@@ -2027,34 +1730,23 @@ def test_render_glossary_all_uncategorized_header_omits_kind_breakdown(
 
 
 def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> None:
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'scenarios': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'scenarios': [
-                    {
-                        'id': 'pkg/test_booking.py::test_make',
-                        'narration': _narration('Make a booking'),
-                        'module': 'test_booking',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 1,
-                        'steps': [],
-                        'parameters': None,
-                        'error': None,
-                    }
-                ],
+                'id': 'pkg/test_booking.py::test_make',
+                'narration': _narration('Make a booking'),
+                'module': 'test_booking',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 1,
+                'steps': [],
+                'parameters': None,
+                'error': None,
             }
-        )
-    )
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     # Anchor carries the short slug, not the raw node ID.
     assert 'scenario=booking/make' in content
@@ -2070,17 +1762,7 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
 
 
 def test_render_html_accepts_report_data(tmp_path: Path) -> None:
-    report = report_from_dict(
-        {
-            'metadata': {
-                'project': 'from-model',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
-            'scenarios': [],
-        }
-    )
+    report = _report({'metadata': {'project': 'from-model'}})
     html_path = tmp_path / 'report.html'
     render_html(report, html_path)
     assert 'from-model' in html_path.read_text(encoding='utf-8')
@@ -2122,14 +1804,9 @@ def _alpine_directive_values(html: str) -> list[tuple[str, str]]:
 def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None:
     """Every string the report model carries into a directive-bearing element,
     poisoned with a payload that closes a JS string literal and calls out."""
-    report = report_from_dict(
+    report = _report(
         {
-            'metadata': {
-                'project': f'proj{_BREAKOUT}',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
+            'metadata': {'project': f'proj{_BREAKOUT}'},
             'scenarios': [
                 {
                     'id': f'test_a.py::test_b[{_BREAKOUT}]',
@@ -2256,14 +1933,8 @@ def test_a_disambiguated_columns_token_takes_its_own_columns_color(
     it points at reads the header's color. A token still carrying the bare
     expression would take the first `price` column's color while sitting under
     the second one's header."""
-    report = report_from_dict(
+    report = _report(
         {
-            'metadata': {
-                'project': 'p',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
             'scenarios': [
                 {
                     'id': 't.py::test_brew',
@@ -2315,17 +1986,8 @@ def test_a_disambiguated_columns_token_takes_its_own_columns_color(
 def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
     """`metadata.title`, when set, names the report in the browser tab and the
     topbar; `metadata.project` stays the rootdir name for source-link `{project}`."""
-    report = report_from_dict(
-        {
-            'metadata': {
-                'project': 'pytest-given',
-                'title': 'Coffee Shop Example',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
-            'scenarios': [],
-        }
+    report = _report(
+        {'metadata': {'project': 'pytest-given', 'title': 'Coffee Shop Example'}}
     )
     html_path = tmp_path / 'report.html'
     render_html(report, html_path)
@@ -2339,86 +2001,75 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
     carry both directions as data: which sentences each scenario covers, and
     what each sentence says. Neither is derivable from the story markup, which
     only paints the sentence's prose as pills inside the Stories view."""
-    json_path = tmp_path / 'data.json'
-    json_path.write_text(
-        json.dumps(
+    payload = {
+        'glossary': {
+            'terms': [
+                {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
+                {'id': 'search', 'kind': 'activity', 'canonical': 'search'},
+                {'id': 'room', 'kind': 'object', 'canonical': 'Room'},
+            ],
+        },
+        'stories': [
             {
-                'metadata': {
-                    'project': 'p',
-                    'timestamp': 't',
-                    'pytest_version': '9',
-                    'plugin_version': '0.1',
-                },
-                'glossary': {
-                    'terms': [
-                        {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
-                        {'id': 'search', 'kind': 'activity', 'canonical': 'search'},
-                        {'id': 'room', 'kind': 'object', 'canonical': 'Room'},
-                    ],
-                },
-                'stories': [
+                'id': 'book-a-room',
+                'title': 'Book a Room',
+                'sentences': [
                     {
-                        'id': 'book-a-room',
-                        'title': 'Book a Room',
-                        'sentences': [
+                        'id': 1,
+                        'clauses': [
                             {
-                                'id': 1,
-                                'clauses': [
+                                'parts': [
+                                    {'term_id': 'guest', 'display': 'Carol'},
                                     {
-                                        'parts': [
-                                            {'term_id': 'guest', 'display': 'Carol'},
-                                            {
-                                                'term_id': 'search',
-                                                'display': 'searches for',
-                                            },
-                                            {'term_id': 'room', 'display': 'Room'},
-                                        ]
-                                    }
-                                ],
+                                        'term_id': 'search',
+                                        'display': 'searches for',
+                                    },
+                                    {'term_id': 'room', 'display': 'Room'},
+                                ]
                             }
                         ],
-                    }
-                ],
-                'scenarios': [
-                    {
-                        'id': 'test.py::test_x',
-                        'narration': _narration('Carol searches'),
-                        'module': 'm',
-                        'tags': [],
-                        'status': 'passed',
-                        'duration_ms': 0,
-                        'story_ids': ['book-a-room'],
-                        'steps': [
-                            {
-                                'phase': 'when',
-                                'narration': _narration(
-                                    'Carol searches for a Room',
-                                    [
-                                        {'term_id': 'guest', 'display': 'Carol'},
-                                        {'value': ' '},
-                                        {
-                                            'term_id': 'search',
-                                            'display': 'searches for',
-                                        },
-                                        {'value': ' a '},
-                                        {'term_id': 'room', 'display': 'Room'},
-                                    ],
-                                ),
-                                'status': 'passed',
-                                'children': [],
-                                'attachments': [],
-                                'error': None,
-                            }
-                        ],
-                        'parameters': None,
-                        'error': None,
                     }
                 ],
             }
-        )
-    )
+        ],
+        'scenarios': [
+            {
+                'id': 'test.py::test_x',
+                'narration': _narration('Carol searches'),
+                'module': 'm',
+                'tags': [],
+                'status': 'passed',
+                'duration_ms': 0,
+                'story_ids': ['book-a-room'],
+                'steps': [
+                    {
+                        'phase': 'when',
+                        'narration': _narration(
+                            'Carol searches for a Room',
+                            [
+                                {'term_id': 'guest', 'display': 'Carol'},
+                                {'value': ' '},
+                                {
+                                    'term_id': 'search',
+                                    'display': 'searches for',
+                                },
+                                {'value': ' a '},
+                                {'term_id': 'room', 'display': 'Room'},
+                            ],
+                        ),
+                        'status': 'passed',
+                        'children': [],
+                        'attachments': [],
+                        'error': None,
+                    }
+                ],
+                'parameters': None,
+                'error': None,
+            }
+        ],
+    }
     html_path = tmp_path / 'report.html'
-    render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
+    render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     app_data = embedded_app_data(content)
     assert app_data['scenario_sentences'] == {'test.py::test_x': {'book-a-room': [1]}}
@@ -2430,17 +2081,7 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
 def test_render_emits_the_configured_theme_as_the_document_default() -> None:
     """`data-theme-default` is the contract with the head script: it is the
     only place the configured theme reaches the page."""
-    report = report_from_dict(
-        {
-            'metadata': {
-                'project': 'p',
-                'timestamp': 't',
-                'pytest_version': '9',
-                'plugin_version': '0.1',
-            },
-            'scenarios': [],
-        }
-    )
+    report = _report({})
     assert 'data-theme-default="dark"' in render_html_string(
         report, source_link_template=None, theme='dark'
     )
