@@ -9,6 +9,7 @@ import pytest
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.citations import CitationsResult, check_citations, markdown_documents
+from pytest_given.citations import check as check_module
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -88,6 +89,64 @@ def test_update_rewrites_a_stale_citation(tmp_path: Path) -> None:
         assert written == f'🔵 [checkout]({URL}#tag=checkout) (1 ✅ · 1 🔵)\n'
     with then('no finding remains'):
         assert result.remaining == []
+
+
+@scenario(t'`citations update` refuses a document that changed while it ran')
+def test_update_refuses_a_document_that_changed_while_it_ran(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An update writes the text it analyzed, so it would lose a save another
+    writer made in the meantime."""
+    with given(t'a stale {pg["Citation"].l} to rewrite'):
+        report = report_(PAY)
+        document = f'❓ [Pay by card]({URL}#scenario=t.py::test_pay)\n'
+        attach('document', document)
+    with when('another writer saves the document while the update analyzes it'):
+        _save_while_analyzing(monkeypatch, tmp_path / 'doc.md')
+        with pytest.raises(PytestGivenError) as caught:
+            _run(tmp_path, document, report, update=True)
+    with then('the update refuses, saying the document changed'):
+        assert 'changed while citations ran' in str(caught.value)
+    with then("the other writer's save is what is on disk"):
+        on_disk = (tmp_path / 'doc.md').read_bytes().decode('utf-8')
+        assert on_disk == document + 'a concurrent edit\n'
+        assert [path.name for path in tmp_path.iterdir()] == ['doc.md']
+
+
+def test_update_writes_no_document_at_all_when_one_changed_under_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """All or nothing across the documents of one run."""
+    stale = f'❓ [Pay by card]({URL}#scenario=t.py::test_pay)\n'.encode()
+    doc_a, doc_b = tmp_path / 'a.md', tmp_path / 'b.md'
+    doc_a.write_bytes(stale)
+    doc_b.write_bytes(stale)
+    _save_while_analyzing(monkeypatch, doc_a)
+    with pytest.raises(PytestGivenError, match=r'a.md changed while citations ran'):
+        check_citations(
+            report_(PAY), [doc_a, doc_b], report_url=None, report_path=None, update=True
+        )
+    assert doc_b.read_bytes() == stale
+    assert sorted(path.name for path in tmp_path.iterdir()) == ['a.md', 'b.md']
+
+
+def _save_while_analyzing(monkeypatch: pytest.MonkeyPatch, document: Path) -> None:
+    """Append to `document` once the update has read and analyzed it — the
+    window another writer's save lands in."""
+    analyze = check_module._check_document
+
+    def analyze_then_save(
+        path: Path,
+        text: str,
+        resolver: check_module.TargetResolver,
+        location: check_module._ReportLocation,
+    ) -> tuple[list[check_module.ReportLink], list[check_module._Edit]]:
+        analyzed = analyze(path, text, resolver, location)
+        if path == document:
+            path.write_bytes(path.read_bytes() + b'a concurrent edit\n')
+        return analyzed
+
+    monkeypatch.setattr(check_module, '_check_document', analyze_then_save)
 
 
 @scenario(

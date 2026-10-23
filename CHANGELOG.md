@@ -27,6 +27,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A run that executes no test — `--collect-only`, `--setup-only`, `--setup-plan`, or a selection that matches nothing — no longer overwrites the previous report.
 - A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.
 - The `conditional-check` lint no longer flags a `then` whose `if`/`else` checks on every branch.
+- `pytest-given citations update` now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.
 
 ## [0.5.0] - 2026-10-18
 

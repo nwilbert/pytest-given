@@ -32,6 +32,7 @@ from ..report import (
     Target,
     link_text,
     report_fragment,
+    write_all_or_none,
 )
 from .markdown_links import VARIATION_SELECTOR, Glyph, MarkdownLink, scan_links
 from .narrated import LooseDetails, NarratedCitation, scan_narrated
@@ -172,12 +173,29 @@ def check_citations(
             'documents link it.'
         )
     updated = [path for path, text in edited.items() if text != texts[path]]
-    for path in updated:
-        path.write_bytes(edited[path].encode('utf-8'))
+    _write_documents({path: edited[path] for path in updated}, texts)
     return CitationsResult(
         links=links,
         listed=[link for link in links if covers(link.resolved)],
         updated=updated,
+    )
+
+
+def _write_documents(edited: dict[Path, str], read: dict[Path, str]) -> None:
+    """Write every edited document or none, and none another writer saved
+    since it was read: that save would be lost under the text analyzed."""
+
+    def refuse_a_changed_document() -> None:
+        changed = [path for path in edited if _read(path) != read[path]]
+        if changed:
+            raise PytestGivenError(
+                f'{", ".join(path.as_posix() for path in changed)} changed while '
+                'citations ran, so nothing was written; run the update again.'
+            )
+
+    # `newline=''`: an update rewrites no line ending it does not mean to.
+    write_all_or_none(
+        edited.items(), newline='', before_replace=refuse_a_changed_document
     )
 
 
