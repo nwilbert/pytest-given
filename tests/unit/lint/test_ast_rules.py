@@ -1113,6 +1113,25 @@ def test_unused_interpolation_store_does_not_count_for_when(tmp_path) -> None:
     assert len(findings) == 1
 
 
+def test_unused_interpolation_augmented_assign_counts_for_when(tmp_path) -> None:
+    # `total += amount` reads `total` before it stores it — the AST marks the
+    # target Store, but the step does use the name it names.
+    src = _write(
+        tmp_path,
+        """\
+        def test_a():
+            with when(t'raising {total}'):
+                total += amount
+        """,
+    )
+    scenario = _scenario(
+        [_value_step('when', 'raising 2', _line(src, 'with when'), ['total'])]
+    )
+    assert (
+        _rule_findings(_ast_rules([scenario], tmp_path), 'unused-interpolation') == []
+    )
+
+
 @pytest.mark.parametrize('expression', ['machine["coffees"]', 'str(x)', '!!'])
 def test_unused_interpolation_skips_complex_expressions(tmp_path, expression) -> None:
     src = _write(
