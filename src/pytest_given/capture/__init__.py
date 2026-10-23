@@ -30,7 +30,7 @@ from .scenario import (
     scenario,
     scenario_marker,
 )
-from .source import item_source
+from .source import item_source, set_rootdir
 from .steps import (
     StepDescriptor,
     attach,
@@ -80,6 +80,7 @@ __all__ = [
     'scenario_marker',
     'sentence',
     'set_active_collector',
+    'set_rootdir',
     'step_descriptor',
     'story',
     'then',

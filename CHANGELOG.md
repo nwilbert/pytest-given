@@ -30,6 +30,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Reading a JSON report now rejects a frame `is_internal` that is not a boolean, naming the field — a hand-edited `"false"` would otherwise ride into the model as truthy and flip the frame toggle.
 - Reading a JSON report now rejects a narration whose `text` disagrees with what its `parts` render — the two feed the search box and the per-part highlighting respectively, and a report where they diverge must not load silently.
 - `citations update` now re-reads each document it is about to write and refuses — writing nothing at all — when one changed on disk while the update ran, instead of clobbering the newer text with the stale one it analyzed.
+- A pytest-given loaded from a conftest (`pytest_plugins = [...]` under `PYTEST_DISABLE_PLUGIN_AUTOLOAD`) — too late for the hook that prepares capture — now warns instead of degrading silently, and publishes the rootdir late so what the run records from session start on is right. Load it the usual way — an installed entry point, or `-p given` — to avoid the warning.
 
 ## [0.5.0] - 2026-10-18
 

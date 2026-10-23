@@ -661,6 +661,15 @@
 | empty-clears | \[\] | \[\] |
 | list-replaces | \[a\[2\]\] | \[2\] |
 
+## ✓ A plugin registered from a conftest warns instead of degrading silently
+`tests/integration/test_plugin.py::test_a_conftest_registered_plugin_warns_instead_of_degrading_silently` · validation
+
+- **given** a «scenario» and a conftest that registers the plugin
+- **when** the suite runs with plugin autoload disabled
+- **then** the run passes and the report is still written
+- **then** the «scenario» keeps its rootdir-relative source
+- **then** a warning says the plugin loaded too late to prepare capture
+
 ## ✓ A `Template` «given annotation» on an unparametrized «scenario» fails that «scenario»
 `tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario` · parametrization, validation
 

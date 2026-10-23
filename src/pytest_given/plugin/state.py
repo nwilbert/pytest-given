@@ -1,10 +1,12 @@
 """What a session keeps in `config.stash`, and the accessors that read it.
 
-Four values, one writer each: `Collector` is the recorder itself, created at
+Five values, one writer each: `Collector` is the recorder itself, created at
 session start; `GivenConfig` is this run's options, parsed once at configure
 time; `SessionState` is the bookkeeping the per-item hooks pass between each
-other; `SessionOutcome` is what session finish leaves for the terminal summary.
-The stash rather than module globals throughout, so a nested in-process run
+other; `SessionOutcome` is what session finish leaves for the terminal summary;
+and the capture-bootstrap mark is `pytest_load_initial_conftests`'s, whose
+absence at session start is what a conftest-registered plugin shows. The stash
+rather than module globals throughout, so a nested in-process run
 (pytester, `pytest.main`) gets its own set instead of rebinding — and thereby
 clobbering — the outer session's.
 
@@ -86,6 +88,19 @@ _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 _given_config_key: pytest.StashKey[GivenConfig] = pytest.StashKey()
 _session_outcome_key: pytest.StashKey[SessionOutcome] = pytest.StashKey()
 _session_state_key: pytest.StashKey[SessionState] = pytest.StashKey()
+_capture_bootstrapped_key: pytest.StashKey[bool] = pytest.StashKey()
+
+
+def mark_capture_bootstrapped(config: pytest.Config) -> None:
+    """Record that `pytest_load_initial_conftests` ran for this run. Its
+    absence at session start is how a plugin registered from a conftest — too
+    late for that hook, which pluggy has already dispatched — is told apart
+    from one that loaded the usual way."""
+    config.stash[_capture_bootstrapped_key] = True
+
+
+def capture_bootstrapped(config: pytest.Config) -> bool:
+    return config.stash.get(_capture_bootstrapped_key, False)
 
 
 def store_given_config(config: pytest.Config, given: GivenConfig) -> None:

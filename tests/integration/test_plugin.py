@@ -1,11 +1,20 @@
 import json
 import textwrap
+import warnings
 from pathlib import Path
 from typing import Annotated
 
 import pytest
 
-from pytest_given import Template, attach, given, scenario, then, when
+from pytest_given import (
+    PytestGivenWarning,
+    Template,
+    attach,
+    given,
+    scenario,
+    then,
+    when,
+)
 from pytest_given.plugin import session
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -2907,6 +2916,63 @@ def test_session_finish_warns_of_a_story_declared_before_the_session(pytester):
     )
     data = json.loads(pytester.path.joinpath('report.json').read_text())
     assert data['stories'] == []
+
+
+@scenario(
+    t'A plugin registered from a conftest warns instead of degrading silently',
+    tags=['validation'],
+)
+def test_a_conftest_registered_plugin_warns_instead_of_degrading_silently(
+    pytester, tmp_path
+):
+    """Under --disable-plugin-autoload the plugin loads too late for the hook
+    that publishes rootdir: the run would look fine while its conftest's
+    import-time Story and GlossaryTerm declarations lost their source links.
+    The warning keeps that degradation visible, and the rootdir is published
+    late so what the run records from session start on is right."""
+    with given(t'a {pg["Scenario"].l} and a conftest that registers the plugin'):
+        pytester.makeconftest("pytest_plugins = ['pytest_given.plugin']")
+        pytester.makepyfile(_SUITE)
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with plugin autoload disabled'):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            result = pytester.runpytest(
+                '--disable-plugin-autoload', f'--given-json={json_path}'
+            )
+    with then('the run passes and the report is still written'):
+        result.assert_outcomes(passed=1)
+        data = json.loads(json_path.read_text())
+        assert data['scenarios'][0]['narration']['text'] == 'Buy coffee'
+    with then(t'the {pg["Scenario"].l} keeps its rootdir-relative source'):
+        assert data['scenarios'][0]['source']['relpath'].endswith('.py')
+    with then('a warning says the plugin loaded too late to prepare capture'):
+        matching = [
+            str(entry.message)
+            for entry in caught
+            if issubclass(entry.category, PytestGivenWarning)
+        ]
+        assert matching, 'expected a PytestGivenWarning'
+        assert 'too late to prepare capture' in matching[0]
+
+
+def test_a_p_flag_registration_needs_no_late_bootstrap(pytester, tmp_path):
+    """`-p given` registers before the initial-conftests hook, so the normal
+    bootstrap runs — the way to run under --disable-plugin-autoload."""
+    pytester.makepyfile(_SUITE)
+    json_path = tmp_path / 'report.json'
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        result = pytester.runpytest(
+            '-p', 'given', '--disable-plugin-autoload', f'--given-json={json_path}'
+        )
+    result.assert_outcomes(passed=1)
+    assert not [
+        entry
+        for entry in caught
+        if issubclass(entry.category, PytestGivenWarning)
+        and 'too late' in str(entry.message)
+    ]
 
 
 def test_session_finish_with_no_stories_leaves_glossary_none(pytester):

@@ -21,6 +21,7 @@ from ..capture import (
     registered_stories,
     resolve_glossary,
     restore_capture_state,
+    set_rootdir,
 )
 from ..grouping import group_parametrized
 from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
@@ -37,8 +38,10 @@ from ..model import (
 )
 from ..report import detect_commit_sha, emit_sinks, sink_failure
 from .state import (
+    capture_bootstrapped,
     given_config,
     init_session_stash,
+    mark_capture_bootstrapped,
     session_collector,
     session_outcome,
     session_state,
@@ -74,11 +77,40 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
     early_config.add_cleanup(restore_displaced_state)
     begin_capture_session(Path(early_config.rootpath))
+    mark_capture_bootstrapped(early_config)
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector and hook bookkeeping."""
-    init_session_stash(session.config)
+    """Give the session its own collector and hook bookkeeping.
+
+    A plugin registered from a conftest — `pytest_plugins = [...]` under
+    `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` — misses
+    `pytest_load_initial_conftests`, which pluggy has already dispatched by
+    the time the conftest imports it. Such a run starts degraded: no rootdir
+    published, no story registry cleared, and the conftest's import-time
+    `Story` / `GlossaryTerm` source links — computed against no rootdir —
+    are gone for good. Rather than degrade silently, warn, and publish the
+    rootdir late so everything recorded from here on is right. The story
+    registry is *not* cleared late: the conftest has registered into it by
+    now, its own declarations included.
+    """
+    config = session.config
+    if not capture_bootstrapped(config):
+        displaced = capture_snapshot()
+        config.add_cleanup(lambda: restore_capture_state(displaced))
+        set_rootdir(Path(config.rootpath))
+        warnings.warn(
+            PytestGivenWarning(
+                'pytest-given loaded too late to prepare capture: a plugin '
+                'registered from a conftest misses the hook that runs before '
+                'the conftests import, so Story and GlossaryTerm declared '
+                'at import time carry no source link. Load it the usual '
+                'way — an installed entry point, or -p given — so it can '
+                'prepare before the conftests run.'
+            ),
+            stacklevel=1,
+        )
+    init_session_stash(config)
 
 
 @dataclass(frozen=True, kw_only=True)
