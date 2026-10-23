@@ -56,20 +56,7 @@ from pytest_given.report.html_renderer import (
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
-
-
-def _embedded_app_data(content: str) -> dict:
-    """The `window.__REPORT_DATA__` payload, decoded.
-
-    Asserting on the parsed value rather than on the emitted text: the blob is
-    a `JSON.parse("…")` call, so every quote in it is escaped twice and a
-    substring match would pin the encoding rather than the data.
-    """
-    start = content.index('window.__REPORT_DATA__ = JSON.parse(') + len(
-        'window.__REPORT_DATA__ = JSON.parse('
-    )
-    end = content.index(');\n', start)
-    return json.loads(json.loads(content[start:end]))
+from tests.unit.report.app_data import embedded_app_data
 
 
 def render_html(
@@ -1859,7 +1846,7 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert _embedded_app_data(content)['term_scenarios'] == {
+    assert embedded_app_data(content)['term_scenarios'] == {
         'guest': ['test.py::test_x']
     }
     assert 'data-scenario-id="test.py::test_x"' in content
@@ -2073,7 +2060,7 @@ def test_render_emits_short_scenario_slug_anchor_and_global(tmp_path: Path) -> N
     assert 'scenario=booking/make' in content
     assert 'scenario=pkg/test_booking.py::test_make' not in content
     # The app data resolves slug -> node ID.
-    slugs = _embedded_app_data(content)['scenario_slugs']
+    slugs = embedded_app_data(content)['scenario_slugs']
     assert slugs['booking/make'] == 'pkg/test_booking.py::test_make'
 
 
@@ -2433,7 +2420,7 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report_from_dict(json.loads(json_path.read_text())), html_path)
     content = html_path.read_text(encoding='utf-8')
-    app_data = _embedded_app_data(content)
+    app_data = embedded_app_data(content)
     assert app_data['scenario_sentences'] == {'test.py::test_x': {'book-a-room': [1]}}
     assert app_data['sentence_labels'] == {
         'book-a-room:1': 'Sentence 1: Carol searches for Room'
@@ -2490,7 +2477,7 @@ def _citable_report(report_url: str | None) -> ReportData:
 
 def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
     url = 'https://example.org/report.html'
-    data = _embedded_app_data(render_html_string(_citable_report(url), None))
+    data = embedded_app_data(render_html_string(_citable_report(url), None))
     citations = data['citations']
 
     def line(halves: list[str]) -> str:
@@ -2510,7 +2497,7 @@ def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
 
 def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() -> None:
     report = _citable_report('https://example.org/report.html')
-    data = _embedded_app_data(render_html_string(report, None))
+    data = embedded_app_data(render_html_string(report, None))
     citations = data['citations']
     index = CitationIndex.of(report)
     assert citations['templates'] == scenario_citation_templates(
@@ -2523,12 +2510,12 @@ def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() 
 
 
 def test_a_report_without_a_url_carries_no_citations() -> None:
-    data = _embedded_app_data(render_html_string(_citable_report(None), None))
+    data = embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['citations'] is None
 
 
 def test_a_grouped_scenarios_base_node_id_opens_it() -> None:
-    data = _embedded_app_data(render_html_string(_citable_report(None), None))
+    data = embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['cited_scenario_ids'] == {'t.py::test_pour': 't.py::test_pour[water]'}
 
 
