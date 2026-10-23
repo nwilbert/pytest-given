@@ -134,6 +134,15 @@
 - **then** the «scenario» carries its title, its «tag» and its three «steps»
 - **then** the given «step» holds a «term ref» to the term
 
+## ✓ A chained failure keeps the frames of its own error in the «report»
+`tests/integration/test_plugin.py::test_chained_failure_keeps_the_frames_of_its_own_error` · validation
+
+- **given** a «scenario» failing through a cause
+- **when** the suite fails and the report is written
+- **then** the failure is recorded on the scenario
+- **then** the frames of the actual error are structured, not tail text
+- **then** the tail carries the cause, the connector and the error
+
 ## ✓ A «scenario» failing on a pytest-given refusal points at the test, not at pytest-given
 `tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test` · validation
 

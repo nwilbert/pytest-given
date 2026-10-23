@@ -196,3 +196,50 @@ def test_absolute_user_frame_relativized_to_rootdir(tmp_path: Path) -> None:
         assert frames[0].lineno == 5
     finally:
         restore_rootdir(None)
+
+
+def test_chained_repr_resumes_at_the_cause_connector() -> None:
+    """`getrepr` chains by default: a `raise … from …` renders the cause's
+    block first, then the connector sentence, then the actual error's frames.
+    The connector is the parser's cue to start parsing frames again — the
+    error the reader opened the scenario for must not end up as unparsed
+    tail text, hidden from `--given-all-frames` and frame classification."""
+    text = (
+        'tests/setup.py:3: in load\n'
+        '    return broken()\n'
+        'E   ValueError: the cause\n'
+        '\n'
+        'The above exception was the direct cause of the following exception:\n'
+        'tests/test_brew.py:12: in test_brew\n'
+        '    assert cup is not None\n'
+        'E   AssertionError: assert None is not None'
+    )
+    frames, tail = parse_short_repr(text)
+    assert [frame.func for frame in frames] == ['load', 'test_brew']
+    assert frames[1].path == 'tests/test_brew.py'
+    assert frames[1].is_internal is False
+    assert frames[1].code == '    assert cup is not None'
+    assert tail is not None
+    # The connector explains the frames, so it stays in the tail.
+    assert tail.startswith('E   ValueError: the cause')
+    assert 'The above exception was the direct cause' in tail
+    assert tail.endswith('E   AssertionError: assert None is not None')
+
+
+def test_chained_repr_resumes_at_the_during_handling_connector() -> None:
+    """An exception raised inside an `except` block chains through
+    `__context__`, rendered with the other connector sentence."""
+    text = (
+        'tests/setup.py:3: in load\n'
+        '    return broken()\n'
+        'E   ValueError: the cause\n'
+        '\n'
+        'During handling of the above exception, another exception occurred:\n'
+        'tests/test_brew.py:12: in test_brew\n'
+        '    raise RuntimeError("the actual error")\n'
+        'E   RuntimeError: the actual error'
+    )
+    frames, tail = parse_short_repr(text)
+    assert [frame.func for frame in frames] == ['load', 'test_brew']
+    assert tail is not None
+    assert 'During handling of the above exception' in tail

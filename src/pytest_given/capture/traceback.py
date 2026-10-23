@@ -25,6 +25,14 @@ from .source import to_relpath
 # cannot pass for a new frame header.
 _FRAME_HEADER_RE = re.compile(r'^(?P<path>\S.*?):(?P<lineno>\d+): in (?P<func>.+)$')
 
+# `getrepr` chains by default: a `raise … from …` (or an exception raised
+# inside an `except`) renders the cause's block first, then the sentence that
+# connects it to the block of the error the reader actually cares about.
+_CHAIN_CONNECTORS = (
+    'The above exception was the direct cause of the following exception:',
+    'During handling of the above exception, another exception occurred:',
+)
+
 # Substrings (after backslash → forward-slash normalization) that mark a
 # frame as internal. Suffix entries use endswith; others use substring.
 # Kept strict on purpose: a missed internal frame is uglier output, but a
@@ -89,6 +97,12 @@ def parse_short_repr(text: str) -> tuple[list[TracebackFrame], str | None]:
 
     for line in text.splitlines():
         if in_tail:
+            if line in _CHAIN_CONNECTORS:
+                # The tail ends here: the frames of the actual error follow,
+                # and they must reach the structured frames — classified, and
+                # visible to `--given-all-frames` — not stay tail text. The
+                # connector itself stays, as it explains them.
+                in_tail = False
             tail_lines.append(line)
             continue
         match = _FRAME_HEADER_RE.match(line)

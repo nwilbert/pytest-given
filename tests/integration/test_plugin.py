@@ -149,6 +149,47 @@ def test_given_all_frames_retains_internal_frames(pytester, tmp_path):
     assert any(f['func'] == 'test_fail' for f in error['frames'])
 
 
+_CHAINED_FAILURE = """
+    from pytest_given import scenario, then
+
+    @scenario('Chained failure')
+    def test_chained():
+        with then('the values agree'):
+            try:
+                raise ValueError('the cause')
+            except ValueError as cause:
+                raise AssertionError('the actual error') from cause
+"""
+
+
+@scenario(
+    t'A chained failure keeps the frames of its own error in the {pg["Report"].l}',
+    tags=['validation'],
+)
+def test_chained_failure_keeps_the_frames_of_its_own_error(pytester, tmp_path):
+    """`getrepr` chains by default: a `raise … from …` renders the cause's
+    block first, and a parser that never resumes after it leaves the actual
+    error's frames as unclassified tail text — hidden from the frame toggle."""
+    with given(t'a {pg["Scenario"].l} failing through a cause'):
+        pytester.makepyfile(_CHAINED_FAILURE)
+        json_path = tmp_path / 'report.json'
+    with when('the suite fails and the report is written'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then('the failure is recorded on the scenario'):
+        result.assert_outcomes(failed=1)
+        error = json.loads(json_path.read_text())['scenarios'][0]['error']
+        assert error is not None
+    with then('the frames of the actual error are structured, not tail text'):
+        assert any('the actual error' in f['code'] for f in error['frames']), (
+            f'expected the failing line as a frame, got {error["frames"]!r}'
+        )
+        assert all(not f['is_internal'] for f in error['frames'])
+    with then('the tail carries the cause, the connector and the error'):
+        assert 'the cause' in error['error_tail']
+        assert 'direct cause' in error['error_tail']
+        assert 'the actual error' in error['error_tail']
+
+
 _AUTHORING_MISTAKES = """
     from pytest_given import Glossary, given, scenario, when
 

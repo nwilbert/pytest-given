@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-23T10:04:24.664219+00:00",
+    "timestamp": "2026-10-23T10:06:53.664057+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "705e72ea6375be2992e460aeba8dcaea232308b7",
+    "commit_sha": "0aa4e52d61b9e3951f7ac65d83c8749a6a5cef0c",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -877,7 +877,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -1041,6 +1041,107 @@
       "pins": null
     },
     {
+      "id": "tests/integration/test_plugin.py::test_chained_failure_keeps_the_frames_of_its_own_error",
+      "narration": {
+        "text": "A chained failure keeps the frames of its own error in the report",
+        "parts": [
+          {
+            "value": "A chained failure keeps the frames of its own error in the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin",
+      "tags": [
+        "validation"
+      ],
+      "status": "passed",
+      "duration_ms": 27,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario failing through a cause",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " failing through a cause"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the suite fails and the report is written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the failure is recorded on the scenario",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the frames of the actual error are structured, not tail text",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the tail carries the cause, the connector and the error",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin.py",
+        "line": 165
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test",
       "narration": {
         "text": "A scenario failing on a pytest-given refusal points at the test, not at pytest-given",
@@ -1063,7 +1164,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1122,7 +1223,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 171
+        "line": 212
       },
       "story_ids": [],
       "pins": null
@@ -1215,7 +1316,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 193
+        "line": 234
       },
       "story_ids": [],
       "pins": null
@@ -1347,7 +1448,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 262
+        "line": 303
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -1383,7 +1484,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 539,
+      "duration_ms": 554,
       "steps": [
         {
           "phase": "given",
@@ -1462,7 +1563,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 297
+        "line": 338
       },
       "story_ids": [],
       "pins": null
@@ -1511,7 +1612,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -1658,7 +1759,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 335
+        "line": 376
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -1698,7 +1799,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -1856,7 +1957,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 385
+        "line": 426
       },
       "story_ids": [],
       "pins": null
@@ -1884,7 +1985,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -1926,7 +2027,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 537
+        "line": 578
       },
       "story_ids": [],
       "pins": null
@@ -2033,7 +2134,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 566
+        "line": 607
       },
       "story_ids": [],
       "pins": null
@@ -2061,7 +2162,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -2132,7 +2233,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 634
+        "line": 675
       },
       "story_ids": [],
       "pins": null
@@ -2202,7 +2303,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 666
+        "line": 707
       },
       "story_ids": [],
       "pins": null
@@ -2327,7 +2428,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 692
+        "line": 733
       },
       "story_ids": [],
       "pins": null
@@ -2350,7 +2451,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -2441,7 +2542,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 912
+        "line": 953
       },
       "story_ids": [],
       "pins": null
@@ -2485,7 +2586,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -2597,7 +2698,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 1049
+        "line": 1090
       },
       "story_ids": [],
       "pins": null
@@ -2613,7 +2714,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -2757,7 +2858,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 1109
+        "line": 1150
       },
       "story_ids": [],
       "pins": null
@@ -2874,7 +2975,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 1628
+        "line": 1669
       },
       "story_ids": [],
       "pins": null
@@ -2900,7 +3001,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -2942,7 +3043,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2239
+        "line": 2280
       },
       "story_ids": [],
       "pins": null
@@ -2973,7 +3074,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3109,7 +3210,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2407
+        "line": 2448
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3145,7 +3246,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3243,7 +3344,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2479
+        "line": 2520
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3284,7 +3385,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -3385,7 +3486,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2517
+        "line": 2558
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3429,7 +3530,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3538,7 +3639,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2563
+        "line": 2604
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3582,7 +3683,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -3683,7 +3784,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2604
+        "line": 2645
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3727,7 +3828,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3830,7 +3931,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2666
+        "line": 2707
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -3874,7 +3975,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -4023,7 +4124,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 2706
+        "line": 2747
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -4067,7 +4168,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4167,7 +4268,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3198
+        "line": 3239
       },
       "story_ids": [],
       "pins": null
@@ -4196,7 +4297,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -4356,7 +4457,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3240
+        "line": 3281
       },
       "story_ids": [],
       "pins": null
@@ -4382,7 +4483,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -4450,7 +4551,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3348
+        "line": 3389
       },
       "story_ids": [],
       "pins": null
@@ -4476,7 +4577,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -4527,7 +4628,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3361
+        "line": 3402
       },
       "story_ids": [],
       "pins": null
@@ -4555,7 +4656,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -4636,7 +4737,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3384
+        "line": 3425
       },
       "story_ids": [],
       "pins": null
@@ -4672,7 +4773,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -4726,7 +4827,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3446
+        "line": 3487
       },
       "story_ids": [],
       "pins": null
@@ -4762,7 +4863,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -4831,7 +4932,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3484
+        "line": 3525
       },
       "story_ids": [],
       "pins": null
@@ -4854,7 +4955,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -4916,7 +5017,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3517
+        "line": 3558
       },
       "story_ids": [],
       "pins": null
@@ -4936,7 +5037,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -5002,7 +5103,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3537
+        "line": 3578
       },
       "story_ids": [],
       "pins": null
@@ -5087,7 +5188,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3570
+        "line": 3611
       },
       "story_ids": [],
       "pins": null
@@ -5113,7 +5214,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -5186,7 +5287,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3602
+        "line": 3643
       },
       "story_ids": [],
       "pins": null
@@ -5220,7 +5321,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -5291,7 +5392,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3743
+        "line": 3784
       },
       "story_ids": [],
       "pins": null
@@ -5319,7 +5420,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -5384,7 +5485,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3791
+        "line": 3832
       },
       "story_ids": [],
       "pins": null
@@ -5433,7 +5534,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -5547,7 +5648,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3844
+        "line": 3885
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -5586,7 +5687,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -5634,7 +5735,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3926
+        "line": 3967
       },
       "story_ids": [],
       "pins": null
@@ -5662,7 +5763,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -5761,7 +5862,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin.py",
-        "line": 3976
+        "line": 4017
       },
       "story_ids": [],
       "pins": null
@@ -5811,7 +5912,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 135,
       "steps": [
         {
           "phase": "given",
@@ -6072,7 +6173,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -6179,7 +6280,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -6299,7 +6400,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -6429,7 +6530,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -6659,7 +6760,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -6771,7 +6872,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -6867,7 +6968,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -13636,7 +13737,7 @@
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -15794,7 +15895,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -26765,7 +26866,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",

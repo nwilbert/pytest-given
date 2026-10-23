@@ -25,6 +25,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A failed parametrize case that recorded steps no longer escapes the grouping checks: its narration must agree with the baseline's template over the steps it recorded, or the group is refused (previously only passed cases were compared, so a failed case's wording rode under the baseline's).
 - `--collect-only`, `--setup-only` and `--setup-plan` runs no longer build or write a report — the previous report is left untouched, and the terminal summary says so when a sink flag was configured.
+- A chained exception (`raise … from …`, or an exception raised inside an `except`) now reports the frames of its own error as structured, classified frames — previously they stayed unparsed tail text after the cause's block, hidden from the `--given-all-frames` toggle.
 
 ## [0.5.0] - 2026-10-18
 
