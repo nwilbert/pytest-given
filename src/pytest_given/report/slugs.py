@@ -44,12 +44,20 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
         if not moved:
             # Every directory is already in the slug and the pair still reads
             # the same. Nothing shorter than the node ID can separate them.
-            slugs.update(_fallback_slugs(colliding))
+            # The slugs the escalation settled for other scenarios are taken:
+            # a folded node ID can land on one of those, so the fallback must
+            # dodge them to keep the index's uniqueness global.
+            settled = {
+                slug for node_id, slug in slugs.items() if node_id not in set(colliding)
+            }
+            slugs.update(_fallback_slugs(colliding, reserved=settled))
             break
     return slugs
 
 
-def _fallback_slugs(colliding: list[NodeId]) -> dict[NodeId, str]:
+def _fallback_slugs(
+    colliding: list[NodeId], *, reserved: set[str]
+) -> dict[NodeId, str]:
     """Fragment-safe, unique slugs for scenarios no path depth separates.
 
     A node ID is unique by construction but may carry the characters
@@ -57,15 +65,26 @@ def _fallback_slugs(colliding: list[NodeId]) -> dict[NodeId, str]:
     again, which is the one case the escalation above cannot reach. Such a
     group is separated by an ordinal over the *sorted* ids, so the slug a
     scenario gets still does not depend on the order the report lists them in.
+
+    `reserved` holds the slugs the escalation settled for scenarios outside
+    the colliding group; a fallback that lands on one of those advances to
+    the next ordinal, so uniqueness holds against the whole index, not just
+    within the group.
     """
     by_safe: dict[str, list[NodeId]] = {}
     for node_id in sorted(colliding):
         by_safe.setdefault(_fragment_safe(node_id), []).append(node_id)
-    return {
-        node_id: safe if len(group) == 1 else f'{safe}-{ordinal}'
-        for safe, group in by_safe.items()
-        for ordinal, node_id in enumerate(group, start=1)
-    }
+    slugs: dict[NodeId, str] = {}
+    for safe, group in by_safe.items():
+        ordinal = 1 if len(group) > 1 else 0
+        for node_id in group:
+            candidate = safe if ordinal == 0 else f'{safe}-{ordinal}'
+            while candidate in reserved:
+                ordinal += 1
+                candidate = f'{safe}-{ordinal}'
+            reserved.add(candidate)
+            slugs[node_id] = candidate
+    return slugs
 
 
 def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:

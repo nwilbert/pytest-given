@@ -35,6 +35,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given skills install` now prunes directories under its bundled skills that no bundled file lives in — the leftovers of removed stale files, or manually created empty ones — and `--check` reports them as drift instead of passing them.
 - A sink file can no longer be left half-written: the report files are written to sibling temporaries first and only move into place once every write succeeded, so a Ctrl-C or kill mid-write leaves the previous report — never a truncated file that reads as current — and an interrupted write discards the stale one like any other failure.
 - A `given_source_link` template whose format spec or conversion is bad (`{line:>{width}}`, `{line!x}`) is now rejected when the option is validated, with the variable or conversion named — instead of crashing at render time and discarding the whole report for a template typo.
+- Two scenarios can no longer end up with the same `#scenario=` slug when a pair that survives a full path falls back to its node IDs: a fallback that folds onto a slug the escalation settled for an unrelated scenario now takes the next ordinal over it.
 
 ## [0.5.0] - 2026-10-18
 
