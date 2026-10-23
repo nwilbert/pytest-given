@@ -40,6 +40,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A failure raised from inside the Markdown-glossary reader or the narration helpers no longer shows pytest-given's own frame as a user frame in the report's traceback — those modules refuse bad input, and by the internal-frame rule their frames belong behind the toggle.
 - `attach()` with content JSON cannot carry — dict keys that are not strings, a self-referencing structure — now refuses with a pytest-given error naming the attachment and the fix, instead of leaking the raw `TypeError` or `ValueError` from `json.dumps` into the middle of a test.
 - `Template('a {cup_size')` — a brace left open — now raises `PytestGivenError` at construction like every other authoring mistake the class refuses, with the stdlib reason folded in and the `{{` / `}}` escape named, instead of a raw `ValueError` from the format parser.
+- A grouped parametrized scenario whose cases skipped for different reasons no longer carries one case's reason for all of them: the group keeps a skip reason only when every skipped case shares it, the same rule the xfail reason already followed.
 
 ## [0.5.0] - 2026-10-18
 

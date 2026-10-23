@@ -179,6 +179,56 @@ def test_xfailed_cases_with_different_reasons_leave_the_group_without_one() -> N
     assert grouped.xfail_reason is None
 
 
+def test_skipped_cases_with_different_reasons_leave_the_group_without_one() -> None:
+    """A group that skips for more than one reason cannot carry one of them:
+    the anchor's would speak for every case it does not."""
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(
+            id=nid1,
+            narration=Narration(text='x'),
+            module='m',
+            status='skipped',
+            skip_reason='needs a database',
+        ),
+        Scenario(
+            id=nid2,
+            narration=Narration(text='x'),
+            module='m',
+            status='skipped',
+            skip_reason='needs a service',
+        ),
+    ]
+    param_info: ParamInfo = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    [grouped] = group_parametrized(scenarios, param_info)
+    assert grouped.status == 'skipped'
+    assert grouped.skip_reason is None
+
+
+def test_skipped_cases_sharing_one_reason_carry_it() -> None:
+    nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
+    scenarios = [
+        Scenario(
+            id=case_id,
+            narration=Narration(text='x'),
+            module='m',
+            status='skipped',
+            skip_reason='needs a database',
+        )
+        for case_id in (nid1, nid2)
+    ]
+    param_info: ParamInfo = {
+        nid1: ParamSpec(names=['n'], values=[1]),
+        nid2: ParamSpec(names=['n'], values=[2]),
+    }
+    [grouped] = group_parametrized(scenarios, param_info)
+    assert grouped.status == 'skipped'
+    assert grouped.skip_reason == 'needs a database'
+
+
 def test_a_passed_group_does_not_inherit_a_skipped_anchors_reason() -> None:
     nid1, nid2 = NodeId('t::x[1]'), NodeId('t::x[2]')
     scenarios = [
