@@ -107,8 +107,8 @@ class Template:
     """Deferred brace-style template. Same `{...}` syntax as f/t-strings.
 
     Supports bare identifiers only — `{name}`, `{name:spec}`, `{name!conv}`.
-    Attribute access, indexing, and arbitrary expressions raise PytestGivenError
-    at construction time.
+    Attribute access, indexing, arbitrary expressions, and a brace left open
+    raise PytestGivenError at construction time.
     """
 
     def __init__(self, template: str) -> None:
@@ -117,7 +117,15 @@ class Template:
         # An escaped brace ends a literal of its own, so the text up to each
         # placeholder is joined back: each literal is read for spans alone.
         text = ''
-        for literal, name, spec, conversion in _FORMATTER.parse(template):
+        try:
+            parsed = list(_FORMATTER.parse(template))
+        except ValueError as error:
+            raise PytestGivenError(
+                f'pytest_given.Template cannot read {template!r}: {error}. '
+                'Escape a literal brace as {{ or }}, and close every '
+                "placeholder's brace."
+            ) from error
+        for literal, name, spec, conversion in parsed:
             text += literal
             if name is None:
                 continue
