@@ -102,6 +102,25 @@ def compile_source_link(
             f'Unknown source-link template variable(s) {sorted(unknown)!r}. '
             f'Valid: {_valid_vars()}.'
         )
+    # A nested spec (`{line:>{width}}`) or a bad conversion (`{line!x}`) names
+    # its problem only at format() time; the field-name check above cannot see
+    # into a spec. One dry-run format here surfaces it at compile time, where
+    # it belongs, instead of mid-render, where it would discard a whole report
+    # for a template typo. The sample values carry the types the real
+    # substitution passes, so what formats once formats every time.
+    try:
+        template.format(
+            path='/proj/test_x.py',
+            relpath='test_x.py',
+            line=1,
+            project=project,
+            sha=commit_sha or '',
+        )
+    except (KeyError, ValueError, IndexError) as error:
+        raise PytestGivenError(
+            f'Source-link template {template!r} fails to format: '
+            f'{type(error).__name__}: {error}. Valid: {_valid_vars()}.'
+        ) from error
     if 'sha' in used and commit_sha is None:
         raise PytestGivenError(
             'Source-link template uses {sha} but no commit SHA was detected. '
