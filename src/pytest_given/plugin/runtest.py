@@ -9,6 +9,7 @@ from collections.abc import Generator
 from typing import TYPE_CHECKING
 
 import pytest
+from _pytest._code.code import ExceptionChainRepr
 
 from ..capture import (
     Collector,
@@ -19,6 +20,7 @@ from ..capture import (
     set_active_collector,
 )
 from ..model import (
+    ErrorCause,
     ErrorInfo,
     NodeId,
     ParamSpec,
@@ -189,12 +191,35 @@ def _capture_error(item: pytest.Item, call: pytest.CallInfo[None]) -> ErrorInfo 
     # scenario. Not gated on --given-all-frames: neither ever wants a traceback.
     if call.excinfo.errisinstance((pytest.skip.Exception, pytest.xfail.Exception)):
         return None
-    if not given_config(item.config).all_frames:
+    all_frames = given_config(item.config).all_frames
+    if not all_frames:
         _filter_internal_frames(call.excinfo)
     error_repr = call.excinfo.getrepr(style='short')
-    message = str(call.excinfo.value)
-    frames, error_tail = parse_short_repr(str(error_repr))
-    return ErrorInfo(message=message, frames=frames, error_tail=error_tail)
+    # Always a chain in this style: root cause first, each link carrying the
+    # sentence that leads on to the next, the error itself last.
+    assert isinstance(error_repr, ExceptionChainRepr)
+    *cause_links, (own_traceback, _crash, _connector) = error_repr.chain
+    frames, error_tail = parse_short_repr(str(own_traceback))
+    causes = [
+        _cause(str(traceback), connector, all_frames=all_frames)
+        for traceback, _crash, connector in cause_links
+    ]
+    return ErrorInfo(
+        message=str(call.excinfo.value),
+        frames=frames,
+        error_tail=error_tail,
+        causes=causes,
+    )
+
+
+def _cause(traceback: str, connector: str | None, *, all_frames: bool) -> ErrorCause:
+    """A cause's traceback never passed the pre-filter, so its internal frames
+    go here — by the same rule, keeping them all when every one is internal."""
+    assert connector is not None
+    frames, error_tail = parse_short_repr(traceback)
+    if not all_frames:
+        frames = [frame for frame in frames if not frame.is_internal] or frames
+    return ErrorCause(frames=frames, error_tail=error_tail, connector=connector)
 
 
 @pytest.hookimpl(trylast=True)

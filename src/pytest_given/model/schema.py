@@ -355,10 +355,22 @@ class TracebackFrame:
 
 
 @dataclass(frozen=True)
+class ErrorCause:
+    """An exception an error was raised from or while handling, and the
+    sentence pytest joins it to the next exception of the chain with."""
+
+    frames: list[TracebackFrame]
+    error_tail: str | None
+    connector: str
+
+
+@dataclass(frozen=True)
 class ErrorInfo:
     message: str
     frames: list[TracebackFrame] = field(default_factory=list)
     error_tail: str | None = None
+    # Root cause first, the order pytest prints them in above `frames`.
+    causes: list[ErrorCause] = field(default_factory=list)
 
 
 @dataclass

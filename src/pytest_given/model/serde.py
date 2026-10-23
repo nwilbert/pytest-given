@@ -34,6 +34,7 @@ from .schema import (
     ClauseTermRef,
     ClauseWord,
     ColumnId,
+    ErrorCause,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -291,6 +292,14 @@ def _error_from_dict(d: dict[str, Any] | None) -> ErrorInfo | None:
         message=d['message'],
         frames=[_frame_from_dict(f) for f in d.get('frames', [])],
         error_tail=d.get('error_tail'),
+        causes=[
+            ErrorCause(
+                frames=[_frame_from_dict(f) for f in cause['frames']],
+                error_tail=cause['error_tail'],
+                connector=cause['connector'],
+            )
+            for cause in d.get('causes', [])
+        ],
     )
 
 

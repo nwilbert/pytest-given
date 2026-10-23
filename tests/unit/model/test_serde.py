@@ -6,6 +6,7 @@ from pytest_given.model import (
     Clause,
     ClauseTermRef,
     ClauseWord,
+    ErrorCause,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -1009,6 +1010,22 @@ def _every_field_populated() -> ReportData:
                             )
                         ],
                         error_tail='E   AssertionError',
+                        causes=[
+                            ErrorCause(
+                                frames=[
+                                    TracebackFrame(
+                                        path='t.py',
+                                        lineno=3,
+                                        func='load',
+                                        code='raise E',
+                                        is_internal=False,
+                                    )
+                                ],
+                                error_tail='E   ValueError',
+                                connector='During handling of the above '
+                                'exception, another exception occurred:',
+                            )
+                        ],
                     ),
                 )
             ],

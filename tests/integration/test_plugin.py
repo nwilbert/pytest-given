@@ -149,6 +149,71 @@ def test_given_all_frames_retains_internal_frames(pytester, tmp_path):
     assert any(f['func'] == 'test_fail' for f in error['frames'])
 
 
+_CHAINED_FAILURE = """
+    from pytest_given import scenario, then
+
+    @scenario('Chained failure')
+    def test_chained():
+        with then('the values agree'):
+            try:
+                raise ValueError('the cause')
+            except ValueError as cause:
+                raise AssertionError('the actual error') from cause
+"""
+
+
+@scenario(
+    t'A chained failure reports the frames of its own error, and its cause apart',
+    tags=['validation'],
+)
+def test_chained_failure_keeps_the_frames_of_its_own_error(pytester, tmp_path):
+    """`getrepr` chains by default: a `raise … from …` renders the cause's
+    block first. The error's frames must be its own, not its cause's — the
+    Markdown's failure location reads them."""
+    with given(t'a {pg["Scenario"].l} failing through a cause'):
+        pytester.makepyfile(_CHAINED_FAILURE)
+        json_path = tmp_path / 'report.json'
+    with when('the suite fails and the report is written'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+        result.assert_outcomes(failed=1)
+        error = json.loads(json_path.read_text())['scenarios'][0]['error']
+    with then("the error's frames hold the line that raised it"):
+        [frame] = error['frames']
+        assert 'the actual error' in frame['code']
+        assert error['error_tail'] == 'E   AssertionError: the actual error'
+    with then('the cause is reported apart, with the sentence leading on to the error'):
+        [cause] = error['causes']
+        assert cause['error_tail'] == 'E   ValueError: the cause'
+        assert cause['connector'].startswith('The above exception was the direct')
+
+
+_FAILURE_CAUSED_INSIDE_PYTEST_GIVEN = """
+    from pytest_given import PytestGivenError, Template, scenario, then
+
+    @scenario('Caused inside pytest-given')
+    def test_chained():
+        with then('the template reads'):
+            try:
+                Template('{cup.size}')
+            except PytestGivenError as cause:
+                raise AssertionError('the actual error') from cause
+"""
+
+
+@pytest.mark.parametrize(
+    ('flags', 'internal'), [((), False), (('--given-all-frames',), True)]
+)
+def test_a_causes_internal_frames_follow_the_all_frames_flag(
+    pytester, tmp_path, flags, internal
+):
+    pytester.makepyfile(_FAILURE_CAUSED_INSIDE_PYTEST_GIVEN)
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}', *flags).assert_outcomes(failed=1)
+    [cause] = json.loads(json_path.read_text())['scenarios'][0]['error']['causes']
+    assert any(frame['func'] == 'test_chained' for frame in cause['frames'])
+    assert any(frame['is_internal'] for frame in cause['frames']) is internal
+
+
 _AUTHORING_MISTAKES = """
     from pytest_given import Glossary, given, scenario, when
 

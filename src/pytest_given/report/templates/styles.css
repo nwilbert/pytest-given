@@ -925,6 +925,12 @@ span.param-highlight {
   white-space: pre-wrap;
   color: var(--error-ink);
 }
+.error-connector {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  color: var(--text-muted);
+}
 [x-cloak] { display: none !important; }
 
 /* Reason: why a scenario was skipped or expected to fail, in its status colour. */

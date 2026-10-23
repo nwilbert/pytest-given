@@ -100,7 +100,8 @@
 
   {#- The status colours the block: an xfailed one is not an alarm. -#}
   {%- macro render_error(error, status) -%}
-    {%- set internal_count = error.frames | selectattr('is_internal') | list | length -%}
+    {%- set chained_frames = error.causes | map(attribute='frames') | sum(start=[]) -%}
+    {%- set internal_count = (chained_frames + error.frames) | selectattr('is_internal') | list | length -%}
     <div class="error-block {{ status }}"{% if internal_count %} x-data="{ showInternal: false }"{% endif %}>
       <div class="error-message">{{ error.message }}</div>
       {%- if internal_count -%}
@@ -109,19 +110,29 @@
           <span x-show="showInternal" x-cloak>Hide internal frames</span>
         </button>
       {%- endif -%}
-      {%- if error.frames -%}
-        <div class="error-frames">
-          {%- for f in error.frames -%}
-            <div class="error-frame{% if f.is_internal %} error-frame-internal{% endif %}"
-                 {%- if f.is_internal %} x-show="showInternal" x-cloak{% endif -%}>
-              <div class="error-frame-loc">{{ f.path }}:{{ f.lineno }}: in {{ f.func }}</div>
-              <pre class="error-frame-code">{{ f.code }}</pre>
-            </div>
-          {%- endfor -%}
-        </div>
-      {%- endif -%}
-      {%- if error.error_tail -%}<pre class="error-tail">{{ error.error_tail }}</pre>{%- endif -%}
+      {#- A chained error reads as pytest prints it: each cause, root first,
+          then the sentence leading on to the next, then the error's own. -#}
+      {%- for cause in error.causes -%}
+        {{ render_frames(cause.frames, cause.error_tail) }}
+        <div class="error-connector">{{ cause.connector }}</div>
+      {%- endfor -%}
+      {{ render_frames(error.frames, error.error_tail) }}
     </div>
+  {%- endmacro -%}
+
+  {%- macro render_frames(frames, tail) -%}
+    {%- if frames -%}
+      <div class="error-frames">
+        {%- for f in frames -%}
+          <div class="error-frame{% if f.is_internal %} error-frame-internal{% endif %}"
+               {%- if f.is_internal %} x-show="showInternal" x-cloak{% endif -%}>
+            <div class="error-frame-loc">{{ f.path }}:{{ f.lineno }}: in {{ f.func }}</div>
+            <pre class="error-frame-code">{{ f.code }}</pre>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+    {%- if tail -%}<pre class="error-tail">{{ tail }}</pre>{%- endif -%}
   {%- endmacro -%}
 
   {#- `step_id` is interpolated straight into the Alpine expressions below,
