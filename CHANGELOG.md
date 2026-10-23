@@ -39,6 +39,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `Template` with an unclosed brace now raises `PytestGivenError` instead of `ValueError`.
 - A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.
 - The `unused-interpolation` lint no longer flags a step whose body updates the interpolated name with an augmented assignment such as `total += 1`.
+- `pytest-given citations update` no longer splits a CRLF line break when an edit ends at a line end.
 
 ## [0.5.0] - 2026-10-18
 
