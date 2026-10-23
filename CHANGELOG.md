@@ -41,6 +41,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `attach()` with content JSON cannot carry — dict keys that are not strings, a self-referencing structure — now refuses with a pytest-given error naming the attachment and the fix, instead of leaking the raw `TypeError` or `ValueError` from `json.dumps` into the middle of a test.
 - `Template('a {cup_size')` — a brace left open — now raises `PytestGivenError` at construction like every other authoring mistake the class refuses, with the stdlib reason folded in and the `{{` / `}}` escape named, instead of a raw `ValueError` from the format parser.
 - A grouped parametrized scenario whose cases skipped for different reasons no longer carries one case's reason for all of them: the group keeps a skip reason only when every skipped case shares it, the same rule the xfail reason already followed.
+- A `given_lint_ignore` entry's brackets after the `::` now name a parametrize case instead of a glob character class: `tests/t.py::test_a[b]` matches that case — previously it never matched it, and silently suppressed `test_ab`'s findings instead.
 
 ## [0.5.0] - 2026-10-18
 

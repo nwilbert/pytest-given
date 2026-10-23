@@ -24,6 +24,8 @@ Each rule has a default severity. A `warn` lint finding is printed in the termin
 
 Change a rule's severity with `given_lint_rules`. Skip lint findings for specific tests with `given_lint_ignore`: each entry is a node-id pattern (with `*` wildcards), optionally limited to one rule with a `rule-id:` prefix.
 
+Brackets after the `::` name a parametrize case, not a glob character class: `tests/unit/test_math.py::test_add[water]` matches that case — and only it — so `[water]` cannot accidentally swallow some other test's findings.
+
 ```toml
 [tool.pytest]
 given_lint = true

@@ -100,6 +100,11 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
     typo worth reporting, *unless* what follows is itself a node ID: that is
     how a Windows drive letter arrives (``c:/repo/tests/t.py::test_x``), where
     the prefix is part of a path rather than a rule scope.
+
+    After the ``::``, a bracket is a callspec, not a glob character class:
+    ``tests/t.py::test_a[b]`` names that case. `fnmatchcase` would read the
+    brackets as a class — never matching the case, and silently suppressing
+    ``test_ab``'s findings — so the stored pattern takes them literally.
     """
     entries: list[IgnoreEntry] = []
     for line in lines:
@@ -107,15 +112,31 @@ def parse_ignore_entries(lines: list[str]) -> list[IgnoreEntry]:
         rule = RuleId(prefix.strip())
         if sep and _RULE_PREFIX_RE.fullmatch(rule):
             if rule in DEFAULTS:
-                entries.append(IgnoreEntry(raw=line, rule=rule, pattern=rest.strip()))
+                entries.append(
+                    IgnoreEntry(
+                        raw=line, rule=rule, pattern=_callspec_safe(rest.strip())
+                    )
+                )
                 continue
             if '::' not in rest:
                 raise PytestGivenError(
                     f'unknown rule prefix {rule!r} in given_lint_ignore entry '
                     f'{line!r} (known: {", ".join(sorted(DEFAULTS))}).'
                 )
-        entries.append(IgnoreEntry(raw=line, rule=None, pattern=line.strip()))
+        entries.append(
+            IgnoreEntry(raw=line, rule=None, pattern=_callspec_safe(line.strip()))
+        )
     return entries
+
+
+def _callspec_safe(pattern: str) -> str:
+    """The glob pattern with callspec brackets — the ones after `::` — taken
+    literally. `*` and `?` keep their glob meaning everywhere; a character
+    class still works in the path portion, before the `::`."""
+    scope, sep, func = pattern.partition('::')
+    if not sep:
+        return pattern
+    return f'{scope}::{func.replace("[", "[[]")}'
 
 
 def apply_config(
