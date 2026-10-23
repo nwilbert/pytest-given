@@ -7,6 +7,7 @@ baseline, comparable cases, cells, cases — happens here; the promoting is
 `templatize`'s.
 """
 
+from collections.abc import Iterable
 from dataclasses import replace
 
 from ..model import (
@@ -84,10 +85,10 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     # derives rather than inherits are then the only ones spelled out, and a
     # field added to `Scenario` later cannot go missing here by omission.
     # `error` is dropped because a grouped scenario carries none of its own —
-    # each case's sits in the table. A reason goes only with its status:
-    # `skip_reason` is then the anchor's, the one every case shares when they
-    # all skipped; `xfail_reason` cannot be, as the one xfailed row of a table
-    # is seldom the anchor.
+    # each case's sits in the table. A reason goes only with its status, and
+    # only when every case with that status shares it: the one xfailed or
+    # skipped row of a table is seldom the anchor, and a group that skips or
+    # xfails for more than one reason cannot carry one of them.
     status = rolled_up_status(case.status for case in table.cases)
     return replace(
         anchor,
@@ -97,11 +98,17 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
         steps=template_steps,
         parameters=table,
         error=None,
-        skip_reason=anchor.skip_reason if status == 'skipped' else None,
-        xfail_reason=_shared_xfail_reason(group.cases) if status == 'xfailed' else None,
+        skip_reason=_shared_reason(
+            case.skip_reason for case in group.cases if status == case.status
+        ),
+        xfail_reason=_shared_reason(
+            case.xfail_reason for case in group.cases if status == case.status
+        ),
     )
 
 
-def _shared_xfail_reason(cases: list[Scenario]) -> str | None:
-    reasons = {case.xfail_reason for case in cases if case.status == 'xfailed'}
-    return reasons.pop() if len(reasons) == 1 else None
+def _shared_reason(reasons: Iterable[str | None]) -> str | None:
+    """The one reason these cases share, or None when they differ — a group
+    cannot speak one case's reason for another."""
+    distinct = set(reasons)
+    return distinct.pop() if len(distinct) == 1 else None

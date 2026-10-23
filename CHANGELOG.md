@@ -36,6 +36,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.
 - `attach()` with content JSON cannot carry, such as non-string dict keys or a cycle, now raises `PytestGivenError` naming the attachment.
 - `Template` with an unclosed brace now raises `PytestGivenError` instead of `ValueError`.
+- A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.
 
 ## [0.5.0] - 2026-10-18
 

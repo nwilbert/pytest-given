@@ -110,7 +110,8 @@ def _cases(*specs: tuple[Status, str | None]) -> tuple[list[Scenario], ParamInfo
             narration=Narration(text='x'),
             module='m',
             status=status,
-            xfail_reason=reason,
+            skip_reason=reason if status == 'skipped' else None,
+            xfail_reason=reason if status == 'xfailed' else None,
         )
         for index, (status, reason) in enumerate(specs, start=1)
     ]
@@ -173,10 +174,36 @@ def test_xfailed_outranks_skipped() -> None:
     assert grouped.status == 'xfailed'
 
 
-def test_xfailed_cases_with_different_reasons_leave_the_group_without_one() -> None:
-    [grouped] = group_parametrized(*_cases(('xfailed', 'one'), ('xfailed', 'two')))
-    assert grouped.status == 'xfailed'
-    assert grouped.xfail_reason is None
+@scenario(
+    t'A {pg["Parametrized scenario"].l} carries a skip or xfail reason only '
+    t'when its {pg["Case"].l.s} all give it',
+    tags=['parametrization'],
+)
+@pytest.mark.parametrize(
+    ('status', 'first', 'second', 'shared'),
+    [
+        ('skipped', 'needs a database', 'needs a service', None),
+        ('skipped', 'needs a database', 'needs a database', 'needs a database'),
+        ('xfailed', 'flaky', 'slow', None),
+        ('xfailed', 'flaky', 'flaky', 'flaky'),
+    ],
+    ids=['skipped-different', 'skipped-shared', 'xfailed-different', 'xfailed-shared'],
+)
+def test_a_group_carries_a_reason_only_its_cases_share(
+    status: Status, first: str, second: str, shared: str | None
+) -> None:
+    with given(
+        t'two {status} {pg["Case"].l.s}, one saying {first} and one saying {second}'
+    ):
+        cases = _cases((status, first), (status, second))
+    with when(t'the {pg["Case"].l.s} are {pg["Group"]("grouped")}'):
+        [grouped] = group_parametrized(*cases)
+    with then(
+        t'the {pg["Parametrized scenario"].l} is {status}, with the reason {shared}'
+    ):
+        assert grouped.status == status
+        reason = grouped.skip_reason if status == 'skipped' else grouped.xfail_reason
+        assert reason == shared
 
 
 def test_a_passed_group_does_not_inherit_a_skipped_anchors_reason() -> None:
