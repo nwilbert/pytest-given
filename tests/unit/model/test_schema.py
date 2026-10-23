@@ -25,6 +25,7 @@ from pytest_given.model import (
     ParameterColumn,
     ParameterTable,
     Pin,
+    PytestGivenError,
     ReportData,
     Scenario,
     Sentence,
@@ -381,6 +382,20 @@ def test_glossary_register_rejects_id_collision() -> None:
     g.register(GlossaryTerm(id=TermId('x'), kind='actor', canonical='X'))
     with pytest.raises(AssertionError, match='already registered'):
         g.register(GlossaryTerm(id=TermId('x'), kind='activity', canonical='X'))
+
+
+def test_a_glossary_with_a_duplicate_term_id_is_refused() -> None:
+    """The constructor silently last-won duplicate ids: `get()` would find one
+    term while iteration shows another, and the serde rebuild path reads a
+    saved report through exactly this hole. Term ids are unique, and a
+    duplicate says so."""
+    with pytest.raises(PytestGivenError, match="'guest'"):
+        Glossary(
+            terms=[
+                GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest'),
+                GlossaryTerm(id=TermId('guest'), kind='activity', canonical='Guest'),
+            ]
+        )
 
 
 def test_glossary_index_excluded_from_repr() -> None:

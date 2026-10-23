@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import Literal, NewType
 
+from .errors import PytestGivenError
 from .report_url import ReportUrl
 
 # A parameter-table column's identity — what the DOM keys on and what a
@@ -220,6 +221,8 @@ class Glossary:
     model carries and what the deserializer rebuilds. The user-facing
     registration API is a subclass in `pytest_given.capture.glossary`, which
     needs the caller's source location — capture's business, not the leaf's.
+    Construction refuses a duplicate term id: the index and iteration must
+    agree about what the glossary holds.
 
     `eq=False` keeps identity equality and, with it, hashability. Nothing
     compares two glossaries by value, while several places do need to collect
@@ -236,7 +239,18 @@ class Glossary:
     )
 
     def __post_init__(self) -> None:
-        self._by_id = {term.id: term for term in self.terms}
+        # A duplicate id would silently last-win: `get()` would find one term
+        # while iteration shows another, and the serde rebuild path reads a
+        # saved report through exactly this constructor. `register` asserts
+        # uniqueness for the live path; this is the same rule on read.
+        self._by_id = {}
+        for term in self.terms:
+            if term.id in self._by_id:
+                raise PytestGivenError(
+                    f'duplicate glossary term id {term.id!r}; term ids must be '
+                    'unique — get() and iteration would otherwise disagree.'
+                )
+            self._by_id[term.id] = term
 
     def get(self, key: TermId) -> GlossaryTerm | None:
         return self._by_id.get(key)

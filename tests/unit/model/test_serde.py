@@ -654,6 +654,23 @@ def test_report_from_dict_rejects_an_out_of_range_literal(mutate, expected) -> N
         report_from_dict(payload)
 
 
+def test_report_from_dict_rejects_a_duplicate_glossary_term_id() -> None:
+    """The glossary rebuild used to last-win duplicates silently: `get()`
+    would find one term while iteration shows another. A report carrying two
+    terms of one id says so rather than loading half-right."""
+    report = ReportData(
+        metadata=_meta(),
+        scenarios=[],
+        glossary=Glossary(
+            terms=[GlossaryTerm(id=TermId('g'), kind='actor', canonical='G')]
+        ),
+    )
+    payload = report_to_dict(report)
+    payload['glossary']['terms'].append(dict(payload['glossary']['terms'][0]))
+    with pytest.raises(PytestGivenError, match="'g'"):
+        report_from_dict(payload)
+
+
 def test_report_from_dict_rejects_a_custom_id_that_is_no_bool() -> None:
     """A hand-edited `"false"` would otherwise read as true."""
     table = ParameterTable(
