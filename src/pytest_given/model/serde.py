@@ -300,7 +300,7 @@ def _frame_from_dict(d: dict[str, Any]) -> TracebackFrame:
         lineno=d['lineno'],
         func=d['func'],
         code=d['code'],
-        is_internal=d['is_internal'],
+        is_internal=_bool(d['is_internal'], 'frame is_internal'),
     )
 
 

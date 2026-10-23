@@ -27,6 +27,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `--collect-only`, `--setup-only` and `--setup-plan` runs no longer build or write a report — the previous report is left untouched, and the terminal summary says so when a sink flag was configured.
 - A chained exception (`raise … from …`, or an exception raised inside an `except`) now reports the frames of its own error as structured, classified frames — previously they stayed unparsed tail text after the cause's block, hidden from the `--given-all-frames` toggle.
 - The `conditional-check` lint no longer flags a `then` whose `if`/`else` (or `elif` chain ending in `else`) checks on every branch: all paths through it reach a check, so it counts as unconditional.
+- Reading a JSON report now rejects a frame `is_internal` that is not a boolean, naming the field — a hand-edited `"false"` would otherwise ride into the model as truthy and flip the frame toggle.
 
 ## [0.5.0] - 2026-10-18
 

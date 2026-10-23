@@ -644,6 +644,28 @@ def test_report_from_dict_rejects_a_custom_id_that_is_no_bool() -> None:
         report_from_dict(payload)
 
 
+def test_report_from_dict_rejects_an_is_internal_that_is_no_bool() -> None:
+    """A hand-edited `'false'` would otherwise ride into the model as a truthy
+    `is_internal`, flipping the very frame toggle it marks frames for."""
+    scenario = Scenario(
+        id=NodeId('t.py::t'),
+        narration=Narration(text='x'),
+        module='m',
+        error=ErrorInfo(
+            message='boom',
+            frames=[
+                TracebackFrame(
+                    path='t.py', lineno=1, func='t', code='    pass', is_internal=False
+                )
+            ],
+        ),
+    )
+    payload = report_to_dict(ReportData(metadata=_meta(), scenarios=[scenario]))
+    payload['scenarios'][0]['error']['frames'][0]['is_internal'] = 'false'
+    with pytest.raises(PytestGivenError, match="invalid frame is_internal 'false'"):
+        report_from_dict(payload)
+
+
 def test_clause_part_variants_round_trip():
     parts = (
         ClauseTermRef(term_id=TermId('guest'), display='Guest'),
