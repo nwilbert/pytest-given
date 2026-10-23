@@ -38,6 +38,38 @@ def test_install_removes_stale_files_inside_owned_dirs(tmp_path: Path) -> None:
     assert not stale.exists()
 
 
+def test_install_prunes_directories_emptied_by_stale_file_removal(
+    tmp_path: Path,
+) -> None:
+    """A stale file's directory must not linger once the file is gone: the
+    mirror owns the bundled trees, and an empty directory is drift too. A
+    nested chain prunes in one pass, deepest first."""
+    dest = tmp_path / 'skills'
+    _install(dest)
+    deep = dest / AUTHORING / 'references' / 'old' / 'older'
+    deep.mkdir(parents=True)
+    (deep / 'obsolete.md').write_text('from an older version', encoding='utf-8')
+    assert _install(dest) == 0
+    assert not (dest / AUTHORING / 'references' / 'old').exists()
+
+
+def test_install_prunes_a_manually_created_empty_directory(tmp_path: Path) -> None:
+    dest = tmp_path / 'skills'
+    _install(dest)
+    empty = dest / AUTHORING / 'empty-dir'
+    empty.mkdir()
+    assert _install(dest) == 0
+    assert not empty.exists()
+
+
+def test_install_keeps_directories_holding_bundled_files(tmp_path: Path) -> None:
+    dest = tmp_path / 'skills'
+    _install(dest)
+    assert (dest / AUTHORING / 'references').is_dir()
+    assert _install(dest) == 0
+    assert (dest / AUTHORING / 'references' / 'scenarios.md').is_file()
+
+
 def test_install_leaves_sibling_skills_alone(tmp_path: Path) -> None:
     dest = tmp_path / 'skills'
     own = dest / 'my-own-skill' / 'SKILL.md'
@@ -70,6 +102,23 @@ def test_check_reports_drift(
     assert 'differs' in out
     assert 'missing' in out
     assert 'stale' in out
+
+
+def test_check_reports_an_empty_directory_as_drift(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A directory the mirror would prune is drift a `--check` must name, or
+    an in-sync report lies about an install that would still write."""
+    dest = tmp_path / 'skills'
+    _install(dest)
+    empty = dest / AUTHORING / 'empty-dir'
+    empty.mkdir()
+    capsys.readouterr()
+    assert main(['skills', 'install', '--dest', str(dest), '--check']) == 1
+    out = capsys.readouterr().out
+    assert 'stale' in out
+    assert 'empty-dir' in out
+    assert '(empty directory)' in out
 
 
 def test_check_writes_nothing(tmp_path: Path) -> None:

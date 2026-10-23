@@ -55,6 +55,9 @@ def _install_skills(dest: Path) -> int:
     """
     bundled = _bundled_skill_tree()
     stale = _stale_files(dest, bundled)
+    # Deepest first, so after the stale files are gone each directory is empty
+    # when its turn comes.
+    stale_dirs = _stale_dirs(dest, bundled)
     for rel, data in bundled.items():
         target = dest.joinpath(*rel.parts)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -63,6 +66,9 @@ def _install_skills(dest: Path) -> int:
     for path in stale:
         path.unlink()
         print(f'removed stale {path}')
+    for path in stale_dirs:
+        path.rmdir()
+        print(f'removed stale directory {path}')
     return 0
 
 
@@ -77,6 +83,9 @@ def _report_drift(dest: Path) -> int:
         elif target.read_bytes() != data:
             findings.append(f'differs: {target}')
     findings.extend(f'stale: {path}' for path in _stale_files(dest, bundled))
+    findings.extend(
+        f'stale: {path} (empty directory)' for path in _stale_dirs(dest, bundled)
+    )
     for finding in findings:
         print(finding)
     if findings:
@@ -109,3 +118,25 @@ def _stale_files(dest: Path, bundled: SkillTree) -> list[Path]:
         for path in sorted((dest / name).rglob('*'))
         if path.is_file() and path not in known
     ]
+
+
+def _stale_dirs(dest: Path, bundled: SkillTree) -> list[Path]:
+    """Directories under a bundled skill's tree that no bundled file lives
+    under — the leftovers of removed stale files, or a user's empty ones —
+    deepest first, so a nested chain prunes in one pass."""
+    owned_dirs = {rel.parts[0] for rel in bundled}
+    stale: list[Path] = []
+    for name in sorted(owned_dirs):
+        root = dest / name
+        if not root.is_dir():
+            continue
+        dirs = sorted(
+            (path for path in root.rglob('*') if path.is_dir()),
+            key=lambda path: len(path.parts),
+            reverse=True,
+        )
+        for path in dirs:
+            rel_dir = path.relative_to(dest).parts
+            if not any(rel.parts[: len(rel_dir)] == rel_dir for rel in bundled):
+                stale.append(path)
+    return stale
