@@ -425,15 +425,19 @@ def _bare_identifier(expression: str) -> str | None:
 def _names_used(node: ast.With, *, include_stores: bool) -> set[str]:
     """Names used anywhere under the `with` — items and body, nested steps
     included — skipping t-string subtrees: an interpolation in a narration
-    (this step's own, or a nested step's) is text, not a code use."""
-    return {
-        sub.id
-        for sub in _walk_pruned(
-            ast.iter_child_nodes(node), skip=lambda n: isinstance(n, ast.TemplateStr)
-        )
-        if isinstance(sub, ast.Name)
-        and (include_stores or isinstance(sub.ctx, ast.Load))
-    }
+    (this step's own, or a nested step's) is text, not a code use. `x += 1`
+    reads `x`, so its target counts even when stores do not."""
+    names: set[str] = set()
+    for sub in _walk_pruned(
+        ast.iter_child_nodes(node), skip=lambda n: isinstance(n, ast.TemplateStr)
+    ):
+        if isinstance(sub, ast.Name) and (
+            include_stores or isinstance(sub.ctx, ast.Load)
+        ):
+            names.add(sub.id)
+        elif isinstance(sub, ast.AugAssign) and isinstance(sub.target, ast.Name):
+            names.add(sub.target.id)
+    return names
 
 
 def _body_performs_action(node: _BodyNode) -> bool:
