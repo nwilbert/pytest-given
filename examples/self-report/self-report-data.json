@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-23T12:42:56.625612+00:00",
+    "timestamp": "2026-10-23T12:49:26.307596+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "4c3afab7e8fc41f424080e00149858c265556fd9",
+    "commit_sha": "8059ebfb046eb6f6030f19368fc7297c9fd70be2",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -889,7 +889,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -1176,7 +1176,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -1496,7 +1496,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 538,
+      "duration_ms": 535,
       "steps": [
         {
           "phase": "given",
@@ -1624,7 +1624,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -1811,7 +1811,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -2463,7 +2463,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -2598,7 +2598,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -3542,7 +3542,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3987,7 +3987,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4158,7 +4158,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -4417,7 +4417,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -6650,7 +6650,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -7088,7 +7088,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -13857,7 +13857,7 @@
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -27078,7 +27078,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",

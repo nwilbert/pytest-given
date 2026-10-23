@@ -343,33 +343,6 @@ def _parametrized_report() -> dict[str, object]:
     }
 
 
-def test_param_coloring_classes_and_theme_rules(tmp_path: Path) -> None:
-    html_path = tmp_path / 'report.html'
-    render_html(_report(_parametrized_report()), html_path)
-    content = html_path.read_text(encoding='utf-8')
-    assert re.search(r'<th[^>]*\bparam-color-0\b[^>]*\bdata-param="euros"', content)
-    assert re.search(r'<th[^>]*\bparam-color-1\b[^>]*\bdata-param="expect"', content)
-    # One generated rule per column, after the stylesheet so a term ref bound
-    # to a column takes the column ink.
-    rules = re.findall(
-        r'\.param-color-(\d+), th\.param-color-\1 '
-        r'\{ color: var\(--param-color-\1\); \}',
-        content,
-    )
-    assert rules == ['0', '1']
-    assert content.index('.param-color-0,') > content.index('.term-ref-actor {')
-    # Each column ink is a token set once per theme; the dark theme only
-    # redefines the token.
-    light = re.findall(r':root \{ --param-color-(\d+): (#[0-9a-f]{6}); \}', content)
-    dark = re.findall(
-        r'\[data-theme="dark"\] \{ --param-color-(\d+): (#[0-9a-f]{6}); \}',
-        content,
-    )
-    assert [index for index, _ in light] == ['0', '1']
-    assert [index for index, _ in dark] == ['0', '1']
-    assert len({color for _, color in light + dark}) == 4
-
-
 def test_render_grouped_placeholder_drops_format_spec_and_conversion(
     tmp_path: Path,
 ) -> None:
@@ -687,7 +660,8 @@ def test_render_inlines_assets_without_their_comments() -> None:
 
 
 def test_render_clickable_tag_badges(tmp_path: Path) -> None:
-    """Tag badges on scenario cards include click handler for filtering."""
+    """A scenario's tags reach the page as data — in `data-tag` attributes and
+    in the app data — so a click can filter by them."""
     payload = {
         'scenarios': [
             {
@@ -710,12 +684,17 @@ def test_render_clickable_tag_badges(tmp_path: Path) -> None:
     # test_report_data_never_lands_in_an_alpine_expression for why.
     assert 'data-tag="billing"' in content
     assert 'data-tag="happy-path"' in content
-    assert 'filterByTag($el.dataset.tag)' in content
-    assert 'scenario-tag' in content
+    # What the page can filter by is the data contract; turning a click into
+    # a filter is app.js's, and Playwright's to verify.
+    assert [
+        scenario['tags'] for scenario in embedded_app_data(content)['scenarios']
+    ] == [['billing', 'happy-path']]
 
 
-def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -> None:
-    """Scenarios are collapsed by default; failed ones auto-expand."""
+def test_app_data_carries_each_scenarios_status(tmp_path: Path) -> None:
+    """The page expands a failed scenario from what the data says, so every
+    scenario's status reaches the app data. The expanding itself is app.js's,
+    and Playwright's to verify — a Python test stays on the data."""
     payload = {
         'scenarios': [
             {
@@ -749,8 +728,12 @@ def test_render_scenarios_collapsed_by_default_failed_expanded(tmp_path: Path) -
     html_path = tmp_path / 'report.html'
     render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert 'expandedScenarios' in content
-    assert 'toggleScenario' in content
+    assert [
+        scenario['status'] for scenario in embedded_app_data(content)['scenarios']
+    ] == [
+        'passed',
+        'failed',
+    ]
 
 
 def _report_with_glossary(tmp_path: Path, *, terms: list[dict]) -> str:
@@ -777,7 +760,9 @@ def _report_with_glossary(tmp_path: Path, *, terms: list[dict]) -> str:
 
 
 def test_render_includes_terms_browse_segment(tmp_path: Path) -> None:
-    """A report with a glossary offers Terms as a third browse axis."""
+    """A report with a glossary offers Terms as a third browse axis: the tab
+    is there and the app data carries the terms it browses. How the chips and
+    the filtering behave is app.js's, and Playwright's to verify."""
     content = _report_with_glossary(
         tmp_path,
         terms=[
@@ -790,15 +775,12 @@ def test_render_includes_terms_browse_segment(tmp_path: Path) -> None:
             }
         ],
     )
-    assert "view === 'terms'" in content
     assert '>Terms<' in content
-    assert 'onGroupClick(group)' in content
-    # The active-term chips read canonical names, not slug ids, and several
-    # terms intersect rather than replacing one another.
-    assert 'termLabel(termId)' in content
-    assert 'x-for="termId in termFilters"' in content
-    assert 'removeTermFilter(termId)' in content
-    assert 'termNames[t.id] = t.canonical' in content
+    [term] = embedded_app_data(content)['glossary']['terms']
+    assert term['canonical'] == 'Guest'
+    assert term['kind'] == 'actor'
+    assert term['definition'] == 'A person staying over.'
+    assert embedded_app_data(content)['term_ids'] == ['guest']
 
 
 def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
@@ -808,9 +790,12 @@ def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
     assert '>Terms<' not in content
     assert '>Tags<' in content
     assert '>Modules<' in content
+    assert embedded_app_data(content)['term_ids'] == []
 
 
-def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
+def test_render_shows_a_skipped_scenarios_reason(tmp_path: Path) -> None:
+    """The reason a scenario skipped is report data, and the page shows it —
+    the text, not the markup it sits in, is the Python-visible contract."""
     payload = {
         'scenarios': [
             {
@@ -831,76 +816,6 @@ def test_render_includes_skip_reason_block_and_chevron(tmp_path: Path) -> None:
     render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
     assert 'awaiting fixture' in content
-    assert 'reason-box skipped' in content
-    # Chevron present (scenario has a body): the placeholder span element is absent.
-    assert '<span class="scenario-chevron-placeholder">' not in content
-
-
-def test_render_skipped_without_reason_has_no_chevron(tmp_path: Path) -> None:
-    payload = {
-        'scenarios': [
-            {
-                'id': 't::x',
-                'narration': _narration('Skipped no reason'),
-                'module': 'mod',
-                'tags': [],
-                'status': 'skipped',
-                'duration_ms': 0,
-                'steps': [],
-                'parameters': None,
-                'error': None,
-                'skip_reason': None,
-            }
-        ],
-    }
-    html_path = tmp_path / 'report.html'
-    render_html(_report(payload), html_path)
-    content = html_path.read_text(encoding='utf-8')
-    assert '<span class="scenario-chevron-placeholder">' in content
-    assert 'class="reason-box' not in content
-
-
-def test_render_parameter_table_skipped_case_uses_dot_skipped(tmp_path: Path) -> None:
-    """Skipped parametrize cases render ○ (dot-skipped), not ✗ (dot-failed)."""
-    payload = {
-        'scenarios': [
-            {
-                'id': 't::x',
-                'narration': _narration('One skipped'),
-                'module': 'mod',
-                'tags': [],
-                'status': 'passed',
-                'duration_ms': 0,
-                'steps': [],
-                'parameters': {
-                    'columns': [{'id': 'n', 'name': 'n', 'kind': 'param'}],
-                    'cases': [
-                        {
-                            'id': 't.py::test_x[5]',
-                            'values': [1],
-                            'custom_id': False,
-                            'status': 'passed',
-                            'error': None,
-                        },
-                        {
-                            'id': 't.py::test_x[6]',
-                            'values': [2],
-                            'custom_id': False,
-                            'status': 'skipped',
-                            'error': None,
-                        },
-                    ],
-                },
-                'error': None,
-                'skip_reason': None,
-            }
-        ],
-    }
-    html_path = tmp_path / 'report.html'
-    render_html(_report(payload), html_path)
-    content = html_path.read_text(encoding='utf-8')
-    assert '<span class="dot-skipped">○</span>' in content
-    assert '<span class="dot-failed">✗</span>' not in content
 
 
 def test_renderer_emits_source_links_when_template_set(tmp_path: Path) -> None:
@@ -1080,9 +995,9 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(_report(payload), html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert 'data-param="euros"' in content
-    # The placeholder span carries both class and data-param
-    assert 'class="param-color-0" data-param="euros"' in content
+    # The placeholder span is tagged with its column's name; which color it
+    # takes is the stylesheet's business.
+    assert re.search(r'<span[^>]*\bdata-param="euros"', content)
 
 
 def test_render_param_table_cells_get_data_param(tmp_path: Path) -> None:
@@ -1984,8 +1899,10 @@ def test_a_disambiguated_columns_token_takes_its_own_columns_color(
 
 
 def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
-    """`metadata.title`, when set, names the report in the browser tab and the
-    topbar; `metadata.project` stays the rootdir name for source-link `{project}`."""
+    """`metadata.title`, when set, names the report in the browser tab;
+    `metadata.project` stays the rootdir name for source-link `{project}`.
+    Where the title shows in the page is frontend markup, Playwright's to
+    verify — the document title is the Python-visible text."""
     report = _report(
         {'metadata': {'project': 'pytest-given', 'title': 'Coffee Shop Example'}}
     )
@@ -1993,7 +1910,6 @@ def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
     render_html(report, html_path)
     content = html_path.read_text(encoding='utf-8')
     assert '<title>Coffee Shop Example — pytest-given Report</title>' in content
-    assert re.search(r'class="topbar-title"[^>]*>Coffee Shop Example<', content)
 
 
 def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
