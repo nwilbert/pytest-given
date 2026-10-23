@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-23T10:06:53.664057+00:00",
+    "timestamp": "2026-10-23T10:57:57.036845+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "0aa4e52d61b9e3951f7ac65d83c8749a6a5cef0c",
+    "commit_sha": "e0b25fc3a36f1ef6749d8cdfff120202163757e9",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -1164,7 +1164,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 22,
       "steps": [
         {
           "phase": "given",
@@ -1484,7 +1484,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 554,
+      "duration_ms": 544,
       "steps": [
         {
           "phase": "given",
@@ -1612,7 +1612,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -2052,7 +2052,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -2261,7 +2261,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -2586,7 +2586,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -3385,7 +3385,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -3530,7 +3530,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -3683,7 +3683,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -3975,7 +3975,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -4577,7 +4577,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -5037,7 +5037,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -5912,7 +5912,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 135,
+      "duration_ms": 134,
       "steps": [
         {
           "phase": "given",
@@ -6280,7 +6280,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -22887,7 +22887,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 621
+        "line": 638
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -23009,7 +23009,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 769
+        "line": 786
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -23131,7 +23131,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_ast_rules.py",
-        "line": 951
+        "line": 968
       },
       "story_ids": [
         "adopt-pytest-given"
