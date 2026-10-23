@@ -35,6 +35,7 @@ from ..model import (
     location_suffix,
     node_base,
     render_interpolation,
+    walk_steps,
 )
 from .columns import Format
 from .context import Group, PartSite
@@ -56,16 +57,25 @@ def check_same_template(group: Group) -> None:
     Runs first, against the very tree `templatize_steps` goes on to walk: the
     other rules index a case by the baseline's path without a `.get` and read
     the part there as the baseline's kind, both of which hold only because this
-    ran. A non-passed case is exempt — which is exactly `group.comparable`.
+    ran. A non-passed case drops out of that comparison — which is exactly
+    `group.comparable` — but a failed case that recorded a tree is held to
+    the prefix it shares with the baseline: the grouped tree still claims those
+    steps for its row.
     """
-    if not group.comparable:
+    if not group.comparable and not group.partial:
         return
     baseline = group.baseline
     # `build_group` already walked and keyed every comparable case; the
     # baseline is `comparable[0]`, so its own walk is in there too. A
     # `walk_steps` mapping is keyed by DFS pre-order path, which makes the
     # path/shape list below equivalent to a recursive structure signature.
-    baseline_steps = list(group.indexed[baseline.id].items())
+    # With no comparable case at all, the baseline is a non-passed case, so
+    # its walk lives in `partial` — or nowhere, when no case recorded steps.
+    baseline_steps = (
+        list(group.indexed[baseline.id].items())
+        if group.comparable
+        else list(walk_steps(baseline.steps))
+    )
     signature = step_shape(baseline_steps)
     baseline_keys = [
         [part_key(part) for part in step.narration.parts]
@@ -98,6 +108,49 @@ def check_same_template(group: Group) -> None:
                 raise _divergence_error(
                     case, f'{difference} in its {step.phase} step', group
                 )
+    for case in group.cases:
+        if case.id == baseline.id or case.id not in group.partial:
+            continue
+        _check_partial(case, baseline_steps, baseline_keys, group)
+
+
+def _check_partial(
+    case: Scenario,
+    baseline_steps: list[tuple[StepPath, Step]],
+    baseline_keys: list[list[PartKey]],
+    group: Group,
+) -> None:
+    """Rules 6 and 1 over the prefix a non-passed case recorded.
+
+    A failed case may abort mid-tree, so everything after its last recorded
+    step is exempt — but the steps it did record appear in the grouped tree
+    under the baseline's sentences, pins and slots, and those must agree.
+    `walk_steps` yields execution order, so a recorded tree is a pre-order
+    prefix of the baseline's walk: anything else is a divergence, not an
+    abort.
+    """
+    steps = group.partial[case.id]
+    paths = list(steps)
+    baseline_paths = [path for path, _step in baseline_steps]
+    if paths != baseline_paths[: len(paths)]:
+        raise _divergence_error(case, 'a different step structure', group)
+    shared = len(paths)
+    for (_path, base_step), keys, case_step in zip(
+        baseline_steps[:shared], baseline_keys[:shared], steps.values(), strict=True
+    ):
+        if case_step.phase != base_step.phase:
+            raise _divergence_error(case, 'a different step structure', group)
+        if case_step.pins != base_step.pins:
+            raise _varying_pins_error(case, group)
+        if not keys and not case_step.narration.parts:
+            if case_step.narration.text != base_step.narration.text:
+                raise _varying_str_error(base_step, group)
+            continue
+        difference = narration_difference(keys, case_step.narration)
+        if difference is not None:
+            raise _divergence_error(
+                case, f'{difference} in its {case_step.phase} step', group
+            )
 
 
 def _varying_str_error(step: Step, group: Group) -> PytestGivenError:

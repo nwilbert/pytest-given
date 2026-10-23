@@ -49,8 +49,10 @@ class Group:
     baseline: Scenario
     # The passed cases — every one of them. Rule 6 has already refused a group
     # whose passed cases narrate different templates, so positional comparison
-    # is safe by construction. A non-passed case drops out: a skipped one
-    # records no steps and a failed one may abort mid-tree.
+    # is safe by construction. A non-passed case drops out of promotion: a
+    # skipped one records no steps and a failed one may abort mid-tree — but
+    # what a failed one did record is held to the baseline as a prefix, in
+    # `partial` below.
     comparable: list[Scenario]
     # Each case's raw parametrize arguments by name. A `Template` slot — in a
     # step or in the scenario title — records no per-case rendering to compare
@@ -61,6 +63,12 @@ class Group:
     # every other case" is a lookup rather than a parallel descent through
     # several trees.
     indexed: dict[NodeId, dict[StepPath, Step]]
+    # Each non-passed case that recorded a tree, keyed the same way. The
+    # grouped tree shows such a case's row under the baseline's sentences,
+    # pins and slots, so what it recorded must agree with them over the
+    # prefix it shares — `checks._check_partial` — while promotion reads
+    # only `comparable`.
+    partial: dict[NodeId, dict[StepPath, Step]]
 
     def parts_at(self, site: PartSite) -> Iterator[tuple[NodeId, NarrationPart]]:
         """Each comparable case's narration part at the baseline's position.
@@ -85,6 +93,11 @@ def build_group(cases: list[Scenario], param_info: ParamInfo) -> Group:
         comparable=comparable,
         case_params={case.id: param_info[case.id].mapping() for case in cases},
         indexed={case.id: dict(walk_steps(case.steps)) for case in comparable},
+        partial={
+            case.id: dict(walk_steps(case.steps))
+            for case in cases
+            if case.status != 'passed' and case.steps
+        },
     )
 
 

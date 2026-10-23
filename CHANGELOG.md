@@ -21,6 +21,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - The HTML report's Tags sidebar copy button is visually tidied.
 
+### Fixed
+
+- A failed parametrize case that recorded steps no longer escapes the grouping checks: its narration must agree with the baseline's template over the steps it recorded, or the group is refused (previously only passed cases were compared, so a failed case's wording rode under the baseline's).
+
 ## [0.5.0] - 2026-10-18
 
 ### Added

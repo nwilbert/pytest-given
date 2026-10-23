@@ -468,6 +468,8 @@ def test_grouped_scenario_keeps_the_first_cases_identity_fields() -> None:
 
 
 def test_no_case_passed_falls_back_to_the_first_case() -> None:
+    """With no case to promote from, the baseline is the first case — and the
+    others must still narrate its tree, or the group is refused."""
     nid1, nid2 = NodeId('t.py::test_brew[200]'), NodeId('t.py::test_brew[350]')
     scenarios = [
         Scenario(
@@ -482,7 +484,7 @@ def test_no_case_passed_falls_back_to_the_first_case() -> None:
             narration=Narration(text='brew'),
             module='m',
             status='failed',
-            steps=[Step(phase='when', narration=Narration(text='second'))],
+            steps=[Step(phase='when', narration=Narration(text='first'))],
         ),
     ]
     param_info = {
@@ -2876,8 +2878,8 @@ def test_cases_differing_only_in_rendered_values_still_merge() -> None:
 
 
 def test_a_single_passed_case_has_nothing_to_compare() -> None:
-    """A failed case may abort mid-tree, so it is never held to the baseline's
-    shape."""
+    """A failed case that recorded no steps at all cannot contradict the
+    baseline — one that recorded a tree is held to it as a prefix."""
     scenarios, info = _two_case_group(
         [Step(phase='when', narration=Narration(text='it brews'))],
         [Step(phase='when', narration=Narration(text='it brews'))],
@@ -2895,6 +2897,128 @@ def test_a_varying_str_narration_keeps_rule_ones_diagnosis() -> None:
     )
     with pytest.raises(PytestGivenError, match='records no parts'):
         group_parametrized(scenarios, info)
+
+
+@scenario(
+    t'A {pg["Case"].l.s} that failed with a complete {pg["Step"].l} tree is still '
+    t'held to the {pg["Group"]("grouped")}',
+    tags=['parametrization', 'validation'],
+)
+def test_a_failed_case_with_recorded_steps_must_narrate_the_baseline() -> None:
+    """The classic shape of a failing parametrized test: the case dies in its
+    final `then`, so its tree is complete — and dropping every failed case
+    from the comparison let its wording ride under the baseline's."""
+    with given(t'two {pg["Case"].l.s} whose {pg["Step"].l} texts differ'):
+        scenarios, info = _two_case_group(
+            [_tstring_step('when', ' items load', 'n', '3')],
+            [_tstring_step('when', ' things break', 'n', '4')],
+        )
+        scenarios[1] = dataclasses.replace(scenarios[1], status='failed')
+    with (
+        when_then(
+            t'the {pg["Case"].l.s} are {pg["Group"]("grouped")}',
+            'the grouping is refused',
+        ),
+        pytest.raises(PytestGivenError) as excinfo,
+    ):
+        group_parametrized(scenarios, info)
+    with then('the error names the failed case and its difference from the baseline'):
+        message = str(excinfo.value)
+        assert 'different wording' in message
+        assert "' items load'" in message
+        assert 'than case [200]' in message
+
+
+def test_a_failed_case_may_stop_before_the_baselines_tree_ends() -> None:
+    """The exemption's honest shape: a case that aborted mid-tree recorded a
+    prefix, and a prefix contradicts nothing."""
+    scenarios, info = _two_case_group(
+        [
+            _tstring_step('when', ' items load', 'n', '3'),
+            Step(phase='then', narration=Narration(text='it is hot')),
+        ],
+        [_tstring_step('when', ' items load', 'n', '4')],
+    )
+    scenarios[1] = dataclasses.replace(scenarios[1], status='failed')
+    grouped = group_parametrized(scenarios, info)[0]
+    assert grouped.parameters is not None
+    assert [case.status for case in grouped.parameters.cases] == ['passed', 'failed']
+
+
+def test_a_failed_case_narrating_a_step_the_baseline_lacks_is_refused() -> None:
+    """A failure path can narrate a step no passing case reaches; the grouped
+    tree would silently hide it."""
+    scenarios, info = _two_case_group(
+        [_tstring_step('when', ' items load', 'n', '3')],
+        [
+            _tstring_step('when', ' items load', 'n', '4'),
+            Step(phase='then', narration=Narration(text='it broke')),
+        ],
+    )
+    scenarios[1] = dataclasses.replace(scenarios[1], status='failed')
+    with pytest.raises(PytestGivenError, match='different step structure'):
+        group_parametrized(scenarios, info)
+
+
+def test_a_failed_case_narrating_a_different_phase_at_the_same_path_is_refused() -> (
+    None
+):
+    scenarios, info = _two_case_group(
+        [Step(phase='when', narration=Narration(text='it brews'))],
+        [Step(phase='then', narration=Narration(text='it brews'))],
+    )
+    scenarios[1] = dataclasses.replace(scenarios[1], status='failed')
+    with pytest.raises(PytestGivenError, match='different step structure'):
+        group_parametrized(scenarios, info)
+
+
+def test_a_failed_case_with_a_varying_str_narration_keeps_rule_ones_diagnosis() -> None:
+    scenarios, info = _two_case_group(
+        [Step(phase='when', narration=Narration(text='the machine brews 200 ml'))],
+        [Step(phase='when', narration=Narration(text='the machine brews 350 ml'))],
+    )
+    scenarios[1] = dataclasses.replace(scenarios[1], status='failed')
+    with pytest.raises(PytestGivenError, match='records no parts'):
+        group_parametrized(scenarios, info)
+
+
+def test_a_failed_case_giving_the_shared_step_different_pins_is_refused() -> None:
+    """Story coverage reads the grouped tree's one `pins=`, so a failed case's
+    step cannot claim a sentence the baseline does not."""
+    pin = (Pin(story_id=StoryId('s'), sentence_id=SentenceId(1)),)
+    scenarios, info = _two_case_group(
+        [Step(phase='given', narration=Narration(text='a machine'))],
+        [Step(phase='given', narration=Narration(text='a machine'), pins=pin)],
+    )
+    scenarios[1] = dataclasses.replace(scenarios[1], status='failed')
+    with pytest.raises(PytestGivenError, match='different pins='):
+        group_parametrized(scenarios, info)
+
+
+def test_with_no_case_passed_the_others_are_still_held_to_the_first_tree() -> None:
+    nid1, nid2 = NodeId('t.py::test_brew[200]'), NodeId('t.py::test_brew[350]')
+    scenarios = [
+        Scenario(
+            id=nid1,
+            narration=Narration(text='brew'),
+            module='m',
+            status='failed',
+            steps=[Step(phase='when', narration=Narration(text='first'))],
+        ),
+        Scenario(
+            id=nid2,
+            narration=Narration(text='brew'),
+            module='m',
+            status='failed',
+            steps=[Step(phase='when', narration=Narration(text='second'))],
+        ),
+    ]
+    param_info = {
+        nid1: ParamSpec(names=['cup_size'], values=[200]),
+        nid2: ParamSpec(names=['cup_size'], values=[350]),
+    }
+    with pytest.raises(PytestGivenError, match='records no parts'):
+        group_parametrized(scenarios, param_info)
 
 
 def _term_group(

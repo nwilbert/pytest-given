@@ -3771,6 +3771,14 @@
 - **then** the grouping is refused
 - **then** the error names the divergence and the opt-out that answers it
 
+## ✓ A «cases» that failed with a complete «step» tree is still held to the «grouped»
+`tests/unit/test_grouping.py::test_a_failed_case_with_recorded_steps_must_narrate_the_baseline` · parametrization, validation
+
+- **given** two «cases» whose «step» texts differ
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the failed case and its difference from the baseline
+
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
 `tests/unit/test_grouping.py::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
 
