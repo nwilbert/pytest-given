@@ -11,11 +11,15 @@ from pytest_given.model import (
     ClausePart,
     ClauseTermRef,
     ClauseWord,
+    ColumnId,
     Metadata,
     Narration,
     NarrationLiteral,
     NarrationTermRef,
     NodeId,
+    ParameterCase,
+    ParameterColumn,
+    ParameterTable,
     ReportData,
     Scenario,
     Sentence,
@@ -164,6 +168,42 @@ def test_an_interrupted_write_discards_the_stale_report(tmp_path, monkeypatch):
     with pytest.raises(KeyboardInterrupt):
         sinks.emit_sinks(_report_dict(), SinkConfig(json_path=stale))
     assert not stale.exists()
+
+
+def test_a_non_finite_parameter_value_is_spelled_not_bared(tmp_path):
+    """A parametrize value can be NaN or Infinity. `json.dumps` writes those
+    as bare literals that Python reads back but jq and `JSON.parse` reject —
+    one such cell would make the whole committed report unparseable. They
+    are spelled as their string forms, which the table still shows."""
+    report = ReportData(
+        metadata=Metadata(
+            project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+        ),
+        scenarios=[
+            Scenario(
+                id=NodeId('t.py::test_x[nan]'),
+                narration=Narration(text='s'),
+                module='m',
+                parameters=ParameterTable(
+                    columns=[ParameterColumn(id=ColumnId('x'), name='x', kind='param')],
+                    cases=[
+                        ParameterCase(
+                            id=NodeId('t.py::test_x[nan]'),
+                            values=[float('nan'), float('inf'), float('-inf')],
+                        )
+                    ],
+                ),
+            )
+        ],
+    )
+    json_path = tmp_path / 'report.json'
+    sinks.emit_sinks(report_to_dict(report), SinkConfig(json_path=json_path))
+    written = json.loads(json_path.read_text(encoding='utf-8'))
+    assert written['scenarios'][0]['parameters']['cases'][0]['values'] == [
+        'NaN',
+        'Infinity',
+        '-Infinity',
+    ]
 
 
 def _refs(*term_ids: str) -> tuple[ClausePart, ...]:

@@ -19,6 +19,7 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 import json
 import os
 from dataclasses import dataclass, field, replace
+from math import isfinite, isnan
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -198,7 +199,29 @@ def render_json(report_dict: dict[str, Any], report: ReportData) -> str:
     them, so a saved report re-rendered through `pytest-given report` recomputes
     them rather than carrying a stale copy."""
     json_dict = {**report_dict, 'coverage': build_coverage_records(report)}
-    return json.dumps(json_dict, indent=2)
+    return json.dumps(_json_compliant(json_dict), indent=2)
+
+
+def _json_compliant(value: object) -> object:
+    """`value` with the floats JSON cannot express — NaN, Infinity — spelled
+    as their string forms.
+
+    `json.dumps` writes those as bare literals, which Python reads back but
+    `jq` and `JSON.parse` reject, so one such cell would make a committed
+    report unparseable to everything else. A string keeps what the cell said —
+    the parameter table still reads NaN — and stays a valid `ParamValue` on
+    the way back in."""
+    match value:
+        case dict():
+            return {key: _json_compliant(item) for key, item in value.items()}
+        case list() | tuple():
+            return [_json_compliant(item) for item in value]
+        case float() if not isfinite(value):
+            if isnan(value):
+                return 'NaN'
+            return 'Infinity' if value > 0 else '-Infinity'
+        case _:
+            return value
 
 
 def write_sinks(rendered: RenderedSinks) -> None:
