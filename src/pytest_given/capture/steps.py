@@ -65,7 +65,10 @@ def attach(label: str, content: object) -> None:
     """Attach data to the current step.
 
     *label* is plain text — an f-string is the way to vary it. If *content* is a
-    ``str`` it is stored verbatim; any other type is serialized as indented JSON.
+    ``str`` it is stored verbatim; any other type is serialized as indented
+    JSON, and a value JSON cannot carry — dict keys that are not strings, a
+    self-referencing structure — is refused with an error naming the
+    attachment.
     """
     if not isinstance(label, str):
         raise PytestGivenError(
@@ -79,11 +82,20 @@ def attach(label: str, content: object) -> None:
     if isinstance(content, str):
         collector.attach(label, content, content_type='text')
     else:
-        collector.attach(
-            label,
-            json.dumps(content, indent=2, default=str),
-            content_type='json',
-        )
+        try:
+            payload = json.dumps(content, indent=2, default=str)
+        except (TypeError, ValueError) as error:
+            # A dict key that is not a string, a self-referencing structure:
+            # `json.dumps` refuses, and the refusal is the author's, so it
+            # surfaces as ours rather than as a stdlib error from the middle
+            # of a test.
+            raise PytestGivenError(
+                f'cannot serialize the attachment {label!r} as JSON: {error}. '
+                'Give attach() JSON-ready values — strings, numbers, lists, '
+                'dicts with string keys — or pass the text to show instead: '
+                'attach(label, str(content)).'
+            ) from error
+        collector.attach(label, payload, content_type='json')
 
 
 def step_descriptor(func: object) -> StepDescriptor | None:
