@@ -719,6 +719,15 @@
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
 
+## ✓ A «report» is not written over by a run that runs no tests
+`tests/integration/test_plugin.py::test_a_collect_only_run_leaves_the_previous_report_untouched` · validation
+
+- **given** a suite with one «scenario» and its written «report»
+- **when** the suite is collected without running any test
+- **then** the run passes
+- **then** the report on disk is still the one the real run wrote
+- **then** the summary says no report was written
+
 ## ✓ The Markdown «report» leaves the line out of each «scenario» anchor under `given_md_lines = false`
 `tests/integration/test_plugin.py::test_given_md_lines_ini_drops_the_anchor_line` · versions/0.5.0
 

@@ -47,6 +47,10 @@ class SessionOutcome:
     report_error: str | None = None
     lint_error: str | None = None
     md_stdout: str | None = None
+    # Why this run wrote no report although sinks were configured (a
+    # `--collect-only`-style run), for a summary note. None on every run
+    # that writes, or had nothing configured to write.
+    report_note: str | None = None
     # None when the lint did not run, so a clean run can still say it ran.
     findings: list[LintFinding] | None = None
 

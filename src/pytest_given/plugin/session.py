@@ -116,8 +116,19 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     The lint runs outside that handler: by then the sinks are written, and the
     lint neither writes them nor owns them, so a failure in it must not delete
     a report that is on disk and correct.
+
+    A run that never executes tests builds nothing at all: see
+    `_withheld_report_reason`.
     """
     config = session.config
+    withheld = _withheld_report_reason(config)
+    if withheld is not None:
+        # No sink is touched, so the previous run's report survives; a note in
+        # the terminal summary keeps the silence diagnosable for a run that
+        # asked for one.
+        if given_config(config).sinks.writes_anything():
+            session_outcome(config).report_note = withheld
+        return
     try:
         built = _build_report(session)
         if built.report_dict is not None:
@@ -135,6 +146,26 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     except (PytestGivenError, OSError) as error:
         session_outcome(config).lint_error = str(error)
         _fail_run(session)
+
+
+def _withheld_report_reason(config: pytest.Config) -> str | None:
+    """Why this run neither builds nor writes a report: the runtest protocol
+    never ran, so every scenario would be missing. Writing that report would
+    discard the previous run's — the one outcome worse than no report at all —
+    so these modes are refused outright, each with its own one-line reason.
+
+    `--setup-only` and `--setup-plan` stop around fixture setup: a scenario
+    opens but never finishes, and half a scenario is nothing to report either.
+    `--setup-plan` sets `--setup-only`'s flag on top of its own, so it must be
+    asked first to keep its reason truthful.
+    """
+    if config.option.collectonly:
+        return 'a --collect-only run runs no tests'
+    if config.option.setupplan:
+        return 'a --setup-plan run plans setup but runs no tests'
+    if config.option.setuponly:
+        return 'a --setup-only run stops before the tests'
+    return None
 
 
 def _fail_run(session: pytest.Session) -> None:
@@ -271,8 +302,16 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     _write_error(
         terminalreporter, 'pytest-given: narration lint failed', outcome.lint_error
     )
+    _write_note(terminalreporter, outcome.report_note)
     _write_lint_findings(terminalreporter, outcome.findings)
     _write_md(terminalreporter, outcome.md_stdout)
+
+
+def _write_note(terminalreporter: pytest.TerminalReporter, note: str | None) -> None:
+    if note is None:
+        return
+    terminalreporter.write_sep('=', 'pytest-given: report not written', green=True)
+    terminalreporter.line(f'{note} — the previous report, if any, is untouched.')
 
 
 def _write_error(

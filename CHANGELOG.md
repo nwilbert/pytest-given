@@ -24,6 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - A failed parametrize case that recorded steps no longer escapes the grouping checks: its narration must agree with the baseline's template over the steps it recorded, or the group is refused (previously only passed cases were compared, so a failed case's wording rode under the baseline's).
+- `--collect-only`, `--setup-only` and `--setup-plan` runs no longer build or write a report — the previous report is left untouched, and the terminal summary says so when a sink flag was configured.
 
 ## [0.5.0] - 2026-10-18
 
