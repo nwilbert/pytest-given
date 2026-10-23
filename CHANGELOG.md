@@ -44,6 +44,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A `given_lint_ignore` entry's brackets after the `::` now name a parametrize case instead of a glob character class: `tests/t.py::test_a[b]` matches that case — previously it never matched it, and silently suppressed `test_ab`'s findings instead.
 - The `unused-interpolation` lint no longer flags a step that acts by an augmented assignment (`total += 1`): `+=` reads its target before storing it, so the name the step interpolates is used.
 - A report carrying two glossary terms of one id is now refused on read, naming the duplicate — the rebuild used to silently last-win, leaving `get()` and iteration disagreeing about what the glossary holds.
+- A citation edit spanning to the end of a line in a CRLF document no longer cuts between the `\r` and the `\n` — the span now ends past the whole line break, so an applied edit cannot corrupt the line ending.
 
 ## [0.5.0] - 2026-10-18
 

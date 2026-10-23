@@ -57,7 +57,16 @@ class TextRun:
     def span(self, start: int, end: int) -> Span:
         if end == start:
             return (self.offsets[start], self.offsets[start])
-        return (self.offsets[start], self.offsets[end - 1] + 1)
+        last = end - 1
+        if self.text[last] == '\n':
+            # A newline in `text` is the join between two lines, standing for
+            # the source's whole line break. Ending on it ends past the break
+            # of the line it joins: `offsets[last] + 1` stops inside a CRLF
+            # break, between its `\r` and its `\n`, and an edit applied by the
+            # span would corrupt the ending.
+            join = self.text.count('\n', 0, last)
+            return (self.offsets[start], self.lines[join].break_end)
+        return (self.offsets[start], self.offsets[last] + 1)
 
     def line_at(self, index: int) -> int:
         return self.line + self.text.count('\n', 0, index)
@@ -74,7 +83,12 @@ class TextRun:
                     min(end, line_end) - position,
                 )
                 lines.append(
-                    SourceLine(line.start + low, line.content[low:high], line.end)
+                    SourceLine(
+                        line.start + low,
+                        line.content[low:high],
+                        line.end,
+                        line.break_end,
+                    )
                 )
             position = line_end + 1
         return TextRun(self.line_at(start), tuple(lines), self.in_table_row)
@@ -138,7 +152,9 @@ def text_runs(source: str) -> Iterator[TextRun]:
         elif isinstance(block, Table):
             for row in (block.header, *block.rows):
                 for cell in row.cells:
-                    cell_line = SourceLine(cell.start, cell.text, cell.end)
+                    # A cell holds one line, and a one-line run's spans never
+                    # cross a break.
+                    cell_line = SourceLine(cell.start, cell.text, cell.end, cell.end)
                     yield TextRun(row.line, (cell_line,), in_table_row=True)
 
 
@@ -178,9 +194,14 @@ class SourceLine:
     content: str
     # Where the source line ends, before its line break.
     end: int
+    # Past the line break: the next line's start, or `len(source)`.
+    break_end: int
 
     def after(self, column: int) -> SourceLine:
-        return SourceLine(self.start + column, self.content[column:], self.end)
+        # Stripping the container prefix moves the text, not the break.
+        return SourceLine(
+            self.start + column, self.content[column:], self.end, self.break_end
+        )
 
 
 # The citation readers each walk the document they read.
@@ -325,9 +346,14 @@ def _source_lines(source: str) -> list[SourceLine]:
     # Every line break markdown-it reads, so its line numbers are the source's.
     for line_break in LINE_BREAK.finditer(source):
         lines.append(
-            SourceLine(start, source[start : line_break.start()], line_break.start())
+            SourceLine(
+                start,
+                source[start : line_break.start()],
+                line_break.start(),
+                line_break.end(),
+            )
         )
         start = line_break.end()
     if start < len(source):
-        lines.append(SourceLine(start, source[start:], len(source)))
+        lines.append(SourceLine(start, source[start:], len(source), len(source)))
     return lines

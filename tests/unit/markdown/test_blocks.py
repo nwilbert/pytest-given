@@ -128,6 +128,27 @@ def test_a_slice_of_a_run_stays_placed_in_the_source(start: int, end: int) -> No
     assert piece.line == run.line_at(start)
 
 
+def test_a_span_ending_on_a_join_ends_past_the_whole_line_break() -> None:
+    """The newline that joins a run's lines stands for the source's whole line
+    break. In a CRLF document that break is a `\r\n` pair, and a span ending
+    on the join must end past both — not between them, where an edit applied
+    by the span would corrupt the ending."""
+    source = 'alpha\r\nbeta\r\n'
+    [run] = text_runs(source)
+    assert run.text == 'alpha\nbeta'
+    start, end = run.span(0, 6)
+    assert source[start:end] == 'alpha\r\n'
+
+
+def test_a_span_ending_on_a_join_in_a_quoted_block_ends_before_its_prefix() -> None:
+    """Ending past the line break still ends before the next line's container
+    prefix: a span never swallows a `> ` it does not name."""
+    source = '> alpha\r\n> beta\r\n'
+    [run] = text_runs(source)
+    start, end = run.span(0, 6)
+    assert source[start:end] == 'alpha\r\n'
+
+
 @pytest.mark.parametrize(
     ('source', 'container', 'prefix'),
     [
