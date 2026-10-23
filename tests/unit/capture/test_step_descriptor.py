@@ -233,6 +233,27 @@ def test_attach_non_string_content_serializes_as_json() -> None:
     assert '3' in att.content
 
 
+def test_attach_content_json_cannot_express_refuses_with_a_given_error() -> None:
+    """`attach` promises any non-string content serializes as indented JSON;
+    a value `json.dumps` cannot carry — dict keys that are not strings, a
+    self-referencing structure — must refuse as a PytestGivenError naming the
+    attachment, not as a raw stdlib error from the middle of a test."""
+    collector = Collector()
+    collector.start_scenario('id', 'name', 'mod', [])
+    collector.push_step('given', Narration(text='a step'))
+    set_active_collector(collector)
+    try:
+        with pytest.raises(PytestGivenError, match="'payload'") as caught:
+            attach('payload', {(1, 2): 'a value'})
+        assert 'JSON-ready' in str(caught.value)
+        cycle: dict[str, object] = {}
+        cycle['self'] = cycle
+        with pytest.raises(PytestGivenError, match="'payload'"):
+            attach('payload', cycle)
+    finally:
+        set_active_collector(None)
+
+
 def test_step_descriptor_with_plain_str_has_empty_narration_parts() -> None:
     desc = StepDescriptor('given', 'a thing')
     assert desc.narration.text == 'a thing'

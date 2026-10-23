@@ -79,11 +79,16 @@ def attach(label: str, content: object) -> None:
     if isinstance(content, str):
         collector.attach(label, content, content_type='text')
     else:
-        collector.attach(
-            label,
-            json.dumps(content, indent=2, default=str),
-            content_type='json',
-        )
+        try:
+            payload = json.dumps(content, indent=2, default=str)
+        except (TypeError, ValueError) as error:
+            raise PytestGivenError(
+                f'cannot serialize the attachment {label!r} as JSON: {error}. '
+                'Give attach() JSON-ready values — strings, numbers, lists, '
+                'dicts with string keys — or pass the text to show instead: '
+                'attach(label, str(content)).'
+            ) from error
+        collector.attach(label, payload, content_type='json')
 
 
 def step_descriptor(func: object) -> StepDescriptor | None:

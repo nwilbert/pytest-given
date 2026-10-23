@@ -34,6 +34,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A `given_source_link` template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.
 - Two scenarios no longer share a `#scenario=` slug when one falls back to its node ID.
 - A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.
+- `attach()` with content JSON cannot carry, such as non-string dict keys or a cycle, now raises `PytestGivenError` naming the attachment.
 
 ## [0.5.0] - 2026-10-18
 
