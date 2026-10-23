@@ -126,8 +126,11 @@ def test_template_reads_a_span_across_escaped_braces() -> None:
     ]
 
 
-def test_template_unclosed_brace_raises_value_error() -> None:
-    with pytest.raises(ValueError, match="expected '}'"):
+def test_template_unclosed_brace_refuses_with_a_given_error() -> None:
+    """A brace left open is an authoring mistake like any other `Template`
+    refuses at construction time, and those refusals are `PytestGivenError` —
+    not a stdlib ValueError escaping the format parser."""
+    with pytest.raises(PytestGivenError, match='cannot read'):
         Template('a {cup_size')
 
 

@@ -39,6 +39,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A NaN or Infinity parameter value no longer makes `report-data.json` unparseable outside Python: `json.dumps` writes them as bare literals that `jq` and `JSON.parse` reject, so the JSON sink now spells them as their string forms — `NaN`, `Infinity` — which the parameter table still displays and which read back as valid values.
 - A failure raised from inside the Markdown-glossary reader or the narration helpers no longer shows pytest-given's own frame as a user frame in the report's traceback — those modules refuse bad input, and by the internal-frame rule their frames belong behind the toggle.
 - `attach()` with content JSON cannot carry — dict keys that are not strings, a self-referencing structure — now refuses with a pytest-given error naming the attachment and the fix, instead of leaking the raw `TypeError` or `ValueError` from `json.dumps` into the middle of a test.
+- `Template('a {cup_size')` — a brace left open — now raises `PytestGivenError` at construction like every other authoring mistake the class refuses, with the stdlib reason folded in and the `{{` / `}}` escape named, instead of a raw `ValueError` from the format parser.
 
 ## [0.5.0] - 2026-10-18
 
