@@ -144,7 +144,7 @@ def apply_config(
         for i, entry in enumerate(config.ignores):
             if entry.rule is not None and entry.rule != raw.rule:
                 continue
-            if fnmatchcase(raw.subject, entry.pattern):
+            if _matches(raw.subject, entry.pattern):
                 used.add(i)
                 suppressed = True
         if not suppressed:
@@ -162,6 +162,14 @@ def apply_config(
         if i not in used
     )
     return kept
+
+
+def _matches(subject: str, pattern: str) -> bool:
+    """A node-id glob, where a bracket after the `::` opens a parametrize
+    case's callspec rather than a character class."""
+    scope, sep, function = pattern.partition('::')
+    literal = f'{scope}{sep}{function.replace("[", "[[]")}'
+    return fnmatchcase(subject, literal)
 
 
 def _resolved(raw: RawLintFinding, level: Severity) -> LintFinding:

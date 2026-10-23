@@ -122,6 +122,35 @@ def test_apply_config_rule_scoped_glob_suppresses_only_its_rule() -> None:
     assert [f.rule for f in out] == [RuleId('then-without-check')]
 
 
+def test_apply_config_callspec_brackets_match_literally() -> None:
+    """`fnmatchcase` reads `test_a[b]` as a character class — never matching
+    the case the entry names, and silently suppressing `test_ab`'s findings.
+    After `::`, a bracket opens a callspec, not a class."""
+    findings = [
+        _finding(subject='tests/t.py::test_a[b]'),
+        _finding(subject='tests/t.py::test_ab'),
+    ]
+    out = apply_config(findings, _config(ignores=['empty-step: tests/t.py::test_a[b]']))
+    assert [f.subject for f in out] == ['tests/t.py::test_ab']
+
+
+def test_apply_config_an_unscoped_entry_takes_callspecs_literally() -> None:
+    out = apply_config(
+        [_finding(subject='tests/t.py::test_x[a b]')],
+        _config(ignores=['tests/t.py::test_x[a b]']),
+    )
+    assert out == []
+
+
+def test_apply_config_globs_keep_working_after_the_scope_separator() -> None:
+    findings = [
+        _finding(subject='tests/t.py::test_water'),
+        _finding(subject='tests/t.py::test_fire'),
+    ]
+    out = apply_config(findings, _config(ignores=['tests/t.py::test_*']))
+    assert out == []
+
+
 def test_apply_config_stale_entry_becomes_error_finding() -> None:
     out = apply_config([], _config(ignores=['empty-step: no-match-*']))
     [stale] = out

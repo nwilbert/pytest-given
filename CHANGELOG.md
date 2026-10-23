@@ -20,6 +20,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - The HTML report's Tags sidebar copy button is visually tidied.
+- **Breaking.** Brackets after the `::` in a `given_lint_ignore` entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped `[[]` with a plain `[`.
 
 ### Fixed
 
