@@ -21,6 +21,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - The HTML report's Tags sidebar copy button is visually tidied.
 
+### Fixed
+
+- A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.
+
 ## [0.5.0] - 2026-10-18
 
 ### Added

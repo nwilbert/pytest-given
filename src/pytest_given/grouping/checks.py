@@ -56,15 +56,13 @@ def check_same_template(group: Group) -> None:
     Runs first, against the very tree `templatize_steps` goes on to walk: the
     other rules index a case by the baseline's path without a `.get` and read
     the part there as the baseline's kind, both of which hold only because this
-    ran. A non-passed case is exempt — which is exactly `group.comparable`.
+    ran. A non-passed case is held only to the steps it shares with the
+    baseline; see `_check_shared_steps`.
     """
-    if not group.comparable:
-        return
     baseline = group.baseline
-    # `build_group` already walked and keyed every comparable case; the
-    # baseline is `comparable[0]`, so its own walk is in there too. A
-    # `walk_steps` mapping is keyed by DFS pre-order path, which makes the
-    # path/shape list below equivalent to a recursive structure signature.
+    # `build_group` already walked and keyed every case. A `walk_steps` mapping
+    # is keyed by DFS pre-order path, which makes the path/shape list below
+    # equivalent to a recursive structure signature.
     baseline_steps = list(group.indexed[baseline.id].items())
     signature = step_shape(baseline_steps)
     baseline_keys = [
@@ -86,18 +84,48 @@ def check_same_template(group: Group) -> None:
         for (path, step), keys in zip(baseline_steps, baseline_keys, strict=True):
             # A comparable case has the baseline's exact structure, so every
             # baseline path exists in it — index, never `.get`.
-            other = case_steps[path].narration
-            if not keys and not other.parts:
-                # Rule 1: nothing to compare as a template, so compare the text
-                # and answer with the fix that names this step's own phase.
-                if other.text != step.narration.text:
-                    raise _varying_str_error(step, group)
-                continue
-            difference = narration_difference(keys, other)
-            if difference is not None:
-                raise _divergence_error(
-                    case, f'{difference} in its {step.phase} step', group
-                )
+            _check_narration(case, step, keys, case_steps[path].narration, group)
+    for case in group.cases:
+        if case.status != 'passed' and case.id != baseline.id:
+            _check_shared_steps(case, baseline_steps, baseline_keys, group)
+
+
+def _check_shared_steps(
+    case: Scenario,
+    baseline_steps: list[tuple[StepPath, Step]],
+    baseline_keys: list[list[PartKey]],
+    group: Group,
+) -> None:
+    """Rules 6 and 1 for a non-passed case, up to where its tree parts from
+    the baseline's: from there on it aborted, or failed down another path,
+    and its own error says so."""
+    case_steps = group.indexed[case.id].items()
+    for (path, step), keys, (case_path, case_step) in zip(
+        baseline_steps, baseline_keys, case_steps, strict=False
+    ):
+        if (case_path, case_step.phase) != (path, step.phase):
+            return
+        if case_step.pins != step.pins:
+            raise _varying_pins_error(case, group)
+        _check_narration(case, step, keys, case_step.narration, group)
+
+
+def _check_narration(
+    case: Scenario,
+    step: Step,
+    keys: list[PartKey],
+    other: Narration,
+    group: Group,
+) -> None:
+    if not keys and not other.parts:
+        # Rule 1: nothing to compare as a template, so compare the text and
+        # answer with the fix that names this step's own phase.
+        if other.text != step.narration.text:
+            raise _varying_str_error(step, group)
+        return
+    difference = narration_difference(keys, other)
+    if difference is not None:
+        raise _divergence_error(case, f'{difference} in its {step.phase} step', group)
 
 
 def _varying_str_error(step: Step, group: Group) -> PytestGivenError:

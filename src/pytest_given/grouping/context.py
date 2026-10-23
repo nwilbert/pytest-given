@@ -57,9 +57,8 @@ class Group:
     # against, so what it renders has to be recomputed from these; see
     # `templatize._reconciled_slot`.
     case_params: dict[NodeId, dict[str, RawParamValue]]
-    # Each comparable case's tree keyed by position, so "the same position in
-    # every other case" is a lookup rather than a parallel descent through
-    # several trees.
+    # Each case's tree keyed by position, so "the same position in every other
+    # case" is a lookup rather than a parallel descent through several trees.
     indexed: dict[NodeId, dict[StepPath, Step]]
 
     def parts_at(self, site: PartSite) -> Iterator[tuple[NodeId, NarrationPart]]:
@@ -84,7 +83,7 @@ def build_group(cases: list[Scenario], param_info: ParamInfo) -> Group:
         baseline=_baseline(cases, comparable),
         comparable=comparable,
         case_params={case.id: param_info[case.id].mapping() for case in cases},
-        indexed={case.id: dict(walk_steps(case.steps)) for case in comparable},
+        indexed={case.id: dict(walk_steps(case.steps)) for case in cases},
     )
 
 
