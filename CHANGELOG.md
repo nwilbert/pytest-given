@@ -32,6 +32,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given skills install` now removes directories no bundled file lives in, and `--check` reports them as drift.
 - An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.
 - A `given_source_link` template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.
+- Two scenarios no longer share a `#scenario=` slug when one falls back to its node ID.
 
 ## [0.5.0] - 2026-10-18
 

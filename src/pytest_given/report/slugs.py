@@ -2,6 +2,7 @@
 
 import re
 from collections import Counter
+from itertools import chain, count
 
 from ..model import NodeId, ReportData, node_base
 
@@ -44,12 +45,18 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
         if not moved:
             # Every directory is already in the slug and the pair still reads
             # the same. Nothing shorter than the node ID can separate them.
-            slugs.update(_fallback_slugs(colliding))
+            in_group = set(colliding)
+            settled = {
+                slug for node_id, slug in slugs.items() if node_id not in in_group
+            }
+            slugs.update(_fallback_slugs(colliding, reserved=settled))
             break
     return slugs
 
 
-def _fallback_slugs(colliding: list[NodeId]) -> dict[NodeId, str]:
+def _fallback_slugs(
+    colliding: list[NodeId], *, reserved: set[str]
+) -> dict[NodeId, str]:
     """Fragment-safe, unique slugs for scenarios no path depth separates.
 
     A node ID is unique by construction but may carry the characters
@@ -57,15 +64,24 @@ def _fallback_slugs(colliding: list[NodeId]) -> dict[NodeId, str]:
     again, which is the one case the escalation above cannot reach. Such a
     group is separated by an ordinal over the *sorted* ids, so the slug a
     scenario gets still does not depend on the order the report lists them in.
+
+    A folded id can also land on a slug in `reserved`, one the escalation
+    settled for another scenario, so it skips those too.
     """
     by_safe: dict[str, list[NodeId]] = {}
     for node_id in sorted(colliding):
         by_safe.setdefault(_fragment_safe(node_id), []).append(node_id)
-    return {
-        node_id: safe if len(group) == 1 else f'{safe}-{ordinal}'
-        for safe, group in by_safe.items()
-        for ordinal, node_id in enumerate(group, start=1)
-    }
+    slugs: dict[NodeId, str] = {}
+    for safe, group in by_safe.items():
+        candidates = chain(
+            [safe] if len(group) == 1 else [],
+            (f'{safe}-{ordinal}' for ordinal in count(1)),
+        )
+        for node_id in group:
+            slug = next(slug for slug in candidates if slug not in reserved)
+            reserved.add(slug)
+            slugs[node_id] = slug
+    return slugs
 
 
 def _colliding_ids(slugs: dict[NodeId, str]) -> list[NodeId]:

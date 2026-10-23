@@ -102,6 +102,27 @@ def test_scenario_slug_duplicate_basename_gains_its_directory() -> None:
     assert index[NodeId('b/test_booking.py::test_make')] == 'b/booking/make'
 
 
+def test_a_fallback_slug_dodges_a_slug_settled_elsewhere() -> None:
+    """`d/e/f/x` and `d/e/f/x.py` read the same at every depth, so both fall
+    back to their node IDs — and `d/e/f/x` is the slug `d/e/test_f.py::test_x`
+    already settled on."""
+    rd = ReportData(
+        metadata=_meta(),
+        scenarios=[
+            _scn('d/e/test_f.py::test_x'),
+            _scn('e/test_f.py::test_x'),
+            _scn('d/e/f/x'),
+            _scn('d/e/f/x.py'),
+        ],
+    )
+    index = build_scenario_slug_index(rd)
+    assert index[NodeId('d/e/test_f.py::test_x')] == 'd/e/f/x'
+    assert index[NodeId('e/test_f.py::test_x')] == 'e/f/x'
+    assert index[NodeId('d/e/f/x.py')] == 'd/e/f/x.py'
+    assert index[NodeId('d/e/f/x')] == 'd/e/f/x-1'
+    assert len(set(index.values())) == len(index)
+
+
 def test_scenario_slug_escalates_only_as_far_as_it_must() -> None:
     """Directories come back one level at a time, and only for the colliding
     scenarios — a scenario that is already unique keeps its short slug."""
