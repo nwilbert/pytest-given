@@ -398,7 +398,7 @@ def test_narration_literal_part() -> None:
                 {
                     'id': 'i',
                     'narration': {
-                        'text': 'S',
+                        'text': 'hello',
                         'parts': [{'value': 'hello'}],
                     },
                     'module': 'm',
@@ -424,7 +424,7 @@ def test_narration_value_part() -> None:
                 {
                     'id': 'i',
                     'narration': {
-                        'text': 'S',
+                        'text': '12.0',
                         'parts': [
                             {
                                 'rendered': '12.0',
@@ -464,7 +464,7 @@ def test_narration_placeholder_part() -> None:
                 {
                     'id': 'i',
                     'narration': {
-                        'text': 'S',
+                        'text': '{euros}',
                         'parts': [
                             {
                                 'name': 'euros',
@@ -491,6 +491,34 @@ def test_narration_placeholder_part() -> None:
             name='euros', column_id='euros', format_spec='03d', conversion='r'
         ),
     )
+
+
+def test_report_from_dict_rejects_narration_text_disagreeing_with_its_parts() -> None:
+    """`text` is what the report's search box and the grouping read, while the
+    renderers color the parts — a report where the two disagree must not load
+    silently."""
+    with pytest.raises(PytestGivenError, match="its parts render 'hello'"):
+        report_from_dict(
+            {
+                'metadata': _minimal_metadata_dict(),
+                'scenarios': [
+                    {
+                        'id': 'i',
+                        'narration': {
+                            'text': 'goodbye',
+                            'parts': [{'value': 'hello'}],
+                        },
+                        'module': 'm',
+                        'tags': [],
+                        'status': 'passed',
+                        'duration_ms': 0,
+                        'steps': [],
+                        'parameters': None,
+                        'error': None,
+                    }
+                ],
+            }
+        )
 
 
 def test_narration_unknown_part_shape_raises() -> None:
@@ -553,7 +581,7 @@ def test_round_trip_via_to_dict() -> None:
             Scenario(
                 id=NodeId('i'),
                 narration=Narration(
-                    text='S',
+                    text='Brew {cup}',
                     parts=(
                         NarrationLiteral(value='Brew '),
                         NarrationPlaceholder(
@@ -694,7 +722,7 @@ def test_glossary_round_trips_and_rebuilds_index():
 
 def test_narration_term_ref_round_trips():
     narration = Narration(
-        text='Alice arrives',
+        text='Hello Alice',
         parts=(
             NarrationLiteral(value='Hello '),
             NarrationTermRef(
@@ -966,12 +994,13 @@ def _every_field_populated() -> ReportData:
     step = Step(
         phase='given',
         narration=Narration(
-            text='a Guest with 2 rooms',
+            text='a Guest with 2{rooms}',
             parts=(
                 NarrationLiteral(value='a '),
                 NarrationTermRef(
                     term_id=TermId('guest'), display='Guest', expression='pg'
                 ),
+                NarrationLiteral(value=' with '),
                 NarrationValue(
                     rendered='2', expression='count', conversion='r', format_spec='d'
                 ),

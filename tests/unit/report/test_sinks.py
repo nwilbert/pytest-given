@@ -13,6 +13,7 @@ from pytest_given.model import (
     ClauseWord,
     Metadata,
     Narration,
+    NarrationLiteral,
     NarrationTermRef,
     NodeId,
     ReportData,
@@ -148,9 +149,12 @@ def _story_report() -> ReportData:
         phase='when',
         narration=Narration(
             text='guest search room',
-            parts=tuple(
-                NarrationTermRef(term_id=TermId(tid), display=tid)
-                for tid in ('guest', 'search', 'room')
+            parts=(
+                NarrationTermRef(term_id=TermId('guest'), display='guest'),
+                NarrationLiteral(value=' '),
+                NarrationTermRef(term_id=TermId('search'), display='search'),
+                NarrationLiteral(value=' '),
+                NarrationTermRef(term_id=TermId('room'), display='room'),
             ),
         ),
     )

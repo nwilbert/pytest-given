@@ -28,6 +28,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A chained exception (`raise … from …`, or an exception raised inside an `except`) now reports the frames of its own error as structured, classified frames — previously they stayed unparsed tail text after the cause's block, hidden from the `--given-all-frames` toggle.
 - The `conditional-check` lint no longer flags a `then` whose `if`/`else` (or `elif` chain ending in `else`) checks on every branch: all paths through it reach a check, so it counts as unconditional.
 - Reading a JSON report now rejects a frame `is_internal` that is not a boolean, naming the field — a hand-edited `"false"` would otherwise ride into the model as truthy and flip the frame toggle.
+- Reading a JSON report now rejects a narration whose `text` disagrees with what its `parts` render — the two feed the search box and the per-part highlighting respectively, and a report where they diverge must not load silently.
 
 ## [0.5.0] - 2026-10-18
 

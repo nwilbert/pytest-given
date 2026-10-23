@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, TypedDict, cast
 
 from .errors import PytestGivenError
+from .narration import narration_text
 from .report_url import resolve_report_url
 from .schema import (
     COLUMN_KINDS,
@@ -367,9 +368,19 @@ def _cell_from_json(value: Any) -> CellValue:
 
 
 def _narration_from_dict(d: dict[str, Any]) -> Narration:
+    parts = tuple(_narration_part_from_dict(p) for p in d.get('parts', []))
+    # `text` is what search and grouping read while the renderers color the
+    # parts, so the two must agree — `narration_text` is the rule the capture
+    # side derives `text` with, and a part-less narration has nothing to check
+    # against.
+    if parts and narration_text(parts) != d['text']:
+        raise PytestGivenError(
+            f'invalid narration text {d["text"]!r} in JSON report; '
+            f'its parts render {narration_text(parts)!r}.'
+        )
     return Narration(
         text=d['text'],
-        parts=tuple(_narration_part_from_dict(p) for p in d.get('parts', [])),
+        parts=parts,
     )
 
 

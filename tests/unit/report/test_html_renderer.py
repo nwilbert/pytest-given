@@ -325,7 +325,7 @@ def _parametrized_report() -> dict[str, object]:
                     {
                         'phase': 'when',
                         'narration': _narration(
-                            'I insert 1 into shop',
+                            'I insert {euros} into shop',
                             [
                                 {'value': 'I insert '},
                                 {
@@ -443,7 +443,7 @@ def test_render_grouped_placeholder_drops_format_spec_and_conversion(
                             {
                                 'phase': 'when',
                                 'narration': _narration(
-                                    'x',
+                                    '{n} {obj}',
                                     [
                                         {
                                             'name': 'n',
@@ -1272,7 +1272,7 @@ def test_render_placeholder_gets_data_param_attribute(tmp_path: Path) -> None:
                             {
                                 'phase': 'when',
                                 'narration': _narration(
-                                    'I insert 1',
+                                    'I insert {euros}',
                                     [
                                         {'value': 'I insert '},
                                         {
@@ -1838,7 +1838,7 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
                             {
                                 'phase': 'when',
                                 'narration': _narration(
-                                    'a',
+                                    'Guest',
                                     [
                                         {'term_id': 'guest', 'display': 'Guest'},
                                     ],
@@ -2408,10 +2408,12 @@ def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
                                     'Carol searches for a Room',
                                     [
                                         {'term_id': 'guest', 'display': 'Carol'},
+                                        {'value': ' '},
                                         {
                                             'term_id': 'search',
                                             'display': 'searches for',
                                         },
+                                        {'value': ' a '},
                                         {'term_id': 'room', 'display': 'Room'},
                                     ],
                                 ),
