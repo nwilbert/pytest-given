@@ -697,10 +697,20 @@ def test_two_test_files_sharing_a_basename_render_fine(pytester, tmp_path):
 
 
 @scenario(
-    t'An unknown {pg["Source link"].l} preset stops the run before it collects',
+    t'A {pg["Source link"].l} value that cannot work stops the run before it collects',
     tags=['validation'],
 )
-def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
+@pytest.mark.parametrize(
+    ('value', 'error'),
+    [
+        ('bogus', 'Unknown --given-source-link preset'),
+        ('{bogus}', 'Unknown source-link template variable'),
+    ],
+    ids=['misspelled-preset', 'unknown-variable'],
+)
+def test_a_source_link_that_cannot_work_fails_before_the_suite_runs(
+    pytester, value, error
+):
     """A typo in --given-source-link is a usage error, caught at configure time.
 
     Learning about it only at session finish means paying for the whole suite
@@ -717,13 +727,13 @@ def test_an_unknown_source_link_preset_fails_before_the_suite_runs(pytester):
             """
         pytester.makepyfile(suite)
         attach('suite', textwrap.dedent(suite).strip())
-    with when(t'the suite runs with a misspelled {pg["Source link"].l} preset'):
+    with when(t'the suite runs with --given-source-link={value}'):
         result = pytester.runpytest(
-            '--given-html=report.html', '--given-source-link=bogus'
+            '--given-html=report.html', f'--given-source-link={value}'
         )
-    with then('the run ends as a usage error, naming the flag the user typed'):
+    with then(t'the run ends as a usage error, saying {error}'):
         assert result.ret == pytest.ExitCode.USAGE_ERROR
-        result.stderr.fnmatch_lines(['*Unknown --given-source-link preset*'])
+        assert error in result.stderr.str()
     with then('no test ran'):
         assert 'passed' not in result.stdout.str()
 
@@ -754,12 +764,24 @@ def test_an_unknown_source_link_preset_in_an_ini_names_the_ini(pytester):
         result.stderr.fnmatch_lines(['*Unknown given_source_link preset*'])
 
 
+@pytest.mark.parametrize('template', ['{line:>{width}}', '{relpath'])
+def test_a_bad_source_link_template_fails_before_the_tests_run(pytester, template):
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest(
+        '--given-html=report.html', f'--given-source-link={template}'
+    )
+    assert result.ret == pytest.ExitCode.USAGE_ERROR
+    result.stderr.fnmatch_lines(['*Source-link template*'])
+
+
 @scenario(
     t'A {pg["Report"].l} that fails to render leaves no report behind, not even '
     t'the previous one',
     tags=['validation'],
 )
-def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
+def test_a_render_failure_leaves_no_half_replaced_report(
+    pytester, tmp_path, monkeypatch
+):
     """Every sink is rendered before any is written.
 
     Otherwise the JSON lands, the HTML render raises, and the pair on disk
@@ -782,12 +804,13 @@ def test_a_render_failure_leaves_no_half_replaced_report(pytester, tmp_path):
         json_path.write_text('{"stale": true}')
         html_path.write_text('<html>stale</html>')
     with when(t'the run trips a {pg["Renderer"].l} failure'):
-        # A raw template passes preset resolution at configure time and fails
-        # when the renderer compiles it — the last point a sink can still raise.
+        # `{sha}` passes validation at configure time and fails only when the
+        # renderer finds no commit to fill in — the last point a sink can raise.
+        monkeypatch.setattr(session, 'detect_commit_sha', lambda: None)
         result = pytester.runpytest(
             f'--given-json={json_path}',
             f'--given-html={html_path}',
-            '--given-source-link={bogus}',
+            '--given-source-link=https://x/{sha}/{relpath}',
         )
     with then('the run fails, saying no report was written'):
         assert result.ret == pytest.ExitCode.TESTS_FAILED
@@ -838,7 +861,9 @@ def test_a_write_failure_leaves_no_half_written_report(pytester, tmp_path):
     assert not json_path.exists()
 
 
-def test_an_unwritable_report_shows_in_the_summary_line(pytester, tmp_path):
+def test_an_unwritable_report_shows_in_the_summary_line(
+    pytester, tmp_path, monkeypatch
+):
     """A run that writes no report must not print a green summary.
 
     Same reason as the lint's — see
@@ -856,10 +881,11 @@ def test_an_unwritable_report_shows_in_the_summary_line(pytester, tmp_path):
                 pass
         """
     )
+    monkeypatch.setattr(session, 'detect_commit_sha', lambda: None)
     result = pytester.runpytest(
         '-ra',
         f'--given-html={tmp_path / "report.html"}',
-        '--given-source-link={bogus}',
+        '--given-source-link=https://x/{sha}/{relpath}',
     )
     assert result.ret == pytest.ExitCode.TESTS_FAILED
     result.stdout.fnmatch_lines(['*1 passed*1 error*'])

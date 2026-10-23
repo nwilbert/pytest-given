@@ -337,6 +337,36 @@ def test_format_unknown_variable_raises() -> None:
     assert 'line' in msg
 
 
+def test_a_nested_format_spec_variable_is_rejected_up_front() -> None:
+    """`{line:>{width}}` names `width` only inside the format spec, which the
+    field-name check never sees — at render time the raw KeyError would
+    discard the whole report for a template typo."""
+    with pytest.raises(PytestGivenError) as exc:
+        compile_source_link(
+            '{relpath}:{line:>{width}}',
+            project='p',
+            commit_sha=None,
+        )
+    assert 'width' in str(exc.value)
+
+
+def test_a_bad_conversion_is_rejected_up_front() -> None:
+    """`{line!x}` carries its bad conversion past the field-name check and
+    only explodes at render time — a whole report must not die on it."""
+    with pytest.raises(PytestGivenError) as exc:
+        compile_source_link(
+            'foo://x/{line!x}',
+            project='p',
+            commit_sha=None,
+        )
+    assert 'conversion' in str(exc.value) or 'line' in str(exc.value)
+
+
+def test_an_unclosed_brace_is_rejected_up_front() -> None:
+    with pytest.raises(PytestGivenError, match='cannot be read'):
+        compile_source_link('https://x/{relpath', project='p', commit_sha=None)
+
+
 def _clear_ci_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     for var in ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT'):
         monkeypatch.delenv(var, raising=False)

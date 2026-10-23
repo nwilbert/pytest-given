@@ -67,6 +67,9 @@ def resolve_source_link_template(
     if value in _STATIC_PRESETS:
         return _STATIC_PRESETS[value]
     if '{' in value or '://' in value:
+        # Compiled against stand-in values, so a typo fails before the suite
+        # runs; only a `{sha}` with no commit is left for render time.
+        compile_source_link(value, project='project', commit_sha='0' * 40)
         return value
     valid = ', '.join(sorted(_ALL_PRESET_NAMES))
     raise PytestGivenError(
@@ -121,6 +124,15 @@ def compile_source_link(
             sha=commit_sha or '',
         )
 
+    # A bad format spec (`{line:>{width}}`) or conversion (`{line!x}`) fails
+    # only when formatting, so one dry run fails it here rather than mid-render.
+    try:
+        substitute(SourceLocation(relpath='test_x.py', line=1))
+    except (KeyError, ValueError, IndexError) as error:
+        raise PytestGivenError(
+            f'Source-link template {template!r} fails to format: '
+            f'{type(error).__name__}: {error}. Valid: {_valid_vars()}.'
+        ) from error
     return substitute
 
 
@@ -129,8 +141,15 @@ def _extract_field_names(template: str) -> list[str]:
     str.format semantics. Rejects attribute / index access up front rather
     than letting `template.format()` surface it as an opaque AttributeError
     on a substituted string."""
+    try:
+        parsed = list(string.Formatter().parse(template))
+    except ValueError as error:
+        raise PytestGivenError(
+            f'Source-link template {template!r} cannot be read: {error}. '
+            'Escape a literal brace as {{ or }}.'
+        ) from error
     fields: list[str] = []
-    for _literal, field_name, _spec, _conv in string.Formatter().parse(template):
+    for _literal, field_name, _spec, _conv in parsed:
         if field_name is None:
             continue
         if '.' in field_name or '[' in field_name:
