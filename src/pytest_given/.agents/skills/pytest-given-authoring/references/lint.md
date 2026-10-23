@@ -6,7 +6,7 @@ The narration lint enforces the structural part of the rules in [scenarios.md](s
 |---|---|---|
 | `empty-step` | error | A step whose body does nothing: only constants or `pass`, or, for `when`/`then`, only an `attach(...)` call. |
 | `then-without-check` | error | A `then` with no `assert` statement and no checking call. A checking call is one whose name starts with `assert` (`assert_totals(order)`, `result.assert_outcomes(...)`), or `pytest.raises` / `pytest.warns` / `pytest.fail`. Nothing else counts, not even `pytest.approx`. |
-| `conditional-check` | warn | A `then` whose checks all sit under an `if`, a loop, a `match` or an `except`, so a run can pass it having checked nothing. An `if` that calls `pytest.fail` counts as a check, and so does a loop over a literal such as `(a, b)`. Assert the condition itself (`assert 'index' not in entry`), or split the cases into rows. |
+| `conditional-check` | warn | A `then` whose checks all sit under an `if`, a loop, a `match` or an `except`, so a run can pass it having checked nothing. An `if` that calls `pytest.fail` counts as a check, and so do an `if`/`else` that checks on every branch and a loop over a literal such as `(a, b)`. Assert the condition itself (`assert 'index' not in entry`), or split the cases into rows. |
 | `missing-phase` | warn | A passed scenario that doesn't cover all three phases. Fixture `@given`s and `Annotated[..., given(...)]` parameters count. |
 | `check-outside-then` | warn | An `assert` inside a `given` or `when`. The `when` half of a `when_then` pair is exempt. |
 | `action-in-then` | warn | No `when` performs an action, and a `then` folds the action into its assertion. |

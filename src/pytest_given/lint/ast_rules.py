@@ -473,8 +473,9 @@ def _contains_check(node: _BodyNode) -> bool:
 def _checks_unconditionally(stmts: Iterable[ast.stmt]) -> bool:
     """Whether every run through *stmts* reaches a check.
 
-    An `if` that calls `pytest.fail` counts: the `if` is the check. A loop
-    over a literal with an unstarred item runs at least once.
+    An `if` that calls `pytest.fail` counts: the `if` is the check. So does an
+    `if`/`else` whose branches all check. A loop over a literal with an
+    unstarred item runs at least once.
     """
     for stmt in stmts:
         match stmt:
@@ -498,6 +499,11 @@ def _checks_unconditionally(stmts: Iterable[ast.stmt]) -> bool:
                 if any(
                     isinstance(sub, ast.Call) and _is_pytest_call(sub.func, ('fail',))
                     for sub in ast.walk(stmt)
+                ):
+                    return True
+                if stmt.orelse and (
+                    _checks_unconditionally(stmt.body)
+                    and _checks_unconditionally(stmt.orelse)
                 ):
                     return True
             case _ if not isinstance(stmt, _COMPOUND_STMTS):

@@ -26,6 +26,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.
 - A run that executes no test — `--collect-only`, `--setup-only`, `--setup-plan`, or a selection that matches nothing — no longer overwrites the previous report.
 - A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.
+- The `conditional-check` lint no longer flags a `then` whose `if`/`else` checks on every branch.
 
 ## [0.5.0] - 2026-10-18
 

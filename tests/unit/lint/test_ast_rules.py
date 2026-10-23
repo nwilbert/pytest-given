@@ -417,8 +417,19 @@ def test_conditional_check_fires_on_assert_only_under_an_if(tmp_path) -> None:
         'match x:\n    case 1:\n        assert y',
         'for row in rows:\n    assert_valid(row)',
         'if x:\n    with pytest.raises(E):\n        f()',
+        # Only one of the branches checks — the other path still slips by.
+        'if x:\n    pass\nelse:\n    assert y',
     ],
-    ids=['for', 'all-starred-literal', 'while', 'except', 'match', 'helper', 'raises'],
+    ids=[
+        'for',
+        'all-starred-literal',
+        'while',
+        'except',
+        'match',
+        'helper',
+        'raises',
+        'if-else-one-check',
+    ],
 )
 def test_conditional_check_fires_on_every_kind_of_guard(tmp_path, body) -> None:
     scenario = _then_holds_scenario(tmp_path, body)
@@ -439,6 +450,10 @@ def test_conditional_check_fires_on_every_kind_of_guard(tmp_path, body) -> None:
         'try:\n    f()\nexcept E:\n    pass\nelse:\n    assert g()',
         'if x:\n    pytest.fail("nope")',
         'result = assert_valid(x)',
+        # Every path through the if/else checks — an elif chain is an `if`
+        # nested in `orelse`, so the recursion covers it.
+        'if x:\n    assert y\nelse:\n    assert z',
+        'if x:\n    assert y\nelif z:\n    assert w\nelse:\n    assert v',
     ],
     ids=[
         'beside-if',
@@ -450,6 +465,8 @@ def test_conditional_check_fires_on_every_kind_of_guard(tmp_path, body) -> None:
         'try-else',
         'conditional-fail',
         'assigned-helper',
+        'if-else-both-check',
+        'if-elif-else-all-check',
     ],
 )
 def test_conditional_check_passes_an_unconditional_check(tmp_path, body) -> None:
