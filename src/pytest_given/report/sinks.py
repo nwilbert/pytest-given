@@ -19,9 +19,15 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 import json
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
-from ..model import PytestGivenError, ReportData, ReportUrl, report_from_dict
+from ..model import (
+    JsonObject,
+    PytestGivenError,
+    ReportData,
+    ReportUrl,
+    report_from_dict,
+)
 from .function_source import read_function_sources
 from .html_renderer import render_html_string
 from .md_renderer import render_md
@@ -116,7 +122,7 @@ class RenderedSinks:
 
 
 def emit_sinks(
-    report_dict: dict[str, Any], config: SinkConfig, source: str | None = None
+    report_dict: JsonObject, config: SinkConfig, source: str | None = None
 ) -> RenderedSinks:
     """Render and write every configured sink, or leave none of them behind.
 
@@ -143,7 +149,7 @@ def emit_sinks(
 
 
 def render_sinks(
-    report_dict: dict[str, Any], config: SinkConfig, source: str | None = None
+    report_dict: JsonObject, config: SinkConfig, source: str | None = None
 ) -> RenderedSinks:
     """Render the configured sinks to text. Nothing here writes to the filesystem.
 
@@ -187,7 +193,7 @@ def render_sinks(
     return RenderedSinks(files=files, md_stdout=md_stdout)
 
 
-def render_json(report_dict: dict[str, Any], report: ReportData) -> str:
+def render_json(report_dict: JsonObject, report: ReportData) -> str:
     """The dict plus its derived sections. `report_from_dict` reads none of
     them, so a saved report re-rendered through `pytest-given report` recomputes
     them rather than carrying a stale copy."""
