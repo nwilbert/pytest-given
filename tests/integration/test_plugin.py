@@ -3382,6 +3382,78 @@ def test_given_md_path_writes_file_no_stdout(pytester: pytest.Pytester) -> None:
 
 
 @scenario(
+    t'A {pg["Report"].l} is not written over by a run that runs no tests',
+    tags=['validation'],
+)
+@pytest.mark.parametrize(
+    ('mode', 'reason'),
+    [
+        ('--collect-only', 'a --collect-only run runs no tests'),
+        ('--setup-only', 'a --setup-only run stops before the tests'),
+        ('--setup-plan', 'a --setup-plan run plans setup but runs no tests'),
+    ],
+)
+def test_a_run_that_runs_no_tests_leaves_the_previous_report_untouched(
+    pytester: pytest.Pytester, mode: str, reason: str
+) -> None:
+    """Such a run looks successful, and the empty report it would write would
+    discard the previous one."""
+    with given(t'a suite with one {pg["Scenario"].l} and its written {pg["Report"].l}'):
+        pytester.makepyfile(_SUITE)
+        json_path = pytester.path / 'report-data.json'
+        pytester.runpytest(f'--given-json={json_path}')
+        written = json_path.read_bytes()
+    with when(t'the suite runs again with {mode}'):
+        result = pytester.runpytest(f'--given-json={json_path}', mode)
+    with then('the run passes'):
+        assert result.ret == 0
+    with then('the report on disk is still the one the real run wrote'):
+        assert json_path.read_bytes() == written
+        assert b'test_buy' in written
+    with then(t'the summary says no report was written, because {reason}'):
+        summary = result.stdout.str()
+        assert 'pytest-given: report not written' in summary
+        assert reason in summary
+
+
+def test_a_selection_matching_no_test_leaves_the_previous_report_untouched(
+    pytester: pytest.Pytester,
+) -> None:
+    pytester.makepyfile(_SUITE)
+    json_path = pytester.path / 'report-data.json'
+    pytester.runpytest(f'--given-json={json_path}')
+    written = json_path.read_bytes()
+    result = pytester.runpytest(f'--given-json={json_path}', '-k', 'nomatch')
+    assert json_path.read_bytes() == written
+    assert 'no test was selected to run' in result.stdout.str()
+
+
+def test_a_run_without_the_setup_plugins_still_writes_its_report(
+    pytester: pytest.Pytester,
+) -> None:
+    """`-p no:setupplan` and `-p no:setuponly` take their options with them."""
+    pytester.makepyfile(_SUITE)
+    json_path = pytester.path / 'report-data.json'
+    result = pytester.runpytest(
+        '-p', 'no:setupplan', '-p', 'no:setuponly', f'--given-json={json_path}'
+    )
+    result.assert_outcomes(passed=1)
+    assert b'test_buy' in json_path.read_bytes()
+
+
+@pytest.mark.parametrize('mode', ['--collect-only', '--setup-only', '--setup-plan'])
+def test_a_run_that_runs_no_tests_prints_nothing_without_sink_flags(
+    pytester: pytest.Pytester, mode: str
+) -> None:
+    """The note is for a run that asked for a report; a bare one must stay
+    silent about pytest-given entirely."""
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest(mode)
+    assert result.ret == 0
+    assert 'pytest-given' not in result.stdout.str()
+
+
+@scenario(
     t'The Markdown {pg["Report"].l} leaves the line out of each '
     t'{pg["Scenario"].l} anchor under `given_md_lines = false`',
     tags=['versions/0.5.0'],

@@ -24,6 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.
+- A run that executes no test — `--collect-only`, `--setup-only`, `--setup-plan`, or a selection that matches nothing — no longer overwrites the previous report.
 
 ## [0.5.0] - 2026-10-18
 

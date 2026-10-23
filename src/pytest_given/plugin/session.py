@@ -118,8 +118,16 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     a report that is on disk and correct.
     """
     config = session.config
+    mode = _mode_running_no_test(config)
+    # An empty report would discard the previous run's, so none is written.
+    withheld = mode or (None if session.items else 'no test was selected to run')
+    if withheld is not None and given_config(config).sinks.writes_anything():
+        session_outcome(config).report_note = withheld
+    if mode is not None:
+        # Its scenarios never finish, so there is nothing for the lint either.
+        return
     try:
-        built = _build_report(session)
+        built = _build_report(session, write=withheld is None)
         if built.report_dict is not None:
             rendered = emit_sinks(built.report_dict, given_config(config).sinks)
             if rendered.md_stdout is not None:
@@ -137,6 +145,19 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         _fail_run(session)
 
 
+def _mode_running_no_test(config: pytest.Config) -> str | None:
+    """Why this run's mode runs no test, if it does. `--setup-plan` also sets
+    `--setup-only`'s flag, so it is asked first; both belong to plugins
+    `-p no:` can block, so each is read with a default."""
+    if config.option.collectonly:
+        return 'a --collect-only run runs no tests'
+    if config.getoption('setupplan', False):
+        return 'a --setup-plan run plans setup but runs no tests'
+    if config.getoption('setuponly', False):
+        return 'a --setup-only run stops before the tests'
+    return None
+
+
 def _fail_run(session: pytest.Session) -> None:
     """Fail a run pytest was otherwise about to call successful.
 
@@ -151,12 +172,12 @@ def _fail_run(session: pytest.Session) -> None:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
-def _build_report(session: pytest.Session) -> _SessionReport:
+def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
     """Group, resolve, and serialize — everything that can fail before a sink
     is touched.
 
     Grouping and the glossary passes run on every run — each refuses its own
-    authoring forms. Everything after them is sink-only work, so a run with no
+    authoring forms. Everything after them is sink-only work, so a run writing no
     sink skips it and keeps just what the lint reads.
     """
     config = session.config
@@ -179,7 +200,7 @@ def _build_report(session: pytest.Session) -> _SessionReport:
     if glossary is not None:
         glossary = infer_glossary_kinds(glossary, stories)
     report_dict = None
-    if given.sinks.writes_anything():
+    if write and given.sinks.writes_anything():
         report = ReportData(
             metadata=Metadata(
                 project=config.rootpath.name,
@@ -271,8 +292,16 @@ def pytest_terminal_summary(terminalreporter: pytest.TerminalReporter) -> None:
     _write_error(
         terminalreporter, 'pytest-given: narration lint failed', outcome.lint_error
     )
+    _write_note(terminalreporter, outcome.report_note)
     _write_lint_findings(terminalreporter, outcome.findings)
     _write_md(terminalreporter, outcome.md_stdout)
+
+
+def _write_note(terminalreporter: pytest.TerminalReporter, note: str | None) -> None:
+    if note is None:
+        return
+    terminalreporter.write_sep('=', 'pytest-given: report not written', green=True)
+    terminalreporter.line(f'{note} — the previous report, if any, is untouched.')
 
 
 def _write_error(
