@@ -30,6 +30,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `pytest-given citations update` now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.
 - A pytest-given registered from a conftest under `PYTEST_DISABLE_PLUGIN_AUTOLOAD` now warns that it loaded too late, instead of silently losing the source links of import-time `Story` and `GlossaryTerm` declarations.
 - `pytest-given skills install` now removes directories no bundled file lives in, and `--check` reports them as drift.
+- An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.
 
 ## [0.5.0] - 2026-10-18
 

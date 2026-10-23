@@ -25,6 +25,7 @@ from ..model import PytestGivenError, ReportData, ReportUrl, report_from_dict
 from .function_source import read_function_sources
 from .html_renderer import render_html_string
 from .md_renderer import render_md
+from .staged_write import write_all_or_none
 from .story_view import build_coverage_records
 from .theme import DEFAULT_THEME, Theme
 
@@ -132,10 +133,10 @@ def emit_sinks(
         write_sinks(rendered)
     except (PytestGivenError, OSError) as error:
         raise PytestGivenError(sink_failure(error, config)) from error
-    except Exception:
-        # A renderer bug (an undefined template name, a missing color key) is
-        # not a user error and keeps its own traceback — but it fails the same
-        # way for the stale report on disk, which must still go.
+    except BaseException:
+        # A renderer bug (an undefined template name, a missing color key) or
+        # a Ctrl-C is not a user error and keeps its own traceback — but it
+        # fails the same way for the stale report on disk, which must still go.
         discard_stale_sinks(config)
         raise
     return rendered
@@ -195,9 +196,8 @@ def render_json(report_dict: dict[str, Any], report: ReportData) -> str:
 
 
 def write_sinks(rendered: RenderedSinks) -> None:
-    for path, text in rendered.files:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding='utf-8')
+    # A truncated file would read as current, so none is written in place.
+    write_all_or_none(rendered.files)
 
 
 def sink_failure(error: Exception, config: SinkConfig) -> str:

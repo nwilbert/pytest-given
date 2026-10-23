@@ -109,6 +109,53 @@ def test_an_unexpected_render_failure_still_discards_the_stale_report(
     assert not stale.exists()
 
 
+def _report_dict() -> dict[str, object]:
+    """The smallest report every sink renders: no scenarios, no stories."""
+    return report_to_dict(
+        ReportData(
+            metadata=Metadata(
+                project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+            ),
+            scenarios=[],
+        )
+    )
+
+
+def test_an_interrupted_write_leaves_no_sink_and_no_temporary(tmp_path, monkeypatch):
+    """Nothing moves into place until every file is written."""
+    json_path, md_path = tmp_path / 'report.json', tmp_path / 'report.md'
+    _interrupt_temporary(monkeypatch, number=2)
+    with pytest.raises(KeyboardInterrupt):
+        sinks.emit_sinks(
+            _report_dict(), SinkConfig(json_path=json_path, md_path=md_path)
+        )
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_an_interrupted_write_discards_the_stale_report(tmp_path, monkeypatch):
+    stale = tmp_path / 'report.json'
+    stale.write_text('{"stale": true}')
+    _interrupt_temporary(monkeypatch, number=1)
+    with pytest.raises(KeyboardInterrupt):
+        sinks.emit_sinks(_report_dict(), SinkConfig(json_path=stale))
+    assert not stale.exists()
+
+
+def _interrupt_temporary(monkeypatch: pytest.MonkeyPatch, *, number: int) -> None:
+    """A Ctrl-C while the `number`th staged temporary is written."""
+    real_write = Path.write_text
+    seen: list[Path] = []
+
+    def write_text(self, data, *args, **kwargs):
+        if self.name.endswith('.tmp'):
+            seen.append(self)
+            if len(seen) == number:
+                raise KeyboardInterrupt
+        return real_write(self, data, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'write_text', write_text)
+
+
 def _refs(*term_ids: str) -> tuple[ClausePart, ...]:
     return tuple(ClauseTermRef(term_id=TermId(tid), display=tid) for tid in term_ids)
 
