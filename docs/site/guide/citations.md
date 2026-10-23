@@ -200,7 +200,7 @@ pytest-given citations check docs/ README.md --report report.json
 # then publish report.html at given_report_url
 ```
 
-Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped `given_report_url`, the check exits 2 instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.
+Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped `given_report_url`, the check refuses with an error instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.
 
 If you commit the reports instead, write the JSON and HTML report together whenever you regenerate them, and let CI run only the check against the committed JSON. [Standalone CLI](../cli.md#citations) lists the flags and exit codes.
 

@@ -96,7 +96,9 @@ def run_citations(args: argparse.Namespace) -> int:
         )
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
-        return 2
+        # Like `report`'s operational failures, so the two subcommands agree;
+        # 2 stays argparse's usage-error code alone.
+        return 1
     if args.update:
         return _report_update(result)
     return _report_check(result, listed=args.list_links or bool(covering))

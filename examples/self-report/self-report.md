@@ -24,7 +24,7 @@
 | stale | document | readable | check | 1 | False |
 | stale | document | readable | update | 0 | True |
 | of a gone scenario | document | readable | update | 1 | True |
-| stale | document | unreadable | update | 2 | False |
+| stale | document | unreadable | update | 1 | False |
 
 - **current, readable, check, 0, False** — document:
     ```
@@ -46,7 +46,7 @@
     ✅ [Gone](https://example.org/report.html#scenario=t.py::test_gone)
     ```
 
-- **stale, unreadable, update, 2, False** — document:
+- **stale, unreadable, update, 1, False** — document:
     ```
     ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
     ```
@@ -61,7 +61,7 @@
         ```
 - **given** a JSON «report» served from https://example.org/report.html
 - **when** `pytest-given citations check` runs on the document
-- **then** it exits 2, as for a report it cannot read
+- **then** it exits 1, as for a «report» it cannot read
 - **then** the error names the URL it looked for
 
 ## ✓ `citations check --list` prints every «report link», its findings under it

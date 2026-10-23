@@ -73,7 +73,7 @@ _CITATIONS = {
         ('check', 'stale', 'readable', 1, False),
         ('update', 'stale', 'readable', 0, True),
         ('update', 'of a gone scenario', 'readable', 1, True),
-        ('update', 'stale', 'unreadable', 2, False),
+        ('update', 'stale', 'unreadable', 1, False),
     ],
 )
 def test_the_citations_exit_code_says_whether_a_finding_remains(
@@ -113,8 +113,8 @@ def test_documents_that_never_link_the_report_are_refused(
         report = _write_report(tmp_path, report_url=URL)
     with when('`pytest-given citations check` runs on the document'):
         rc = main(['citations', 'check', str(doc), '--report', str(report)])
-    with then('it exits 2, as for a report it cannot read'):
-        assert rc == 2
+    with then(t'it exits 1, as for a {pg["Report"].l} it cannot read'):
+        assert rc == 1
     with then('the error names the URL it looked for'):
         assert f'No document links to the report at {URL}' in capsys.readouterr().err
 
@@ -159,13 +159,13 @@ def test_update_exits_1_when_findings_remain(tmp_path: Path, capsys) -> None:
 
 
 @pytest.mark.parametrize('report_text', ['{not json', '{"metadata": {}}'])
-def test_an_unreadable_report_exits_2_and_writes_nothing(
+def test_an_unreadable_report_exits_1_and_writes_nothing(
     tmp_path: Path, capsys, report_text: str
 ) -> None:
     report = tmp_path / 'report.json'
     report.write_text(report_text, encoding='utf-8')
     doc = _doc(tmp_path, f'✓ [old]({URL}#scenario=t.py::test_pay)\n')
-    assert main(['citations', 'update', str(doc), '--report', str(report)]) == 2
+    assert main(['citations', 'update', str(doc), '--report', str(report)]) == 1
     assert doc.read_text(encoding='utf-8').startswith('✓ ')
     assert 'Error:' in capsys.readouterr().err
 
@@ -176,43 +176,43 @@ def test_an_unreadable_report_is_named_by_its_posix_path(
     report = tmp_path / 'report.json'
     report.write_text('{not json', encoding='utf-8')
     doc = _doc(tmp_path, 'text\n')
-    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 2
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 1
     assert f'Error: {report.as_posix()} is not valid JSON' in capsys.readouterr().err
 
 
 def test_a_missing_report_is_named_by_its_posix_path(tmp_path: Path, capsys) -> None:
     report = tmp_path / 'reports' / 'missing.json'
     doc = _doc(tmp_path, 'text\n')
-    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 2
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 1
     assert f'Error: {report.as_posix()} not found' in capsys.readouterr().err
 
 
-def test_a_report_that_is_not_utf8_exits_2(tmp_path: Path) -> None:
+def test_a_report_that_is_not_utf8_exits_1(tmp_path: Path) -> None:
     report = tmp_path / 'report.json'
     report.write_bytes(b'\xff\xfe')
     doc = _doc(tmp_path, 'text\n')
-    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 2
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 1
 
 
-def test_an_unreadable_document_exits_2_and_writes_no_other(tmp_path: Path) -> None:
+def test_an_unreadable_document_exits_1_and_writes_no_other(tmp_path: Path) -> None:
     report = _write_report(tmp_path)
     good = _doc(tmp_path, f'✓ [old]({URL}#scenario=t.py::test_pay)\n')
     (tmp_path / 'docs' / 'bad.md').write_bytes(b'\xff\xfe')
     rc = main(['citations', 'update', str(tmp_path / 'docs'), '--report', str(report)])
-    assert rc == 2
+    assert rc == 1
     assert good.read_text(encoding='utf-8').startswith('✓ ')
 
 
-def test_a_missing_document_path_exits_2(tmp_path: Path) -> None:
+def test_a_missing_document_path_exits_1(tmp_path: Path) -> None:
     report = _write_report(tmp_path)
     rc = main(['citations', 'check', str(tmp_path / 'nope'), '--report', str(report)])
-    assert rc == 2
+    assert rc == 1
 
 
-def test_neither_report_url_nor_report_path_exits_2(tmp_path: Path, capsys) -> None:
+def test_neither_report_url_nor_report_path_exits_1(tmp_path: Path, capsys) -> None:
     report = _write_report(tmp_path, report_url=None)
     doc = _doc(tmp_path, 'text\n')
-    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 2
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 1
     assert 'report URL' in capsys.readouterr().err
 
 
@@ -234,7 +234,7 @@ def test_report_path_reads_relative_links(tmp_path: Path) -> None:
     assert doc.read_text(encoding='utf-8').startswith('✅ [Pay by card]')
 
 
-def test_a_bad_report_url_flag_exits_2(tmp_path: Path) -> None:
+def test_a_bad_report_url_flag_exits_1(tmp_path: Path) -> None:
     report = _write_report(tmp_path)
     doc = _doc(tmp_path, 'text\n')
     rc = main(
@@ -248,7 +248,7 @@ def test_a_bad_report_url_flag_exits_2(tmp_path: Path) -> None:
             'r.html',
         ]
     )
-    assert rc == 2
+    assert rc == 1
 
 
 def test_a_verb_is_required() -> None:
@@ -405,7 +405,7 @@ def test_a_repeated_covering_lists_the_links_of_each(tmp_path: Path, capsys) -> 
     assert out.splitlines()[-1] == 'citations: 1 finding; `citations update` fixes 1'
 
 
-def test_covering_an_unknown_scenario_exits_2(tmp_path: Path, capsys) -> None:
+def test_covering_an_unknown_scenario_exits_1(tmp_path: Path, capsys) -> None:
     doc = _doc(tmp_path, _LISTED)
     report = _write_report(tmp_path)
     rc = main(
@@ -419,7 +419,7 @@ def test_covering_an_unknown_scenario_exits_2(tmp_path: Path, capsys) -> None:
             't.py::test_pai',
         ]
     )
-    assert rc == 2
+    assert rc == 1
     assert capsys.readouterr().err == (
         'Error: scenario t.py::test_pai is not in the report; '
         'closest by node ID: t.py::test_pay, t.py::test_refund\n'

@@ -20,6 +20,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - The HTML report's Tags sidebar copy button is visually tidied.
+- `pytest-given citations` operational failures — an unreadable report or document, no known report URL or path, a document set that links no report — now exit 1 like `pytest-given report`'s, reserving exit 2 for argparse's usage errors alone.
 
 ### Fixed
 
