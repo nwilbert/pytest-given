@@ -17,6 +17,7 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 """
 
 import json
+import os
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -138,6 +139,12 @@ def emit_sinks(
         # way for the stale report on disk, which must still go.
         discard_stale_sinks(config)
         raise
+    except BaseException:
+        # A Ctrl-C mid-write leaves the same half-written set any failure
+        # does, so the stale report goes for the same reason. The interruption
+        # itself keeps its own traceback and propagates.
+        discard_stale_sinks(config)
+        raise
     return rendered
 
 
@@ -195,9 +202,29 @@ def render_json(report_dict: dict[str, Any], report: ReportData) -> str:
 
 
 def write_sinks(rendered: RenderedSinks) -> None:
-    for path, text in rendered.files:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding='utf-8')
+    """Write the rendered files so no sink is ever left half-written.
+
+    A `write_text` on the target truncates it in place, so a kill or Ctrl-C
+    mid-write leaves a truncated file that reads as current. Each file
+    instead goes to a sibling temporary, and nothing moves into place until
+    every write succeeded — an interrupted run leaves the previous report, or
+    none, but never a half-written one. The temporaries carry the process id,
+    so two runs writing the same sink do not fight over one; on failure the
+    ones already written are removed again.
+    """
+    temporaries: list[tuple[Path, Path]] = []
+    try:
+        for path, text in rendered.files:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = path.with_name(f'.{path.name}.{os.getpid()}.tmp')
+            temporary.write_text(text, encoding='utf-8')
+            temporaries.append((temporary, path))
+    except BaseException:
+        for temporary, _ in temporaries:
+            temporary.unlink(missing_ok=True)
+        raise
+    for temporary, path in temporaries:
+        temporary.replace(path)
 
 
 def sink_failure(error: Exception, config: SinkConfig) -> str:

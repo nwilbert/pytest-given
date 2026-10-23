@@ -33,6 +33,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `citations update` now re-reads each document it is about to write and refuses — writing nothing at all — when one changed on disk while the update ran, instead of clobbering the newer text with the stale one it analyzed.
 - A pytest-given loaded from a conftest (`pytest_plugins = [...]` under `PYTEST_DISABLE_PLUGIN_AUTOLOAD`) — too late for the hook that prepares capture — now warns instead of degrading silently, and publishes the rootdir late so what the run records from session start on is right. Load it the usual way — an installed entry point, or `-p given` — to avoid the warning.
 - `pytest-given skills install` now prunes directories under its bundled skills that no bundled file lives in — the leftovers of removed stale files, or manually created empty ones — and `--check` reports them as drift instead of passing them.
+- A sink file can no longer be left half-written: the report files are written to sibling temporaries first and only move into place once every write succeeded, so a Ctrl-C or kill mid-write leaves the previous report — never a truncated file that reads as current — and an interrupted write discards the stale one like any other failure.
 
 ## [0.5.0] - 2026-10-18
 

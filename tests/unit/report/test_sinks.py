@@ -110,6 +110,62 @@ def test_an_unexpected_render_failure_still_discards_the_stale_report(
     assert not stale.exists()
 
 
+def _report_dict() -> dict[str, object]:
+    """The smallest report every sink renders: no scenarios, no stories."""
+    return report_to_dict(
+        ReportData(
+            metadata=Metadata(
+                project='p', timestamp='t', pytest_version='9', plugin_version='0.1'
+            ),
+            scenarios=[],
+        )
+    )
+
+
+def test_an_interrupted_write_leaves_no_sink_and_no_temporary(tmp_path, monkeypatch):
+    """A Ctrl-C mid-write must not leave a truncated file that reads as
+    current: nothing moves into place until every file is written."""
+    json_path = tmp_path / 'report.json'
+    md_path = tmp_path / 'report.md'
+    temporaries: list[Path] = []
+    real_write = Path.write_text
+
+    def interrupt_the_second_temporary(self, data, *args, **kwargs):
+        if self.name.endswith('.tmp'):
+            temporaries.append(self)
+            if len(temporaries) == 2:
+                raise KeyboardInterrupt
+        return real_write(self, data, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'write_text', interrupt_the_second_temporary)
+    with pytest.raises(KeyboardInterrupt):
+        sinks.emit_sinks(
+            _report_dict(),
+            SinkConfig(json_path=json_path, md_path=md_path),
+        )
+    assert not json_path.exists()
+    assert not md_path.exists()
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_an_interrupted_write_discards_the_stale_report(tmp_path, monkeypatch):
+    """The stale-report promise holds for a Ctrl-C too: the previous run's
+    report must not survive the interrupted one, reading as current."""
+    stale = tmp_path / 'report.json'
+    stale.write_text('{"stale": true}')
+    real_write = Path.write_text
+
+    def interrupt_the_temporary(self, data, *args, **kwargs):
+        if self.name.endswith('.tmp'):
+            raise KeyboardInterrupt
+        return real_write(self, data, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'write_text', interrupt_the_temporary)
+    with pytest.raises(KeyboardInterrupt):
+        sinks.emit_sinks(_report_dict(), SinkConfig(json_path=stale))
+    assert not stale.exists()
+
+
 def _refs(*term_ids: str) -> tuple[ClausePart, ...]:
     return tuple(ClauseTermRef(term_id=TermId(tid), display=tid) for tid in term_ids)
 
