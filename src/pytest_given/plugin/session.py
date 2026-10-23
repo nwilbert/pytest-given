@@ -10,7 +10,6 @@ from datetime import UTC, datetime
 from importlib.metadata import version
 from pathlib import Path
 from types import ModuleType
-from typing import Any
 
 import pytest
 
@@ -27,6 +26,7 @@ from ..grouping import group_parametrized
 from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
 from ..model import (
     Glossary,
+    JsonObject,
     Metadata,
     PytestGivenError,
     PytestGivenWarning,
@@ -127,7 +127,7 @@ class _SessionReport:
     scenarios: list[Scenario]
     glossary: Glossary | None
     stories: list[Story]
-    report_dict: dict[str, Any] | None
+    report_dict: JsonObject | None
 
 
 def pytest_sessionfinish(session: pytest.Session) -> None:

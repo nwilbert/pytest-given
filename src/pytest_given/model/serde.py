@@ -66,7 +66,7 @@ from .schema import (
 )
 
 
-def report_to_dict(report: ReportData) -> dict[str, Any]:
+def report_to_dict(report: ReportData) -> JsonObject:
     result = _asdict_filtered(report)
     assert isinstance(result, dict)
     return result
