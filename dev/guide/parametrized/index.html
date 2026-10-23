@@ -1139,7 +1139,7 @@
 </tr>
 <tr>
 <td>6</td>
-<td>Passed cases whose steps differ in any other way: different steps, different wording, a different t-string expression, or different pins</td>
+<td>Cases whose steps differ in any other way: different steps, different wording, a different t-string expression, or different pins. A case that didn't pass is compared only up to the step where it stopped or took a different path</td>
 <td>Add <code>group_parametrized=False</code> to <code>@scenario</code> so each case becomes its own scenario. For pins that differ, pin the step to one sentence instead</td>
 </tr>
 </tbody>

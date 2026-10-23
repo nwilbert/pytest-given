@@ -1084,7 +1084,7 @@
 <tr>
 <td><code>conditional-check</code></td>
 <td><code>warn</code></td>
-<td>A <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>, so a run can pass it without checking anything. An <code>if</code> that calls <code>pytest.fail</code> counts as a check, and so does a loop over a literal such as <code>(a, b)</code>.</td>
+<td>A <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>, so a run can pass it without checking anything. An <code>if</code> that calls <code>pytest.fail</code> counts as a check, and so do an <code>if</code>/<code>else</code> that checks on every branch and a loop over a literal such as <code>(a, b)</code>.</td>
 </tr>
 <tr>
 <td><code>missing-phase</code></td>
@@ -1120,6 +1120,7 @@
 </table>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>Change a rule's severity with <code>given_lint_rules</code>. Skip lint findings for specific tests with <code>given_lint_ignore</code>: each entry is a node-id pattern (with <code>*</code> wildcards), optionally limited to one rule with a <code>rule-id:</code> prefix.</p>
+<p>Brackets after the <code>::</code> name a parametrize case, not a glob character class, so <code>tests/unit/test_math.py::test_add[water]</code> matches only that case.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[tool.pytest]</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">given_lint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">given_lint_rules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
