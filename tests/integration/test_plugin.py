@@ -2933,6 +2933,59 @@ def test_session_finish_warns_of_a_story_declared_before_the_session(pytester):
     assert data['stories'] == []
 
 
+@scenario(
+    t'A plugin registered from a conftest warns instead of degrading silently',
+    tags=['validation'],
+)
+def test_a_conftest_registered_plugin_warns_instead_of_degrading_silently(
+    pytester, tmp_path
+):
+    """Its conftest's import-time Story and GlossaryTerm declarations lose
+    their source links, which would otherwise go unnoticed."""
+    with given(t'a {pg["Scenario"].l} and a conftest that registers the plugin'):
+        pytester.makeconftest("pytest_plugins = ['pytest_given.plugin']")
+        pytester.makepyfile(_SUITE)
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with plugin autoload disabled'):
+        result = pytester.runpytest(
+            '--disable-plugin-autoload', f'--given-json={json_path}'
+        )
+    with then('the run passes and the report is still written'):
+        result.assert_outcomes(passed=1)
+        data = json.loads(json_path.read_text())
+        assert data['scenarios'][0]['narration']['text'] == 'Buy coffee'
+    with then(t'the {pg["Scenario"].l} keeps its rootdir-relative source'):
+        assert data['scenarios'][0]['source']['relpath'] == (
+            'test_a_conftest_registered_plugin_warns_instead_of_degrading_silently.py'
+        )
+    with then("pytest's warnings summary says it loaded too late to prepare capture"):
+        assert 'PytestGivenWarning: pytest-given loaded too late' in result.stdout.str()
+
+
+def test_a_p_flag_registration_needs_no_late_bootstrap(pytester, tmp_path):
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest(
+        '-p',
+        'given',
+        '--disable-plugin-autoload',
+        f'--given-json={tmp_path / "r.json"}',
+    )
+    result.assert_outcomes(passed=1)
+    assert 'too late' not in result.stdout.str()
+
+
+def test_the_late_load_warning_obeys_filterwarnings(pytester):
+    pytester.makeconftest("pytest_plugins = ['pytest_given.plugin']")
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest(
+        '--disable-plugin-autoload',
+        '-W',
+        'ignore::pytest_given.PytestGivenWarning',
+    )
+    result.assert_outcomes(passed=1)
+    assert 'too late' not in result.stdout.str()
+
+
 def test_session_finish_with_no_stories_leaves_glossary_none(pytester):
     pytester.makepyfile("""
         from pytest_given import scenario

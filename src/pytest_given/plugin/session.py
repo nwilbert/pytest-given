@@ -37,8 +37,10 @@ from ..model import (
 )
 from ..report import detect_commit_sha, emit_sinks, sink_failure
 from .state import (
+    capture_bootstrapped,
     given_config,
     init_session_stash,
+    mark_capture_bootstrapped,
     session_collector,
     session_outcome,
     session_state,
@@ -57,6 +59,36 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     in-process run's conftests import before its sessionstart, so clearing
     there would leave the outer session's registrations visible as spurious
     `already declared` collisions."""
+    _prepare_capture(early_config, clear_registry=True)
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    """Give the session its own collector and hook bookkeeping.
+
+    A plugin registered from a conftest (`pytest_plugins` under
+    `PYTEST_DISABLE_PLUGIN_AUTOLOAD`) has missed `pytest_load_initial_conftests`,
+    so it prepares capture here, keeping the registry the conftest has
+    already registered into.
+    """
+    config = session.config
+    if not capture_bootstrapped(config):
+        _prepare_capture(config, clear_registry=False)
+        # Through pytest, so `filterwarnings` and the warnings summary see it.
+        config.issue_config_time_warning(
+            PytestGivenWarning(
+                'pytest-given loaded too late to prepare capture: a plugin '
+                'registered from a conftest misses the hook that runs before '
+                'the conftests import, so Story and GlossaryTerm declared '
+                'at import time carry no source link. Load it the usual '
+                'way — an installed entry point, or -p given — so it can '
+                'prepare before the conftests run.'
+            ),
+            stacklevel=2,
+        )
+    init_session_stash(config)
+
+
+def _prepare_capture(config: pytest.Config, *, clear_registry: bool) -> None:
     displaced = capture_snapshot()
 
     def restore_displaced_state() -> None:
@@ -72,13 +104,9 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
         """
         restore_capture_state(displaced)
 
-    early_config.add_cleanup(restore_displaced_state)
-    begin_capture_session(Path(early_config.rootpath))
-
-
-def pytest_sessionstart(session: pytest.Session) -> None:
-    """Give the session its own collector and hook bookkeeping."""
-    init_session_stash(session.config)
+    config.add_cleanup(restore_displaced_state)
+    begin_capture_session(Path(config.rootpath), clear_registry=clear_registry)
+    mark_capture_bootstrapped(config)
 
 
 @dataclass(frozen=True, kw_only=True)

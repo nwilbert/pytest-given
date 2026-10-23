@@ -53,9 +53,9 @@ def restore_capture_state(state: CaptureState) -> None:
     set_active_collector(state.collector)
 
 
-def begin_capture_session(rootdir: Path) -> None:
-    """Point capture at a session's rootdir, on a cleared story registry and
-    with no collector active.
+def begin_capture_session(rootdir: Path, *, clear_registry: bool = True) -> None:
+    """Point capture at a session's rootdir with no collector active, and on
+    a cleared story registry unless `clear_registry` is false.
 
     Take a `capture_snapshot` first when the caller may be nested inside
     another run, and `restore_capture_state` when this one is done. The
@@ -63,5 +63,6 @@ def begin_capture_session(rootdir: Path) -> None:
     into the outer session's open scenario.
     """
     set_rootdir(rootdir)
-    restore_story_registry({})
+    if clear_registry:
+        restore_story_registry({})
     set_active_collector(None)

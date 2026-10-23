@@ -28,6 +28,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.
 - The `conditional-check` lint no longer flags a `then` whose `if`/`else` checks on every branch.
 - `pytest-given citations update` now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.
+- A pytest-given registered from a conftest under `PYTEST_DISABLE_PLUGIN_AUTOLOAD` now warns that it loaded too late, instead of silently losing the source links of import-time `Story` and `GlossaryTerm` declarations.
 
 ## [0.5.0] - 2026-10-18
 

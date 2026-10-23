@@ -338,10 +338,14 @@ def _fake_session() -> Any:
 
     The stash carries a `GivenConfig` because the real lifecycle always runs
     `pytest_configure` first — that is where every option is resolved, and
-    `pytest_sessionstart` reads the result rather than re-deriving it.
+    `pytest_sessionstart` reads the result rather than re-deriving it. The
+    capture-bootstrap mark is set because a run that reaches sessionstart
+    the normal way — the entry point — has run the initial-conftests hook;
+    the conftest-registered latecomer is the integration suite's subject.
     """
     config = SimpleNamespace(stash=pytest.Stash())
     state.store_given_config(config, _given_config())
+    state.mark_capture_bootstrapped(config)
     return SimpleNamespace(config=config)
 
 

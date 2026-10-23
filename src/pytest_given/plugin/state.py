@@ -1,10 +1,11 @@
 """What a session keeps in `config.stash`, and the accessors that read it.
 
-Four values, one writer each: `Collector` is the recorder itself, created at
+Five values, one writer each: `Collector` is the recorder itself, created at
 session start; `GivenConfig` is this run's options, parsed once at configure
 time; `SessionState` is the bookkeeping the per-item hooks pass between each
-other; `SessionOutcome` is what session finish leaves for the terminal summary.
-The stash rather than module globals throughout, so a nested in-process run
+other; `SessionOutcome` is what session finish leaves for the terminal summary;
+the capture-bootstrap mark says capture was prepared for this run. The stash
+rather than module globals throughout, so a nested in-process run
 (pytester, `pytest.main`) gets its own set instead of rebinding — and thereby
 clobbering — the outer session's.
 
@@ -84,6 +85,15 @@ _collector_key: pytest.StashKey[Collector] = pytest.StashKey()
 _given_config_key: pytest.StashKey[GivenConfig] = pytest.StashKey()
 _session_outcome_key: pytest.StashKey[SessionOutcome] = pytest.StashKey()
 _session_state_key: pytest.StashKey[SessionState] = pytest.StashKey()
+_capture_bootstrapped_key: pytest.StashKey[bool] = pytest.StashKey()
+
+
+def mark_capture_bootstrapped(config: pytest.Config) -> None:
+    config.stash[_capture_bootstrapped_key] = True
+
+
+def capture_bootstrapped(config: pytest.Config) -> bool:
+    return config.stash.get(_capture_bootstrapped_key, False)
 
 
 def store_given_config(config: pytest.Config, given: GivenConfig) -> None:
