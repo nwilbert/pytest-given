@@ -8,8 +8,9 @@ import webbrowser
 import zipfile
 from collections.abc import Iterator
 from contextlib import contextmanager
+from functools import cache
 from pathlib import Path
-from typing import Literal, NamedTuple
+from typing import Any, Literal, NamedTuple
 
 import nox
 
@@ -368,15 +369,22 @@ def check_release(session: nox.Session) -> None:
     session.log(f'the {target} release of pytest-given passed a live smoke run')
 
 
-_ZENSICAL_CONFIG = tomllib.loads(Path('zensical.toml').read_text(encoding='utf-8'))
+@cache
+def _zensical_config() -> dict[str, Any]:
+    """`zensical.toml`, read on first need rather than at import: only the
+    docs-and-reports sessions parse it, so a missing or malformed file breaks
+    the session that needs the site URL — not every `nox` invocation."""
+    return tomllib.loads(Path('zensical.toml').read_text(encoding='utf-8'))
 
 
 def _examples_url(docs_version: str) -> str:
-    return f'{_ZENSICAL_CONFIG["project"]["site_url"]}{docs_version}/examples'
+    return f'{_zensical_config()["project"]["site_url"]}{docs_version}/examples'
 
 
 # The `/dev/` docs, which every push to `main` publishes.
-_PAGES_EXAMPLES_URL = _examples_url('dev')
+@cache
+def _pages_examples_url() -> str:
+    return _examples_url('dev')
 
 
 class _Example(NamedTuple):
@@ -485,7 +493,7 @@ def _regenerate_examples(session: nox.Session) -> None:
             f'--given-md=examples/{slug}/{slug}.md',
             f'--given-title={title}',
             '--given-source-link=github',
-            f'--given-report-url={_PAGES_EXAMPLES_URL}/{slug}.html',
+            f'--given-report-url={_pages_examples_url()}/{slug}.html',
             # These suites have intentional failures, so the run already
             # returns a tolerated exit 1 (success_codes below), which masks
             # error-level lint findings. The printed summary is the signal
@@ -720,7 +728,7 @@ def _regenerate_self_report(session: nox.Session) -> None:
         '--given-md=examples/self-report/self-report.md',
         '--given-title=pytest-given Self-Report',
         '--given-source-link=github',
-        f'--given-report-url={_PAGES_EXAMPLES_URL}/self-report.html',
+        f'--given-report-url={_pages_examples_url()}/self-report.html',
         # The backend suite has no intentional failures, so an error-level
         # lint finding turns this session red — a real gate.
         '--given-lint',
