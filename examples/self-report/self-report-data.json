@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-23T12:19:59.419229+00:00",
+    "timestamp": "2026-10-23T12:20:56.586265+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "23ede2c49a2a56179166a16ffc1c5196ea3a4b62",
+    "commit_sha": "f1b291d8ad7377b76598a9f1a146ff816fc343c3",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -719,7 +719,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -889,7 +889,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -1258,7 +1258,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -1367,7 +1367,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -1496,7 +1496,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 531,
+      "duration_ms": 532,
       "steps": [
         {
           "phase": "given",
@@ -1811,7 +1811,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 37,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -2174,7 +2174,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -2896,7 +2896,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -3013,7 +3013,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -3397,7 +3397,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -3987,7 +3987,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4603,7 +4603,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -4776,7 +4776,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -5157,7 +5157,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -5441,7 +5441,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -5807,7 +5807,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -6032,7 +6032,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 142,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -6650,7 +6650,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -13857,7 +13857,7 @@
       "module": "tests.unit.capture.test_markdown_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",

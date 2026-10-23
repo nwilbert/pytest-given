@@ -50,10 +50,12 @@ _INTERNAL_SUFFIXES = tuple(
         'pytest_given.capture.collector',
         'pytest_given.capture.file_glossary',
         'pytest_given.capture.glossary',
+        'pytest_given.capture.markdown_glossary',
         'pytest_given.capture.scenario',
         'pytest_given.capture.steps',
         'pytest_given.capture.story',
         'pytest_given.capture.template',
+        'pytest_given.model.narration',
         'pytest_given.model.text',
     )
 )

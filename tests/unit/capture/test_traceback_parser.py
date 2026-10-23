@@ -140,8 +140,10 @@ def test_pytest_given_annotated_reader_frame_classified_internal() -> None:
         'capture/collector',
         'capture/glossary',
         'capture/file_glossary',
+        'capture/markdown_glossary',
         'capture/story',
         'capture/template',
+        'model/narration',
         'model/text',
     ],
 )

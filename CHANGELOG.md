@@ -37,6 +37,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A `given_source_link` template whose format spec or conversion is bad (`{line:>{width}}`, `{line!x}`) is now rejected when the option is validated, with the variable or conversion named — instead of crashing at render time and discarding the whole report for a template typo.
 - Two scenarios can no longer end up with the same `#scenario=` slug when a pair that survives a full path falls back to its node IDs: a fallback that folds onto a slug the escalation settled for an unrelated scenario now takes the next ordinal over it.
 - A NaN or Infinity parameter value no longer makes `report-data.json` unparseable outside Python: `json.dumps` writes them as bare literals that `jq` and `JSON.parse` reject, so the JSON sink now spells them as their string forms — `NaN`, `Infinity` — which the parameter table still displays and which read back as valid values.
+- A failure raised from inside the Markdown-glossary reader or the narration helpers no longer shows pytest-given's own frame as a user frame in the report's traceback — those modules refuse bad input, and by the internal-frame rule their frames belong behind the toggle.
 
 ## [0.5.0] - 2026-10-18
 
