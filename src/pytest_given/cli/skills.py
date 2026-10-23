@@ -54,7 +54,7 @@ def _install_skills(dest: Path) -> int:
     ``dest`` are never read or written.
     """
     bundled = _bundled_skill_tree()
-    stale = _stale_files(dest, bundled)
+    stale, stale_dirs = _stale(dest, bundled)
     for rel, data in bundled.items():
         target = dest.joinpath(*rel.parts)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -63,6 +63,9 @@ def _install_skills(dest: Path) -> int:
     for path in stale:
         path.unlink()
         print(f'removed stale {path}')
+    for path in stale_dirs:
+        path.rmdir()
+        print(f'removed stale directory {path}')
     return 0
 
 
@@ -76,7 +79,9 @@ def _report_drift(dest: Path) -> int:
             findings.append(f'missing: {target}')
         elif target.read_bytes() != data:
             findings.append(f'differs: {target}')
-    findings.extend(f'stale: {path}' for path in _stale_files(dest, bundled))
+    stale, stale_dirs = _stale(dest, bundled)
+    findings.extend(f'stale: {path}' for path in stale)
+    findings.extend(f'stale: {path} (directory)' for path in stale_dirs)
     for finding in findings:
         print(finding)
     if findings:
@@ -99,13 +104,22 @@ def _collect(node: Traversable, prefix: PurePosixPath, tree: SkillTree) -> None:
             tree[prefix / child.name] = child.read_bytes()
 
 
-def _stale_files(dest: Path, bundled: SkillTree) -> list[Path]:
-    owned_dirs = {rel.parts[0] for rel in bundled}
+def _stale(dest: Path, bundled: SkillTree) -> tuple[list[Path], list[Path]]:
+    """What no bundled file accounts for under the bundled skills' directories:
+    the entries to unlink, a symlink among them whatever it points at, then
+    the directories left to prune, each before its parent."""
     known = {dest.joinpath(*rel.parts) for rel in bundled}
-    return [
+    needed = {
+        dest.joinpath(*rel.parts[:depth])
+        for rel in bundled
+        for depth in range(1, len(rel.parts))
+    }
+    tree = [
         path
-        for name in sorted(owned_dirs)
+        for name in sorted({rel.parts[0] for rel in bundled})
         if (dest / name).is_dir()
         for path in sorted((dest / name).rglob('*'))
-        if path.is_file() and path not in known
     ]
+    dirs = [path for path in tree if path.is_dir() and not path.is_symlink()]
+    files = [path for path in tree if path not in known and path not in dirs]
+    return files, [path for path in reversed(dirs) if path not in needed]

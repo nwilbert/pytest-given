@@ -29,6 +29,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The `conditional-check` lint no longer flags a `then` whose `if`/`else` checks on every branch.
 - `pytest-given citations update` now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.
 - A pytest-given registered from a conftest under `PYTEST_DISABLE_PLUGIN_AUTOLOAD` now warns that it loaded too late, instead of silently losing the source links of import-time `Story` and `GlossaryTerm` declarations.
+- `pytest-given skills install` now removes directories no bundled file lives in, and `--check` reports them as drift.
 
 ## [0.5.0] - 2026-10-18
 
