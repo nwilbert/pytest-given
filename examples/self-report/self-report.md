@@ -134,6 +134,14 @@
 - **then** the «scenario» carries its title, its «tag» and its three «steps»
 - **then** the given «step» holds a «term ref» to the term
 
+## ✓ A chained failure reports the frames of its own error, and its cause apart
+`tests/integration/test_plugin.py::test_chained_failure_keeps_the_frames_of_its_own_error` · validation
+
+- **given** a «scenario» failing through a cause
+- **when** the suite fails and the report is written
+- **then** the error's frames hold the line that raised it
+- **then** the cause is reported apart, with the sentence leading on to the error
+
 ## ✓ A «scenario» failing on a pytest-given refusal points at the test, not at pytest-given
 `tests/integration/test_plugin.py::test_refusal_frame_points_at_the_test` · validation
 
@@ -282,8 +290,8 @@
 - **then** the run says no report was written, naming the file
 - **then** the stale files are gone rather than left reading as current
 
-## ✓ An unknown «source link» preset stops the run before it collects
-`tests/integration/test_plugin.py::test_an_unknown_source_link_preset_fails_before_the_suite_runs` · validation
+## ✓ A «source link» value that cannot work stops the run before it collects · 2 cases
+`tests/integration/test_plugin.py::test_a_source_link_that_cannot_work_fails_before_the_suite_runs` · validation
 
 - **given** a suite that would otherwise pass
     - 📎 suite:
@@ -295,9 +303,14 @@
             with then("it brews"):
                 assert True
         ```
-- **when** the suite runs with a misspelled «source link» preset
-- **then** the run ends as a usage error, naming the flag the user typed
+- **when** the suite runs with --given-source-link={value}
+- **then** the run ends as a usage error, saying {error}
 - **then** no test ran
+
+| case ID | value | error |
+|---|---|---|
+| misspelled-preset | bogus | Unknown --given-source-link preset |
+| unknown-variable | {bogus} | Unknown source-link template variable |
 
 ## ✓ An unknown «source link» preset in an ini reports the ini name
 `tests/integration/test_plugin.py::test_an_unknown_source_link_preset_in_an_ini_names_the_ini` · validation
@@ -652,6 +665,15 @@
 | empty-clears | \[\] | \[\] |
 | list-replaces | \[a\[2\]\] | \[2\] |
 
+## ✓ A plugin registered from a conftest warns instead of degrading silently
+`tests/integration/test_plugin.py::test_a_conftest_registered_plugin_warns_instead_of_degrading_silently` · validation
+
+- **given** a «scenario» and a conftest that registers the plugin
+- **when** the suite runs with plugin autoload disabled
+- **then** the run passes and the report is still written
+- **then** the «scenario» keeps its rootdir-relative source
+- **then** pytest's warnings summary says it loaded too late to prepare capture
+
 ## ✓ A `Template` «given annotation» on an unparametrized «scenario» fails that «scenario»
 `tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario` · parametrization, validation
 
@@ -718,6 +740,21 @@
 - **given** a suite with one «scenario»
 - **when** the suite runs with a bare --given-md
 - **then** the narration is printed between the fence markers
+
+## ✓ A «report» is not written over by a run that runs no tests · 3 cases
+`tests/integration/test_plugin.py::test_a_run_that_runs_no_tests_leaves_the_previous_report_untouched` · validation
+
+- **given** a suite with one «scenario» and its written «report»
+- **when** the suite runs again with {mode}
+- **then** the run passes
+- **then** the report on disk is still the one the real run wrote
+- **then** the summary says no report was written, because {reason}
+
+| mode | reason |
+|---|---|
+| --collect-only | a --collect-only run runs no tests |
+| --setup-only | a --setup-only run stops before the tests |
+| --setup-plan | a --setup-plan run plans setup but runs no tests |
 
 ## ✓ The Markdown «report» leaves the line out of each «scenario» anchor under `given_md_lines = false`
 `tests/integration/test_plugin.py::test_given_md_lines_ini_drops_the_anchor_line` · versions/0.5.0
@@ -1128,6 +1165,15 @@
 - **when** the suite runs with an HTML report
 - **then** the failure is summarized as the lint's, rather than raised as a traceback or titled as a report that was not written
 - **then** the report that was already written is still there
+
+## ✓ `skills install` removes what no bundled file accounts for, the directories it empties included
+`tests/integration/test_skills_cli.py::test_install_prunes_directories_emptied_by_stale_file_removal`
+
+- **given** installed skills holding a stale file two directories deep
+- **when** skills install runs again
+- **then** it succeeds
+- **then** the stale file and both directories it emptied are gone
+- **then** a bundled file beside them stays in place
 
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py::test_start_and_finish_scenario`
@@ -2371,6 +2417,18 @@
         ```
 - **then** no finding remains
 
+## ✓ `citations update` refuses a document that changed while it ran
+`tests/unit/citations/test_check.py::test_update_refuses_a_document_that_changed_while_it_ran`
+
+- **given** a stale «citation» to rewrite
+    - 📎 document:
+        ```
+        ❓ [Pay by card](https://example.org/report.html#scenario=t.py::test_pay)
+        ```
+- **when** another writer saves the document while the update analyzes it
+- **then** the update refuses, saying the document changed
+- **then** the other writer's save is what is on disk
+
 ## ✓ A plain «report link» claims only that its target exists
 `tests/unit/citations/test_check.py::test_a_plain_report_link_claims_only_that_its_target_exists` · spec/citations, versions/0.5.0
 
@@ -3416,7 +3474,8 @@
               "is_internal": false
             }
           ],
-          "error_tail": null
+          "error_tail": null,
+          "causes": []
         }
         ```
 - **when** the Markdown «report» is rendered
@@ -3621,6 +3680,20 @@
 | skipped, passed | passed | None |
 | skipped, skipped | skipped | None |
 
+## ✓ A «parametrized scenario» carries a skip or xfail reason only when its «cases» all give it · 4 cases
+`tests/unit/test_grouping.py::test_a_group_carries_a_reason_only_its_cases_share` · parametrization
+
+- **given** two {status} «cases», one saying {first} and one saying {second}
+- **when** the «cases» are «grouped»
+- **then** the «parametrized scenario» is {status}, with the reason {shared}
+
+| case ID | status | first | second | shared |
+|---|---|---|---|---|
+| skipped-different | skipped | needs a database | needs a service | None |
+| skipped-shared | skipped | needs a database | needs a database | needs a database |
+| xfailed-different | xfailed | flaky | slow | None |
+| xfailed-shared | xfailed | flaky | flaky | flaky |
+
 ## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
 `tests/unit/test_grouping.py::test_group_parametrized_keeps_source_order` · parametrization
 
@@ -3770,6 +3843,34 @@
 - **when** the «cases» are «grouped»
 - **then** the grouping is refused
 - **then** the error names the divergence and the opt-out that answers it
+
+## ✓ A failed «case» must narrate the «steps» it shares with the passed ones the same way
+`tests/unit/test_grouping.py::test_a_failed_case_with_recorded_steps_must_narrate_the_baseline` · parametrization, validation
+
+- **given** two «cases» whose «step» texts differ
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the failed case and its difference from the baseline
+
+## ✓ A failed «case» that stops early or takes another path still «groups» · 2 cases
+`tests/unit/test_grouping.py::test_a_failed_case_is_not_held_to_steps_it_does_not_share` · parametrization, validation
+
+- **given** a passed «case» that loads its items, then checks it is hot
+- **given** a failed «case» that loads its items, then retries instead of checking it is hot: {retries}
+    - 📎 failed steps — *see parameter table*
+- **when** the «cases» are «grouped»
+- **then** they make one scenario, with a row for each case
+
+| case ID | retries | failed steps |
+|---|---|---|
+| stops-early | False | `when 4 items load` |
+| parts-from-the-baseline | True | failed steps |
+
+- **parts-from-the-baseline** — failed steps:
+    ```
+    when 4 items load
+    when it retries
+    ```
 
 ## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
 `tests/unit/test_grouping.py::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization

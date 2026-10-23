@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-18T18:03:29.396666+00:00",
+    "timestamp": "2026-10-23T17:51:10.992023+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "af994c6d931af0efcd61ee6664b1f4fdbe31c983",
+    "commit_sha": "e5978d8580b649a77e1b7ced0e69f669e51c5939",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -213,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 80,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -415,7 +415,8 @@
                   "is_internal": false
                 }
               ],
-              "error_tail": "E   assert False == True"
+              "error_tail": "E   assert False == True",
+              "causes": []
             },
             "custom_id": true
           }
@@ -1617,7 +1618,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 45,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -1738,7 +1739,8 @@
             "is_internal": false
           }
         ],
-        "error_tail": "E   assert 10 == 20"
+        "error_tail": "E   assert 10 == 20",
+        "causes": []
       },
       "skip_reason": null,
       "xfail_reason": null,
@@ -1782,7 +1784,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 49,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1921,7 +1923,8 @@
             "is_internal": false
           }
         ],
-        "error_tail": "E   NotImplementedError: the machine does not read loyalty cards yet"
+        "error_tail": "E   NotImplementedError: the machine does not read loyalty cards yet",
+        "causes": []
       },
       "skip_reason": null,
       "xfail_reason": "loyalty cards not implemented yet",

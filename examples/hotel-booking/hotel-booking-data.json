@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-18T10:35:18.902575+00:00",
+    "timestamp": "2026-10-23T17:51:11.914291+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.0",
-    "commit_sha": "2e57a6d139a1f44aa1eaafe4f5b5bfd45236baad",
+    "commit_sha": "e5978d8580b649a77e1b7ced0e69f669e51c5939",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 37,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -805,7 +805,8 @@
                   "is_internal": false
                 }
               ],
-              "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     - partial balance\nE     + unsupported payment method"
+              "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     - partial balance\nE     + unsupported payment method",
+              "causes": []
             },
             "custom_id": false
           }
@@ -1018,7 +1019,7 @@
       "module": "test_hotel_booking",
       "tags": [],
       "status": "xfailed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -1118,7 +1119,8 @@
             "is_internal": false
           }
         ],
-        "error_tail": "E   NotImplementedError: rebooking a cancelled booking is not supported yet"
+        "error_tail": "E   NotImplementedError: rebooking a cancelled booking is not supported yet",
+        "causes": []
       },
       "skip_reason": null,
       "xfail_reason": "rebooking is not implemented yet",
