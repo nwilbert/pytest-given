@@ -24,6 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled reviewing skill now flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, and asks for a scenario per new rule rather than per changelog entry or branch.
 - The bundled reviewing skill now passes per-file reviewers the paths of the test file, glossary and code under test, accepts a contrast row under a conditional claim, runs its commands through the project's own runner, and lists undecorated tests from collection alone, without jq.
 - The bundled navigating skill now warns that a saved report may cover only a selection, queries an area by several terms, a tag and a path at once, and points to where an area has no scenario.
+- The bundled citing skill now says to build the report without xdist's `-n` and to leave a claim no test can show uncited.
 
 ### Fixed
 

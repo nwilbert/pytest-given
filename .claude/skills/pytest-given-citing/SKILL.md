@@ -14,7 +14,7 @@ A **narrated citation** is a scenario citation written as a `<details>` block, i
 
 A **plain report link** has no glyph: it keeps its own wording and claims only that its target exists.
 
-`pytest-given citations check DOCS… --report report.json` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both read the JSON report of a run of **every** scenario (`pytest -m pytest_given --given-json=report.json`); a target the run left out counts as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository. Both commands exit 2 when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
+`pytest-given citations check DOCS… --report report.json` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both read the JSON report of a run of **every** scenario (`pytest -m pytest_given --given-json=report.json`, without xdist's `-n`); a target the run left out counts as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository. Both commands exit 2 when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
 
 ## Triage
 
@@ -36,7 +36,7 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 Citations are optional. A document such as a spec uses them to tie its prose to the code and to show the rules it describes at work. Cite only where the user asks. Where a passage cites:
 
 - The cited scenario must not contradict the prose that cites it.
-- The citations cover all the logic the passage describes: every case, not just one.
+- The citations cover all the logic the passage describes: every case, not just one. A claim no test can show, such as an instruction in an agent prompt, stays uncited. Tell the user, rather than citing a scenario that only looks related.
 - If the project has a glossary, the passage uses its terms consistently, as the cited scenarios do.
 
 You cannot click a copy button. Write a placeholder — a typed `?` glyph and empty text — and let `update` fill it:
