@@ -9,7 +9,7 @@ The test suite describes itself. The rendered scenarios are a behavioral spec, t
 
 ## Orientation: first contact
 
-1. **Look for an existing report.** A `*.md` or `*.json` report that is committed or published by CI (often under `given-report/`) is the spec of the last run. Reading it costs nothing: no test environment, no suite run. To re-render a saved JSON report as Markdown, run `pytest-given report <data.json> --format md`. Render a fresh one only when there is none, or when the question is about *this* checkout.
+1. **Look for an existing report.** A `*.md` or `*.json` report that is committed or published by CI (often under `given-report/`) is the spec of the last run. Reading it costs nothing: no test environment, no suite run. To re-render a saved JSON report as Markdown, run `pytest-given report <data.json> --format md`. Render a fresh one only when there is none, or when the question is about *this* checkout. A report covers only what its run selected, so a local one may be partial: compare the test files it lists (`[.scenarios[].source.relpath] | unique`) with the suite's, and its `metadata.commit_sha` with HEAD, before treating it as the whole spec.
 2. **Read the glossary first.** Read `GLOSSARY.md`, or the `Glossary()` or `FileGlossary` declaration the tests import. It holds the domain vocabulary, with definitions.
 3. **Render the spec.** `pytest <selection> --given-md` runs the selected tests and prints a Markdown spec of every scenario to stdout, between `<!-- pytest-given:md:start -->` and `:end`. The ``file.py:line::test_name`` line under each heading leads back to the code. Select tests with pytest's own arguments (`-k`, node IDs, `--lf`); the report covers whatever ran. When a full run is slow, add `-m pytest_given`: the report holds only scenarios, so leaving the plain tests out changes nothing in it.
 4. **Read the stories.** The `story(...)` definitions are the flows between actors that the scenarios implement. `stories=` on a `@scenario`, or a pin on a scenario or a step, links a scenario to them.
@@ -18,13 +18,19 @@ The test suite describes itself. The rendered scenarios are a behavioral spec, t
 
 For questions like "which scenarios are tagged X, reference term Y, fail, or implement story Z", write the data file and query it. The full shape and more recipes are in [references/report-json.md](references/report-json.md).
 
+"Is this area covered?" usually spans several glossary terms, a tag and a directory. Match any of them:
+
 ```bash
 pytest <selection> --given-json=report.json
-jq -r '.scenarios[] | select(.tags | index("validation"))
+jq -r '.scenarios[] | select(([.. | .term_id? // empty] | any(IN("late-fee", "waitlist")))
+         or (.tags | any(startswith("billing")))
+         or (.source.relpath | startswith("tests/billing/")))
        | .narration.text + " — " + .source.relpath + ":" + (.source.line|tostring)' report.json
 ```
 
-The reference has recipes by status, words, term, tag and story. Use them rather than writing your own: a parametrized scenario keeps its failures per case, term refs nest at any depth, and `.story_ids` misses a scenario that only pins a story.
+The reference has recipes by status, words, term, tag and story. Use them rather than writing your own: a parametrized scenario keeps its failures per case, term refs nest at any depth, and `.story_ids` misses a scenario that only pins a story. Without jq, load the JSON with Python's `json` module. The recipes' logic carries over.
+
+These queries find only what exists. For where an area has no scenario, the reviewing skill's [completeness.md](../pytest-given-reviewing/references/completeness.md) lists the undecorated tests and the test files without a single scenario.
 
 ## Traps
 

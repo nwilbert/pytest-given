@@ -14,6 +14,8 @@ Narration can be **audited, but nothing verifies it**. No tool compares a step's
 
 Don't skip layer 1. It is cheaper and stricter than finding the same problems by reading.
 
+Run the `pytest` commands below through the project's own runner, such as `uv run pytest` or tox.
+
 ## 1. Structural gate: run the lint first
 
 ```bash
@@ -30,24 +32,24 @@ If Markdown documents cite the report, review the citations too: follow [referen
 
 ## 2. Semantic audit: step text against step body
 
-**Reviewing a change? Diff the Markdown report first.** Render `pytest <selection> --no-given-md-lines --given-md=<file>` at the base and at the head of the change, or use a committed report, and diff the two. For a saved JSON report, `pytest-given report <file> --format md --no-lines` does the same. The Markdown has no timestamps or commit SHAs, so the diff shows exactly how the described behavior changed, and it tells you what to audit. Compare it with the code diff in both directions. Changed narration means its body needs another check. A changed step *body* under unchanged narration is the typical sign of drift: the behavior changed, but the spec didn't.
+**Reviewing a change? Diff the Markdown report first.** Render `pytest <selection> --no-given-md-lines --given-md=<file>` at the base and at the head of the change, or use a committed report, and diff the two. For a saved JSON report, `pytest-given report <file> --format md --no-lines` does the same. The Markdown has no timestamps or commit SHAs, so the diff shows exactly how the described behavior changed, and it tells you what to audit. Compare it with the code diff in both directions. Changed narration means its body needs another check. A changed step *body* under unchanged narration is the typical sign of drift: the behavior changed, but the spec didn't. If the merge target has moved since the branch left it, judge vocabulary and actions against the code under test as it will be after the merge.
 
 **No base to compare with**, as on a branch that adopts pytest-given? Audit the whole suite. Start with the scenarios whose bodies the branch changed, then go through the rest file by file. `--given-md` needs no project setup, so run it yourself even when CI only writes other formats.
 
-Judge each scenario's step texts against their bodies with the rubric below. `pytest <test file> --given-md=<file> --given-md-source` prints them side by side: each scenario's narration ends with its test function, decorators included, under its line numbers, so you cite `file:line` straight from it. Only the test function is shown. A step with no `with` in the function was recorded by a step fixture or a decorated step helper the body calls, and a constant or helper the body uses is elsewhere in the file, so open the file before you judge a value. The rubric is complete on its own, so a reviewer you hand it to needs nothing else.
+Judge each scenario's step texts against their bodies with the rubric below. `pytest <test file> --given-md=<file> --given-md-source` prints them side by side: each scenario's narration ends with its test function, decorators included, under its line numbers, so you cite `file:line` straight from it. Only the test function is shown. A step with no `with` in the function was recorded by a step fixture or a decorated step helper the body calls, and a constant or helper the body uses is elsewhere in the file, so open the file before you judge a value.
 
 **Step text may abstract, but it must never overstate.**
 
 - **Values:** a quantity, date or amount in the text must match the body. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes. A literal copied from a constant goes stale when the constant changes; ask for the interpolation (`{BATCH_SIZE}`) instead.
 - **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title is a claim about every item it covers. Assertions on a sample overstate it, like "each slot becomes a term ref" backed by checks on two of three slots. Fix it by asserting the rest or by narrowing the text.
-- **Outcomes:** everything a `then` claims must be asserted in it. "…and recorded in the ledger" without such an assertion describes behavior nobody checked. So does a `then` that sets the value it asserts, or asserts a constant. The lint doesn't catch these, because the step contains an `assert`. Nor does it catch "never called" backed by a stub that raises: if the code catches the error, nothing checks the claim. Ask for recorded calls asserted in the `then`. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row.
+- **Outcomes:** everything a `then` claims must be asserted in it. "…and recorded in the ledger" without such an assertion describes behavior nobody checked. So does a `then` that sets the value it asserts, or asserts a constant. The lint doesn't catch these, because the step contains an `assert`. Nor does it catch "never called" backed by a stub that raises: if the code catches the error, nothing checks the claim. Ask for recorded calls asserted in the `then`. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row. A conditional claim ("a coffee is brewed when the machine has beans") still holds on a contrast row where its condition fails, such as an empty machine that brews nothing.
 - **Strength:** an assertion must fail when its claim is false. `relpath.endswith('.py')` under "keeps its rootdir-relative source" passes on an absolute path too. The data checked must also be able to show the claim: "the cause comes first", checked against JSON that keeps the cause in a field of its own, claims an order nothing sees.
 - **Raises:** the `then` of an expected raise may restate the pinned message in domain terms, but it must not claim more than `match=` checks. When the `then` promises that the message names the offender, offers a hint or includes a file:line, the regex must fail without that detail. For example, `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. A pin with alternatives (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch: sibling scenarios that narrate *different* refusals all pass on one generic message. Pin what tells this refusal apart from the others.
 - **Expected failures:** an `xfail` mark without `strict=True` (and without the `xfail_strict` ini) stays on a scenario quietly once the behavior works. A later regression then shows up as an expected failure. Ask for `strict=True`.
 - **Actions:** what the `when` names must be what its body calls. A common drift: the `when` text reads like more arrangement, but its body also performs the action, so the action appears nowhere in the report. Move the setup into a `given`.
 - **Vocabulary:** a term ref puts the ubiquitous language right next to the code it describes. So each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. `File glossary` over a `FileGlossary` call matches by design, since term names are natural language and the definition spells out the class. But `Reservation` over code that only knows `Booking` is language drift. A term ref must also *mean* its term. One chosen just for its word (`Kindless` in "not kindless inference") sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
 
-For a large suite, split layer 2 by test file: hand each reviewer one test file's Markdown and the rubric, nothing else, and have it return findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only the one file. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
+For a large suite, split layer 2 by test file. One run's Markdown splits at its scenario headings, each followed by its `file::test` line. Hand each reviewer one test file's Markdown, the rubric, and the paths of the test file, the glossary and the code under test, and have it return findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only that one file's context. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
 
 ## 3. Completeness audit: what the report doesn't say
 
@@ -71,7 +73,7 @@ For each finding, give the file:line, what the narration claims, what the body a
 
 ```bash
 jq -r '.scenarios | group_by(.source.relpath)[]
-       | .[0].source.relpath, (.[] | "  " + .narration.text)' report.json
+       | .[0].source.relpath, (map(.narration.text) | unique[] | "  " + .)' report.json
 ```
 
 Flag a title that:

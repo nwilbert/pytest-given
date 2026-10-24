@@ -5,21 +5,15 @@ Start from what the project promises, then from the implementation, and ask what
 - **Promises without a scenario.** A project states its behavior in release notes or a changelog, in the user documentation, and in glossary rows that make a claim ("X takes precedence over Y", "must be unique"). Check that a scenario demonstrates each claim. An entry that fixes or refines a rule a scenario already states is covered by it: one scenario per rule, not per branch. Start with the newest, such as a changelog's unreleased entries. These gaps matter most, because readers trust the promise. A claim narrated only in part, such as the fix without the way to opt out, is a finding too. Prefer adding a scenario to weakening the claim. When a scenario contradicts a glossary row, the row is a false claim.
 - **Behavior without a scenario.** Go through the branches of the code under review that carry behavior: a scoping rule, a precedence decision, a fallback path. Check that each rule among them has a scenario that names it. An edge case of a narrated rule stays a plain test. A rule that only an undecorated test covers is invisible in the report. A branch with no test at all rates higher, because the spec looks complete while hiding it. A rule narrated at the wrong layer is also a finding. There are two cases. In one, several callers each repeat a rule that a shared function decides. In the other, a unit scenario's title claims what the system does, but its body only calls internal code, and no other scenario shows a run reaching that code. The second case is a false claim: decorate a test that proves the title instead. Look among the undecorated tests first; the right one often exists already.
 
-  List the undecorated tests in test files that hold a scenario, and the test files that hold none:
+  List the undecorated tests in test files that hold a scenario, and the test files that hold none. Collecting is enough, no test runs:
 
   ```bash
-  pytest <selection> -m pytest_given --given-json=report.json
-  pytest <selection> -m "not pytest_given" --collect-only -q > plain.txt
+  pytest <selection> --collect-only -q -m pytest_given | grep '::' | sed 's/::.*//' | sort -u > narrated.txt
+  pytest <selection> --collect-only -q -m "not pytest_given" | grep '::' | sed 's/\[.*//' | sort -u > plain.txt
   # undecorated tests next to narrated ones
-  jq -r --rawfile plain plain.txt '
-    [.scenarios[].id | split("::")[0]] as $files
-    | $plain | split("\n") | map(select(contains("::")) | sub("[[].*"; "")) | unique[]
-    | select(split("::")[0] | IN($files[]))' report.json
+  awk -F'::' 'NR==FNR {narrated[$1]; next} $1 in narrated' narrated.txt plain.txt
   # test files without a single scenario
-  jq -r --rawfile plain plain.txt '
-    [.scenarios[].id | split("::")[0]] as $files
-    | $plain | split("\n") | map(select(contains("::")) | split("::")[0]) | unique[]
-    | select(IN($files[]) | not)' report.json
+  awk -F'::' 'NR==FNR {narrated[$1]; next} !($1 in narrated) {print $1}' narrated.txt plain.txt | sort -u
   ```
 
   In a large suite the first list is long: read the test names for rules a user would recognize, and skip the edge cases. In the second, a file that drives a user-facing surface end to end, such as a command line or a configuration option, is the likelier gap.
