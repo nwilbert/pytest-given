@@ -860,6 +860,14 @@
 | neither | 2 | --no-given-lint | 0 | True |
 | serial-report | 0 | --given-json=report.json | 0 | True |
 
+## ✓ A Markdown «report» printed to stdout is UTF-8, whatever the console's code page
+`tests/integration/test_plugin.py::test_md_on_stdout_is_utf8_on_a_codepage_console`
+
+- **given** a suite that passes
+- **given** a console whose code page is cp1252, which has no status glyphs
+- **when** the suite runs with a bare --given-md, in its own process
+- **then** the scenario heading carries its ✓ glyph, not an escape
+
 ## ✓ An unknown «theme» stops the run before it collects
 `tests/integration/test_plugin.py::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 

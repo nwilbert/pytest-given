@@ -1,4 +1,6 @@
+import io
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -191,6 +193,41 @@ def test_cli_format_md_to_stdout(tmp_path, capsys) -> None:
     rc = main(['report', str(json_path), '--format', 'md'])
     assert rc == 0
     assert '## ✓ Alpha' in capsys.readouterr().out
+
+
+def test_cli_md_to_stdout_is_utf8_on_a_codepage_console(tmp_path, monkeypatch) -> None:
+    """Python 3.14 writes a pipe in the locale's code page: cp1252 on Windows,
+    which has no glyph for a status mark."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(
+        json.dumps(
+            {
+                'metadata': {
+                    'project': 'cli',
+                    'timestamp': 't',
+                    'pytest_version': '9',
+                    'plugin_version': '0.1',
+                },
+                'scenarios': [
+                    {
+                        'id': 'tests/t.py::test_a',
+                        'narration': {'text': 'Alpha', 'parts': []},
+                        'module': 'tests/t.py',
+                        'tags': [],
+                        'status': 'passed',
+                        'steps': [],
+                    }
+                ],
+            }
+        )
+    )
+    buffer = io.BytesIO()
+    stdout = io.TextIOWrapper(buffer, encoding='cp1252')
+    monkeypatch.setattr(sys, 'stdout', stdout)
+    rc = main(['report', str(json_path), '--format', 'md'])
+    stdout.flush()
+    assert rc == 0
+    assert '## ✓ Alpha' in buffer.getvalue().decode('utf-8')
 
 
 @pytest.mark.parametrize('name', ['r.md', 'r.markdown', 'R.MD'])

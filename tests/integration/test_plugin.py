@@ -3980,6 +3980,23 @@ def test_the_xdist_refusal_says_how_to_run_instead(pytester):
 
 
 @scenario(
+    t'A Markdown {pg["Report"].l} printed to stdout is UTF-8, whatever the '
+    t"console's code page"
+)
+def test_md_on_stdout_is_utf8_on_a_codepage_console(pytester, monkeypatch):
+    """Python 3.14 writes a pipe in the locale's code page: cp1252 on Windows,
+    where pytest's terminal writer escapes every glyph it cannot encode."""
+    with given('a suite that passes'):
+        pytester.makepyfile(_SUITE)
+    with given('a console whose code page is cp1252, which has no status glyphs'):
+        monkeypatch.setenv('PYTHONIOENCODING', 'cp1252')
+    with when('the suite runs with a bare --given-md, in its own process'):
+        result = pytester.runpytest_subprocess('--given-md')
+    with then('the scenario heading carries its ✓ glyph, not an escape'):
+        assert '## ✓ ' in result.stdout.str()
+
+
+@scenario(
     t'An unknown {pg["Theme"].l} stops the run before it collects',
     tags=['validation'],
 )

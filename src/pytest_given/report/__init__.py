@@ -14,6 +14,7 @@ from .citation_index import (
     Target,
     report_fragment,
 )
+from .console import write_console_as_utf8
 from .link_text import html_link_text, link_text
 from .sinks import (
     DEFAULT_HTML_PATH,
@@ -63,4 +64,5 @@ __all__ = [
     'resolve_theme',
     'sink_failure',
     'write_all_or_none',
+    'write_console_as_utf8',
 ]

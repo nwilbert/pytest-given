@@ -13,6 +13,7 @@ stderr.
 import argparse
 from collections.abc import Callable
 
+from ..report import write_console_as_utf8
 from .citations import add_citations_parser
 from .report import add_report_parser
 from .skills import add_skills_parser
@@ -21,6 +22,7 @@ __all__ = ['main']
 
 
 def main(argv: list[str] | None = None) -> int:
+    write_console_as_utf8()
     parser = argparse.ArgumentParser(
         prog='pytest-given',
         description='pytest-given command-line tools.',

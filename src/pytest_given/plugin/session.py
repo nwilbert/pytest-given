@@ -35,7 +35,12 @@ from ..model import (
     iter_steps,
     report_to_dict,
 )
-from ..report import detect_commit_sha, emit_sinks, sink_failure
+from ..report import (
+    detect_commit_sha,
+    emit_sinks,
+    sink_failure,
+    write_console_as_utf8,
+)
 from .state import (
     capture_bootstrapped,
     given_config,
@@ -365,6 +370,8 @@ def _write_lint_findings(
 def _write_md(terminalreporter: pytest.TerminalReporter, md: str | None) -> None:
     if md is None:
         return
+    # By the summary, capture has handed back the stream the writer writes to.
+    write_console_as_utf8()
     terminalreporter.write_line('<!-- pytest-given:md:start -->')
     for line in md.splitlines():
         terminalreporter.write_line(line)

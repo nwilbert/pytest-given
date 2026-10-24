@@ -32,6 +32,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.
 - A run that executes no test — `--collect-only`, `--setup-only`, `--setup-plan`, or a selection that matches nothing — no longer overwrites the previous report.
 - A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.
+- Markdown and citation output on stdout is now UTF-8 on a Windows console whose code page lacks the status glyphs: `pytest-given report --format md` and `citations check --list` no longer crash with `UnicodeEncodeError`, and a bare `--given-md` no longer prints its glyphs as `\u` escapes.
 - The `conditional-check` lint no longer flags a `then` whose `if`/`else` checks on every branch.
 - `pytest-given citations update` now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.
 - A pytest-given registered from a conftest under `PYTEST_DISABLE_PLUGIN_AUTOLOAD` now warns that it loaded too late, instead of silently losing the source links of import-time `Story` and `GlossaryTerm` declarations.
