@@ -22,4 +22,5 @@
 - [ ] Implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/specs/proposed/2026-06-06-flat-step-display-design.md`)
 - [ ] Support `attach` with images
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios (or just give a skill recipe)
+- [ ] Default JSON report for the citations CLI: `citations check` / `update` require `--report`. Default it to the path a bare `--given-json` writes, read from a new `[tool.pytest]` setting (also the plugin's default, hard-coded today as `given-report/report-data.json`), so no CLI call repeats it. The CLI reads no `pyproject.toml` yet. Maybe the same for `--given-html` and `--report-path`.
 - [ ] Maybe: a grouped scenario's citation summarizes its cases, as in `(3 ✅ · 1 ❌)`, while tag and story summaries keep counting scenarios like the report does. Held back because adding a case would make every citation of the scenario stale, the two summaries would count different things, and a narrated citation's parameter table already shows per-case status.
