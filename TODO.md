@@ -22,3 +22,4 @@
 - [ ] Implement flat-step-display — opt-in body hiding on `given`/`when`/`then` (see `docs/specs/proposed/2026-06-06-flat-step-display-design.md`)
 - [ ] Support `attach` with images
 - [ ] enable definition of a custom mapping for boolean (or general) values to strings in parameterized scenarios (or just give a skill recipe)
+- [ ] Maybe: a grouped scenario's citation summarizes its cases, as in `(3 ✅ · 1 ❌)`, while tag and story summaries keep counting scenarios like the report does. Held back because adding a case would make every citation of the scenario stale, the two summaries would count different things, and a narrated citation's parameter table already shows per-case status.
