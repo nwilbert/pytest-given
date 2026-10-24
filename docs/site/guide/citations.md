@@ -163,7 +163,7 @@ A scenario citation written as a `<details>` block carries the scenario's narrat
 
 The citation is in the `<summary>`: the glyph, then an `<a href="…">` with the [report link](#writing-it-by-hand) as its only attribute and the title as its link text, written as HTML. Everything below it, down to `</details>` on a line of its own, is the body. The `<summary>` follows `<details>` with no blank line between, and the block needs a blank line above it: `check` reports a block that breaks either as mistyped, such as one that continues another narrated citation's `</details>`. Only a scenario can be narrated, not a tag or a story.
 
-The body reads as the scenario's section of the Markdown report (`--given-md`), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.
+The body reads as the scenario's section of the [Markdown report](../markdown-report.md), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.
 
 To add one, choose **Copy narrated citation** in the report's copy menu on a scenario card, paste it into your document, and run `pytest-given citations update`, which fills the empty body. From then on `update` rewrites the body to match the report, and `pytest-given citations check` fails when it differs, or when the opening tag lacks `markdown="1"`, which `update` adds, keeping any other attributes such as `open`.
 

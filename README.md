@@ -80,10 +80,10 @@ pytest-given works the other way round: **engineers or their agents write normal
 
 ### Written by agents, reviewed by people
 
-More and more tests aren't written by hand. A person describes a scenario, an AI agent writes the test along with the code, and people review the narrated report instead of the test code. The diagram shows this loop, and [Working with AI agents](https://nwilbert.github.io/pytest-given/latest/ai-agents/) explains how to set it up.
+Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. The diagram shows this loop, and [Working with AI agents](https://nwilbert.github.io/pytest-given/latest/ai-agents/) explains how to set it up.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/pytest-given-diagram.svg" alt="A loop between people, agents, and artifacts: developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents." width="640">
+  <img src="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/pytest-given-diagram.svg" alt="A loop between people, agents, and artifacts: developers instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report, which domain experts validate. Developers review all the artifacts, feeding back to the agents." width="640">
 </p>
 
 ### Glossary and Domain Storytelling
@@ -92,7 +92,7 @@ pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary
 
 ### Documents that stay true
 
-A design spec or a README can [cite](https://nwilbert.github.io/pytest-given/latest/guide/citations/) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run, and `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
+A design spec or a README can [cite](https://nwilbert.github.io/pytest-given/latest/guide/citations/) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run. `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
 
 ## Features
 
@@ -101,6 +101,7 @@ A design spec or a README can [cite](https://nwilbert.github.io/pytest-given/lat
 - **[Parametrized scenarios](https://nwilbert.github.io/pytest-given/latest/guide/parametrized/)**: one narrated tree plus a parameter table per case, or one scenario per case on request.
 - **[Glossary](https://nwilbert.github.io/pytest-given/latest/guide/glossary/)**: your domain's terms, declared in code or loaded from a `GLOSSARY.md`, rendered as highlighted term refs in the narration.
 - **[Domain Storytelling](https://nwilbert.github.io/pytest-given/latest/guide/domain-storytelling/)**: Domain Stories as sequences of sentences, and per-sentence coverage in the report.
+- **Reports**: a self-contained [HTML report](https://nwilbert.github.io/pytest-given/latest/html-report/) to browse and share, and a [Markdown report](https://nwilbert.github.io/pytest-given/latest/markdown-report/) for diffs, reviews and agents.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
 - **[Citations](https://nwilbert.github.io/pytest-given/latest/guide/citations/)**: links from Markdown documents to scenarios, tags and stories, led by their status and checked against the latest run.
 - **[Agent skills](https://nwilbert.github.io/pytest-given/latest/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.
@@ -109,4 +110,4 @@ The full reference — pytest options, source links, the standalone CLI — is o
 
 ## License
 
-[MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md). The bundled Alpine.js runtime is also MIT; its notice is in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).
+[MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md). The bundled Alpine.js runtime is also MIT, with its notice in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).

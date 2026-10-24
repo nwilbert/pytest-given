@@ -42,7 +42,7 @@ Run it:
 pytest --given-html
 ```
 
-This produces `given-report/report.html` — one file you can open directly in a browser.
+This produces `given-report/report.html` — one file you can open directly in a browser. See [HTML report](html-report.md) for what it offers, and [Markdown report](markdown-report.md) for a text version.
 
 The Coffeeshop example's report shows this same scenario:
 

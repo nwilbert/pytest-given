@@ -30,15 +30,16 @@ title: Home
 
 Classical BDD tools (Cucumber, behave, pytest-bdd) center on Gherkin, a natural-language DSL: stakeholders write the tests, and engineers maintain the glue code behind each step. The [BDD page](bdd.md) writes the quick start's scenario that way, for comparison.
 
-pytest-given works the other way round: **engineers or their agents write normal tests, and pytest-given turns them into readable documentation.** Stakeholders and domain experts can follow the HTML report without ever opening the test suite. Engineers get a view of the system's behavior that is easier to scan than test code, browsable by tag, glossary term, or module. The approach is the one [JGiven](https://jgiven.org/) pioneered for Java, brought to pytest.
+pytest-given works the other way round: **engineers or their agents write normal tests, and pytest-given turns them into readable documentation.** Stakeholders and domain experts can follow the [HTML report](html-report.md) without ever opening the test suite. Engineers get a view of the system's behavior that is easier to scan than test code, browsable by tag, glossary term, or module. The approach is the one [JGiven](https://jgiven.org/) pioneered for Java, brought to pytest.
 
 - Plain Python: no Gherkin, no `.feature` files, no parser.
 - Tests stay first-class pytest tests, and the report is a by-product.
 - Self-contained HTML: open it locally or attach it to a CI run, with no server and no external assets.
+- A [Markdown report](markdown-report.md) of the same run, for pull request diffs and for agents.
 
 ### Written by agents, reviewed by people
 
-More and more tests aren't written by hand. A person describes a scenario, an AI agent writes the test along with the code, and people review the narrated report instead of the test code. The diagram shows this loop, and [Working with AI agents](ai-agents.md) explains how to set it up.
+Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. The diagram shows this loop, and [Working with AI agents](ai-agents.md) explains how to set it up.
 
 <figure class="pg-diagram">
   --8<-- "docs/site/assets/pytest-given-diagram.svg"
@@ -51,7 +52,7 @@ pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary
 
 ### Documents that stay true
 
-A design spec or a README can [cite](guide/citations.md) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run, and `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
+A design spec or a README can [cite](guide/citations.md) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run. `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
 
 ## Example reports
 
@@ -64,4 +65,4 @@ The [Examples](examples.md) page links the test code behind each report.
 
 ## Development and license
 
-See [AGENTS.md](https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md) for setup, quality gates, and conventions. pytest-given is [MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md) licensed. The bundled Alpine.js runtime is also MIT; its notice is in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).
+See [AGENTS.md](https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md) for setup, quality gates, and conventions. pytest-given is [MIT](https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md) licensed. The bundled Alpine.js runtime is also MIT, with its notice in [THIRD-PARTY-LICENSES](https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES).

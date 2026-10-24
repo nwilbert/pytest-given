@@ -10,7 +10,7 @@ The checks, however, always run. Every run builds the report, even if it doesn't
 |------|---------|-------------|
 | `--given-json[=PATH]` | off | Write the JSON report data. Without a path: `given-report/report-data.json`. |
 | `--given-html[=PATH]` | off | Write the HTML report. Without a path: `given-report/report.html`. |
-| `--given-md[=PATH]` | off | Write the Markdown report. **Without a path, it prints to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
+| `--given-md[=PATH]` | off | Write the [Markdown report](../markdown-report.md). **Without a path, it prints to stdout**, between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers. |
 | `--given-md-lines` / `--no-given-md-lines` | `true` | Show the line in the `file.py:line::test_name` anchor under each Markdown heading. Off, the anchor is the node ID, so a Markdown diff doesn't show every anchor below an inserted test. Ini setting: `given_md_lines`; both flags override it. |
 | `--given-md-source` | off | End each Markdown scenario with its test function, decorators included, each line under its number in the file, for reviewing step text against step body. Only the test function is shown, not the step fixtures or helpers it uses. No ini setting. |
 | `--given-title=TEXT` | rootdir name | The report's name: the Markdown heading, and the HTML report's browser tab title and top bar. Ini setting: `given_title`. |
