@@ -15,39 +15,33 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- A BDD page on the documentation site compares pytest-given with Gherkin tools such as pytest-bdd and behave.
+- The documentation site has new [BDD](https://nwilbert.github.io/pytest-given/dev/bdd/), [HTML report](https://nwilbert.github.io/pytest-given/dev/html-report/) and [Markdown report](https://nwilbert.github.io/pytest-given/dev/markdown-report/) pages.
+- `pytest-given citations check` / `update` and `pytest-given report` read `given-report/report-data.json`, where a bare `--given-json` writes it, when no JSON report is passed.
 
 ### Changed
 
-- `pytest-given citations check` / `update` and `pytest-given report` now read `given-report/report-data.json`, where a bare `--given-json` writes it, when no JSON report is passed.
-- The HTML report's Tags sidebar copy button is visually tidied.
-- **Breaking.** Brackets after the `::` in a `given_lint_ignore` entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped `[[]` with a plain `[`.
-- The bundled reviewing skill now flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, and asks for a scenario per new rule rather than per changelog entry or branch.
-- The bundled reviewing skill now passes per-file reviewers the paths of the test file, glossary and code under test, accepts a contrast row under a conditional claim, runs its commands through the project's own runner, and lists undecorated tests from collection alone, without jq.
-- The bundled navigating skill now warns that a saved report may cover only a selection, queries an area by several terms, a tag and a path at once, and points to where an area has no scenario.
-- The bundled citing skill now says to build the report without xdist's `-n` and to leave a claim no test can show uncited.
-- The bundled skills are tightened: rules and examples stated twice are cut, and the reviewing skill's citation checks move into its `SKILL.md`.
 - **Breaking.** A pytest-xdist run (`-n`) that writes a report or runs the narration lint now stops with a usage error instead of writing an empty or partial report: run it without `-n`, or pass `--no-given-lint` to a `-n` run in a project that sets `given_lint = true`.
+- **Breaking.** Brackets after the `::` in a `given_lint_ignore` entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped `[[]` with a plain `[`.
+- **Breaking.** A failed parametrize case that narrates a step it shares with the baseline case differently now fails the run, instead of its row showing under wording it never narrated: narrate the shared steps the way the baseline does.
+- The HTML report's Tags sidebar copy button is visually tidied.
+- The bundled `pytest-given-reviewing` skill flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, accepts a contrast row under a conditional claim, and asks for a scenario per new rule.
+- The bundled skills are tightened, `pytest-given-navigating` warns that a saved report may cover only a selection and points to where an area has no scenario, and `pytest-given-citing` leaves a claim no test can show uncited.
 
 ### Fixed
 
-- A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.
 - A run that executes no test — `--collect-only`, `--setup-only`, `--setup-plan`, or a selection that matches nothing — no longer overwrites the previous report.
+- An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.
 - A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.
-- Markdown and citation output on stdout is now UTF-8 on a Windows console whose code page lacks the status glyphs: `pytest-given report --format md` and `citations check --list` no longer crash with `UnicodeEncodeError`, and a bare `--given-md` no longer prints its glyphs as `\u` escapes.
-- The `conditional-check` lint no longer flags a `then` whose `if`/`else` checks on every branch.
-- `pytest-given citations update` now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.
+- A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.
+- Two scenarios no longer share a `#scenario=` slug when one falls back to its node ID.
+- `pytest-given report --format md`, `citations check --list` and a bare `--given-md` now write UTF-8 to a Windows console whose code page lacks the status glyphs, instead of crashing or printing `\u` escapes.
+- The `conditional-check` lint no longer flags a `then` that checks on every `if`/`else` branch, and `unused-interpolation` no longer flags a step that updates the interpolated name with an augmented assignment such as `total += 1`.
+- `pytest-given citations update` now writes no document that changed on disk while it ran, replaces each document it writes in one atomic rename, and no longer splits a CRLF line break when an edit ends at a line end.
+- `attach()` with content JSON cannot carry, such as non-string dict keys or a cycle, and `Template` with an unclosed brace now raise `PytestGivenError`.
+- A `given_source_link` template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.
+- A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.
 - A pytest-given registered from a conftest under `PYTEST_DISABLE_PLUGIN_AUTOLOAD` now warns that it loaded too late, instead of silently losing the source links of import-time `Story` and `GlossaryTerm` declarations.
 - `pytest-given skills install` now removes directories no bundled file lives in, and `--check` reports them as drift.
-- An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.
-- A `given_source_link` template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.
-- Two scenarios no longer share a `#scenario=` slug when one falls back to its node ID.
-- A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.
-- `attach()` with content JSON cannot carry, such as non-string dict keys or a cycle, now raises `PytestGivenError` naming the attachment.
-- `Template` with an unclosed brace now raises `PytestGivenError` instead of `ValueError`.
-- A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.
-- The `unused-interpolation` lint no longer flags a step whose body updates the interpolated name with an augmented assignment such as `total += 1`.
-- `pytest-given citations update` no longer splits a CRLF line break when an edit ends at a line end.
 
 ## [0.5.0] - 2026-10-18
 
