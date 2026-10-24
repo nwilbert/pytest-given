@@ -1156,13 +1156,13 @@
 </code></pre></div>
 </li>
 <li>
-<p><strong>Run</strong> the scenarios, writing both reports:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pytest<span class="w"> </span>--given-json<span class="o">=</span>report.json<span class="w"> </span>--given-html<span class="o">=</span>report.html
+<p><strong>Run</strong> the scenarios, writing both reports under <code>given-report/</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pytest<span class="w"> </span>--given-json<span class="w"> </span>--given-html
 </code></pre></div>
 </li>
 <li>
-<p><strong>Publish</strong> <code>report.html</code> at that URL. How depends on your hosting; with a docs site served from <code>https://docs.example.org/</code>, copy it in before the site build:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cp<span class="w"> </span>report.html<span class="w"> </span>docs/report.html
+<p><strong>Publish</strong> <code>given-report/report.html</code> at that URL. How depends on your hosting; with a docs site served from <code>https://docs.example.org/</code>, copy it in before the site build:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cp<span class="w"> </span>given-report/report.html<span class="w"> </span>docs/report.html
 </code></pre></div>
 </li>
 <li>
@@ -1170,16 +1170,17 @@
 </li>
 <li>
 <p><strong>Update</strong> your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under <code>docs/</code> and the project's <code>README.md</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md
 </code></pre></div>
+<p>It reads the JSON report at <code>given-report/report-data.json</code>, where a bare <code>--given-json</code> writes it. Pass <code>--report PATH</code> for one written elsewhere.</p>
 </li>
 <li>
 <p><strong>Check</strong> in CI that the documents match the report:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md
 </code></pre></div>
 </li>
 </ol>
-<p>The run must include every scenario a document cites, because the commands can't tell a scenario the run left out from one that was deleted. Add the flags to your usual test run, or pass <code>-m pytest_given</code> to run only the scenarios. If you kept only the JSON report, <code>pytest-given report report.json -o report.html</code> renders the matching HTML from it.</p>
+<p>The run must include every scenario a document cites, because the commands can't tell a scenario the run left out from one that was deleted. Add the flags to your usual test run, or pass <code>-m pytest_given</code> to run only the scenarios. If you kept only the JSON report, <code>pytest-given report</code> renders the matching HTML from it.</p>
 <h2 id="glyphs-and-summaries">Glyphs and summaries<a class="headerlink" href="#glyphs-and-summaries" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1302,8 +1303,8 @@
 <p>To add one, choose <strong>Copy narrated citation</strong> in the report's copy menu on a scenario card, paste it into your document, and run <code>pytest-given citations update</code>, which fills the empty body. From then on <code>update</code> rewrites the body to match the report, and <code>pytest-given citations check</code> fails when it differs, or when the opening tag lacks <code>markdown="1"</code>, which <code>update</code> adds, keeping any other attributes such as <code>open</code>.</p>
 <p>On a Python-Markdown site (MkDocs, Zensical), enable <code>md_in_html</code> and keep the block at the top level of the page, not inside a list item. GitHub renders it anywhere.</p>
 <h2 id="updating-citations">Updating citations<a class="headerlink" href="#updating-citations" title="Permanent link">&para;</a></h2>
-<p>Pass the documents or directories to update, and the JSON report from <a href="#how-it-fits-together">the run that wrote your HTML report</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
+<p>Pass the documents or directories to update. The JSON report must come from <a href="#how-it-fits-together">the run that wrote your HTML report</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md
 </code></pre></div>
 <p>It rewrites what the report now says:</p>
 <ul>
@@ -1321,9 +1322,9 @@
 <p>The bundled <a href="../../ai-agents/#agent-skills"><code>pytest-given-citing</code> skill</a> walks an agent through these.</p>
 <h2 id="checking-in-ci">Checking in CI<a class="headerlink" href="#checking-in-ci" title="Permanent link">&para;</a></h2>
 <p><code>pytest-given citations check</code> takes the same arguments, writes nothing, and exits 1 on any citation finding, including what <code>pytest-given citations update</code> would rewrite:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest<span class="w"> </span>--given-json<span class="o">=</span>report.json<span class="w"> </span>--given-html<span class="o">=</span>report.html
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># then publish report.html at given_report_url</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest<span class="w"> </span>--given-json<span class="w"> </span>--given-html
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># then publish given-report/report.html at given_report_url</span>
 </code></pre></div>
 <p>Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped <code>given_report_url</code>, the check exits 2 instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.</p>
 <p>If you commit the reports instead, write the JSON and HTML report together whenever you regenerate them, and let CI run only the check against the committed JSON. <a href="../../cli/#citations">Standalone CLI</a> lists the flags and exit codes.</p>
@@ -1350,7 +1351,7 @@
 </code></pre></div>
 <h3 id="finding-the-citations-of-a-scenario">Finding the citations of a scenario<a class="headerlink" href="#finding-the-citations-of-a-scenario" title="Permanent link">&para;</a></h3>
 <p>To list the report links that may cite a scenario, pass its node ID to <code>--covering</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>--covering<span class="w"> </span>tests/test_checkout.py::test_pay_by_card
 </code></pre></div>
 <p>It prints each link's file, line, glyph and target:</p>
