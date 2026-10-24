@@ -14,7 +14,11 @@ A **narrated citation** is a scenario citation written as a `<details>` block, i
 
 A **plain report link** has no glyph: it keeps its own wording and claims only that its target exists.
 
-`pytest-given citations check DOCS…` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both read the JSON report of a run of **every** scenario (`pytest -m pytest_given --given-json`, without xdist's `-n`), from `given-report/report-data.json` unless `--report PATH` names another. A target the run left out counts as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository. Both commands exit 2 when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
+`pytest-given citations check DOCS…` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both commands:
+
+- **read the JSON report of a run of every scenario:** `pytest -m pytest_given --given-json`, without xdist's `-n`. They read `given-report/report-data.json` unless `--report PATH` names another. A target the run left out counts as gone.
+- **recognize a report link by its URL:** the one the JSON stores (`given_report_url`), or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository.
+- **exit 2** when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
 
 ## Triage
 
@@ -24,7 +28,7 @@ A **plain report link** has no glyph: it keeps its own wording and claims only t
 | Cited target fails | The document claims what doesn't hold now. Fix the code, or, if the claim itself is outdated, tell the human: the prose is theirs. |
 | Summary after a scenario citation | Delete it, unless the author wrote it as prose — then reword it so it no longer reads as a summary. |
 | A tag or story citation "takes no narration" | Rewrite it as a one-line citation: only a scenario has a narration. |
-| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. For a `<details>` block: a blank line above it, `<summary>` on the next line in the summary shape under Writing citations, and a `</details>` closing it on its own line. |
+| Mistyped citation | Fix the fragment to `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<id>`, or drop the glyph if a plain link is meant. For a `<details>` block, match the shape under [Writing citations](#writing-citations). |
 | Target not in the report | Rule out the report first: a partial run, or one from another rootdir (node IDs are relative to it), loses many targets at once. Then follow [references/repair.md](references/repair.md). |
 
 ## Finding what cites a scenario
@@ -43,10 +47,10 @@ You cannot click a copy button. Write a placeholder — a typed `?` glyph and em
 
     ? [](https://example.org/report.html#scenario=tests/test_x.py::test_y)
 
-Choose the target as in a repair: read its steps and body against the prose that cites it; a matching title is not enough.
+Choose the target as in a [repair](references/repair.md), not by its title.
 
 - Narrate a scenario where the document states the behavior it demonstrates: a reader sees its steps, and a diff shows them change. A one-line citation only points at it.
-- To narrate, write a `<details markdown="1">` block: a `<summary>` of the glyph and an `<a href="…#scenario=…">` with no other attribute, `</summary>` ending its line, a blank line, an empty body, `</details>` on its own line. `update` fills the body with the scenario's `--given-md` narration and rewrites it whole from then on, so write your own prose outside the block. On a Python-Markdown site, keep the block at the top level. Keep formatters off it (Prettier: `<!-- prettier-ignore-start -->` … `<!-- prettier-ignore-end -->`).
+- To narrate, write a `<details markdown="1">` block after a blank line: on the next line a `<summary>` of the glyph and an `<a href="…#scenario=…">` with no other attribute, `</summary>` ending its line, then a blank line, an empty body, and `</details>` on its own line. `update` fills the body with the scenario's `--given-md` narration and rewrites it whole from then on, so write your own prose outside the block. On a Python-Markdown site, keep the block at the top level. Keep formatters off it (Prettier: `<!-- prettier-ignore-start -->` … `<!-- prettier-ignore-end -->`).
 - Write the glyph and link bare: `**✅**` or `*[…](…)*` no longer reads as a citation.
 - On a versioned docs site, link the report relatively (`../examples/report.html#tag=…`), so each version's page opens its own report. A copied citation links `given_report_url`: replace its URL up to the `#`.
 - To cite a piece of work as a whole, give it one tag (`spec/<slug>`) and cite that. Don't cite a broad area tag, whose summary every later scenario changes: link it with a plain report link.

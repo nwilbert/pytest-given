@@ -31,10 +31,6 @@ Readers scan titles first, often without the steps: in the report's list, in Mar
 - **When building the object *is* the action under test, `when` builds it and `given` shows only the input.** This applies when a scenario asserts a property of a freshly loaded, parsed or built object (`Order(lines)` computes its total, `parse(doc)` yields all rows). The `given` holds the raw input and, when useful, `attach`es it. The `when` runs the constructor, and the `then` asserts on the result. A `given` that both arranges the input *and* builds the object under test is the most common missed `when`.
 - **Two phases are fine when honest, but rarer than they look.** If the assertion inspects a *static property of the arranged state*, not the return value of an action, then `given` + `then` is truthful. Don't invent a `when` for it. Likewise, a pure "constructing X raises" check needs no `given`.
 
-## Parameter tables
-
-A parametrized scenario renders as one narrated tree above a parameter table. Before you decorate a parametrized test or merge sibling scenarios into one, read [parameter-tables.md](parameter-tables.md).
-
 ## Arrangement
 
 - **Show the arrangement as a `given`. Don't hide it in the `when` or the assertion.** When the action uses a module constant or a value built on the fly (a document string, a path, a list of rows), bind it in a `with given(...)` block. Don't pass it as a literal into the `when`, the `then` or the `pytest.raises` call.
@@ -71,11 +67,10 @@ A parametrized scenario renders as one narrated tree above a parameter table. Be
 
 - **Narrate in glossary vocabulary.** Reference terms through handles in t-string step text, like `t'a {g["Room"].l} is booked'` (see [glossaries.md](glossaries.md)). They then render as kind-colored words and feed the Glossary tab's per-term filter. Use `.l` in the middle of a sentence and the bare handle at its start. Use `.s` for a regular plural or verb -s (`.l.s` in the middle of a sentence). Pick a term for its meaning, not its word: a term ref whose definition isn't what the sentence means sends the reader to the wrong row. (Skip this rule if the project has no glossary yet.)
 - **The code speaks the language too.** Each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. `File glossary` over a `FileGlossary` call matches by design, since term names are natural language. But `{g["Reservation"]}` over code that only knows `Booking` is language drift, so rename one side.
+- **Keep step text short.** A t-string with two or three term refs reaches your line-length limit fast. Move detail into nested steps instead of one long sentence.
 - **Keep tags separate from the glossary.** A tag that repeats a term is redundant; filter by the term instead. `tag-shadows-term` catches exact collisions. It doesn't catch a tag that names a feature area the glossary covers under another word (`markdown` on scenarios that reference `File glossary`).
 - **Expect few tags.** Tags carry only what the glossary can't: behavior (`validation`) and mechanism (`parametrization`). A tag must cut across modules, because a tag used in only one test file repeats the module grouping. It must also stay on a minority of the suite: `happy-path` on most scenarios filters nothing. Once you use a tag, put it on every scenario it describes, or filtering by it will miss some.
-- **A `/` nests a tag.** The Tags sidebar files `ticket/ABC-123` under a `ticket` heading, which filters like a package, so a family of tags takes one row. Ticket tags are the family worth having: each one shows exactly one ticket's work in the report.
-- **A work-item tag marks one piece of work.** `ticket/ABC-123` or `spec/<slug>` means "added by this piece of work", not "describes this behavior": it need not cut across modules, and other scenarios of the same behavior need not carry it.
-- **Keep step text short.** A t-string with two or three term refs reaches your line-length limit fast. Move detail into nested steps instead of one long sentence.
+- **A work-item tag marks one piece of work.** `ticket/ABC-123` or `spec/<slug>` means "added by this piece of work", not "describes this behavior": it need not cut across modules, and other scenarios of the same behavior need not carry it. A `/` nests a tag: the Tags sidebar files `ticket/ABC-123` under a `ticket` heading, which filters like a package, so the family takes one row.
 
 ## Keeping it truthful
 

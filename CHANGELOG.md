@@ -26,6 +26,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - The bundled reviewing skill now passes per-file reviewers the paths of the test file, glossary and code under test, accepts a contrast row under a conditional claim, runs its commands through the project's own runner, and lists undecorated tests from collection alone, without jq.
 - The bundled navigating skill now warns that a saved report may cover only a selection, queries an area by several terms, a tag and a path at once, and points to where an area has no scenario.
 - The bundled citing skill now says to build the report without xdist's `-n` and to leave a claim no test can show uncited.
+- The bundled skills are tightened: rules and examples stated twice are cut, and the reviewing skill's citation checks move into its `SKILL.md`.
 - **Breaking.** A pytest-xdist run (`-n`) that writes a report or runs the narration lint now stops with a usage error instead of writing an empty or partial report: run it without `-n`, or pass `--no-given-lint` to a `-n` run in a project that sets `given_lint = true`.
 
 ### Fixed

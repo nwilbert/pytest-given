@@ -14,7 +14,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 
 | Field | Meaning |
 |---|---|
-| `id` | The pytest node ID. A grouped parametrized scenario **keeps the suffix of its first collected case** (`tests/test_x.py::test_y[1-False]`). The suffix is not removed, so match on a prefix, not on equality. |
+| `id` | The pytest node ID. A grouped parametrized scenario keeps the suffix of its **first collected case** (`tests/test_x.py::test_y[1-False]`), so match on a prefix, not on equality. Its `module`, `tags` and `source` come from that case too, but its `steps` from the first case that *passed*. Neither identifies a case: read `parameters.cases[]` for each case's node ID and status. |
 | `narration.text` | The scenario title. It keeps its `**`, `*` and `` ` `` markers as written, and so does a step's, so strip them before you search for words. For a parametrized scenario it is the grouped template. A *step* in a grouped parametrized scenario also holds the template (`the drink costs {price} euros`), not the text of the first case. |
 | `module` | The Python module the test lives in. |
 | `tags[]` | `tags=` from `@scenario`. These are report metadata, **not** pytest marks. |
@@ -27,12 +27,6 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}], causes: [{frames, error_tail, connector}]}`. `causes` holds a chained error's causes, root first, each with the sentence that leads on to the next. `is_internal` marks a frame from `pluggy`, `_pytest` or pytest-given; such frames are kept only with `--given-all-frames`. **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`, with the same shape. |
 | `source` | `{relpath, line}`: where the test function is defined. |
 | `story_ids` / `pins` | `story_ids` lists the stories `@scenario(stories=...)` matches against. `pins` lists the scenario's pins as `[{story_id, sentence_id}]`: `null` when the scenario isn't pinned, `[]` when it turned matching off. A step's `pins` works the same way. |
-
-In a grouped scenario, `id`, `module`, `tags` and `source` come from the first
-*collected* case, while `steps` are built from the first case that *passed*.
-So when the first case was skipped, the `id` and the step tree come from two
-different cases. Neither identifies a case: read `parameters.cases[]` for the
-node ID and status of each case.
 
 ## Step
 

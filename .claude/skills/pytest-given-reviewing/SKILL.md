@@ -28,7 +28,7 @@ Lint the whole suite, not just the tests a change touches. A `given_lint_ignore`
 
 `warn` lint findings print in the summary, an `error` lint finding fails the run, and a clean run prints `narration lint (no findings)`. The rule catalog, and when an ignored `missing-phase` is justified, are in the authoring skill's [lint.md](../pytest-given-authoring/references/lint.md). A lint finding that is a deliberate exception belongs on the project's `given_lint_ignore` list; don't just let it pass in review.
 
-If Markdown documents cite the report, review the citations too: follow [references/citations.md](references/citations.md).
+If Markdown documents cite the report, run `pytest-given citations check` and hand its citation findings to the `pytest-given-citing` skill. Where a cited scenario's title or behavior changed, run `citations update`, then reread each sentence that `citations check --covering <node ID>` lists, unresolved links included: the claim may no longer hold. Read each citing passage against the rules under "Writing citations" in the [citing skill](../pytest-given-citing/SKILL.md#writing-citations). A narrated citation's body is the behavior its document claims, so a contradiction is a false claim. A document without citations is no finding.
 
 ## 2. Semantic audit: step text against step body
 
@@ -40,14 +40,14 @@ Judge each scenario's step texts against their bodies with the rubric below. `py
 
 **Step text may abstract, but it must never overstate.**
 
-- **Values:** a quantity, date or amount in the text must match the body. `'three copies'` over `catalog={'Dune': 1}` is a lie, even when every assertion passes. A literal copied from a constant goes stale when the constant changes; ask for the interpolation (`{BATCH_SIZE}`) instead.
-- **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title is a claim about every item it covers. Assertions on a sample overstate it, like "each slot becomes a term ref" backed by checks on two of three slots. Fix it by asserting the rest or by narrowing the text.
-- **Outcomes:** everything a `then` claims must be asserted in it. "…and recorded in the ledger" without such an assertion describes behavior nobody checked. So does a `then` that sets the value it asserts, or asserts a constant. The lint doesn't catch these, because the step contains an `assert`. Nor does it catch "never called" backed by a stub that raises: if the code catches the error, nothing checks the claim. Ask for recorded calls asserted in the `then`. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row. A conditional claim ("a coffee is brewed when the machine has beans") still holds on a contrast row where its condition fails, such as an empty machine that brews nothing.
-- **Strength:** an assertion must fail when its claim is false. `relpath.endswith('.py')` under "keeps its rootdir-relative source" passes on an absolute path too. The data checked must also be able to show the claim: "the cause comes first", checked against JSON that keeps the cause in a field of its own, claims an order nothing sees.
-- **Raises:** the `then` of an expected raise may restate the pinned message in domain terms, but it must not claim more than `match=` checks. When the `then` promises that the message names the offender, offers a hint or includes a file:line, the regex must fail without that detail. For example, `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. A pin with alternatives (`match=r'odd|dangling|ends'`) is only as strong as its weakest branch: sibling scenarios that narrate *different* refusals all pass on one generic message. Pin what tells this refusal apart from the others.
-- **Expected failures:** an `xfail` mark without `strict=True` (and without the `xfail_strict` ini) stays on a scenario quietly once the behavior works. A later regression then shows up as an expected failure. Ask for `strict=True`.
-- **Actions:** what the `when` names must be what its body calls. A common drift: the `when` text reads like more arrangement, but its body also performs the action, so the action appears nowhere in the report. Move the setup into a `given`.
-- **Vocabulary:** a term ref puts the ubiquitous language right next to the code it describes. So each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. `File glossary` over a `FileGlossary` call matches by design, since term names are natural language and the definition spells out the class. But `Reservation` over code that only knows `Booking` is language drift. A term ref must also *mean* its term. One chosen just for its word (`Kindless` in "not kindless inference") sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
+- **Values:** a quantity, date or amount in the text must match the body's data, even when every assertion passes. Ask for an interpolation (`{BATCH_SIZE}`) over a literal copied from a constant.
+- **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title claims every item it covers. Assertions on a sample overstate it: ask for the rest to be asserted, or for the text to be narrowed.
+- **Outcomes:** everything a `then` claims must be asserted in it, on a value the code under test produced. The lint can't tell, because the step contains an `assert`. A "never called" claim needs recorded calls asserted in the `then`, not a stub that raises, whose error the code may catch. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row. A conditional claim ("a coffee is brewed when the machine has beans") still holds on a contrast row where its condition fails, such as an empty machine that brews nothing.
+- **Strength:** an assertion must fail when its claim is false. `relpath.endswith('.py')` under "keeps its rootdir-relative source" passes on an absolute path too. Data that keeps two parts in separate fields can't show their order.
+- **Raises:** the `then` of an expected raise must not claim more than `match=` checks. When it promises that the message names the offender, offers a hint or includes a file:line, the regex must fail without that detail: `match='Gues'` matches the echoed bad input, not the did-you-mean suggestion. An alternation is only as strong as its weakest branch, so sibling scenarios that narrate *different* refusals may all pass on one generic message. Pin what tells this refusal apart from the others.
+- **Expected failures:** an `xfail` without `strict=True` (or the `xfail_strict` ini) stays quietly on working behavior and turns a later regression into an expected failure. Ask for `strict=True`.
+- **Actions:** what the `when` names must be what its body calls. Watch for a `when` whose text reads like arrangement while its body also performs the action, which then appears nowhere in the report.
+- **Vocabulary:** each referenced term should show up in the names inside the step: in the body, and in the names of the code it calls directly. A natural-language term over its class (`File glossary` over `FileGlossary`) is no drift. A term ref must also *mean* its term. One chosen just for its word (`Kindless` in "not kindless inference") sends the reader to the wrong row. Flag drift once per term, not once per step, and don't prescribe which side should be renamed.
 
 For a large suite, split layer 2 by test file. One run's Markdown splits at its scenario headings, each followed by its `file::test` line. Hand each reviewer one test file's Markdown, the rubric, and the paths of the test file, the glossary and the code under test, and have it return findings. Where the harness and the user allow subagents, a cheap, fast model is enough, because the rubric needs only that one file's context. Check a sample of their findings before you report them. Title twins, rules narrated at the wrong layer and the list of titles need the whole suite, so the coordinating reviewer does those.
 
@@ -86,12 +86,12 @@ Also flag twins: two titles that don't tell their scenarios apart. Twins are oft
 
 Parameter tables are part of the document too. Flag these:
 
-- A column that only makes sense next to a value another step fixes, like `existing_start=50` next to a new booking that another step fixes at hours 10 to 20.
+- A column that only makes sense next to a value another step fixes.
 - A column that no step narrates.
-- A column of Python reprs, such as `Booking(...)` objects or a list of step texts.
+- A column of Python reprs, such as objects or lists.
 - A label column that the body turns back into data, with no attachment showing the data.
 - A case ID that misnames its row, or only repeats a column's value.
-- An outcome that varies but has no column of its own, or that the body derives from an input column (`[1, 2] if enabled else []`).
+- An outcome that varies but has no column of its own, or that the body derives from an input column.
 - Sibling scenarios that should be one table: the same steps with one arrangement varied, or titles that negate each other.
 
 The fixes are in the authoring skill's [parameter-tables.md](../pytest-given-authoring/references/parameter-tables.md). Report all legibility problems as one combined finding, not one per instance. A wording you would simply have chosen differently is out of scope.
