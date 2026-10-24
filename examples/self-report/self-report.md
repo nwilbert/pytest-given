@@ -845,6 +845,21 @@
 - **then** the test passes
 - **then** the page declares dark as its default «theme»
 
+## ✓ Under pytest-xdist, a run that writes a «report» or runs the «narration lint» stops before it collects · 4 cases
+`tests/integration/test_plugin.py::test_a_report_or_lint_under_xdist_fails_before_the_suite_runs` · validation
+
+- **given** a suite that would otherwise pass
+- **when** the suite runs on {workers} xdist workers with {option}
+- **then** it exits {exit_code}
+- **then** the suite ran: {ran}
+
+| case ID | workers | option | exit_code | ran |
+|---|---|---|---|---|
+| report | 2 | --given-json=report.json | 4 | False |
+| lint | 2 | --given-lint | 4 | False |
+| neither | 2 | --no-given-lint | 0 | True |
+| serial-report | 0 | --given-json=report.json | 0 | True |
+
 ## ✓ An unknown «theme» stops the run before it collects
 `tests/integration/test_plugin.py::test_an_unknown_theme_fails_before_the_suite_runs` · validation
 

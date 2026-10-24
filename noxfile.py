@@ -94,7 +94,7 @@ def mypy(session: nox.Session) -> None:
 
 @nox.session
 def test(session: nox.Session) -> None:
-    _sync(session, include_project=True)
+    _sync(session, 'test', include_project=True)
     session.run('pytest')
 
 
@@ -110,7 +110,7 @@ def compat(session: nox.Session, pytest_version: str) -> None:
     only moves on `uv lock --upgrade`. pytest 9.0 predates the `max_warnings`
     option, so there an unknown-option warning replaces the warnings gate.
     """
-    _sync(session, include_project=True)
+    _sync(session, 'test', include_project=True)
     if pytest_version == 'latest':
         installs = [
             'pytest',
@@ -128,7 +128,7 @@ def compat(session: nox.Session, pytest_version: str) -> None:
 
 @nox.session
 def coverage(session: nox.Session) -> None:
-    _sync(session, 'coverage', include_project=True)
+    _sync(session, 'coverage', 'test', include_project=True)
     session.run(
         'coverage',
         'run',
@@ -462,7 +462,7 @@ def reports_current(session: nox.Session) -> None:
     against unnoticed: regenerate every report, then diff the tracked Markdown —
     the reports' `.md` and the documents whose citations that updated. Markdown
     alone, as it carries no commit SHA, timestamp or duration."""
-    _sync(session, include_project=True)
+    _sync(session, 'test', include_project=True)
     _regenerate_examples(session)
     _regenerate_self_report(session)
     session.run('git', 'diff', '--exit-code', '--', '*.md', external=True)
@@ -699,7 +699,7 @@ def self_report(session: nox.Session) -> None:
     tests. The @scenario-decorated unit tests narrate the plugin's behavior in
     the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
     """
-    _sync(session, include_project=True)
+    _sync(session, 'test', include_project=True)
     _regenerate_self_report(session)
 
 

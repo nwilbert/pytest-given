@@ -3943,6 +3943,43 @@ def test_given_theme_absent_follows_the_system(pytester, tmp_path):
 
 
 @scenario(
+    t'Under pytest-xdist, a run that writes a {pg["Report"].l} or runs the '
+    t'{pg["Narration lint"].l} stops before it collects',
+    tags=['validation'],
+)
+@pytest.mark.parametrize(
+    ('workers', 'option', 'exit_code', 'ran'),
+    [
+        (2, '--given-json=report.json', pytest.ExitCode.USAGE_ERROR.value, False),
+        (2, '--given-lint', pytest.ExitCode.USAGE_ERROR.value, False),
+        (2, '--no-given-lint', pytest.ExitCode.OK.value, True),
+        (0, '--given-json=report.json', pytest.ExitCode.OK.value, True),
+    ],
+    ids=['report', 'lint', 'neither', 'serial-report'],
+)
+def test_a_report_or_lint_under_xdist_fails_before_the_suite_runs(
+    pytester, workers, option, exit_code, ran
+):
+    """Workers record their scenarios in their own processes, so the
+    controller would write an empty report, and each worker a partial one."""
+    with given('a suite that would otherwise pass'):
+        pytester.makepyfile(_SUITE)
+    with when(t'the suite runs on {workers} xdist workers with {option}'):
+        result = pytester.runpytest('-n', str(workers), option)
+    with then(t'it exits {exit_code}'):
+        assert result.ret == exit_code
+    with then(t'the suite ran: {ran}'):
+        assert ('passed' in result.stdout.str()) == ran
+
+
+def test_the_xdist_refusal_says_how_to_run_instead(pytester):
+    pytester.makepyfile(_SUITE)
+    result = pytester.runpytest('-n', '2', '--given-md=report.md')
+    result.stderr.fnmatch_lines(['*pytest-xdist*without -n*'])
+    assert not (pytester.path / 'report.md').exists()
+
+
+@scenario(
     t'An unknown {pg["Theme"].l} stops the run before it collects',
     tags=['validation'],
 )

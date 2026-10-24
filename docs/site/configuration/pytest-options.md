@@ -43,7 +43,7 @@ Mind `-k`: it matches any part of a test's keywords, and a scenario's include `p
 
 ## pytest-xdist
 
-**pytest-given doesn't work with `pytest-xdist`.** With `-n`, tests run in worker processes, and their steps never reach the main process. The run passes, but the report is empty. Generate reports from a run without `-n`.
+**pytest-given can't write a report or lint under `pytest-xdist`.** With `-n`, tests run in worker processes, and their steps never reach the main process. So a `-n` run that asks for a report (`--given-json`, `--given-html`, `--given-md`) or the narration lint (`--given-lint`, or `given_lint = true`) stops with a usage error before it collects. Generate reports and lint from a run without `-n`, or with `-n 0`. A `-n` run that asks for neither runs as usual. Pass `--no-given-lint` to one in a project that turns the lint on in its ini.
 
 ## Ini settings
 

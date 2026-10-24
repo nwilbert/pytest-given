@@ -216,20 +216,34 @@ def pytest_configure(config: pytest.Config) -> None:
         )
     except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
-    store_given_config(
-        config,
-        GivenConfig(
-            lint=lint,
-            # `BooleanOptionalAction` with `default=None` keeps the flag
-            # tri-state, so "not given" stays distinguishable from
-            # `--no-given-lint` and the ini is consulted only in the first case.
-            lint_enabled=_cli_over_ini(config, 'given_lint', bool),
-            sinks=sinks,
-            title=_resolve_title(config),
-            report_url=report_url,
-            all_frames=bool(config.getoption('given_all_frames')),
-        ),
+    given = GivenConfig(
+        lint=lint,
+        # `BooleanOptionalAction` with `default=None` keeps the flag
+        # tri-state, so "not given" stays distinguishable from
+        # `--no-given-lint` and the ini is consulted only in the first case.
+        lint_enabled=_cli_over_ini(config, 'given_lint', bool),
+        sinks=sinks,
+        title=_resolve_title(config),
+        report_url=report_url,
+        all_frames=bool(config.getoption('given_all_frames')),
     )
+    if _distributed_by_xdist(config) and (
+        given.sinks.writes_anything() or given.lint_enabled
+    ):
+        raise pytest.UsageError(
+            'pytest-given cannot write a report or run the narration lint under '
+            'pytest-xdist: each worker records the scenarios it runs, and none '
+            'of them reach the main process. Run without -n (or with -n 0).'
+        )
+    store_given_config(config, given)
+
+
+def _distributed_by_xdist(config: pytest.Config) -> bool:
+    """xdist turns `-n N` into `--dist load` before configure, and leaves
+    `-n 0` at `no`; without xdist installed there is no such option."""
+    dist = config.getoption('dist', 'no')
+    assert isinstance(dist, str)
+    return dist != 'no'
 
 
 def _cli_over_ini[T](config: pytest.Config, name: str, kind: type[T]) -> T:
