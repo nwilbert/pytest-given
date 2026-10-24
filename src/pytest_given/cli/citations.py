@@ -14,6 +14,7 @@ from ..model import (
     report_from_dict,
     resolve_report_url,
 )
+from ..report import DEFAULT_JSON_PATH
 
 
 def add_citations_parser(
@@ -43,8 +44,11 @@ def add_citations_parser(
         verb_parser.add_argument(
             '--report',
             type=Path,
-            required=True,
-            help='The JSON report of a run of every scenario',
+            default=DEFAULT_JSON_PATH,
+            help=(
+                'The JSON report of a run of every scenario (default: '
+                f'{DEFAULT_JSON_PATH.as_posix()}, where a bare --given-json writes it)'
+            ),
         )
         verb_parser.add_argument(
             '--report-url',

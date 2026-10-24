@@ -59,16 +59,16 @@ Citations link to the HTML report you publish, but the `pytest-given citations` 
     given_report_url = "https://docs.example.org/report.html"
     ```
 
-2. **Run** the scenarios, writing both reports:
+2. **Run** the scenarios, writing both reports under `given-report/`:
 
     ```bash
-    pytest --given-json=report.json --given-html=report.html
+    pytest --given-json --given-html
     ```
 
-3. **Publish** `report.html` at that URL. How depends on your hosting; with a docs site served from `https://docs.example.org/`, copy it in before the site build:
+3. **Publish** `given-report/report.html` at that URL. How depends on your hosting; with a docs site served from `https://docs.example.org/`, copy it in before the site build:
 
     ```bash
-    cp report.html docs/report.html
+    cp given-report/report.html docs/report.html
     ```
 
 4. **Cite** scenarios, tags and stories by [copying a citation from the report](#copying-from-the-report), or by [writing one by hand](#writing-it-by-hand).
@@ -76,16 +76,18 @@ Citations link to the HTML report you publish, but the `pytest-given citations` 
 5. **Update** your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under `docs/` and the project's `README.md`:
 
     ```bash
-    pytest-given citations update docs/ README.md --report report.json
+    pytest-given citations update docs/ README.md
     ```
+
+    It reads the JSON report at `given-report/report-data.json`, where a bare `--given-json` writes it. Pass `--report PATH` for one written elsewhere.
 
 6. **Check** in CI that the documents match the report:
 
     ```bash
-    pytest-given citations check docs/ README.md --report report.json
+    pytest-given citations check docs/ README.md
     ```
 
-The run must include every scenario a document cites, because the commands can't tell a scenario the run left out from one that was deleted. Add the flags to your usual test run, or pass `-m pytest_given` to run only the scenarios. If you kept only the JSON report, `pytest-given report report.json -o report.html` renders the matching HTML from it.
+The run must include every scenario a document cites, because the commands can't tell a scenario the run left out from one that was deleted. Add the flags to your usual test run, or pass `-m pytest_given` to run only the scenarios. If you kept only the JSON report, `pytest-given report` renders the matching HTML from it.
 
 ## Glyphs and summaries
 
@@ -169,10 +171,10 @@ On a Python-Markdown site (MkDocs, Zensical), enable `md_in_html` and keep the b
 
 ## Updating citations
 
-Pass the documents or directories to update, and the JSON report from [the run that wrote your HTML report](#how-it-fits-together):
+Pass the documents or directories to update. The JSON report must come from [the run that wrote your HTML report](#how-it-fits-together):
 
 ```bash
-pytest-given citations update docs/ README.md --report report.json
+pytest-given citations update docs/ README.md
 ```
 
 It rewrites what the report now says:
@@ -195,9 +197,9 @@ The bundled [`pytest-given-citing` skill](../ai-agents.md#agent-skills) walks an
 `pytest-given citations check` takes the same arguments, writes nothing, and exits 1 on any citation finding, including what `pytest-given citations update` would rewrite:
 
 ```bash
-pytest --given-json=report.json --given-html=report.html
-pytest-given citations check docs/ README.md --report report.json
-# then publish report.html at given_report_url
+pytest --given-json --given-html
+pytest-given citations check docs/ README.md
+# then publish given-report/report.html at given_report_url
 ```
 
 Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped `given_report_url`, the check exits 2 instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.
@@ -233,7 +235,7 @@ These habits keep `pytest-given citations check` from failing on a document noth
 To list the report links that may cite a scenario, pass its node ID to `--covering`:
 
 ```bash
-pytest-given citations check docs/ README.md --report report.json \
+pytest-given citations check docs/ README.md \
     --covering tests/test_checkout.py::test_pay_by_card
 ```
 

@@ -79,6 +79,16 @@ def test_cli_refuses_a_report_url_no_citation_can_link(tmp_path: Path, capsys) -
     assert '--report-url must be an absolute http(s) URL' in capsys.readouterr().err
 
 
+def test_cli_without_a_json_file_reads_the_default_json_report(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    sinks.DEFAULT_JSON_PATH.parent.mkdir(parents=True)
+    sinks.DEFAULT_JSON_PATH.write_text(json.dumps(_minimal_report()))
+    assert main(['report']) == 0
+    assert 'cli-test' in sinks.DEFAULT_HTML_PATH.read_text(encoding='utf-8')
+
+
 def test_cli_missing_input_file(tmp_path: Path) -> None:
     rc = main(['report', str(tmp_path / 'nonexistent.json')])
     assert rc == 1

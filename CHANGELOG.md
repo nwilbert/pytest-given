@@ -19,6 +19,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
+- `pytest-given citations check` / `update` and `pytest-given report` now read `given-report/report-data.json`, where a bare `--given-json` writes it, when no JSON report is passed.
 - The HTML report's Tags sidebar copy button is visually tidied.
 - **Breaking.** Brackets after the `::` in a `given_lint_ignore` entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped `[[]` with a plain `[`.
 - The bundled reviewing skill now flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, and asks for a scenario per new rule rather than per changelog entry or branch.

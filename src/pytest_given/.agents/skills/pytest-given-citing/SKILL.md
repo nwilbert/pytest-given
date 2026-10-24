@@ -14,7 +14,7 @@ A **narrated citation** is a scenario citation written as a `<details>` block, i
 
 A **plain report link** has no glyph: it keeps its own wording and claims only that its target exists.
 
-`pytest-given citations check DOCS… --report report.json` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both read the JSON report of a run of **every** scenario (`pytest -m pytest_given --given-json=report.json`, without xdist's `-n`); a target the run left out counts as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository. Both commands exit 2 when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
+`pytest-given citations check DOCS…` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both read the JSON report of a run of **every** scenario (`pytest -m pytest_given --given-json`, without xdist's `-n`), from `given-report/report-data.json` unless `--report PATH` names another. A target the run left out counts as gone. A link is a report link when its URL is the one the JSON stores (`given_report_url`) or the one `--report-url` names. A relative link counts only with `--report-path`, the HTML report's place in the repository. Both commands exit 2 when they have neither a URL nor a path, or when no document links the report: check the URL and path first.
 
 ## Triage
 

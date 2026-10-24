@@ -64,6 +64,19 @@
 - **then** it exits 2, as for a report it cannot read
 - **then** the error names the URL it looked for
 
+## ✓ Without `--report`, `citations` reads the JSON «report» a bare `--given-json` writes
+`tests/integration/test_cli_citations.py::test_citations_without_report_reads_the_default_json_report`
+
+- **given** a JSON «report» at `given-report/report-data.json`
+- **given** a document with a stale «citation»
+    - 📎 document:
+        ```
+        ✓ [old](https://example.org/report.html#scenario=t.py::test_pay)
+        ```
+- **when** `pytest-given citations update` runs on it without `--report`
+- **then** it exits 0
+- **then** the «citation» reads what that report says
+
 ## ✓ `citations check --list` prints every «report link», its findings under it
 `tests/integration/test_cli_citations.py::test_check_list_prints_every_report_link_with_its_findings` · spec/citations-list, versions/0.5.0
 

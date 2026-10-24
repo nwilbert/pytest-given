@@ -7,13 +7,17 @@ import pytest
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.cli import main
+from pytest_given.report import DEFAULT_JSON_PATH
 from tests.ubiquitous_language import pg
 
 URL = 'https://example.org/report.html'
 
 
-def _write_report(tmp_path: Path, *, report_url: str | None = URL) -> Path:
-    path = tmp_path / 'report.json'
+def _write_report(
+    tmp_path: Path, *, report_url: str | None = URL, name: Path = Path('report.json')
+) -> Path:
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(
             {
@@ -117,6 +121,27 @@ def test_documents_that_never_link_the_report_are_refused(
         assert rc == 2
     with then('the error names the URL it looked for'):
         assert f'No document links to the report at {URL}' in capsys.readouterr().err
+
+
+@scenario(
+    t'Without `--report`, `citations` reads the JSON {pg["Report"].l} a bare '
+    t'`--given-json` writes'
+)
+def test_citations_without_report_reads_the_default_json_report(
+    tmp_path: Path, monkeypatch
+) -> None:
+    with given(t'a JSON {pg["Report"].l} at `given-report/report-data.json`'):
+        monkeypatch.chdir(tmp_path)
+        _write_report(tmp_path, name=DEFAULT_JSON_PATH)
+    with given(t'a document with a stale {pg["Citation"].l}'):
+        doc = _doc(tmp_path, _CITATIONS['stale'])
+        attach('document', _CITATIONS['stale'])
+    with when('`pytest-given citations update` runs on it without `--report`'):
+        rc = main(['citations', 'update', str(doc)])
+    with then('it exits 0'):
+        assert rc == 0
+    with then(t'the {pg["Citation"].l} reads what that report says'):
+        assert doc.read_text(encoding='utf-8') == _CITATIONS['current']
 
 
 def test_check_exits_0_when_every_citation_is_current(tmp_path: Path, capsys) -> None:

@@ -7,6 +7,8 @@ pytest-given report path/to/report-data.json -o path/to/report.html \
     --source-link=vscode
 ```
 
+Without a JSON file it reads `given-report/report-data.json`, where a bare `--given-json` writes it.
+
 The CLI takes its settings from flags only, never from your pytest config, and imports none of your code, so it also runs without installing: `uvx pytest-given@<version> report …`, pinned to the version that wrote the JSON file.
 
 `--source-link` takes the same presets and URL templates as `--given-source-link` (see [Source links](configuration/source-links.md)). Without it (or with `--source-link=none`), file:line is shown as plain text, without a link. With `--format md`, the option is checked but has no effect.
@@ -26,12 +28,12 @@ With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the py
 `pytest-given citations check` verifies every link into the report in a set of Markdown files against a JSON report, and `citations update` rewrites the [citations](guide/citations.md) among them to match it:
 
 ```bash
-pytest-given citations check docs/specs/ README.md --report report.json \
-    [--report-url URL] [--report-path PATH]
+pytest-given citations check docs/specs/ README.md \
+    [--report PATH] [--report-url URL] [--report-path PATH]
 pytest-given citations update …   # same arguments
 ```
 
-A directory is searched recursively for `*.md`. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (`pytest -m pytest_given --given-json=report.json`). `--report-url` defaults to the URL stored in the report (`--given-report-url`); `--report-path` names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.
+A directory is searched recursively for `*.md`. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (`pytest -m pytest_given --given-json`). `--report` defaults to `given-report/report-data.json`, where a bare `--given-json` writes it. `--report-url` defaults to the URL stored in the report (`--given-report-url`); `--report-path` names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.
 
 `check` writes nothing and exits 1 on any citation finding; `update` exits 1 when a citation finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, when neither a report URL nor a report path is known, or when no document links the report, as a mistyped URL or path would otherwise pass every document.
 
