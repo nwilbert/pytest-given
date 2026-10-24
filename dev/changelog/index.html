@@ -1106,12 +1106,17 @@
 <li>The HTML report's Tags sidebar copy button is visually tidied.</li>
 <li><strong>Breaking.</strong> Brackets after the <code>::</code> in a <code>given_lint_ignore</code> entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped <code>[[]</code> with a plain <code>[</code>.</li>
 <li>The bundled reviewing skill now flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, and asks for a scenario per new rule rather than per changelog entry or branch.</li>
+<li>The bundled reviewing skill now passes per-file reviewers the paths of the test file, glossary and code under test, accepts a contrast row under a conditional claim, runs its commands through the project's own runner, and lists undecorated tests from collection alone, without jq.</li>
+<li>The bundled navigating skill now warns that a saved report may cover only a selection, queries an area by several terms, a tag and a path at once, and points to where an area has no scenario.</li>
+<li>The bundled citing skill now says to build the report without xdist's <code>-n</code> and to leave a claim no test can show uncited.</li>
+<li><strong>Breaking.</strong> A pytest-xdist run (<code>-n</code>) that writes a report or runs the narration lint now stops with a usage error instead of writing an empty or partial report: run it without <code>-n</code>, or pass <code>--no-given-lint</code> to a <code>-n</code> run in a project that sets <code>given_lint = true</code>.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.</li>
 <li>A run that executes no test — <code>--collect-only</code>, <code>--setup-only</code>, <code>--setup-plan</code>, or a selection that matches nothing — no longer overwrites the previous report.</li>
 <li>A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.</li>
+<li>Markdown and citation output on stdout is now UTF-8 on a Windows console whose code page lacks the status glyphs: <code>pytest-given report --format md</code> and <code>citations check --list</code> no longer crash with <code>UnicodeEncodeError</code>, and a bare <code>--given-md</code> no longer prints its glyphs as <code>\u</code> escapes.</li>
 <li>The <code>conditional-check</code> lint no longer flags a <code>then</code> whose <code>if</code>/<code>else</code> checks on every branch.</li>
 <li><code>pytest-given citations update</code> now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.</li>
 <li>A pytest-given registered from a conftest under <code>PYTEST_DISABLE_PLUGIN_AUTOLOAD</code> now warns that it loaded too late, instead of silently losing the source links of import-time <code>Story</code> and <code>GlossaryTerm</code> declarations.</li>
