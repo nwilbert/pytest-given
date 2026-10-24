@@ -13,6 +13,7 @@
         <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/changelog/">
       
       
+      
         <link rel="prev" href="../bdd/">
       
       
@@ -21,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -32,12 +33,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -1039,10 +1040,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#051-2026-10-24" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Unreleased
+        0.5.1 - 2026-10-24
       </span>
     </span>
   </a>
@@ -1150,41 +1151,36 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="051-2026-10-24"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.0...v0.5.1">0.5.1</a> - 2026-10-24<a class="headerlink" href="#051-2026-10-24" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
-<li>A BDD page on the documentation site compares pytest-given with Gherkin tools such as pytest-bdd and behave.</li>
+<li>The documentation site has new <a href="https://nwilbert.github.io/pytest-given/0.5/bdd/">BDD</a>, <a href="https://nwilbert.github.io/pytest-given/0.5/html-report/">HTML report</a> and <a href="https://nwilbert.github.io/pytest-given/0.5/markdown-report/">Markdown report</a> pages.</li>
+<li><code>pytest-given citations check</code> / <code>update</code> and <code>pytest-given report</code> read <code>given-report/report-data.json</code>, where a bare <code>--given-json</code> writes it, when no JSON report is passed.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>pytest-given citations check</code> / <code>update</code> and <code>pytest-given report</code> now read <code>given-report/report-data.json</code>, where a bare <code>--given-json</code> writes it, when no JSON report is passed.</li>
-<li>The HTML report's Tags sidebar copy button is visually tidied.</li>
-<li><strong>Breaking.</strong> Brackets after the <code>::</code> in a <code>given_lint_ignore</code> entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped <code>[[]</code> with a plain <code>[</code>.</li>
-<li>The bundled reviewing skill now flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, and asks for a scenario per new rule rather than per changelog entry or branch.</li>
-<li>The bundled reviewing skill now passes per-file reviewers the paths of the test file, glossary and code under test, accepts a contrast row under a conditional claim, runs its commands through the project's own runner, and lists undecorated tests from collection alone, without jq.</li>
-<li>The bundled navigating skill now warns that a saved report may cover only a selection, queries an area by several terms, a tag and a path at once, and points to where an area has no scenario.</li>
-<li>The bundled citing skill now says to build the report without xdist's <code>-n</code> and to leave a claim no test can show uncited.</li>
 <li><strong>Breaking.</strong> A pytest-xdist run (<code>-n</code>) that writes a report or runs the narration lint now stops with a usage error instead of writing an empty or partial report: run it without <code>-n</code>, or pass <code>--no-given-lint</code> to a <code>-n</code> run in a project that sets <code>given_lint = true</code>.</li>
+<li><strong>Breaking.</strong> Brackets after the <code>::</code> in a <code>given_lint_ignore</code> entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped <code>[[]</code> with a plain <code>[</code>.</li>
+<li><strong>Breaking.</strong> A failed parametrize case that narrates a step it shares with the baseline case differently now fails the run, instead of its row showing under wording it never narrated: narrate the shared steps the way the baseline does.</li>
+<li>The HTML report's Tags sidebar copy button is visually tidied.</li>
+<li>The bundled <code>pytest-given-reviewing</code> skill flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, accepts a contrast row under a conditional claim, and asks for a scenario per new rule.</li>
+<li>The bundled skills are tightened, <code>pytest-given-navigating</code> warns that a saved report may cover only a selection and points to where an area has no scenario, and <code>pytest-given-citing</code> leaves a claim no test can show uncited.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>A failed parametrize case must now narrate the steps it shares with the baseline case the way the baseline does, so its row no longer shows under wording it never narrated.</li>
 <li>A run that executes no test — <code>--collect-only</code>, <code>--setup-only</code>, <code>--setup-plan</code>, or a selection that matches nothing — no longer overwrites the previous report.</li>
+<li>An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.</li>
 <li>A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.</li>
-<li>Markdown and citation output on stdout is now UTF-8 on a Windows console whose code page lacks the status glyphs: <code>pytest-given report --format md</code> and <code>citations check --list</code> no longer crash with <code>UnicodeEncodeError</code>, and a bare <code>--given-md</code> no longer prints its glyphs as <code>\u</code> escapes.</li>
-<li>The <code>conditional-check</code> lint no longer flags a <code>then</code> whose <code>if</code>/<code>else</code> checks on every branch.</li>
-<li><code>pytest-given citations update</code> now writes no document when one changed on disk while it ran, and replaces each document it writes in one atomic rename.</li>
+<li>A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.</li>
+<li>Two scenarios no longer share a <code>#scenario=</code> slug when one falls back to its node ID.</li>
+<li><code>pytest-given report --format md</code>, <code>citations check --list</code> and a bare <code>--given-md</code> now write UTF-8 to a Windows console whose code page lacks the status glyphs, instead of crashing or printing <code>\u</code> escapes.</li>
+<li>The <code>conditional-check</code> lint no longer flags a <code>then</code> that checks on every <code>if</code>/<code>else</code> branch, and <code>unused-interpolation</code> no longer flags a step that updates the interpolated name with an augmented assignment such as <code>total += 1</code>.</li>
+<li><code>pytest-given citations update</code> now writes no document that changed on disk while it ran, replaces each document it writes in one atomic rename, and no longer splits a CRLF line break when an edit ends at a line end.</li>
+<li><code>attach()</code> with content JSON cannot carry, such as non-string dict keys or a cycle, and <code>Template</code> with an unclosed brace now raise <code>PytestGivenError</code>.</li>
+<li>A <code>given_source_link</code> template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.</li>
+<li>A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.</li>
 <li>A pytest-given registered from a conftest under <code>PYTEST_DISABLE_PLUGIN_AUTOLOAD</code> now warns that it loaded too late, instead of silently losing the source links of import-time <code>Story</code> and <code>GlossaryTerm</code> declarations.</li>
 <li><code>pytest-given skills install</code> now removes directories no bundled file lives in, and <code>--check</code> reports them as drift.</li>
-<li>An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.</li>
-<li>A <code>given_source_link</code> template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.</li>
-<li>Two scenarios no longer share a <code>#scenario=</code> slug when one falls back to its node ID.</li>
-<li>A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.</li>
-<li><code>attach()</code> with content JSON cannot carry, such as non-string dict keys or a cycle, now raises <code>PytestGivenError</code> naming the attachment.</li>
-<li><code>Template</code> with an unclosed brace now raises <code>PytestGivenError</code> instead of <code>ValueError</code>.</li>
-<li>A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.</li>
-<li>The <code>unused-interpolation</code> lint no longer flags a step whose body updates the interpolated name with an augmented assignment such as <code>total += 1</code>.</li>
-<li><code>pytest-given citations update</code> no longer splits a CRLF line break when an edit ends at a line end.</li>
 </ul>
 <h2 id="050-2026-10-18"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0">0.5.0</a> - 2026-10-18<a class="headerlink" href="#050-2026-10-18" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
@@ -1671,10 +1667,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../assets/javascripts/bundle.a2388154.min.js"></script>
       
     
   </body>
