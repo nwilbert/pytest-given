@@ -262,7 +262,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="./configuration/pytest-options/" class="md-tabs__link">
+        <a href="./html-report/" class="md-tabs__link">
           
   
   Reports
@@ -865,6 +865,60 @@
   
   
     <li class="md-nav__item">
+      <a href="./html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="./configuration/pytest-options/" class="md-nav__link">
         
   
@@ -1068,18 +1122,19 @@
 </div>
 <h2 id="why-pytest-given">Why pytest-given?<a class="headerlink" href="#why-pytest-given" title="Permanent link">&para;</a></h2>
 <p>Classical BDD tools (Cucumber, behave, pytest-bdd) center on Gherkin, a natural-language DSL: stakeholders write the tests, and engineers maintain the glue code behind each step. The <a href="bdd/">BDD page</a> writes the quick start's scenario that way, for comparison.</p>
-<p>pytest-given works the other way round: <strong>engineers or their agents write normal tests, and pytest-given turns them into readable documentation.</strong> Stakeholders and domain experts can follow the HTML report without ever opening the test suite. Engineers get a view of the system's behavior that is easier to scan than test code, browsable by tag, glossary term, or module. The approach is the one <a href="https://jgiven.org/">JGiven</a> pioneered for Java, brought to pytest.</p>
+<p>pytest-given works the other way round: <strong>engineers or their agents write normal tests, and pytest-given turns them into readable documentation.</strong> Stakeholders and domain experts can follow the <a href="html-report/">HTML report</a> without ever opening the test suite. Engineers get a view of the system's behavior that is easier to scan than test code, browsable by tag, glossary term, or module. The approach is the one <a href="https://jgiven.org/">JGiven</a> pioneered for Java, brought to pytest.</p>
 <ul>
 <li>Plain Python: no Gherkin, no <code>.feature</code> files, no parser.</li>
 <li>Tests stay first-class pytest tests, and the report is a by-product.</li>
 <li>Self-contained HTML: open it locally or attach it to a CI run, with no server and no external assets.</li>
+<li>A <a href="markdown-report/">Markdown report</a> of the same run, for pull request diffs and for agents.</li>
 </ul>
 <h3 id="written-by-agents-reviewed-by-people">Written by agents, reviewed by people<a class="headerlink" href="#written-by-agents-reviewed-by-people" title="Permanent link">&para;</a></h3>
-<p>More and more tests aren't written by hand. A person describes a scenario, an AI agent writes the test along with the code, and people review the narrated report instead of the test code. The diagram shows this loop, and <a href="ai-agents/">Working with AI agents</a> explains how to set it up.</p>
+<p>Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. The diagram shows this loop, and <a href="ai-agents/">Working with AI agents</a> explains how to set it up.</p>
 <figure class="pg-diagram">
   <svg class="pg-diagram-svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="pg-diagram-title pg-diagram-desc">
     <title id="pg-diagram-title">A loop between people, agents, and artifacts</title>
-    <desc id="pg-diagram-desc">Developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents.</desc>
+    <desc id="pg-diagram-desc">Developers instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report, which domain experts validate. Developers review all the artifacts, feeding back to the agents.</desc>
     <style>
       /* Sizes are in the 1000-unit viewBox; colours are the --pg-diagram-* tokens
          (defined by the page inline, by the generated README copy standalone). */
@@ -1174,7 +1229,7 @@
       <path d="M130,806 L130,137 Q130,121 146,121 L364,121"/>
       <path d="M510,159 L510,277"/>
       <path d="M430,439 L430,163"/>
-      <path d="M210,806 L210,496 Q210,480 226,480 L301,480"/>
+      <path d="M210,806 L210,336 Q210,320 226,320 L301,320"/>
       <path d="M485,455 L500,455 Q515,455 515,440 L515,388 Q515,372 531,372 L575,372"/>
       <path d="M485,509 L500,509 Q515,509 515,524 L515,579 Q515,595 531,595 L575,595"/>
       <path d="M820,806 L820,611 Q820,595 804,595 L730,595"/>
@@ -1244,7 +1299,7 @@
 <h3 id="glossary-and-domain-storytelling">Glossary and Domain Storytelling<a class="headerlink" href="#glossary-and-domain-storytelling" title="Permanent link">&para;</a></h3>
 <p>pytest-given goes beyond JGiven by tying tests to the domain itself. A <a href="guide/glossary/">glossary</a> defines the terms your team uses, and the report highlights them wherever a test mentions them. <a href="guide/domain-storytelling/">Domain Storytelling</a> adds the big picture: stories of how the domain works, with the report showing which scenarios cover each sentence of a story.</p>
 <h3 id="documents-that-stay-true">Documents that stay true<a class="headerlink" href="#documents-that-stay-true" title="Permanent link">&para;</a></h3>
-<p>A design spec or a README can <a href="guide/citations/">cite</a> scenarios, tags and stories as links into the report, each led by its current status. <code>pytest-given citations update</code> keeps the citations in line with the latest run, and <code>pytest-given citations check</code> in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.</p>
+<p>A design spec or a README can <a href="guide/citations/">cite</a> scenarios, tags and stories as links into the report, each led by its current status. <code>pytest-given citations update</code> keeps the citations in line with the latest run. <code>pytest-given citations check</code> in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.</p>
 <h2 id="example-reports">Example reports<a class="headerlink" href="#example-reports" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="examples/coffeeshop.html" target="_blank">Coffeeshop</a></strong>: a tour of the core features.</li>
@@ -1254,7 +1309,7 @@
 </ul>
 <p>The <a href="examples/">Examples</a> page links the test code behind each report.</p>
 <h2 id="development-and-license">Development and license<a class="headerlink" href="#development-and-license" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md">AGENTS.md</a> for setup, quality gates, and conventions. pytest-given is <a href="https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md">MIT</a> licensed. The bundled Alpine.js runtime is also MIT; its notice is in <a href="https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES">THIRD-PARTY-LICENSES</a>.</p>
+<p>See <a href="https://github.com/nwilbert/pytest-given/blob/main/AGENTS.md">AGENTS.md</a> for setup, quality gates, and conventions. pytest-given is <a href="https://github.com/nwilbert/pytest-given/blob/main/LICENSE.md">MIT</a> licensed. The bundled Alpine.js runtime is also MIT, with its notice in <a href="https://github.com/nwilbert/pytest-given/blob/main/THIRD-PARTY-LICENSES">THIRD-PARTY-LICENSES</a>.</p>
 
 
 

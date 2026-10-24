@@ -16,7 +16,7 @@
         <link rel="prev" href="../guide/citations/">
       
       
-        <link rel="next" href="../configuration/pytest-options/">
+        <link rel="next" href="../html-report/">
       
       
         
@@ -264,7 +264,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../configuration/pytest-options/" class="md-tabs__link">
+        <a href="../html-report/" class="md-tabs__link">
           
   
   Reports
@@ -850,6 +850,60 @@
   
   
     <li class="md-nav__item">
+      <a href="../html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/pytest-options/" class="md-nav__link">
         
   
@@ -1040,7 +1094,7 @@
 <p><strong>Know what the narration is and isn't.</strong> Narration is <em>auditable, not verified</em>: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The <a href="../configuration/narration-lint/">narration lint</a> catches structural lies (an empty step, a <code>then</code> that checks nothing, a missing phase), never semantic truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.</p>
 <p>What the agent itself gets out of it:</p>
 <ul>
-<li><strong>Context economy.</strong> <code>pytest --given-md</code> renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (<code>-k</code>, <code>--lf</code>, node IDs).</li>
+<li><strong>Context economy.</strong> <code>pytest --given-md</code> renders a run's narration as <a href="../markdown-report/">Markdown</a> to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (<code>-k</code>, <code>--lf</code>, node IDs).</li>
 <li><strong>Structured queries.</strong> <code>--given-json</code> + <code>jq</code> filter scenarios by tag, status, or glossary term.</li>
 <li><strong>A controlled vocabulary.</strong> A <a href="../guide/glossary/"><code>Glossary</code></a> — or a <code>FileGlossary</code> over the <code>GLOSSARY.md</code> you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.</li>
 <li><strong>Specs that stay true.</strong> A design spec the agent writes can <a href="../guide/citations/">cite</a> the scenarios that implement it. <code>pytest-given citations check</code> fails CI when one of them stops passing or disappears, so the spec doesn't drift from the code the way separate documentation does.</li>

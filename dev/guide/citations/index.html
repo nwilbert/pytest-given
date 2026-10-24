@@ -264,7 +264,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../configuration/pytest-options/" class="md-tabs__link">
+        <a href="../../html-report/" class="md-tabs__link">
           
   
   Reports
@@ -916,6 +916,60 @@
   
   
     <li class="md-nav__item">
+      <a href="../../html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../configuration/pytest-options/" class="md-nav__link">
         
   
@@ -1299,7 +1353,7 @@
 <a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>&lt;/details&gt;
 </code></pre></div>
 <p>The citation is in the <code>&lt;summary&gt;</code>: the glyph, then an <code>&lt;a href="../…"&gt;</code> with the <a href="#writing-it-by-hand">report link</a> as its only attribute and the title as its link text, written as HTML. Everything below it, down to <code>&lt;/details&gt;</code> on a line of its own, is the body. The <code>&lt;summary&gt;</code> follows <code>&lt;details&gt;</code> with no blank line between, and the block needs a blank line above it: <code>check</code> reports a block that breaks either as mistyped, such as one that continues another narrated citation's <code>&lt;/details&gt;</code>. Only a scenario can be narrated, not a tag or a story.</p>
-<p>The body reads as the scenario's section of the Markdown report (<code>--given-md</code>), minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.</p>
+<p>The body reads as the scenario's section of the <a href="../../markdown-report/">Markdown report</a>, minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.</p>
 <p>To add one, choose <strong>Copy narrated citation</strong> in the report's copy menu on a scenario card, paste it into your document, and run <code>pytest-given citations update</code>, which fills the empty body. From then on <code>update</code> rewrites the body to match the report, and <code>pytest-given citations check</code> fails when it differs, or when the opening tag lacks <code>markdown="1"</code>, which <code>update</code> adds, keeping any other attributes such as <code>open</code>.</p>
 <p>On a Python-Markdown site (MkDocs, Zensical), enable <code>md_in_html</code> and keep the block at the top level of the page, not inside a list item. GitHub renders it anywhere.</p>
 <h2 id="updating-citations">Updating citations<a class="headerlink" href="#updating-citations" title="Permanent link">&para;</a></h2>

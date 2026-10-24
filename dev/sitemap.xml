@@ -51,4 +51,10 @@
       <url>
         <loc>https://nwilbert.github.io/pytest-given/latest/guide/step-text/</loc>
       </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/html-report/</loc>
+      </url>
+      <url>
+        <loc>https://nwilbert.github.io/pytest-given/latest/markdown-report/</loc>
+      </url>
 </urlset>
