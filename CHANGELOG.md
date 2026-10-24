@@ -11,11 +11,11 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 <!-- --8<-- [start:site] -->
 
-## [Unreleased]
+## [0.5.1] - 2026-10-24
 
 ### Added
 
-- The documentation site has new [BDD](https://nwilbert.github.io/pytest-given/dev/bdd/), [HTML report](https://nwilbert.github.io/pytest-given/dev/html-report/) and [Markdown report](https://nwilbert.github.io/pytest-given/dev/markdown-report/) pages.
+- The documentation site has new [BDD](https://nwilbert.github.io/pytest-given/0.5/bdd/), [HTML report](https://nwilbert.github.io/pytest-given/0.5/html-report/) and [Markdown report](https://nwilbert.github.io/pytest-given/0.5/markdown-report/) pages.
 - `pytest-given citations check` / `update` and `pytest-given report` read `given-report/report-data.json`, where a bare `--given-json` writes it, when no JSON report is passed.
 
 ### Changed
@@ -465,7 +465,8 @@ First public release.
 - Bundled authoring, navigating, and reviewing skills for AI agents, shipped in
   the wheel and version-matched to the plugin.
 
-[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/nwilbert/pytest-given/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/nwilbert/pytest-given/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/nwilbert/pytest-given/compare/v0.3.0...v0.4.0
