@@ -13,6 +13,7 @@
         <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/cli/">
       
       
+      
         <link rel="prev" href="../configuration/source-links/">
       
       
@@ -23,7 +24,7 @@
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -34,12 +35,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -264,7 +265,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../configuration/pytest-options/" class="md-tabs__link">
+        <a href="../html-report/" class="md-tabs__link">
           
   
   Reports
@@ -285,6 +286,22 @@
         
   
   Examples
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../bdd/" class="md-tabs__link">
+        
+  
+  BDD
 
       </a>
     </li>
@@ -776,6 +793,60 @@
   
   
     <li class="md-nav__item">
+      <a href="../html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/pytest-options/" class="md-nav__link">
         
   
@@ -949,6 +1020,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../bdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  BDD
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../changelog/" class="md-nav__link">
         
   
@@ -998,6 +1095,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pytest-given<span class="w"> </span>report<span class="w"> </span>path/to/report-data.json<span class="w"> </span>-o<span class="w"> </span>path/to/report.html<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>--source-link<span class="o">=</span>vscode
 </code></pre></div>
+<p>Without a JSON file it reads <code>given-report/report-data.json</code>, where a bare <code>--given-json</code> writes it.</p>
 <p>The CLI takes its settings from flags only, never from your pytest config, and imports none of your code, so it also runs without installing: <code>uvx pytest-given@&lt;version&gt; report …</code>, pinned to the version that wrote the JSON file.</p>
 <p><code>--source-link</code> takes the same presets and URL templates as <code>--given-source-link</code> (see <a href="../configuration/source-links/">Source links</a>). Without it (or with <code>--source-link=none</code>), file:line is shown as plain text, without a link. With <code>--format md</code>, the option is checked but has no effect.</p>
 <p><code>--theme=light|dark|auto</code> sets the theme the report opens in, like <code>--given-theme</code>. The default is <code>auto</code>.</p>
@@ -1007,11 +1105,11 @@
 <p>With <code>--format md</code> and no <code>-o</code>, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no <code>&lt;!-- pytest-given:md:start --&gt;</code> markers; the plugin only adds them to separate the report from pytest's own output.</p>
 <h2 id="citations">Citations<a class="headerlink" href="#citations" title="Permanent link">&para;</a></h2>
 <p><code>pytest-given citations check</code> verifies every link into the report in a set of Markdown files against a JSON report, and <code>citations update</code> rewrites the <a href="../guide/citations/">citations</a> among them to match it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/specs/<span class="w"> </span>README.md<span class="w"> </span>--report<span class="w"> </span>report.json<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="o">[</span>--report-url<span class="w"> </span>URL<span class="o">]</span><span class="w"> </span><span class="o">[</span>--report-path<span class="w"> </span>PATH<span class="o">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/specs/<span class="w"> </span>README.md<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="o">[</span>--report<span class="w"> </span>PATH<span class="o">]</span><span class="w"> </span><span class="o">[</span>--report-url<span class="w"> </span>URL<span class="o">]</span><span class="w"> </span><span class="o">[</span>--report-path<span class="w"> </span>PATH<span class="o">]</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>…<span class="w">   </span><span class="c1"># same arguments</span>
 </code></pre></div>
-<p>A directory is searched recursively for <code>*.md</code>. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (<code>pytest -m pytest_given --given-json=report.json</code>). <code>--report-url</code> defaults to the URL stored in the report (<code>--given-report-url</code>); <code>--report-path</code> names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.</p>
+<p>A directory is searched recursively for <code>*.md</code>. Neither command runs tests: both read the JSON report of an earlier run, which must hold every scenario a document may cite (<code>pytest -m pytest_given --given-json</code>). <code>--report</code> defaults to <code>given-report/report-data.json</code>, where a bare <code>--given-json</code> writes it. <code>--report-url</code> defaults to the URL stored in the report (<code>--given-report-url</code>); <code>--report-path</code> names where the HTML report sits in the repository once your docs build has placed it, so relative links to it are read too.</p>
 <p><code>check</code> writes nothing and exits 1 on any citation finding; <code>update</code> exits 1 when a citation finding remains that it cannot fix, such as a target no longer in the report. Both exit 2, writing nothing, when the report or a document cannot be read, when neither a report URL nor a report path is known, or when no document links the report, as a mistyped URL or path would otherwise pass every document.</p>
 <p><code>check</code> takes two more options, which leave its summary and exit code as they are:</p>
 <ul>
@@ -1080,10 +1178,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../assets/javascripts/bundle.a2388154.min.js"></script>
       
     
   </body>

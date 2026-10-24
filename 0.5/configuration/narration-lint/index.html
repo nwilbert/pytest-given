@@ -13,6 +13,7 @@
         <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/">
       
       
+      
         <link rel="prev" href="../../guide/domain-storytelling/">
       
       
@@ -23,7 +24,7 @@
       
       
       <link rel="icon" href="../../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -34,12 +35,12 @@
       
         
       
-      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -264,7 +265,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../pytest-options/" class="md-tabs__link">
+        <a href="../../html-report/" class="md-tabs__link">
           
   
   Reports
@@ -285,6 +286,22 @@
         
   
   Examples
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../bdd/" class="md-tabs__link">
+        
+  
+  BDD
 
       </a>
     </li>
@@ -856,6 +873,60 @@
   
   
     <li class="md-nav__item">
+      <a href="../../html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../pytest-options/" class="md-nav__link">
         
   
@@ -971,6 +1042,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../../bdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  BDD
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../changelog/" class="md-nav__link">
         
   
@@ -1042,7 +1139,7 @@
 <tr>
 <td><code>conditional-check</code></td>
 <td><code>warn</code></td>
-<td>A <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>, so a run can pass it without checking anything. An <code>if</code> that calls <code>pytest.fail</code> counts as a check, and so does a loop over a literal such as <code>(a, b)</code>.</td>
+<td>A <code>then</code> whose checks all sit under an <code>if</code>, a loop, a <code>match</code> or an <code>except</code>, so a run can pass it without checking anything. An <code>if</code> that calls <code>pytest.fail</code> counts as a check, and so do an <code>if</code>/<code>else</code> that checks on every branch and a loop over a literal such as <code>(a, b)</code>.</td>
 </tr>
 <tr>
 <td><code>missing-phase</code></td>
@@ -1078,6 +1175,7 @@
 </table>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>Change a rule's severity with <code>given_lint_rules</code>. Skip lint findings for specific tests with <code>given_lint_ignore</code>: each entry is a node-id pattern (with <code>*</code> wildcards), optionally limited to one rule with a <code>rule-id:</code> prefix.</p>
+<p>Brackets after the <code>::</code> name a parametrize case, not a glob character class, so <code>tests/unit/test_math.py::test_add[water]</code> matches only that case.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[tool.pytest]</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">given_lint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">given_lint_rules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
@@ -1159,10 +1257,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a2388154.min.js"></script>
       
     
   </body>

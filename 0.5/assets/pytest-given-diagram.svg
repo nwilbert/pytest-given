@@ -1,6 +1,6 @@
 <svg class="pg-diagram-svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="pg-diagram-title pg-diagram-desc">
   <title id="pg-diagram-title">A loop between people, agents, and artifacts</title>
-  <desc id="pg-diagram-desc">Developers and domain experts instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report that domain experts validate and developers review, feeding back to the agents.</desc>
+  <desc id="pg-diagram-desc">Developers instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report, which domain experts validate. Developers review all the artifacts, feeding back to the agents.</desc>
   <style>
     /* Sizes are in the 1000-unit viewBox; colours are the --pg-diagram-* tokens
        (defined by the page inline, by the generated README copy standalone). */
@@ -95,7 +95,7 @@
     <path d="M130,806 L130,137 Q130,121 146,121 L364,121"/>
     <path d="M510,159 L510,277"/>
     <path d="M430,439 L430,163"/>
-    <path d="M210,806 L210,496 Q210,480 226,480 L301,480"/>
+    <path d="M210,806 L210,336 Q210,320 226,320 L301,320"/>
     <path d="M485,455 L500,455 Q515,455 515,440 L515,388 Q515,372 531,372 L575,372"/>
     <path d="M485,509 L500,509 Q515,509 515,524 L515,579 Q515,595 531,595 L575,595"/>
     <path d="M820,806 L820,611 Q820,595 804,595 L730,595"/>

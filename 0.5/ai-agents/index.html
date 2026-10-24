@@ -13,17 +13,18 @@
         <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/ai-agents/">
       
       
+      
         <link rel="prev" href="../guide/citations/">
       
       
-        <link rel="next" href="../configuration/pytest-options/">
+        <link rel="next" href="../html-report/">
       
       
         
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -34,12 +35,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -264,7 +265,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../configuration/pytest-options/" class="md-tabs__link">
+        <a href="../html-report/" class="md-tabs__link">
           
   
   Reports
@@ -285,6 +286,22 @@
         
   
   Examples
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../bdd/" class="md-tabs__link">
+        
+  
+  BDD
 
       </a>
     </li>
@@ -834,6 +851,60 @@
   
   
     <li class="md-nav__item">
+      <a href="../html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/pytest-options/" class="md-nav__link">
         
   
@@ -949,6 +1020,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../bdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  BDD
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../changelog/" class="md-nav__link">
         
   
@@ -998,7 +1095,7 @@
 <p><strong>Know what the narration is and isn't.</strong> Narration is <em>auditable, not verified</em>: in an agentic workflow the same agent writes both the code and the claim about the code, and nothing mechanically checks that a step's text matches its body. The <a href="../configuration/narration-lint/">narration lint</a> catches structural lies (an empty step, a <code>then</code> that checks nothing, a missing phase), never semantic truth. The report is worth as much as your review process's habit of reading step text against step bodies — treat it as a review aid, not as evidence.</p>
 <p>What the agent itself gets out of it:</p>
 <ul>
-<li><strong>Context economy.</strong> <code>pytest --given-md</code> renders a run's narration as Markdown to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (<code>-k</code>, <code>--lf</code>, node IDs).</li>
+<li><strong>Context economy.</strong> <code>pytest --given-md</code> renders a run's narration as <a href="../markdown-report/">Markdown</a> to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (<code>-k</code>, <code>--lf</code>, node IDs).</li>
 <li><strong>Structured queries.</strong> <code>--given-json</code> + <code>jq</code> filter scenarios by tag, status, or glossary term.</li>
 <li><strong>A controlled vocabulary.</strong> A <a href="../guide/glossary/"><code>Glossary</code></a> — or a <code>FileGlossary</code> over the <code>GLOSSARY.md</code> you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.</li>
 <li><strong>Specs that stay true.</strong> A design spec the agent writes can <a href="../guide/citations/">cite</a> the scenarios that implement it. <code>pytest-given citations check</code> fails CI when one of them stops passing or disappears, so the spec doesn't drift from the code the way separate documentation does.</li>
@@ -1079,10 +1176,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../assets/javascripts/bundle.a2388154.min.js"></script>
       
     
   </body>

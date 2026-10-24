@@ -13,7 +13,8 @@
         <link rel="canonical" href="https://nwilbert.github.io/pytest-given/latest/changelog/">
       
       
-        <link rel="prev" href="../examples/">
+      
+        <link rel="prev" href="../bdd/">
       
       
       
@@ -21,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -32,12 +33,12 @@
       
         
       
-      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -260,7 +261,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../configuration/pytest-options/" class="md-tabs__link">
+        <a href="../html-report/" class="md-tabs__link">
           
   
   Reports
@@ -281,6 +282,22 @@
         
   
   Examples
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../bdd/" class="md-tabs__link">
+        
+  
+  BDD
 
       </a>
     </li>
@@ -769,6 +786,60 @@
   
   
     <li class="md-nav__item">
+      <a href="../html-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  HTML report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../markdown-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Markdown report
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/pytest-options/" class="md-nav__link">
         
   
@@ -881,6 +952,32 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../bdd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  BDD
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -943,10 +1040,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
+  <a href="#051-2026-10-24" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Unreleased
+        0.5.1 - 2026-10-24
       </span>
     </span>
   </a>
@@ -1054,9 +1151,39 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
-<h2 id="050-2026-10-18"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0">0.5.0</a> - 2026-10-18<a class="headerlink" href="#050-2026-10-18" title="Permanent link">&para;</a></h2>
+<h2 id="051-2026-10-24"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.0...v0.5.1">0.5.1</a> - 2026-10-24<a class="headerlink" href="#051-2026-10-24" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The documentation site has new <a href="https://nwilbert.github.io/pytest-given/0.5/bdd/">BDD</a>, <a href="https://nwilbert.github.io/pytest-given/0.5/html-report/">HTML report</a> and <a href="https://nwilbert.github.io/pytest-given/0.5/markdown-report/">Markdown report</a> pages.</li>
+<li><code>pytest-given citations check</code> / <code>update</code> and <code>pytest-given report</code> read <code>given-report/report-data.json</code>, where a bare <code>--given-json</code> writes it, when no JSON report is passed.</li>
+</ul>
+<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Breaking.</strong> A pytest-xdist run (<code>-n</code>) that writes a report or runs the narration lint now stops with a usage error instead of writing an empty or partial report: run it without <code>-n</code>, or pass <code>--no-given-lint</code> to a <code>-n</code> run in a project that sets <code>given_lint = true</code>.</li>
+<li><strong>Breaking.</strong> Brackets after the <code>::</code> in a <code>given_lint_ignore</code> entry now match a parametrize case literally instead of acting as a glob character class: replace a hand-escaped <code>[[]</code> with a plain <code>[</code>.</li>
+<li><strong>Breaking.</strong> A failed parametrize case that narrates a step it shares with the baseline case differently now fails the run, instead of its row showing under wording it never narrated: narrate the shared steps the way the baseline does.</li>
+<li>The HTML report's Tags sidebar copy button is visually tidied.</li>
+<li>The bundled <code>pytest-given-reviewing</code> skill flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, accepts a contrast row under a conditional claim, and asks for a scenario per new rule.</li>
+<li>The bundled skills are tightened, <code>pytest-given-navigating</code> warns that a saved report may cover only a selection and points to where an area has no scenario, and <code>pytest-given-citing</code> leaves a claim no test can show uncited.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A run that executes no test — <code>--collect-only</code>, <code>--setup-only</code>, <code>--setup-plan</code>, or a selection that matches nothing — no longer overwrites the previous report.</li>
+<li>An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.</li>
+<li>A chained exception's report now gives the error its own frames, with each cause shown above them as a separate block.</li>
+<li>A grouped scenario whose cases skipped for different reasons no longer shows one case's reason for all of them.</li>
+<li>Two scenarios no longer share a <code>#scenario=</code> slug when one falls back to its node ID.</li>
+<li><code>pytest-given report --format md</code>, <code>citations check --list</code> and a bare <code>--given-md</code> now write UTF-8 to a Windows console whose code page lacks the status glyphs, instead of crashing or printing <code>\u</code> escapes.</li>
+<li>The <code>conditional-check</code> lint no longer flags a <code>then</code> that checks on every <code>if</code>/<code>else</code> branch, and <code>unused-interpolation</code> no longer flags a step that updates the interpolated name with an augmented assignment such as <code>total += 1</code>.</li>
+<li><code>pytest-given citations update</code> now writes no document that changed on disk while it ran, replaces each document it writes in one atomic rename, and no longer splits a CRLF line break when an edit ends at a line end.</li>
+<li><code>attach()</code> with content JSON cannot carry, such as non-string dict keys or a cycle, and <code>Template</code> with an unclosed brace now raise <code>PytestGivenError</code>.</li>
+<li>A <code>given_source_link</code> template with a bad format spec, conversion or brace is now rejected when the option is read, before the tests run, instead of failing the report at render time.</li>
+<li>A failure raised inside the Markdown-glossary reader now shows its pytest-given frame as internal.</li>
+<li>A pytest-given registered from a conftest under <code>PYTEST_DISABLE_PLUGIN_AUTOLOAD</code> now warns that it loaded too late, instead of silently losing the source links of import-time <code>Story</code> and <code>GlossaryTerm</code> declarations.</li>
+<li><code>pytest-given skills install</code> now removes directories no bundled file lives in, and <code>--check</code> reports them as drift.</li>
+</ul>
+<h2 id="050-2026-10-18"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.1...v0.5.0">0.5.0</a> - 2026-10-18<a class="headerlink" href="#050-2026-10-18" title="Permanent link">&para;</a></h2>
+<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Markdown documents, such as design specs, can <a href="https://nwilbert.github.io/pytest-given/0.5/guide/citations/">cite</a> scenarios, tags and stories as links into the published HTML report: <code>--given-report-url</code> or the <code>given_report_url</code> setting sets the report's URL and gives it buttons that copy a citation, <code>pytest-given citations check</code> and <code>pytest-given citations update</code> keep a document's citations in line with a JSON report, a scenario's narration in a <code>&lt;details markdown="1"&gt;</code> block included, <code>citations check --list</code> prints every report link with its findings, narrowed by <code>--covering</code> to the links that <a href="https://nwilbert.github.io/pytest-given/0.5/guide/citations/#finding-the-citations-of-a-scenario">cite a scenario</a>, and the bundled <code>pytest-given-citing</code> skill writes citations and repairs the ones <code>citations update</code> cannot.</li>
 <li>When a link into the HTML report points at a scenario, tag or other filter the report no longer has, the report warns that the link is out of date, names what is missing, and ignores it.</li>
@@ -1070,7 +1197,7 @@
 <li>A <a href="https://nwilbert.github.io/pytest-given/0.5/guide/parametrized/#grouping">parameter table</a> starts with a <code>case ID</code> column when any case ID is custom, and each case in the JSON report's <code>parameters.cases[]</code> carries its node ID as <code>id</code> and a <code>custom_id</code> flag.</li>
 <li>A Tags sidebar row in the HTML report has a copy button for the tag's link and citation.</li>
 </ul>
-<h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
+<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Markdown report indents nested steps and attachments by four spaces.</li>
 <li><strong>Breaking.</strong> <code>@scenario</code>'s first parameter is now <code>title</code>: replace <code>@scenario(name=...)</code> with <code>@scenario(title=...)</code>; a positional title is unaffected.</li>
@@ -1088,31 +1215,31 @@
 <li>pytest-given now depends on markdown-it-py.</li>
 <li><code>FileGlossary</code> reads the tables a GFM renderer shows, so it reads a table in a blockquote or list, skips one in an indented code or HTML block, and reads a cell missing from a row as empty instead of raising.</li>
 </ul>
-<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Notes below a parameter table in the Markdown report that would share a key add their row number.</li>
 <li>The narration lint checks a test file with an encoding declaration, such as <code># -*- coding: latin-1 -*-</code>, instead of skipping it.</li>
 </ul>
 <h2 id="041-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1">0.4.1</a> - 2026-10-04<a class="headerlink" href="#041-2026-10-04" title="Permanent link">&para;</a></h2>
-<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The HTML report's phase hover outline in a parameter table now follows an attachment payload opened or closed under the pointer.</li>
 </ul>
 <h2 id="040-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.3.0...v0.4.0">0.4.0</a> - 2026-10-04<a class="headerlink" href="#040-2026-10-04" title="Permanent link">&para;</a></h2>
-<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Python 3.15 is supported.</li>
 <li>Hovering a phase in the HTML report's narration, or a column of its parameter table, highlights that phase in both.</li>
 <li>Scenarios that fail as expected (<code>xfail</code>) get their own <code>xfailed</code> status, with their reason, steps and error, in every report format.</li>
 </ul>
-<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The parameter table orders its columns the way the narration first shows them, and shows its status column only when the cases differ in status.</li>
 <li>The HTML report's Stories view shows each scenario as a full card that expands in place, and a tag clicked there opens the Scenarios view filtered by it.</li>
 <li>The HTML report is visually tidied: term refs, the Glossary view, story coverage, narration spacing, hover states and the header row are restyled, and a parametrized scenario is marked by a second status bar.</li>
 <li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the <code>pytest-given-reviewing</code> skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.</li>
 </ul>
-<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A <code>@given</code> fixture parametrized with an unhashable value, such as a list, no longer errors every test that requests it.</li>
 <li>Editor source links build <code>{path}</code> from pytest's rootdir instead of the working directory, so they no longer point at a doubled path when pytest runs from a subdirectory.</li>
@@ -1134,7 +1261,7 @@
 <li>A parametrized scenario shows a skip reason only when every case was skipped, no longer its first case's reason beside cases that ran.</li>
 </ul>
 <h2 id="030-2026-09-27"><a href="https://github.com/nwilbert/pytest-given/compare/v0.2.0...v0.3.0">0.3.0</a> - 2026-09-27<a class="headerlink" href="#030-2026-09-27" title="Permanent link">&para;</a></h2>
-<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A documentation site at <a href="https://nwilbert.github.io/pytest-given/">https://nwilbert.github.io/pytest-given/</a> has a user guide, configuration and CLI reference, and the example reports. The bundled skills link to it, and the CLI help names the page on source-link templates.</li>
 <li>The HTML report has a dark theme, with a Light / Dark / System control in its header that each browser remembers.</li>
@@ -1144,7 +1271,7 @@
 <li>One scenario can document a flow that spans several stories: <code>@scenario(stories=[a, b])</code> lists it under each story in the Stories tab, and the Scenarios view's sentence filter names the story when a report has several.</li>
 <li>A sentence can be named (<code>sentence(..., name='checkout')</code>), so a pin can refer to it by name and survives reordering the story. The Stories timeline shows the name beside the sentence's coverage.</li>
 </ul>
-<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Breaking.</strong> Story vocabulary follows Domain Storytelling: a story is made of <em>sentences</em>, and <em>activity</em> is the verb kind. <code>activity()</code> is now <code>sentence()</code>, <code>path()</code> is now <code>clause()</code>, and <code>Glossary.verb()</code> is now <code>Glossary.activity()</code>. A file glossary's kind column says <code>activity</code> instead of <code>verb</code>, the report's <code>#activity-filter=</code> link parameter is now <code>#sentence-filter=</code>, and the HTML report says <em>Sentence</em> and <em>Activities</em> where it said <em>Activity</em> and <em>Verbs</em>.</li>
 <li><strong>Breaking.</strong> <code>@scenario(story=)</code> is now <code>stories=</code>.</li>
@@ -1160,7 +1287,7 @@
 <li>The reviewing skill can list each scenario's narration beside its test's source for side-by-side review, and checks that a scenario demonstrates every rule the project's changelog announces. Both skills flag <code>match=</code> pins that use alternation, and a <code>when</code> that narrates setup while its body acts.</li>
 <li>The authoring, reviewing and navigating skills cover sentence handles, <code>pins=</code> and <code>stories=</code>. The reviewing skill also checks that the test body exercises each sentence its scenario pins.</li>
 </ul>
-<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_4">Fixed<a class="headerlink" href="#fixed_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>When rendering a report fails unexpectedly, the previous run's report is still discarded instead of staying on disk looking current.</li>
 <li>A <code>#scenario=</code> deep link now opens the right scenario when two node ids differ only in a character the slug folds, and no longer breaks the URL.</li>
@@ -1178,7 +1305,7 @@
 <li>A pin on a <code>@given</code> fixture scoped wider than <code>function</code> now counts in every scenario the fixture reaches, even when a test without <code>@scenario</code> set it up first. The run used to fail with a bare <code>AssertionError</code>.</li>
 </ul>
 <h2 id="020-2026-09-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.1.0...v0.2.0">0.2.0</a> - 2026-09-04<a class="headerlink" href="#020-2026-09-04" title="Permanent link">&para;</a></h2>
-<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>pytest_given.PytestGivenWarning</code> is a top-level export, and a step or
   <code>attach()</code> recorded in a test without <code>@scenario</code> now warns with it instead of
@@ -1198,7 +1325,7 @@
 <li>A selected activity in the Stories view offers <strong>Open in Scenarios</strong>, filtering
   the Scenarios view down to the scenarios covering it.</li>
 </ul>
-<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
+<h3 id="changed_4">Changed<a class="headerlink" href="#changed_4" title="Permanent link">&para;</a></h3>
 <h4 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>Breaking.</strong> <code>--given-lint</code> is a plain boolean flag: write <code>--given-lint</code> and
@@ -1305,7 +1432,7 @@
   <code>given_lint_rules</code> or <code>given_lint_ignore</code> entry naming it, which would
   otherwise fail config parsing.</li>
 </ul>
-<h3 id="fixed_4">Fixed<a class="headerlink" href="#fixed_4" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_5">Fixed<a class="headerlink" href="#fixed_5" title="Permanent link">&para;</a></h3>
 <h4 id="authoring-api_1">Authoring API<a class="headerlink" href="#authoring-api_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
@@ -1456,7 +1583,7 @@
 </ul>
 <h2 id="010-2026-08-08"><a href="https://github.com/nwilbert/pytest-given/releases/tag/v0.1.0">0.1.0</a> - 2026-08-08<a class="headerlink" href="#010-2026-08-08" title="Permanent link">&para;</a></h2>
 <p>First public release.</p>
-<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
+<h3 id="added_5">Added<a class="headerlink" href="#added_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>@scenario</code> decorator plus <code>given</code> / <code>when</code> / <code>then</code> step blocks, usable as
   both context managers and decorators, including on fixtures.</li>
@@ -1540,10 +1667,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../assets/javascripts/bundle.a2388154.min.js"></script>
       
     
   </body>
