@@ -1163,6 +1163,10 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes to this project are documented here. The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.1...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A parameter table no longer shows an id column for a long value that pytest 9.2's <code>parametrize_long_str_id_strategy = sha256</code> names by its digest.</li>
+</ul>
 <h2 id="051-2026-10-24"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.0...v0.5.1">0.5.1</a> - 2026-10-24<a class="headerlink" href="#051-2026-10-24" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1178,7 +1182,7 @@
 <li>The bundled <code>pytest-given-reviewing</code> skill flags an assertion that would still pass with its claim false and a parameter-table column of Python reprs, accepts a contrast row under a conditional claim, and asks for a scenario per new rule.</li>
 <li>The bundled skills are tightened, <code>pytest-given-navigating</code> warns that a saved report may cover only a selection and points to where an area has no scenario, and <code>pytest-given-citing</code> leaves a claim no test can show uncited.</li>
 </ul>
-<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A run that executes no test — <code>--collect-only</code>, <code>--setup-only</code>, <code>--setup-plan</code>, or a selection that matches nothing — no longer overwrites the previous report.</li>
 <li>An interrupted report write no longer leaves a half-written sink: each file is written to a temporary and moved into place once all of them are written.</li>
@@ -1227,13 +1231,13 @@
 <li>pytest-given now depends on markdown-it-py.</li>
 <li><code>FileGlossary</code> reads the tables a GFM renderer shows, so it reads a table in a blockquote or list, skips one in an indented code or HTML block, and reads a cell missing from a row as empty instead of raising.</li>
 </ul>
-<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Notes below a parameter table in the Markdown report that would share a key add their row number.</li>
 <li>The narration lint checks a test file with an encoding declaration, such as <code># -*- coding: latin-1 -*-</code>, instead of skipping it.</li>
 </ul>
 <h2 id="041-2026-10-04"><a href="https://github.com/nwilbert/pytest-given/compare/v0.4.0...v0.4.1">0.4.1</a> - 2026-10-04<a class="headerlink" href="#041-2026-10-04" title="Permanent link">&para;</a></h2>
-<h3 id="fixed_2">Fixed<a class="headerlink" href="#fixed_2" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The HTML report's phase hover outline in a parameter table now follows an attachment payload opened or closed under the pointer.</li>
 </ul>
@@ -1251,7 +1255,7 @@
 <li>The HTML report is visually tidied: term refs, the Glossary view, story coverage, narration spacing, hover states and the header row are restyled, and a parametrized scenario is marked by a second status bar.</li>
 <li>The bundled <code>pytest-given-authoring</code> skill asks for one scenario per rule and covers parametrized scenarios as decision tables, and the <code>pytest-given-reviewing</code> skill catches more ways scenarios, glossary rows, pins, tags and parameter tables can disagree.</li>
 </ul>
-<h3 id="fixed_3">Fixed<a class="headerlink" href="#fixed_3" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_4">Fixed<a class="headerlink" href="#fixed_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A <code>@given</code> fixture parametrized with an unhashable value, such as a list, no longer errors every test that requests it.</li>
 <li>Editor source links build <code>{path}</code> from pytest's rootdir instead of the working directory, so they no longer point at a doubled path when pytest runs from a subdirectory.</li>
@@ -1299,7 +1303,7 @@
 <li>The reviewing skill can list each scenario's narration beside its test's source for side-by-side review, and checks that a scenario demonstrates every rule the project's changelog announces. Both skills flag <code>match=</code> pins that use alternation, and a <code>when</code> that narrates setup while its body acts.</li>
 <li>The authoring, reviewing and navigating skills cover sentence handles, <code>pins=</code> and <code>stories=</code>. The reviewing skill also checks that the test body exercises each sentence its scenario pins.</li>
 </ul>
-<h3 id="fixed_4">Fixed<a class="headerlink" href="#fixed_4" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_5">Fixed<a class="headerlink" href="#fixed_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li>When rendering a report fails unexpectedly, the previous run's report is still discarded instead of staying on disk looking current.</li>
 <li>A <code>#scenario=</code> deep link now opens the right scenario when two node ids differ only in a character the slug folds, and no longer breaks the URL.</li>
@@ -1444,7 +1448,7 @@
   <code>given_lint_rules</code> or <code>given_lint_ignore</code> entry naming it, which would
   otherwise fail config parsing.</li>
 </ul>
-<h3 id="fixed_5">Fixed<a class="headerlink" href="#fixed_5" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_6">Fixed<a class="headerlink" href="#fixed_6" title="Permanent link">&para;</a></h3>
 <h4 id="authoring-api_1">Authoring API<a class="headerlink" href="#authoring-api_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
