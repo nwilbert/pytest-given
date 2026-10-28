@@ -849,3 +849,37 @@ def test_an_unescaped_id_is_not_custom_where_escaping_is_off(
         def test_x(a): pass
         """,
     ) == {'naïve': False}
+
+
+_LONG_STR_STRATEGY_IN_PYTEST = pytest.mark.skipif(
+    pytest.version_tuple < (9, 2),
+    reason='parametrize_long_str_id_strategy is new in pytest 9.2',
+)
+
+
+@pytest.mark.parametrize(
+    'strategy',
+    [
+        None,
+        *(
+            pytest.param(strategy, marks=_LONG_STR_STRATEGY_IN_PYTEST)
+            for strategy in ['short', 'legacy', 'sha256']
+        ),
+    ],
+)
+def test_an_id_generated_from_a_long_value_is_not_custom(
+    pytester: pytest.Pytester, strategy: str | None
+) -> None:
+    """A value over 100 characters is named by its argname and position, by
+    the value itself or by its sha256 digest, as the strategy says."""
+    if strategy is not None:
+        pytester.makeini(f'[pytest]\nparametrize_long_str_id_strategy = {strategy}\n')
+    ids = _custom_ids(
+        pytester,
+        """
+        @pytest.mark.parametrize('v', ['x' * 101, 'x' * 101, b'y' * 101])
+        def test_x(v): pass
+        """,
+    )
+    assert len(ids) == 3
+    assert not any(ids.values())

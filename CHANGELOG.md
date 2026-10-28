@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Fixed
+
+- A parameter table no longer shows an id column for a long value that pytest 9.2's `parametrize_long_str_id_strategy = sha256` names by its digest.
+
 ## [0.5.1] - 2026-10-24
 
 ### Added

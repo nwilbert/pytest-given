@@ -8,6 +8,7 @@ copied, as pytest exports none of it; tests pin each rule.
 """
 
 import enum
+import hashlib
 import re
 from collections.abc import Mapping
 
@@ -52,14 +53,14 @@ def _token(config: pytest.Config, value: object, argname: str) -> re.Pattern[str
     is not known here, and the fallback also names an empty parameter set.
     A trailing counter is what pytest appends to tell duplicate ids apart,
     after a `_` where the id ends in a digit."""
-    text = _hook_token(config, value, argname)
-    if text is None:
-        text = _value_token(config, value)
-    fallback = f'{re.escape(argname)}\\d+(?:_\\d+)?'
-    if text is None:
-        return re.compile(fallback)
-    counter = '_' if text[-1:].isdigit() else ''
-    return re.compile(f'{re.escape(text)}(?:{counter}\\d+)?|{fallback}')
+    hook_text = _hook_token(config, value, argname)
+    texts = [hook_text] if hook_text is not None else _value_tokens(config, value)
+    alternatives = []
+    for text in texts:
+        counter = '_' if text[-1:].isdigit() else ''
+        alternatives.append(f'{re.escape(text)}(?:{counter}\\d+)?')
+    alternatives.append(f'{re.escape(argname)}\\d+(?:_\\d+)?')
+    return re.compile('|'.join(alternatives))
 
 
 def _hook_token(config: pytest.Config, value: object, argname: str) -> str | None:
@@ -74,21 +75,30 @@ def _hook_token(config: pytest.Config, value: object, argname: str) -> str | Non
     return token
 
 
-def _value_token(config: pytest.Config, value: object) -> str | None:
+def _value_tokens(config: pytest.Config, value: object) -> list[str]:
+    """A str or bytes over 100 long may also be named by its sha256 digest
+    (pytest 9.2's `parametrize_long_str_id_strategy`). The option goes unread,
+    as pytest 9.0 has none. A custom id equal to the digest is no real risk."""
     if isinstance(value, str | bytes):
         if isinstance(value, str) and config.getini(
             'disable_test_id_escaping_and_forfeit_all_rights_to_community_support'
         ):
-            return value
-        return _ascii_escaped(value)
+            text = value
+        else:
+            text = _ascii_escaped(value)
+        texts = [text]
+        if len(value) > 100:
+            encoded = value.encode('utf-8') if isinstance(value, str) else value
+            texts.append(hashlib.sha256(encoded).hexdigest())
+        return texts
     if value is None or isinstance(value, float | int | bool | complex):
-        return str(value)
+        return [str(value)]
     if isinstance(value, re.Pattern):
-        return _ascii_escaped(value.pattern)
+        return [_ascii_escaped(value.pattern)]
     if isinstance(value, enum.Enum):
-        return str(value)
+        return [str(value)]
     name = getattr(value, '__name__', None)
-    return name if isinstance(name, str) else None
+    return [name] if isinstance(name, str) else []
 
 
 def _ascii_escaped(value: str | bytes) -> str:
