@@ -10,6 +10,8 @@
 ## Later
 
 - [ ] continue work on the story-diagrams branch
+- [ ] Story diagrams: an Excalidraw export (`.excalidraw` per story, like the egon-export branch's `.egn`), with node ids stamped in `customData` so a hand-edited file can be read back as layout pins — kept as-is while the story graph is unchanged, otherwise pinning the known nodes and placing only new ones. Excalidraw as the in-report viewer was ruled out: React bundle, CDN fonts, replay and hover rebuilt.
+- [ ] Citations in diagrams. Mermaid first: a reader for `mermaid` fences pairing `click id href "…"` with the node's quoted label, so `update` stays span-based. Use case: architecture diagrams whose components cite `#tag=component/…`. Check whether GitHub and Zensical let `click` links through. Excalidraw would need a JSON reader/writer, `check.py` generalized beyond `MarkdownLink`, and a spike on whether Excalidraw refits a rewritten label's stored size on load. Narrated citations don't map to either.
 - [ ] Enable term descriptions referencing other terms (in MD glossaries maybe via *italics*; resolve any conflict with the inline Markdown definitions already render, where `*italic*` is plain italics)
 - [ ] polish the JSON format and possibly turn it into proper API spec using Pydantic
 - [ ] enable free text stories / sentences with glossary term references
