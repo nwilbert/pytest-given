@@ -2853,6 +2853,13 @@
     > </details>
     ```
 
+## ✓ A «Rename log» entry with neither `new` nor `cases` is refused, naming the entry
+`tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta
+
+- **given** a «rename log» whose second scenario entry only names `old`
+- **when** it is parsed
+- **then** the error names `[[scenario]] #2`
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 

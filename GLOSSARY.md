@@ -73,6 +73,17 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Lint finding** | One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender. |
 | **Severity** | A *Lint rule*'s level — `off`, `warn` or `error`. Only `error` fails the run, `warn` reports in the terminal summary, and an `off` rule is not evaluated at all. |
 
+## Delta report
+
+| Term | Meaning |
+|---|---|
+| **Delta report** | What changed in a suite's scenarios and glossary terms between two *Reports*: a JSON file and an HTML page that hold only the added, removed and changed ones, built by `pytest-given delta`. |
+| **Rename log** | `given-renames.toml`: the authored, committed file of identity changes the delta cannot detect by itself, `[[scenario]]` and `[[term]]` entries each pairing an old identity with its new one. |
+| **Scenario identity** | What pairs a *Scenario* across two reports: its *Node ID* without the parametrize tail, or its full *Node ID* for a *Per-case scenario*. |
+| **Per-case scenario** | One *Case* of a scenario with `group_parametrized` off: it has a parametrize tail but no *Parameter table*, so its *Scenario identity* is its full *Node ID* and it never pairs by values. |
+| **Pairing** | Matching an item of the *before* report with one of the *after* report, by same *Scenario identity* (after the *Rename log* has rewritten the before side's) and then by same *Scenario title*. The unpaired are removed or added. |
+| **Suggested match** | A removed and an added item that look like one renamed item. Never applied: the delta JSON records it so an agent or a person can confirm it into the *Rename log*. |
+
 ## Domain Storytelling
 
 The Domain-Driven Design layer atop the core surface. All terms here are optional features: a test suite can use none, some, or all.

@@ -41,21 +41,23 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 
 ## Architecture
 
-`src/pytest_given/` is eight library subpackages plus two entry points, with a
+`src/pytest_given/` is nine library subpackages plus two entry points, with a
 strict dependency direction (convention, not lint-enforced):
 
 ```
 markdown/                  a leaf — reading Markdown: blocks, tables, inline spans
 git/                       a leaf — every `git` subprocess call
-model/                     schema, serde, errors, shared text rules
+model/                     schema, serde (report and delta), errors, shared text rules,
+                           term cross-references (`term_refs`)
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
+delta/                     on model/ only: pairing two reports, the rename log; no pytest, no git
 citations/                 on model/ + report/
-plugin/   cli/             the entry points; may import all eight, and hold
-                           nothing the eight could
+plugin/   cli/             the entry points; may import all nine, and hold
+                           nothing the nine could
 ```
 
-Every package may import `markdown/` and `git/`, which import none of them.
+Every package may import `markdown/`, and every one but `delta/` may import `git/`; both import none of them.
 
 What no filename tells you:
 
