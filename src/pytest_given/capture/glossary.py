@@ -1,7 +1,6 @@
 """User-facing Glossary API: id derivation, value classes, registration."""
 
 import difflib
-import re
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -17,6 +16,7 @@ from ..model import (
     TermId,
     TermKind,
     id_derive,
+    l_form,
     s_form,
 )
 from .source import capture_caller_source
@@ -130,7 +130,7 @@ class TermHandleBase(ABC):
     def l(self) -> TermInstance:  # noqa: E743
         """This reading lowercased — the common mid-sentence form
         (``guest.l`` instead of ``guest('guest')``)."""
-        return self._reading(_lowercase_words(self.display))
+        return self._reading(l_form(self.display))
 
     @property
     def s(self) -> TermInstance:
@@ -211,24 +211,6 @@ class TermInstance(TermHandleBase):
 
     def _reading(self, surface: str) -> TermInstance:
         return self.handle(surface)
-
-
-_WORD = re.compile(r'[^\W\d_]+')
-
-
-def _lowercase_words(text: str) -> str:
-    """Lowercase each capitalized word, leaving acronyms (``LLM``), standalone
-    letters (``Plan B``) and mixed case (``iPhone``) as written. A letter before
-    a hyphen starts a word (``E-Mail``), so it is lowercased."""
-
-    def lowered(match: re.Match[str]) -> str:
-        word = match[0]
-        starts_hyphenated = len(word) == 1 and text[match.end() :].startswith('-')
-        if word[0].isupper() and (word[1:].islower() or starts_hyphenated):
-            return word.lower()
-        return word
-
-    return _WORD.sub(lowered, text)
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:

@@ -51,13 +51,14 @@ model/                     schema, serde (report and delta), errors, shared text
                            term cross-references (`term_refs`)
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
-delta/                     on model/ only: pairing two reports, the rename log; no pytest, no git
+delta/                     on model/ + markdown/: pairing two reports, the rename log,
+                           word diffs; no pytest, no git
 citations/                 on model/ + report/
 plugin/   cli/             the entry points; may import all nine, and hold
                            nothing the nine could
 ```
 
-Every package may import `markdown/`, and every one but `delta/` may import `git/`; both import none of them.
+Every package may import `markdown/` and `git/`, which import none of the others. `delta/` runs no git all the same: `cli/` asks `git/` and hands `delta/` the answers.
 
 What no filename tells you:
 

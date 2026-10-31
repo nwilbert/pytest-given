@@ -2895,6 +2895,43 @@
 - **then** against v0.6, happy-hour keeps its ID and 1.5-True becomes 2.0-True
 - **then** against v0.7, happy-hour becomes happy-hour-weekdays
 
+## ✓ A value compares by what it renders, not its source expression
+`tests/unit/delta/test_narration.py::test_a_value_compares_by_what_it_renders` · delta
+
+- **given** a «narration» that interpolates 200 from the expression ml
+- **given** a plain narration that reads the same
+- **when** the two are compared
+- **then** they are equal
+
+## ✓ A placeholder compares by the column it points at
+`tests/unit/delta/test_narration.py::test_a_placeholder_compares_by_its_column` · delta
+
+- **given** a before placeholder whose column pairs with the after column `derived:1`
+- **given** an after placeholder of another name and format spec in that column
+- **when** the two are compared
+- **then** they are equal
+- **when** the before placeholder is read without the column pairing
+- **then** they differ
+
+## ✓ A «term ref» compares by term and form, not by its display
+`tests/unit/delta/test_narration.py::test_a_term_ref_compares_by_term_and_form` · delta
+
+- **given** a before «term ref» to room, lowercased, and a «rename log» renaming room to suite
+- **when** it is compared with suite, lowercased, and with suite in its «S-form»
+- **then** the same form is equal and the other form differs
+- **when** two «instances» of guest, Alice and Bob, are compared
+- **then** they differ
+
+## ✓ A word diff keeps «term refs», placeholders and inline spans whole
+`tests/unit/delta/test_narration.py::test_a_word_diff_keeps_term_refs_placeholders_and_spans_whole` · delta
+
+- **given** the before narration `the **later** booking is cancelled`
+- **given** the after narration `the **late** {Booking} is cancelled and refunded`, with a «term ref» to booking
+- **when** the two are diffed by word
+- **then** the bold span and the «term ref» that replaced booking are each marked whole, and the added words follow the unchanged ones
+- **when** the placeholder points at another column in the after narration
+- **then** the placeholder reads removed and added whole
+
 ## ✓ A «Rename log» entry with neither `new` nor `cases` is refused, naming the entry
 `tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta
 

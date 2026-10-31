@@ -132,6 +132,7 @@ from .term_refs import (
 from .text import (
     derived_id,
     id_derive,
+    l_form,
     plural,
     s_form,
 )
@@ -235,6 +236,7 @@ __all__ = [
     'is_own_name',
     'iter_narrations',
     'iter_steps',
+    'l_form',
     'location_suffix',
     'narration_of',
     'narration_text',

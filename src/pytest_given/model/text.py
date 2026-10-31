@@ -1,7 +1,8 @@
 """Text rules two packages that cannot import each other have to agree on.
 
 `s_form` is shared so that what a handle's `.s` spells, the report recognizes
-as the same term; `plural` so the lint summary and the report count alike.
+as the same term, and `l_form` so that the delta reads a `.l` as that form;
+`plural` so the lint summary and the report count alike.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
@@ -14,6 +15,7 @@ from .errors import PytestGivenError
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
 _SIBILANT_ENDINGS = ('s', 'x', 'z', 'ch', 'sh')
 _CONSONANT_Y = re.compile(r'[b-df-hj-np-tv-z]y$')
+_LETTERS = re.compile(r'[^\W\d_]+')
 
 
 def derived_id(name: str) -> str | None:
@@ -55,3 +57,18 @@ def s_form(text: str) -> str:
     if _CONSONANT_Y.search(text):
         return f'{text[:-1]}ies'
     return f'{text}s'
+
+
+def l_form(text: str) -> str:
+    """Lowercase each capitalized word, leaving acronyms (``LLM``), standalone
+    letters (``Plan B``) and mixed case (``iPhone``) as written. A letter before
+    a hyphen starts a word (``E-Mail``), so it is lowercased."""
+
+    def lowered(match: re.Match[str]) -> str:
+        word = match[0]
+        starts_hyphenated = len(word) == 1 and text[match.end() :].startswith('-')
+        if word[0].isupper() and (word[1:].islower() or starts_hyphenated):
+            return word.lower()
+        return word
+
+    return _LETTERS.sub(lowered, text)
