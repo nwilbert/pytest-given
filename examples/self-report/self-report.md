@@ -3005,6 +3005,14 @@
 - **when** the second Then is swapped for a wholly different one
 - **then** the old Then is removed and the new one added
 
+## ✓ A removed and an added scenario with nearly the same steps are a «suggested match», never applied
+`tests/unit/delta/test_suggestions.py::test_nearly_the_same_steps_are_a_suggested_match_never_applied` · delta
+
+- **given** a scenario removed, and one added under another name with one step reworded
+- **when** the delta is built
+- **then** it records the two as a suggested match
+- **then** the scenarios stay removed and added, never paired
+
 ## ✓ An added column keeps the «parameter table» paired case by case
 `tests/unit/delta/test_table.py::test_an_added_column_keeps_the_table_paired_case_by_case` · delta, parametrization
 

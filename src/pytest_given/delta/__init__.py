@@ -11,10 +11,10 @@ from .build import (
     build_delta,
     comparable_title,
     is_per_case,
-    scenario_identity,
 )
 from .chains import CaseMap, Rewrite, Rewrites, rewrite_case_id, rewrite_identities
 from .check import check_reports
+from .identity import scenario_identity
 from .renames import (
     DEFAULT_RENAMES_PATH,
     EntryTable,

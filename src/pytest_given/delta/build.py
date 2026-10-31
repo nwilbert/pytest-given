@@ -24,6 +24,7 @@ from ..model import (
     node_base,
 )
 from .chains import Rewrites, rewrite_case_id, rewrite_identities
+from .identity import scenario_identity
 from .narration import (
     Reading,
     Token,
@@ -35,12 +36,9 @@ from .narration import (
 from .order import interleaved
 from .renames import RenameLog
 from .steps import align_steps, steps_changed
+from .suggestions import suggest
 from .table import align_table
 from .terms import TermAlignment, align_terms
-
-
-def scenario_identity(scenario: Scenario) -> str:
-    return node_base(scenario.id) if scenario.parameters is not None else scenario.id
 
 
 def is_per_case(scenario: Scenario) -> bool:
@@ -85,7 +83,9 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
     before, after = inputs.before, inputs.after
     terms = align_terms(before, after, inputs.renames, inputs.skipped_revs)
     identities = _Identities(before.scenarios, after.scenarios, inputs)
-    pairing = _pair(before, after, identities, terms)
+    before_reading = Reading(before.glossary, terms.term_id, _placeholder_name)
+    after_reading = Reading(after.glossary, _same_term, _placeholder_name)
+    pairing = _pair(before, after, before_reading, after_reading, identities)
 
     listed: list[ScenarioDelta] = []
     unchanged: list[IdentityPair] = []
@@ -122,6 +122,7 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
             else:
                 listed.append(compared)
 
+    suggested = suggest(listed, terms.delta, before_reading, after_reading)
     delta = DeltaData(
         metadata=DeltaMetadata(
             before=_side(before, inputs.before_label),
@@ -131,10 +132,16 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
         ),
         scenarios=tuple(listed),
         unchanged=tuple(unchanged),
+        suggestions=suggested.suggestions,
         glossary=terms.delta,
     )
     return DeltaResult(
-        delta=delta, warnings=(*terms.warnings, *identities.rewrites.warnings)
+        delta=delta,
+        warnings=(
+            *terms.warnings,
+            *identities.rewrites.warnings,
+            *suggested.warnings,
+        ),
     )
 
 
@@ -197,8 +204,9 @@ type _Pairing = dict[int, tuple[int, ScenarioPairing]]  # before index → after
 def _pair(
     before: ReportData,
     after: ReportData,
+    before_reading: Reading,
+    after_reading: Reading,
     identities: _Identities,
-    terms: TermAlignment,
 ) -> _Pairing:
     """By rewritten identity, then by a title unique on each side among the
     unpaired. One-to-one even when a malformed report repeats an identity."""
@@ -219,8 +227,6 @@ def _pair(
     # Columns pair only once their scenarios have, so a placeholder reads by name.
     # A per-case title keeps its case ID: an argname added, or grouping turned
     # on, reads as removed and added unless the rename log maps it.
-    before_reading = Reading(before.glossary, terms.term_id, _placeholder_name)
-    after_reading = Reading(after.glossary, _same_term, _placeholder_name)
     paired_after = {partner for partner, _ in pairing.values()}
     for before_index, after_index in _unique_titles(
         {

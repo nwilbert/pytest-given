@@ -109,12 +109,15 @@ def token_bucket(read: Sequence[Token]) -> tuple[tuple[TokenKind, str], ...]:
 def similarity(a: Narration, ra: Reading, b: Narration, rb: Reading) -> float:
     """The share of tokens the two have in common, spaces left out: 1.0 for
     the same words, 0.0 for none shared."""
-    words_a = [token for token in tokens(a, ra) if token.kind != 'space']
-    words_b = [token for token in tokens(b, rb) if token.kind != 'space']
+    words_a, words_b = reading_words(a, ra), reading_words(b, rb)
     if not words_a and not words_b:
         return 1.0
     shared = len(lcs_pairs(words_a, words_b, tokens_equal))
     return 2 * shared / (len(words_a) + len(words_b))
+
+
+def reading_words(narration: Narration, reading: Reading) -> list[Token]:
+    return [token for token in tokens(narration, reading) if token.kind != 'space']
 
 
 def word_diff(

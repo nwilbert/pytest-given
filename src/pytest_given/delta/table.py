@@ -67,8 +67,8 @@ class _Alignment:
         self.after_columns = _comparable(after.columns)
         self.before_by_id = {case.id: case for case in before.cases}
         self.after_by_id = {case.id: case for case in after.cases}
-        self.before_cells = {case.id: _cells_of(before, case) for case in before.cases}
-        self.after_cells = {case.id: _cells_of(after, case) for case in after.cases}
+        self.before_cells = {case.id: cells_of(before, case) for case in before.cases}
+        self.after_cells = {case.id: cells_of(after, case) for case in after.cases}
         # Each pairing runs from the before ID to the after ID and how it paired.
         self.columns: dict[ColumnId, tuple[ColumnId, ColumnPairing]] = {}
         self.cases: dict[NodeId, tuple[NodeId, CasePairing]] = {}
@@ -216,7 +216,7 @@ def _cell_key(value: CellValue) -> CellKey:
     return (type(value).__name__, value)
 
 
-def _cells_of(table: ParameterTable, case: ParameterCase) -> CaseCells:
+def cells_of(table: ParameterTable, case: ParameterCase) -> CaseCells:
     return {
         column.id: _cell_key(value)
         for column, value in table.cells(case)
