@@ -2853,6 +2853,48 @@
     > </details>
     ```
 
+## ✓ A «Rename log» chain ends at the last «Scenario identity» present in the after report
+`tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after` · delta
+
+- **given** a «rename log» renaming A to B, and later B to C
+- **when** the before identity A is rewritten against reports that end at B or C
+- **then** A ends at C when C exists, and at B when only B does
+- **then** the rewrite to C followed both entries
+
+## ✓ A chain that reaches nothing in the after report rewrites nothing, silently
+`tests/unit/delta/test_chains.py::test_a_chain_that_reaches_nothing_in_after_rewrites_nothing` · delta
+
+- **given** a «rename log» renaming A to B
+- **when** the after report holds neither A nor B
+- **then** nothing is rewritten and nothing is warned about
+
+## ✓ An entry whose rev predates the range is skipped, so a reused «Scenario identity» pairs with its old self
+`tests/unit/delta/test_chains.py::test_an_entry_whose_rev_predates_the_range_is_skipped` · delta
+
+- **given** a «rename log» entry renaming A to B at rev v1
+- **when** v1 predates the range and both A and B exist in the after report
+- **then** A is not rewritten
+- **when** the same entry falls inside the range
+- **then** A is rewritten to B, the name a new test later reused
+
+## ✓ A swap goes through a name neither test has, and a plain swap is a merge
+`tests/unit/delta/test_chains.py::test_a_swap_goes_through_a_name_neither_test_has` · delta
+
+- **given** a «rename log» swapping A and B through tmp
+- **given** a «rename log» that writes the swap as A to B, then B to A
+- **when** both are applied to before and after reports holding A and B
+- **then** the routed swap rewrites A to B and B to A
+- **then** the plain swap rewrites neither, and warns once naming both entries
+
+## ✓ A cases map from a later release leaves an earlier range alone
+`tests/unit/delta/test_chains.py::test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone` · delta
+
+- **given** a «rename log» that renames test_pricing to test_price_list at v0.6.0 and renames the case happy-hour at v0.7.0
+- **when** v0.5, where the test is still test_pricing, is compared with a later one
+- **then** test_pricing is rewritten to test_price_list
+- **then** against v0.6, happy-hour keeps its ID and 1.5-True becomes 2.0-True
+- **then** against v0.7, happy-hour becomes happy-hour-weekdays
+
 ## ✓ A «Rename log» entry with neither `new` nor `cases` is refused, naming the entry
 `tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta
 

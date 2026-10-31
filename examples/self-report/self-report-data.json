@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-31T14:06:53.932733+00:00",
+    "timestamp": "2026-10-31T14:15:01.766707+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.1",
-    "commit_sha": "08e96bdb70553b8d16f45548fb25583ab6216aad",
+    "commit_sha": "768bf708df02ae62e93021bc6eec5944d4c24d0c",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html",
     "schema_version": 1
@@ -34,7 +34,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 114,
+      "duration_ms": 117,
       "steps": [
         {
           "phase": "given",
@@ -140,7 +140,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -691,7 +691,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -837,7 +837,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -1007,7 +1007,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -1185,7 +1185,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 92,
+      "duration_ms": 94,
       "steps": [
         {
           "phase": "given",
@@ -1278,7 +1278,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -1469,7 +1469,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -1913,7 +1913,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 86,
+      "duration_ms": 90,
       "steps": [
         {
           "phase": "given",
@@ -2276,7 +2276,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -2608,7 +2608,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2743,7 +2743,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 75,
       "steps": [
         {
           "phase": "given",
@@ -2871,7 +2871,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 85,
       "steps": [
         {
           "phase": "given",
@@ -3158,7 +3158,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 155,
+      "duration_ms": 159,
       "steps": [
         {
           "phase": "given",
@@ -3403,7 +3403,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -3542,7 +3542,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -3687,7 +3687,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -3840,7 +3840,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -3985,7 +3985,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -4132,7 +4132,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 140,
+      "duration_ms": 144,
       "steps": [
         {
           "phase": "given",
@@ -4303,7 +4303,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -4433,7 +4433,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 99,
+      "duration_ms": 93,
       "steps": [
         {
           "phase": "given",
@@ -4562,7 +4562,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 124,
+      "duration_ms": 126,
       "steps": [
         {
           "phase": "given",
@@ -4748,7 +4748,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -4842,7 +4842,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -4921,7 +4921,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 201,
+      "duration_ms": 209,
       "steps": [
         {
           "phase": "given",
@@ -5103,7 +5103,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -5193,7 +5193,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -5285,7 +5285,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 82,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -5367,7 +5367,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -5459,7 +5459,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 25,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -5544,7 +5544,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -5651,7 +5651,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 153,
+      "duration_ms": 157,
       "steps": [
         {
           "phase": "given",
@@ -5949,7 +5949,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 366,
+      "duration_ms": 373,
       "steps": [
         {
           "phase": "given",
@@ -6144,7 +6144,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -6522,7 +6522,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 374,
+      "duration_ms": 385,
       "steps": [
         {
           "phase": "given",
@@ -6681,7 +6681,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 24,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -7140,7 +7140,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 104,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -7370,7 +7370,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -7482,7 +7482,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -7578,7 +7578,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 93,
+      "duration_ms": 83,
       "steps": [
         {
           "phase": "given",
@@ -7645,7 +7645,7 @@
       "module": "tests.integration.test_skills_cli",
       "tags": [],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -9145,7 +9145,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -20425,7 +20425,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -20825,7 +20825,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -20995,7 +20995,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -21700,7 +21700,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22201,7 +22201,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -22416,7 +22416,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -22706,7 +22706,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -22904,7 +22904,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -23046,6 +23046,489 @@
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
         "line": 1426
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after",
+      "narration": {
+        "text": "A Rename log chain ends at the last Scenario identity present in the after report",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "rename-log",
+            "display": "Rename log",
+            "expression": "pg[\"Rename log\"]"
+          },
+          {
+            "value": " chain ends at the last "
+          },
+          {
+            "term_id": "scenario-identity",
+            "display": "Scenario identity",
+            "expression": "pg[\"Scenario identity\"]"
+          },
+          {
+            "value": " present in the after report"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_chains",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log renaming A to B, and later B to C",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " renaming A to B, and later B to C"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the before identity A is rewritten against reports that end at B or C",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "A ends at C when C exists, and at B when only B does",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the rewrite to C followed both entries",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_chains.py",
+        "line": 22
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_chains.py::test_a_chain_that_reaches_nothing_in_after_rewrites_nothing",
+      "narration": {
+        "text": "A chain that reaches nothing in the after report rewrites nothing, silently",
+        "parts": [
+          {
+            "value": "A chain that reaches nothing in the after report rewrites nothing, silently"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_chains",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log renaming A to B",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " renaming A to B"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the after report holds neither A nor B",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "nothing is rewritten and nothing is warned about",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_chains.py",
+        "line": 40
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_chains.py::test_an_entry_whose_rev_predates_the_range_is_skipped",
+      "narration": {
+        "text": "An entry whose rev predates the range is skipped, so a reused Scenario identity pairs with its old self",
+        "parts": [
+          {
+            "value": "An entry whose rev predates the range is skipped, so a reused "
+          },
+          {
+            "term_id": "scenario-identity",
+            "display": "Scenario identity",
+            "expression": "pg[\"Scenario identity\"]"
+          },
+          {
+            "value": " pairs with its old self"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_chains",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log entry renaming A to B at rev v1",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " entry renaming A to B at rev v1"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "v1 predates the range and both A and B exist in the after report",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "A is not rewritten",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the same entry falls inside the range",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "A is rewritten to B, the name a new test later reused",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_chains.py",
+        "line": 54
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_chains.py::test_a_swap_goes_through_a_name_neither_test_has",
+      "narration": {
+        "text": "A swap goes through a name neither test has, and a plain swap is a merge",
+        "parts": [
+          {
+            "value": "A swap goes through a name neither test has, and a plain swap is a merge"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_chains",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log swapping A and B through tmp",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " swapping A and B through tmp"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log that writes the swap as A to B, then B to A",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " that writes the swap as A to B, then B to A"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "both are applied to before and after reports holding A and B",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the routed swap rewrites A to B and B to A",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the plain swap rewrites neither, and warns once naming both entries",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_chains.py",
+        "line": 73
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/delta/test_chains.py::test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone",
+      "narration": {
+        "text": "A cases map from a later release leaves an earlier range alone",
+        "parts": [
+          {
+            "value": "A cases map from a later release leaves an earlier range alone"
+          }
+        ]
+      },
+      "module": "tests.unit.delta.test_chains",
+      "tags": [
+        "delta"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a rename log that renames test_pricing to test_price_list at v0.6.0 and renames the case happy-hour at v0.7.0",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "rename-log",
+                "display": "rename log",
+                "expression": "pg[\"Rename log\"].l"
+              },
+              {
+                "value": " that renames test_pricing to test_price_list at v0.6.0 and renames the case happy-hour at v0.7.0"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "v0.5, where the test is still test_pricing, is compared with a later one",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "test_pricing is rewritten to test_price_list",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "against v0.6, happy-hour keeps its ID and 1.5-True becomes 2.0-True",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "against v0.7, happy-hour becomes happy-hour-weekdays",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/delta/test_chains.py",
+        "line": 95
       },
       "story_ids": [],
       "pins": null
@@ -27320,7 +27803,7 @@
       "module": "tests.unit.report.test_coverage",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -27725,7 +28208,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 145,
+      "duration_ms": 165,
       "steps": [
         {
           "phase": "given",
