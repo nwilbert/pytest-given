@@ -2993,124 +2993,8 @@
 - **when** the runtime «lint rules» run over that story
 - **then** dead-term flags none of its terms
 
-## ✓ A «sentence» references its «terms», whatever surface form they take
-`tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display`
-
-- **given** a «sentence» written with an «instance» and an «inflection»
-- **when** «coverage» collects the «sentence» references
-- **then** they are the «term» ids alone; words contribute nothing
-
-## ✓ A multi-clause «sentence» unions references across its «clauses»
-`tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_clause_sentence`
-
-- **given** a «sentence» with two «clauses»
-- **when** «coverage» collects the «sentence» references
-- **then** the «terms» of both clauses are present
-
-## ✓ A «sentence» whose «clauses» start at different «actors» builds and is covered
-`tests/unit/report/test_coverage.py::test_sentence_with_clauses_from_different_actors_is_covered`
-
-- **given** a «sentence» of two «clauses»: a guest signs the register, and a clerk signs the register
-- **given** a «step» naming both actors, the activity and the register
-- **when** «coverage» is computed against the «story»
-- **then** the «sentence» is covered
-
-## ✓ A «step» references its «terms», whatever surface form they take
-`tests/unit/report/test_coverage.py::test_s_for_step_collects_term_ids_whatever_the_display`
-
-- **given** a «step» naming an «instance» and an «inflection»
-- **when** «coverage» collects the «step» references
-- **then** they are the «term» ids alone
-
-## ✓ An «instance» and its bare «term» cover each other
-`tests/unit/report/test_coverage.py::test_compute_coverage_matches_instance_and_bare_term_both_ways`
-
-- **given** a «sentence» naming a bare «actor»
-- **given** the same «sentence» naming an «instance» of that actor
-- **given** a «step» naming the «instance», and one naming the bare actor
-- **when** «coverage» is computed for each pairing
-- **then** the «instance» «step» covers the bare «sentence»
-- **then** the bare «step» covers the «instance» «sentence»
-
-## ✓ A «sentence» is covered by one «step» naming all its «terms», never by several «steps» together · 3 cases
-`tests/unit/report/test_coverage.py::test_a_sentence_is_covered_by_one_step_never_by_several_together`
-
-- **given** a «story» whose «sentence» names guest, search and room
-- **given** a «scenario» whose «steps» name {steps_naming}
-- **when** «coverage» is computed against the «story»
-- **then** the «sentence» is covered: {covered}
-
-| steps_naming | covered |
-|---|---|
-| \[\['guest', 'search', 'room'\]\] | True |
-| \[\['guest', 'search'\], \['room'\]\] | False |
-| \[\['guest'\], \['guest', 'search', 'room'\]\] | True |
-
-## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_sentence_gains_a_term`
-
-- **given** a «step» naming two «term refs»
-- **given** the same «sentence» with that middle slot a bare word, then an «activity» ref
-- **when** «coverage» is computed against each «story»
-- **then** the two-ref «sentence» is covered
-- **then** the widened «sentence» is no longer covered
-
-## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 6 cases
-`tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins`
-
-- **given** a scenario with pins={scenario_pins}
-- **given** a step matching sentence 1, with pins={step_pins}
-- **when** «coverage» is computed against the «story»
-- **then** the «scenario» covers the «sentences» {covered}
-
-| case ID | scenario_pins | step_pins | covered |
-|---|---|---|---|
-| nothing-pinned | None | None | \[1\] |
-| step-pinned | None | \[2\] | \[2\] |
-| scenario-pinned | \[\] | None | \[\] |
-| both-pinned | \[\] | \[2\] | \[2\] |
-| scenario-pins-elsewhere | \[2\] | None | \[2\] |
-| scenario-and-step-pinned | \[1\] | \[2\] | \[1, 2\] |
-
-## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
-`tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms`
-
-- **given** a «sentence» referencing the «terms» {term_ids}
-- **when** its «coverage» eligibility is checked
-- **then** it is eligible: {eligible}
-
-| term_ids | eligible |
-|---|---|
-| \['guest', 'room'\] | True |
-| \['guest', 'guest'\] | False |
-| \['guest'\] | False |
-| \[\] | False |
-
-## ✓ An under-anchored «sentence» is covered only through a «pin» · 4 cases
-`tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
-
-- **given** a «story» whose «sentence» references the «terms» {term_ids}
-- **given** a «step» narrating those «terms», «pinning» the «sentence»: {pinned}
-- **when** «coverage» is computed against the «story»
-- **then** the «sentence» is covered: {covered}
-
-| term_ids | pinned | covered |
-|---|---|---|
-| \['guest', 'room'\] | False | True |
-| \['guest', 'room'\] | True | True |
-| \['guest'\] | False | False |
-| \['guest'\] | True | True |
-
-## ✓ A nested «step» covers a «sentence» like a top-level one
-`tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
-
-- **given** a «story» with one canonical «sentence»
-- **given** the covering «term refs» in a nested child «step»
-- **when** «coverage» is computed against the «story»
-- **then** the nested «step» still counts and the «sentence» is covered
-
 ## ✓ The «glossary» view aggregates «instances» and «activity» forms
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «report» whose «story» and «scenario» reference «instances» of an actor and a work object, and an «inflection»
     - 📎 Report data:
@@ -3240,53 +3124,169 @@
 - **then** the activity collects its «inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by a «sentence» record the «story»
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_records_story_refs_via_sentences`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_records_story_refs_via_sentences`
 
 - **given** a «story» whose «sentence» references an actor and an activity
 - **when** the «glossary» aggregations are built
 - **then** the actor and the activity each list that «story»
 
 ## ✓ A «story» referencing a «term» twice lists it once
-`tests/unit/report/test_glossary_view.py::test_repeated_references_within_one_story_are_recorded_once`
+`tests/unit/model/test_term_refs.py::test_repeated_references_within_one_story_are_recorded_once`
 
 - **given** a «story» whose two «sentences» repeat the same «term» and the same «inflection»
 - **when** the «glossary» aggregations are built
 - **then** the «story» and the «inflection» appear once each
 
 ## ✓ A canonical reference to an actor or work object is not an «instance», whatever its case
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_ref_is_not_an_instance`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_canonical_ref_is_not_an_instance`
 
 - **given** a «story» sentence referencing an actor and a work object by canonical name, and a «step» referencing one in lowercase
 - **when** the «glossary» aggregations are built
 - **then** neither the actor nor the work object records an «instance»
 
 ## ✓ An «S-form» reference is the «term» itself, not an «instance» or an «inflection»
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself` · versions/0.5.0
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself` · versions/0.5.0
 
 - **given** a «story» «sentence» referencing a work object and an activity by their «s-forms», each lowercase and capitalized
 - **when** the «glossary» aggregations are built
 - **then** the work object records no «instance» and the activity no «inflection»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «kindless» «term» referenced by a «story» sentence
 - **when** the «glossary» aggregations are built
 - **then** the «term» lists the «story» but no «instance» and no «inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_glossary_view.py::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/model/test_term_refs.py::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «scenario» whose fixture-sourced «step» names an «instance»
 - **when** the «glossary» aggregations are built
 - **then** the «instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_glossary_view.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/model/test_term_refs.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «scenario» referencing one «term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «term» maps to the scenario exactly once
+
+## ✓ A «sentence» references its «terms», whatever surface form they take
+`tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display`
+
+- **given** a «sentence» written with an «instance» and an «inflection»
+- **when** «coverage» collects the «sentence» references
+- **then** they are the «term» ids alone; words contribute nothing
+
+## ✓ A multi-clause «sentence» unions references across its «clauses»
+`tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_clause_sentence`
+
+- **given** a «sentence» with two «clauses»
+- **when** «coverage» collects the «sentence» references
+- **then** the «terms» of both clauses are present
+
+## ✓ A «sentence» whose «clauses» start at different «actors» builds and is covered
+`tests/unit/report/test_coverage.py::test_sentence_with_clauses_from_different_actors_is_covered`
+
+- **given** a «sentence» of two «clauses»: a guest signs the register, and a clerk signs the register
+- **given** a «step» naming both actors, the activity and the register
+- **when** «coverage» is computed against the «story»
+- **then** the «sentence» is covered
+
+## ✓ A «step» references its «terms», whatever surface form they take
+`tests/unit/report/test_coverage.py::test_s_for_step_collects_term_ids_whatever_the_display`
+
+- **given** a «step» naming an «instance» and an «inflection»
+- **when** «coverage» collects the «step» references
+- **then** they are the «term» ids alone
+
+## ✓ An «instance» and its bare «term» cover each other
+`tests/unit/report/test_coverage.py::test_compute_coverage_matches_instance_and_bare_term_both_ways`
+
+- **given** a «sentence» naming a bare «actor»
+- **given** the same «sentence» naming an «instance» of that actor
+- **given** a «step» naming the «instance», and one naming the bare actor
+- **when** «coverage» is computed for each pairing
+- **then** the «instance» «step» covers the bare «sentence»
+- **then** the bare «step» covers the «instance» «sentence»
+
+## ✓ A «sentence» is covered by one «step» naming all its «terms», never by several «steps» together · 3 cases
+`tests/unit/report/test_coverage.py::test_a_sentence_is_covered_by_one_step_never_by_several_together`
+
+- **given** a «story» whose «sentence» names guest, search and room
+- **given** a «scenario» whose «steps» name {steps_naming}
+- **when** «coverage» is computed against the «story»
+- **then** the «sentence» is covered: {covered}
+
+| steps_naming | covered |
+|---|---|
+| \[\['guest', 'search', 'room'\]\] | True |
+| \[\['guest', 'search'\], \['room'\]\] | False |
+| \[\['guest'\], \['guest', 'search', 'room'\]\] | True |
+
+## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
+`tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_sentence_gains_a_term`
+
+- **given** a «step» naming two «term refs»
+- **given** the same «sentence» with that middle slot a bare word, then an «activity» ref
+- **when** «coverage» is computed against each «story»
+- **then** the two-ref «sentence» is covered
+- **then** the widened «sentence» is no longer covered
+
+## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 6 cases
+`tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins`
+
+- **given** a scenario with pins={scenario_pins}
+- **given** a step matching sentence 1, with pins={step_pins}
+- **when** «coverage» is computed against the «story»
+- **then** the «scenario» covers the «sentences» {covered}
+
+| case ID | scenario_pins | step_pins | covered |
+|---|---|---|---|
+| nothing-pinned | None | None | \[1\] |
+| step-pinned | None | \[2\] | \[2\] |
+| scenario-pinned | \[\] | None | \[\] |
+| both-pinned | \[\] | \[2\] | \[2\] |
+| scenario-pins-elsewhere | \[2\] | None | \[2\] |
+| scenario-and-step-pinned | \[1\] | \[2\] | \[1, 2\] |
+
+## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
+`tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms`
+
+- **given** a «sentence» referencing the «terms» {term_ids}
+- **when** its «coverage» eligibility is checked
+- **then** it is eligible: {eligible}
+
+| term_ids | eligible |
+|---|---|
+| \['guest', 'room'\] | True |
+| \['guest', 'guest'\] | False |
+| \['guest'\] | False |
+| \[\] | False |
+
+## ✓ An under-anchored «sentence» is covered only through a «pin» · 4 cases
+`tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
+
+- **given** a «story» whose «sentence» references the «terms» {term_ids}
+- **given** a «step» narrating those «terms», «pinning» the «sentence»: {pinned}
+- **when** «coverage» is computed against the «story»
+- **then** the «sentence» is covered: {covered}
+
+| term_ids | pinned | covered |
+|---|---|---|
+| \['guest', 'room'\] | False | True |
+| \['guest', 'room'\] | True | True |
+| \['guest'\] | False | False |
+| \['guest'\] | True | True |
+
+## ✓ A nested «step» covers a «sentence» like a top-level one
+`tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
+
+- **given** a «story» with one canonical «sentence»
+- **given** the covering «term refs» in a nested child «step»
+- **when** «coverage» is computed against the «story»
+- **then** the nested «step» still counts and the «sentence» is covered
 
 ## ✓ «Parameter coloring» ties each placeholder to its column header
 `tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration` · parametrization

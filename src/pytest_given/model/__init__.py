@@ -94,6 +94,15 @@ from .steps import (
     iter_steps,
     walk_steps,
 )
+from .term_refs import (
+    INSTANCE_KINDS,
+    GlossaryAggregation,
+    TermCrossRefs,
+    TermForm,
+    TermOccurrence,
+    build_term_crossrefs,
+    is_own_name,
+)
 from .text import (
     derived_id,
     id_derive,
@@ -103,6 +112,7 @@ from .text import (
 
 __all__ = [
     'CONTENT_TYPES',
+    'INSTANCE_KINDS',
     'PHASES',
     'REPORT_SCHEMA_VERSION',
     'STATUSES',
@@ -120,6 +130,7 @@ __all__ = [
     'ErrorCause',
     'ErrorInfo',
     'Glossary',
+    'GlossaryAggregation',
     'GlossaryTerm',
     'InterpolatedPart',
     'JsonObject',
@@ -158,13 +169,18 @@ __all__ = [
     'StepPath',
     'Story',
     'StoryId',
+    'TermCrossRefs',
+    'TermForm',
     'TermId',
     'TermKind',
+    'TermOccurrence',
     'TracebackFrame',
+    'build_term_crossrefs',
     'case_id',
     'case_suffix',
     'derived_id',
     'id_derive',
+    'is_own_name',
     'iter_narrations',
     'iter_steps',
     'location_suffix',
