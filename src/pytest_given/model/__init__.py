@@ -38,6 +38,7 @@ from .report_url import ReportUrl, resolve_report_url
 from .schema import (
     CONTENT_TYPES,
     PHASES,
+    REPORT_SCHEMA_VERSION,
     STATUSES,
     Attachment,
     AttachmentLabel,
@@ -122,6 +123,7 @@ from .text import (
 __all__ = [
     'CONTENT_TYPES',
     'PHASES',
+    'REPORT_SCHEMA_VERSION',
     'STATUSES',
     'Attachment',
     'AttachmentLabel',

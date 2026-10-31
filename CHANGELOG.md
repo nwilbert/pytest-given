@@ -13,6 +13,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
+
 ## [0.6.0] - 2026-11-21
 
 ### Added
