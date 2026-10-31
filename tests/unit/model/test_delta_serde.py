@@ -1,0 +1,320 @@
+import json
+from collections.abc import Callable
+
+import pytest
+
+from pytest_given.model import (
+    DELTA_SCHEMA_VERSION,
+    CasePair,
+    ColumnId,
+    ColumnPair,
+    DeltaData,
+    DeltaMetadata,
+    DeltaSide,
+    DiffSegment,
+    Glossary,
+    GlossaryDelta,
+    IdentityPair,
+    JsonObject,
+    NarrationValue,
+    NodeId,
+    ParameterDelta,
+    PytestGivenError,
+    ScenarioDelta,
+    StepDelta,
+    Suggestion,
+    TermDelta,
+    TermFacts,
+    delta_from_dict,
+    delta_to_dict,
+    is_delta_dict,
+    report_to_dict,
+)
+from tests.unit.delta.builders import (
+    lit,
+    meta,
+    narr,
+    ph,
+    ref,
+    report,
+    scn,
+    step,
+    table,
+    term,
+)
+
+
+def _full_delta() -> DeltaData:
+    value = NarrationValue(
+        rendered='3', expression='n', format_spec='02', conversion='r'
+    )
+    words = (
+        DiffSegment(mark='equal', parts=(lit('a '), ref('coffee', 'coffee'))),
+        DiffSegment(mark='removed', parts=(lit('old'), value)),
+        DiffSegment(mark='added', parts=(ph('size', 'size'), lit('new'))),
+    )
+    before_scenario = scn(
+        'tests/test_a.py::test_a[1]',
+        'A brew',
+        step('given', narr(lit('a '), ref('coffee', 'coffee'))),
+        parameters=table([('size', 'param')], ('1', [1]), custom=True),
+    )
+    after_scenario = scn(
+        'tests/test_a.py::test_a[2]',
+        'A brew',
+        step('given', 'a cup', step('when', 'it fills')),
+        tags=['fast'],
+        status='failed',
+        parameters=table(
+            [('size', 'param'), ('shown', 'derived')], ('2', [1, 'x'], 'failed')
+        ),
+    )
+    changed = ScenarioDelta(
+        change='changed',
+        before=before_scenario,
+        after=after_scenario,
+        paired_by='rename-log',
+        title_changed=True,
+        tags_added=('fast',),
+        tags_removed=('slow',),
+        status_changed=True,
+        reason_changed=True,
+        steps=(
+            StepDelta(
+                change='modified',
+                before=(0,),
+                after=(0, 1),
+                phase_changed=True,
+                words=words,
+                children=(StepDelta(change='equal', before=(0, 0), after=(0, 0)),),
+            ),
+            StepDelta(change='added', after=(1,)),
+            StepDelta(change='removed', before=(2,)),
+        ),
+        parameters=ParameterDelta(
+            columns=(
+                ColumnPair(
+                    before=ColumnId('size'), after=ColumnId('size'), paired_by='name'
+                ),
+                ColumnPair(after=ColumnId('derived:0')),
+            ),
+            cases=(
+                CasePair(
+                    before=NodeId('a'),
+                    after=NodeId('b'),
+                    paired_by='values',
+                    changed_cells=(ColumnId('size'),),
+                    id_changed=True,
+                    status_changed=True,
+                ),
+                CasePair(before=NodeId('gone')),
+            ),
+        ),
+    )
+    return DeltaData(
+        metadata=DeltaMetadata(
+            before=DeltaSide(metadata=meta('aaa'), label='v1', modules=('m.a',)),
+            after=DeltaSide(metadata=meta('bbb'), modules=('m.a', 'm.b')),
+            plugin_version='0.2.0',
+            timestamp='2026-02-02T00:00:00+00:00',
+        ),
+        scenarios=(
+            changed,
+            ScenarioDelta(change='added', after=after_scenario),
+            ScenarioDelta(change='removed', before=before_scenario),
+        ),
+        unchanged=(IdentityPair(before='t::a', after='t::a'),),
+        suggestions=(
+            Suggestion(of='scenario', before='t::old', after='t::new'),
+            Suggestion(
+                of='case',
+                before='1',
+                after='2',
+                scenario=IdentityPair(before='t::a', after='t::a'),
+            ),
+        ),
+        glossary=GlossaryDelta(
+            before=Glossary(terms=[term('coffee', 'coffee', definition='A drink.')]),
+            after=Glossary(terms=[term('coffee', 'coffee', definition='A hot drink.')]),
+            terms=(
+                TermDelta(
+                    change='changed',
+                    before=term('coffee', 'coffee', definition='A drink.'),
+                    after=term('coffee', 'coffee', definition='A hot drink.'),
+                    paired_by='term-id',
+                    before_facts=TermFacts(other_forms=('coffees',), scenario_count=2),
+                    after_facts=TermFacts(scenario_count=3),
+                    definition=(DiffSegment(mark='added', parts=(lit('hot'),)),),
+                ),
+                TermDelta(change='added', after=term('tea', 'tea')),
+            ),
+            unchanged=(IdentityPair(before='tea', after='tea'),),
+        ),
+    )
+
+
+def _through_json(delta: DeltaData) -> JsonObject:
+    loaded = json.loads(json.dumps(delta_to_dict(delta)))
+    assert isinstance(loaded, dict)
+    return loaded
+
+
+def test_a_delta_with_every_variant_round_trips_through_json() -> None:
+    delta = _full_delta()
+
+    restored = delta_from_dict(_through_json(delta))
+
+    assert delta_to_dict(restored) == delta_to_dict(delta)
+    # `Glossary` compares by identity, so the rest is compared by value.
+    assert restored.metadata == delta.metadata
+    assert restored.scenarios == delta.scenarios
+    assert restored.suggestions == delta.suggestions
+    assert restored.glossary.terms == delta.glossary.terms
+    assert restored.glossary.before is not None
+    assert restored.glossary.before.terms == [
+        term('coffee', 'coffee', definition='A drink.')
+    ]
+
+
+def test_a_delta_with_nothing_in_it_round_trips() -> None:
+    delta = DeltaData(
+        metadata=DeltaMetadata(
+            before=DeltaSide(metadata=meta()),
+            after=DeltaSide(metadata=meta()),
+            plugin_version='0.2.0',
+            timestamp='t',
+        )
+    )
+
+    restored = delta_from_dict(_through_json(delta))
+
+    assert restored == delta
+    assert restored.metadata.schema_version == DELTA_SCHEMA_VERSION
+
+
+def test_a_delta_dict_is_told_from_a_report_dict_by_its_kind() -> None:
+    report_dict = report_to_dict(report(scn('t.py::a', 'A')))
+
+    assert (
+        is_delta_dict(_through_json(_full_delta())),
+        is_delta_dict(report_dict),
+    ) == (
+        True,
+        False,
+    )
+
+
+def test_a_report_dict_is_refused_with_a_pointer_to_the_delta_command() -> None:
+    report_dict = report_to_dict(report(scn('t.py::a', 'A')))
+
+    with pytest.raises(PytestGivenError, match='is a report, not a delta') as raised:
+        delta_from_dict(report_dict, 'before.json')
+
+    assert 'before.json' in str(raised.value)
+    assert 'pytest-given delta BEFORE.json AFTER.json' in str(raised.value)
+
+
+def test_a_dict_that_is_neither_a_delta_nor_a_report_is_not_called_a_report() -> None:
+    with pytest.raises(PytestGivenError) as raised:
+        delta_from_dict({'name': 'x'}, 'other.json')
+
+    assert str(raised.value) == 'other.json is not a delta report.'
+
+
+def _drop_a_side(delta_dict: JsonObject) -> None:
+    metadata = delta_dict['metadata']
+    assert isinstance(metadata, dict)
+    del metadata['before']
+
+
+def _add_a_scenario(delta_dict: JsonObject, scenario: object) -> None:
+    scenarios = delta_dict['scenarios']
+    assert isinstance(scenarios, list)
+    scenarios.append({'change': 'added', 'after': scenario})
+
+
+@pytest.mark.parametrize(
+    'mutate',
+    [
+        _drop_a_side,
+        lambda delta_dict: _add_a_scenario(delta_dict, 3),
+        lambda delta_dict: _add_a_scenario(delta_dict, {}),
+    ],
+    ids=['missing-side', 'scenario-not-a-dict', 'scenario-missing-fields'],
+)
+def test_a_malformed_delta_raises_a_pytest_given_error(
+    mutate: Callable[[JsonObject], None],
+) -> None:
+    delta_dict = _through_json(_full_delta())
+    mutate(delta_dict)
+
+    with pytest.raises(PytestGivenError, match='not a pytest-given delta'):
+        delta_from_dict(delta_dict, 'delta.json')
+
+
+def test_an_unknown_change_is_refused() -> None:
+    delta_dict = _through_json(_full_delta())
+    scenarios = delta_dict['scenarios']
+    assert isinstance(scenarios, list)
+    first = scenarios[0]
+    assert isinstance(first, dict)
+    first['change'] = 'moved'
+
+    with pytest.raises(PytestGivenError, match="invalid scenario change 'moved'"):
+        delta_from_dict(delta_dict)
+
+
+def _parameters(
+    columns: tuple[ColumnPair, ...] = (), cases: tuple[CasePair, ...] = ()
+) -> ParameterDelta:
+    return ParameterDelta(columns=columns, cases=cases)
+
+
+def _case(**kw: object) -> CasePair:
+    return CasePair(before=NodeId('1'), after=NodeId('1'), paired_by='case-id', **kw)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ('parameters', 'changed'),
+    [
+        (
+            _parameters(
+                (
+                    ColumnPair(
+                        before=ColumnId('a'), after=ColumnId('a'), paired_by='name'
+                    ),
+                ),
+                (_case(),),
+            ),
+            False,
+        ),
+        (_parameters((ColumnPair(after=ColumnId('b')),)), True),
+        (
+            _parameters(
+                (
+                    ColumnPair(
+                        before=ColumnId('a'), after=ColumnId('b'), paired_by='values'
+                    ),
+                )
+            ),
+            True,
+        ),
+        (_parameters(cases=(CasePair(before=NodeId('1')),)), True),
+        (_parameters(cases=(_case(changed_cells=(ColumnId('a'),)),)), True),
+        (_parameters(cases=(_case(status_changed=True),)), True),
+        (_parameters(cases=(_case(id_changed=True),)), True),
+    ],
+    ids=[
+        'all-paired',
+        'unpaired-column',
+        'renamed-column',
+        'unpaired-case',
+        'changed-cell',
+        'changed-status',
+        'changed-id',
+    ],
+)
+def test_a_parameter_delta_is_changed_when_a_pair_is(
+    parameters: ParameterDelta, changed: bool
+) -> None:
+    assert parameters.changed is changed

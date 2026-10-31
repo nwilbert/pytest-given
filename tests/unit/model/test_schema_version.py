@@ -2,11 +2,21 @@ import dataclasses
 import hashlib
 import typing
 
-from pytest_given.model import REPORT_SCHEMA_VERSION, ReportData
+from pytest_given.model import (
+    DELTA_SCHEMA_VERSION,
+    REPORT_SCHEMA_VERSION,
+    DeltaData,
+    ReportData,
+)
 
 PINNED_REPORT_SCHEMA = (
     1,
     '2ce49010ff6451dd5c27c5ee073985601ec27c411efc63d591fe0f1cd56819c0',
+)
+
+PINNED_DELTA_SCHEMA = (
+    1,
+    '6ae4e5c993807aeb1cecd7eee707ff5c47093ba4d72f92714cb3fab4f560670c',
 )
 
 
@@ -36,6 +46,12 @@ def test_the_report_schema_version_moves_with_its_shape() -> None:
     assert (REPORT_SCHEMA_VERSION, schema_fingerprint(ReportData)) == (
         PINNED_REPORT_SCHEMA
     ), 'The report JSON changed shape: bump REPORT_SCHEMA_VERSION and re-pin.'
+
+
+def test_the_delta_schema_version_moves_with_its_shape() -> None:
+    assert (DELTA_SCHEMA_VERSION, schema_fingerprint(DeltaData)) == (
+        PINNED_DELTA_SCHEMA
+    ), 'The delta JSON changed shape: bump DELTA_SCHEMA_VERSION and re-pin.'
 
 
 def _serialized_fields(dataclass: type) -> list[dataclasses.Field[object]]:
