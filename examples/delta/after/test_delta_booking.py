@@ -33,8 +33,9 @@ def test_check_in():
         stay = {'guest': 'Alice', 'confirmed': True, 'key': None}
     with when(t'{guest("Alice")} gives her name at the front desk'):
         stay['arrived'] = True
-    with then('the hotel sends her a digital key'):
+    with when('the hotel sends her a digital key'):
         stay['key'] = 'digital key'
+    with then('her phone opens the door of her room'):
         assert stay['key'] == 'digital key'
 
 

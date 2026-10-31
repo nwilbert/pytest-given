@@ -15,10 +15,23 @@ from pytest_given.model import (
 from pytest_given.report.delta_html import (
     ListedScenario,
     ReasonRow,
+    StepBlock,
+    StepRow,
     delta_render_context,
     render_delta_html,
 )
-from tests.unit.delta.builders import meta, report, scn, term
+from tests.unit.delta.builders import (
+    lit,
+    meta,
+    narr,
+    ph,
+    ref,
+    report,
+    scn,
+    step,
+    table,
+    term,
+)
 from tests.unit.report.app_data import embedded_app_data
 
 
@@ -133,15 +146,176 @@ def test_a_reason_the_after_side_dropped_is_kept_as_what_it_was() -> None:
     ]
 
 
-def test_the_tooltip_knows_both_glossaries_terms_the_after_one_first() -> None:
+def test_a_before_side_ref_finds_its_term_where_the_after_one_reads_otherwise() -> None:
     before = report(
-        glossary=Glossary(terms=[term('room', 'Room'), term('guest', 'Guest')])
+        glossary=Glossary(
+            terms=[
+                term('room', 'Room'),
+                term('guest', 'Guest'),
+                term('desk', 'Desk', definition='Front desk.'),
+                term('bill', 'Bill', definition='Old.'),
+            ]
+        )
     )
     after = report(
         scn('t.py::test_new', 'New'),
-        glossary=Glossary(terms=[term('guest', 'Visitor')]),
+        glossary=Glossary(
+            terms=[
+                term('guest', 'Visitor'),
+                term('desk', 'Desk', definition='Front desk.'),
+                term('bill', 'Bill', definition='New.'),
+            ]
+        ),
     )
     data = embedded_app_data(render_delta_html(_delta(before, after), None))
+    assert [entry['id'] for entry in data['glossary']['terms']] == [
+        'guest',
+        'desk',
+        'bill',
+    ]
     assert [
-        (entry['id'], entry['canonical']) for entry in data['glossary']['terms']
-    ] == [('guest', 'Visitor'), ('room', 'Room')]
+        (entry['id'], entry['canonical'], entry['definition'])
+        for entry in data['before_terms']
+    ] == [('room', 'Room', None), ('guest', 'Guest', None), ('bill', 'Bill', 'Old.')]
+
+
+def _shape(blocks: list[StepBlock] | None) -> list[tuple[object, ...]]:
+    assert blocks is not None
+    return [
+        (
+            block.phase,
+            block.was_phase,
+            block.after_block,
+            [_row(row) for row in block.rows],
+        )
+        for block in blocks
+    ]
+
+
+def _row(row: StepRow) -> tuple[object, ...]:
+    return (
+        row.change,
+        row.side,
+        row.step.narration.text,
+        row.was_phase,
+        [_row(child) for child in row.children],
+    )
+
+
+def test_a_changed_scenario_reads_its_steps_in_after_order_with_removed_ones_in_place():
+    before = report(
+        scn(
+            't.py::test_stay',
+            'Stay',
+            step('given', 'a guest', step('given', 'with her passport')),
+            step('when', 'she phones the desk'),
+            step('when', 'she checks in'),
+            step('then', 'she gets a key card'),
+        )
+    )
+    after = report(
+        scn(
+            't.py::test_stay',
+            'Stay',
+            step('given', 'a guest', step('given', 'with her passport and visa')),
+            step('given', 'a free room'),
+            step('when', 'she checks in'),
+            step('when', 'she gets a digital key card'),
+            step('then', 'her phone opens the door'),
+        )
+    )
+    [item] = _listed(_delta(before, after))
+    assert _shape(item.step_blocks) == [
+        (
+            'given',
+            None,
+            0,
+            [
+                (
+                    'equal',
+                    'after',
+                    'a guest',
+                    None,
+                    [('modified', 'after', 'with her passport and visa', None, [])],
+                ),
+            ],
+        ),
+        # Removed at its before position, under its own phase, and so
+        # splitting the after side's first block in two.
+        ('when', None, None, [('removed', 'before', 'she phones the desk', None, [])]),
+        ('given', None, 0, [('added', 'after', 'a free room', None, [])]),
+        ('when', None, 1, [('equal', 'after', 'she checks in', None, [])]),
+        (
+            'when',
+            'then',
+            1,
+            [
+                ('modified', 'after', 'she gets a digital key card', 'then', []),
+            ],
+        ),
+        ('then', None, 2, [('added', 'after', 'her phone opens the door', None, [])]),
+    ]
+
+
+def test_a_block_of_removed_steps_names_the_after_block_its_added_steps_are_in():
+    """Until an after step joins it."""
+    before = report(
+        scn(
+            't.py::test_stay',
+            'Stay',
+            step('given', 'a guest'),
+            step('when', 'she waits'),
+            step('when', 'she knocks'),
+        )
+    )
+    after = report(
+        scn(
+            't.py::test_stay',
+            'Stay',
+            step('given', 'a guest'),
+            step('when', 'she rings the bell twice'),
+        )
+    )
+    [item] = _listed(_delta(before, after))
+    assert [
+        (block.phase, block.after_block, [row.change for row in block.rows])
+        for block in item.step_blocks or []
+    ] == [('given', 0, ['equal']), ('when', 1, ['removed', 'removed', 'added'])]
+
+
+def test_added_and_removed_scenarios_read_their_steps_unmarked() -> None:
+    before = report(scn('t.py::test_old', 'Old', step('given', 'a guest')))
+    after = report(scn('t.py::test_new', 'New', step('given', 'a host')))
+    assert [item.step_blocks for item in _listed(_delta(before, after))] == [
+        None,
+        None,
+    ]
+
+
+def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_has():
+    before = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            step('when', narr(lit('the clerk types '), ph('pin'))),
+            step('then', narr(lit('she pays by '), ph('pin'))),
+            parameters=table([('pin', 'param')], ('t.py::test_pay[1]', [1])),
+        ),
+    )
+    after = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            step('when', 'she taps her card'),
+            step('then', narr(lit('she pays by '), ref('card', 'Card'))),
+        ),
+        glossary=Glossary(terms=[term('card', 'Card')]),
+    )
+    delta = _delta(before, after)
+    [item] = _listed(delta)
+    assert [row.change for block in item.step_blocks or [] for row in block.rows] == [
+        'removed',
+        'added',
+        'modified',
+    ]
+    render_delta_html(delta, source_link_template=None)

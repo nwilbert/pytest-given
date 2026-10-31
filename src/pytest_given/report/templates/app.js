@@ -1117,6 +1117,11 @@ function reportApp() {
         wrap.appendChild(outline);
       }
     },
+    // The term a ref's tooltip shows; the delta page reads some refs against
+    // its before glossary.
+    _tipTerm(pill) {
+      return termsById.get(pill.dataset.termId);
+    },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside
     // `overflow: hidden` collapsible bodies, which would clip an absolutely
@@ -1130,7 +1135,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = termsById.get(pill.dataset.termId);
+        const term = this._tipTerm(pill);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';

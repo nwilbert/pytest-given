@@ -1859,6 +1859,49 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 .delta-module-mark[data-change="removed"] { --change-ink: var(--removed-ink); }
 
 
+
+
+
+
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
+.delta-step[data-change="modified"] > .step-text,
+.delta-step[data-change="added"] .step-text,
+.delta-step[data-change="removed"] .step-text {
+  background: var(--change-tint);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-xs);
+  margin-left: calc(-1 * var(--space-xs));
+  width: fit-content;
+}
+.delta-step:not([data-change="equal"]) > .step-text::before {
+  content: var(--step-glyph);
+  position: absolute;
+  left: calc(-1 * var(--space-md));
+  font-weight: 700;
+  color: var(--change-ink);
+}
+.delta-step[data-change="removed"] .step-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--removed-line);
+}
+
+.delta-words { border-radius: 2px; padding: 0 1px; }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
+del.delta-words + ins.delta-words { margin-left: 2px; }
+.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
+.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
+
+
+.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
+
+
+.delta .step-children { position: relative; }
+.delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
+
+
 </style>
 </head><body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
@@ -1871,7 +1914,7 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   <header class="topbar">
     <div class="topbar-title" title="Delta Example">Delta Example</div>
     <div class="topbar-meta">
-      <span class="delta-range">v1 2026-10-31T18:37:40.415543+00:00 to v2 2026-10-31T18:37:40.817694+00:00</span>
+      <span class="delta-range">v1 2026-10-31T18:57:26.661912+00:00 to v2 2026-10-31T18:57:27.067607+00:00</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
@@ -1993,7 +2036,7 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="delta-title">
           <span class="scenario-title">Guests check in with a digital key</span>
-          <span class="delta-was">was <del>Guests check in at the front desk</del></span>
+          <span class="delta-was" data-term-side="before">was <del>Guests check in at the front desk</del></span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/check_in" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2008,15 +2051,18 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 
     <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
-      <div class="steps"><div class="phase-block" data-block="0">
+      <div class="steps delta-phase-changed"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div>
+              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div></div>
+            </div></div><div class="phase-block" data-block="1">
+            <div class="phase-label"><del class="delta-phase">Then</del> When</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified"><div class="step-text">the hotel <del class="delta-words" data-term-side="before">hands</del><ins class="delta-words">sends</ins> her a <del class="delta-words" data-term-side="before">key</del><ins class="delta-words">digital</ins> <del class="delta-words" data-term-side="before">card</del><ins class="delta-words">key</ins></div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the hotel sends her a digital key</div>
+              <div class="delta-step" data-change="added"><div class="step-text">her phone opens the door of her room</div></div>
             </div></div></div>
 
       
@@ -2052,21 +2098,23 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
     <div class="scenario-body-inner">
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div>
+              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the hotel returns the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> in full</div>
+              <div class="delta-step" data-change="equal"><div class="step-text">the hotel returns the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div><div class="phase-steps">
-              <div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div>
+              <div class="delta-step" data-change="removed" data-term-side="before"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
+            </div><div class="phase-steps">
+              <div class="delta-step" data-change="added"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
             </div></div></div>
 
       
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:41</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:42</span></div>
     </div>
     </div>
   </div>
@@ -2080,7 +2128,7 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-2" :aria-expanded="!!expandedScenarios[2]" :aria-label="(expandedScenarios[2] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(2)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span></button>
         <span class="delta-title">
           <span class="scenario-title">A walk-in guest is offered the next free suite</span>
-          <span class="delta-was">was <del>A walk-in guest gets the next free room</del></span>
+          <span class="delta-was" data-term-side="before">was <del>A walk-in guest gets the next free room</del></span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/walk_in_booking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2097,24 +2145,24 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
     <div class="scenario-body-inner">
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">the front desk has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div>
+              <div class="delta-step" data-change="modified"><div class="step-text"><del class="delta-words" data-term-side="before"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist">Dana</span></del><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">a walk-in <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div>
+              <div class="delta-step" data-change="equal"><div class="step-text">a walk-in <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> gets <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite 101</span></div>
+              <div class="delta-step" data-change="modified"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> gets <del class="delta-words" data-term-side="before"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room 101</span></del><ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite 101</span></ins></div></div>
             </div></div></div>
 
       
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:55</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:56</span></div>
     </div>
     </div>
   </div>
   <div class="scenario"
-       data-change="removed"
+       data-change="removed" data-term-side="before"
        x-show="isVisible(3)"
        id="scenario-3"
        data-scenario-id="test_delta_booking.py::test_late_checkout">
@@ -2189,7 +2237,7 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
       
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:65</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:66</span></div>
     </div>
     </div>
   </div>
@@ -2221,15 +2269,15 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
       </div>
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div>
+              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a fee of <span class="param-color-1" data-param="derived:0" data-subst="derived:0">{fee}</span></div>
+              <div class="delta-step" data-change="modified"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span><ins class="delta-words"> with a fee of <span class="param-color-3" data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-2" data-param="reason" data-subst="reason">{reason}</span></div>
+              <div class="delta-step" data-change="equal"><div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-4" data-param="reason" data-subst="reason">{reason}</span></div></div>
             </div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending</div>
+              <div class="delta-step" data-change="equal"><div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
             </div></div></div>
 
       
@@ -2350,11 +2398,11 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
             <td colspan="6">
               <div class="error-block failed">
       <div class="error-message">gift cards are not wired into payments yet</div><div class="error-frames"><div class="error-frame">
-            <div class="error-frame-loc">test_delta_booking.py:109: in test_payment_declined</div>
+            <div class="error-frame-loc">test_delta_booking.py:110: in test_payment_declined</div>
             <pre class="error-frame-code">    response = submit_payment(payment_method, amount, reason)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
           </div><div class="error-frame">
-            <div class="error-frame-loc">test_delta_booking.py:87: in submit_payment</div>
+            <div class="error-frame-loc">test_delta_booking.py:88: in submit_payment</div>
             <pre class="error-frame-code">    raise NotImplementedError(&#39;gift cards are not wired into payments yet&#39;)</pre>
           </div></div><pre class="error-tail">E   NotImplementedError: gift cards are not wired into payments yet</pre>
     </div>
@@ -2410,7 +2458,7 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
       
 
       
-      <div class="scenario-source"><span>test_delta_booking.py:91</span></div>
+      <div class="scenario-source"><span>test_delta_booking.py:92</span></div>
     </div>
     </div>
   </div>
@@ -2447,7 +2495,7 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-31T18:37:40.817694+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"}]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-31T18:57:27.067607+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"}]},\"before_terms\":[{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3569,6 +3617,11 @@ function reportApp() {
     },
 
 
+    _tipTerm(pill) {
+      return termsById.get(pill.dataset.termId);
+    },
+
+
 
 
     _initTermTooltip() {
@@ -3580,7 +3633,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = termsById.get(pill.dataset.termId);
+        const term = this._tipTerm(pill);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';
@@ -3714,6 +3767,8 @@ function deltaApp() {
   for (const s of data.scenarios) changeCounts[s.change] += 1;
   const changesPresent = CHANGES.filter(c => changeCounts[c] > 0);
   const moduleChanges = data.module_changes || {};
+
+  const beforeTerms = new Map((data.before_terms || []).map(t => [t.id, t]));
   const overrides = {
     shownChanges: allChangesShown(),
     get changeCounts() {
@@ -3747,6 +3802,12 @@ function deltaApp() {
     resetFilters() {
       base.resetFilters.call(this);
       this.shownChanges = allChangesShown();
+    },
+
+
+    _tipTerm(pill) {
+      const before = pill.closest('[data-term-side="before"]') && beforeTerms.get(pill.dataset.termId);
+      return before || base._tipTerm.call(this, pill);
     },
 
 

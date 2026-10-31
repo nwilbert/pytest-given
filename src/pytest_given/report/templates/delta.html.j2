@@ -12,6 +12,7 @@
 <div class="main">
 
   {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, scenario_steps, param_table, stale_link_snackbar with context -%}
+  {%- from '_delta_macros.html.j2' import delta_steps with context -%}
   {{ icon_sprite() }}
   
   <header class="topbar">
@@ -114,7 +115,7 @@
   {%- set reasons = item.reasons -%}
   {%- set has_body = scenario.steps or scenario.parameters or scenario.error or reasons -%}
   <div class="scenario{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
-       data-change="{{ item.change }}"
+       data-change="{{ item.change }}"{% if item.side == 'before' %} data-term-side="before"{% endif %}
        x-show="isVisible({{ index }})"
        id="scenario-{{ index }}"
        data-scenario-id="{{ scenario.id }}">
@@ -127,7 +128,7 @@
           {%- else %}
           <span class="scenario-title">{{ scenario.narration | narration('after') }}</span>
           {%- if item.delta.title_changed %}
-          <span class="delta-was">was <del>{{ before.narration | narration('before') }}</del></span>
+          <span class="delta-was" data-term-side="before">was <del>{{ before.narration | narration('before') }}</del></span>
           {%- endif %}
           {%- endif %}
         </span>
@@ -171,7 +172,8 @@
         {%- endif %}
       </div>
       {%- endfor %}
-      {{ scenario_steps(scenario, index, item.side) }}
+      {%- set blocks = item.step_blocks %}
+      {% if blocks is not none %}{{ delta_steps(blocks, index) }}{% else %}{{ scenario_steps(scenario, index, item.side) }}{% endif %}
 
       {% if scenario.parameters %}
       {{ param_table(scenario, index) }}

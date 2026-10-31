@@ -3,7 +3,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-10-31T18:37:40.415543+00:00",
+        "timestamp": "2026-10-31T18:57:26.661912+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -19,7 +19,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-10-31T18:37:40.817694+00:00",
+        "timestamp": "2026-10-31T18:57:27.067607+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -33,7 +33,7 @@
       ]
     },
     "plugin_version": "0.5.1",
-    "timestamp": "2026-10-31T18:37:41.082003+00:00",
+    "timestamp": "2026-10-31T18:57:27.330686+00:00",
     "kind": "delta",
     "schema_version": 1
   },
@@ -181,9 +181,20 @@
             "fixture_name": null
           },
           {
-            "phase": "then",
+            "phase": "when",
             "narration": {
               "text": "the hotel sends her a digital key",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "her phone opens the door of her room",
               "parts": []
             },
             "children": [],
@@ -244,7 +255,7 @@
           "after": [
             2
           ],
-          "phase_changed": false,
+          "phase_changed": true,
           "words": [
             {
               "mark": "equal",
@@ -319,6 +330,16 @@
               ]
             }
           ],
+          "children": []
+        },
+        {
+          "change": "added",
+          "before": null,
+          "after": [
+            3
+          ],
+          "phase_changed": false,
+          "words": [],
           "children": []
         }
       ],
@@ -419,8 +440,22 @@
           {
             "phase": "then",
             "narration": {
-              "text": "Alice receives a cancellation email",
-              "parts": []
+              "text": "Alice receives a cancellation email with her Invoice",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " receives a cancellation email with her "
+                },
+                {
+                  "term_id": "invoice",
+                  "display": "Invoice",
+                  "expression": "invoice"
+                }
+              ]
             },
             "children": [],
             "attachments": [],
@@ -555,7 +590,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 41
+          "line": 42
         },
         "story_ids": [],
         "pins": null
@@ -826,7 +861,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 55
+          "line": 56
         },
         "story_ids": [],
         "pins": null
@@ -1120,7 +1155,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 65
+          "line": 66
         },
         "story_ids": [],
         "pins": null
@@ -1552,14 +1587,14 @@
                 "frames": [
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 109,
+                    "lineno": 110,
                     "func": "test_payment_declined",
                     "code": "    response = submit_payment(payment_method, amount, reason)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                     "is_internal": false
                   },
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 87,
+                    "lineno": 88,
                     "func": "submit_payment",
                     "code": "    raise NotImplementedError('gift cards are not wired into payments yet')",
                     "is_internal": false
@@ -1589,7 +1624,7 @@
         "xfail_reason": null,
         "source": {
           "relpath": "test_delta_booking.py",
-          "line": 91
+          "line": 92
         },
         "story_ids": [],
         "pins": null
@@ -2025,7 +2060,7 @@
         "paired_by": "term-id",
         "before_facts": {
           "other_forms": [],
-          "scenario_count": 0
+          "scenario_count": 1
         },
         "after_facts": {
           "other_forms": [],

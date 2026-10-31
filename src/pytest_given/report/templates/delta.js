@@ -13,6 +13,8 @@ function deltaApp() {
   for (const s of data.scenarios) changeCounts[s.change] += 1;
   const changesPresent = CHANGES.filter(c => changeCounts[c] > 0);
   const moduleChanges = data.module_changes || {};
+  // The before glossary's terms that read otherwise than the after one's.
+  const beforeTerms = new Map((data.before_terms || []).map(t => [t.id, t]));
   const overrides = {
     shownChanges: allChangesShown(),
     get changeCounts() {
@@ -46,6 +48,12 @@ function deltaApp() {
     resetFilters() {
       base.resetFilters.call(this);
       this.shownChanges = allChangesShown();
+    },
+    // A ref inside `data-term-side="before"` was read against the before
+    // glossary; every other against the after one.
+    _tipTerm(pill) {
+      const before = pill.closest('[data-term-side="before"]') && beforeTerms.get(pill.dataset.termId);
+      return before || base._tipTerm.call(this, pill);
     },
     // The Glossary tab lists only the terms that changed; a term ref to any
     // other has nowhere to go.

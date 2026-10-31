@@ -7,6 +7,7 @@ that side's glossary, and its source link names that side's commit.
 # A CLI command that renders no HTML never loads Jinja or MarkupSafe.
 __lazy_modules__ = ['jinja2', 'markupsafe']
 
+import dataclasses
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Literal
@@ -18,15 +19,24 @@ from ..model import (
     Change,
     DeltaData,
     DeltaSide,
+    DiffSegment,
     Glossary,
     GlossaryTerm,
+    Mark,
     Narration,
     NodeId,
     ParameterColumn,
+    Phase,
     ReportData,
     Scenario,
     ScenarioDelta,
     SourceLocation,
+    Step,
+    StepChange,
+    StepDelta,
+    StepPath,
+    narration_text,
+    walk_steps,
 )
 from .html_renderer import (
     base_env,
@@ -34,6 +44,7 @@ from .html_renderer import (
     bundled_assets,
     make_narration_filter,
     make_source_url_filter,
+    phase_blocks,
     script_json_parse,
     shown_text,
     term_app_data,
@@ -67,6 +78,33 @@ class ReasonRow:
 
 
 @dataclass(frozen=True)
+class StepRow:
+    """A step as a changed scenario reads it, from the side it comes from. An
+    added or removed step stands for its whole subtree, so it has no rows
+    below it."""
+
+    change: StepChange
+    side: Side
+    step: Step
+    words: tuple[DiffSegment, ...]
+    was_phase: Phase | None
+    children: tuple[StepRow, ...]
+
+
+@dataclass(frozen=True)
+class StepBlock:
+    """A run of top-level rows under one keyword, as the report's phase
+    blocks are, split also where a step's phase changed."""
+
+    phase: Phase
+    was_phase: Phase | None
+    # The after scenario's phase block, which its parameter table's columns
+    # name; None for a block of removed steps alone.
+    after_block: int | None
+    rows: list[StepRow]
+
+
+@dataclass(frozen=True)
 class ListedScenario:
     delta: ScenarioDelta
     # Prefixed `removed-` for a removed scenario, so a removed and an added
@@ -91,6 +129,14 @@ class ListedScenario:
     @property
     def fragment(self) -> str:
         return f'scenario={self.slug}'
+
+    @property
+    def step_blocks(self) -> list[StepBlock] | None:
+        """A changed scenario's steps with their changes; None for an added or
+        removed one, whose steps read unmarked."""
+        if self.change != 'changed':
+            return None
+        return _step_blocks(self.delta)
 
     @property
     def reasons(self) -> list[ReasonRow]:
@@ -191,6 +237,51 @@ def _removed(scenario_delta: ScenarioDelta) -> Scenario:
     return scenario_delta.before
 
 
+def _step_blocks(scenario_delta: ScenarioDelta) -> list[StepBlock]:
+    before, after = scenario_delta.before, scenario_delta.after
+    assert before is not None
+    assert after is not None
+    rows = _StepRows(dict(walk_steps(before.steps)), dict(walk_steps(after.steps)))
+    after_blocks = [
+        index for index, block in enumerate(phase_blocks(after.steps)) for _ in block
+    ]
+    blocks: list[StepBlock] = []
+    for step_delta in scenario_delta.steps:
+        row = rows.row(step_delta)
+        after_block = after_blocks[step_delta.after[0]] if step_delta.after else None
+        last = blocks[-1] if blocks else None
+        if last and (last.phase, last.was_phase) == (row.step.phase, row.was_phase):
+            last.rows.append(row)
+            if last.after_block is None:
+                blocks[-1] = dataclasses.replace(last, after_block=after_block)
+        else:
+            blocks.append(StepBlock(row.step.phase, row.was_phase, after_block, [row]))
+    return blocks
+
+
+@dataclass(frozen=True)
+class _StepRows:
+    before: dict[StepPath, Step]
+    after: dict[StepPath, Step]
+
+    def row(self, step_delta: StepDelta) -> StepRow:
+        side: Side = 'before' if step_delta.change == 'removed' else 'after'
+        path = step_delta.before if side == 'before' else step_delta.after
+        assert path is not None
+        was_phase = None
+        if step_delta.phase_changed:
+            assert step_delta.before is not None
+            was_phase = self.before[step_delta.before].phase
+        return StepRow(
+            change=step_delta.change,
+            side=side,
+            step=(self.before if side == 'before' else self.after)[path],
+            words=step_delta.words,
+            was_phase=was_phase,
+            children=tuple(self.row(child) for child in step_delta.children),
+        )
+
+
 def _module_changes(
     delta: DeltaData, listed: list[ListedScenario]
 ) -> dict[str, Change]:
@@ -227,7 +318,10 @@ def _app_data(
     return {
         'metadata': {'timestamp': delta.metadata.after.metadata.timestamp},
         'status_labels': STATUS_LABEL,
-        'glossary': {'terms': [term_app_data(term) for term in _tip_terms(delta)]},
+        'glossary': {
+            'terms': [term_app_data(term) for term in _terms(delta.glossary.after)]
+        },
+        'before_terms': [term_app_data(term) for term in _before_tip_terms(delta)],
         'scenarios': [
             {
                 'id': item.slug,
@@ -252,13 +346,21 @@ def _search_text(item: ListedScenario) -> str:
     return ' '.join([*titles, *item.delta.tags_removed])
 
 
-def _tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
-    """Every term the tooltip may be asked about: the after glossary's, and
-    the before glossary's the after one dropped."""
-    after = delta.glossary.after.terms if delta.glossary.after else []
-    after_ids = {term.id for term in after}
-    before = delta.glossary.before.terms if delta.glossary.before else []
-    return [*after, *(term for term in before if term.id not in after_ids)]
+def _terms(glossary: Glossary | None) -> list[GlossaryTerm]:
+    return glossary.terms if glossary is not None else []
+
+
+def _before_tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
+    """The before glossary's terms whose tooltip reads otherwise than the after
+    glossary's term of that ID, or that it lacks: a term ref read from the
+    before side looks here first."""
+    after = {term.id: term for term in _terms(delta.glossary.after)}
+    return [
+        term
+        for term in _terms(delta.glossary.before)
+        if (shared := after.get(term.id)) is None
+        or (shared.canonical, shared.definition) != (term.canonical, term.definition)
+    ]
 
 
 def _build_env(
@@ -266,7 +368,16 @@ def _build_env(
 ) -> jinja2.Environment:
     env = base_env()
     listed = _listed_scenarios(delta)
-    param_color_map = build_param_color_map([item.shown for item in listed])
+    # Both sides', so a removed step's placeholder finds its column; only the
+    # keys are read, parameter coloring being off on this page.
+    param_color_map = build_param_color_map(
+        [
+            scenario
+            for item in delta.scenarios
+            for scenario in (item.before, item.after)
+            if scenario is not None
+        ]
+    )
     glossaries: dict[Side, Glossary | None] = {
         'before': delta.glossary.before,
         'after': delta.glossary.after,
@@ -293,13 +404,40 @@ def _build_env(
     def source_url(value: SourceLocation | None, side: Side) -> str | None:
         return source_url_filters[side](value)
 
+    def narration_diff(words: tuple[DiffSegment, ...]) -> Markup:
+        """A modified step's word diff: removed runs read from the before
+        side, equal and added ones from the after side."""
+        return Markup('').join(
+            _marked(
+                segment.mark,
+                narration(
+                    Narration(text=narration_text(segment.parts), parts=segment.parts),
+                    'before' if segment.mark == 'removed' else 'after',
+                ),
+            )
+            for segment in words
+        )
+
     def no_param_color(column: ParameterColumn) -> str:
         return ''
 
     env.filters['narration'] = narration
+    env.filters['narration_diff'] = narration_diff
     env.filters['source_url'] = source_url
     env.filters['param_color_class'] = no_param_color
     return env
+
+
+def _marked(mark: Mark, text: Markup) -> Markup:
+    match mark:
+        case 'equal':
+            return text
+        case 'removed':
+            return Markup(
+                '<del class="delta-words" data-term-side="before">{}</del>'
+            ).format(text)
+        case 'added':
+            return Markup('<ins class="delta-words">{}</ins>').format(text)
 
 
 def _source_url_filter(

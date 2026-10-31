@@ -1,0 +1,57 @@
+{#
+  A changed scenario's steps on the delta page: the report's phase blocks and
+  step lines, with each step's change marked in place. The marks' look is
+  `.delta-step` in styles.css; `data-term-side="before"` tells the term
+  tooltip (`delta.js`) which glossary a ref inside it was read against.
+#}
+  {%- from '_macros.html.j2' import render_step, step_text, step_children, step_attachments with context -%}
+
+  {#- `step_ids` as `scenario_steps` makes them: a running count, unique
+      across blocks. A block of removed steps alone carries no `data-block`:
+      the after side's columns name no such block. -#}
+  {%- macro delta_steps(blocks, scenario_idx) -%}
+      <div class="steps{% if blocks | selectattr('was_phase') | first %} delta-phase-changed{% endif %}">
+        {%- set ns = namespace(step_idx=0) -%}
+        {%- for block in blocks -%}
+          <div class="phase-block"{% if block.after_block is not none %} data-block="{{ block.after_block }}"{% endif %}>
+            <div class="phase-label">{{ phase_change(block.phase, block.was_phase) }}</div>
+            {%- for row in block.rows -%}
+            <div class="phase-steps">
+              {{ render_step_delta(row, 's' ~ scenario_idx ~ '_' ~ ns.step_idx) }}
+            </div>
+            {%- set ns.step_idx = ns.step_idx + 1 -%}
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+  {%- endmacro -%}
+
+  {%- macro phase_change(phase, was_phase) -%}
+    {%- if was_phase -%}<del class="delta-phase">{{ was_phase | capitalize }}</del> {% endif -%}
+    {{ phase | capitalize }}
+  {%- endmacro -%}
+
+  {#- An added or removed row is its step's whole subtree, rendered from its
+      side and tinted as one. A nested step has no phase label, so a changed
+      phase shows beside its text. -#}
+  {%- macro render_step_delta(row, step_id, nested=false) -%}
+    <div class="delta-step" data-change="{{ row.change }}"{% if row.side == 'before' %} data-term-side="before"{% endif %}>
+    {%- if row.change in ('added', 'removed') -%}
+      {{ render_step(row.step, step_id, row.side) }}
+    {%- else -%}
+      {%- set text -%}
+        {%- if nested and row.was_phase %}<span class="delta-phase-inline">{{ phase_change(row.step.phase, row.was_phase) }}</span> {% endif -%}
+        {%- if row.change == 'modified' %}{{ row.words | narration_diff }}{% else %}{{ row.step.narration | narration('after') }}{% endif -%}
+      {%- endset -%}
+      {{ step_text(row.step, step_id, text) }}
+      {%- if row.children -%}
+        {%- call step_children(step_id) -%}
+          {%- for child in row.children -%}
+            {{ render_step_delta(child, step_id ~ '_' ~ loop.index0, true) }}
+          {%- endfor -%}
+        {%- endcall -%}
+      {%- endif -%}
+      {{ step_attachments(row.step, step_id) }}
+    {%- endif -%}
+    </div>
+  {%- endmacro -%}

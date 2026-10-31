@@ -171,6 +171,20 @@
   {#- `side` names the delta page's side the step is read from; the report
       page's narration filter takes none. -#}
   {%- macro render_step(step, step_id, side=none) -%}
+  {{- step_text(step, step_id, step.narration | narration(side) if side else step.narration | narration) -}}
+  {%- if step.children and step.children | length > 0 -%}
+    {%- call step_children(step_id) -%}
+        {%- for child in step.children -%}
+          {{ render_step(child, step_id ~ '_' ~ loop.index0, side) }}
+        {%- endfor -%}
+    {%- endcall -%}
+  {%- endif -%}
+  {{- step_attachments(step, step_id) -}}
+  {%- endmacro -%}
+
+  {#- A step's line, `text` its rendered narration, with the toggle that opens
+      its children when it has any. The delta page shares these three. -#}
+  {%- macro step_text(step, step_id, text) -%}
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
       <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
@@ -178,21 +192,23 @@
                 :aria-expanded="!!expandedSteps['{{ step_id }}']"
                 :aria-label="(expandedSteps['{{ step_id }}'] ? 'Collapse' : 'Expand') + ' sub-steps'"
                 @click.stop="toggleStep('{{ step_id }}')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span></button>
-        {{ step.narration | narration(side) if side else step.narration | narration }}
+        {{ text }}
       </span>
     {%- else -%}
-      {{ step.narration | narration(side) if side else step.narration | narration }}
+      {{ text }}
     {%- endif -%}
   </div>
-  {%- if step.children and step.children | length > 0 -%}
+  {%- endmacro -%}
+
+  {%- macro step_children(step_id) -%}
     <div class="step-expand" :class="{ expanded: expandedSteps['{{ step_id }}'] }">
       <div class="step-children">
-        {%- for child in step.children -%}
-          {{ render_step(child, step_id ~ '_' ~ loop.index0, side) }}
-        {%- endfor -%}
+        {{- caller() -}}
       </div>
     </div>
-  {%- endif -%}
+  {%- endmacro -%}
+
+  {%- macro step_attachments(step, step_id) -%}
   {%- if step.attachments -%}
     {%- for att in step.attachments -%}
     {%- if att is attachment_ref -%}

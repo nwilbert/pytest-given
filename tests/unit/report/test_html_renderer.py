@@ -49,10 +49,10 @@ from pytest_given.report.html_renderer import (
     _inline_md,
     _make_clause_part_filter,
     _neutralize_script_data,
-    _phase_blocks,
     _strip_comments,
     build_param_color_map,
     make_narration_filter,
+    phase_blocks,
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -1122,7 +1122,7 @@ def test_phase_blocks_are_the_runs_of_top_level_steps_sharing_a_phase() -> None:
         _placeholder_step('when'),
     ]
 
-    assert [[step.phase for step in block] for block in _phase_blocks(steps)] == [
+    assert [[step.phase for step in block] for block in phase_blocks(steps)] == [
         ['given', 'given'],
         ['when'],
         ['then'],

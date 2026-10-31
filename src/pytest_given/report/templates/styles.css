@@ -1825,3 +1825,46 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 .delta-module-mark[data-change="added"] { --change-ink: var(--added-ink); }
 .delta-module-mark[data-change="changed"] { --change-ink: var(--changed-ink); }
 .delta-module-mark[data-change="removed"] { --change-ink: var(--removed-ink); }
+
+/* A changed scenario's steps, each line tinted by its change and led by its
+   glyph in the margin left of the keywords. The glyph is positioned against
+   the phase block, so a nested step's sits in the same margin. Added and
+   removed lines stand for their whole subtree, tinted alike; a modified or
+   equal line's children carry their own marks. */
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
+.delta-step[data-change="modified"] > .step-text,
+.delta-step[data-change="added"] .step-text,
+.delta-step[data-change="removed"] .step-text {
+  background: var(--change-tint);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-xs);
+  margin-left: calc(-1 * var(--space-xs));
+  width: fit-content;
+}
+.delta-step:not([data-change="equal"]) > .step-text::before {
+  content: var(--step-glyph);
+  position: absolute;
+  left: calc(-1 * var(--space-md));
+  font-weight: 700;
+  color: var(--change-ink);
+}
+.delta-step[data-change="removed"] .step-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--removed-line);
+}
+/* Word marks: stronger than the line's tint, so they read on it. */
+.delta-words { border-radius: 2px; padding: 0 1px; }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
+del.delta-words + ins.delta-words { margin-left: 2px; }
+.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
+.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
+/* Room for the old keyword beside the new one, in every block alike so the
+   steps still align. */
+.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
+/* A collapsed parent clips its children, so a nested glyph sits inside the
+   children's indent rather than out in the margin, where it would escape. */
+.delta .step-children { position: relative; }
+.delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }

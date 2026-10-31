@@ -47,7 +47,7 @@ def test_cancel_booking():
     with then(t'the hotel returns the {payment} in full'):
         stay['refunded'] = stay['paid']
         assert stay['refunded']
-    with then('Alice receives a cancellation email'):
+    with then(t'{guest("Alice")} receives a cancellation email with her {invoice}'):
         stay['notified'] = True
         assert stay['notified']
 

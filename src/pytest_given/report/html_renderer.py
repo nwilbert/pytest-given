@@ -185,7 +185,7 @@ def base_env() -> jinja2.Environment:
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
-    env.filters['phase_blocks'] = _phase_blocks
+    env.filters['phase_blocks'] = phase_blocks
     env.filters['column_phase_blocks'] = _column_phase_blocks
     env.filters['case_id'] = case_id
     env.globals['data_url'] = data_url
@@ -206,7 +206,7 @@ def _make_param_color_class(
     return _class
 
 
-def _phase_blocks(steps: list[Step]) -> list[list[Step]]:
+def phase_blocks(steps: list[Step]) -> list[list[Step]]:
     """Top-level steps in runs sharing a phase: one keyword each in the
     narration, and what a phase hover outlines."""
     blocks: list[list[Step]] = []
@@ -224,7 +224,7 @@ def _column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
     or, leading the table, the first."""
     assert scenario.parameters is not None
     met_in: dict[ColumnId, int] = {}
-    for index, block in enumerate(_phase_blocks(scenario.steps)):
+    for index, block in enumerate(phase_blocks(scenario.steps)):
         for step in iter_steps(block):
             for part in step.narration.parts:
                 if isinstance(part, NarrationPlaceholder):
