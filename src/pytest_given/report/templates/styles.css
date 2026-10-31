@@ -62,6 +62,14 @@
   --term-activity-ink: #5f2d9a; --term-activity-line: #906fc5;
   --term-kindless-ink: #545962; --term-kindless-line: #8c9099;
 
+  /* The delta page's changes: added green, removed red, changed amber. The
+     ink is text, the line a row's bar, the tint a marked row's ground and the
+     strong tint a marked word's. On that page status, parameter and term-kind
+     colours are off (see `body.delta`), so these mean nothing else there. */
+  --added-ink: #17693f;   --added-line: #3f9e6b;   --added-tint: #e3f3e8;   --added-tint-strong: #bfe4cb;
+  --removed-ink: #a8231c; --removed-line: #d0584f; --removed-tint: #fcebe9; --removed-tint-strong: #f5c6c1;
+  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc; --changed-tint-strong: #f2d89e;
+
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   /* Inline code inside the tooltip, which is inverted (ink on bg). */
   --bg-tip-code: rgba(255, 255, 255, 0.14);
@@ -107,6 +115,10 @@
   --term-object-ink: #7fded0;   --term-object-line: #53a397;
   --term-activity-ink: #cbb5f7; --term-activity-line: #917dbd;
   --term-kindless-ink: #b8b2c2; --term-kindless-line: #7f798a;
+
+  --added-ink: #7ad7a0;   --added-line: #4fae7c;   --added-tint: #1f3329;   --added-tint-strong: #2d5641;
+  --removed-ink: #f4968d; --removed-line: #d8675d; --removed-tint: #3b2228; --removed-tint-strong: #66303a;
+  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f; --changed-tint-strong: #5c4826;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -1730,3 +1742,86 @@ span.param-highlight {
 @media (prefers-reduced-motion: reduce) {
   .copy-menu { animation: none; }
 }
+
+/* === Delta page ===
+   The report's page, where green, red and amber mean added, removed and
+   changed alone. So the status colours, parameter colours and term-kind
+   colours are re-pointed at neutral ones here, rather than every rule that
+   paints them being overridden: a status is its glyph and word in muted ink,
+   a placeholder plain bold, a term ref's underline the kindless grey. */
+body.delta {
+  --color-passed: var(--text-muted);
+  --color-failed: var(--text-muted);
+  --color-skipped: var(--text-muted);
+  --color-xfailed: var(--text-muted);
+  --color-passed-tint: var(--bg-page);
+  --color-failed-tint: var(--bg-page);
+  --color-skipped-tint: var(--bg-page);
+  --color-xfailed-tint: var(--bg-page);
+  /* The dark theme's traceback ground is the failed tint. */
+  --bg-traceback: var(--bg-page);
+  --term-actor-ink: var(--term-kindless-ink);       --term-actor-line: var(--term-kindless-line);
+  --term-object-ink: var(--term-kindless-ink);      --term-object-line: var(--term-kindless-line);
+  --term-activity-ink: var(--term-kindless-ink);    --term-activity-line: var(--term-kindless-line);
+}
+body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 700; }
+
+/* The row's bar is its change. */
+.delta .scenario[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
+.delta .scenario[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
+.delta .scenario[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
+.delta .scenario::before,
+.delta .scenario.multi-case > .scenario-header::before { background: var(--change-line); }
+
+.delta-range { font-variant-numeric: tabular-nums; }
+.delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
+/* What a change replaced, under what replaced it: quieter than the text it
+   sits under, and struck. */
+.delta-was {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: normal;
+}
+.delta-was del, .delta-title > del.scenario-title { text-decoration-color: var(--removed-line); }
+.delta-change-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--change-ink);
+}
+.delta-badge {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0 7px;
+  white-space: nowrap;
+}
+.scenario-tag.delta-tag-added { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
+.scenario-tag.delta-tag-removed {
+  cursor: default;
+  color: var(--removed-ink);
+  border-color: var(--removed-line);
+  background: var(--removed-tint);
+}
+.delta-status { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.reason-box .delta-was { margin-top: 2px; }
+
+/* The Change filter's pills, each in its change's colour while on. */
+.delta-change-pill[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); --change-tint: var(--added-tint); }
+.delta-change-pill[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); --change-tint: var(--changed-tint); }
+.delta-change-pill[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); --change-tint: var(--removed-tint); }
+.delta-change-pill.active-change { background: var(--change-tint); color: var(--change-ink); border-color: var(--change-line); }
+.delta-unchanged {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+.delta-module-mark {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  padding-left: var(--space-xs);
+  color: var(--change-ink);
+}
+.delta-module-mark[data-change="added"] { --change-ink: var(--added-ink); }
+.delta-module-mark[data-change="changed"] { --change-ink: var(--changed-ink); }
+.delta-module-mark[data-change="removed"] { --change-ink: var(--removed-ink); }

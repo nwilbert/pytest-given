@@ -168,7 +168,9 @@
     </div>
   {%- endmacro -%}
 
-  {%- macro render_step(step, step_id) -%}
+  {#- `side` names the delta page's side the step is read from; the report
+      page's narration filter takes none. -#}
+  {%- macro render_step(step, step_id, side=none) -%}
   <div class="step-text">
     {%- if step.children and step.children | length > 0 -%}
       <span class="step-toggle" @click="toggleStep('{{ step_id }}')">
@@ -176,17 +178,17 @@
                 :aria-expanded="!!expandedSteps['{{ step_id }}']"
                 :aria-label="(expandedSteps['{{ step_id }}'] ? 'Collapse' : 'Expand') + ' sub-steps'"
                 @click.stop="toggleStep('{{ step_id }}')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['{{ step_id }}'] }"></span></button>
-        {{ step.narration | narration }}
+        {{ step.narration | narration(side) if side else step.narration | narration }}
       </span>
     {%- else -%}
-      {{ step.narration | narration }}
+      {{ step.narration | narration(side) if side else step.narration | narration }}
     {%- endif -%}
   </div>
   {%- if step.children and step.children | length > 0 -%}
     <div class="step-expand" :class="{ expanded: expandedSteps['{{ step_id }}'] }">
       <div class="step-children">
         {%- for child in step.children -%}
-          {{ render_step(child, step_id ~ '_' ~ loop.index0) }}
+          {{ render_step(child, step_id ~ '_' ~ loop.index0, side) }}
         {%- endfor -%}
       </div>
     </div>
@@ -204,4 +206,172 @@
     {%- endif -%}
     {%- endfor -%}
   {%- endif -%}
+  {%- endmacro -%}
+
+  {#- Text, not an icon: the current state has to be readable without
+      hovering. `aria-pressed` on each segment is the accessible state. -#}
+  {%- macro theme_toggle() -%}
+      <div class="seg-toggle" role="group" aria-label="Theme">
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
+      </div>
+  {%- endmacro -%}
+
+  {#- `model` is the Alpine property the box edits: a name from the template,
+      never report data. -#}
+  {%- macro search_box(model, placeholder) -%}
+    <label class="search-box">
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="{{ placeholder }}" x-model="{{ model }}">
+      <button type="button" class="search-box-clear" @click="{{ model }} = ''" x-show="{{ model }}" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
+  {%- endmacro -%}
+
+  {%- macro status_filter() -%}
+    <div class="sidebar-section">
+      <div class="sidebar-label">Status</div>
+      <div class="status-pills">
+        {#- Disabled at zero: the counts are report totals, so there is
+            nothing to filter, and `_visible` ignores a status no scenario
+            has. Skipped and Expected failure hide instead, being the rare
+            ones. -#}
+        {%- for status in statuses %}
+        <button type="button" class="btn-reset status-pill" :class="{ 'active-{{ status }}': shownStatuses.{{ status }} }" :aria-pressed="shownStatuses.{{ status }}" @click="shownStatuses.{{ status }} = !shownStatuses.{{ status }}" {% if status in ('passed', 'failed') %}:disabled="counts.{{ status }} === 0"{% else %}x-show="counts.{{ status }} > 0"{% endif %}>{{ status | status_glyph }} {{ status | status_label | capitalize }} <span x-text="counts.{{ status }}"></span></button>
+        {%- endfor %}
+      </div>
+    </div>
+  {%- endmacro -%}
+
+  {#- A scenario's steps under their phase keywords; `side` as for
+      `render_step`. -#}
+  {%- macro scenario_steps(scenario, scenario_idx, side=none) -%}
+      <div class="steps">
+        {#- A running count, not the inner loop's index: step ids key
+            `expandedSteps`, so they must stay unique across blocks. -#}
+        {%- set ns = namespace(step_idx=0) -%}
+        {%- for block in scenario.steps | phase_blocks -%}
+          <div class="phase-block" data-block="{{ loop.index0 }}">
+            <div class="phase-label">{{ block[0].phase | capitalize }}</div>
+            {%- for step in block -%}
+            <div class="phase-steps">
+              {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ ns.step_idx, side) }}
+            </div>
+            {%- set ns.step_idx = ns.step_idx + 1 -%}
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+  {%- endmacro -%}
+
+  {%- macro param_table(scenario, scenario_idx) -%}
+      {#- Only when the cases differ in status: a column of one glyph repeats
+          the header's status badge on every row. -#}
+      {%- set show_status = scenario.parameters.has_mixed_statuses -%}
+      {#- Only when some case ID is custom: generated ids restate
+          the value columns. -#}
+      {%- set show_ids = scenario.parameters.has_custom_ids -%}
+      {%- set table_width = scenario.parameters.columns | length + show_status + show_ids %}
+      {#- Each column carries its phase block, so a phase hover can outline the
+          narration and its columns together. The id and status columns share
+          one of their own: they frame the row, at its two ends. -#}
+      {%- set col_blocks = scenario | column_phase_blocks %}
+      <div class="param-table-scroll">
+      <table class="param-table">
+        <thead>
+          <tr>
+            {% if show_ids %}<th class="param-id" data-block="frame">case ID</th>{% endif %}
+            {% for col in scenario.parameters.columns %}
+            <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>{{ col.name }}</th>
+            {% endfor %}
+            {% if show_status %}<th class="param-status" data-block="frame">status</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for case in scenario.parameters.cases %}
+          {%- set case_idx = loop.index0 -%}
+          <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
+            {% if show_ids %}<th scope="row" class="param-id" data-block="frame">{{ case.id | case_id }}</th>{% endif %}
+            {% for col, val in scenario.parameters.cells(case) %}
+            {% if col.kind == 'attachment' %}
+            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>
+              {% if val %}
+              {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
+              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name, val.content_type) }}
+              {% endif %}
+            </td>
+            {% else %}
+            {# `data-subst` only where the cell has something to substitute: a
+               generated column is blank for a case that recorded no value, and
+               substituting that blank would erase the step's {token} instead of
+               replacing it. A `param` cell always substitutes — `None` there is
+               a real parametrize value. #}
+            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            {% endif %}
+            {% endfor %}
+            {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
+          </tr>
+          {% if case.error %}
+          <tr>
+            <td colspan="{{ table_width }}">
+              {{ render_error(case.error, case.status) }}
+            </td>
+          </tr>
+          {% endif %}
+          {#- A payload opens across the whole table rather than inside its
+              cell: an attachment is routinely wider than any column, and a
+              cell that holds one both squeezes the columns beside it (the
+              collapsed content still sizes the column) and clips what it
+              cannot fit. -#}
+          {% for col, val in scenario.parameters.cells(case) %}
+          {% if col.kind == 'attachment' and val %}
+          {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
+          <tr class="attachment-panel-row">
+            <td class="attachment-panel" colspan="{{ table_width }}">
+              <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
+                <div class="attachment-expand-inner">
+                  <div class="attachment-panel-body">
+                    {#- The column name alone: the panel opens under its own
+                        row, so the case is already on screen — unlike a Markdown
+                        block, which is collected below the whole table and needs
+                        the case key to say where it belongs. What the caption is
+                        for is telling two panels open on one row apart. -#}
+                    <div class="attachment-panel-label">{{ col.name }}</div>
+                    <div class="attachment-content"><pre>{{ val.content }}</pre></div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+  {%- endmacro -%}
+
+  {#- Names the parts of an arriving link this report no longer has. The live
+      region stays put so the message inserted into it is announced; the
+      countdown bar's animation is the timer, so hovering or focusing the
+      snackbar pauses both. -#}
+  {%- macro stale_link_snackbar() -%}
+<div class="snackbar-region" role="status" aria-live="polite">
+  <template x-if="staleLink">
+    <div class="snackbar">
+      <div class="snackbar-body">
+        <p class="snackbar-title">This link is out of date</p>
+        <ul class="snackbar-list">
+          <template x-for="part in staleLink" :key="part.kind + ':' + part.value">
+            <li>No <span x-text="part.kind"></span> <code x-text="part.value"></code></li>
+          </template>
+        </ul>
+      </div>
+      <button type="button" class="snackbar-close btn-reset" aria-label="Dismiss" @click="staleLink = null"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span class="snackbar-countdown" aria-hidden="true" @animationend="staleLink = null"></span>
+    </div>
+  </template>
+</div>
   {%- endmacro -%}

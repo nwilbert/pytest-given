@@ -146,22 +146,13 @@ def _build_env(
     source_root: Path | None,
     param_color_map: ParamColorMap,
 ) -> jinja2.Environment:
-    """The Jinja environment: the template loader plus every filter and test
-    the report templates call."""
-    env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
-        autoescape=True,
-    )
+    """The Jinja environment: the shared one plus every filter the report's
+    own data feeds."""
+    env = base_env()
     # The sentence key's format lives in `story_view`; the template emits it
     # for the jump button and `app.js` looks the label up by it, so both sides
     # go through the one constructor.
     env.globals['sentence_key'] = sentence_key
-    # The status filter's pills, in order; `app.js` reads the same table from
-    # its data, so a new status touches neither.
-    env.globals['statuses'] = tuple(STATUS_LABEL)
-    # The step-tree macro branches on this: an AttachmentRef has no content to
-    # expand, only a column to point at.
-    env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
     env.filters['source_url'] = make_source_url_filter(
         template=source_link_template,
         project=report.metadata.project,
@@ -173,11 +164,27 @@ def _build_env(
         glossary=report.glossary,
     )
     env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
+    env.filters['param_color_class'] = _make_param_color_class(param_color_map)
+    return env
+
+
+def base_env() -> jinja2.Environment:
+    """The template loader and the filters and tests that read no report, which
+    the report page and the delta page share."""
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
+        autoescape=True,
+    )
+    # The status filter's pills, in order; `app.js` reads the same table from
+    # its data, so a new status touches neither.
+    env.globals['statuses'] = tuple(STATUS_LABEL)
+    # The step-tree macro branches on this: an AttachmentRef has no content to
+    # expand, only a column to point at.
+    env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
     env.filters['inline_md'] = _inline_md
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
-    env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     env.filters['phase_blocks'] = _phase_blocks
     env.filters['column_phase_blocks'] = _column_phase_blocks
     env.filters['case_id'] = case_id
@@ -278,7 +285,7 @@ def _render_context(
                 strict=True,
             )
         ),
-        'app_data_js': _script_json_parse(
+        'app_data_js': script_json_parse(
             _app_data(report)
             | {
                 'story_ids': [story.id for story in report.stories],
@@ -317,7 +324,7 @@ def _neutralize_script_data(text: str) -> str:
     return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
 
 
-def _script_json_parse(value: object) -> Markup:
+def script_json_parse(value: object) -> Markup:
     """Serialize `value` as a `JSON.parse(...)` call rather than a JS object
     literal: an engine reads a JSON string faster than the equivalent source,
     and this is the largest blob on the page.
@@ -339,22 +346,7 @@ def _app_data(report: ReportData) -> dict[str, object]:
         'metadata': {'timestamp': report.metadata.timestamp},
         'status_labels': STATUS_LABEL,
         'glossary': (
-            {
-                'terms': [
-                    {
-                        'id': term.id,
-                        'canonical': term.canonical,
-                        'kind': term.kind,
-                        'definition': term.definition,
-                        # Pre-rendered once per term, for the hover tooltip.
-                        # `render_definition` escapes the text and re-admits
-                        # only <br>/<code>/<strong>/<em>, which is what lets
-                        # app.js assign it as innerHTML.
-                        'definition_html': render_definition(term.definition or ''),
-                    }
-                    for term in report.glossary.terms
-                ]
-            }
+            {'terms': [term_app_data(term) for term in report.glossary.terms]}
             if report.glossary is not None
             else None
         ),
@@ -364,14 +356,27 @@ def _app_data(report: ReportData) -> dict[str, object]:
                 'module': scenario.module,
                 'tags': scenario.tags,
                 'status': scenario.status,
-                'search_text': _shown_text(scenario.narration),
+                'search_text': shown_text(scenario.narration),
             }
             for scenario in report.scenarios
         ],
     }
 
 
-def _shown_text(narration: Narration) -> str:
+def term_app_data(term: GlossaryTerm) -> dict[str, object]:
+    return {
+        'id': term.id,
+        'canonical': term.canonical,
+        'kind': term.kind,
+        'definition': term.definition,
+        # Pre-rendered once per term, for the hover tooltip. `render_definition`
+        # escapes the text and re-admits only <br>/<code>/<strong>/<em>, which
+        # is what lets app.js assign it as innerHTML.
+        'definition_html': render_definition(term.definition or ''),
+    }
+
+
+def shown_text(narration: Narration) -> str:
     """A title as the page shows it, its markers rendered away."""
     return ''.join(_piece_text(piece) for piece in read_narration(narration))
 
@@ -418,16 +423,17 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
 
 def bundled_assets() -> dict[str, Markup]:
     """The stylesheet and scripts inlined into the page — the whole reason the
-    report needs no server and no external asset. Our own two lose their
-    comments; the vendored Alpine bundle is already minified and keeps its
-    licence line."""
-    css, app_js, alpine_js = (
+    report needs no server and no external asset. Our own lose their comments;
+    the vendored Alpine bundle is already minified and keeps its licence line.
+    `delta_js` is the delta page's alone."""
+    css, app_js, delta_js, alpine_js = (
         (_TEMPLATES_DIR / filename).read_text(encoding='utf-8')
-        for filename in ('styles.css', 'app.js', 'alpine.min.js')
+        for filename in ('styles.css', 'app.js', 'delta.js', 'alpine.min.js')
     )
     return {
         'css': Markup(_strip_comments(css)),
         'app_js': Markup(_strip_comments(app_js)),
+        'delta_js': Markup(_strip_comments(delta_js)),
         'alpine_js': Markup(alpine_js),
     }
 

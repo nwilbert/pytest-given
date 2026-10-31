@@ -35,6 +35,7 @@ from tests.unit.delta.builders import (
     table,
     term,
 )
+from tests.unit.report.app_data import embedded_app_data
 
 
 def _delta(
@@ -71,7 +72,7 @@ def test_a_listed_scenario_is_shown_from_its_after_side_or_its_before_side_if_re
     before = report(scn('t.py::test_pay', 'Pay'), scn('t.py::test_gone', 'Gone'))
     after = report(scn('t.py::test_pay', 'Pay now'), scn('t.py::test_new', 'New'))
     listed = _listed(_delta(before, after))
-    assert sorted((item.change, item.side, item.scenario.id) for item in listed) == [
+    assert sorted((item.change, item.side, item.shown.id) for item in listed) == [
         ('added', 'after', 't.py::test_new'),
         ('changed', 'after', 't.py::test_pay'),
         ('removed', 'before', 't.py::test_gone'),
@@ -122,9 +123,12 @@ def test_hostile_titles_and_case_ids_survive_the_json_and_are_escaped_in_the_htm
     assert listed.after.id == hostile_id
     assert listed.after.narration == delta.scenarios[0].after.narration
     html = html_path.read_text(encoding='utf-8')
-    assert '<b>' not in html
-    assert '&lt;b&gt;' in html
-    assert 'a]::-é' in html
+    # The search text in the page's data blob is script data, not markup.
+    markup = html[: html.index('window.__REPORT_DATA__')]
+    assert '<b>' not in markup
+    assert '&lt;b&gt;' in markup
+    assert 'a]::-é' in markup
+    assert embedded_app_data(html)['scenarios'][0]['search_text'] == '<b>"x"</b>'
 
 
 def test_a_title_renders_its_term_refs_and_placeholders_against_its_own_side() -> None:

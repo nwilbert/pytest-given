@@ -390,19 +390,25 @@ function reportApp() {
       }
     },
     get filterSummary() {
+      // An em space: this lands in one x-text, so the gap has to be a character.
+      const parts = this._summaryParts();
+      if (parts.length) return parts.join('\u2003');
+      // Term/tag/module filters each have their own removable chip, so they
+      // are not repeated here — but they do suppress "All Scenarios".
+      return this._chipped() ? '' : 'All Scenarios';
+    },
+    _summaryParts() {
       const parts = [];
       const shown = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shown.length !== statusesPresent.length) {
         parts.push(shown.length ? shown.map(s => STATUS_LABELS[s]).join(', ') : 'no statuses');
       }
       if (this.search) parts.push('"' + this.search + '"');
-      // Term/tag/module filters each have their own removable chip, so they
-      // are not repeated here — but they do suppress "All Scenarios".
-      // An em space: this lands in one x-text, so the gap has to be a character.
-      if (parts.length) return parts.join('\u2003');
-      const chipped = this.termFilters.length || this.tagFilters.length
+      return parts;
+    },
+    _chipped() {
+      return this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.sentenceFilter;
-      return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -421,11 +427,7 @@ function reportApp() {
     // the cache only stops the O(n) scan repeating within one pass. The array
     // filters compare by identity — both are replaced, never mutated.
     _visible() {
-      const state = [
-        ...STATUSES.map(s => this.shownStatuses[s]),
-        this.moduleFilter, this.sentenceFilter, this.search,
-        this.tagFilters, this.termFilters,
-      ];
+      const state = this._filterState();
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
         return visibleCache.value;
       }
@@ -436,6 +438,14 @@ function reportApp() {
       }
       visibleCache = { state, value };
       return value;
+    },
+    // Every value `_matchesFilters` reads: what the cache above keys on.
+    _filterState() {
+      return [
+        ...STATUSES.map(s => this.shownStatuses[s]),
+        this.moduleFilter, this.sentenceFilter, this.search,
+        this.tagFilters, this.termFilters,
+      ];
     },
     // Every axis renders as the same flat list of rows carrying their own
     // `depth`, so one template serves all three; only interior rows have
@@ -1217,6 +1227,9 @@ function reportApp() {
       this.$nextTick(() => { this.staleLink = stale; });
     },
     _writeHash(mode = 'push') {
+      serializeHash(this._hashParams(), mode);
+    },
+    _hashParams() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
@@ -1231,7 +1244,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      serializeHash(params, mode);
+      return params;
     },
   };
 }

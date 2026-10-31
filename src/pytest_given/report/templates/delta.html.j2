@@ -4,39 +4,214 @@
 {%- set page_title = title ~ ' — pytest-given Delta' %}
 {% include '_head.html.j2' %}
 </head>
-<body>
+{#- The report's page and component, with what a delta changes: the Change
+    filter, a row per listed scenario shown from one side, and no status,
+    parameter or term-kind colour (`body.delta` in styles.css). -#}
+<body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
 <div class="main">
 
+  {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, scenario_steps, param_table, stale_link_snackbar with context -%}
+  {{ icon_sprite() }}
+  
   <header class="topbar">
     <div class="topbar-title" title="{{ title }}">{{ title }}</div>
     <div class="topbar-meta">
-      <span>{{ range }}</span>
+      <span class="delta-range">{{ range }}</span>
+      {{ theme_toggle() }}
     </div>
   </header>
 
+  <div id="view-scenarios">
+  <div class="view-layout">
+  <div class="sidebar">
+    {{ search_box('search', 'Search titles and tags...') }}
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Change</div>
+      <div class="status-pills">
+        {%- for change, count in change_counts.items() %}
+        <button type="button" class="btn-reset status-pill delta-change-pill" data-change="{{ change }}" :class="{ 'active-change': shownChanges.{{ change }} }" :aria-pressed="shownChanges.{{ change }}" @click="shownChanges.{{ change }} = !shownChanges.{{ change }}"{% if not count %} disabled{% endif %}>{{ change_glyph[change] }} {{ change | capitalize }} <span>{{ count }}</span></button>
+        {%- endfor %}
+      </div>
+      <div class="delta-unchanged">{{ unchanged_count }} unchanged</div>
+    </div>
+
+    {{ status_filter() }}
+
+    <div class="sidebar-section">
+      <div class="sidebar-label-row">
+        <div class="sidebar-label">Browse by</div>
+        <div class="sort-toggle">
+          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'name' }"
+                  :aria-pressed="sortBy === 'name'" @click="sortBy = 'name'"
+                  aria-label="Sort groups by name">A&ndash;Z</button>
+          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'count' }"
+                  :aria-pressed="sortBy === 'count'" @click="sortBy = 'count'"
+                  aria-label="Sort groups by scenario count">Count</button>
+        </div>
+      </div>
+      <div class="seg-toggle">
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
+      </div>
+      <div class="nav-tree">
+        {#- As in the report, plus a module's change: by which sides have the
+            module at all, so a package row, which is no module, has none. -#}
+        <template x-for="group in groups" :key="group.id">
+          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-bucket': group.bucket }"
+               :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
+            <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
+                    :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
+                    :aria-expanded="!!expandedGroups[group.id]"
+                    :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
+                    @click.stop="toggleGroup(group.id)"></button>
+            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && groupsNest"></span>
+            <button type="button" class="btn-reset nav-group-select"
+                    :aria-pressed="isGroupActive(group)"
+                    @click.stop="onGroupClick(group)">
+              <span class="nav-group-name" x-text="group.name"></span>
+            </button>
+            <template x-if="view === 'modules' && moduleChange(group.id)">
+              <span class="delta-module-mark" :data-change="moduleChange(group.id)" :title="'Module ' + moduleChange(group.id)"
+                    x-text="changeGlyph(moduleChange(group.id))"></span>
+            </template>
+            <span class="nav-group-count" x-text="group.count"></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+  {{ sidebar_resizer() }}
   <div class="view-main">
   {% if listed %}
+  <div class="header">
+    <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+      <div class="header-title" x-text="filteredCount + ' change' + (filteredCount !== 1 ? 's' : '')"></div>
+      <div class="header-context" x-text="filterSummary"></div>
+      <span class="filter-chip" x-show="moduleFilter" x-cloak>
+        Module: <span x-text="moduleFilter"></span>
+        <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
+      </span>
+      <template x-for="tag in tagFilters" :key="tag">
+        <span class="filter-chip" x-cloak>
+          Tag: <span x-text="tagLabel(tag)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
+        </span>
+      </template>
+      <button class="collapse-all-btn" @click="toggleAllScenarios()">
+        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
+        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
+      </button>
+    </div>
+  </div>
+
   <div class="scenario-list">
   {% for item in listed %}
-  {%- set scenario = item.scenario -%}
-  <div class="scenario {{ scenario.status }}" data-scenario-id="{{ scenario.id }}" data-change="{{ item.change }}">
-    <div class="scenario-header scenario-header-empty">
-      <span class="scenario-title">{{ scenario.narration | narration(item.side) }}</span>
-      <span class="scenario-meta"><span class="scenario-status">{{ item.change }}</span></span>
+  {%- set scenario = item.shown -%}
+  {%- set before = item.delta.before -%}
+  {%- set index = loop.index0 -%}
+  {%- set reasons = item.reasons -%}
+  {%- set has_body = scenario.steps or scenario.parameters or scenario.error or reasons -%}
+  <div class="scenario{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
+       data-change="{{ item.change }}"
+       x-show="isVisible({{ index }})"
+       id="scenario-{{ index }}"
+       data-scenario-id="{{ scenario.id }}">
+    <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ index }})"{% endif %}>
+      <div style="display:flex; align-items:center;">
+        {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ index }}" :aria-expanded="!!expandedScenarios[{{ index }}]" :aria-label="(expandedScenarios[{{ index }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ index }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ index }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
+        <span class="delta-title">
+          {%- if item.change == 'removed' %}
+          <del class="scenario-title">{{ scenario.narration | narration('before') }}</del>
+          {%- else %}
+          <span class="scenario-title">{{ scenario.narration | narration('after') }}</span>
+          {%- if item.delta.title_changed %}
+          <span class="delta-was">was <del>{{ before.narration | narration('before') }}</del></span>
+          {%- endif %}
+          {%- endif %}
+        </span>
+        {{ anchor_link(item.fragment) }}
+      </div>
+      <span class="scenario-meta">
+        <span class="delta-change-label" data-change="{{ item.change }}">{{ item.change }}</span>
+        {%- if item.delta.paired_by == 'rename-log' %}
+        <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
+        {%- endif %}
+        {%- for tag in scenario.tags %}
+        {%- set added = tag in item.delta.tags_added %}
+        <button type="button" class="btn-reset scenario-tag{% if added %} delta-tag-added{% endif %}" data-tag="{{ tag }}"{% if added %} title="Added tag"{% endif %} :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">{% if added %}+{% endif %}{{ tag }}</button>
+        {%- endfor %}
+        {%- for tag in item.delta.tags_removed %}
+        <del class="scenario-tag delta-tag-removed" title="Removed tag">{{ tag }}</del>
+        {%- endfor %}
+        <span class="scenario-status delta-status">
+          {%- if item.change == 'removed' -%}
+          was {{ scenario.status | status_glyph }} {{ scenario.status | status_label }}
+          {%- elif item.delta.status_changed -%}
+          {{ before.status | status_glyph }} {{ before.status | status_label }} → {{ scenario.status | status_glyph }} {{ scenario.status | status_label }}
+          {%- else -%}
+          {{ scenario.status | status_glyph }} {{ scenario.status | status_label }}
+          {%- endif -%}
+        </span>
+        <span class="scenario-duration">{{ scenario.duration_ms }}ms</span>
+      </span>
     </div>
-    {%- if scenario.source %}
-    {%- set url = scenario.source | source_url(item.side) %}
-    <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>{% else %}<span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>{% endif %}</div>
-    {%- endif %}
+
+    <div class="scenario-body" id="scenario-body-{{ index }}" :class="{ expanded: expandedScenarios[{{ index }}] }">
+    <div class="scenario-body-inner">
+      {%- for row in reasons %}
+      <div class="reason-box {{ row.status }}">
+        {%- if row.reason %}
+        <span class="reason-box-label">{{ row.label }}</span>
+        <span>{{ row.reason }}</span>
+        {%- endif %}
+        {%- if row.was %}
+        <div class="delta-was">was {% if not row.reason %}{{ row.label | lower }} {% endif %}<del>{{ row.was }}</del></div>
+        {%- endif %}
+      </div>
+      {%- endfor %}
+      {{ scenario_steps(scenario, index, item.side) }}
+
+      {% if scenario.parameters %}
+      {{ param_table(scenario, index) }}
+      {% endif %}
+
+      {% if scenario.error %}
+      {{ render_error(scenario.error, scenario.status) }}
+      {% endif %}
+
+      {%- if scenario.source %}
+      {%- set url = scenario.source | source_url(item.side) %}
+      <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>{% else %}<span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>{% endif %}</div>
+      {%- endif %}
+    </div>
+    </div>
   </div>
   {% endfor %}
   </div>
   {% else %}
   <div class="glossary-empty">No changes</div>
   {% endif %}
-  </div>
+  </div>{# end .view-main #}
+  </div>{# end .view-layout #}
+  </div>{# end #view-scenarios #}
 
 </div>
+
+<!-- Shared hover tooltip for term refs; positioned by app.js. -->
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
+</div>
+
+{{ stale_link_snackbar() }}
+
+<script>
+window.__REPORT_DATA__ = {{ app_data_js }};
+{{ app_js }}
+{{ delta_js }}
+</script>
+<script>{{ alpine_js }}</script>
 </body>
 </html>
