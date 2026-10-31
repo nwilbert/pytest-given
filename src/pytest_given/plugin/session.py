@@ -23,6 +23,7 @@ from ..capture import (
 from ..grouping import group_parametrized
 from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
 from ..model import (
+    REPORT_SCHEMA_VERSION,
     Glossary,
     JsonObject,
     Metadata,
@@ -240,6 +241,7 @@ def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
                 commit_sha=detect_commit_sha(),
                 title=given.title,
                 report_url=given.report_url,
+                schema_version=REPORT_SCHEMA_VERSION,
             ),
             scenarios=scenarios,
             stories=stories,

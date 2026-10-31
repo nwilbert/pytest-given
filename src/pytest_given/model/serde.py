@@ -96,6 +96,12 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
     where the dict came from, for the caller that read it from somewhere the
     user can point at.
     """
+    metadata = d.get('metadata')
+    if isinstance(metadata, dict) and metadata.get('kind') == 'delta':
+        raise PytestGivenError(
+            f'{source or "input"} is a delta report, not a report; '
+            f'render it with `pytest-given delta {source or "<file>"}`.'
+        )
     try:
         return ReportData(
             metadata=_metadata_from_dict(d['metadata'], source),
@@ -148,6 +154,7 @@ def _metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
             d.get('report_url') or '',
             f'metadata.report_url in {source or "the report"}',
         ),
+        schema_version=d.get('schema_version'),
     )
 
 
