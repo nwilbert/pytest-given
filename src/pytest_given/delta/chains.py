@@ -43,32 +43,20 @@ def rewrite_identities(
         identity: _follow(identity, after, in_range)
         for identity in dict.fromkeys(before)
     }
-    reached: dict[str, list[str]] = {}
-    for identity, chain in chains.items():
-        target = chain.stop.identity if chain.stop else identity
-        if chain.stop or identity in after:
-            reached.setdefault(target, []).append(identity)
-
-    by_identity: dict[str, Rewrite] = {}
-    warnings: list[str] = []
-    merged: set[str] = set()
-    for target, identities in reached.items():
-        if len(identities) > 1:
-            merged.update(identities)
-            warnings.append(_merge_warning(target, identities, chains))
-            continue
-        (identity,) = identities
-        stop = chains[identity].stop
-        if stop and stop.identity != identity:
-            by_identity[identity] = Rewrite(
-                identity=stop.identity,
-                entries=stop.entries,
-                case_maps=tuple(stop.case_maps),
-            )
-    unmoved_case_maps = {
-        identity: chain.stay_case_maps
+    blocked, warnings = _merges(chains, after)
+    by_identity = {
+        identity: Rewrite(
+            identity=chain.stop.identity,
+            entries=chain.stop.entries,
+            case_maps=tuple(chain.stop.case_maps),
+        )
         for identity, chain in chains.items()
-        if identity not in by_identity and chain.stay_case_maps
+        if identity not in blocked and chain.stop and chain.stop.identity != identity
+    }
+    unmoved_case_maps = {
+        identity: maps
+        for identity, chain in chains.items()
+        if identity not in by_identity and (maps := chain.unmoved_case_maps(identity))
     }
     return Rewrites(
         by_identity=by_identity,
@@ -102,6 +90,41 @@ class _Stop:
 class _Chain:
     stop: _Stop | None
     stay_case_maps: tuple[CaseMap, ...]
+
+    def target(self, start: str, after: AbstractSet[str]) -> str | None:
+        if self.stop is not None:
+            return self.stop.identity
+        return start if start in after else None
+
+    def unmoved_case_maps(self, start: str) -> tuple[CaseMap, ...]:
+        """A chain back to its start still renamed cases on the way."""
+        if self.stop is not None and self.stop.identity == start:
+            return tuple(self.stop.case_maps)
+        return self.stay_case_maps
+
+
+def _merges(
+    chains: dict[str, _Chain], after: AbstractSet[str]
+) -> tuple[set[str], list[str]]:
+    """The identities a merge blocks, to a fixpoint: a blocked identity present
+    in after keeps it, which can make another rewrite onto it a merge too."""
+    blocked: set[str] = set()
+    warnings: list[str] = []
+    while True:
+        reached: dict[str, list[str]] = {}
+        for identity, chain in chains.items():
+            if identity in blocked:
+                target = identity if identity in after else None
+            else:
+                target = chain.target(identity, after)
+            if target is not None:
+                reached.setdefault(target, []).append(identity)
+        merged = {target: group for target, group in reached.items() if len(group) > 1}
+        if not merged:
+            return blocked, warnings
+        for target, group in merged.items():
+            blocked.update(group)
+            warnings.append(_merge_warning(target, group, chains))
 
 
 def _follow(
@@ -138,7 +161,7 @@ def _merge_warning(
     involved = {
         entry.label: None
         for identity in identities
-        if (stop := chains[identity].stop)
+        if (stop := chains[identity].stop) and stop.identity == target
         for entry in stop.entries
     }
     entries = f' through {", ".join(involved)}' if involved else ''

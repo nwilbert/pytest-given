@@ -312,3 +312,15 @@ def test_a_merging_rename_warns_and_pairs_nothing_by_it() -> None:
         'removed',
         'added',
     ]
+
+
+def test_a_missing_definition_and_an_empty_one_are_the_same() -> None:
+    before = report(glossary=_glossary(term('guest', 'Guest', definition=None)))
+    after = report(glossary=_glossary(term('guest', 'Guest', definition='')))
+
+    alignment = align_terms(before, after, RenameLog(), set())
+
+    assert alignment.delta.terms == ()
+    assert [(pair.before, pair.after) for pair in alignment.delta.unchanged] == [
+        ('guest', 'guest')
+    ]

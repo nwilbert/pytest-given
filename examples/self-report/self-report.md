@@ -2853,6 +2853,62 @@
     > </details>
     ```
 
+## ✓ A grouped scenario's «scenario identity» survives its first «case» changing
+`tests/unit/delta/test_build.py::test_a_grouped_identity_survives_its_first_case_changing` · delta
+
+- **given** a grouped scenario whose first «case» is `t[1]` before and a new `t[0]` after
+- **when** a «delta report» is built
+- **then** both sides have the «scenario identity» `t.py::t`
+- **then** the two pair by it, changed by the added case
+
+## ✓ A «per-case scenario»'s «scenario identity» is its full «node ID»
+`tests/unit/delta/test_build.py::test_a_per_case_identity_is_its_full_node_id` · delta
+
+- **given** «per-case scenarios» `t[a]` and `t[b]`, and a `t[c]` only after
+- **when** a «delta report» is built
+- **then** `t[a]` and `t[b]` are unchanged, each under its own node ID
+- **then** `t[c]` is added
+
+## ✓ A moved test file pairs by its unique «scenario title»
+`tests/unit/delta/test_build.py::test_a_moved_test_file_pairs_by_its_unique_title` · delta
+
+- **given** a scenario moved from `a.py` to `b.py` with its «scenario title» kept and a tag added
+- **when** a «delta report» is built
+- **then** the two pair by «scenario title»
+- **when** a second after scenario has the same «scenario title»
+- **then** nothing pairs: the old one is removed and both new ones added
+
+## ✓ «Pairing» on the rewritten «scenario identity» keeps a reused ID honest
+`tests/unit/delta/test_build.py::test_pairing_on_the_rewritten_identity_keeps_a_reused_id_honest` · delta
+
+- **given** a «rename log» entry renaming `A` to `B`
+- **given** before holds `A`, after holds `B` and a new test that took the name `A`
+- **when** a «delta report» is built
+- **then** the old `A` pairs with `B` through the rename log
+- **then** the new `A` is added
+
+## ✓ What doesn't make a scenario changed in a «delta report»
+`tests/unit/delta/test_build.py::test_what_does_not_make_a_scenario_changed` · delta
+
+- **given** a parametrized scenario, moved and renamed through the «rename log»
+- **given** its after side differs in module, source, duration, error message, fixture name, story IDs, pins, attachments and an attachment column
+- **when** a «delta report» is built
+- **then** the scenario is unchanged and nothing is listed
+
+## ✓ What makes a scenario changed in a «delta report»
+`tests/unit/delta/test_build.py::test_what_makes_a_scenario_changed` · delta
+
+- **given** six scenarios whose after sides each differ in one of title, step, tag, status, reason and parameter table
+- **when** a «delta report» is built
+- **then** each is changed, with the flag of what differs
+
+## ✓ A schema version mismatch is refused, naming both versions
+`tests/unit/delta/test_build.py::test_a_schema_version_mismatch_is_refused_naming_both_versions` · delta
+
+- **given** a before report at the current schema version and an after report without one
+- **when** the reports are checked
+- **then** the error names both versions and points at the delta skill
+
 ## ✓ A «Rename log» chain ends at the last «Scenario identity» present in the after report
 `tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after` · delta
 

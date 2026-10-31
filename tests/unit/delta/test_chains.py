@@ -249,3 +249,34 @@ def test_a_case_id_follows_the_maps_to_the_last_id_present_in_after() -> None:
     assert rewrite_case_id('a', maps, {'z'}) == 'a'
     assert rewrite_case_id('a', [], {'a'}) == 'a'
     assert rewrite_case_id('q', maps, {'c'}) == 'q'
+
+
+def test_a_chain_back_to_its_start_keeps_the_cases_maps_up_to_the_stop() -> None:
+    entries = [
+        RenameEntry(
+            table='scenario', position=1, old='A', new='B', cases=(('x', 'y'),)
+        ),
+        RenameEntry(
+            table='scenario', position=2, old='B', new='A', cases=(('y', 'z'),)
+        ),
+    ]
+
+    rewrites = rewrite_identities(['A'], {'A'}, entries, set())
+
+    assert rewrites.by_identity == {}
+    assert rewrites.case_maps_of('A') == ((('x', 'y'),), (('y', 'z'),))
+    assert rewrite_case_id('x', rewrites.case_maps_of('A'), {'z'}) == 'z'
+
+
+def test_a_rewrite_onto_an_identity_a_merge_kept_in_place_is_a_merge_too() -> None:
+    entries = [_move(1, 'A', 'D'), _move(2, 'B', 'D'), _move(3, 'C', 'B')]
+
+    rewrites = rewrite_identities(['A', 'B', 'C'], {'B', 'D'}, entries, set())
+
+    assert rewrites.by_identity == {}
+    first, second = rewrites.warnings
+    assert '"D"' in first
+    assert '"B"' in second
+    assert '"C"' in second
+    assert entries[2].label in second
+    assert entries[1].label not in second

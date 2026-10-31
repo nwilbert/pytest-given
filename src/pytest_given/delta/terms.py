@@ -147,7 +147,10 @@ def term_facts(report: ReportData) -> dict[TermId, TermFacts]:
 
 
 def _same_term(before: GlossaryTerm, after: GlossaryTerm) -> bool:
-    return (before.canonical, before.definition) == (after.canonical, after.definition)
+    return (before.canonical, before.definition or '') == (
+        after.canonical,
+        after.definition or '',
+    )
 
 
 def _definition_diff(
@@ -156,7 +159,7 @@ def _definition_diff(
     before_reading: Reading,
     after_reading: Reading,
 ) -> tuple[DiffSegment, ...]:
-    if before.definition == after.definition:
+    if (before.definition or '') == (after.definition or ''):
         return ()
     return word_diff(
         Narration(text=before.definition or ''),

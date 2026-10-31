@@ -7,7 +7,7 @@ authored.
 """
 
 import re
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
 from itertools import groupby
 from typing import Literal
@@ -89,9 +89,20 @@ def tokens_equal(a: Token, b: Token) -> bool:
 
 
 def narrations_equal(a: Narration, ra: Reading, b: Narration, rb: Reading) -> bool:
-    tokens_a, tokens_b = tokens(a, ra), tokens(b, rb)
+    return token_lists_equal(tokens(a, ra), tokens(b, rb))
+
+
+def token_lists_equal(tokens_a: Sequence[Token], tokens_b: Sequence[Token]) -> bool:
     return len(tokens_a) == len(tokens_b) and all(
         map(tokens_equal, tokens_a, tokens_b, strict=True)
+    )
+
+
+def token_bucket(read: Sequence[Token]) -> tuple[tuple[TokenKind, str], ...]:
+    """A hashable key that two equal token lists always share; equal keys can
+    still differ in a space's width or a term ref's form."""
+    return tuple(
+        (token.kind, '' if token.kind == 'space' else token.key) for token in read
     )
 
 
