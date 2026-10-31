@@ -44,3 +44,12 @@ A directory is searched recursively for `*.md`. Neither command runs tests: both
 
 The same command also installs the agent skills with `pytest-given skills install`; see [Agent skills](ai-agents.md#agent-skills).
 
+## Exit status
+
+Every subcommand uses the same codes, so a script can branch on the code alone:
+
+- `0` means there is nothing to act on. The command succeeded, and every citation or skill is current.
+- `1` means something to act on. A citation finding remains, or `skills install --check` finds drift. Fix it and run again.
+- `2` means the command could not do its job. A file could not be read or written, or a flag value was refused. The message goes to stderr.
+
+`report` and a plain `skills install` never exit 1, since neither reports findings.

@@ -103,7 +103,7 @@ def run_report(args: argparse.Namespace) -> int:
         rendered = emit_sinks(read_report_json(json_file), config, json_file.as_posix())
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
-        return 1
+        return 2
     if rendered.md_stdout is not None:
         print(rendered.md_stdout)
     for rendered_file in rendered.files:

@@ -178,5 +178,5 @@ def test_skills_install_reports_a_write_failure_as_a_cli_error(
         raise PermissionError('read-only file system')
 
     monkeypatch.setattr(Path, 'write_bytes', refuse)
-    assert main(['skills', 'install', '--dest', str(tmp_path)]) == 1
+    assert main(['skills', 'install', '--dest', str(tmp_path)]) == 2
     assert 'read-only file system' in capsys.readouterr().err

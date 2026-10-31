@@ -17,6 +17,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
 
+### Changed
+
+- **Breaking.** `pytest-given report` and `pytest-given skills` exit 2 on an error, where they exited 1. A script checking for 1 needs to check for 2.
+
 ### Fixed
 
 - A parameter table no longer shows an id column for a long value that pytest 9.2's `parametrize_long_str_id_strategy = sha256` names by its digest.
