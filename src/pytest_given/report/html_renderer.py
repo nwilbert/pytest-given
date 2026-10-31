@@ -133,7 +133,7 @@ def render_html_string(
     """
     # Built once and handed to both: the narration filter colors placeholders
     # with it, and the template emits the matching `.param-color-N` rules.
-    param_color_map = _build_param_color_map(report.scenarios)
+    param_color_map = build_param_color_map(report.scenarios)
     env = _build_env(report, source_link_template, source_root, param_color_map)
     return env.get_template('report.html.j2').render(
         **_render_context(report, param_color_map, theme)
@@ -162,13 +162,13 @@ def _build_env(
     # The step-tree macro branches on this: an AttachmentRef has no content to
     # expand, only a column to point at.
     env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
-    env.filters['source_url'] = _make_source_url_filter(
+    env.filters['source_url'] = make_source_url_filter(
         template=source_link_template,
         project=report.metadata.project,
         commit_sha=report.metadata.commit_sha,
         root=source_root,
     )
-    env.filters['narration'] = _make_narration_filter(
+    env.filters['narration'] = make_narration_filter(
         param_color_map,
         glossary=report.glossary,
     )
@@ -181,7 +181,7 @@ def _build_env(
     env.filters['phase_blocks'] = _phase_blocks
     env.filters['column_phase_blocks'] = _column_phase_blocks
     env.filters['case_id'] = case_id
-    env.globals['data_url'] = _data_url
+    env.globals['data_url'] = data_url
     return env
 
 
@@ -297,7 +297,7 @@ def _render_context(
                 },
             }
         ),
-        **_bundled_assets(),
+        **bundled_assets(),
     }
 
 
@@ -416,7 +416,7 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
     }
 
 
-def _bundled_assets() -> dict[str, Markup]:
+def bundled_assets() -> dict[str, Markup]:
     """The stylesheet and scripts inlined into the page — the whole reason the
     report needs no server and no external asset. Our own two lose their
     comments; the vendored Alpine bundle is already minified and keeps its
@@ -435,7 +435,7 @@ def _bundled_assets() -> dict[str, Markup]:
 _DATA_URL_MIME = {'.woff2': 'font/woff2', '.svg': 'image/svg+xml'}
 
 
-def _data_url(filename: str) -> Markup:
+def data_url(filename: str) -> Markup:
     """Jinja global: a binary asset under `templates/` as a `data:` URL, so
     the template names each font and the logo beside the rule that uses it.
     The files stay the only copies to update — the docs site stages its logo
@@ -463,7 +463,7 @@ def _strip_comments(source: str) -> str:
     return _COMMENT_LINE.sub('', without_blocks)
 
 
-def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
+def build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     """One color per column *name* across the report, so a parameter reads the
     same color in every scenario. Attachment columns are excluded — a badge
     needs no value color."""
@@ -481,7 +481,7 @@ def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     return color_map
 
 
-def _make_source_url_filter(
+def make_source_url_filter(
     *,
     template: str | None,
     project: str,
@@ -510,7 +510,7 @@ def _make_source_url_filter(
     return _filter
 
 
-def _make_narration_filter(
+def make_narration_filter(
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
 ) -> Callable[[Narration], Markup]:

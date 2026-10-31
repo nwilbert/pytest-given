@@ -16,6 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
+- `pytest-given delta BEFORE.json AFTER.json` writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a `given-renames.toml` rename log for renamed tests and terms.
 
 ### Changed
 

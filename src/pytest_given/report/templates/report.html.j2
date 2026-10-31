@@ -1,61 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-theme-default="{{ theme_default }}">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{#- Resolves the theme before the stylesheet parses, so a dark report never
-    flashes light. Order: the viewer's saved choice, then the configured
-    default. All three choices are stored explicitly — an absent key, not
-    "auto", is what means "use the default", so a viewer's System beats a
-    report configured dark. Plain script, no Alpine: it runs before the bundle
-    exists. It owns the whole mechanism — storage, the choice → theme rule and
-    the follow-the-system listener — and hands app.js `window.__REPORT_THEME__`
-    with the resolved `choice` and a `set` the toggle calls. -#}
-<script>
-(function () {
-  var root = document.documentElement;
-  var key = 'pytest-given-theme';
-  var darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  var stored = null;
-  try { stored = localStorage.getItem(key); } catch (error) { /* no storage: this page only */ }
-  var theme = {
-    choice: (stored === 'light' || stored === 'dark' || stored === 'auto') ? stored : root.getAttribute('data-theme-default'),
-    set: function (choice) {
-      theme.choice = choice;
-      apply();
-      try { localStorage.setItem(key, choice); } catch (error) { /* no storage: this page only */ }
-    }
-  };
-  function apply() {
-    var dark = theme.choice === 'dark' || (theme.choice === 'auto' && darkScheme.matches);
-    root.setAttribute('data-theme', dark ? 'dark' : 'light');
-  }
-  apply();
-  darkScheme.addEventListener('change', apply);
-  window.__REPORT_THEME__ = theme;
-})();
-</script>
-<title>{{ metadata.title or metadata.project }} — pytest-given Report</title>
-<link rel="icon" type="image/svg+xml" href="{{ data_url('logo.svg') }}">
-<style>
-{#- Fontsource variable latin subsets (OFL 1.1, see THIRD-PARTY-LICENSES),
-    inlined so the report stays one file. Upright only: nothing in the report
-    is set in italic, so no face is embedded for the browser to synthesise. -#}
-@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("{{ data_url('fonts/source-sans-3-latin-wght-normal.woff2') }}") format("woff2-variations"); }
-@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("{{ data_url('fonts/source-code-pro-latin-wght-normal.woff2') }}") format("woff2-variations"); }
-{{ css }}
-{# One token and one rule per parametrize column, generated for this report's
-   column count. Like every other colour, the token is set once per theme and
-   the rule only reads it. See report/palette.py for how the ring is derived;
-   styles.css holds only the properties every column shares. The `th` half of
-   the selector is there to outrank `.param-table th`, which sets a color of
-   its own. #}
-{%- for light, dark in param_colors %}
-:root { --param-color-{{ loop.index0 }}: {{ light }}; }
-[data-theme="dark"] { --param-color-{{ loop.index0 }}: {{ dark }}; }
-.param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: var(--param-color-{{ loop.index0 }}); }
-{%- endfor %}
-</style>
+{%- set page_title = (metadata.title or metadata.project) ~ ' — pytest-given Report' %}
+{% include '_head.html.j2' %}
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 

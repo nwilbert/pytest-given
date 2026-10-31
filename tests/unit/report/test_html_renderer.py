@@ -45,14 +45,14 @@ from pytest_given.report.html_renderer import (
     _COMMENT_LINE,
     _TEMPLATES_DIR,
     _app_data,
-    _build_param_color_map,
     _column_phase_blocks,
     _inline_md,
     _make_clause_part_filter,
-    _make_narration_filter,
     _neutralize_script_data,
     _phase_blocks,
     _strip_comments,
+    build_param_color_map,
+    make_narration_filter,
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
@@ -109,13 +109,13 @@ def test_inline_md_filter_renders_markdown() -> None:
 
 
 def test_narration_filter_renders_the_spans_of_a_plain_string() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(text='Books a **suite**\nfor *two*')
     assert render(narration) == 'Books a <strong>suite</strong>\nfor <em>two</em>'
 
 
 def test_narration_filter_renders_the_spans_of_a_literal_part() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(
         text='a `cup` costs 2',
         parts=(
@@ -127,7 +127,7 @@ def test_narration_filter_renders_the_spans_of_a_literal_part() -> None:
 
 
 def test_narration_filter_reads_no_markdown_in_a_value() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(
         text='*x*', parts=(NarrationValue(rendered='*x*', expression='name'),)
     )
@@ -137,7 +137,7 @@ def test_narration_filter_reads_no_markdown_in_a_value() -> None:
 
 
 def test_narration_filter_flanks_a_literal_s_edge_by_the_part_beside_it() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(
         text='a**(b)**',
         parts=(
@@ -1196,7 +1196,7 @@ def _glossary() -> Glossary:
 
 def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
@@ -1206,7 +1206,7 @@ def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
 
 def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Room',
         parts=(NarrationTermRef(term_id=TermId('room'), display='Room'),),
@@ -1216,7 +1216,7 @@ def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
 
 def test_narration_filter_renders_activity_term_ref_with_activity_class() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='search',
         parts=(NarrationTermRef(term_id=TermId('search'), display='searches'),),
@@ -1238,7 +1238,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
             definition='A person staying at the hotel.',
         )
     )
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
@@ -1264,7 +1264,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
 
 def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='X',
         parts=(NarrationTermRef(term_id=TermId('missing'), display='X'),),
@@ -1277,7 +1277,7 @@ def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
 def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
     """When the renderer is invoked with glossary=None (e.g. no glossary
     declared), NarrationTermRef still renders as escaped text."""
-    f = _make_narration_filter(param_color_map={}, glossary=None)
+    f = make_narration_filter(param_color_map={}, glossary=None)
     n = Narration(
         text='X',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
@@ -1829,7 +1829,7 @@ def test_param_color_map_skips_attachment_columns() -> None:
             cases=[],
         ),
     )
-    color_map = _build_param_color_map([scenario])
+    color_map = build_param_color_map([scenario])
     assert color_map == {'cup_size': 0}
 
 

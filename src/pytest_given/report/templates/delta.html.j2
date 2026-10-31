@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" data-theme-default="{{ theme_default }}">
+<head>
+{%- set page_title = title ~ ' — pytest-given Delta' %}
+{% include '_head.html.j2' %}
+</head>
+<body>
+
+<div class="main">
+
+  <header class="topbar">
+    <div class="topbar-title" title="{{ title }}">{{ title }}</div>
+    <div class="topbar-meta">
+      <span>{{ range }}</span>
+    </div>
+  </header>
+
+  <div class="view-main">
+  {% if listed %}
+  <div class="scenario-list">
+  {% for item in listed %}
+  {%- set scenario = item.scenario -%}
+  <div class="scenario {{ scenario.status }}" data-scenario-id="{{ scenario.id }}" data-change="{{ item.change }}">
+    <div class="scenario-header scenario-header-empty">
+      <span class="scenario-title">{{ scenario.narration | narration(item.side) }}</span>
+      <span class="scenario-meta"><span class="scenario-status">{{ item.change }}</span></span>
+    </div>
+    {%- if scenario.source %}
+    {%- set url = scenario.source | source_url(item.side) %}
+    <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>{% else %}<span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>{% endif %}</div>
+    {%- endif %}
+  </div>
+  {% endfor %}
+  </div>
+  {% else %}
+  <div class="glossary-empty">No changes</div>
+  {% endif %}
+  </div>
+
+</div>
+</body>
+</html>

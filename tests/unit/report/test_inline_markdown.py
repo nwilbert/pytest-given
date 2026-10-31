@@ -9,7 +9,7 @@ from pytest_given.model import (
     narration_of,
 )
 from pytest_given.report import CitationIndex, Target
-from pytest_given.report.html_renderer import _make_narration_filter
+from pytest_given.report.html_renderer import make_narration_filter
 from pytest_given.report.inline_markdown import render_definition
 from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
@@ -20,7 +20,7 @@ def _outputs(title: Narration) -> tuple[str, str, str]:
     """The title as the HTML, the Markdown report and a citation show it."""
     report = report_(scenario_('t.py::test_book'))
     report.scenarios[0].narration = title
-    html = str(_make_narration_filter(param_color_map={}, glossary=None)(title))
+    html = str(make_narration_filter(param_color_map={}, glossary=None)(title))
     heading = render_md(report).splitlines()[2]
     citation = CitationIndex.of(report).citation(Target('scenario', 't.py::test_book'))
     return html, heading, citation.markdown_halves()[0]
@@ -126,5 +126,5 @@ def test_render_definition(text: str, expected: str) -> None:
     ],
 )
 def test_a_title_s_spans_never_break(text: str, expected: str) -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     assert render(Narration(text=text)) == expected

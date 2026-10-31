@@ -15,6 +15,14 @@ from .citation_index import (
     report_fragment,
 )
 from .console import write_console_as_utf8
+from .delta_html import range_label, render_delta_html
+from .delta_sinks import (
+    DEFAULT_DELTA_HTML_PATH,
+    DEFAULT_DELTA_JSON_PATH,
+    DeltaSinkConfig,
+    delta_sink_failure,
+    emit_delta_sinks,
+)
 from .link_text import html_link_text, link_text
 from .sinks import (
     DEFAULT_HTML_PATH,
@@ -34,6 +42,8 @@ from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [
     'CITATION_GLYPH',
+    'DEFAULT_DELTA_HTML_PATH',
+    'DEFAULT_DELTA_JSON_PATH',
     'DEFAULT_HTML_PATH',
     'DEFAULT_JSON_PATH',
     'DEFAULT_THEME',
@@ -45,15 +55,20 @@ __all__ = [
     'THEME_HELP',
     'Citation',
     'CitationIndex',
+    'DeltaSinkConfig',
     'RenderedFile',
     'RenderedSinks',
     'SinkConfig',
     'Target',
     'Theme',
     'build_scenario_slug_index',
+    'delta_sink_failure',
+    'emit_delta_sinks',
     'emit_sinks',
     'html_link_text',
     'link_text',
+    'range_label',
+    'render_delta_html',
     'report_fragment',
     'resolve_source_link_template',
     'resolve_theme',

@@ -17,6 +17,7 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 """
 
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import NamedTuple
@@ -71,9 +72,9 @@ class SinkConfig:
     report_url: ReportUrl | None = None
 
     def __post_init__(self) -> None:
-        _require_suffix('JSON', self.json_path, ('.json',))
-        _require_suffix('HTML', self.html_path, ('.html', '.htm'))
-        _require_suffix('Markdown', self.md_path, MD_SUFFIXES)
+        require_suffix('JSON', self.json_path, ('.json',))
+        require_suffix('HTML', self.html_path, ('.html', '.htm'))
+        require_suffix('Markdown', self.md_path, MD_SUFFIXES)
 
     def file_paths(self) -> list[Path]:
         """The paths this run would write, in sink order. Only real files —
@@ -90,7 +91,7 @@ class SinkConfig:
         return bool(self.file_paths()) or self.md_to_stdout
 
 
-def _require_suffix(sink: str, path: Path | None, allowed: tuple[str, ...]) -> None:
+def require_suffix(sink: str, path: Path | None, allowed: tuple[str, ...]) -> None:
     """Refuse a sink path that could not be a report file.
 
     These paths come from CLIs where a bare flag takes the next argument as
@@ -222,12 +223,20 @@ def discard_stale_sinks(config: SinkConfig) -> list[str]:
 
     Writing no report leaves the *previous* run's in place, where it reads as
     current — the one outcome worse than no report at all. Only the paths this
-    run was told to write are touched. Cannot raise: the caller is already
-    handling a failure, and the usual reason a write failed (an unwritable
-    directory) is also a reason the unlink will.
+    run was told to write are touched.
+    """
+    return discard_files(config.file_paths())
+
+
+def discard_files(paths: Sequence[Path]) -> list[str]:
+    """Delete each existing file, and say what happened.
+
+    Cannot raise: the caller is already handling a failure, and the usual
+    reason a write failed (an unwritable directory) is also a reason the
+    unlink will.
     """
     notes = []
-    for path in config.file_paths():
+    for path in paths:
         if not path.is_file():
             continue
         try:

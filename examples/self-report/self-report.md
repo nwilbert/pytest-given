@@ -122,6 +122,21 @@
 - **then** the summary counts the finding it left out
 - **then** it exits 1 for that finding
 
+## ✓ `pytest-given delta` writes a «delta report» as JSON and HTML, and exits 0 whether or not anything changed · 2 cases
+`tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta, cli
+
+- **given** a before «report» with a scenario titled "Pay by card"
+- **given** an after «report» that titles it "{after_title}"
+- **when** `pytest-given delta` compares the two
+- **then** it exits 0
+- **then** the delta JSON lists {listed} changed scenarios
+- **then** the delta HTML is written beside it
+
+| after_title | listed |
+|---|---|
+| Pay by card | 0 |
+| Pay by credit card | 1 |
+
 ## ✓ A «scenario» reaches the «report» with its «tags» and «term refs»
 `tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
 

@@ -13,7 +13,7 @@ from pytest_given.model import (
     TermId,
     param_id,
 )
-from pytest_given.report.html_renderer import _make_narration_filter
+from pytest_given.report.html_renderer import make_narration_filter
 from pytest_given.report.markdown_writer import (
     code_span_markdown,
     literal_markdown,
@@ -113,7 +113,7 @@ def test_a_code_span_shows_its_content_as_written(content: str, written: str) ->
 def test_a_markdown_viewer_renders_the_spans_the_report_does(text: str) -> None:
     narration = Narration(text=text)
     rendered = _MARKDOWN.render(narration_markdown(narration))
-    html = _make_narration_filter(param_color_map={}, glossary=None)(narration)
+    html = make_narration_filter(param_color_map={}, glossary=None)(narration)
     assert rendered == f'<p>{html}</p>\n'
 
 
@@ -185,7 +185,7 @@ def test_no_two_spans_touch_across_an_empty_value(marker: str, written: str) -> 
             NarrationLiteral(value=f'{marker}b{marker}'),
         ),
     )
-    html = _make_narration_filter(param_color_map={}, glossary=None)(narration)
+    html = make_narration_filter(param_color_map={}, glossary=None)(narration)
     assert narration_markdown(narration) == written
     assert _MARKDOWN.renderInline(written) == str(html).replace(
         '<span class="value-highlight"></span>', ''
