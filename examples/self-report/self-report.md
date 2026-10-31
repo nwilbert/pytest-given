@@ -3123,7 +3123,8 @@
             "plugin_version": "0",
             "commit_sha": null,
             "title": null,
-            "report_url": null
+            "report_url": null,
+            "schema_version": null
           },
           "scenarios": [
             {

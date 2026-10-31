@@ -34,6 +34,7 @@ from .runtime import (
 from .schema import (
     CONTENT_TYPES,
     PHASES,
+    REPORT_SCHEMA_VERSION,
     STATUSES,
     Attachment,
     AttachmentLabel,
@@ -103,6 +104,7 @@ from .text import (
 __all__ = [
     'CONTENT_TYPES',
     'PHASES',
+    'REPORT_SCHEMA_VERSION',
     'STATUSES',
     'Attachment',
     'AttachmentLabel',

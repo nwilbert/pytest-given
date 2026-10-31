@@ -10,9 +10,12 @@ of the JSON; `Step.source` is the only one.
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
-from typing import Literal, NewType
+from typing import Final, Literal, NewType
 
 from .report_url import ReportUrl
+
+# Bumped with every change to the report JSON's shape; a test pins the shape.
+REPORT_SCHEMA_VERSION: Final = 1
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -489,6 +492,7 @@ class Metadata:
     # copies link, and what `pytest-given citations` reads report links
     # against. None leaves the report copying links alone.
     report_url: ReportUrl | None = None
+    schema_version: int | None = None
 
 
 @dataclass(frozen=True)

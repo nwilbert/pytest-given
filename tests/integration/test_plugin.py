@@ -6,6 +6,7 @@ from typing import Annotated
 import pytest
 
 from pytest_given import Template, attach, given, scenario, then, when
+from pytest_given.model import REPORT_SCHEMA_VERSION
 from pytest_given.plugin import session
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -55,6 +56,23 @@ def test_a_scenario_reaches_the_report_with_its_tags_and_term_refs(pytester, tmp
     with then(t'the given {pg["Step"].l} holds a {pg["Term ref"].l} to the term'):
         parts = s['steps'][0]['narration']['parts']
         assert [part['term_id'] for part in parts if 'term_id' in part] == ['guest']
+
+
+def test_the_json_report_records_its_schema_version(pytester, tmp_path):
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, when
+
+        @scenario("Versioned")
+        def test_versioned():
+            with when("it runs"):
+                pass
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=1)
+    metadata = json.loads(json_path.read_text())['metadata']
+    assert metadata['schema_version'] == REPORT_SCHEMA_VERSION
 
 
 def test_nested_steps(pytester, tmp_path):

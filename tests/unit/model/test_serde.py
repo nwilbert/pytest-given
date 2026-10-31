@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from pytest_given.model import (
@@ -1121,3 +1123,17 @@ def test_a_stored_report_url_a_citation_cannot_link_is_refused(stored: str) -> N
         PytestGivenError, match=r'metadata\.report_url in reports/x\.json must be'
     ):
         report_from_dict(data, 'reports/x.json')
+
+
+def test_schema_version_round_trips():
+    report = ReportData(metadata=replace(_meta(), schema_version=1))
+    assert _round_trip(report).metadata.schema_version == 1
+
+
+def test_a_report_without_schema_version_reads_as_none():
+    assert _round_trip(ReportData(metadata=_meta())).metadata.schema_version is None
+
+
+def test_report_from_dict_refuses_a_delta_json():
+    with pytest.raises(PytestGivenError, match=r'pytest-given delta d.json'):
+        report_from_dict({'metadata': {'kind': 'delta'}, 'scenarios': []}, 'd.json')
