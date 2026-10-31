@@ -1,0 +1,2159 @@
+{
+  "metadata": {
+    "before": {
+      "metadata": {
+        "project": "delta-example",
+        "timestamp": "2026-10-31T18:22:14.594671+00:00",
+        "pytest_version": "9.1.1",
+        "plugin_version": "0.5.1",
+        "commit_sha": null,
+        "title": "Delta Example",
+        "report_url": null,
+        "schema_version": 1
+      },
+      "label": "v1",
+      "modules": [
+        "test_delta_booking"
+      ]
+    },
+    "after": {
+      "metadata": {
+        "project": "delta-example",
+        "timestamp": "2026-10-31T18:22:14.998433+00:00",
+        "pytest_version": "9.1.1",
+        "plugin_version": "0.5.1",
+        "commit_sha": null,
+        "title": "Delta Example",
+        "report_url": null,
+        "schema_version": 1
+      },
+      "label": "v2",
+      "modules": [
+        "test_delta_booking"
+      ]
+    },
+    "plugin_version": "0.5.1",
+    "timestamp": "2026-10-31T18:22:15.262219+00:00",
+    "kind": "delta",
+    "schema_version": 1
+  },
+  "scenarios": [
+    {
+      "change": "changed",
+      "before": {
+        "id": "test_delta_booking.py::test_check_in",
+        "narration": {
+          "text": "Guests check in at the front desk",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "front-desk"
+        ],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has a confirmed Booking",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has a confirmed "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice gives her name at the front desk",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " gives her name at the front desk"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the hotel hands her a key card",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 30
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "after": {
+        "id": "test_delta_booking.py::test_check_in",
+        "narration": {
+          "text": "Guests check in with a digital key",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "front-desk",
+          "digital-key"
+        ],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has a confirmed Booking",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has a confirmed "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice gives her name at the front desk",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " gives her name at the front desk"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the hotel sends her a digital key",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 30
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "paired_by": "node-id",
+      "title_changed": true,
+      "tags_added": [
+        "digital-key"
+      ],
+      "tags_removed": [],
+      "status_changed": false,
+      "reason_changed": false,
+      "steps": [
+        {
+          "change": "equal",
+          "before": [
+            0
+          ],
+          "after": [
+            0
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "equal",
+          "before": [
+            1
+          ],
+          "after": [
+            1
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "modified",
+          "before": [
+            2
+          ],
+          "after": [
+            2
+          ],
+          "phase_changed": false,
+          "words": [
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "value": "the hotel "
+                }
+              ]
+            },
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "value": "hands"
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
+                {
+                  "value": "sends"
+                }
+              ]
+            },
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "value": " her a "
+                }
+              ]
+            },
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "value": "key"
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
+                {
+                  "value": "digital"
+                }
+              ]
+            },
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "value": " "
+                }
+              ]
+            },
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "value": "card"
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
+                {
+                  "value": "key"
+                }
+              ]
+            }
+          ],
+          "children": []
+        }
+      ],
+      "parameters": null
+    },
+    {
+      "change": "changed",
+      "before": {
+        "id": "test_delta_booking.py::test_cancel_booking",
+        "narration": {
+          "text": "Cancelling a paid booking refunds it",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "cancellation",
+          "legacy"
+        ],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has a confirmed Booking she paid for",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has a confirmed "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                },
+                {
+                  "value": " she paid for"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice cancels the Booking",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " cancels the "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the hotel returns the Payment in full",
+              "parts": [
+                {
+                  "value": "the hotel returns the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " in full"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "Alice receives a cancellation email",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 41
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "after": {
+        "id": "test_delta_booking.py::test_cancel_booking",
+        "narration": {
+          "text": "Cancelling a paid booking refunds it",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "cancellation"
+        ],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has a confirmed Booking she paid for",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has a confirmed "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                },
+                {
+                  "value": " she paid for"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice cancels the Booking",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " cancels the "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the hotel returns the Payment in full",
+              "parts": [
+                {
+                  "value": "the hotel returns the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " in full"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the cancellation is noted on the Invoice",
+              "parts": [
+                {
+                  "value": "the cancellation is noted on the "
+                },
+                {
+                  "term_id": "invoice",
+                  "display": "Invoice",
+                  "expression": "invoice"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 41
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "paired_by": "node-id",
+      "title_changed": false,
+      "tags_added": [],
+      "tags_removed": [
+        "legacy"
+      ],
+      "status_changed": false,
+      "reason_changed": false,
+      "steps": [
+        {
+          "change": "equal",
+          "before": [
+            0
+          ],
+          "after": [
+            0
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "equal",
+          "before": [
+            1
+          ],
+          "after": [
+            1
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "equal",
+          "before": [
+            2
+          ],
+          "after": [
+            2
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "removed",
+          "before": [
+            3
+          ],
+          "after": null,
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "added",
+          "before": null,
+          "after": [
+            3
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        }
+      ],
+      "parameters": null
+    },
+    {
+      "change": "changed",
+      "before": {
+        "id": "test_delta_booking.py::test_walk_in",
+        "narration": {
+          "text": "A walk-in guest gets the next free room",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "front-desk"
+        ],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Dana has one free Room",
+              "parts": [
+                {
+                  "term_id": "receptionist",
+                  "display": "Dana",
+                  "expression": "receptionist(\"Dana\")"
+                },
+                {
+                  "value": " has one free "
+                },
+                {
+                  "term_id": "room",
+                  "display": "Room",
+                  "expression": "room"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "a walk-in Bob asks for a Room",
+              "parts": [
+                {
+                  "value": "a walk-in "
+                },
+                {
+                  "term_id": "guest",
+                  "display": "Bob",
+                  "expression": "guest(\"Bob\")"
+                },
+                {
+                  "value": " asks for a "
+                },
+                {
+                  "term_id": "room",
+                  "display": "Room",
+                  "expression": "room"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "Bob gets Room 101",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Bob",
+                  "expression": "guest(\"Bob\")"
+                },
+                {
+                  "value": " gets "
+                },
+                {
+                  "term_id": "room",
+                  "display": "Room 101",
+                  "expression": "room(\"Room 101\")"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 55
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "after": {
+        "id": "test_delta_booking.py::test_walk_in_booking",
+        "narration": {
+          "text": "A walk-in guest is offered the next free suite",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "front-desk"
+        ],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "the front desk has one free Suite",
+              "parts": [
+                {
+                  "value": "the front desk has one free "
+                },
+                {
+                  "term_id": "suite",
+                  "display": "Suite",
+                  "expression": "suite"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "a walk-in Bob asks for a Suite",
+              "parts": [
+                {
+                  "value": "a walk-in "
+                },
+                {
+                  "term_id": "guest",
+                  "display": "Bob",
+                  "expression": "guest(\"Bob\")"
+                },
+                {
+                  "value": " asks for a "
+                },
+                {
+                  "term_id": "suite",
+                  "display": "Suite",
+                  "expression": "suite"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "Bob gets Suite 101",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Bob",
+                  "expression": "guest(\"Bob\")"
+                },
+                {
+                  "value": " gets "
+                },
+                {
+                  "term_id": "suite",
+                  "display": "Suite 101",
+                  "expression": "suite(\"Suite 101\")"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 55
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "paired_by": "rename-log",
+      "title_changed": true,
+      "tags_added": [],
+      "tags_removed": [],
+      "status_changed": false,
+      "reason_changed": false,
+      "steps": [
+        {
+          "change": "modified",
+          "before": [
+            0
+          ],
+          "after": [
+            0
+          ],
+          "phase_changed": false,
+          "words": [
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "term_id": "receptionist",
+                  "display": "Dana",
+                  "expression": "receptionist(\"Dana\")"
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
+                {
+                  "value": "the front desk "
+                }
+              ]
+            },
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "value": "has one free "
+                },
+                {
+                  "term_id": "suite",
+                  "display": "Suite",
+                  "expression": "suite"
+                }
+              ]
+            }
+          ],
+          "children": []
+        },
+        {
+          "change": "equal",
+          "before": [
+            1
+          ],
+          "after": [
+            1
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "modified",
+          "before": [
+            2
+          ],
+          "after": [
+            2
+          ],
+          "phase_changed": false,
+          "words": [
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Bob",
+                  "expression": "guest(\"Bob\")"
+                },
+                {
+                  "value": " gets "
+                }
+              ]
+            },
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "term_id": "room",
+                  "display": "Room 101",
+                  "expression": "room(\"Room 101\")"
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
+                {
+                  "term_id": "suite",
+                  "display": "Suite 101",
+                  "expression": "suite(\"Suite 101\")"
+                }
+              ]
+            }
+          ],
+          "children": []
+        }
+      ],
+      "parameters": null
+    },
+    {
+      "change": "removed",
+      "before": {
+        "id": "test_delta_booking.py::test_late_checkout",
+        "narration": {
+          "text": "Late check-out is refused when the next guest arrives early",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "the next Carol arrives at noon",
+              "parts": [
+                {
+                  "value": "the next "
+                },
+                {
+                  "term_id": "guest",
+                  "display": "Carol",
+                  "expression": "guest(\"Carol\")"
+                },
+                {
+                  "value": " arrives at noon"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice asks the Receptionist for a 2 pm check-out",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " asks the "
+                },
+                {
+                  "term_id": "receptionist",
+                  "display": "Receptionist",
+                  "expression": "receptionist"
+                },
+                {
+                  "value": " for a 2 pm check-out"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the request is refused",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 65
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "after": null,
+      "paired_by": null,
+      "title_changed": false,
+      "tags_added": [],
+      "tags_removed": [],
+      "status_changed": false,
+      "reason_changed": false,
+      "steps": [],
+      "parameters": null
+    },
+    {
+      "change": "added",
+      "before": null,
+      "after": {
+        "id": "test_delta_booking.py::test_loyalty_discount",
+        "narration": {
+          "text": "Returning guests get a loyalty discount on the invoice",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [],
+        "status": "passed",
+        "duration_ms": 0,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has stayed three times before",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has stayed three times before"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "the Concierge prepares her Invoice",
+              "parts": [
+                {
+                  "value": "the "
+                },
+                {
+                  "term_id": "concierge",
+                  "display": "Concierge",
+                  "expression": "concierge"
+                },
+                {
+                  "value": " prepares her "
+                },
+                {
+                  "term_id": "invoice",
+                  "display": "Invoice",
+                  "expression": "invoice"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the total is reduced by 10 percent",
+              "parts": []
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": null,
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 65
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "paired_by": null,
+      "title_changed": false,
+      "tags_added": [],
+      "tags_removed": [],
+      "status_changed": false,
+      "reason_changed": false,
+      "steps": [],
+      "parameters": null
+    },
+    {
+      "change": "changed",
+      "before": {
+        "id": "test_delta_booking.py::test_payment_declined[credit-card]",
+        "narration": {
+          "text": "A declined payment leaves the booking pending",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "error-handling"
+        ],
+        "status": "xfailed",
+        "duration_ms": 36,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has a pending Booking",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has a pending "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice submits the Payment by {payment_method}",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " submits the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " by "
+                },
+                {
+                  "name": "payment_method",
+                  "column_id": "payment_method",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the hotel declines the Payment because of {decline_reason}",
+              "parts": [
+                {
+                  "value": "the hotel declines the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " because of "
+                },
+                {
+                  "name": "decline_reason",
+                  "column_id": "decline_reason",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the Booking stays pending",
+              "parts": [
+                {
+                  "value": "the "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                },
+                {
+                  "value": " stays pending"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": {
+          "columns": [
+            {
+              "id": "payment_method",
+              "name": "payment_method",
+              "kind": "param"
+            },
+            {
+              "id": "decline_reason",
+              "name": "decline_reason",
+              "kind": "param"
+            },
+            {
+              "id": "amount",
+              "name": "amount",
+              "kind": "param"
+            }
+          ],
+          "cases": [
+            {
+              "id": "test_delta_booking.py::test_payment_declined[credit-card]",
+              "values": [
+                "credit card",
+                "insufficient funds",
+                120
+              ],
+              "status": "passed",
+              "error": null,
+              "custom_id": true
+            },
+            {
+              "id": "test_delta_booking.py::test_payment_declined[debit-card]",
+              "values": [
+                "debit card",
+                "expired card",
+                80
+              ],
+              "status": "passed",
+              "error": null,
+              "custom_id": true
+            },
+            {
+              "id": "test_delta_booking.py::test_payment_declined[bank-transfer]",
+              "values": [
+                "bank transfer",
+                "fraud check failed",
+                300
+              ],
+              "status": "passed",
+              "error": null,
+              "custom_id": true
+            },
+            {
+              "id": "test_delta_booking.py::test_payment_declined[gift-card]",
+              "values": [
+                "gift card",
+                "partial balance",
+                50
+              ],
+              "status": "xfailed",
+              "error": {
+                "message": "gift cards are not wired into payments yet",
+                "frames": [
+                  {
+                    "path": "test_delta_booking.py",
+                    "lineno": 111,
+                    "func": "test_payment_declined",
+                    "code": "    response = submit_payment(payment_method, amount, decline_reason)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                    "is_internal": false
+                  },
+                  {
+                    "path": "test_delta_booking.py",
+                    "lineno": 87,
+                    "func": "submit_payment",
+                    "code": "    raise NotImplementedError('gift cards are not wired into payments yet')",
+                    "is_internal": false
+                  }
+                ],
+                "error_tail": "E   NotImplementedError: gift cards are not wired into payments yet",
+                "causes": []
+              },
+              "custom_id": true
+            }
+          ]
+        },
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": "gift cards are not wired in yet",
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 91
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "after": {
+        "id": "test_delta_booking.py::test_payment_declined[credit-card]",
+        "narration": {
+          "text": "A declined payment leaves the booking pending",
+          "parts": []
+        },
+        "module": "test_delta_booking",
+        "tags": [
+          "error-handling"
+        ],
+        "status": "failed",
+        "duration_ms": 38,
+        "steps": [
+          {
+            "phase": "given",
+            "narration": {
+              "text": "Alice has a pending Booking",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " has a pending "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "when",
+            "narration": {
+              "text": "Alice submits the Payment by {payment_method} with a fee of {fee}",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " submits the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " by "
+                },
+                {
+                  "name": "payment_method",
+                  "column_id": "payment_method",
+                  "format_spec": "",
+                  "conversion": null
+                },
+                {
+                  "value": " with a fee of "
+                },
+                {
+                  "name": "fee",
+                  "column_id": "derived:0",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the hotel declines the Payment because of {reason}",
+              "parts": [
+                {
+                  "value": "the hotel declines the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " because of "
+                },
+                {
+                  "name": "reason",
+                  "column_id": "reason",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          },
+          {
+            "phase": "then",
+            "narration": {
+              "text": "the Booking stays pending",
+              "parts": [
+                {
+                  "value": "the "
+                },
+                {
+                  "term_id": "booking",
+                  "display": "Booking",
+                  "expression": "booking"
+                },
+                {
+                  "value": " stays pending"
+                }
+              ]
+            },
+            "children": [],
+            "attachments": [],
+            "pins": null,
+            "fixture_name": null
+          }
+        ],
+        "parameters": {
+          "columns": [
+            {
+              "id": "payment_method",
+              "name": "payment_method",
+              "kind": "param"
+            },
+            {
+              "id": "derived:0",
+              "name": "fee",
+              "kind": "derived"
+            },
+            {
+              "id": "reason",
+              "name": "reason",
+              "kind": "param"
+            },
+            {
+              "id": "amount",
+              "name": "amount",
+              "kind": "param"
+            }
+          ],
+          "cases": [
+            {
+              "id": "test_delta_booking.py::test_payment_declined[credit-card]",
+              "values": [
+                "credit card",
+                "12",
+                "insufficient funds",
+                120
+              ],
+              "status": "passed",
+              "error": null,
+              "custom_id": true
+            },
+            {
+              "id": "test_delta_booking.py::test_payment_declined[debit-card]",
+              "values": [
+                "debit card",
+                "9",
+                "expired card",
+                95
+              ],
+              "status": "passed",
+              "error": null,
+              "custom_id": true
+            },
+            {
+              "id": "test_delta_booking.py::test_payment_declined[gift-card]",
+              "values": [
+                "gift card",
+                null,
+                "partial balance",
+                50
+              ],
+              "status": "failed",
+              "error": {
+                "message": "gift cards are not wired into payments yet",
+                "frames": [
+                  {
+                    "path": "test_delta_booking.py",
+                    "lineno": 109,
+                    "func": "test_payment_declined",
+                    "code": "    response = submit_payment(payment_method, amount, reason)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+                    "is_internal": false
+                  },
+                  {
+                    "path": "test_delta_booking.py",
+                    "lineno": 87,
+                    "func": "submit_payment",
+                    "code": "    raise NotImplementedError('gift cards are not wired into payments yet')",
+                    "is_internal": false
+                  }
+                ],
+                "error_tail": "E   NotImplementedError: gift cards are not wired into payments yet",
+                "causes": []
+              },
+              "custom_id": true
+            },
+            {
+              "id": "test_delta_booking.py::test_payment_declined[voucher]",
+              "values": [
+                "voucher",
+                "4",
+                "voucher expired",
+                40
+              ],
+              "status": "passed",
+              "error": null,
+              "custom_id": false
+            }
+          ]
+        },
+        "error": null,
+        "skip_reason": null,
+        "xfail_reason": null,
+        "source": {
+          "relpath": "test_delta_booking.py",
+          "line": 91
+        },
+        "story_ids": [],
+        "pins": null
+      },
+      "paired_by": "node-id",
+      "title_changed": false,
+      "tags_added": [],
+      "tags_removed": [],
+      "status_changed": true,
+      "reason_changed": true,
+      "steps": [
+        {
+          "change": "equal",
+          "before": [
+            0
+          ],
+          "after": [
+            0
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "modified",
+          "before": [
+            1
+          ],
+          "after": [
+            1
+          ],
+          "phase_changed": false,
+          "words": [
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "term_id": "guest",
+                  "display": "Alice",
+                  "expression": "guest(\"Alice\")"
+                },
+                {
+                  "value": " submits the "
+                },
+                {
+                  "term_id": "payment",
+                  "display": "Payment",
+                  "expression": "payment"
+                },
+                {
+                  "value": " by "
+                },
+                {
+                  "name": "payment_method",
+                  "column_id": "payment_method",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
+                {
+                  "value": " with a fee of "
+                },
+                {
+                  "name": "fee",
+                  "column_id": "derived:0",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            }
+          ],
+          "children": []
+        },
+        {
+          "change": "equal",
+          "before": [
+            2
+          ],
+          "after": [
+            2
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "equal",
+          "before": [
+            3
+          ],
+          "after": [
+            3
+          ],
+          "phase_changed": false,
+          "words": [],
+          "children": []
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "before": "payment_method",
+            "after": "payment_method",
+            "paired_by": "name"
+          },
+          {
+            "before": null,
+            "after": "derived:0",
+            "paired_by": null
+          },
+          {
+            "before": "decline_reason",
+            "after": "reason",
+            "paired_by": "values"
+          },
+          {
+            "before": "amount",
+            "after": "amount",
+            "paired_by": "name"
+          }
+        ],
+        "cases": [
+          {
+            "before": "test_delta_booking.py::test_payment_declined[credit-card]",
+            "after": "test_delta_booking.py::test_payment_declined[credit-card]",
+            "paired_by": "case-id",
+            "changed_cells": [],
+            "id_changed": false,
+            "status_changed": false
+          },
+          {
+            "before": "test_delta_booking.py::test_payment_declined[debit-card]",
+            "after": "test_delta_booking.py::test_payment_declined[debit-card]",
+            "paired_by": "case-id",
+            "changed_cells": [
+              "amount"
+            ],
+            "id_changed": false,
+            "status_changed": false
+          },
+          {
+            "before": "test_delta_booking.py::test_payment_declined[bank-transfer]",
+            "after": null,
+            "paired_by": null,
+            "changed_cells": [],
+            "id_changed": false,
+            "status_changed": false
+          },
+          {
+            "before": "test_delta_booking.py::test_payment_declined[gift-card]",
+            "after": "test_delta_booking.py::test_payment_declined[gift-card]",
+            "paired_by": "case-id",
+            "changed_cells": [],
+            "id_changed": false,
+            "status_changed": true
+          },
+          {
+            "before": null,
+            "after": "test_delta_booking.py::test_payment_declined[voucher]",
+            "paired_by": null,
+            "changed_cells": [],
+            "id_changed": false,
+            "status_changed": false
+          }
+        ]
+      }
+    }
+  ],
+  "unchanged": [
+    {
+      "before": "test_delta_booking.py::test_quote_rate",
+      "after": "test_delta_booking.py::test_quote_rate"
+    }
+  ],
+  "suggestions": [],
+  "glossary": {
+    "before": {
+      "terms": [
+        {
+          "id": "guest",
+          "kind": "actor",
+          "canonical": "Guest",
+          "definition": "Person staying at the hotel.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 16
+          }
+        },
+        {
+          "id": "receptionist",
+          "kind": "actor",
+          "canonical": "Receptionist",
+          "definition": "Staff member who works the front desk.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 17
+          }
+        },
+        {
+          "id": "room",
+          "kind": "object",
+          "canonical": "Room",
+          "definition": "A bookable hotel room.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 19
+          }
+        },
+        {
+          "id": "booking",
+          "kind": "object",
+          "canonical": "Booking",
+          "definition": "A reservation for one room.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 20
+          }
+        },
+        {
+          "id": "invoice",
+          "kind": "object",
+          "canonical": "Invoice",
+          "definition": "A bill for a stay.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 21
+          }
+        },
+        {
+          "id": "payment",
+          "kind": "object",
+          "canonical": "Payment",
+          "definition": "Money transferred for a booking.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 22
+          }
+        },
+        {
+          "id": "upgrade",
+          "kind": "object",
+          "canonical": "Upgrade",
+          "definition": "A better room offered at the same rate.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 23
+          }
+        }
+      ]
+    },
+    "after": {
+      "terms": [
+        {
+          "id": "guest",
+          "kind": "actor",
+          "canonical": "Guest",
+          "definition": "Person staying at the hotel.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 16
+          }
+        },
+        {
+          "id": "concierge",
+          "kind": "actor",
+          "canonical": "Concierge",
+          "definition": "Staff member who arranges extras for guests.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 17
+          }
+        },
+        {
+          "id": "suite",
+          "kind": "object",
+          "canonical": "Suite",
+          "definition": "A bookable hotel room.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 19
+          }
+        },
+        {
+          "id": "booking",
+          "kind": "object",
+          "canonical": "Booking",
+          "definition": "A reservation for one room.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 20
+          }
+        },
+        {
+          "id": "invoice",
+          "kind": "object",
+          "canonical": "Invoice",
+          "definition": "The itemised bill of a stay, settled at check-out.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 21
+          }
+        },
+        {
+          "id": "payment",
+          "kind": "object",
+          "canonical": "Payment",
+          "definition": "Money transferred for a booking.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 22
+          }
+        },
+        {
+          "id": "upgrade",
+          "kind": "activity",
+          "canonical": "upgrade",
+          "definition": "Move a guest to a better room at the same rate.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 23
+          }
+        }
+      ]
+    },
+    "terms": [
+      {
+        "change": "removed",
+        "before": {
+          "id": "receptionist",
+          "kind": "actor",
+          "canonical": "Receptionist",
+          "definition": "Staff member who works the front desk.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 17
+          }
+        },
+        "after": null,
+        "paired_by": null,
+        "before_facts": {
+          "other_forms": [
+            "Dana"
+          ],
+          "scenario_count": 2
+        },
+        "after_facts": null,
+        "definition": []
+      },
+      {
+        "change": "added",
+        "before": null,
+        "after": {
+          "id": "concierge",
+          "kind": "actor",
+          "canonical": "Concierge",
+          "definition": "Staff member who arranges extras for guests.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 17
+          }
+        },
+        "paired_by": null,
+        "before_facts": null,
+        "after_facts": {
+          "other_forms": [],
+          "scenario_count": 1
+        },
+        "definition": []
+      },
+      {
+        "change": "changed",
+        "before": {
+          "id": "room",
+          "kind": "object",
+          "canonical": "Room",
+          "definition": "A bookable hotel room.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 19
+          }
+        },
+        "after": {
+          "id": "suite",
+          "kind": "object",
+          "canonical": "Suite",
+          "definition": "A bookable hotel room.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 19
+          }
+        },
+        "paired_by": "rename-log",
+        "before_facts": {
+          "other_forms": [
+            "Room 101"
+          ],
+          "scenario_count": 2
+        },
+        "after_facts": {
+          "other_forms": [
+            "Suite 101"
+          ],
+          "scenario_count": 2
+        },
+        "definition": []
+      },
+      {
+        "change": "changed",
+        "before": {
+          "id": "invoice",
+          "kind": "object",
+          "canonical": "Invoice",
+          "definition": "A bill for a stay.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 21
+          }
+        },
+        "after": {
+          "id": "invoice",
+          "kind": "object",
+          "canonical": "Invoice",
+          "definition": "The itemised bill of a stay, settled at check-out.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 21
+          }
+        },
+        "paired_by": "term-id",
+        "before_facts": {
+          "other_forms": [],
+          "scenario_count": 0
+        },
+        "after_facts": {
+          "other_forms": [],
+          "scenario_count": 2
+        },
+        "definition": [
+          {
+            "mark": "removed",
+            "parts": [
+              {
+                "value": "A"
+              }
+            ]
+          },
+          {
+            "mark": "added",
+            "parts": [
+              {
+                "value": "The itemised "
+              }
+            ]
+          },
+          {
+            "mark": "equal",
+            "parts": [
+              {
+                "value": "bill "
+              }
+            ]
+          },
+          {
+            "mark": "removed",
+            "parts": [
+              {
+                "value": "for"
+              }
+            ]
+          },
+          {
+            "mark": "added",
+            "parts": [
+              {
+                "value": "of"
+              }
+            ]
+          },
+          {
+            "mark": "equal",
+            "parts": [
+              {
+                "value": " a "
+              }
+            ]
+          },
+          {
+            "mark": "removed",
+            "parts": [
+              {
+                "value": "stay."
+              }
+            ]
+          },
+          {
+            "mark": "added",
+            "parts": [
+              {
+                "value": "stay, settled at check-out."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "change": "removed",
+        "before": {
+          "id": "upgrade",
+          "kind": "object",
+          "canonical": "Upgrade",
+          "definition": "A better room offered at the same rate.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 23
+          }
+        },
+        "after": null,
+        "paired_by": null,
+        "before_facts": {
+          "other_forms": [],
+          "scenario_count": 1
+        },
+        "after_facts": null,
+        "definition": []
+      },
+      {
+        "change": "added",
+        "before": null,
+        "after": {
+          "id": "upgrade",
+          "kind": "activity",
+          "canonical": "upgrade",
+          "definition": "Move a guest to a better room at the same rate.",
+          "source": {
+            "relpath": "test_delta_booking.py",
+            "line": 23
+          }
+        },
+        "paired_by": null,
+        "before_facts": null,
+        "after_facts": {
+          "other_forms": [],
+          "scenario_count": 1
+        },
+        "definition": []
+      }
+    ],
+    "unchanged": [
+      {
+        "before": "guest",
+        "after": "guest"
+      },
+      {
+        "before": "booking",
+        "after": "booking"
+      },
+      {
+        "before": "payment",
+        "after": "payment"
+      }
+    ]
+  }
+}

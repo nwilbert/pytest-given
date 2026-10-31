@@ -461,16 +461,18 @@ def reports_current(session: nox.Session) -> None:
     """Fail on a stale committed report, which `citations` would check documents
     against unnoticed: regenerate every report, then diff the tracked Markdown —
     the reports' `.md` and the documents whose citations that updated. Markdown
-    alone, as it carries no commit SHA, timestamp or duration."""
+    alone, as it carries no commit SHA, timestamp or duration. The example delta
+    has no Markdown, so its JSON is compared without those fields."""
     _sync(session, 'test', include_project=True)
     _regenerate_examples(session)
     _regenerate_self_report(session)
     session.run('git', 'diff', '--exit-code', '--', '*.md', external=True)
+    _check_delta_example_current(session)
 
 
 @nox.session
 def examples(session: nox.Session) -> None:
-    """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
+    """Regenerate the example reports and the example delta."""
     _sync(session, include_project=True)
     _regenerate_examples(session)
 
@@ -506,6 +508,7 @@ def _regenerate_examples(session: nox.Session) -> None:
         )
         if slug in _CITED_REPORTS:
             _run_citations(session, 'update', slug)
+    _regenerate_delta_example(session)
     session.log(
         'Note: coffeeshop and hotel-booking have intentional failures for failure '
         'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
@@ -513,6 +516,117 @@ def _regenerate_examples(session: nox.Session) -> None:
         'toggle; hotel-booking uses the default filter. '
         'file-glossary-booking has no intentional failures.'
     )
+
+
+_DELTA_EXAMPLE = Path('examples/delta')
+_DELTA_EXAMPLE_JSON = _DELTA_EXAMPLE / 'delta-data.json'
+_DELTA_EXAMPLE_FILE = 'test_delta_booking.py'
+# Unset for the staged runs, so both see the same commit whatever CI exports.
+_COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
+
+
+def _regenerate_delta_example(session: nox.Session) -> None:
+    """Run the example's two versions and build their delta.
+
+    Each version is staged under the same relative path, so their node IDs
+    agree, beside an empty `pytest.ini` that keeps the repo's own pytest
+    configuration out of the run. The delta JSON is the committed output, its
+    HTML the page the docs site and the Playwright checks open.
+    """
+    project_root = Path.cwd()
+    with tempfile.TemporaryDirectory() as tmp:
+        reports: list[Path] = []
+        for side in ('before', 'after'):
+            workdir = Path(tmp) / side / 'delta-example'
+            workdir.mkdir(parents=True)
+            shutil.copyfile(
+                _DELTA_EXAMPLE / side / _DELTA_EXAMPLE_FILE,
+                workdir / _DELTA_EXAMPLE_FILE,
+            )
+            (workdir / 'pytest.ini').write_text('', encoding='utf-8')
+            report = Path(tmp) / f'{side}.json'
+            reports.append(report)
+            session.chdir(workdir)
+            try:
+                session.run(
+                    'pytest',
+                    _DELTA_EXAMPLE_FILE,
+                    '--rootdir=.',
+                    f'--given-json={report.as_posix()}',
+                    '--given-title=Delta Example',
+                    # The after version fails a case on purpose.
+                    '--tb=no',
+                    '--no-header',
+                    '-q',
+                    env=dict.fromkeys(_COMMIT_ENV_VARS),
+                    success_codes=[0, 1],
+                )
+            finally:
+                session.chdir(project_root)
+        session.run(
+            'pytest-given',
+            'delta',
+            *(report.as_posix() for report in reports),
+            '--renames',
+            (_DELTA_EXAMPLE / 'given-renames.toml').as_posix(),
+            '--json',
+            _DELTA_EXAMPLE_JSON.as_posix(),
+            '--html',
+            (_DELTA_EXAMPLE / 'delta.html').as_posix(),
+            '--before-label',
+            'v1',
+            '--after-label',
+            'v2',
+        )
+
+
+def _check_delta_example_current(session: nox.Session) -> None:
+    """Fail when the regenerated example delta differs from the staged one in
+    more than what every regeneration rewrites. The delta has no Markdown, so
+    this comparison is where a contributor reads its real change."""
+    staged = session.run(
+        'git',
+        'show',
+        f':{_DELTA_EXAMPLE_JSON.as_posix()}',
+        external=True,
+        silent=True,
+        success_codes=[0, 128],
+    )
+    if not staged:
+        session.log(f'{_DELTA_EXAMPLE_JSON} is not staged yet; nothing to compare')
+        return
+    assert isinstance(staged, str)
+    regenerated = _stable_part(
+        json.loads(_DELTA_EXAMPLE_JSON.read_text(encoding='utf-8'))
+    )
+    if _stable_part(json.loads(staged)) != regenerated:
+        session.error(
+            f'{_DELTA_EXAMPLE_JSON} differs from its staged version beyond its '
+            'metadata and durations: read `git diff` on it, then stage it if the '
+            'change is intended'
+        )
+
+
+type _Json = dict[str, _Json] | list[_Json] | str | int | float | bool | None
+
+
+def _stable_part(delta: dict[str, _Json]) -> _Json:
+    """The delta JSON without its `metadata` and every `duration_ms`."""
+    return _without_durations(
+        {key: value for key, value in delta.items() if key != 'metadata'}
+    )
+
+
+def _without_durations(node: _Json) -> _Json:
+    if isinstance(node, dict):
+        return {
+            key: _without_durations(value)
+            for key, value in node.items()
+            if key != 'duration_ms'
+        }
+    if isinstance(node, list):
+        return [_without_durations(item) for item in node]
+    return node
 
 
 @nox.session
@@ -542,6 +656,7 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
     diagram the Home page links to (the README copy, see `diagram`), every
     example's report — rendered from its JSON, so its copy buttons link the
     `docs_version` being built rather than the committed HTML's `/dev/` —
+    the example delta, rendered from its JSON likewise,
     the two upright font faces the report package embeds (the site's italic
     faces have no other home and stay committed), and the report's logo, which
     is the site's logo and favicon alike. Each copy lands under
@@ -572,6 +687,13 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
             '--source-link=github',
             f'--report-url={_examples_url(docs_version)}/{slug}.html',
         )
+    session.run(
+        'pytest-given',
+        'delta',
+        _DELTA_EXAMPLE_JSON.as_posix(),
+        '--html',
+        (_DOCS_SITE / 'examples' / 'delta.html').as_posix(),
+    )
     # --clean: the page cache is keyed on the Markdown source alone, so an edited
     # snippet include (the diagram SVG, CHANGELOG.md) would otherwise go stale.
     session.run('zensical', 'build', '--strict', '--clean')
