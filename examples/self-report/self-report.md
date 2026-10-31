@@ -2981,6 +2981,23 @@
 - **then** without the rewrite one case is removed and one added
 - **then** with the rewrite they pair by the rename log, the n cell changed
 
+## ✓ A renamed «term» pairs only through a `[[term]]` entry in the «rename log»
+`tests/unit/delta/test_terms.py::test_a_renamed_term_pairs_only_through_a_term_entry` · delta
+
+- **given** a «glossary» whose guest term is called visitor in the next one, and a «rename log» with a `[[term]]` entry for guest
+- **when** the terms are aligned with and without the entry
+- **then** the entry pairs them, and the renamed term reads as changed
+- **then** without the entry the term is removed and the new one added
+- **then** a narration ref to guest is rewritten to visitor with the entry
+
+## ✓ A «term» whose kind changed is listed twice
+`tests/unit/delta/test_terms.py::test_a_term_whose_kind_changed_is_listed_twice` · delta
+
+- **given** a «term» that is an object in one «glossary» and an actor in the next
+- **when** the terms are aligned
+- **then** it is removed under its old kind and added under its new one
+- **then** narration refs to it still compare as the same term
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 
