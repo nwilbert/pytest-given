@@ -15,18 +15,18 @@ import pytest_given
 PACKAGE = 'pytest_given'
 PACKAGE_ROOT = Path(pytest_given.__file__).parent
 
-LIBRARY = frozenset(
-    {'markdown', 'model', 'capture', 'lint', 'report', 'grouping', 'citations'}
-)
+LEAVES = frozenset({'markdown', 'git'})
+LIBRARY = LEAVES | {'model', 'capture', 'lint', 'report', 'grouping', 'citations'}
 # Each subpackage, and the subpackages it may import.
 ALLOWED: dict[str, frozenset[str]] = {
     'markdown': frozenset(),
-    'model': frozenset({'markdown'}),
-    'capture': frozenset({'markdown', 'model'}),
-    'lint': frozenset({'markdown', 'model'}),
-    'report': frozenset({'markdown', 'model'}),
-    'grouping': frozenset({'markdown', 'model', 'capture'}),
-    'citations': frozenset({'markdown', 'model', 'report'}),
+    'git': frozenset(),
+    'model': LEAVES,
+    'capture': LEAVES | {'model'},
+    'lint': LEAVES | {'model'},
+    'report': LEAVES | {'model'},
+    'grouping': LEAVES | {'model', 'capture'},
+    'citations': LEAVES | {'model', 'report'},
     'plugin': LIBRARY,
     'cli': LIBRARY,
 }
