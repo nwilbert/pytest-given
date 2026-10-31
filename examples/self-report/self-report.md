@@ -2949,6 +2949,38 @@
 - **when** the second Then is swapped for a wholly different one
 - **then** the old Then is removed and the new one added
 
+## ✓ An added column keeps the «parameter table» paired case by case
+`tests/unit/delta/test_table.py::test_an_added_column_keeps_the_table_paired_case_by_case` · delta, parametrization
+
+- **given** a «parameter table» of n and big, and one gaining a size column that changes every generated «case ID»
+- **when** the two are aligned
+- **then** the «pairing» of both «cases» is by their values, without a changed cell
+- **then** the size column is added and the other two pair by name
+- **then** the table changed
+
+## ✓ An inserted «case» doesn't shift the positional IDs' pairing
+`tests/unit/delta/test_table.py::test_an_inserted_case_does_not_shift_the_positional_ids_pairing` · delta, parametrization
+
+- **given** a «parameter table» of objects A and B with the positional IDs order0 and order1, and one with a new object Z in front of them
+- **when** the two are aligned
+- **then** A and B pair by their values, and Z is added
+
+## ✓ A renamed argname pairs when its values did not change
+`tests/unit/delta/test_table.py::test_a_renamed_argname_pairs_when_its_values_did_not_change` · delta, parametrization
+
+- **given** a «parameter table» with a euros column, and one naming it eur
+- **when** the two are aligned
+- **then** euros and eur pair as one column, by their values
+- **then** the table changed, though no cell did
+
+## ✓ A value changed under a generated «case ID» reads as removed and added
+`tests/unit/delta/test_table.py::test_a_value_changed_under_a_generated_case_id_reads_as_removed_and_added` · delta, parametrization
+
+- **given** a «parameter table» whose case 2-True became 3-True
+- **when** the two are aligned, with and without a rename-log rewrite
+- **then** without the rewrite one case is removed and one added
+- **then** with the rewrite they pair by the rename log, the n cell changed
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 
