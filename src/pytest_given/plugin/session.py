@@ -21,6 +21,7 @@ from ..capture import (
     resolve_glossary,
     restore_capture_state,
 )
+from ..git import detect_commit_sha
 from ..grouping import group_parametrized
 from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
 from ..model import (
@@ -36,12 +37,7 @@ from ..model import (
     iter_steps,
     report_to_dict,
 )
-from ..report import (
-    detect_commit_sha,
-    emit_sinks,
-    sink_failure,
-    write_console_as_utf8,
-)
+from ..report import emit_sinks, sink_failure, write_console_as_utf8
 from .state import (
     capture_bootstrapped,
     given_config,

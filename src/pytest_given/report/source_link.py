@@ -4,19 +4,13 @@ Resolves a config value into a substitution template, and substitutes the
 template variables against a SourceLocation + metadata. Errors raised here
 are PytestGivenError, so they surface uniformly through both the plugin
 session-finish path and the standalone CLI.
-
-`detect_commit_sha` is here rather than in a module of its own because it is
-the same `git` seam the `github` preset reads, and its only consumer is the
-report metadata that the SHA-pinned links are substituted from.
 """
 
-import os
-import re
 import string
-import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
+from ..git import detect_github_repo
 from ..model import PytestGivenError, SourceLocation
 
 _STATIC_PRESETS: dict[str, str] = {
@@ -26,7 +20,7 @@ _STATIC_PRESETS: dict[str, str] = {
     'pycharm': 'pycharm://open?file={path}&line={line}',
 }
 
-# `github` is a preset but resolves via `_detect_github_repo`, not the static
+# `github` is a preset but resolves via `detect_github_repo`, not the static
 # table. Listed here so the unknown-preset error advertises it.
 _ALL_PRESET_NAMES = frozenset(_STATIC_PRESETS) | {'github'}
 
@@ -168,15 +162,6 @@ def _extract_field_names(template: str) -> list[str]:
     return fields
 
 
-_GITHUB_URL_RE = re.compile(
-    r'(?:https://github\.com/|git@github\.com:)'
-    r'(?P<org>[^/]+)/'
-    r'(?P<repo>[^/]+?)'
-    r'(?:\.git)?'
-    r'/?$'
-)
-
-
 def _resolve_github_preset() -> str:
     """Detect org/repo and bake into the GitHub permalink template.
 
@@ -184,7 +169,7 @@ def _resolve_github_preset() -> str:
     GitHub remote is available; the message points users at the raw-template
     escape hatch.
     """
-    detected = _detect_github_repo()
+    detected = detect_github_repo()
     if detected is None:
         raise PytestGivenError(
             "given_source_link='github' could not detect an org/repo. "
@@ -195,59 +180,3 @@ def _resolve_github_preset() -> str:
         )
     org, repo = detected
     return f'https://github.com/{org}/{repo}/blob/{{sha}}/{{relpath}}#L{{line}}'
-
-
-def _detect_github_repo() -> tuple[str, str] | None:
-    """Return (org, repo) from GITHUB_REPOSITORY env or `git remote get-url
-    origin`; None if neither yields a recognizable GitHub remote."""
-    env = os.environ.get('GITHUB_REPOSITORY')
-    if env and '/' in env:
-        org, _, repo = env.partition('/')
-        if org and repo:
-            return (org, repo)
-    remote = _git('remote', 'get-url', 'origin')
-    if remote is None:
-        return None
-    match = _GITHUB_URL_RE.match(remote)
-    if match is None:
-        return None
-    return (match['org'], match['repo'])
-
-
-def _git(*args: str) -> str | None:
-    """The stripped stdout of a `git` call, or None when it cannot answer.
-
-    `OSError` covers the whole exec side: a `git` that exists but is not
-    executable raises `PermissionError`, and letting that escape would cost the
-    entire report — session finish catches `OSError` and discards every sink.
-    Timed out rather than left to hang, since a wedged git would hold up an
-    already-finished test session.
-    """
-    try:
-        result = subprocess.run(
-            ['git', *args],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=True,
-        )
-    except OSError, subprocess.SubprocessError:
-        return None
-    return result.stdout.strip()
-
-
-_COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
-
-
-def detect_commit_sha() -> str | None:
-    """Return the current commit SHA, or None if it can't be determined.
-
-    Checks CI env vars in priority order (GitHub → GitLab → Buildkite) then
-    falls back to `git rev-parse HEAD`. Any subprocess failure returns None
-    silently — only relevant if the user's template references `{sha}`, and
-    that case raises a clearer error in `compile_source_link`.
-    """
-    for var in _COMMIT_ENV_VARS:
-        if sha := os.environ.get(var):
-            return sha
-    return _git('rev-parse', 'HEAD')

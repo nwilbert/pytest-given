@@ -27,11 +27,7 @@ from .sinks import (
     sink_failure,
 )
 from .slugs import build_scenario_slug_index
-from .source_link import (
-    SOURCE_LINK_HELP,
-    detect_commit_sha,
-    resolve_source_link_template,
-)
+from .source_link import SOURCE_LINK_HELP, resolve_source_link_template
 from .staged_write import write_all_or_none
 from .text import CITATION_GLYPH, STATUS_GLYPH
 from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
@@ -55,7 +51,6 @@ __all__ = [
     'Target',
     'Theme',
     'build_scenario_slug_index',
-    'detect_commit_sha',
     'emit_sinks',
     'html_link_text',
     'link_text',

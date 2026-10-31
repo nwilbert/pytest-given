@@ -1,10 +1,18 @@
 # Expose the pytest-given FileGlossary at conftest module level so the plugin
 # discovers it and renders the Glossary tab for the self-documenting scenarios.
+from pathlib import Path
+
 import pytest
 
 from pytest_given.capture.source import current_rootdir, restore_rootdir
 from pytest_given.capture.story import restore_story_registry, snapshot_story_registry
+from tests.git_repo import GitRepo, make_git_repo
 from tests.ubiquitous_language import pg  # noqa: F401
+
+
+@pytest.fixture
+def git_repo(tmp_path: Path) -> GitRepo:
+    return make_git_repo(tmp_path / 'repo')
 
 
 @pytest.fixture(autouse=True)
