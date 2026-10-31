@@ -7,7 +7,6 @@ from pytest_given import given, scenario, then, when, when_then
 from pytest_given.model import PytestGivenError, SourceLocation
 from pytest_given.report.source_link import (
     compile_source_link,
-    detect_commit_sha,
     resolve_source_link_template,
 )
 from tests.ubiquitous_language import pg
@@ -365,92 +364,6 @@ def test_a_bad_conversion_is_rejected_up_front() -> None:
 def test_an_unclosed_brace_is_rejected_up_front() -> None:
     with pytest.raises(PytestGivenError, match='cannot be read'):
         compile_source_link('https://x/{relpath', project='p', commit_sha=None)
-
-
-def _clear_ci_vars(monkeypatch: pytest.MonkeyPatch) -> None:
-    for var in ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT'):
-        monkeypatch.delenv(var, raising=False)
-
-
-@pytest.mark.parametrize(
-    ('env_var', 'sha'),
-    [
-        ('GITHUB_SHA', 'abc123'),
-        ('CI_COMMIT_SHA', 'def456'),
-        ('BUILDKITE_COMMIT', '7890ab'),
-    ],
-)
-def test_detect_commit_sha_from_a_ci_env_var(
-    monkeypatch: pytest.MonkeyPatch, env_var: str, sha: str
-) -> None:
-    _clear_ci_vars(monkeypatch)
-    monkeypatch.setenv(env_var, sha)
-    assert detect_commit_sha() == sha
-
-
-def test_detect_commit_sha_priority_github_over_gitlab(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _clear_ci_vars(monkeypatch)
-    monkeypatch.setenv('GITHUB_SHA', 'gh')
-    monkeypatch.setenv('CI_COMMIT_SHA', 'gl')
-    assert detect_commit_sha() == 'gh'
-
-
-def test_detect_commit_sha_git_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
-    _clear_ci_vars(monkeypatch)
-    captured: list[list[str]] = []
-
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        captured.append(cmd)
-        return subprocess.CompletedProcess(cmd, 0, stdout='fakegitsha\n', stderr='')
-
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert detect_commit_sha() == 'fakegitsha'
-    assert captured == [['git', 'rev-parse', 'HEAD']]
-
-
-def test_detect_commit_sha_git_failure_returns_none(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _clear_ci_vars(monkeypatch)
-
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        raise subprocess.CalledProcessError(returncode=128, cmd=cmd)
-
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert detect_commit_sha() is None
-
-
-def test_detect_commit_sha_git_not_installed_returns_none(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _clear_ci_vars(monkeypatch)
-
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        raise FileNotFoundError('git not found')
-
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert detect_commit_sha() is None
-
-
-def test_detect_commit_sha_unrunnable_git_returns_none(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """A `git` that exists but cannot be executed is still "git cannot answer".
-
-    `subprocess.run` raises `PermissionError` (an `OSError`, neither a
-    `SubprocessError` nor a `FileNotFoundError`) for a non-executable `git` on
-    PATH. Escaping here costs the whole report: session finish catches `OSError`
-    and discards every sink over an optional SHA.
-    """
-    _clear_ci_vars(monkeypatch)
-
-    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-        raise PermissionError(13, 'Permission denied', 'git')
-
-    monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert detect_commit_sha() is None
 
 
 def test_resolve_github_preset_unrunnable_git_raises_the_plugin_error(

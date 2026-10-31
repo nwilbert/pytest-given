@@ -42,21 +42,22 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 
 ## Architecture
 
-`src/pytest_given/` is seven library subpackages plus two entry points, with a
+`src/pytest_given/` is eight library subpackages plus two entry points, with a
 strict dependency direction (held by `tests/unit/test_architecture.py`):
 
 ```
-markdown/                  the leaf — reading Markdown (blocks, tables, inline
+markdown/                  a leaf — reading Markdown (blocks, tables, inline
                            spans), writing spans back, rendering them as HTML
+git/                       a leaf — every `git` subprocess call
 model/                     schema, serde, errors, shared text rules
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
 citations/                 on model/ + report/
-plugin/   cli/             the entry points; may import all seven, and hold
-                           nothing the seven could
+plugin/   cli/             the entry points; may import all eight, and hold
+                           nothing the eight could
 ```
 
-Every package may import `markdown/`, which imports none of them.
+Every package may import `markdown/` and `git/`, which import none of them.
 
 What no filename tells you:
 
