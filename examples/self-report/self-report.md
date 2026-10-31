@@ -2939,6 +2939,16 @@
 - **when** it is parsed
 - **then** the error names `[[scenario]] #2`
 
+## ✓ A reworded «step» reads as modified, an unrelated one as removed and added
+`tests/unit/delta/test_steps.py::test_a_reworded_step_reads_as_modified` · delta
+
+- **given** a before and an after «step» list of one booking story
+- **when** the two are aligned
+- **then** the reworded When and Then are modified between the two unchanged steps
+- **then** the modified Then carries the words that changed
+- **when** the second Then is swapped for a wholly different one
+- **then** the old Then is removed and the new one added
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 
