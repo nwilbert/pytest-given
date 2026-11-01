@@ -1830,23 +1830,39 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 .delta-module-mark[data-change="changed"] { --change-ink: var(--changed-ink); }
 .delta-module-mark[data-change="removed"] { --change-ink: var(--removed-ink); }
 
-/* A changed scenario's steps, each line tinted by its change and led by its
-   glyph in the margin left of the keywords. The glyph is positioned against
-   the phase block, so a nested step's sits in the same margin. Added and
-   removed lines stand for their whole subtree, tinted alike; a modified or
-   equal line's children carry their own marks. */
-.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
-.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
-.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
-.delta-step[data-change="modified"] > .step-text,
-.delta-step[data-change="added"] .step-text,
-.delta-step[data-change="removed"] .step-text {
-  background: var(--change-tint);
-  border-radius: var(--radius-sm);
-  padding: 0 var(--space-xs);
-  margin-left: calc(-1 * var(--space-xs));
-  width: fit-content;
+/* A listed scenario's sides in two columns, before on the left, each under
+   its caption: steps above the side's table. A grid row is as tall as its
+   taller side, so the tables start level; within a row `delta.js` lines up
+   the steps and the cases. A table that didn't change spans both columns.
+   A column stops growing at a reading width, so a wide screen keeps the
+   sides as close as a laptop's. */
+.delta-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 42rem));
+  column-gap: var(--space-xl);
+  align-items: start;
+  margin-top: var(--space-md);
 }
+.delta-sides > [data-side="before"] { grid-column: 1; }
+.delta-sides > [data-side="after"] { grid-column: 2; }
+.delta-sides > .delta-shared { grid-column: 1 / -1; }
+.delta-caption {
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.delta-side-steps .steps { padding-top: var(--space-xs); }
+
+/* A step's change, by the glyph in the margin left of its keyword: the
+   marked words carry the rest. The glyph is positioned against the phase
+   block, so a nested step's sits in the same margin. */
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --step-glyph: '\2212'; }
 .delta-step:not([data-change="equal"]) > .step-text::before {
   content: var(--step-glyph);
   position: absolute;
@@ -1854,45 +1870,34 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   font-weight: 700;
   color: var(--change-ink);
 }
-.delta-step[data-change="removed"] .step-text {
-  text-decoration: line-through;
-  text-decoration-color: var(--removed-line);
-}
-/* Word marks: stronger than the line's tint, so they read on it. */
+/* Struck in the text's own ink, which reads on the red where a line colour
+   would not. The toggle of a step with sub-steps is inline-flex, which a
+   strike-through doesn't reach into. */
+.delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
 .delta-words { border-radius: 2px; padding: 0 1px; }
-del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
 ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
-del.delta-words + ins.delta-words { margin-left: 2px; }
-.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
-.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
-/* Room for the old keyword beside the new one, in every block alike so the
-   steps still align. */
-.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
 /* A collapsed parent clips its children, so a nested glyph sits inside the
    children's indent rather than out in the margin, where it would escape. */
 .delta .step-children { position: relative; }
 .delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
-
-/* A changed parameter table: each side's table under its caption, side by
-   side, a case on one line across them (`delta.js` evens out the rows). Top
-   aligned, since evening out grows a row past its content. */
-.delta-tables {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-xl);
-  margin: var(--space-md) 0 0 var(--space-xl);
+/* A step the side lacks, hatched across the keyword's gutter too and outside
+   any phase, so a phase's outline never takes in a step of the other side;
+   a line high until `delta.js` sizes it to the step it stands in for.
+   Content-box clipped, since the push that lines it up is padding. A phase
+   it interrupts goes on below it without its keyword. */
+.delta-gaps + .phase-block:not(.delta-continued) { margin-top: var(--space-sm); }
+.delta-gap {
+  height: 1lh;
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px) content-box;
 }
+
+/* A side's parameter table, a case on one line across the two (`delta.js`
+   evens out the rows). Top aligned, since evening out grows a row past its
+   content. */
 .delta-table { min-width: 0; }
-.delta-table .param-table { margin: 0; max-width: 100%; }
 .delta-table .param-table th,
 .delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
-.delta-table-caption {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  margin-bottom: var(--space-xs);
-}
 .delta-table .param-table th .delta-was { display: block; }
 .delta-table .param-table del { text-decoration-color: var(--removed-line); }
 /* An added or removed case's row in its change's tint; every case's ID is led

@@ -1867,18 +1867,34 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 
 
 
-.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
-.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
-.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
-.delta-step[data-change="modified"] > .step-text,
-.delta-step[data-change="added"] .step-text,
-.delta-step[data-change="removed"] .step-text {
-  background: var(--change-tint);
-  border-radius: var(--radius-sm);
-  padding: 0 var(--space-xs);
-  margin-left: calc(-1 * var(--space-xs));
-  width: fit-content;
+
+.delta-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 42rem));
+  column-gap: var(--space-xl);
+  align-items: start;
+  margin-top: var(--space-md);
 }
+.delta-sides > [data-side="before"] { grid-column: 1; }
+.delta-sides > [data-side="after"] { grid-column: 2; }
+.delta-sides > .delta-shared { grid-column: 1 / -1; }
+.delta-caption {
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.delta-side-steps .steps { padding-top: var(--space-xs); }
+
+
+
+
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --step-glyph: '\2212'; }
 .delta-step:not([data-change="equal"]) > .step-text::before {
   content: var(--step-glyph);
   position: absolute;
@@ -1886,20 +1902,13 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   font-weight: 700;
   color: var(--change-ink);
 }
-.delta-step[data-change="removed"] .step-text {
-  text-decoration: line-through;
-  text-decoration-color: var(--removed-line);
-}
 
+
+
+.delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
 .delta-words { border-radius: 2px; padding: 0 1px; }
-del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
 ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
-del.delta-words + ins.delta-words { margin-left: 2px; }
-.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
-.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
-
-
-.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
 
 
 .delta .step-children { position: relative; }
@@ -1908,23 +1917,19 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
 
 
-.delta-tables {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-xl);
-  margin: var(--space-md) 0 0 var(--space-xl);
+
+.delta-gaps + .phase-block:not(.delta-continued) { margin-top: var(--space-sm); }
+.delta-gap {
+  height: 1lh;
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px) content-box;
 }
+
+
+
+
 .delta-table { min-width: 0; }
-.delta-table .param-table { margin: 0; max-width: 100%; }
 .delta-table .param-table th,
 .delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
-.delta-table-caption {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  margin-bottom: var(--space-xs);
-}
 .delta-table .param-table th .delta-was { display: block; }
 .delta-table .param-table del { text-decoration-color: var(--removed-line); }
 
@@ -2114,8 +2119,8 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-0" :aria-expanded="!!expandedScenarios[0]" :aria-label="(expandedScenarios[0] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(0)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[0] }"></span></button>
         <span class="delta-title">
-          <span class="scenario-title">Guests check in with a digital key</span>
-          <span class="delta-was" data-term-side="before">was <del>Guests check in at the front desk</del></span>
+          <span class="scenario-title" data-side="after">Guests check in with a digital key</span>
+          <span class="delta-was" data-side="before" data-term-side="before">was <del>Guests check in at the front desk</del></span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/check_in" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2130,21 +2135,26 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
     <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
-      <div class="steps delta-phase-changed"><div class="phase-block" data-block="0">
-            <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
-            </div></div><div class="phase-block" data-block="1">
-            <div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div></div>
-            </div></div><div class="phase-block" data-block="1">
-            <div class="phase-label"><del class="delta-phase">Then</del> When</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified"><div class="step-text">the hotel <del class="delta-words" data-term-side="before">hands</del><ins class="delta-words">sends</ins> her a <del class="delta-words" data-term-side="before">key</del><ins class="delta-words">digital</ins> <del class="delta-words" data-term-side="before">card</del><ins class="delta-words">key</ins></div></div>
-            </div></div><div class="phase-block" data-block="2">
-            <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="added"><div class="step-text">her phone opens the door of her room</div></div>
-            </div></div></div>
-
-      
+      <div class="delta-sides">
+        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
+        <div class="delta-caption" data-side="after">After: v2 2026-11-01T07:17:51.754604+00:00</div>
+        <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_1"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s0_2"><div class="step-text">the hotel <del class="delta-words">hands</del> her a <del class="delta-words">key</del> <del class="delta-words">card</del></div></div>
+            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s0_3" aria-hidden="true"></div></div></div></div>
+        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s0_1"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> gives her name at the front desk</div></div>
+            </div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s0_2"><div class="step-text">the hotel <ins class="delta-words">sends</ins> her a <ins class="delta-words">digital</ins> <ins class="delta-words">key</ins></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="added" data-row="s0_3"><div class="step-text">her phone opens the door of her room</div></div>
+            </div></div></div></div>
+      </div>
 
       
       <div class="scenario-source"><span>test_delta_booking.py:30</span></div>
@@ -2160,7 +2170,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-1" :aria-expanded="!!expandedScenarios[1]" :aria-label="(expandedScenarios[1] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(1)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[1] }"></span></button>
         <span class="delta-title">
-          <span class="scenario-title">Cancelling a paid booking refunds it</span>
+          <span class="scenario-title" data-side="after">Cancelling a paid booking refunds it</span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/cancel_booking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2175,22 +2185,28 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
     <div class="scenario-body" id="scenario-body-1" :class="{ expanded: expandedScenarios[1] }">
     <div class="scenario-body-inner">
-      <div class="steps"><div class="phase-block" data-block="0">
-            <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
-            </div></div><div class="phase-block" data-block="1">
-            <div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
-            </div></div><div class="phase-block" data-block="2">
-            <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text">the hotel returns the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
+      <div class="delta-sides">
+        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
+        <div class="delta-caption" data-side="after">After: v2 2026-11-01T07:17:51.754604+00:00</div>
+        <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="removed" data-term-side="before"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
-            </div><div class="phase-steps">
-              <div class="delta-step" data-change="added"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
-            </div></div></div>
-
-      
+              <div class="delta-step" data-change="removed" data-row="s1_3"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> receives a cancellation email with her <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
+            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s1_4" aria-hidden="true"></div></div></div></div>
+        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s1_1"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> cancels the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s1_2"><div class="step-text">the hotel returns the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> in full</div></div>
+            </div></div><div class="delta-gaps"><div class="delta-gap" data-row="s1_3" aria-hidden="true"></div></div><div class="phase-block delta-continued" data-block="2"><div class="phase-steps">
+              <div class="delta-step" data-change="added" data-row="s1_4"><div class="step-text">the cancellation is noted on the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="invoice">Invoice</span></div></div>
+            </div></div></div></div>
+      </div>
 
       
       <div class="scenario-source"><span>test_delta_booking.py:42</span></div>
@@ -2206,8 +2222,8 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-2" :aria-expanded="!!expandedScenarios[2]" :aria-label="(expandedScenarios[2] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(2)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[2] }"></span></button>
         <span class="delta-title">
-          <span class="scenario-title">A walk-in guest is offered the next free suite</span>
-          <span class="delta-was" data-term-side="before">was <del>A walk-in guest gets the next free room</del></span>
+          <span class="scenario-title" data-side="after">A walk-in guest is offered the next free suite</span>
+          <span class="delta-was" data-side="before" data-term-side="before">was <del>A walk-in guest gets the next free room</del></span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/walk_in_booking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2222,18 +2238,24 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
     <div class="scenario-body" id="scenario-body-2" :class="{ expanded: expandedScenarios[2] }">
     <div class="scenario-body-inner">
-      <div class="steps"><div class="phase-block" data-block="0">
-            <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified"><div class="step-text"><del class="delta-words" data-term-side="before"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist">Dana</span></del><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
-            </div></div><div class="phase-block" data-block="1">
-            <div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text">a walk-in <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
-            </div></div><div class="phase-block" data-block="2">
-            <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> gets <del class="delta-words" data-term-side="before"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room 101</span></del><ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite 101</span></ins></div></div>
-            </div></div></div>
-
-      
+      <div class="delta-sides">
+        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
+        <div class="delta-caption" data-side="after">After: v2 2026-11-01T07:17:51.754604+00:00</div>
+        <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s2_2"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> gets <del class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room 101</span></del></div></div>
+            </div></div></div></div>
+        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><ins class="delta-words">the front desk </ins>has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s2_1"><div class="step-text">a walk-in <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> asks for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite</span></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s2_2"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span> gets <ins class="delta-words"><span class="term-ref-object term-ref--link has-term-tip" data-term-id="suite">Suite 101</span></ins></div></div>
+            </div></div></div></div>
+      </div>
 
       
       <div class="scenario-source"><span>test_delta_booking.py:56</span></div>
@@ -2249,7 +2271,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-3" :aria-expanded="!!expandedScenarios[3]" :aria-label="(expandedScenarios[3] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(3)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[3] }"></span></button>
         <span class="delta-title">
-          <del class="scenario-title">Late check-out is refused when the next guest arrives early</del>
+          <del class="scenario-title" data-side="before">Late check-out is refused when the next guest arrives early</del>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=removed-delta_booking/late_checkout" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2262,7 +2284,9 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
     <div class="scenario-body" id="scenario-body-3" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
-      <div class="steps"><div class="phase-block" data-block="0">
+      <div class="delta-sides">
+        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
+        <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">the next <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Carol</span> arrives at noon</div>
             </div></div><div class="phase-block" data-block="1">
@@ -2271,9 +2295,8 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the request is refused</div>
-            </div></div></div>
-
-      
+            </div></div></div></div>
+      </div>
 
       
       <div class="scenario-source"><span>test_delta_booking.py:65</span></div>
@@ -2289,7 +2312,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-4" :aria-expanded="!!expandedScenarios[4]" :aria-label="(expandedScenarios[4] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(4)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[4] }"></span></button>
         <span class="delta-title">
-          <span class="scenario-title">Returning guests get a loyalty discount on the invoice</span>
+          <span class="scenario-title" data-side="after">Returning guests get a loyalty discount on the invoice</span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/loyalty_discount" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2302,7 +2325,9 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
     <div class="scenario-body" id="scenario-body-4" :class="{ expanded: expandedScenarios[4] }">
     <div class="scenario-body-inner">
-      <div class="steps"><div class="phase-block" data-block="0">
+      <div class="delta-sides">
+        <div class="delta-caption" data-side="after">After: v2 2026-11-01T07:17:51.754604+00:00</div>
+        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has stayed three times before</div>
             </div></div><div class="phase-block" data-block="1">
@@ -2311,9 +2336,8 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the total is reduced by 10 percent</div>
-            </div></div></div>
-
-      
+            </div></div></div></div>
+      </div>
 
       
       <div class="scenario-source"><span>test_delta_booking.py:66</span></div>
@@ -2329,7 +2353,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-5" :aria-expanded="!!expandedScenarios[5]" :aria-label="(expandedScenarios[5] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(5)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span></button>
         <span class="delta-title">
-          <span class="scenario-title">A declined payment leaves the booking pending</span>
+          <span class="scenario-title" data-side="after">A declined payment leaves the booking pending</span>
         </span>
         <button type="button" class="anchor-link" title="Copy link" data-anchor="scenario=delta_booking/payment_declined" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
       </div>
@@ -2346,56 +2370,62 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <div class="reason-box xfailed">
         <div class="delta-was">was expected to fail: <del>gift cards are not wired in yet</del></div>
       </div>
-      <div class="steps"><div class="phase-block" data-block="0">
-            <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
-            </div></div><div class="phase-block" data-block="1">
-            <div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <del class="delta-words" data-term-side="before">deposit</del><ins class="delta-words">fee</ins> of <del class="delta-words" data-term-side="before"><span class="param-color-1" data-param="before:derived:0">{deposit}</span></del><ins class="delta-words"><span class="param-color-4" data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
-            </div></div><div class="phase-block" data-block="2">
-            <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-5" data-param="reason" data-subst="reason">{reason}</span></div></div>
+      <div class="delta-sides">
+        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
+        <div class="delta-caption" data-side="after">After: v2 2026-11-01T07:17:51.754604+00:00</div>
+        <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s5_1"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <del class="delta-words">deposit</del> of <del class="delta-words"><span class="param-color-1" data-param="before:derived:0" data-subst="before:derived:0">{deposit}</span></del></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s5_2"><div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-2" data-param="reason" data-subst="reason">{decline_reason}</span></div></div>
             </div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
-            </div></div></div>
-
-      
-      <div class="delta-tables">
+              <div class="delta-step" data-change="equal" data-row="s5_3"><div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
+            </div></div></div></div>
+        <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
+            </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
+              <div class="delta-step" data-change="modified" data-row="s5_1"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <ins class="delta-words">fee</ins> of <ins class="delta-words"><span class="param-color-4" data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
+            </div></div><div class="phase-block" data-block="2"><div class="phase-label">Then</div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s5_2"><div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-5" data-param="reason" data-subst="reason">{reason}</span></div></div>
+            </div><div class="phase-steps">
+              <div class="delta-step" data-change="equal" data-row="s5_3"><div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
+            </div></div></div></div>
+        
         <div class="delta-table" data-side="before">
-          <div class="delta-table-caption">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
           <div class="param-table-scroll">
           <table class="param-table">
             <thead data-band="head">
               <tr>
-                <th class="param-id">case ID</th>
-                <th data-param="payment_method">payment_method</th>
-                <th data-param="before:derived:0" data-change="removed"><del>deposit</del></th>
-                <th data-param="reason">decline_reason</th>
-                <th data-param="amount">amount</th>
-                <th class="param-status">status</th>
+                <th class="param-id" data-block="frame">case ID</th>
+                <th data-param="payment_method" data-block="1">payment_method</th>
+                <th data-param="before:derived:0" data-block="1" data-change="removed"><del>deposit</del></th>
+                <th data-param="reason" data-block="2">decline_reason</th>
+                <th data-param="amount" data-block="2">amount</th>
+                <th class="param-status" data-block="frame">status</th>
               </tr>
             </thead>
             <tbody data-band="0">
               <tr data-case-row>
-                <th scope="row" class="param-id" data-change="removed">
+                <th scope="row" class="param-id" data-block="frame" data-change="removed">
                   <span class="delta-row-lead">~</span>credit-card</th>
                 
             
-            <td data-param="payment_method">credit card</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
             
                 
             
-            <td data-param="before:derived:0">60</td>
+            <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">60</td>
             
                 
             
-            <td data-param="reason">insufficient funds</td>
+            <td data-param="reason" data-block="2" data-subst="reason">insufficient funds</td>
             
                 
             
-            <td data-param="amount">120</td>
+            <td data-param="amount" data-block="2" data-subst="amount">120</td>
             
-                <td class="param-status"><span class="dot-passed">✓</span></td>
+                <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
           
@@ -2409,25 +2439,25 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
             </tbody>
             <tbody data-band="1">
               <tr data-case-row>
-                <th scope="row" class="param-id">
+                <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">~</span>debit-card</th>
                 
             
-            <td data-param="payment_method">debit card</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
             
                 
             
-            <td data-param="before:derived:0">40</td>
+            <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">40</td>
             
                 
             
-            <td data-param="reason">expired card</td>
+            <td data-param="reason" data-block="2" data-subst="reason">expired card</td>
             
                 
             
-            <td data-param="amount" data-change="removed">80</td>
+            <td data-param="amount" data-block="2" data-subst="amount" data-change="removed">80</td>
             
-                <td class="param-status"><span class="dot-passed">✓</span></td>
+                <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
           
@@ -2441,25 +2471,25 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
             </tbody>
             <tbody data-band="2">
               <tr data-case-row data-change="removed">
-                <th scope="row" class="param-id">
+                <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">−</span><del>bank-transfer</del></th>
                 
             
-            <td data-param="payment_method">bank transfer</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">bank transfer</td>
             
                 
             
-            <td data-param="before:derived:0">150</td>
+            <td data-param="before:derived:0" data-block="1" data-subst="before:derived:0">150</td>
             
                 
             
-            <td data-param="reason">fraud check failed</td>
+            <td data-param="reason" data-block="2" data-subst="reason">fraud check failed</td>
             
                 
             
-            <td data-param="amount">300</td>
+            <td data-param="amount" data-block="2" data-subst="amount">300</td>
             
-                <td class="param-status"><span class="dot-passed">✓</span></td>
+                <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
           
@@ -2473,25 +2503,25 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
             </tbody>
             <tbody data-band="3">
               <tr data-case-row>
-                <th scope="row" class="param-id">
+                <th scope="row" class="param-id" data-block="frame">
                   <span class="delta-row-lead">~</span>gift-card</th>
                 
             
-            <td data-param="payment_method">gift card</td>
+            <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
             
                 
             
-            <td data-param="before:derived:0"></td>
+            <td data-param="before:derived:0" data-block="1"></td>
             
                 
             
-            <td data-param="reason">partial balance</td>
+            <td data-param="reason" data-block="2" data-subst="reason">partial balance</td>
             
                 
             
-            <td data-param="amount">50</td>
+            <td data-param="amount" data-block="2" data-subst="amount">50</td>
             
-                <td class="param-status" data-change="removed"><span class="dot-xfailed">⊗</span></td>
+                <td class="param-status" data-block="frame" data-change="removed"><span class="dot-xfailed">⊗</span></td>
               </tr>
               
           <tr>
@@ -2525,7 +2555,6 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           </div>
         </div>
         <div class="delta-table" data-side="after">
-          <div class="delta-table-caption">After: v2 2026-11-01T07:17:51.754604+00:00</div>
           <div class="param-table-scroll">
           <table class="param-table">
             <thead data-band="head">
@@ -2688,7 +2717,6 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           </div>
         </div>
       </div>
-      
 
       
       <div class="scenario-source"><span>test_delta_booking.py:92</span></div>
@@ -2963,7 +2991,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
               <span class="term-name">Invoice<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=invoice" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
             </span>
             <div class="entry-body">
-              <div class="entry-def"><del class="delta-words" data-term-side="before">A</del><ins class="delta-words">The itemised </ins>bill <del class="delta-words" data-term-side="before">for</del><ins class="delta-words">of</ins> a <del class="delta-words" data-term-side="before">stay.</del><ins class="delta-words">stay, settled at check-out.</ins><span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-def"><del class="delta-words">A</del><ins class="delta-words">The itemised </ins>bill <del class="delta-words">for</del><ins class="delta-words">of</ins> a <del class="delta-words">stay.</del><ins class="delta-words">stay, settled at check-out.</ins><span class="entry-def-badge" style="display:none">Undefined</span></div>
               <span class="delta-change-label" data-change="changed">changed</span>
               <div class="entry-summary meta-list"><span>1 → 2 scenarios</span></div>
             </div>
@@ -4034,7 +4062,7 @@ function reportApp() {
       rowEl.querySelectorAll('td[data-subst]').forEach(td => {
         values[td.dataset.subst] = td.textContent.trim();
       });
-      scope.querySelectorAll('span[data-subst]').forEach(span => {
+      this._previewSpans(rowEl, scope).forEach(span => {
         const val = values[span.dataset.subst];
         if (val === undefined) return;
 
@@ -4042,6 +4070,11 @@ function reportApp() {
         span.textContent = val;
         span.classList.add('param-substituted');
       });
+    },
+
+
+    _previewSpans(rowEl, scope) {
+      return [...scope.querySelectorAll('span[data-subst]')];
     },
     clearHoverRow(rowEl) {
       const scope = rowEl?.closest('.scenario');
@@ -4178,22 +4211,23 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = this._phaseTable(scope);
-        if (table) redraw.observe(table);
+        scope.querySelectorAll('.param-table').forEach(table => redraw.observe(table));
       });
       document.addEventListener('pointerout', (event) => {
         if (!event.relatedTarget) leave();
       });
     },
 
-
-
-
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = this._phaseTable(scope);
-      if (!table) return;
+      scope.querySelectorAll('.param-table').forEach(table => this._outlineColumns(table, safe));
+    },
+
+
+
+
+    _outlineColumns(table, safe) {
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
       const columns = [];
@@ -4225,11 +4259,6 @@ function reportApp() {
         outline.style.height = `${bottom - top}px`;
         wrap.appendChild(outline);
       }
-    },
-
-
-    _phaseTable(scope) {
-      return scope.querySelector('.param-table');
     },
 
 
@@ -4468,33 +4497,27 @@ function deltaApp() {
     },
 
 
-    _phaseTable(scope) {
-      if (!scope.querySelector('.delta-tables')) return base._phaseTable.call(this, scope);
-      return scope.querySelector('.delta-table[data-side="after"] .param-table');
+    _previewSpans(rowEl, scope) {
+      const spans = base._previewSpans.call(this, rowEl, scope);
+      const side = rowEl.closest('[data-side]')?.dataset.side;
+      if (!side) return spans;
+      return spans.filter(span => span.closest('[data-side]')?.dataset.side === side);
     },
     init() {
       base.init.call(this);
       this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
-      this._initTableAlignment();
+      this._initAlignment();
     },
 
 
 
 
-    _initTableAlignment() {
-      for (const pair of document.querySelectorAll('.delta-tables')) {
-        const tables = pair.querySelectorAll('.param-table');
-        if (tables.length !== 2) continue;
-        let queued = false;
-        const observer = new ResizeObserver(() => {
-          if (queued) return;
-          queued = true;
-          requestAnimationFrame(() => {
-            queued = false;
-            alignBands(...tables);
-          });
-        });
-        tables.forEach(table => observer.observe(table));
+    _initAlignment() {
+      for (const sides of document.querySelectorAll('.delta-sides')) {
+        const steps = sides.querySelectorAll(':scope > .delta-side-steps');
+        const tables = sides.querySelectorAll(':scope > .delta-table .param-table');
+        if (steps.length === 2) alignOnResize(steps, () => alignRows(...steps));
+        if (tables.length === 2) alignOnResize(tables, () => alignBands(...tables));
       }
     },
     _readHash() {
@@ -4518,6 +4541,63 @@ function deltaApp() {
 
   const app = Object.defineProperties({},Object.getOwnPropertyDescriptors(base));
   return Object.defineProperties(app, Object.getOwnPropertyDescriptors(overrides));
+}
+
+function alignOnResize(elements, align) {
+  let queued = false;
+  const observer = new ResizeObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      align();
+    });
+  });
+  elements.forEach(element => observer.observe(element));
+}
+
+
+
+
+
+
+function alignRows(before, after) {
+  if (!before.getClientRects().length) return;  // a hidden scenario
+  const shown = side => [...side.querySelectorAll('[data-row]')]
+    .filter(row => !row.parentElement.closest('.step-expand:not(.expanded)'));
+  const pairs = zip(shown(before), shown(after));
+  if (!pairs) {
+    console.assert(false, 'delta steps have unequal rows', before, after);
+    return;
+  }
+  for (const row of pairs.flat()) {
+    row.style.paddingTop = '';
+    row.style.height = '';
+  }
+  const boxes = pairs.map(pair => pair.map(row => row.getBoundingClientRect()));
+  const shift = [0, 0];
+  pairs.forEach((pair, i) => {
+    const tops = boxes[i].map((box, side) => box.top + shift[side]);
+    const level = Math.max(...tops);
+    pair.forEach((row, side) => {
+      const push = level - tops[side] >= 0.5 ? level - tops[side] : 0;
+      if (push) row.style.paddingTop = `${push}px`;
+      shift[side] += push;
+      if (!row.classList.contains('delta-gap')) return;
+
+      const height = boxes[i][1 - side].height;
+      row.style.height = `${push + height}px`;
+      shift[side] += height - boxes[i][side].height;
+    });
+  });
+}
+
+
+
+function zip(before, after) {
+  if (before.length !== after.length) return null;
+  if (before.some((row, i) => row.dataset.row !== after[i].dataset.row)) return null;
+  return before.map((row, i) => [row, after[i]]);
 }
 
 

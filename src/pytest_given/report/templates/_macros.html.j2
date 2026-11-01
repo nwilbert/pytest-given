@@ -366,9 +366,9 @@
   {%- endmacro -%}
 
   {#- One cell of a case's row. `cell_id` keys an attachment's payload,
-      `block` is the column's phase block, `subst` whether a hovered row
-      previews the cell in the steps, and `change` the delta page's mark. -#}
-  {%- macro param_cell(col, val, cell_id, block, subst=true, change=none) -%}
+      `block` is the column's phase block, and `change` the delta page's
+      mark. -#}
+  {%- macro param_cell(col, val, cell_id, block, change=none) -%}
             {% if col.kind == 'attachment' %}
             <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>
               {% if val %}
@@ -382,7 +382,7 @@
                substituting that blank would erase the step's {token} instead of
                replacing it. A `param` cell always substitutes — `None` there is
                a real parametrize value. #}
-            <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if subst and (col.kind == 'param' or val is not none) %} data-subst="{{ col.id }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
   {%- endmacro -%}
 

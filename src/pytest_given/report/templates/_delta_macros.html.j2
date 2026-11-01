@@ -1,12 +1,12 @@
 {#
   What the delta page adds to the report's macros: the Change filter, a
-  changed scenario's steps (the report's phase blocks and step lines, with
-  each step's change marked in place, styled as `.delta-step`) and its
-  parameter tables side by side, and a listed term's card.
+  changed scenario's two sides (the report's phase blocks and step lines,
+  each step's change marked on its side, styled as `.delta-step`, and the
+  parameter tables), and a listed term's card.
   `data-term-side="before"` tells the term tooltip (`delta.js`) which glossary
   a ref inside it was read against.
 #}
-  {%- from '_macros.html.j2' import anchor_link, render_step, step_text, step_children, step_attachments, param_cell, case_extras, status_dot with context -%}
+  {%- from '_macros.html.j2' import anchor_link, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, param_cell, case_extras, status_dot with context -%}
 
   {#- The Change filter's pills, each disabled at zero, and how many items
       matched with no change. `model` is the Alpine property the pills
@@ -96,78 +96,103 @@
         </div>
   {%- endmacro -%}
 
-  {#- `step_ids` as `scenario_steps` makes them: a running count, unique
-      across blocks. A block of removed steps alone carries no `data-block`:
-      the after side's columns name no such block. -#}
-  {%- macro delta_steps(blocks, scenario_idx) -%}
-      <div class="steps{% if blocks | selectattr('was_phase') | first %} delta-phase-changed{% endif %}">
-        {%- set ns = namespace(step_idx=0) -%}
-        {%- for block in blocks -%}
-          <div class="phase-block"{% if block.after_block is not none %} data-block="{{ block.after_block }}"{% endif %}>
-            <div class="phase-label">{{ phase_change(block.phase, block.was_phase) }}</div>
+  {#- A listed scenario's sides in two columns, before on the left, each
+      under its caption: a changed scenario's steps side by side above its
+      tables, an added or removed one's own side alone. A table that didn't
+      change spans both columns. `data-side` scopes a hovered row's preview to
+      its own side's text. -#}
+  {%- macro delta_sides(item, table, scenario_idx) -%}
+      {%- set scenario = item.shown -%}
+      {%- set steps = item.steps -%}
+      {%- set sides = ['before', 'after'] if steps is not none else [item.side] -%}
+      <div class="delta-sides">
+        {%- for side in sides %}
+        <div class="delta-caption" data-side="{{ side }}">{{ side | capitalize }}: {{ side_labels[side] }}</div>
+        {%- endfor %}
+        {%- for side in sides %}
+        <div class="delta-side-steps" data-side="{{ side }}"{% if steps is not none and side == 'before' %} data-term-side="before"{% endif %}>
+          {%- if steps is not none %}{{ delta_steps(steps, side, scenario_idx) }}{% else %}{{ scenario_steps(scenario, scenario_idx, side) }}{% endif -%}
+        </div>
+        {%- endfor %}
+        {%- if table %}
+        {{ param_table_delta(table, scenario_idx) }}
+        {%- elif scenario.parameters %}
+        <div class="{{ 'delta-shared' if steps is not none else 'delta-table' }}"{% if steps is none %} data-side="{{ item.side }}"{% endif %}>
+          {{ param_table(scenario, scenario_idx) }}
+        </div>
+        {%- endif %}
+      </div>
+  {%- endmacro -%}
+
+  {#- A changed scenario's steps on one side, under that side's phases, a row
+      for each aligned pair of steps with a hatched one where the side lacks
+      the step, outside any phase. A row's ID is its place among the rows,
+      the same on both sides: it keys the row's line for `delta.js` to align,
+      and its open sub-steps, so one toggle opens both sides. -#}
+  {%- macro delta_steps(view, side, scenario_idx) -%}
+      <div class="steps">
+        {%- for block in view.side(side) -%}
+          {%- if block.phase is none -%}
+          <div class="delta-gaps">
+            {%- for row in block.rows %}{{ step_gap('s' ~ scenario_idx ~ '_' ~ row.path | join('_')) }}{% endfor -%}
+          </div>
+          {%- else -%}
+          <div class="phase-block{% if block.continued %} delta-continued{% endif %}" data-block="{{ block.key }}">
+            {%- if not block.continued %}<div class="phase-label">{{ block.phase | capitalize }}</div>{% endif -%}
             {%- for row in block.rows -%}
             <div class="phase-steps">
-              {{ render_step_delta(row, 's' ~ scenario_idx ~ '_' ~ ns.step_idx) }}
+              {{ render_step_row(row, side, 's' ~ scenario_idx ~ '_' ~ row.path | join('_')) }}
             </div>
-            {%- set ns.step_idx = ns.step_idx + 1 -%}
             {%- endfor -%}
           </div>
+          {%- endif -%}
         {%- endfor -%}
       </div>
   {%- endmacro -%}
 
-  {%- macro phase_change(phase, was_phase) -%}
-    {%- if was_phase -%}<del class="delta-phase">{{ was_phase | capitalize }}</del> {% endif -%}
-    {{ phase | capitalize }}
+  {%- macro step_gap(step_id) -%}
+    <div class="delta-gap" data-row="{{ step_id }}" aria-hidden="true"></div>
   {%- endmacro -%}
 
-  {#- An added or removed row is its step's whole subtree, rendered from its
-      side and tinted as one. A nested step has no phase label, so a changed
-      phase shows beside its text. -#}
-  {%- macro render_step_delta(row, step_id, nested=false) -%}
-    <div class="delta-step" data-change="{{ row.change }}"{% if row.side == 'before' %} data-term-side="before"{% endif %}>
+  {#- An added or removed row is its step's whole subtree, rendered as one. -#}
+  {%- macro render_step_row(row, side, step_id) -%}
+    {%- set line = row.line(side) -%}
+    <div class="delta-step" data-change="{{ row.change }}" data-row="{{ step_id }}">
     {%- if row.change in ('added', 'removed') -%}
-      {{ render_step(row.step, step_id, row.side) }}
+      {{ render_step(line.step, step_id, side) }}
     {%- else -%}
-      {%- set text -%}
-        {%- if nested and row.was_phase %}<span class="delta-phase-inline">{{ phase_change(row.step.phase, row.was_phase) }}</span> {% endif -%}
-        {%- if row.change == 'modified' %}{{ row.words | narration_diff }}{% else %}{{ row.step.narration | narration('after') }}{% endif -%}
-      {%- endset -%}
-      {{ step_text(row.step, step_id, text) }}
+      {{ step_text(line.step, step_id, line.words | narration_diff(side) if line.words else line.step.narration | narration(side)) }}
       {%- if row.children -%}
         {%- call step_children(step_id) -%}
           {%- for child in row.children -%}
-            {{ render_step_delta(child, step_id ~ '_' ~ loop.index0, true) }}
+            {%- set child_id = step_id ~ '_' ~ loop.index0 -%}
+            {%- if child.line(side) is none %}{{ step_gap(child_id) }}{% else %}{{ render_step_row(child, side, child_id) }}{% endif -%}
           {%- endfor -%}
         {%- endcall -%}
       {%- endif -%}
-      {{ step_attachments(row.step, step_id) }}
+      {{ step_attachments(line.step, step_id) }}
     {%- endif -%}
     </div>
   {%- endmacro -%}
 
-  {#- A changed parameter table: each side's table whole, under its side's
-      caption, the rows lined up by case with a hatched row where a side
-      lacks one. A band, the header or a case with the rows under it, is what
-      `delta.js` evens out across the two tables. Only the after table carries
-      phase blocks and previews a hovered row in the steps, which read from
-      the after side. -#}
-  {%- macro param_table_delta(view, scenario, scenario_idx) -%}
-      <div class="delta-tables">
+  {#- A changed parameter table: each side's table whole, in its side's
+      column, the rows lined up by case with a hatched row where a side lacks
+      one. A band, the header or a case with the rows under it, is what
+      `delta.js` evens out across the two tables. -#}
+  {%- macro param_table_delta(view, scenario_idx) -%}
         {%- for table in view.sides %}
         {%- set after = table.side == 'after' %}
-        {%- set col_blocks = scenario | column_phase_blocks if after else {} %}
+        {%- set col_blocks = table.column_blocks %}
         {%- set table_width = table.columns | length + 2 %}
         {#- The mark a changed cell takes on this side: the old value faces
             the new one. -#}
         {%- set cell_mark = 'added' if after else 'removed' %}
         <div class="delta-table" data-side="{{ table.side }}">
-          <div class="delta-table-caption">{{ table.side | capitalize }}: {{ side_labels[table.side] }}</div>
           <div class="param-table-scroll">
           <table class="param-table">
             <thead data-band="head">
               <tr>
-                <th class="param-id"{% if after %} data-block="frame"{% endif %}>case ID</th>
+                <th class="param-id" data-block="frame">case ID</th>
                 {%- for column in table.columns %}
                 {%- set col = column.column %}
                 <th data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if column.change %} data-change="{{ column.change }}"{% endif %}>
@@ -177,7 +202,7 @@
                   {%- if column.was %}<span class="delta-was">was <del>{{ column.was }}</del></span>{% endif -%}
                 </th>
                 {%- endfor %}
-                <th class="param-status"{% if after %} data-block="frame"{% endif %}>status</th>
+                <th class="param-status" data-block="frame">status</th>
               </tr>
             </thead>
             {%- for row in view.rows %}
@@ -186,15 +211,15 @@
             <tbody data-band="{{ loop.index0 }}">
               {%- if case %}
               <tr data-case-row{% if row.change in ('added', 'removed') %} data-change="{{ row.change }}"{% endif %}>
-                <th scope="row" class="param-id"{% if after %} data-block="frame"{% endif %}{% if row.pair.id_changed %} data-change="{{ cell_mark }}"{% endif %}>
+                <th scope="row" class="param-id" data-block="frame"{% if row.pair.id_changed %} data-change="{{ cell_mark }}"{% endif %}>
                   <span class="delta-row-lead">{{ change_glyph[row.change] if row.change else '' }}</span>
                   {%- if row.change == 'removed' %}<del>{{ case.id | case_id }}</del>{% else %}{{ case.id | case_id }}{% endif -%}
                 </th>
                 {%- for col, val in table.parameters.cells(case) %}
                 {%- set changed = table.columns[loop.index0].change == 'added' or col.id in row.pair.changed_cells %}
-                {{ param_cell(col, val, cell_prefix ~ loop.index0, col_blocks.get(col.id), after, cell_mark if changed else none) }}
+                {{ param_cell(col, val, cell_prefix ~ loop.index0, col_blocks.get(col.id), cell_mark if changed else none) }}
                 {%- endfor %}
-                <td class="param-status"{% if after %} data-block="frame"{% endif %}{% if row.pair.status_changed %} data-change="{{ cell_mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
+                <td class="param-status" data-block="frame"{% if row.pair.status_changed %} data-change="{{ cell_mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
               </tr>
               {{ case_extras(table.parameters, case, cell_prefix, table_width) }}
               {%- else %}
@@ -206,5 +231,4 @@
           </div>
         </div>
         {%- endfor %}
-      </div>
   {%- endmacro -%}

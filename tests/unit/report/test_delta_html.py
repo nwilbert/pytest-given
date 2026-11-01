@@ -25,8 +25,6 @@ from pytest_given.report.delta_html import (
     ListedTerm,
     OtherForm,
     ReasonRow,
-    StepBlock,
-    StepRow,
     TableSide,
     TableView,
     delta_render_context,
@@ -303,131 +301,10 @@ def test_a_side_without_a_glossary_lists_the_other_side_s_terms() -> None:
     assert unchanged['term_ids'] == []
 
 
-def _shape(blocks: list[StepBlock] | None) -> list[tuple[object, ...]]:
-    assert blocks is not None
-    return [
-        (
-            block.phase,
-            block.was_phase,
-            block.after_block,
-            [_row(row) for row in block.rows],
-        )
-        for block in blocks
-    ]
-
-
-def _row(row: StepRow) -> tuple[object, ...]:
-    return (
-        row.change,
-        row.side,
-        row.step.narration.text,
-        row.was_phase,
-        [_row(child) for child in row.children],
-    )
-
-
-def test_a_changed_scenario_reads_its_steps_in_after_order_with_removed_ones_in_place():
-    before = report(
-        scn(
-            't.py::test_stay',
-            'Stay',
-            step('given', 'a guest', step('given', 'with her passport')),
-            step('when', 'she phones the desk'),
-            step('when', 'she checks in'),
-            step('then', 'she gets a key card'),
-        )
-    )
-    after = report(
-        scn(
-            't.py::test_stay',
-            'Stay',
-            step('given', 'a guest', step('given', 'with her passport and visa')),
-            step('given', 'a free room'),
-            step('when', 'she checks in'),
-            step('when', 'she gets a digital key card'),
-            step('then', 'her phone opens the door'),
-        )
-    )
-    [item] = _listed(_delta(before, after))
-    assert _shape(item.step_blocks) == [
-        (
-            'given',
-            None,
-            0,
-            [
-                (
-                    'equal',
-                    'after',
-                    'a guest',
-                    None,
-                    [('modified', 'after', 'with her passport and visa', None, [])],
-                ),
-            ],
-        ),
-        # Removed at its before position, under its own phase, and so
-        # splitting the after side's first block in two.
-        ('when', None, None, [('removed', 'before', 'she phones the desk', None, [])]),
-        ('given', None, 0, [('added', 'after', 'a free room', None, [])]),
-        ('when', None, 1, [('equal', 'after', 'she checks in', None, [])]),
-        (
-            'when',
-            'then',
-            1,
-            [
-                ('modified', 'after', 'she gets a digital key card', 'then', []),
-            ],
-        ),
-        ('then', None, 2, [('added', 'after', 'her phone opens the door', None, [])]),
-    ]
-
-
-def test_a_block_of_removed_steps_names_the_after_block_its_added_steps_are_in():
-    """Until an after step joins it."""
-    before = report(
-        scn(
-            't.py::test_stay',
-            'Stay',
-            step('given', 'a guest'),
-            step('when', 'she waits'),
-            step('when', 'she knocks'),
-        )
-    )
-    after = report(
-        scn(
-            't.py::test_stay',
-            'Stay',
-            step('given', 'a guest'),
-            step('when', 'she rings the bell twice'),
-        )
-    )
-    [item] = _listed(_delta(before, after))
-    assert [
-        (block.phase, block.after_block, [row.change for row in block.rows])
-        for block in item.step_blocks or []
-    ] == [('given', 0, ['equal']), ('when', 1, ['removed', 'removed', 'added'])]
-
-
 def test_added_and_removed_scenarios_read_their_steps_unmarked() -> None:
     before = report(scn('t.py::test_old', 'Old', step('given', 'a guest')))
     after = report(scn('t.py::test_new', 'New', step('given', 'a host')))
-    assert [item.step_blocks for item in _listed(_delta(before, after))] == [
-        None,
-        None,
-    ]
-
-
-def test_a_removed_scenario_s_own_text_previews_its_rows_as_the_report_does() -> None:
-    """Unlike a changed scenario's before text (`before`), whose placeholders
-    share their keys with the after table's columns."""
-    before = report(_paying('old', [1]), _paying('pay', [1]))
-    after = report(_paying('pay', [2]), _paying('new', [1]))
-    assert [
-        (item.change, item.text_side) for item in _listed(_delta(before, after))
-    ] == [
-        ('removed', 'removed'),
-        ('changed', 'after'),
-        ('added', 'after'),
-    ]
+    assert [item.steps for item in _listed(_delta(before, after))] == [None, None]
 
 
 def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_has():
@@ -451,7 +328,8 @@ def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_
     )
     delta = _delta(before, after)
     [item] = _listed(delta)
-    assert [row.change for block in item.step_blocks or [] for row in block.rows] == [
+    assert item.steps is not None
+    assert [row.change for block in item.steps.before for row in block.rows] == [
         'removed',
         'added',
         'modified',
@@ -561,20 +439,14 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
         ('derived:0', 'added', None),
         ('attachment:0', None, None),
     ]
-    # What a removed step renders from, and a modified one's removed words.
+    # What the before side's steps render from.
     assert item.delta.before is not None
     [before_step] = item.delta.before.steps
-    [modified] = item.delta.steps
-    removed_words = [
-        part
-        for segment in modified.words
-        if segment.mark == 'removed'
-        for part in segment.parts
-    ]
     assert [
-        [part.column_id for part in parts if isinstance(part, NarrationPlaceholder)]
-        for parts in (before_step.narration.parts, removed_words)
-    ] == [['before:derived:0', 'reason'], ['before:derived:0', 'reason']]
+        part.column_id
+        for part in before_step.narration.parts
+        if isinstance(part, NarrationPlaceholder)
+    ] == ['before:derived:0', 'reason']
     assert [
         attachment.column_id
         for attachment in before_step.attachments
@@ -609,3 +481,41 @@ def test_a_table_gained_or_lost_with_its_parametrization_shows_alone():
     assert [side.side for side in loses.sides] == ['before']
     assert _columns(loses.sides[0]) == [('before:amount', None, None)]
     assert [row.change for row in loses.rows] == ['removed', 'removed']
+    assert [table.sides[0].column_blocks for table in (gains, loses)] == [
+        {'amount': '0'},
+        {'before:amount': '0'},
+    ]
+
+
+def test_each_table_s_columns_key_their_phase_as_their_side_s_steps_do() -> None:
+    """So a phase hover on either side outlines its columns in both tables."""
+    before = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            step('given', narr(lit('she pays '), ph('amount'))),
+            step('when', narr(lit('the desk keeps a deposit of '), ph('deposit'))),
+            parameters=table(
+                [('amount', 'param'), ('deposit', 'param')],
+                ('t.py::test_pay[a]', [1, 10]),
+            ),
+        )
+    )
+    after = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            step('given', narr(lit('she pays '), ph('amount'))),
+            step('then', narr(lit('the hotel charges a fee of '), ph('fee'))),
+            parameters=table(
+                [('amount', 'param'), ('fee', 'param')],
+                ('t.py::test_pay[a]', [1, 2]),
+            ),
+        )
+    )
+    [item] = _listed(_delta(before, after))
+    assert item.table is not None
+    assert [side.column_blocks for side in item.table.sides] == [
+        {'amount': '0', 'before:deposit': 'before:1'},
+        {'amount': '0', 'fee': '1'},
+    ]

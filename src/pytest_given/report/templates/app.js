@@ -925,7 +925,7 @@ function reportApp() {
       rowEl.querySelectorAll('td[data-subst]').forEach(td => {
         values[td.dataset.subst] = td.textContent.trim();
       });
-      scope.querySelectorAll('span[data-subst]').forEach(span => {
+      this._previewSpans(rowEl, scope).forEach(span => {
         const val = values[span.dataset.subst];
         if (val === undefined) return;
         // Stash the original {token} once so re-entry stays idempotent.
@@ -933,6 +933,11 @@ function reportApp() {
         span.textContent = val;
         span.classList.add('param-substituted');
       });
+    },
+    // The narration a hovered row previews into; the delta page keeps each
+    // side's table to its own side's text.
+    _previewSpans(rowEl, scope) {
+      return [...scope.querySelectorAll('span[data-subst]')];
     },
     clearHoverRow(rowEl) {
       const scope = rowEl?.closest('.scenario');
@@ -1069,22 +1074,23 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = this._phaseTable(scope);
-        if (table) redraw.observe(table);
+        scope.querySelectorAll('.param-table').forEach(table => redraw.observe(table));
       });
       document.addEventListener('pointerout', (event) => {
         if (!event.relatedTarget) leave();
       });
     },
+    // Every table of the card: the delta page shows a scenario's two.
+    _outlinePhase(scope, block) {
+      const safe = CSS.escape(block);
+      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
+      scope.querySelectorAll('.param-table').forEach(table => this._outlineColumns(table, safe));
+    },
     // One box per run of adjacent columns and run of rows: the id and status
     // columns sit at opposite ends of a row. A visible row without the block's
     // cells (an error, an open payload) ends a run of rows rather than being
     // drawn through. A collapsed payload row has no height and does not.
-    _outlinePhase(scope, block) {
-      const safe = CSS.escape(block);
-      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = this._phaseTable(scope);
-      if (!table) return;
+    _outlineColumns(table, safe) {
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
       const columns = [];
@@ -1116,11 +1122,6 @@ function reportApp() {
         outline.style.height = `${bottom - top}px`;
         wrap.appendChild(outline);
       }
-    },
-    // The table whose columns a phase block narrates; the delta page shows a
-    // before table beside it.
-    _phaseTable(scope) {
-      return scope.querySelector('.param-table');
     },
     // The term a ref's tooltip shows; the delta page reads some refs against
     // its before glossary.

@@ -88,35 +88,29 @@ function deltaApp() {
       }
       return counts;
     },
-    // A phase block narrates the after table's columns. A lone before table
-    // has none it narrates.
-    _phaseTable(scope) {
-      if (!scope.querySelector('.delta-tables')) return base._phaseTable.call(this, scope);
-      return scope.querySelector('.delta-table[data-side="after"] .param-table');
+    // A side's table previews into its own side's text; the one table of a
+    // scenario whose table didn't change, into both.
+    _previewSpans(rowEl, scope) {
+      const spans = base._previewSpans.call(this, rowEl, scope);
+      const side = rowEl.closest('[data-side]')?.dataset.side;
+      if (!side) return spans;
+      return spans.filter(span => span.closest('[data-side]')?.dataset.side === side);
     },
     init() {
       base.init.call(this);
       this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
-      this._initTableAlignment();
+      this._initAlignment();
     },
-    // Side by side, a case keeps one line across both tables. Re-aligned
-    // whenever a table resizes (a payload opened, the window narrowed), in
-    // the next frame: resizing an observed element inside its own callback
-    // would loop.
-    _initTableAlignment() {
-      for (const pair of document.querySelectorAll('.delta-tables')) {
-        const tables = pair.querySelectorAll('.param-table');
-        if (tables.length !== 2) continue;
-        let queued = false;
-        const observer = new ResizeObserver(() => {
-          if (queued) return;
-          queued = true;
-          requestAnimationFrame(() => {
-            queued = false;
-            alignBands(...tables);
-          });
-        });
-        tables.forEach(table => observer.observe(table));
+    // Side by side, a step and a case each keep one line across both sides.
+    // Re-aligned whenever a side resizes (sub-steps or a payload opened, the
+    // window narrowed), in the next frame: resizing an observed element
+    // inside its own callback would loop.
+    _initAlignment() {
+      for (const sides of document.querySelectorAll('.delta-sides')) {
+        const steps = sides.querySelectorAll(':scope > .delta-side-steps');
+        const tables = sides.querySelectorAll(':scope > .delta-table .param-table');
+        if (steps.length === 2) alignOnResize(steps, () => alignRows(...steps));
+        if (tables.length === 2) alignOnResize(tables, () => alignBands(...tables));
       }
     },
     _readHash() {
@@ -140,6 +134,63 @@ function deltaApp() {
   // once, here, and keep its value instead of the getter.
   const app = Object.defineProperties({},Object.getOwnPropertyDescriptors(base));
   return Object.defineProperties(app, Object.getOwnPropertyDescriptors(overrides));
+}
+
+function alignOnResize(elements, align) {
+  let queued = false;
+  const observer = new ResizeObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      align();
+    });
+  });
+  elements.forEach(element => observer.observe(element));
+}
+
+// Each row's line starts level on both sides, the higher one pushed down, and
+// a hatched gap is as tall as the step it stands in for. Every position is
+// read before any is written: a push moves every line below it on its side
+// by as much, which the running shift accounts for. Rows inside closed
+// sub-steps take no room and are left out, alike on both sides.
+function alignRows(before, after) {
+  if (!before.getClientRects().length) return;  // a hidden scenario
+  const shown = side => [...side.querySelectorAll('[data-row]')]
+    .filter(row => !row.parentElement.closest('.step-expand:not(.expanded)'));
+  const pairs = zip(shown(before), shown(after));
+  if (!pairs) {
+    console.assert(false, 'delta steps have unequal rows', before, after);
+    return;
+  }
+  for (const row of pairs.flat()) {
+    row.style.paddingTop = '';
+    row.style.height = '';
+  }
+  const boxes = pairs.map(pair => pair.map(row => row.getBoundingClientRect()));
+  const shift = [0, 0];
+  pairs.forEach((pair, i) => {
+    const tops = boxes[i].map((box, side) => box.top + shift[side]);
+    const level = Math.max(...tops);
+    pair.forEach((row, side) => {
+      const push = level - tops[side] >= 0.5 ? level - tops[side] : 0;
+      if (push) row.style.paddingTop = `${push}px`;
+      shift[side] += push;
+      if (!row.classList.contains('delta-gap')) return;
+      // Box-sized: the gap's height holds its push.
+      const height = boxes[i][1 - side].height;
+      row.style.height = `${push + height}px`;
+      shift[side] += height - boxes[i][side].height;
+    });
+  });
+}
+
+// The two sides' rows by position, each pair the same row; null when they
+// don't pair up.
+function zip(before, after) {
+  if (before.length !== after.length) return null;
+  if (before.some((row, i) => row.dataset.row !== after[i].dataset.row)) return null;
+  return before.map((row, i) => [row, after[i]]);
 }
 
 // Each band (the header, or a case with its error and payload rows) grows its

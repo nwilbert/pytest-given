@@ -466,35 +466,43 @@ the git tag pointing at that SHA (the highest by version order when several do),
   scenario's *before* node ID equals an added scenario's *after* node ID.
 - **No citation copy menu.** Citations point into the normal report, not into a delta.
 
-### A changed scenario's steps: inline
+### A changed scenario: side by side
 
-The scenario reads as it does in the normal report, with its changes marked in place:
+A changed scenario shows its two versions side by side, steps above parameter table, under one
+pair of captions: each side's label and short SHA, *before* on the left and *after* on the right.
+Each column stops growing at a reading width, so the two sides stay as close on a wide screen as on
+a laptop. Each column reads as its own scenario does in the normal report, and the column says
+which side a line belongs to:
 
 ```
-      Given  our guest Alice
-  ~   When   Alice checks in to the [-Deluxe Suite-][+Garden Suite+]
-  −   Then   t̶h̶e̶ ̶l̶a̶t̶e̶r̶ ̶b̶o̶o̶k̶i̶n̶g̶ ̶i̶s̶ ̶c̶a̶n̶c̶e̶l̶l̶e̶d̶
-  +   Then   the later Booking is cancelled and refunded in full
-      When   she tries to cancel the stay she has checked in to
+ Before: v0.5.0 a1b2c3d                       After: v0.6.0 e4f5a6b
+    Given  our guest Alice                       Given  our guest Alice
+  ~ When   Alice checks in to the                When   Alice checks in to the
+           [Deluxe Suite]                               [Garden Suite]
+  − Then   the later booking is cancelled     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    + Then   the later Booking is cancelled and
+                                                    refunded in full
+    When   she tries to cancel the stay…         When   she tries to cancel the stay…
 ```
 
-- A modified step gets an amber tint and a `~` in the margin. Its removed words are struck through on
-  red, and its added words follow on green. A changed phase shows the old one struck through before
-  the new one.
-- A removed step gets a red tint, `−`, and struck-through text. An added step gets a green tint and
-  `+`.
-- Unchanged steps are plain. Term refs keep their underlines throughout.
-- Added and removed scenarios expand to their steps without marks: the row's colour already says it
-  all.
-
-A side-by-side view of steps was considered and rejected for this version: steps are prose, and
-reading the new scenario as one story with its edits marked suits stakeholders better. The delta
-JSON keeps a side-by-side step view possible.
+- Steps line up by the step alignment, one row per aligned pair, so a step and its counterpart sit
+  level however each wraps. A hatched row marks a step missing on that side, as a missing case is
+  marked in the tables.
+- A modified step is led by `~`. Its removed words are marked on the *before* side, struck through
+  on red, and its added words on the *after* side, on green. Rows are not tinted: the marked words
+  and the glyph carry the change. The strike-through takes the ink colour, so it reads on the red.
+- A removed step is led by `−` and its text is struck through. An added step is led by `+`.
+- A changed phase shows each side's own phase, the step led by `~`.
+- Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
+  side's term refs read from that side's glossary.
+- Nested steps line up the same way, inside their parent.
+- Added and removed scenarios show one side only, under their side's caption, without marks: the
+  row's colour already says it all.
 
 ### A changed parameter table: side by side
 
-Unlike steps, a parameter table is shown side by side, because added and removed columns break a
-merged table:
+A changed parameter table sits under the steps of its side, so each side's steps narrate the table
+beneath them:
 
 ```
  Before: v0.5.0 a1b2c3d                       After: v0.6.0 e4f5a6b
@@ -505,7 +513,7 @@ merged table:
  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░               +large-cup    4     large True   ✓
 ```
 
-- Two complete tables, each captioned with its side's label and short SHA, with a gap between them.
+- Two complete tables, one in each column under the scenario's captions.
 - Rows line up by case, in the *after* table's case order, a removed case placed after the case that
   preceded it on the *before* side. A hatched row marks a case missing on that side.
 - Both tables always show the case ID column and the status column, whether or not any case ID is
@@ -521,12 +529,15 @@ merged table:
   struck through on the *before* side. A renamed column shows its new name, with `was <old name>`
   beneath it.
 - `attachment` columns appear in each side's table, unmarked.
-- Hovering a placeholder in a step highlights its column in both tables. Hovering an *after* row
-  previews its values in the steps, as in the normal report. A *before* row previews nothing, since
-  the steps read from the *after* side.
+- Hovering a placeholder in either side's steps highlights its column in both tables, a renamed
+  column included. Hovering a row previews its values in its own side's steps, as in the normal
+  report.
+- Hovering a phase on either side outlines that phase on both sides and its columns in both
+  tables, as the normal report outlines a phase and its columns.
 - A table that only changed in case statuses still renders both sides. A table that didn't change
-  at all renders once, as in the normal report. A table that was added or removed with its
-  scenario's parametrization renders once, under its side's caption, tinted as added or removed.
+  at all renders once, across both columns, and its rows preview into both sides' steps. A table
+  that was added or removed with its scenario's parametrization renders in its side's column only,
+  tinted as added or removed.
 
 ### Glossary tab
 
@@ -565,8 +576,7 @@ To keep those meanings unambiguous:
 
 Most changes are also marked without colour, by a `+` / `−` / `~` glyph, strike-through or a text
 label. Added words and changed cells are marked by their tint alone. That is accepted: a reader who
-can't tell red from green still sees the tint, and strike-through or the table's side says which
-way the change went. Media that drop background colours, such as print or a high-contrast mode,
+can't tell red from green still sees the tint, and the column says which way the change went. Media that drop background colours, such as print or a high-contrast mode,
 lose those two marks.
 
 ## The agent skill

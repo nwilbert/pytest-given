@@ -45,12 +45,12 @@ from pytest_given.report.html_renderer import (
     _COMMENT_LINE,
     _TEMPLATES_DIR,
     _app_data,
-    _column_phase_blocks,
     _inline_md,
     _make_clause_part_filter,
     _neutralize_script_data,
     _strip_comments,
     build_param_color_map,
+    column_phase_blocks,
     make_narration_filter,
     phase_blocks,
     render_html_string,
@@ -1151,7 +1151,7 @@ def test_a_column_belongs_to_the_phase_block_a_reader_first_meets_it_in() -> Non
         ['guest', 'room', 'payment', 'outcome', 'log', 'refund'],
     )
 
-    assert _column_phase_blocks(scenario) == {
+    assert column_phase_blocks(scenario) == {
         'guest': 0,
         'room': 0,
         'payment': 1,
@@ -1167,7 +1167,7 @@ def test_an_unnarrated_column_joins_the_phase_block_beside_it() -> None:
         ['unnamed', 'guest', 'also_unnamed', 'outcome'],
     )
 
-    assert _column_phase_blocks(scenario) == {
+    assert column_phase_blocks(scenario) == {
         'unnamed': 0,
         'guest': 0,
         'also_unnamed': 0,
@@ -1178,7 +1178,7 @@ def test_an_unnarrated_column_joins_the_phase_block_beside_it() -> None:
 def test_a_table_no_step_narrates_has_no_phase_blocks() -> None:
     scenario = _table_scenario([_placeholder_step('given')], ['unnamed'])
 
-    assert _column_phase_blocks(scenario) == {}
+    assert column_phase_blocks(scenario) == {}
 
 
 # ---------------------------------------------------------------------------

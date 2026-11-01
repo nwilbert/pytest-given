@@ -186,7 +186,7 @@ def base_env() -> jinja2.Environment:
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
     env.filters['phase_blocks'] = phase_blocks
-    env.filters['column_phase_blocks'] = _column_phase_blocks
+    env.filters['column_phase_blocks'] = column_phase_blocks
     env.filters['case_id'] = case_id
     env.globals['data_url'] = data_url
     return env
@@ -218,7 +218,7 @@ def phase_blocks(steps: list[Step]) -> list[list[Step]]:
     return blocks
 
 
-def _column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
+def column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
     """Each parameter-table column's phase block: the one a reader first meets
     it in. A column no step narrates joins the block beside it, the one before
     or, leading the table, the first."""
@@ -519,18 +519,15 @@ def make_source_url_filter(
 def make_narration_filter(
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
-    *,
-    substitutes: bool = True,
 ) -> Callable[[Narration], Markup]:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
-    Without `substitutes` a placeholder takes no row's value on hover.
 
     Usage: `{{ step.narration | narration }}`.
     """
 
     def _render(narration: Narration) -> Markup:
         out = [
-            _render_narration_piece(piece, param_color_map, glossary, substitutes)
+            _render_narration_piece(piece, param_color_map, glossary)
             for piece in read_narration(narration)
         ]
         return Markup(''.join(out))
@@ -542,7 +539,6 @@ def _render_narration_piece(
     part: NarrationPiece,
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
-    substitutes: bool,
 ) -> str:
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
@@ -564,10 +560,10 @@ def _render_narration_piece(
             # would be an injection, since Alpine compiles a directive's
             # *decoded* attribute text as JS.
             safe_id = escape(column_id)
-            subst = f' data-subst="{safe_id}"' if substitutes else ''
             return (
                 f'<span class="param-color-{color_idx}" '
-                f'data-param="{safe_id}"{subst}'
+                f'data-param="{safe_id}" '
+                f'data-subst="{safe_id}"'
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():

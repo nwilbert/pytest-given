@@ -1866,19 +1866,33 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 
 
 
-
-.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
-.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
-.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
-.delta-step[data-change="modified"] > .step-text,
-.delta-step[data-change="added"] .step-text,
-.delta-step[data-change="removed"] .step-text {
-  background: var(--change-tint);
-  border-radius: var(--radius-sm);
-  padding: 0 var(--space-xs);
-  margin-left: calc(-1 * var(--space-xs));
-  width: fit-content;
+.delta-sides {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--space-xl);
+  align-items: start;
+  margin-top: var(--space-md);
 }
+.delta-sides > [data-side="before"] { grid-column: 1; }
+.delta-sides > [data-side="after"] { grid-column: 2; }
+.delta-sides > .delta-shared { grid-column: 1 / -1; }
+.delta-caption {
+  padding-left: var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.delta-side-steps .steps { padding-top: var(--space-xs); }
+
+
+
+
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --step-glyph: '\2212'; }
 .delta-step:not([data-change="equal"]) > .step-text::before {
   content: var(--step-glyph);
   position: absolute;
@@ -1886,20 +1900,13 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   font-weight: 700;
   color: var(--change-ink);
 }
-.delta-step[data-change="removed"] .step-text {
-  text-decoration: line-through;
-  text-decoration-color: var(--removed-line);
-}
 
+
+
+.delta-step[data-change="removed"] :is(.step-text, .step-toggle) { text-decoration: line-through; }
 .delta-words { border-radius: 2px; padding: 0 1px; }
-del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: currentColor; }
 ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
-del.delta-words + ins.delta-words { margin-left: 2px; }
-.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
-.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
-
-
-.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
 
 
 .delta .step-children { position: relative; }
@@ -1908,23 +1915,19 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 
 
 
-.delta-tables {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-xl);
-  margin: var(--space-md) 0 0 var(--space-xl);
+
+.delta-gaps + .phase-block:not(.delta-continued) { margin-top: var(--space-sm); }
+.delta-gap {
+  height: 1lh;
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px) content-box;
 }
+
+
+
+
 .delta-table { min-width: 0; }
-.delta-table .param-table { margin: 0; max-width: 100%; }
 .delta-table .param-table th,
 .delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
-.delta-table-caption {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  margin-bottom: var(--space-xs);
-}
 .delta-table .param-table th .delta-was { display: block; }
 .delta-table .param-table del { text-decoration-color: var(--removed-line); }
 
@@ -2150,7 +2153,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/test_file_glossary_booking.py#L60">examples/file-glossary-booking/test_file_glossary_booking.py:60</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/test_file_glossary_booking.py#L60">examples/file-glossary-booking/test_file_glossary_booking.py:60</a></div>
       
     </div>
     </div>
@@ -2193,7 +2196,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/test_file_glossary_booking.py#L77">examples/file-glossary-booking/test_file_glossary_booking.py:77</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/test_file_glossary_booking.py#L77">examples/file-glossary-booking/test_file_glossary_booking.py:77</a></div>
       
     </div>
     </div>
@@ -2369,7 +2372,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -2512,7 +2515,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
@@ -2577,7 +2580,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -2628,7 +2631,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
@@ -2693,7 +2696,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
@@ -2751,7 +2754,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2788,7 +2791,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/eb0b9d10f5b3b7ae2f59ce002d4b02dcaf5c614f/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
@@ -2847,7 +2850,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T07:40:58.528227+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T12:47:02.288187+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3775,7 +3778,7 @@ function reportApp() {
       rowEl.querySelectorAll('td[data-subst]').forEach(td => {
         values[td.dataset.subst] = td.textContent.trim();
       });
-      scope.querySelectorAll('span[data-subst]').forEach(span => {
+      this._previewSpans(rowEl, scope).forEach(span => {
         const val = values[span.dataset.subst];
         if (val === undefined) return;
 
@@ -3783,6 +3786,11 @@ function reportApp() {
         span.textContent = val;
         span.classList.add('param-substituted');
       });
+    },
+
+
+    _previewSpans(rowEl, scope) {
+      return [...scope.querySelectorAll('span[data-subst]')];
     },
     clearHoverRow(rowEl) {
       const scope = rowEl?.closest('.scenario');
@@ -3919,22 +3927,23 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = this._phaseTable(scope);
-        if (table) redraw.observe(table);
+        scope.querySelectorAll('.param-table').forEach(table => redraw.observe(table));
       });
       document.addEventListener('pointerout', (event) => {
         if (!event.relatedTarget) leave();
       });
     },
 
-
-
-
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = this._phaseTable(scope);
-      if (!table) return;
+      scope.querySelectorAll('.param-table').forEach(table => this._outlineColumns(table, safe));
+    },
+
+
+
+
+    _outlineColumns(table, safe) {
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
       const columns = [];
@@ -3966,11 +3975,6 @@ function reportApp() {
         outline.style.height = `${bottom - top}px`;
         wrap.appendChild(outline);
       }
-    },
-
-
-    _phaseTable(scope) {
-      return scope.querySelector('.param-table');
     },
 
 

@@ -34,31 +34,27 @@ from ..model import (
     ParameterColumn,
     ParameterDelta,
     ParameterTable,
-    Phase,
     ReportData,
     Scenario,
     ScenarioDelta,
     SourceLocation,
     Step,
-    StepChange,
-    StepDelta,
-    StepPath,
     TermDelta,
     TermFacts,
     TermId,
     build_term_crossrefs,
     narration_text,
     plural,
-    walk_steps,
 )
+from .delta_steps import BlockKey, Side, StepsView, block_keys, steps_view
 from .glossary_view import KindGrouping, group_by_kind
 from .html_renderer import (
     base_env,
     build_param_color_map,
     bundled_assets,
+    column_phase_blocks,
     make_narration_filter,
     make_source_url_filter,
-    phase_blocks,
     script_json_parse,
     shown_text,
     term_app_data,
@@ -78,12 +74,6 @@ _CHANGE_GLYPH: dict[Change, str] = {
     'removed': '\N{MINUS SIGN}',
 }
 
-type Side = Literal['before', 'after']
-# Which glossary a text reads against, and whether a hovered row previews its
-# values in it. `before` is a changed scenario's before text, which no row
-# previews into: its placeholders share their keys with the after table's
-# columns. `removed` is a removed scenario's, previewing from its own table.
-type TextSide = Literal['before', 'after', 'removed']
 type ColumnChange = Literal['added', 'removed']
 type FormChange = Literal['added', 'removed']
 
@@ -104,33 +94,6 @@ class ReasonRow:
 
 
 @dataclass(frozen=True)
-class StepRow:
-    """A step as a changed scenario reads it, from the side it comes from. An
-    added or removed step stands for its whole subtree, so it has no rows
-    below it."""
-
-    change: StepChange
-    side: Side
-    step: Step
-    words: tuple[DiffSegment, ...]
-    was_phase: Phase | None
-    children: tuple[StepRow, ...]
-
-
-@dataclass(frozen=True)
-class StepBlock:
-    """A run of top-level rows under one keyword, as the report's phase
-    blocks are, split also where a step's phase changed."""
-
-    phase: Phase
-    was_phase: Phase | None
-    # The after scenario's phase block, which its parameter table's columns
-    # name; None for a block of removed steps alone.
-    after_block: int | None
-    rows: list[StepRow]
-
-
-@dataclass(frozen=True)
 class TableColumn:
     column: ParameterColumn
     # A column only this side's table has. Attachment columns stay unmarked.
@@ -143,6 +106,8 @@ class TableSide:
     side: Side
     parameters: ParameterTable
     columns: list[TableColumn]
+    # Each column's phase block, keyed as the side's steps key theirs.
+    column_blocks: dict[ColumnId, BlockKey]
 
 
 @dataclass(frozen=True)
@@ -195,11 +160,6 @@ class ListedScenario:
         return 'before' if self.delta.after is None else 'after'
 
     @property
-    def text_side(self) -> TextSide:
-        """How the shown scenario's own text, title and steps, renders."""
-        return 'removed' if self.delta.after is None else 'after'
-
-    @property
     def shown(self) -> Scenario:
         shown = self.delta.after or self.delta.before
         assert shown is not None
@@ -214,12 +174,12 @@ class ListedScenario:
         return shown_text(self.shown.narration)
 
     @property
-    def step_blocks(self) -> list[StepBlock] | None:
-        """A changed scenario's steps with their changes; None for an added or
+    def steps(self) -> StepsView | None:
+        """A changed scenario's steps side by side; None for an added or
         removed one, whose steps read unmarked."""
         if self.change != 'changed':
             return None
-        return _step_blocks(self.delta)
+        return steps_view(self.delta)
 
     @property
     def table(self) -> TableView | None:
@@ -424,58 +384,14 @@ def _removed(scenario_delta: ScenarioDelta) -> Scenario:
     return scenario_delta.before
 
 
-def _step_blocks(scenario_delta: ScenarioDelta) -> list[StepBlock]:
-    before, after = scenario_delta.before, scenario_delta.after
-    assert before is not None
-    assert after is not None
-    rows = _StepRows(dict(walk_steps(before.steps)), dict(walk_steps(after.steps)))
-    after_blocks = [
-        index for index, block in enumerate(phase_blocks(after.steps)) for _ in block
-    ]
-    blocks: list[StepBlock] = []
-    for step_delta in scenario_delta.steps:
-        row = rows.row(step_delta)
-        after_block = after_blocks[step_delta.after[0]] if step_delta.after else None
-        last = blocks[-1] if blocks else None
-        if last and (last.phase, last.was_phase) == (row.step.phase, row.was_phase):
-            last.rows.append(row)
-            if last.after_block is None:
-                blocks[-1] = dataclasses.replace(last, after_block=after_block)
-        else:
-            blocks.append(StepBlock(row.step.phase, row.was_phase, after_block, [row]))
-    return blocks
-
-
-@dataclass(frozen=True)
-class _StepRows:
-    before: dict[StepPath, Step]
-    after: dict[StepPath, Step]
-
-    def row(self, step_delta: StepDelta) -> StepRow:
-        side: Side = 'before' if step_delta.change == 'removed' else 'after'
-        path = step_delta.before if side == 'before' else step_delta.after
-        assert path is not None
-        was_phase = None
-        if step_delta.phase_changed:
-            assert step_delta.before is not None
-            was_phase = self.before[step_delta.before].phase
-        return StepRow(
-            change=step_delta.change,
-            side=side,
-            step=(self.before if side == 'before' else self.after)[path],
-            words=step_delta.words,
-            was_phase=was_phase,
-            children=tuple(self.row(child) for child in step_delta.children),
-        )
-
-
 def _table_view(scenario_delta: ScenarioDelta) -> TableView | None:
     before, after = scenario_delta.before, scenario_delta.after
     assert before is not None
     assert after is not None
+    keys = block_keys(scenario_delta)
     parameters = scenario_delta.parameters
     if parameters is None:
-        return _lone_table(before.parameters, after.parameters)
+        return _lone_table(before, after, keys)
     if not parameters.changed:
         return None
     assert before.parameters is not None
@@ -503,6 +419,7 @@ def _table_view(scenario_delta: ScenarioDelta) -> TableView | None:
                     TableColumn(column, 'removed' if column.id in removed else None)
                     for column in before.parameters.columns
                 ],
+                _column_blocks(before, keys['before']),
             ),
             TableSide(
                 'after',
@@ -515,6 +432,7 @@ def _table_view(scenario_delta: ScenarioDelta) -> TableView | None:
                     )
                     for column in after.parameters.columns
                 ],
+                _column_blocks(after, keys['after']),
             ),
         ],
         rows=[
@@ -529,25 +447,46 @@ def _table_view(scenario_delta: ScenarioDelta) -> TableView | None:
 
 
 def _lone_table(
-    before: ParameterTable | None, after: ParameterTable | None
+    before: Scenario, after: Scenario, keys: dict[Side, list[BlockKey]]
 ) -> TableView | None:
     """The one table a scenario gained or lost with its parametrization, every
     case of it added or removed."""
-    if before is not None:
+    if before.parameters is not None:
         return TableView(
-            [_unmarked_side('before', before)],
-            [TableRow(case, None, CasePair(before=case.id)) for case in before.cases],
+            [_unmarked_side('before', before, keys['before'])],
+            [
+                TableRow(case, None, CasePair(before=case.id))
+                for case in before.parameters.cases
+            ],
         )
-    if after is not None:
+    if after.parameters is not None:
         return TableView(
-            [_unmarked_side('after', after)],
-            [TableRow(None, case, CasePair(after=case.id)) for case in after.cases],
+            [_unmarked_side('after', after, keys['after'])],
+            [
+                TableRow(None, case, CasePair(after=case.id))
+                for case in after.parameters.cases
+            ],
         )
     return None
 
 
-def _unmarked_side(side: Side, table: ParameterTable) -> TableSide:
-    return TableSide(side, table, [TableColumn(column) for column in table.columns])
+def _unmarked_side(side: Side, scenario: Scenario, keys: list[BlockKey]) -> TableSide:
+    table = scenario.parameters
+    assert table is not None
+    return TableSide(
+        side,
+        table,
+        [TableColumn(column) for column in table.columns],
+        _column_blocks(scenario, keys),
+    )
+
+
+def _column_blocks(
+    scenario: Scenario, keys: list[BlockKey]
+) -> dict[ColumnId, BlockKey]:
+    return {
+        column: keys[block] for column, block in column_phase_blocks(scenario).items()
+    }
 
 
 def _keyed(scenario_delta: ScenarioDelta) -> ScenarioDelta:
@@ -583,7 +522,6 @@ class _BeforeKeys:
                 steps=[self._step(step) for step in before.steps],
                 parameters=self._table(before.parameters),
             ),
-            steps=tuple(self._step_delta(step) for step in scenario_delta.steps),
             parameters=self._parameter_delta(scenario_delta.parameters),
         )
 
@@ -614,19 +552,6 @@ class _BeforeKeys:
                 else attachment
                 for attachment in step.attachments
             ],
-        )
-
-    def _step_delta(self, step_delta: StepDelta) -> StepDelta:
-        """Only removed words read from the before side."""
-        return dataclasses.replace(
-            step_delta,
-            words=tuple(
-                dataclasses.replace(segment, parts=self._parts(segment.parts))
-                if segment.mark == 'removed'
-                else segment
-                for segment in step_delta.words
-            ),
-            children=tuple(self._step_delta(child) for child in step_delta.children),
         )
 
     def _table(self, table: ParameterTable | None) -> ParameterTable | None:
@@ -864,14 +789,8 @@ def _build_env(
         ]
     )
     narration_filters = {
-        side: make_narration_filter(
-            param_color_map, glossary, substitutes=side != 'before'
-        )
-        for side, glossary in (
-            ('before', delta.glossary.before),
-            ('after', delta.glossary.after),
-            ('removed', delta.glossary.before),
-        )
+        'before': make_narration_filter(param_color_map, delta.glossary.before),
+        'after': make_narration_filter(param_color_map, delta.glossary.after),
     }
     # Compiled only for a side some scenario or term is shown from, so a
     # `{sha}` template fails only when a link would need the SHA a side lacks.
@@ -888,21 +807,20 @@ def _build_env(
         if side in shown_sides
     }
 
-    def narration(value: Narration, side: TextSide) -> Markup:
+    def narration(value: Narration, side: Side) -> Markup:
         return narration_filters[side](value)
 
     def source_url(value: SourceLocation | None, side: Side) -> str | None:
         return source_url_filters[side](value)
 
-    def narration_diff(words: tuple[DiffSegment, ...]) -> Markup:
-        """A modified step's word diff: removed runs read from the before
-        side, equal and added ones from the after side."""
+    def narration_diff(words: tuple[DiffSegment, ...], side: Side) -> Markup:
+        """A modified step's text on one side, its changed words marked."""
         return Markup('').join(
             _marked(
                 segment.mark,
                 narration(
                     Narration(text=narration_text(segment.parts), parts=segment.parts),
-                    'before' if segment.mark == 'removed' else 'after',
+                    side,
                 ),
             )
             for segment in words
@@ -935,9 +853,7 @@ def _marked(mark: Mark, text: Markup) -> Markup:
         case 'equal':
             return text
         case 'removed':
-            return Markup(
-                '<del class="delta-words" data-term-side="before">{}</del>'
-            ).format(text)
+            return Markup('<del class="delta-words">{}</del>').format(text)
         case 'added':
             return Markup('<ins class="delta-words">{}</ins>').format(text)
 
