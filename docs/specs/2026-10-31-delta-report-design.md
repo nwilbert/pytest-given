@@ -603,7 +603,7 @@ feature's name. It covers:
 - Fixing a value that differs on every run at its source, such as with a fixed clock or a stable
   `__str__`, when a step or cell reads as changed in every delta.
 
-It shares the repair technique of the citing skill's [repair guide](../../../src/pytest_given/.agents/skills/pytest-given-citing/references/repair.md)
+It shares the repair technique of the citing skill's [repair guide](../../src/pytest_given/.agents/skills/pytest-given-citing/references/repair.md)
 for renamed tests. The builder decides whether to share a reference file or restate it.
 
 ## Architecture
