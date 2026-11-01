@@ -142,7 +142,8 @@ def _segments_from_list(items: list[dict[str, Any]]) -> tuple[DiffSegment, ...]:
     return tuple(
         DiffSegment(
             mark=literal(item['mark'], MARKS, 'diff mark'),
-            parts=tuple(narration_part_from_dict(p) for p in item['parts']),
+            before=tuple(narration_part_from_dict(p) for p in item.get('before', ())),
+            after=tuple(narration_part_from_dict(p) for p in item.get('after', ())),
         )
         for item in items
     )

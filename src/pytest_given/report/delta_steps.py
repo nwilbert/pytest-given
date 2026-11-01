@@ -3,13 +3,11 @@ each side reading as its own scenario does, under its own phases."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from itertools import groupby
 from typing import Literal
 
 from ..model import (
     DiffSegment,
     Mark,
-    Narration,
     NarrationLiteral,
     NarrationPart,
     Phase,
@@ -18,6 +16,7 @@ from ..model import (
     StepChange,
     StepDelta,
     StepPath,
+    narration_text,
     walk_steps,
 )
 from .html_renderer import phase_blocks
@@ -35,13 +34,21 @@ _SIDE_MARK: dict[Side, Mark] = {'before': 'removed', 'after': 'added'}
 
 
 @dataclass(frozen=True)
+class MarkedRun:
+    """A run of one side's text, in that side's own parts."""
+
+    mark: Mark
+    parts: tuple[NarrationPart, ...]
+
+
+@dataclass(frozen=True)
 class StepLine:
     """A step as its side shows it."""
 
     step: Step
-    # A modified step's text in runs, the words only this side has marked.
-    # Empty where the step reads unmarked.
-    words: tuple[DiffSegment, ...] = ()
+    # A modified step's text in runs, the words only this side has marked;
+    # empty for any other step.
+    words: tuple[MarkedRun, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -127,43 +134,26 @@ def block_keys(scenario_delta: ScenarioDelta) -> dict[Side, list[BlockKey]]:
     }
 
 
-def side_words(
-    narration: Narration, runs: Sequence[DiffSegment]
-) -> tuple[DiffSegment, ...]:
-    """A side's runs of a word diff, its equal ones and its own changed ones,
-    laid over the side's own narration, so the side reads its own text. They
-    differ from it where an equal run shows the after side's parts, a term ref
-    displayed otherwise, say, and where a space went to the other side's
-    change. Where the two don't line up, empty: the step reads unmarked."""
-    own = _atoms(narration.parts or (NarrationLiteral(value=narration.text),))
-    theirs = [(run.mark, atom) for run in runs for atom in _atoms(run.parts)]
-    marked: list[tuple[Mark, NarrationPart]] = []
-    mine = their = 0
-    while mine < len(own) or their < len(theirs):
-        own_space = mine < len(own) and _is_space(own[mine])
-        their_space = their < len(theirs) and _is_space(theirs[their][1])
-        if own_space or their_space:
-            # Spaces compare as a run, whatever their width; a run only this
-            # side has is no change of its own.
-            mark: Mark = theirs[their][0] if own_space and their_space else 'equal'
-            while mine < len(own) and _is_space(own[mine]):
-                marked.append((mark, own[mine]))
-                mine += 1
-            while their < len(theirs) and _is_space(theirs[their][1]):
-                their += 1
-            continue
-        if (
-            mine == len(own)
-            or their == len(theirs)
-            or not _alike(own[mine], theirs[their][1])
-        ):
-            return ()
-        marked.append((theirs[their][0], own[mine]))
-        mine += 1
-        their += 1
-    return tuple(
-        DiffSegment(mark=mark, parts=_joined([part for _, part in run]))
-        for mark, run in groupby(marked, key=lambda atom: atom[0])
+def side_runs(runs: Sequence[DiffSegment], side: Side) -> tuple[MarkedRun, ...]:
+    """One side's text of a word diff: its equal runs and its own changed
+    ones, each in that side's own parts."""
+    return _joined(
+        [
+            MarkedRun(run.mark, run.before if side == 'before' else run.after)
+            for run in runs
+            if run.mark in ('equal', _SIDE_MARK[side])
+        ]
+    )
+
+
+def shown_runs(runs: Sequence[DiffSegment]) -> tuple[MarkedRun, ...]:
+    """A word diff read inline: each change in its own side's parts, an equal
+    run in the after side's."""
+    return _joined(
+        [
+            MarkedRun(run.mark, run.before if run.mark == 'removed' else run.after)
+            for run in runs
+        ]
     )
 
 
@@ -190,10 +180,7 @@ class _Rows:
         step = self.steps[side][at]
         if step_delta.change != 'modified':
             return StepLine(step)
-        runs = [
-            run for run in step_delta.words if run.mark in ('equal', _SIDE_MARK[side])
-        ]
-        return StepLine(step, side_words(step.narration, runs))
+        return StepLine(step, side_runs(step_delta.words, side))
 
 
 def _block_of(steps: list[Step]) -> list[int]:
@@ -230,33 +217,32 @@ def _opened(blocks: list[SideBlock]) -> list[SideBlock]:
     ]
 
 
-def _atoms(parts: Sequence[NarrationPart]) -> list[NarrationPart]:
-    """A literal by the character, any other part whole."""
-    atoms: list[NarrationPart] = []
-    for part in parts:
-        if isinstance(part, NarrationLiteral):
-            atoms.extend(NarrationLiteral(value=char) for char in part.value)
+def _joined(runs: list[MarkedRun]) -> tuple[MarkedRun, ...]:
+    """Runs of one mark merged, and a run of spaces alone between two changes
+    of one mark taken into them, so a changed stretch reads as one."""
+    joined: list[MarkedRun] = []
+    for index, run in enumerate(runs):
+        mark = run.mark
+        if (
+            mark == 'equal'
+            and 0 < index < len(runs) - 1
+            and runs[index - 1].mark == runs[index + 1].mark
+            and narration_text(run.parts).isspace()
+        ):
+            mark = runs[index - 1].mark
+        if joined and joined[-1].mark == mark:
+            joined[-1] = MarkedRun(mark, _merged(joined[-1].parts + run.parts))
         else:
-            atoms.append(part)
-    return atoms
-
-
-def _is_space(atom: NarrationPart) -> bool:
-    return isinstance(atom, NarrationLiteral) and atom.value.isspace()
-
-
-def _alike(own: NarrationPart, theirs: NarrationPart) -> bool:
-    if isinstance(own, NarrationLiteral):
-        return own == theirs
-    return type(own) is type(theirs)
-
-
-def _joined(atoms: list[NarrationPart]) -> tuple[NarrationPart, ...]:
-    joined: list[NarrationPart] = []
-    for atom in atoms:
-        last = joined[-1] if joined else None
-        if isinstance(atom, NarrationLiteral) and isinstance(last, NarrationLiteral):
-            joined[-1] = NarrationLiteral(value=last.value + atom.value)
-        else:
-            joined.append(atom)
+            joined.append(MarkedRun(mark, run.parts))
     return tuple(joined)
+
+
+def _merged(parts: tuple[NarrationPart, ...]) -> tuple[NarrationPart, ...]:
+    merged: list[NarrationPart] = []
+    for part in parts:
+        last = merged[-1] if merged else None
+        if isinstance(part, NarrationLiteral) and isinstance(last, NarrationLiteral):
+            merged[-1] = NarrationLiteral(value=last.value + part.value)
+        else:
+            merged.append(part)
+    return tuple(merged)

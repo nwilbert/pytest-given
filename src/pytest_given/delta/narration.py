@@ -124,16 +124,12 @@ def word_diff(
     a: Narration, ra: Reading, b: Narration, rb: Reading
 ) -> tuple[DiffSegment, ...]:
     """Runs of equal, removed and added tokens; a replaced stretch reads
-    removed, then added. Equal runs show the after side's tokens."""
+    removed, then added. Each run holds each side's own tokens, so either
+    side reads back whole."""
     tokens_a, tokens_b = tokens(a, ra), tokens(b, rb)
-    runs = _joined_spaces(
-        [
-            _Run(mark, [pair for _, pair in ops])
-            for mark, ops in groupby(_ops(tokens_a, tokens_b), key=lambda op: op[0])
-        ]
-    )
     return tuple(
-        DiffSegment(mark=run.mark, parts=_merged_literals(run.tokens)) for run in runs
+        _segment(mark, [pair for _, pair in ops])
+        for mark, ops in groupby(_ops(tokens_a, tokens_b), key=lambda op: op[0])
     )
 
 
@@ -216,21 +212,6 @@ class _Pair:
     before: Token | None
     after: Token | None
 
-    def shown(self, mark: Mark) -> Token:
-        token = self.before if mark == 'removed' else self.after
-        assert token is not None
-        return token
-
-
-@dataclass
-class _Run:
-    mark: Mark
-    pairs: list[_Pair]
-
-    @property
-    def tokens(self) -> list[Token]:
-        return [pair.shown(self.mark) for pair in self.pairs]
-
 
 def _ops(tokens_a: list[Token], tokens_b: list[Token]) -> Iterator[_Op]:
     """Each token marked, every gap between matches read removed-then-added."""
@@ -248,25 +229,12 @@ def _ops(tokens_a: list[Token], tokens_b: list[Token]) -> Iterator[_Op]:
         end_a, end_b = index_a + 1, index_b + 1
 
 
-def _joined_spaces(runs: list[_Run]) -> list[_Run]:
-    """An equal run of only spaces between two runs of one changed mark takes
-    that mark, so a changed stretch never splits around a lone space. The other
-    side's spaces there go unshown."""
-    joined: list[_Run] = []
-    for index, run in enumerate(runs):
-        mark = run.mark
-        if (
-            mark == 'equal'
-            and 0 < index < len(runs) - 1
-            and runs[index - 1].mark == runs[index + 1].mark
-            and all(pair.after and pair.after.kind == 'space' for pair in run.pairs)
-        ):
-            mark = runs[index - 1].mark
-        if joined and joined[-1].mark == mark:
-            joined[-1].pairs.extend(run.pairs)
-        else:
-            joined.append(_Run(mark, list(run.pairs)))
-    return joined
+def _segment(mark: Mark, pairs: list[_Pair]) -> DiffSegment:
+    return DiffSegment(
+        mark=mark,
+        before=_merged_literals([pair.before for pair in pairs if pair.before]),
+        after=_merged_literals([pair.after for pair in pairs if pair.after]),
+    )
 
 
 def _merged_literals(shown: list[Token]) -> tuple[NarrationPart, ...]:

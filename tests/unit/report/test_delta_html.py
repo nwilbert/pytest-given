@@ -439,14 +439,16 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
         ('derived:0', 'added', None),
         ('attachment:0', None, None),
     ]
-    # What the before side's steps render from.
+    # What the before side's steps render from: a step, and a modified step's
+    # words.
     assert item.delta.before is not None
     [before_step] = item.delta.before.steps
+    [modified] = item.delta.steps
+    before_words = tuple(part for run in modified.words for part in run.before)
     assert [
-        part.column_id
-        for part in before_step.narration.parts
-        if isinstance(part, NarrationPlaceholder)
-    ] == ['before:derived:0', 'reason']
+        [part.column_id for part in parts if isinstance(part, NarrationPlaceholder)]
+        for parts in (before_step.narration.parts, before_words)
+    ] == [['before:derived:0', 'reason'], ['before:derived:0', 'reason']]
     assert [
         attachment.column_id
         for attachment in before_step.attachments

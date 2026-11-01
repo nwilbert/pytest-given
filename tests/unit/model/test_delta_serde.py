@@ -49,9 +49,13 @@ def _full_delta() -> DeltaData:
         rendered='3', expression='n', format_spec='02', conversion='r'
     )
     words = (
-        DiffSegment(mark='equal', parts=(lit('a '), ref('coffee', 'coffee'))),
-        DiffSegment(mark='removed', parts=(lit('old'), value)),
-        DiffSegment(mark='added', parts=(ph('size', 'size'), lit('new'))),
+        DiffSegment(
+            mark='equal',
+            before=(lit('a  '), ref('coffee', 'coffee')),
+            after=(lit('a '), ref('coffee', 'Coffee')),
+        ),
+        DiffSegment(mark='removed', before=(lit('old'), value)),
+        DiffSegment(mark='added', after=(ph('size', 'size'), lit('new'))),
     )
     before_scenario = scn(
         'tests/test_a.py::test_a[1]',
@@ -144,7 +148,7 @@ def _full_delta() -> DeltaData:
                     paired_by='term-id',
                     before_facts=TermFacts(other_forms=('coffees',), scenario_count=2),
                     after_facts=TermFacts(scenario_count=3),
-                    definition=(DiffSegment(mark='added', parts=(lit('hot'),)),),
+                    definition=(DiffSegment(mark='added', after=(lit('hot'),)),),
                 ),
                 TermDelta(change='added', after=term('tea', 'tea')),
             ),

@@ -388,9 +388,10 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
 - Each side's module names are stored, for the same reason, so Browse by can tell an added or
   removed module from a changed one.
 - A word-level diff of a narration keeps term refs, placeholders and inline Markdown spans
-  (emphasis, code spans, links) whole: a change inside one marks the whole of it. A term ref that
-  compares equal is unchanged, even when its display changed with its term's canonical name, and
-  shows its *after* display.
+  (emphasis, code spans, links) whole: a change inside one marks the whole of it. Each run holds
+  each side's own text, an unchanged run both sides', so either side reads back whole. A term ref
+  that compares equal is unchanged, even when its display changed with its term's canonical name,
+  and each side shows its own display.
 - Both `unchanged` lists hold the pairs that matched with no change, so the counts can be checked
   and a consumer can tell "unchanged" from "absent".
 - `metadata.schema_version` counts the delta's own shape, separately from the report's, whose

@@ -41,10 +41,13 @@ SUGGESTION_OFS: tuple[SuggestionOf, ...] = ('scenario', 'case', 'term')
 
 @dataclass(frozen=True, kw_only=True)
 class DiffSegment:
-    """A run of one mark; equal runs carry the after parts."""
+    """A run of one mark, in each side's own parts: an equal run both sides',
+    which can differ in a space's width or a term ref's display, a removed run
+    the before side's, an added run the after side's."""
 
     mark: Mark
-    parts: tuple[NarrationPart, ...]
+    before: tuple[NarrationPart, ...] = ()
+    after: tuple[NarrationPart, ...] = ()
 
 
 @dataclass(frozen=True, kw_only=True)

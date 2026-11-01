@@ -39,6 +39,7 @@ from ..model import (
     ScenarioDelta,
     SourceLocation,
     Step,
+    StepDelta,
     TermDelta,
     TermFacts,
     TermId,
@@ -46,7 +47,15 @@ from ..model import (
     narration_text,
     plural,
 )
-from .delta_steps import BlockKey, Side, StepsView, block_keys, steps_view
+from .delta_steps import (
+    BlockKey,
+    MarkedRun,
+    Side,
+    StepsView,
+    block_keys,
+    shown_runs,
+    steps_view,
+)
 from .glossary_view import KindGrouping, group_by_kind
 from .html_renderer import (
     base_env,
@@ -522,6 +531,7 @@ class _BeforeKeys:
                 steps=[self._step(step) for step in before.steps],
                 parameters=self._table(before.parameters),
             ),
+            steps=tuple(self._step_delta(step) for step in scenario_delta.steps),
             parameters=self._parameter_delta(scenario_delta.parameters),
         )
 
@@ -552,6 +562,17 @@ class _BeforeKeys:
                 else attachment
                 for attachment in step.attachments
             ],
+        )
+
+    def _step_delta(self, step_delta: StepDelta) -> StepDelta:
+        """A word diff's before parts, which the before side's text reads."""
+        return dataclasses.replace(
+            step_delta,
+            words=tuple(
+                dataclasses.replace(segment, before=self._parts(segment.before))
+                for segment in step_delta.words
+            ),
+            children=tuple(self._step_delta(child) for child in step_delta.children),
         )
 
     def _table(self, table: ParameterTable | None) -> ParameterTable | None:
@@ -813,28 +834,24 @@ def _build_env(
     def source_url(value: SourceLocation | None, side: Side) -> str | None:
         return source_url_filters[side](value)
 
-    def narration_diff(words: tuple[DiffSegment, ...], side: Side) -> Markup:
-        """A modified step's text on one side, its changed words marked."""
+    def narration_diff(words: tuple[MarkedRun, ...], side: Side) -> Markup:
+        """A modified step's text on one side, its changed words marked. A run
+        holds whole spans, so each renders on its own."""
         return Markup('').join(
             _marked(
-                segment.mark,
+                run.mark,
                 narration(
-                    Narration(text=narration_text(segment.parts), parts=segment.parts),
-                    side,
+                    Narration(text=narration_text(run.parts), parts=run.parts), side
                 ),
             )
-            for segment in words
+            for run in words
         )
 
     def definition_diff(words: tuple[DiffSegment, ...]) -> Markup:
-        """A changed definition's word diff. A segment holds whole spans, so
-        each renders on its own."""
+        """A changed definition's word diff, inline."""
         return Markup('').join(
-            _marked(
-                segment.mark,
-                Markup(render_definition(narration_text(segment.parts))),
-            )
-            for segment in words
+            _marked(run.mark, Markup(render_definition(narration_text(run.parts))))
+            for run in shown_runs(words)
         )
 
     def no_param_color(column: ParameterColumn) -> str:

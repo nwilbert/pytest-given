@@ -23,6 +23,7 @@ from pytest_given.model import (
     NarrationPlaceholder,
     NarrationValue,
     TermId,
+    narration_text,
 )
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import lit, narr, ph, ref, term
@@ -52,7 +53,12 @@ def _equal(before: Narration, after: Narration, reading: Reading | None = None) 
 
 
 def _segment(mark: Mark, *parts: NarrationPart) -> DiffSegment:
-    return DiffSegment(mark=mark, parts=parts)
+    """A run whose side or sides read `parts` alike."""
+    return DiffSegment(
+        mark=mark,
+        before=parts if mark != 'added' else (),
+        after=parts if mark != 'removed' else (),
+    )
 
 
 @scenario(
@@ -267,7 +273,8 @@ def test_spaces_compare_equal_whatever_they_hold() -> None:
     assert not _equal(_plain('a b'), _plain('a b c'))
 
 
-def test_an_equal_term_ref_shows_its_after_display() -> None:
+def test_an_equal_term_ref_keeps_each_side_s_display() -> None:
+    """Renamed, so it compares equal, yet each side reads its own name."""
     before = narr(lit('a '), ref('room', 'room'))
     after = narr(lit('a '), ref('suite', 'suite'))
     assert word_diff(
@@ -275,20 +282,39 @@ def test_an_equal_term_ref_shows_its_after_display() -> None:
         _reading(term('room', 'Room'), renames={'room': 'suite'}),
         after,
         _reading(term('suite', 'Suite')),
-    ) == (_segment('equal', lit('a '), ref('suite', 'suite')),)
-
-
-def test_spaces_between_two_changes_of_one_mark_join_them() -> None:
-    assert word_diff(_plain('X a'), _reading(), _plain('Y Z a'), _reading()) == (
-        _segment('removed', lit('X')),
-        _segment('added', lit('Y Z ')),
-        _segment('equal', lit('a')),
+    ) == (
+        DiffSegment(
+            mark='equal',
+            before=(lit('a '), ref('room', 'room')),
+            after=(lit('a '), ref('suite', 'suite')),
+        ),
     )
 
 
-def test_spaces_between_two_removals_join_them_as_the_before_spaces() -> None:
+def test_each_side_keeps_its_own_spaces() -> None:
+    """The space after `Dana` pairs with one of the after side's: it stays on
+    each side, so neither side's words run together."""
+    before = narr(ref('desk', 'Dana'), lit(' has one free room'))
+    after = _plain('the front desk has one free room')
+    segments = word_diff(before, _reading(), after, _reading())
+    assert [
+        ''.join(narration_text(segment.before) for segment in segments),
+        ''.join(narration_text(segment.after) for segment in segments),
+    ] == ['Dana has one free room', 'the front desk has one free room']
+    assert segments == (
+        _segment('removed', ref('desk', 'Dana')),
+        _segment('added', lit('the')),
+        _segment('equal', lit(' ')),
+        _segment('added', lit('front desk ')),
+        _segment('equal', lit('has one free room')),
+    )
+
+
+def test_spaces_of_another_width_stay_each_side_s_own() -> None:
     assert word_diff(_plain('X\tY a'), _reading(), _plain(' a'), _reading()) == (
-        _segment('removed', lit('X\tY ')),
+        _segment('removed', lit('X')),
+        DiffSegment(mark='equal', before=(lit('\t'),), after=(lit(' '),)),
+        _segment('removed', lit('Y ')),
         _segment('equal', lit('a')),
     )
 

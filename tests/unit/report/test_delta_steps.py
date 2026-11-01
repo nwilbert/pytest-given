@@ -6,17 +6,18 @@ from pytest_given.model import (
     DiffSegment,
     Glossary,
     NarrationTermRef,
-    NarrationValue,
     Scenario,
     ScenarioDelta,
     narration_text,
 )
 from pytest_given.report.delta_steps import (
+    MarkedRun,
     Side,
     StepRow,
     StepsView,
     block_keys,
-    side_words,
+    shown_runs,
+    side_runs,
     steps_view,
 )
 from tests.unit.delta.builders import lit, narr, ref, report, scn, step, term
@@ -146,8 +147,7 @@ def test_a_before_block_the_after_side_kept_nothing_of_keys_as_its_own() -> None
 
 
 def test_each_side_reads_its_own_text_with_only_its_own_words_marked() -> None:
-    """An equal run carries the after side's parts, here a renamed term's
-    display, and lost the space the before side had after `Dana`."""
+    """Here a renamed term's display, and the space after `Dana`."""
     scenario_delta = _scenario_delta(
         scn(
             't.py::test_walk_in',
@@ -193,11 +193,22 @@ def test_each_side_reads_its_own_text_with_only_its_own_words_marked() -> None:
     ] == ['desk', 'room']
 
 
-def test_a_side_whose_runs_dont_line_up_with_its_text_reads_unmarked() -> None:
-    value = NarrationValue(rendered='3', expression='count')
-    shown_as_value = DiffSegment(mark='equal', parts=(lit('she pays '), value))
-    assert side_words(narr(lit('she pays 3')), [shown_as_value]) == ()
-    # Runs past the text's end, or stopping short of it.
-    runs = [DiffSegment(mark='equal', parts=(lit('she pays'),))]
-    assert side_words(narr(lit('she')), runs) == ()
-    assert side_words(narr(lit('she pays now')), runs) == ()
+def test_an_inline_reading_shows_each_change_from_its_side_and_equal_as_after() -> None:
+    runs = (
+        DiffSegment(mark='equal', before=(lit('a  '),), after=(lit('a '),)),
+        DiffSegment(mark='removed', before=(lit('X'),)),
+        DiffSegment(mark='equal', before=(lit(' '),), after=(lit(' '),)),
+        DiffSegment(mark='removed', before=(lit('Y'),)),
+        DiffSegment(mark='added', after=(lit('Z'),)),
+    )
+    # A lone space between two changes of one mark joins them.
+    assert shown_runs(runs) == (
+        MarkedRun('equal', (lit('a '),)),
+        MarkedRun('removed', (lit('X Y'),)),
+        MarkedRun('added', (lit('Z'),)),
+    )
+    # A side reads its own parts, runs of one mark merged.
+    assert side_runs(runs, 'after') == (
+        MarkedRun('equal', (lit('a  '),)),
+        MarkedRun('added', (lit('Z'),)),
+    )
