@@ -21,6 +21,7 @@ from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import (
     lit,
     narr,
+    ph,
     ref,
     report,
     scn,
@@ -246,6 +247,40 @@ def test_a_region_swapping_two_refs_is_no_match() -> None:
         ),
     )
     assert delta.suggestions == ()
+
+
+def test_a_renamed_column_s_placeholder_parts_two_swaps_beside_it() -> None:
+    def paying(first: str, column: str, second: str) -> Scenario:
+        return scn(
+            't.py::t[1]',
+            'Pay',
+            step(
+                'given',
+                narr(
+                    lit('a guest pays by '),
+                    ref(first, first),
+                    ph(column),
+                    ref(second, second),
+                    lit(' tonight'),
+                ),
+            ),
+            parameters=table([(column, 'param')], ('t.py::t[1]', [1])),
+        )
+
+    delta = _delta(
+        report(
+            paying('card', 'cost', 'wallet'),
+            glossary=_glossary(term('card', 'card'), term('wallet', 'wallet')),
+        ),
+        report(
+            paying('credit', 'price', 'purse'),
+            glossary=_glossary(term('credit', 'credit'), term('purse', 'purse')),
+        ),
+    )
+    assert delta.suggestions == (
+        Suggestion(of='term', before='card', after='credit'),
+        Suggestion(of='term', before='wallet', after='purse'),
+    )
 
 
 def test_a_term_swapped_in_a_nested_step_is_a_match() -> None:
