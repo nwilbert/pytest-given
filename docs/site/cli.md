@@ -44,6 +44,26 @@ A directory is searched recursively for `*.md`. Neither command runs tests: both
 
 The same command also installs the agent skills with `pytest-given skills install`; see [Agent skills](ai-agents.md#agent-skills).
 
+## Delta
+
+`pytest-given delta` builds a [delta report](delta-report.md) from two JSON reports, or re-renders the HTML of a delta JSON:
+
+```bash
+pytest-given delta before.json after.json [--json PATH] [--html PATH] \
+    [--renames PATH] [--before-label LABEL] [--after-label LABEL] \
+    [--source-link PRESET] [--theme light|dark|auto]
+pytest-given delta given-report/delta-data.json [--html PATH]
+```
+
+- `--json` and `--html` name the delta JSON and HTML paths. With neither, two inputs write `given-report/delta-data.json` and `given-report/delta.html`, and one input writes the HTML. With only one of them, only that file is written.
+- `--renames` names the [rename log](delta-report.md#the-rename-log). It defaults to `given-renames.toml` in the working directory, when that exists.
+- `--before-label` and `--after-label` set the version label of each side. They default to the git tag on that side's commit.
+- `--source-link` and `--theme` work as for `report`. The source link defaults to none.
+
+One input only re-renders, so `--json`, `--renames`, `--before-label` and `--after-label` with one input are refused. Run the command from your current checkout, so it reads the current rename log.
+
+It prints a summary of the counts. It exits 0 whether or not anything changed, and 2 when it cannot build the delta. The [exit status](#exit-status) rule applies, and the command never exits 1. A report without the schema version of the pytest-given that compares it, a report where a delta JSON is expected (or the reverse), and a malformed rename log all exit 2. A report from a pytest-given that predates the schema version has none, so regenerate it.
+
 ## Exit status
 
 Every subcommand uses the same codes, so a script can branch on the code alone:
@@ -52,4 +72,4 @@ Every subcommand uses the same codes, so a script can branch on the code alone:
 - `1` means something to act on. A citation finding remains, or `skills install --check` finds drift. Fix it and run again.
 - `2` means the command could not do its job. A file could not be read or written, or a flag value was refused. The message goes to stderr.
 
-`report` and a plain `skills install` never exit 1, since neither reports findings.
+`report`, `delta` and a plain `skills install` never exit 1, since none reports findings.
