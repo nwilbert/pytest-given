@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import shutil
+import subprocess
 import tempfile
 import tomllib
 import webbrowser
@@ -647,6 +648,7 @@ _DOCS_SITE = Path('docs/site')
 _REPORT_TEMPLATES = Path('src/pytest_given/report/templates')
 _REPORT_FONTS = _REPORT_TEMPLATES / 'fonts'
 _REPORT_LOGO = _REPORT_TEMPLATES / 'logo.svg'
+_KEPT_DELTAS = Path('docs/deltas')
 
 
 def _build_docs(session: nox.Session, docs_version: str) -> None:
@@ -656,12 +658,12 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
     diagram the Home page links to (the README copy, see `diagram`), every
     example's report — rendered from its JSON, so its copy buttons link the
     `docs_version` being built rather than the committed HTML's `/dev/` —
-    the example delta, rendered from its JSON likewise,
-    the two upright font faces the report package embeds (the site's italic
-    faces have no other home and stay committed), and the report's logo, which
-    is the site's logo and favicon alike. Each copy lands under
-    docs_dir (Zensical builds everything there and has no exclude list), and
-    every target is gitignored. CHANGELOG.md needs no copy:
+    the example delta, rendered from its JSON likewise, every kept release delta
+    (`docs/deltas/*.html`), the two upright font faces the report package embeds
+    (the site's italic faces have no other home and stay committed), and the
+    report's logo, which is the site's logo and favicon alike. Each copy lands
+    under docs_dir (Zensical builds everything there and has no exclude list),
+    and every target is gitignored. CHANGELOG.md needs no copy:
     docs/site/changelog.md embeds it with a pymdownx.snippets include.
     """
     _sync(session, 'docs', include_project=True)
@@ -694,6 +696,11 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
         '--html',
         (_DOCS_SITE / 'examples' / 'delta.html').as_posix(),
     )
+    for kept_html in sorted(_KEPT_DELTAS.glob('*.html')):
+        target = _DOCS_SITE / 'deltas' / kept_html.name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(kept_html, target)
+        session.log(f'staged {kept_html} -> {target}')
     # --clean: the page cache is keyed on the Markdown source alone, so an edited
     # snippet include (the diagram SVG, CHANGELOG.md) would otherwise go stale.
     session.run('zensical', 'build', '--strict', '--clean')
@@ -851,6 +858,30 @@ def _regenerate_self_report(session: nox.Session) -> None:
         '-q',
     )
     _run_citations(session, 'update', 'self-report')
+    _rerender_kept_deltas(session)
+
+
+def _rerender_kept_deltas(session: nox.Session) -> None:
+    """Re-render each kept release delta's HTML beside its JSON. A JSON that a
+    later shape change left unreadable exits 2 and keeps its last HTML: each
+    renders to a scratch file, since a failed delta discards its outputs."""
+    executable = shutil.which('pytest-given', path=session.bin)
+    assert executable is not None
+    with tempfile.TemporaryDirectory() as tmp:
+        rendered = Path(tmp) / 'delta.html'
+        for delta_json in sorted(_KEPT_DELTAS.glob('*.json')):
+            # subprocess, since session.run does not report which success code it saw.
+            completed = subprocess.run(
+                [executable, 'delta', delta_json.as_posix(), '--html', rendered],
+                check=False,
+            )
+            assert completed.returncode in (0, 2), completed.returncode
+            if completed.returncode == 0:
+                shutil.move(rendered, delta_json.with_suffix('.html'))
+            else:
+                session.log(
+                    f'{delta_json.name} is unreadable: its HTML keeps its last render'
+                )
 
 
 @nox.session
