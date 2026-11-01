@@ -104,7 +104,7 @@ A design spec or a README can [cite](https://nwilbert.github.io/pytest-given/lat
 - **Reports**: a self-contained [HTML report](https://nwilbert.github.io/pytest-given/latest/html-report/) to browse and share, and a [Markdown report](https://nwilbert.github.io/pytest-given/latest/markdown-report/) for diffs, reviews and agents.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
 - **[Citations](https://nwilbert.github.io/pytest-given/latest/guide/citations/)**: links from Markdown documents to scenarios, tags and stories, led by their status and checked against the latest run.
-- **[Agent skills](https://nwilbert.github.io/pytest-given/latest/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.
+- **[Agent skills](https://nwilbert.github.io/pytest-given/latest/ai-agents/)**: bundled Agent Skills for working with narrated tests, their reports, citations and deltas, installable with one command.
 
 The full reference — pytest options, source links, the standalone CLI — is on the [documentation site](https://nwilbert.github.io/pytest-given/latest/).
 
