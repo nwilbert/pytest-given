@@ -1766,12 +1766,14 @@ body.delta {
 }
 body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 700; }
 
-/* The row's bar is its change. */
-.delta .scenario[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
-.delta .scenario[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
-.delta .scenario[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
+/* A row's bar is its change, and so is a term card's: its kind is the
+   heading it sits under. */
+.delta .scenario[data-change="added"], .delta .entry[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
+.delta .scenario[data-change="changed"], .delta .entry[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
+.delta .scenario[data-change="removed"], .delta .entry[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
 .delta .scenario::before,
-.delta .scenario.multi-case > .scenario-header::before { background: var(--change-line); }
+.delta .scenario.multi-case > .scenario-header::before,
+.delta .entry::before { background: var(--change-line); }
 
 .delta-range { font-variant-numeric: tabular-nums; }
 .delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
@@ -1796,8 +1798,10 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   padding: 0 7px;
   white-space: nowrap;
 }
-.scenario-tag.delta-tag-added { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
-.scenario-tag.delta-tag-removed {
+.scenario-tag.delta-tag-added,
+.use-chip.delta-form[data-change="added"] { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
+.scenario-tag.delta-tag-removed,
+.use-chip.delta-form[data-change="removed"] {
   cursor: default;
   color: var(--removed-ink);
   border-color: var(--removed-line);
@@ -1915,3 +1919,11 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 .delta-placeholder-row td {
   background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
 }
+
+/* A term card: a renamed term's old name under its name, and its change
+   beside its counts. */
+.delta .entry-name { display: flex; flex-direction: column; align-items: flex-start; }
+.delta .entry-name del { text-decoration-color: var(--removed-line); }
+.use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
+.delta .entry-body > .delta-change-label,
+.delta .entry-body > .delta-badge { flex-shrink: 0; margin-top: 2px; }

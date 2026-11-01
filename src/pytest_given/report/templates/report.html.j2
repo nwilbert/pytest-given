@@ -8,7 +8,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, scenario_steps, param_table, stale_link_snackbar with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -356,30 +356,13 @@
       {% set undefined_count = glossary_view.undefined_count %}
       {% set all_uncategorized = glossary_view.all_uncategorized %}
       {% if not all_uncategorized %}
-      <div class="sidebar-section">
-        <div class="sidebar-label">Show kinds</div>
-        {% for kind in glossary_view.kinds %}
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.{{ kind.key }}">
-          <span class="kind-swatch kind-{{ kind.key }}"></span>
-          <span>{{ kind.label }}</span>
-          <span class="nav-group-count">{{ kind.count }}</span>
-        </label>
-        {% endfor %}
-      </div>
+      {{ kind_filter(glossary_view.kinds) }}
       {% endif %}
 
       {# When every term is defined, the Definitions filter can only ever be a
          no-op: drop it, mirroring the kind grouping's all_uncategorized hide. #}
       {% if undefined_count %}
-      <div class="sidebar-section">
-        <div class="sidebar-label">Definitions</div>
-        <div class="seg-toggle">
-          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" :aria-pressed="glossaryDefinitionFilter === 'all'" @click="glossaryDefinitionFilter = 'all'">All</button>
-          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" :aria-pressed="glossaryDefinitionFilter === 'defined'" @click="glossaryDefinitionFilter = 'defined'">Defined</button>
-          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" :aria-pressed="glossaryDefinitionFilter === 'undefined'" @click="glossaryDefinitionFilter = 'undefined'">Undefined</button>
-        </div>
-      </div>
+      {{ definition_filter() }}
       {% endif %}
     </div>
     {{ sidebar_resizer() }}
@@ -401,15 +384,7 @@
 
       <div class="glossary-entries">
       {% for group in glossary_view.groups %}
-      {% set kind_label, kind_key = group.label, group.key %}
-      <div class="kind-group" x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
-        {% if not all_uncategorized %}
-        <div class="kind-header">
-          <span class="kind-title kind-{{ kind_key }}">{{ kind_label }}</span>
-          <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
-        </div>
-        {% endif %}
-        <div class="entry-list kind-{{ kind_key }}">
+      {% call kind_group(group, all_uncategorized) %}
         {% for entry in group.entries %}
         {% set term = entry.term %}
         {% set agg = entry.aggregation %}
@@ -476,8 +451,7 @@
           </div>
         </div>
         {% endfor %}
-        </div>
-      </div>
+      {% endcall %}
       {% endfor %}
       {#- Every name, hidden: the name column sizes to the widest of them, so
           it holds still while search and the filters hide the entries. -#}

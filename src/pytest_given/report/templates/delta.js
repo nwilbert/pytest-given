@@ -1,8 +1,9 @@
 // --- The delta page ---
-// The report's Alpine component with a Change filter beside the Status one.
-// Loaded after app.js, whose helpers it reuses; `__REPORT_DATA__` here holds
-// one entry per listed scenario, keyed by its slug, since a removed and an
-// added scenario can share a node ID.
+// The report's Alpine component with a Change filter beside the Status one,
+// on each tab. Loaded after app.js, whose helpers it reuses;
+// `__REPORT_DATA__` here holds one entry per listed scenario, keyed by its
+// slug, since a removed and an added scenario can share a node ID, and one
+// per term card, keyed likewise.
 const CHANGES = ['added', 'changed', 'removed'];
 
 function deltaApp() {
@@ -15,8 +16,17 @@ function deltaApp() {
   const moduleChanges = data.module_changes || {};
   // The before glossary's terms that read otherwise than the after one's.
   const beforeTerms = new Map((data.before_terms || []).map(t => [t.id, t]));
+  const termCards = data.term_cards || [];
+  const cardKeys = new Set(termCards.map(card => card.key));
+  // A term ref's card, by the side the ref was read on and its term id.
+  const cardOf = { before: {}, after: {} };
+  for (const card of termCards) {
+    for (const side of ['before', 'after']) if (card[side]) cardOf[side][card[side]] = card.key;
+  }
   const overrides = {
     shownChanges: allChangesShown(),
+    // The Glossary tab's own, as its search is: not in the URL.
+    shownTermChanges: allChangesShown(),
     get changeCounts() {
       return changeCounts;
     },
@@ -57,8 +67,26 @@ function deltaApp() {
     },
     // The Glossary tab lists only the terms that changed; a term ref to any
     // other has nowhere to go.
-    goToTerm(id) {
-      if (hasTerms()) base.goToTerm.call(this, id);
+    _hasTermEntry(key) {
+      return cardKeys.has(key);
+    },
+    _refEntry(pill) {
+      const side = pill.closest('[data-term-side="before"]') ? 'before' : 'after';
+      return lookup(cardOf[side], pill.dataset.termId, null);
+    },
+    // Over the cards, which the Change filter narrows too, rather than over a
+    // glossary's terms.
+    _termCounts() {
+      const query = this.glossarySearch.toLowerCase();
+      const definitions = this.glossaryDefinitionFilter;
+      const counts = {};
+      for (const card of termCards) {
+        if (!this.shownTermChanges[card.change]) continue;
+        if (definitions !== 'all' && (definitions === 'defined') !== card.defined) continue;
+        if (query && !card.search.includes(query)) continue;
+        counts[card.kind] = (counts[card.kind] || 0) + 1;
+      }
+      return counts;
     },
     // A phase block narrates the after table's columns. A lone before table
     // has none it narrates.

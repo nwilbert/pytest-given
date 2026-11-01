@@ -660,7 +660,7 @@ function reportApp() {
     },
     goToTerm(id) {
       // A stale `#term=` link would otherwise open an empty Glossary tab.
-      if (!Object.hasOwn(termNames, id)) return;
+      if (!this._hasTermEntry(id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
@@ -985,7 +985,7 @@ function reportApp() {
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();
-        this.goToTerm(pill.dataset.termId);
+        this.goToTerm(this._refEntry(pill));
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -1127,6 +1127,14 @@ function reportApp() {
     _tipTerm(pill) {
       return termsById.get(pill.dataset.termId);
     },
+    // A Glossary entry is a term, keyed by its id; the delta page keys its
+    // cards by change, and a ref finds its card by the side it was read on.
+    _hasTermEntry(id) {
+      return Object.hasOwn(termNames, id);
+    },
+    _refEntry(pill) {
+      return pill.dataset.termId;
+    },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside
     // `overflow: hidden` collapsible bodies, which would clip an absolutely
@@ -1215,7 +1223,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => Object.hasOwn(termNames, id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {

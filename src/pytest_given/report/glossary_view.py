@@ -2,6 +2,7 @@
 the kind headings the template renders.
 """
 
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Literal, NamedTuple
 
@@ -39,24 +40,33 @@ type KindKey = TermKind | Literal['kindless']
 
 
 @dataclass(frozen=True)
-class KindGroup:
+class KindGroup[Entry]:
     """The Glossary view's terms under one kind heading."""
 
     label: str
     key: KindKey
-    entries: list[TermEntry]
+    entries: list[Entry]
 
 
 @dataclass(frozen=True)
-class GlossaryView:
-    """Everything the Glossary tab renders, computed here rather than in Jinja.
+class KindGrouping[Entry]:
+    """Terms under their kind headings, and the kinds the sidebar filters on.
 
     `all_uncategorized` says the kind grouping carries no information — every
     term is kindless — so the template drops the filter section and the
     'Uncategorized' heading and shows a flat list.
     """
 
-    groups: list[KindGroup]
+    groups: list[KindGroup[Entry]]
+    kinds: list[KindTally]
+    all_uncategorized: bool
+
+
+@dataclass(frozen=True)
+class GlossaryView:
+    """Everything the Glossary tab renders, computed here rather than in Jinja."""
+
+    groups: list[KindGroup[TermEntry]]
     kinds: list[KindTally]
     term_scenarios: dict[TermId, list[NodeId]]
     undefined_count: int
@@ -98,26 +108,33 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
     """The Glossary view's terms, grouped by kind, each with its cross-references."""
     crossrefs = build_term_crossrefs(report)
     terms = report.glossary.terms if report.glossary is not None else []
-    by_kind: dict[KindKey, list[GlossaryTerm]] = {row.key: [] for row in _KIND_GROUPS}
-    for term in terms:
-        by_kind[term.kind or 'kindless'].append(term)
-    counts = {key: len(group) for key, group in by_kind.items()}
-    groups = [
-        KindGroup(
-            label=row.label,
-            key=row.key,
-            entries=[
-                _term_entry(term, row.key, crossrefs) for term in by_kind[row.key]
-            ],
-        )
-        for row in _KIND_GROUPS
-        if by_kind[row.key]
-    ]
+    grouping = group_by_kind(
+        [_term_entry(term, term.kind or 'kindless', crossrefs) for term in terms],
+        lambda entry: entry.term.kind,
+    )
     return GlossaryView(
-        groups=groups,
-        kinds=_kind_tallies(counts),
+        groups=grouping.groups,
+        kinds=grouping.kinds,
         term_scenarios=crossrefs.term_scenarios,
         undefined_count=sum(1 for term in terms if term.definition is None),
+        all_uncategorized=grouping.all_uncategorized,
+    )
+
+
+def group_by_kind[Entry](
+    entries: Iterable[Entry], kind_of: Callable[[Entry], TermKind | None]
+) -> KindGrouping[Entry]:
+    by_kind: dict[KindKey, list[Entry]] = {row.key: [] for row in _KIND_GROUPS}
+    for entry in entries:
+        by_kind[kind_of(entry) or 'kindless'].append(entry)
+    counts = {key: len(group) for key, group in by_kind.items()}
+    return KindGrouping(
+        groups=[
+            KindGroup(label=row.label, key=row.key, entries=by_kind[row.key])
+            for row in _KIND_GROUPS
+            if by_kind[row.key]
+        ],
+        kinds=_kind_tallies(counts),
         all_uncategorized=bool(
             counts['kindless']
             and not (counts['actor'] or counts['object'] or counts['activity'])

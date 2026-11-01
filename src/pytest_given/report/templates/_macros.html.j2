@@ -261,6 +261,49 @@
     </div>
   {%- endmacro -%}
 
+  {#- The Glossary sidebar's two filters. -#}
+  {%- macro kind_filter(kinds) -%}
+      <div class="sidebar-section">
+        <div class="sidebar-label">Show kinds</div>
+        {% for kind in kinds %}
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.{{ kind.key }}">
+          <span class="kind-swatch kind-{{ kind.key }}"></span>
+          <span>{{ kind.label }}</span>
+          <span class="nav-group-count">{{ kind.count }}</span>
+        </label>
+        {% endfor %}
+      </div>
+  {%- endmacro -%}
+
+  {%- macro definition_filter() -%}
+      <div class="sidebar-section">
+        <div class="sidebar-label">Definitions</div>
+        <div class="seg-toggle">
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" :aria-pressed="glossaryDefinitionFilter === 'all'" @click="glossaryDefinitionFilter = 'all'">All</button>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" :aria-pressed="glossaryDefinitionFilter === 'defined'" @click="glossaryDefinitionFilter = 'defined'">Defined</button>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" :aria-pressed="glossaryDefinitionFilter === 'undefined'" @click="glossaryDefinitionFilter = 'undefined'">Undefined</button>
+        </div>
+      </div>
+  {%- endmacro -%}
+
+  {#- One kind's terms under its heading, the caller's entries in its list;
+      the heading's count is of the entries the filters leave. -#}
+  {%- macro kind_group(group, all_uncategorized) -%}
+      {% set kind_label, kind_key = group.label, group.key %}
+      <div class="kind-group" x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
+        {% if not all_uncategorized %}
+        <div class="kind-header">
+          <span class="kind-title kind-{{ kind_key }}">{{ kind_label }}</span>
+          <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
+        </div>
+        {% endif %}
+        <div class="entry-list kind-{{ kind_key }}">
+        {{- caller() }}
+        </div>
+      </div>
+  {%- endmacro -%}
+
   {#- A scenario's steps under their phase keywords; `side` as for
       `render_step`. -#}
   {%- macro scenario_steps(scenario, scenario_idx, side=none) -%}

@@ -3,7 +3,7 @@
 
 import dataclasses
 
-from pytest_given.delta import DeltaInputs, build_delta
+from pytest_given.delta import DeltaInputs, build_delta, parse_rename_log
 from pytest_given.model import (
     Attachment,
     AttachmentRef,
@@ -20,7 +20,10 @@ from pytest_given.model import (
     Step,
 )
 from pytest_given.report.delta_html import (
+    DeltaGlossaryView,
     ListedScenario,
+    ListedTerm,
+    OtherForm,
     ReasonRow,
     StepBlock,
     StepRow,
@@ -177,15 +180,127 @@ def test_a_before_side_ref_finds_its_term_where_the_after_one_reads_otherwise() 
         ),
     )
     data = embedded_app_data(render_delta_html(_delta(before, after), None))
+    # A term only the before side has can't be read otherwise by the after
+    # one, so it stands with the after terms, where the Terms axis names it.
     assert [entry['id'] for entry in data['glossary']['terms']] == [
         'guest',
         'desk',
         'bill',
+        'room',
     ]
     assert [
         (entry['id'], entry['canonical'], entry['definition'])
         for entry in data['before_terms']
-    ] == [('room', 'Room', None), ('guest', 'Guest', None), ('bill', 'Bill', 'Old.')]
+    ] == [('guest', 'Guest', None), ('bill', 'Bill', 'Old.')]
+
+
+def _glossary(delta: DeltaData) -> DeltaGlossaryView:
+    view = delta_render_context(delta)['glossary_view']
+    assert isinstance(view, DeltaGlossaryView)
+    return view
+
+
+def _card(view: DeltaGlossaryView, key: str) -> ListedTerm:
+    [card] = [card for card in view.listed if card.key == key]
+    return card
+
+
+def _invoicing(name: str, title: str = 'Pay') -> Scenario:
+    return scn(f't.py::test_{name}', narr(lit(f'{title} the '), ref('bill', 'bill')))
+
+
+def test_a_term_card_links_only_the_listed_scenarios_that_refer_to_it() -> None:
+    """On the side each scenario's ref was read on: a removed scenario's
+    before ref counts, an unchanged scenario only in the count."""
+    before = report(
+        _invoicing('same'),
+        _invoicing('stay'),
+        _invoicing('gone'),
+        scn('t.py::test_other', 'Other'),
+        glossary=Glossary(terms=[term('bill', 'Bill', definition='Old.')]),
+    )
+    after = report(
+        _invoicing('same'),
+        _invoicing('stay', 'Settle'),
+        scn('t.py::test_other', 'Other, renamed'),
+        glossary=Glossary(terms=[term('bill', 'Bill', definition='New.')]),
+    )
+    delta = _delta(before, after)
+    card = _card(_glossary(delta), 'bill')
+    assert sorted(item.slug for item in card.scenarios) == ['removed-t/gone', 't/stay']
+    assert card.summary == ('3 → 2 scenarios',)
+    # The Terms axis takes each scenario's terms from the side it is shown from.
+    data = embedded_app_data(render_delta_html(delta, None))
+    assert sorted(data['term_scenarios']['bill']) == ['removed-t/gone', 't/stay']
+
+
+def test_a_renamed_term_reads_its_old_name_and_marks_the_other_forms_it_changed():
+    before = report(
+        scn('t.py::test_a', narr(lit('Book '), ref('room', 'Room 101'))),
+        scn('t.py::test_b', narr(lit('Clean '), ref('room', 'Room 102'))),
+        glossary=Glossary(terms=[term('room', 'Room')]),
+    )
+    after = report(
+        scn('t.py::test_a', narr(lit('Book '), ref('suite', 'Suite 101'))),
+        scn('t.py::test_b', narr(lit('Clean '), ref('suite', 'Room 102'))),
+        glossary=Glossary(terms=[term('suite', 'Suite')]),
+    )
+    delta = build_delta(
+        DeltaInputs(
+            before=before,
+            after=after,
+            renames=parse_rename_log('[[term]]\nold = "room"\nnew = "suite"\n', 'log'),
+            plugin_version='0.1.0',
+            timestamp='now',
+        )
+    ).delta
+    card = _card(_glossary(delta), 'suite')
+    assert (card.change, card.was, card.delta.paired_by) == (
+        'changed',
+        'Room',
+        'rename-log',
+    )
+    assert card.other_forms == [
+        OtherForm('Suite 101', 'added'),
+        OtherForm('Room 102'),
+        OtherForm('Room 101', 'removed'),
+    ]
+    # Neither count changed, so neither reads as a change.
+    assert card.summary == ('2 other forms', '2 scenarios')
+    # A ref to it on either side opens its card.
+    [entry] = embedded_app_data(render_delta_html(delta, None))['term_cards']
+    assert (entry['key'], entry['before'], entry['after']) == ('suite', 'room', 'suite')
+
+
+def test_a_term_whose_kind_changed_is_listed_under_each_kind() -> None:
+    before = report(glossary=Glossary(terms=[term('upgrade', 'Upgrade', 'object')]))
+    after = report(glossary=Glossary(terms=[term('upgrade', 'upgrade', 'activity')]))
+    view = _glossary(_delta(before, after))
+    assert [
+        (group.key, [(card.key, card.change) for card in group.entries])
+        for group in view.grouping.groups
+    ] == [
+        ('object', [('removed-upgrade', 'removed')]),
+        ('activity', [('upgrade', 'added')]),
+    ]
+
+
+def test_a_side_without_a_glossary_lists_the_other_side_s_terms() -> None:
+    """And a delta that changed no term has no Glossary tab."""
+    with_terms = report(glossary=Glossary(terms=[term('desk', 'Desk')]))
+    without = report(scn('t.py::test_new', 'New'))
+    for before, after, change in (
+        (with_terms, without, 'removed'),
+        (without, with_terms, 'added'),
+    ):
+        data = embedded_app_data(render_delta_html(_delta(before, after), None))
+        [card] = data['term_cards']
+        assert (card['change'], data['term_ids']) == (change, [card['key']])
+        assert [entry['id'] for entry in data['glossary']['terms']] == ['desk']
+    unchanged = embedded_app_data(
+        render_delta_html(_delta(with_terms, with_terms), None)
+    )
+    assert unchanged['term_ids'] == []
 
 
 def _shape(blocks: list[StepBlock] | None) -> list[tuple[object, ...]]:

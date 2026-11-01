@@ -5,38 +5,45 @@
 {% include '_head.html.j2' %}
 </head>
 {#- The report's page and component, with what a delta changes: the Change
-    filter, a row per listed scenario shown from one side, and no status,
-    parameter or term-kind colour (`body.delta` in styles.css). -#}
+    filter, a row per listed scenario and a card per listed term, each shown
+    from one side, and no status, parameter or term-kind colour (`body.delta`
+    in styles.css). -#}
 <body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, scenario_steps, param_table, stale_link_snackbar with context -%}
-  {%- from '_delta_macros.html.j2' import delta_steps, param_table_delta with context -%}
+  {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar with context -%}
+  {%- from '_delta_macros.html.j2' import change_filter, side_source, term_card, delta_steps, param_table_delta with context -%}
   {{ icon_sprite() }}
-  
+
+  {#- The Glossary tab only when a term is listed; no Stories tab. -#}
+  {%- set terms = glossary_view.listed %}
   <header class="topbar">
     <div class="topbar-title" title="{{ title }}">{{ title }}</div>
+    {% if terms %}
+    <nav class="frame-nav" role="tablist" aria-label="Delta views">
+      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
+              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+              :aria-selected="mainView === 'scenarios'"
+              @click="mainView = 'scenarios'">Scenarios</button>
+      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
+              :class="{ 'nav-tab-active': mainView === 'glossary' }"
+              :aria-selected="mainView === 'glossary'"
+              @click="mainView = 'glossary'">Glossary</button>
+    </nav>
+    {% endif %}
     <div class="topbar-meta">
       <span class="delta-range">{{ range }}</span>
       {{ theme_toggle() }}
     </div>
   </header>
 
-  <div id="view-scenarios">
+  <div id="view-scenarios" {% if terms %}role="tabpanel" aria-labelledby="tab-scenarios"{% endif %} x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
     {{ search_box('search', 'Search titles and tags...') }}
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">Change</div>
-      <div class="status-pills">
-        {%- for change, count in change_counts.items() %}
-        <button type="button" class="btn-reset status-pill delta-change-pill" data-change="{{ change }}" :class="{ 'active-change': shownChanges.{{ change }} }" :aria-pressed="shownChanges.{{ change }}" @click="shownChanges.{{ change }} = !shownChanges.{{ change }}"{% if not count %} disabled{% endif %}>{{ change_glyph[change] }} {{ change | capitalize }} <span>{{ count }}</span></button>
-        {%- endfor %}
-      </div>
-      <div class="delta-unchanged">{{ unchanged_count }} unchanged</div>
-    </div>
+    {{ change_filter('shownChanges', change_counts, unchanged_count) }}
 
     {{ status_filter() }}
 
@@ -54,6 +61,9 @@
       </div>
       <div class="seg-toggle">
         <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
+        {% if browse_terms %}
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'terms' }" :aria-pressed="view === 'terms'" @click="view = 'terms'">Terms</button>
+        {% endif %}
         <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
       </div>
       <div class="nav-tree">
@@ -98,6 +108,12 @@
         <span class="filter-chip" x-cloak>
           Tag: <span x-text="tagLabel(tag)"></span>
           <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
+        </span>
+      </template>
+      <template x-for="termId in termFilters" :key="termId">
+        <span class="filter-chip" x-cloak>
+          Term: <span x-text="termLabel(termId)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
         </span>
       </template>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
@@ -187,8 +203,7 @@
       {% endif %}
 
       {%- if scenario.source %}
-      {%- set url = scenario.source | source_url(item.side) %}
-      <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ scenario.source.relpath }}:{{ scenario.source.line }}</a>{% else %}<span>{{ scenario.source.relpath }}:{{ scenario.source.line }}</span>{% endif %}</div>
+      {{ side_source(scenario.source, item.side) }}
       {%- endif %}
     </div>
     </div>
@@ -201,6 +216,57 @@
   </div>{# end .view-main #}
   </div>{# end .view-layout #}
   </div>{# end #view-scenarios #}
+
+  {% if terms %}
+  {%- set grouping = glossary_view.grouping %}
+  <div id="view-glossary" role="tabpanel" aria-labelledby="tab-glossary" x-show="mainView === 'glossary'" x-cloak>
+  <div class="view-layout">
+    <div class="sidebar">
+      {{ search_box('glossarySearch', 'Search terms...') }}
+
+      {{ change_filter('shownTermChanges', glossary_view.change_counts, glossary_view.unchanged_count) }}
+
+      {% if not grouping.all_uncategorized %}
+      {{ kind_filter(grouping.kinds) }}
+      {% endif %}
+
+      {% if glossary_view.undefined_count %}
+      {{ definition_filter() }}
+      {% endif %}
+    </div>
+    {{ sidebar_resizer() }}
+
+    <div class="view-main">
+      <div class="header">
+        <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+          <div class="header-title">Glossary</div>
+          <div class="header-context meta-list">
+            <span>{{ terms | length | plural('term') }}</span>
+            {%- for change, count in glossary_view.change_counts.items() if count %}
+            <span>{{ count }} {{ change }}</span>{% endfor %}
+          </div>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glossary-entries">
+      {% for group in grouping.groups %}
+      {% call kind_group(group, grouping.all_uncategorized) %}
+        {% for card in group.entries %}
+        {{ term_card(card) }}
+        {% endfor %}
+      {% endcall %}
+      {% endfor %}
+      <div class="entry-name entry-name-sizer" aria-hidden="true">{% for card in terms %}<span class="term-name">{{ card.shown.canonical }}</span>{% endfor %}</div>
+      </div>
+      <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
+    </div>
+  </div>
+  </div>{# end #view-glossary #}
+  {% endif %}
 
 </div>
 

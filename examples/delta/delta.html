@@ -1799,11 +1799,13 @@ body.delta {
 body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 700; }
 
 
-.delta .scenario[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
-.delta .scenario[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
-.delta .scenario[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
+
+.delta .scenario[data-change="added"], .delta .entry[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
+.delta .scenario[data-change="changed"], .delta .entry[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
+.delta .scenario[data-change="removed"], .delta .entry[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
 .delta .scenario::before,
-.delta .scenario.multi-case > .scenario-header::before { background: var(--change-line); }
+.delta .scenario.multi-case > .scenario-header::before,
+.delta .entry::before { background: var(--change-line); }
 
 .delta-range { font-variant-numeric: tabular-nums; }
 .delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
@@ -1828,8 +1830,10 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   padding: 0 7px;
   white-space: nowrap;
 }
-.scenario-tag.delta-tag-added { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
-.scenario-tag.delta-tag-removed {
+.scenario-tag.delta-tag-added,
+.use-chip.delta-form[data-change="added"] { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
+.scenario-tag.delta-tag-removed,
+.use-chip.delta-form[data-change="removed"] {
   cursor: default;
   color: var(--removed-ink);
   border-color: var(--removed-line);
@@ -1949,6 +1953,14 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 }
 
 
+
+.delta .entry-name { display: flex; flex-direction: column; align-items: flex-start; }
+.delta .entry-name del { text-decoration-color: var(--removed-line); }
+.use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
+.delta .entry-body > .delta-change-label,
+.delta .entry-body > .delta-badge { flex-shrink: 0; margin-top: 2px; }
+
+
 </style>
 </head><body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
@@ -1957,9 +1969,20 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       <symbol id="icon-json" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></g></symbol>
       <symbol id="icon-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></g></symbol>
     </svg>
-  
   <header class="topbar">
     <div class="topbar-title" title="Delta Example">Delta Example</div>
+    
+    <nav class="frame-nav" role="tablist" aria-label="Delta views">
+      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
+              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
+              :aria-selected="mainView === 'scenarios'"
+              @click="mainView = 'scenarios'">Scenarios</button>
+      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
+              :class="{ 'nav-tab-active': mainView === 'glossary' }"
+              :aria-selected="mainView === 'glossary'"
+              @click="mainView = 'glossary'">Glossary</button>
+    </nav>
+    
     <div class="topbar-meta">
       <span class="delta-range">v1 2026-11-01T07:17:51.315433+00:00 to v2 2026-11-01T07:17:51.754604+00:00</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -1970,7 +1993,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
     </div>
   </header>
 
-  <div id="view-scenarios">
+  <div id="view-scenarios" role="tabpanel" aria-labelledby="tab-scenarios" x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
     <label class="search-box">
@@ -2015,6 +2038,9 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
       </div>
       <div class="seg-toggle">
         <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
+        
+        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'terms' }" :aria-pressed="view === 'terms'" @click="view = 'terms'">Terms</button>
+        
         <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
       </div>
       <div class="nav-tree"><template x-for="group in groups" :key="group.id">
@@ -2063,6 +2089,12 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
         <span class="filter-chip" x-cloak>
           Tag: <span x-text="tagLabel(tag)"></span>
           <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
+        </span>
+      </template>
+      <template x-for="termId in termFilters" :key="termId">
+        <span class="filter-chip" x-cloak>
+          Term: <span x-text="termLabel(termId)"></span>
+          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
         </span>
       </template>
       <button class="collapse-all-btn" @click="toggleAllScenarios()">
@@ -2670,6 +2702,384 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
   </div>
   </div>
 
+  
+  <div id="view-glossary" role="tabpanel" aria-labelledby="tab-glossary" x-show="mainView === 'glossary'" x-cloak>
+  <div class="view-layout">
+    <div class="sidebar">
+      <label class="search-box">
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search terms..." x-model="glossarySearch">
+      <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
+
+      <div class="sidebar-section">
+      <div class="sidebar-label">Change</div>
+      <div class="status-pills">
+        <button type="button" class="btn-reset status-pill delta-change-pill" data-change="added" :class="{ 'active-change': shownTermChanges.added }" :aria-pressed="shownTermChanges.added" @click="shownTermChanges.added = !shownTermChanges.added">+ Added <span>2</span></button>
+        <button type="button" class="btn-reset status-pill delta-change-pill" data-change="changed" :class="{ 'active-change': shownTermChanges.changed }" :aria-pressed="shownTermChanges.changed" @click="shownTermChanges.changed = !shownTermChanges.changed">~ Changed <span>2</span></button>
+        <button type="button" class="btn-reset status-pill delta-change-pill" data-change="removed" :class="{ 'active-change': shownTermChanges.removed }" :aria-pressed="shownTermChanges.removed" @click="shownTermChanges.removed = !shownTermChanges.removed">− Removed <span>2</span></button>
+      </div>
+      <div class="delta-unchanged">3 unchanged</div>
+    </div>
+
+      
+      <div class="sidebar-section">
+        <div class="sidebar-label">Show kinds</div>
+        
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.actor">
+          <span class="kind-swatch kind-actor"></span>
+          <span>Actors</span>
+          <span class="nav-group-count">2</span>
+        </label>
+        
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.object">
+          <span class="kind-swatch kind-object"></span>
+          <span>Work Objects</span>
+          <span class="nav-group-count">3</span>
+        </label>
+        
+        <label class="kind-filter-row">
+          <input type="checkbox" x-model="glossaryKindFilter.activity">
+          <span class="kind-swatch kind-activity"></span>
+          <span>Activities</span>
+          <span class="nav-group-count">1</span>
+        </label>
+        
+      </div>
+      
+
+      
+    </div>
+    <div class="sidebar-resize" role="separator" aria-orientation="vertical"
+         aria-label="Sidebar width" tabindex="0"
+         :aria-valuenow="sidebarWidth" aria-valuemin="180" aria-valuemax="480"
+         @pointerdown="startSidebarResize($event)"
+         @dblclick="resetSidebar()"
+         @keydown.arrow-left.prevent="nudgeSidebar(-16)"
+         @keydown.arrow-right.prevent="nudgeSidebar(16)"
+         @keydown.home.prevent="resetSidebar()"></div>
+
+    <div class="view-main">
+      <div class="header">
+        <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+          <div class="header-title">Glossary</div>
+          <div class="header-context meta-list">
+            <span>6 terms</span>
+            <span>2 added</span>
+            <span>2 changed</span>
+            <span>2 removed</span>
+          </div>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glossary-entries">
+      
+      
+      <div class="kind-group" x-show="glossaryKindFilter.actor && visibleTermCount('actor') > 0">
+        
+        <div class="kind-header">
+          <span class="kind-title kind-actor">Actors</span>
+          <span class="kind-meta" x-text="visibleTermLabel('actor')"></span>
+        </div>
+        
+        <div class="entry-list kind-actor">
+        
+        
+        <div class="entry" id="term-removed-receptionist" data-change="removed"
+             data-search="receptionist"
+             x-show="shownTermChanges.removed && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="removed-receptionist" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="removed-receptionist"
+                    aria-controls="term-refs-removed-receptionist"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="removed-receptionist" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name"><del>Receptionist</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-receptionist" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Staff member who works the front desk.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <span class="delta-change-label" data-change="removed">removed</span>
+              <div class="entry-summary meta-list"><span>1 other form</span><span>2 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-removed-receptionist" data-term-id="removed-receptionist" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  
+                  
+                  <span class="use-chip use-chip--static">Dana</span>
+                  
+                  
+                </div>
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Listed scenarios:</span>
+                  
+                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/walk_in_booking" data-goto-scenario="delta_booking/walk_in_booking" data-change="changed" title="Changed scenario">~ A walk-in guest is offered the next free suite</a>
+                  
+                  <a class="use-chip delta-scenario-chip" href="#scenario=removed-delta_booking/late_checkout" data-goto-scenario="removed-delta_booking/late_checkout" data-change="removed" title="Removed scenario">− Late check-out is refused when the next guest arrives early</a>
+                  
+                </div>
+                
+                
+                <div class="scenario-source"><span>test_delta_booking.py:17</span></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div class="entry" id="term-concierge" data-change="added"
+             data-search="concierge"
+             x-show="shownTermChanges.added && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="concierge" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="concierge"
+                    aria-controls="term-refs-concierge"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="concierge" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Concierge<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=concierge" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Staff member who arranges extras for guests.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <span class="delta-change-label" data-change="added">added</span>
+              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-concierge" data-term-id="concierge" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Listed scenarios:</span>
+                  
+                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/loyalty_discount" data-goto-scenario="delta_booking/loyalty_discount" data-change="added" title="Added scenario">+ Returning guests get a loyalty discount on the invoice</a>
+                  
+                </div>
+                
+                
+                <div class="scenario-source"><span>test_delta_booking.py:17</span></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      
+        </div>
+      </div>
+      
+      
+      <div class="kind-group" x-show="glossaryKindFilter.object && visibleTermCount('object') > 0">
+        
+        <div class="kind-header">
+          <span class="kind-title kind-object">Work Objects</span>
+          <span class="kind-meta" x-text="visibleTermLabel('object')"></span>
+        </div>
+        
+        <div class="entry-list kind-object">
+        
+        
+        <div class="entry" id="term-suite" data-change="changed"
+             data-search="room suite"
+             x-show="shownTermChanges.changed && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="suite" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="suite"
+                    aria-controls="term-refs-suite"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="suite" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Suite<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=suite" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="delta-was">was <del>Room</del></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <span class="delta-change-label" data-change="changed">changed</span>
+              <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
+              <div class="entry-summary meta-list"><span>1 other form</span><span>2 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-suite" data-term-id="suite" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  
+                  
+                  <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+Suite 101</span>
+                  
+                  
+                  
+                  <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">Room 101</del>
+                  
+                  
+                </div>
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Listed scenarios:</span>
+                  
+                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/walk_in_booking" data-goto-scenario="delta_booking/walk_in_booking" data-change="changed" title="Changed scenario">~ A walk-in guest is offered the next free suite</a>
+                  
+                </div>
+                
+                
+                <div class="scenario-source"><span>test_delta_booking.py:19</span></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div class="entry" id="term-invoice" data-change="changed"
+             data-search="invoice"
+             x-show="shownTermChanges.changed && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="invoice" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="invoice"
+                    aria-controls="term-refs-invoice"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="invoice" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Invoice<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=invoice" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def"><del class="delta-words" data-term-side="before">A</del><ins class="delta-words">The itemised </ins>bill <del class="delta-words" data-term-side="before">for</del><ins class="delta-words">of</ins> a <del class="delta-words" data-term-side="before">stay.</del><ins class="delta-words">stay, settled at check-out.</ins><span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <span class="delta-change-label" data-change="changed">changed</span>
+              <div class="entry-summary meta-list"><span>1 → 2 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-invoice" data-term-id="invoice" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Listed scenarios:</span>
+                  
+                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/cancel_booking" data-goto-scenario="delta_booking/cancel_booking" data-change="changed" title="Changed scenario">~ Cancelling a paid booking refunds it</a>
+                  
+                  <a class="use-chip delta-scenario-chip" href="#scenario=delta_booking/loyalty_discount" data-goto-scenario="delta_booking/loyalty_discount" data-change="added" title="Added scenario">+ Returning guests get a loyalty discount on the invoice</a>
+                  
+                </div>
+                
+                
+                <div class="scenario-source"><span>test_delta_booking.py:21</span></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div class="entry" id="term-removed-upgrade" data-change="removed"
+             data-search="upgrade"
+             x-show="shownTermChanges.removed && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="removed-upgrade" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="removed-upgrade"
+                    aria-controls="term-refs-removed-upgrade"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="removed-upgrade" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name"><del>Upgrade</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">A better room offered at the same rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <span class="delta-change-label" data-change="removed">removed</span>
+              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-removed-upgrade" data-term-id="removed-upgrade" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                
+                <div class="scenario-source"><span>test_delta_booking.py:23</span></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      
+        </div>
+      </div>
+      
+      
+      <div class="kind-group" x-show="glossaryKindFilter.activity && visibleTermCount('activity') > 0">
+        
+        <div class="kind-header">
+          <span class="kind-title kind-activity">Activities</span>
+          <span class="kind-meta" x-text="visibleTermLabel('activity')"></span>
+        </div>
+        
+        <div class="entry-list kind-activity">
+        
+        
+        <div class="entry" id="term-upgrade" data-change="added"
+             data-search="upgrade"
+             x-show="shownTermChanges.added && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="upgrade" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="upgrade"
+                    aria-controls="term-refs-upgrade"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="upgrade" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">upgrade<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Move a guest to a better room at the same rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <span class="delta-change-label" data-change="added">added</span>
+              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-upgrade" data-term-id="upgrade" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                
+                <div class="scenario-source"><span>test_delta_booking.py:23</span></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      
+        </div>
+      </div>
+      
+      <div class="entry-name entry-name-sizer" aria-hidden="true"><span class="term-name">Receptionist</span><span class="term-name">Concierge</span><span class="term-name">Suite</span><span class="term-name">Invoice</span><span class="term-name">Upgrade</span><span class="term-name">upgrade</span></div>
+      </div>
+      <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
+    </div>
+  </div>
+  </div>
+  
+
 </div>
 
 <!-- Shared hover tooltip for term refs; positioned by app.js. -->
@@ -2696,7 +3106,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T07:17:51.754604+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"}]},\"before_terms\":[{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T07:17:51.754604+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"}]},\"before_terms\":[{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"term_ids\":[\"removed-receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed-upgrade\",\"upgrade\"],\"term_cards\":[{\"key\":\"removed-receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\",\"before\":\"receptionist\",\"after\":null},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\",\"before\":null,\"after\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\",\"before\":\"room\",\"after\":\"suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\",\"before\":\"invoice\",\"after\":\"invoice\"},{\"key\":\"removed-upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\",\"before\":\"upgrade\",\"after\":null},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\",\"before\":null,\"after\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed-delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed-delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3359,7 +3769,7 @@ function reportApp() {
     },
     goToTerm(id) {
 
-      if (!Object.hasOwn(termNames, id)) return;
+      if (!this._hasTermEntry(id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
@@ -3684,7 +4094,7 @@ function reportApp() {
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();
-        this.goToTerm(pill.dataset.termId);
+        this.goToTerm(this._refEntry(pill));
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -3828,6 +4238,14 @@ function reportApp() {
     },
 
 
+    _hasTermEntry(id) {
+      return Object.hasOwn(termNames, id);
+    },
+    _refEntry(pill) {
+      return pill.dataset.termId;
+    },
+
+
 
 
     _initTermTooltip() {
@@ -3914,7 +4332,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => Object.hasOwn(termNames, id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {
@@ -3963,6 +4381,7 @@ function reportApp() {
 
 
 
+
 const CHANGES = ['added', 'changed', 'removed'];
 
 function deltaApp() {
@@ -3975,8 +4394,17 @@ function deltaApp() {
   const moduleChanges = data.module_changes || {};
 
   const beforeTerms = new Map((data.before_terms || []).map(t => [t.id, t]));
+  const termCards = data.term_cards || [];
+  const cardKeys = new Set(termCards.map(card => card.key));
+
+  const cardOf = { before: {}, after: {} };
+  for (const card of termCards) {
+    for (const side of ['before', 'after']) if (card[side]) cardOf[side][card[side]] = card.key;
+  }
   const overrides = {
     shownChanges: allChangesShown(),
+
+    shownTermChanges: allChangesShown(),
     get changeCounts() {
       return changeCounts;
     },
@@ -4017,8 +4445,26 @@ function deltaApp() {
     },
 
 
-    goToTerm(id) {
-      if (hasTerms()) base.goToTerm.call(this, id);
+    _hasTermEntry(key) {
+      return cardKeys.has(key);
+    },
+    _refEntry(pill) {
+      const side = pill.closest('[data-term-side="before"]') ? 'before' : 'after';
+      return lookup(cardOf[side], pill.dataset.termId, null);
+    },
+
+
+    _termCounts() {
+      const query = this.glossarySearch.toLowerCase();
+      const definitions = this.glossaryDefinitionFilter;
+      const counts = {};
+      for (const card of termCards) {
+        if (!this.shownTermChanges[card.change]) continue;
+        if (definitions !== 'all' && (definitions === 'defined') !== card.defined) continue;
+        if (query && !card.search.includes(query)) continue;
+        counts[card.kind] = (counts[card.kind] || 0) + 1;
+      }
+      return counts;
     },
 
 

@@ -1,11 +1,100 @@
 {#
-  A changed scenario's steps on the delta page: the report's phase blocks and
-  step lines, with each step's change marked in place. The marks' look is
-  `.delta-step` in styles.css; `data-term-side="before"` tells the term
-  tooltip (`delta.js`) which glossary a ref inside it was read against. Then
-  its parameter tables, side by side.
+  What the delta page adds to the report's macros: the Change filter, a
+  changed scenario's steps (the report's phase blocks and step lines, with
+  each step's change marked in place, styled as `.delta-step`) and its
+  parameter tables side by side, and a listed term's card.
+  `data-term-side="before"` tells the term tooltip (`delta.js`) which glossary
+  a ref inside it was read against.
 #}
-  {%- from '_macros.html.j2' import render_step, step_text, step_children, step_attachments, param_cell, case_extras, status_dot with context -%}
+  {%- from '_macros.html.j2' import anchor_link, render_step, step_text, step_children, step_attachments, param_cell, case_extras, status_dot with context -%}
+
+  {#- The Change filter's pills, each disabled at zero, and how many items
+      matched with no change. `model` is the Alpine property the pills
+      toggle: a name from the template, never report data. -#}
+  {%- macro change_filter(model, counts, unchanged_count) -%}
+    <div class="sidebar-section">
+      <div class="sidebar-label">Change</div>
+      <div class="status-pills">
+        {%- for change, count in counts.items() %}
+        <button type="button" class="btn-reset status-pill delta-change-pill" data-change="{{ change }}" :class="{ 'active-change': {{ model }}.{{ change }} }" :aria-pressed="{{ model }}.{{ change }}" @click="{{ model }}.{{ change }} = !{{ model }}.{{ change }}"{% if not count %} disabled{% endif %}>{{ change_glyph[change] }} {{ change | capitalize }} <span>{{ count }}</span></button>
+        {%- endfor %}
+      </div>
+      <div class="delta-unchanged">{{ unchanged_count }} unchanged</div>
+    </div>
+  {%- endmacro -%}
+
+  {#- A source link on the commit of the side its scenario or term is shown
+      from. -#}
+  {%- macro side_source(source, side) -%}
+    {%- set url = source | source_url(side) -%}
+    <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>{% else %}<span>{{ source.relpath }}:{{ source.line }}</span>{% endif %}</div>
+  {%- endmacro -%}
+
+  {#- A listed term's card: the report's Glossary entry, its bar its change.
+      It links the listed scenarios that refer to it, each into the Scenarios
+      tab (`data-goto-scenario`). -#}
+  {%- macro term_card(card) -%}
+        {%- set term = card.shown %}
+        {%- set key = card.key %}
+        <div class="entry" id="term-{{ key }}" data-change="{{ card.change }}"
+             data-search="{{ card.search_text }}"
+             x-show="shownTermChanges.{{ card.change }} && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+          <div class="entry-head" data-term-id="{{ key }}" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="{{ key }}"
+                    aria-controls="term-refs-{{ key }}"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ key }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">{% if card.change == 'removed' %}<del>{{ term.canonical }}</del>{% else %}{{ term.canonical }}{% endif %}{{ anchor_link('view=glossary&term=' ~ key) }}</span>
+              {%- if card.was %}
+              <span class="delta-was">was <del>{{ card.was }}</del></span>
+              {%- endif %}
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">
+                {%- if card.delta.definition %}{{ card.delta.definition | definition_diff }}{% else %}{{ term.definition | inline_md }}{% endif -%}
+                <span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
+              <span class="delta-change-label" data-change="{{ card.change }}">{{ card.change }}</span>
+              {%- if card.delta.paired_by == 'rename-log' %}
+              <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
+              {%- endif %}
+              <div class="entry-summary meta-list">{% for part in card.summary %}<span>{{ part }}</span>{% endfor %}</div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-{{ key }}" data-term-id="{{ key }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                {% if card.other_forms %}
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  {% for form in card.other_forms %}
+                  {% if form.change == 'removed' %}
+                  <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">{{ form.text }}</del>
+                  {% elif form.change == 'added' %}
+                  <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+{{ form.text }}</span>
+                  {% else %}
+                  <span class="use-chip use-chip--static">{{ form.text }}</span>
+                  {% endif %}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if card.scenarios %}
+                <div class="refs-line">
+                  <span class="refs-label">Listed scenarios:</span>
+                  {% for item in card.scenarios %}
+                  <a class="use-chip delta-scenario-chip" href="#{{ item.fragment }}" data-goto-scenario="{{ item.slug }}" data-change="{{ item.change }}" title="{{ item.change | capitalize }} scenario">{{ change_glyph[item.change] }} {{ item.title_text }}</a>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if term.source %}
+                {{ side_source(term.source, card.side) }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+  {%- endmacro -%}
 
   {#- `step_ids` as `scenario_steps` makes them: a running count, unique
       across blocks. A block of removed steps alone carries no `data-block`:

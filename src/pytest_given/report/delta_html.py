@@ -1,7 +1,7 @@
 """Rendering the delta HTML: the page's context and the filters it reads.
 
-Each listed scenario renders against its own side: its term refs resolve in
-that side's glossary, and its source link names that side's commit.
+Each listed scenario and term renders against its own side: its term refs
+resolve in that side's glossary, and its source link names that side's commit.
 """
 
 # A CLI command that renders no HTML never loads Jinja or MarkupSafe.
@@ -43,9 +43,15 @@ from ..model import (
     StepChange,
     StepDelta,
     StepPath,
+    TermDelta,
+    TermFacts,
+    TermId,
+    build_term_crossrefs,
     narration_text,
+    plural,
     walk_steps,
 )
+from .glossary_view import KindGrouping, group_by_kind
 from .html_renderer import (
     base_env,
     build_param_color_map,
@@ -57,6 +63,7 @@ from .html_renderer import (
     shown_text,
     term_app_data,
 )
+from .inline_markdown import render_definition
 from .slugs import build_scenario_slug_index
 from .text import STATUS_LABEL
 from .theme import DEFAULT_THEME, Theme
@@ -78,6 +85,7 @@ type Side = Literal['before', 'after']
 # columns. `removed` is a removed scenario's, previewing from its own table.
 type TextSide = Literal['before', 'after', 'removed']
 type ColumnChange = Literal['added', 'removed']
+type FormChange = Literal['added', 'removed']
 
 # Prefixes a column only the before side has, where the page keys it: the after
 # side can hold another column of the same ID.
@@ -202,6 +210,10 @@ class ListedScenario:
         return f'scenario={self.slug}'
 
     @property
+    def title_text(self) -> str:
+        return shown_text(self.shown.narration)
+
+    @property
     def step_blocks(self) -> list[StepBlock] | None:
         """A changed scenario's steps with their changes; None for an added or
         removed one, whose steps read unmarked."""
@@ -237,6 +249,93 @@ class ListedScenario:
         return [row for row in rows if row.reason or row.was]
 
 
+@dataclass(frozen=True)
+class OtherForm:
+    text: str
+    change: FormChange | None = None
+
+
+@dataclass(frozen=True)
+class ListedTerm:
+    """A term's card, shown from its after side, or its before side when it
+    was removed."""
+
+    delta: TermDelta
+    # The listed scenarios that refer to it, on either side. Its unchanged
+    # ones it only counts: they aren't on the page.
+    scenarios: list[ListedScenario]
+
+    @property
+    def change(self) -> Change:
+        return self.delta.change
+
+    @property
+    def side(self) -> Side:
+        return 'before' if self.delta.after is None else 'after'
+
+    @property
+    def shown(self) -> GlossaryTerm:
+        shown = self.delta.after or self.delta.before
+        assert shown is not None
+        return shown
+
+    @property
+    def key(self) -> str:
+        """Its card's ID, prefixed `removed-` as a removed scenario's slug is:
+        a term whose kind changed has a card under each kind."""
+        prefix = 'removed-' if self.delta.after is None else ''
+        return prefix + self.shown.id
+
+    @property
+    def was(self) -> str | None:
+        """A renamed term's before name."""
+        before, after = self.delta.before, self.delta.after
+        if before is None or after is None or before.canonical == after.canonical:
+            return None
+        return before.canonical
+
+    @property
+    def other_forms(self) -> list[OtherForm]:
+        shown = self._facts(self.side).other_forms
+        if self.change != 'changed':
+            return [OtherForm(form) for form in shown]
+        before = self._facts('before').other_forms
+        return [
+            OtherForm(form, None if form in before else 'added') for form in shown
+        ] + [OtherForm(form, 'removed') for form in before if form not in shown]
+
+    @property
+    def summary(self) -> tuple[str, ...]:
+        """Its counts, a changed scenario count as `5 → 7 scenarios`."""
+        facts = self._facts(self.side)
+        scenarios = _some(facts.scenario_count, 'scenario')
+        if self.change == 'changed':
+            before_count = self._facts('before').scenario_count
+            if before_count != facts.scenario_count:
+                scenarios = f'{before_count} → {scenarios or "0 scenarios"}'
+        parts = (_some(len(facts.other_forms), 'other form'), scenarios)
+        return tuple(part for part in parts if part)
+
+    @property
+    def search_text(self) -> str:
+        sides = (self.delta.before, self.delta.after)
+        names = [side.canonical for side in sides if side is not None]
+        return ' '.join(dict.fromkeys(names)).lower()
+
+    def _facts(self, side: Side) -> TermFacts:
+        facts = self.delta.before_facts if side == 'before' else self.delta.after_facts
+        return facts or TermFacts()
+
+
+@dataclass(frozen=True)
+class DeltaGlossaryView:
+    listed: list[ListedTerm]
+    grouping: KindGrouping[ListedTerm]
+    change_counts: dict[Change, int]
+    unchanged_count: int
+    undefined_count: int
+
+
 def render_delta_html(
     delta: DeltaData,
     source_link_template: str | None,
@@ -253,6 +352,8 @@ def delta_render_context(
     after = delta.metadata.after.metadata
     listed = _listed_scenarios(delta)
     module_changes = _module_changes(delta, listed)
+    reach = _term_reach(delta, listed)
+    glossary_view = _glossary_view(delta, listed, reach)
     side_labels: dict[Side, str] = {
         'before': range_label(delta.metadata.before),
         'after': range_label(delta.metadata.after),
@@ -268,12 +369,17 @@ def delta_render_context(
         },
         'unchanged_count': len(delta.unchanged),
         'module_changes': module_changes,
+        'glossary_view': glossary_view,
+        # Browse by offers Terms as the report does, whenever a side has any.
+        'browse_terms': bool(_tip_terms(delta)),
         'change_glyph': _CHANGE_GLYPH,
         'theme_default': theme,
         # Parameter coloring is off on this page: green, red and amber mean
         # only added, removed and changed.
         'param_colors': [],
-        'app_data_js': script_json_parse(_app_data(delta, listed, module_changes)),
+        'app_data_js': script_json_parse(
+            _app_data(delta, listed, module_changes, reach, glossary_view)
+        ),
         **bundled_assets(),
     }
 
@@ -550,6 +656,76 @@ class _BeforeKeys:
         )
 
 
+# The listed scenarios that refer to a term, by the side they were read on.
+type TermReach = dict[Side, dict[TermId, list[ListedScenario]]]
+
+
+def _term_reach(delta: DeltaData, listed: list[ListedScenario]) -> TermReach:
+    sides: tuple[tuple[Side, DeltaSide, Glossary | None], ...] = (
+        ('before', delta.metadata.before, delta.glossary.before),
+        ('after', delta.metadata.after, delta.glossary.after),
+    )
+    reach: TermReach = {}
+    for side, side_of, glossary in sides:
+        read = {
+            scenario.id: (scenario, item)
+            for item in listed
+            if (scenario := _on_side(item.delta, side)) is not None
+        }
+        crossrefs = build_term_crossrefs(
+            ReportData(
+                metadata=side_of.metadata,
+                scenarios=[scenario for scenario, _ in read.values()],
+                glossary=glossary,
+            )
+        )
+        reach[side] = {
+            term_id: [read[node_id][1] for node_id in node_ids]
+            for term_id, node_ids in crossrefs.term_scenarios.items()
+        }
+    return reach
+
+
+def _on_side(scenario_delta: ScenarioDelta, side: Side) -> Scenario | None:
+    return scenario_delta.before if side == 'before' else scenario_delta.after
+
+
+def _glossary_view(
+    delta: DeltaData, listed: list[ListedScenario], reach: TermReach
+) -> DeltaGlossaryView:
+    cards = [
+        ListedTerm(term_delta, _referring(term_delta, listed, reach))
+        for term_delta in delta.glossary.terms
+    ]
+    return DeltaGlossaryView(
+        listed=cards,
+        grouping=group_by_kind(cards, lambda card: card.shown.kind),
+        change_counts={
+            change: sum(card.change == change for card in cards)
+            for change in _CHANGE_ORDER
+        },
+        unchanged_count=len(delta.glossary.unchanged),
+        undefined_count=sum(card.shown.definition is None for card in cards),
+    )
+
+
+def _referring(
+    term_delta: TermDelta, listed: list[ListedScenario], reach: TermReach
+) -> list[ListedScenario]:
+    """In the list's order, each scenario once."""
+    sides: tuple[tuple[Side, GlossaryTerm | None], ...] = (
+        ('before', term_delta.before),
+        ('after', term_delta.after),
+    )
+    slugs = {
+        item.slug
+        for side, term in sides
+        if term is not None
+        for item in reach[side].get(term.id, [])
+    }
+    return [item for item in listed if item.slug in slugs]
+
+
 def _module_changes(
     delta: DeltaData, listed: list[ListedScenario]
 ) -> dict[str, Change]:
@@ -579,17 +755,31 @@ def _app_data(
     delta: DeltaData,
     listed: list[ListedScenario],
     module_changes: dict[str, Change],
+    reach: TermReach,
+    glossary_view: DeltaGlossaryView,
 ) -> dict[str, object]:
     """What `delta.js` seeds `reportApp()` with: the report's projection, one
     entry per listed scenario keyed by its slug, since a removed and an added
-    scenario can share a node ID."""
+    scenario can share a node ID, and one per term card, keyed likewise."""
     return {
         'metadata': {'timestamp': delta.metadata.after.metadata.timestamp},
         'status_labels': STATUS_LABEL,
-        'glossary': {
-            'terms': [term_app_data(term) for term in _terms(delta.glossary.after)]
-        },
+        'glossary': {'terms': [term_app_data(term) for term in _tip_terms(delta)]},
         'before_terms': [term_app_data(term) for term in _before_tip_terms(delta)],
+        'term_ids': [card.key for card in glossary_view.listed],
+        'term_cards': [
+            {
+                'key': card.key,
+                'kind': card.shown.kind or 'kindless',
+                'change': card.change,
+                'defined': card.shown.definition is not None,
+                'search': card.search_text,
+                'before': card.delta.before.id if card.delta.before else None,
+                'after': card.delta.after.id if card.delta.after else None,
+            }
+            for card in glossary_view.listed
+        ],
+        'term_scenarios': _shown_term_scenarios(reach),
         'scenarios': [
             {
                 'id': item.slug,
@@ -614,20 +804,47 @@ def _search_text(item: ListedScenario) -> str:
     return ' '.join([*titles, *item.delta.tags_removed])
 
 
+def _some(count: int, singular: str) -> str:
+    """Empty for none, as the report's term summary lists only what it has."""
+    return plural(count, singular) if count else ''
+
+
+def _shown_term_scenarios(reach: TermReach) -> dict[TermId, list[str]]:
+    """The Terms axis: each listed scenario under the terms of the side it is
+    shown from."""
+    shown: dict[TermId, list[str]] = {}
+    for side, by_term in reach.items():
+        for term_id, items in by_term.items():
+            slugs = [item.slug for item in items if item.side == side]
+            if slugs:
+                shown.setdefault(term_id, []).extend(slugs)
+    return shown
+
+
 def _terms(glossary: Glossary | None) -> list[GlossaryTerm]:
     return glossary.terms if glossary is not None else []
 
 
+def _tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
+    """The after glossary's terms, then the before glossary's it lacks, which
+    no after-side ref can name."""
+    after = _terms(delta.glossary.after)
+    after_ids = {term.id for term in after}
+    return after + [
+        term for term in _terms(delta.glossary.before) if term.id not in after_ids
+    ]
+
+
 def _before_tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
     """The before glossary's terms whose tooltip reads otherwise than the after
-    glossary's term of that ID, or that it lacks: a term ref read from the
-    before side looks here first."""
+    glossary's term of that ID: a term ref read from the before side looks here
+    first."""
     after = {term.id: term for term in _terms(delta.glossary.after)}
     return [
         term
         for term in _terms(delta.glossary.before)
-        if (shared := after.get(term.id)) is None
-        or (shared.canonical, shared.definition) != (term.canonical, term.definition)
+        if (shared := after.get(term.id)) is not None
+        and (shared.canonical, shared.definition) != (term.canonical, term.definition)
     ]
 
 
@@ -656,9 +873,12 @@ def _build_env(
             ('removed', delta.glossary.before),
         )
     }
-    # Compiled only for a side some scenario is shown from, so a `{sha}`
-    # template fails only when a link would need the SHA a side lacks.
-    shown_sides = {item.side for item in listed}
+    # Compiled only for a side some scenario or term is shown from, so a
+    # `{sha}` template fails only when a link would need the SHA a side lacks.
+    shown_sides = {item.side for item in listed} | {
+        'before' if term_delta.after is None else 'after'
+        for term_delta in delta.glossary.terms
+    }
     source_url_filters = {
         side: _source_url_filter(source_link_template, side_of)
         for side, side_of in (
@@ -688,11 +908,23 @@ def _build_env(
             for segment in words
         )
 
+    def definition_diff(words: tuple[DiffSegment, ...]) -> Markup:
+        """A changed definition's word diff. A segment holds whole spans, so
+        each renders on its own."""
+        return Markup('').join(
+            _marked(
+                segment.mark,
+                Markup(render_definition(narration_text(segment.parts))),
+            )
+            for segment in words
+        )
+
     def no_param_color(column: ParameterColumn) -> str:
         return ''
 
     env.filters['narration'] = narration
     env.filters['narration_diff'] = narration_diff
+    env.filters['definition_diff'] = definition_diff
     env.filters['source_url'] = source_url
     env.filters['param_color_class'] = no_param_color
     return env
