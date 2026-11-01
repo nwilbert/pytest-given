@@ -6,6 +6,7 @@ from pytest_given import given, scenario, then, when
 from pytest_given.delta.narration import (
     Reading,
     narrations_equal,
+    reading_words,
     similarity,
     term_forms,
     tokens,
@@ -324,7 +325,13 @@ def test_two_empty_narrations_diff_to_nothing() -> None:
 
 
 def test_similarity_counts_shared_tokens_without_spaces() -> None:
-    assert similarity(_plain('a b c'), _reading(), _plain('a b c'), _reading()) == 1.0
-    assert similarity(_plain('a b'), _reading(), _plain('c d'), _reading()) == 0.0
-    assert similarity(_plain('a b'), _reading(), _plain('a  c d'), _reading()) == 0.4
-    assert similarity(_plain(''), _reading(), _plain(''), _reading()) == 1.0
+    def similar(before: str, after: str) -> float:
+        return similarity(
+            reading_words(_plain(before), _reading()),
+            reading_words(_plain(after), _reading()),
+        )
+
+    assert similar('a b c', 'a b c') == 1.0
+    assert similar('a b', 'c d') == 0.0
+    assert similar('a b', 'a  c d') == 0.4
+    assert similar('', '') == 1.0

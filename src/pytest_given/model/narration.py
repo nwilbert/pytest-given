@@ -140,6 +140,18 @@ def narration_of(parts: Iterable[NarrationPart]) -> Narration:
     return Narration(text=narration_text(parts), parts=parts)
 
 
+def merged_literals(parts: Iterable[NarrationPart]) -> tuple[NarrationPart, ...]:
+    """The parts with each run of adjacent literals joined into one."""
+    merged: list[NarrationPart] = []
+    for part in parts:
+        last = merged[-1] if merged else None
+        if isinstance(part, NarrationLiteral) and isinstance(last, NarrationLiteral):
+            merged[-1] = NarrationLiteral(value=last.value + part.value)
+        else:
+            merged.append(part)
+    return tuple(merged)
+
+
 def rebuilt(
     narration: Narration, part_of: Callable[[PartIndex, NarrationPart], NarrationPart]
 ) -> Narration:

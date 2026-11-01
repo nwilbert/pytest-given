@@ -29,7 +29,8 @@ type StepChange = Literal['equal', 'modified', 'added', 'removed']
 type Mark = Literal['equal', 'removed', 'added']
 type SuggestionOf = Literal['scenario', 'case', 'term']
 
-CHANGES: tuple[Change, ...] = ('added', 'removed', 'changed')
+# In the order a delta lists its counts: what a release brings, then what it took away.
+CHANGES: tuple[Change, ...] = ('added', 'changed', 'removed')
 SCENARIO_PAIRINGS: tuple[ScenarioPairing, ...] = ('rename-log', 'node-id', 'title')
 CASE_PAIRINGS: tuple[CasePairing, ...] = ('rename-log', 'case-id', 'values')
 COLUMN_PAIRINGS: tuple[ColumnPairing, ...] = ('name', 'values')

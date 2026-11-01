@@ -18,7 +18,7 @@ from ..model import (
     build_term_crossrefs,
 )
 from .chains import rewrite_identities
-from .narration import Reading, word_diff
+from .narration import Reading, placeholder_name, same_term_id, word_diff
 from .order import interleaved
 from .renames import RenameLog
 
@@ -58,12 +58,8 @@ def align_terms(
     before_facts = term_facts(before)
     after_facts = term_facts(after)
     # A definition has no placeholders, so the column key is never asked for.
-    before_reading = Reading(
-        before.glossary, rewritten, lambda placeholder: placeholder.name
-    )
-    after_reading = Reading(
-        after.glossary, lambda term_id: term_id, lambda placeholder: placeholder.name
-    )
+    before_reading = Reading(before.glossary, rewritten, placeholder_name)
+    after_reading = Reading(after.glossary, same_term_id, placeholder_name)
     before_by_id = {term.id: term for term in before_terms}
     after_by_id = {term.id: term for term in after_terms}
 

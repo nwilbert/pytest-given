@@ -7,6 +7,7 @@ every one of them.
 """
 
 from .delta import (
+    CHANGES,
     DELTA_SCHEMA_VERSION,
     CasePair,
     CasePairing,
@@ -31,7 +32,7 @@ from .delta import (
     TermFacts,
     TermPairing,
 )
-from .delta_serde import delta_from_dict, delta_to_dict, is_delta_dict
+from .delta_serde import delta_from_dict, delta_to_dict
 from .errors import (
     PytestGivenError,
     PytestGivenLookupError,
@@ -41,6 +42,7 @@ from .errors import (
 from .narration import (
     InterpolatedPart,
     NarrationPiece,
+    merged_literals,
     narration_of,
     narration_text,
     placeholder_token,
@@ -112,7 +114,13 @@ from .schema import (
     param_id,
     rolled_up_status,
 )
-from .serde import JsonObject, read_report_json, report_from_dict, report_to_dict
+from .serde import (
+    JsonObject,
+    is_delta_dict,
+    read_report_json,
+    report_from_dict,
+    report_to_dict,
+)
 from .steps import (
     PartIndex,
     StepPath,
@@ -138,6 +146,7 @@ from .text import (
 )
 
 __all__ = [
+    'CHANGES',
     'CONTENT_TYPES',
     'DELTA_SCHEMA_VERSION',
     'INSTANCE_KINDS',
@@ -238,6 +247,7 @@ __all__ = [
     'iter_steps',
     'l_form',
     'location_suffix',
+    'merged_literals',
     'narration_of',
     'narration_text',
     'node_base',

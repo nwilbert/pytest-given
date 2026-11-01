@@ -9,7 +9,6 @@ from typing import Literal
 from ..model import (
     DiffSegment,
     Mark,
-    NarrationLiteral,
     NarrationPart,
     Phase,
     ScenarioDelta,
@@ -17,6 +16,7 @@ from ..model import (
     StepChange,
     StepDelta,
     StepPath,
+    merged_literals,
     narration_text,
     walk_steps,
 )
@@ -222,18 +222,7 @@ def _joined(runs: list[MarkedRun]) -> tuple[MarkedRun, ...]:
         ):
             mark = runs[index - 1].mark
         if joined and joined[-1].mark == mark:
-            joined[-1] = MarkedRun(mark, _merged(joined[-1].parts + run.parts))
+            joined[-1] = MarkedRun(mark, merged_literals(joined[-1].parts + run.parts))
         else:
             joined.append(MarkedRun(mark, run.parts))
     return tuple(joined)
-
-
-def _merged(parts: tuple[NarrationPart, ...]) -> tuple[NarrationPart, ...]:
-    merged: list[NarrationPart] = []
-    for part in parts:
-        last = merged[-1] if merged else None
-        if isinstance(part, NarrationLiteral) and isinstance(last, NarrationLiteral):
-            merged[-1] = NarrationLiteral(value=last.value + part.value)
-        else:
-            merged.append(part)
-    return tuple(merged)

@@ -37,6 +37,7 @@ from .serde import (
     asdict_filtered,
     glossary_from_dict,
     glossary_term_from_dict,
+    is_delta_dict,
     literal,
     metadata_from_dict,
     narration_part_from_dict,
@@ -49,11 +50,6 @@ def delta_to_dict(delta: DeltaData) -> JsonObject:
     result = asdict_filtered(delta)
     assert isinstance(result, dict)
     return result
-
-
-def is_delta_dict(d: JsonObject) -> bool:
-    metadata = d.get('metadata')
-    return isinstance(metadata, dict) and metadata.get('kind') == 'delta'
 
 
 def delta_from_dict(d: dict[str, Any], source: str | None = None) -> DeltaData:

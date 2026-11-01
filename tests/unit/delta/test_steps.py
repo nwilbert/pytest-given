@@ -1,7 +1,7 @@
 """Aligning two step trees into equal, modified, added and removed steps."""
 
 from pytest_given import given, scenario, then, when
-from pytest_given.delta.narration import Reading, similarity
+from pytest_given.delta.narration import Reading, reading_words, similarity
 from pytest_given.delta.steps import MODIFIED_SIMILARITY, align_steps, steps_changed
 from pytest_given.model import (
     Attachment,
@@ -76,18 +76,17 @@ def test_a_reworded_step_reads_as_modified() -> None:
 
 
 def test_the_brief_texts_fall_on_either_side_of_the_threshold() -> None:
-    reworded = similarity(
-        step('then', 'the later booking is cancelled').narration,
-        _READING,
-        step('then', 'the later Booking is cancelled and refunded in full').narration,
-        _READING,
+    def similar(before: str, after: str) -> float:
+        return similarity(
+            reading_words(step('then', before).narration, _READING),
+            reading_words(step('then', after).narration, _READING),
+        )
+
+    reworded = similar(
+        'the later booking is cancelled',
+        'the later Booking is cancelled and refunded in full',
     )
-    unrelated = similarity(
-        step('then', 'the deposit is kept').narration,
-        _READING,
-        step('then', 'a voucher is issued').narration,
-        _READING,
-    )
+    unrelated = similar('the deposit is kept', 'a voucher is issued')
     assert unrelated < MODIFIED_SIMILARITY <= reworded
 
 

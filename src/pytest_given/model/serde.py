@@ -86,6 +86,11 @@ def asdict_filtered(obj: Any) -> Any:
     return obj
 
 
+def is_delta_dict(d: JsonObject) -> bool:
+    metadata = d.get('metadata')
+    return isinstance(metadata, dict) and metadata.get('kind') == 'delta'
+
+
 def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData:
     """Rebuild a report from its serialized form.
 
@@ -94,8 +99,7 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
     where the dict came from, for the caller that read it from somewhere the
     user can point at.
     """
-    metadata = d.get('metadata')
-    if isinstance(metadata, dict) and metadata.get('kind') == 'delta':
+    if is_delta_dict(d):
         raise PytestGivenError(
             f'{source or "input"} is a delta report, not a report; '
             f'render it with `pytest-given delta {source or "<file>"}`.'

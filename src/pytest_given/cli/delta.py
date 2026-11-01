@@ -10,6 +10,7 @@ from pathlib import Path
 from ..delta import DeltaInputs, build_delta, check_reports, read_rename_log
 from ..git import is_ancestor, is_shallow, resolve_revision, tags_pointing_at
 from ..model import (
+    CHANGES,
     Change,
     DeltaData,
     JsonObject,
@@ -281,7 +282,4 @@ def _summary(delta: DeltaData) -> str:
 
 
 def _counts(changes: list[Change]) -> str:
-    return ', '.join(
-        f'{changes.count(change)} {change}'
-        for change in ('added', 'changed', 'removed')
-    )
+    return ', '.join(f'{changes.count(change)} {change}' for change in CHANGES)

@@ -17,7 +17,6 @@ from ..model import (
     Scenario,
     ScenarioDelta,
     ScenarioPairing,
-    TermId,
     case_id,
     case_suffix,
     narration_of,
@@ -28,7 +27,10 @@ from .identity import scenario_identity
 from .narration import (
     Reading,
     Token,
+    TokenBucket,
     narrations_equal,
+    placeholder_name,
+    same_term_id,
     token_bucket,
     token_lists_equal,
     tokens,
@@ -83,8 +85,8 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
     before, after = inputs.before, inputs.after
     terms = align_terms(before, after, inputs.renames, inputs.skipped_revs)
     identities = _Identities(before.scenarios, after.scenarios, inputs)
-    before_reading = Reading(before.glossary, terms.term_id, _placeholder_name)
-    after_reading = Reading(after.glossary, _same_term, _placeholder_name)
+    before_reading = Reading(before.glossary, terms.term_id, placeholder_name)
+    after_reading = Reading(after.glossary, same_term_id, placeholder_name)
     pairing = _pair(before, after, before_reading, after_reading, identities)
 
     listed: list[ScenarioDelta] = []
@@ -270,8 +272,8 @@ def _unique_titles(
     return pairs
 
 
-def _buckets(read: dict[int, list[Token]]) -> dict[_Bucket, list[int]]:
-    buckets: dict[_Bucket, list[int]] = {}
+def _buckets(read: dict[int, list[Token]]) -> dict[TokenBucket, list[int]]:
+    buckets: dict[TokenBucket, list[int]] = {}
     for index, title in read.items():
         buckets.setdefault(token_bucket(title), []).append(index)
     return buckets
@@ -305,7 +307,7 @@ def _compare(
         return paired if paired is not None else f'unpaired {placeholder.column_id}'
 
     before_reading = Reading(inputs.before.glossary, terms.term_id, before_column)
-    after_reading = Reading(inputs.after.glossary, _same_term, _column_id)
+    after_reading = Reading(inputs.after.glossary, same_term_id, _column_id)
     title_changed = not narrations_equal(
         comparable_title(before), before_reading, comparable_title(after), after_reading
     )
@@ -345,17 +347,6 @@ def _compare(
         steps=steps,
         parameters=parameters,
     )
-
-
-type _Bucket = tuple[tuple[str, str], ...]
-
-
-def _same_term(term_id: TermId) -> TermId:
-    return term_id
-
-
-def _placeholder_name(placeholder: NarrationPlaceholder) -> str:
-    return placeholder.name
 
 
 def _column_id(placeholder: NarrationPlaceholder) -> str:

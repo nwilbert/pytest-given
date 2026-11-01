@@ -27,10 +27,11 @@ from ..model import (
     NarrationValue,
     TermId,
     l_form,
+    merged_literals,
     narration_text,
     s_form,
 )
-from .lcs import lcs_pairs
+from .lcs import lcs_gaps, lcs_pairs
 
 
 @dataclass(frozen=True)
@@ -42,9 +43,19 @@ class Reading:
     column: Callable[[NarrationPlaceholder], str]  # the key a placeholder compares by
 
 
+def same_term_id(term_id: TermId) -> TermId:
+    """The after side's `Reading.term_id`: its refs need no rename."""
+    return term_id
+
+
+def placeholder_name(placeholder: NarrationPlaceholder) -> str:
+    return placeholder.name
+
+
 type TokenKind = Literal[
     'word', 'space', 'code', 'emphasis', 'link', 'placeholder', 'term'
 ]
+type TokenBucket = tuple[tuple[TokenKind, str], ...]
 
 
 @dataclass(frozen=True)
@@ -98,7 +109,7 @@ def token_lists_equal(tokens_a: Sequence[Token], tokens_b: Sequence[Token]) -> b
     )
 
 
-def token_bucket(read: Sequence[Token]) -> tuple[tuple[TokenKind, str], ...]:
+def token_bucket(read: Sequence[Token]) -> TokenBucket:
     """A hashable key that two equal token lists always share; equal keys can
     still differ in a space's width or a term ref's form."""
     return tuple(
@@ -106,10 +117,9 @@ def token_bucket(read: Sequence[Token]) -> tuple[tuple[TokenKind, str], ...]:
     )
 
 
-def similarity(a: Narration, ra: Reading, b: Narration, rb: Reading) -> float:
-    """The share of tokens the two have in common, spaces left out: 1.0 for
-    the same words, 0.0 for none shared."""
-    words_a, words_b = reading_words(a, ra), reading_words(b, rb)
+def similarity(words_a: Sequence[Token], words_b: Sequence[Token]) -> float:
+    """The share of `reading_words` the two have in common: 1.0 for the same
+    words, 0.0 for none shared."""
     if not words_a and not words_b:
         return 1.0
     shared = len(lcs_pairs(words_a, words_b, tokens_equal))
@@ -126,7 +136,12 @@ def word_diff(
     """Runs of equal, removed and added tokens; a replaced stretch reads
     removed, then added. Each run holds each side's own tokens, so either
     side reads back whole."""
-    tokens_a, tokens_b = tokens(a, ra), tokens(b, rb)
+    return token_diff(tokens(a, ra), tokens(b, rb))
+
+
+def token_diff(
+    tokens_a: Sequence[Token], tokens_b: Sequence[Token]
+) -> tuple[DiffSegment, ...]:
     return tuple(
         _segment(mark, [pair for _, pair in ops])
         for mark, ops in groupby(_ops(tokens_a, tokens_b), key=lambda op: op[0])
@@ -213,36 +228,24 @@ class _Pair:
     after: Token | None
 
 
-def _ops(tokens_a: list[Token], tokens_b: list[Token]) -> Iterator[_Op]:
+def _ops(tokens_a: Sequence[Token], tokens_b: Sequence[Token]) -> Iterator[_Op]:
     """Each token marked, every gap between matches read removed-then-added."""
-    end_a = end_b = 0
-    for index_a, index_b in [
-        *lcs_pairs(tokens_a, tokens_b, tokens_equal),
-        (len(tokens_a), len(tokens_b)),
-    ]:
-        for token in tokens_a[end_a:index_a]:
-            yield 'removed', _Pair(token, None)
-        for token in tokens_b[end_b:index_b]:
-            yield 'added', _Pair(None, token)
-        if index_a < len(tokens_a):
-            yield 'equal', _Pair(tokens_a[index_a], tokens_b[index_b])
-        end_a, end_b = index_a + 1, index_b + 1
+    for gap_a, gap_b, anchor in lcs_gaps(tokens_a, tokens_b, tokens_equal):
+        for index in gap_a:
+            yield 'removed', _Pair(tokens_a[index], None)
+        for index in gap_b:
+            yield 'added', _Pair(None, tokens_b[index])
+        if anchor is not None:
+            yield 'equal', _Pair(tokens_a[anchor[0]], tokens_b[anchor[1]])
 
 
 def _segment(mark: Mark, pairs: list[_Pair]) -> DiffSegment:
     return DiffSegment(
         mark=mark,
-        before=_merged_literals([pair.before for pair in pairs if pair.before]),
-        after=_merged_literals([pair.after for pair in pairs if pair.after]),
+        before=_parts([pair.before for pair in pairs if pair.before]),
+        after=_parts([pair.after for pair in pairs if pair.after]),
     )
 
 
-def _merged_literals(shown: list[Token]) -> tuple[NarrationPart, ...]:
-    merged: list[NarrationPart] = []
-    for part in (part for token in shown for part in token.parts):
-        last = merged[-1] if merged else None
-        if isinstance(part, NarrationLiteral) and isinstance(last, NarrationLiteral):
-            merged[-1] = NarrationLiteral(value=last.value + part.value)
-        else:
-            merged.append(part)
-    return tuple(merged)
+def _parts(shown: list[Token]) -> tuple[NarrationPart, ...]:
+    return merged_literals(part for token in shown for part in token.parts)

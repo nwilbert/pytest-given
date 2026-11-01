@@ -1,10 +1,18 @@
 """Two step trees aligned: which steps are unchanged, reworded, added or removed."""
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from ..model import Step, StepDelta, StepPath
-from .lcs import lcs_pairs
-from .narration import Reading, narrations_equal, similarity, word_diff
+from .lcs import lcs_gaps
+from .narration import (
+    Reading,
+    Token,
+    similarity,
+    token_diff,
+    token_lists_equal,
+    tokens,
+)
 
 MODIFIED_SIMILARITY = 0.5
 
@@ -21,6 +29,15 @@ def steps_changed(deltas: Sequence[StepDelta]) -> bool:
     )
 
 
+@dataclass(frozen=True)
+class _Read:
+    """A step with its narration read once, for every comparison it takes part in."""
+
+    step: Step
+    tokens: list[Token]
+    words: list[Token]
+
+
 class _Alignment:
     def __init__(self, rb: Reading, ra: Reading) -> None:
         self.rb = rb
@@ -33,21 +50,22 @@ class _Alignment:
         after: list[Step],
         after_parent: StepPath,
     ) -> tuple[StepDelta, ...]:
+        read_before = [_read(step, self.rb) for step in before]
+        read_after = [_read(step, self.ra) for step in after]
         deltas: list[StepDelta] = []
-        start_before = start_after = 0
-        anchors = lcs_pairs(before, after, self._same)
-        for index_before, index_after in [*anchors, (len(before), len(after))]:
+        for gap_before, gap_after, anchor in lcs_gaps(read_before, read_after, _same):
             deltas.extend(
                 self._unanchored(
-                    before[start_before:index_before],
+                    read_before,
+                    gap_before,
                     before_parent,
-                    start_before,
-                    after[start_after:index_after],
+                    read_after,
+                    gap_after,
                     after_parent,
-                    start_after,
                 )
             )
-            if index_before < len(before):
+            if anchor is not None:
+                index_before, index_after = anchor
                 before_path = (*before_parent, index_before)
                 after_path = (*after_parent, index_after)
                 deltas.append(
@@ -63,41 +81,29 @@ class _Alignment:
                         ),
                     )
                 )
-            start_before, start_after = index_before + 1, index_after + 1
         return tuple(deltas)
-
-    def _same(self, before: Step, after: Step) -> bool:
-        return before.phase == after.phase and narrations_equal(
-            before.narration, self.rb, after.narration, self.ra
-        )
-
-    def _similar(self, before: Step, after: Step) -> bool:
-        return (
-            similarity(before.narration, self.rb, after.narration, self.ra)
-            >= MODIFIED_SIMILARITY
-        )
 
     def _unanchored(
         self,
-        before: list[Step],
+        before: list[_Read],
+        before_gap: range,
         before_parent: StepPath,
-        before_start: int,
-        after: list[Step],
+        after: list[_Read],
+        after_gap: range,
         after_parent: StepPath,
-        after_start: int,
     ) -> list[StepDelta]:
         """The steps between two anchors. Each before step pairs with the first
         after step past the last pairing that reads like it, else it is removed;
         the after steps left unpaired are added."""
         deltas: list[StepDelta] = []
-        cursor = 0
-        for index, step in enumerate(before):
-            before_path = (*before_parent, before_start + index)
+        cursor = after_gap.start
+        for index in before_gap:
+            before_path = (*before_parent, index)
             match = next(
                 (
                     candidate
-                    for candidate in range(cursor, len(after))
-                    if self._similar(step, after[candidate])
+                    for candidate in range(cursor, after_gap.stop)
+                    if _similar(before[index], after[candidate])
                 ),
                 None,
             )
@@ -105,34 +111,46 @@ class _Alignment:
                 deltas.append(StepDelta(change='removed', before=before_path))
                 continue
             deltas.extend(
-                StepDelta(change='added', after=(*after_parent, after_start + skipped))
+                StepDelta(change='added', after=(*after_parent, skipped))
                 for skipped in range(cursor, match)
             )
             deltas.append(
                 self._modified(
-                    step,
-                    before_path,
-                    after[match],
-                    (*after_parent, after_start + match),
+                    before[index], before_path, after[match], (*after_parent, match)
                 )
             )
             cursor = match + 1
         deltas.extend(
-            StepDelta(change='added', after=(*after_parent, after_start + skipped))
-            for skipped in range(cursor, len(after))
+            StepDelta(change='added', after=(*after_parent, skipped))
+            for skipped in range(cursor, after_gap.stop)
         )
         return deltas
 
     def _modified(
-        self, before: Step, before_path: StepPath, after: Step, after_path: StepPath
+        self, before: _Read, before_path: StepPath, after: _Read, after_path: StepPath
     ) -> StepDelta:
         return StepDelta(
             change='modified',
             before=before_path,
             after=after_path,
-            phase_changed=before.phase != after.phase,
-            words=word_diff(before.narration, self.rb, after.narration, self.ra),
+            phase_changed=before.step.phase != after.step.phase,
+            words=token_diff(before.tokens, after.tokens),
             children=self.siblings(
-                before.children, before_path, after.children, after_path
+                before.step.children, before_path, after.step.children, after_path
             ),
         )
+
+
+def _read(step: Step, reading: Reading) -> _Read:
+    read = tokens(step.narration, reading)
+    return _Read(step, read, [token for token in read if token.kind != 'space'])
+
+
+def _same(before: _Read, after: _Read) -> bool:
+    return before.step.phase == after.step.phase and token_lists_equal(
+        before.tokens, after.tokens
+    )
+
+
+def _similar(before: _Read, after: _Read) -> bool:
+    return similarity(before.words, after.words) >= MODIFIED_SIMILARITY

@@ -17,6 +17,7 @@ import jinja2
 from markupsafe import Markup
 
 from ..model import (
+    CHANGES,
     AttachmentRef,
     CasePair,
     Change,
@@ -44,6 +45,7 @@ from ..model import (
     TermFacts,
     TermId,
     build_term_crossrefs,
+    narration_of,
     narration_text,
     plural,
 )
@@ -74,8 +76,6 @@ from .text import STATUS_LABEL
 from .theme import DEFAULT_THEME, Theme
 
 _SHORT_SHA = 7
-# The Change filter's order: what a release brings, then what it took away.
-_CHANGE_ORDER: tuple[Change, ...] = ('added', 'changed', 'removed')
 # How a change is marked beside its word, wherever colour is not enough.
 _CHANGE_GLYPH: dict[Change, str] = {
     'added': '+',
@@ -334,8 +334,7 @@ def delta_render_context(
         'plugin_version': delta.metadata.plugin_version,
         'listed': listed,
         'change_counts': {
-            change: sum(item.change == change for item in listed)
-            for change in _CHANGE_ORDER
+            change: sum(item.change == change for item in listed) for change in CHANGES
         },
         'unchanged_count': len(delta.unchanged),
         'module_changes': module_changes,
@@ -652,8 +651,7 @@ def _glossary_view(
         listed=cards,
         grouping=group_by_kind(cards, lambda card: card.shown.kind),
         change_counts={
-            change: sum(card.change == change for card in cards)
-            for change in _CHANGE_ORDER
+            change: sum(card.change == change for card in cards) for change in CHANGES
         },
         unchanged_count=len(delta.glossary.unchanged),
         undefined_count=sum(card.shown.definition is None for card in cards),
@@ -845,9 +843,7 @@ def _build_env(
         return Markup('').join(
             _marked(
                 run.mark,
-                narration(
-                    Narration(text=narration_text(run.parts), parts=run.parts), side
-                ),
+                narration(narration_of(run.parts), side),
             )
             for run in words
         )

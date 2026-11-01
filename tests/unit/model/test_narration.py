@@ -12,6 +12,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     TermId,
+    merged_literals,
     narration_text,
     spanned_part,
 )
@@ -118,3 +119,15 @@ def test_spanned_part_finds_none_when_every_span_stays_in_its_text(
     parts: list[NarrationPart],
 ) -> None:
     assert spanned_part(parts) is None
+
+
+def test_merged_literals_joins_each_run_of_adjacent_literals() -> None:
+    value = _value('n')
+    assert merged_literals(
+        [
+            NarrationLiteral(value='a '),
+            NarrationLiteral(value='b '),
+            value,
+            NarrationLiteral(value=' c'),
+        ]
+    ) == (NarrationLiteral(value='a b '), value, NarrationLiteral(value=' c'))

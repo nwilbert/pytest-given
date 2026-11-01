@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 
-from pytest_given.delta.lcs import lcs_pairs
+from pytest_given.delta.lcs import lcs_gaps, lcs_pairs
 
 _SAME: Callable[[str, str], bool] = str.__eq__
 
@@ -28,4 +28,29 @@ def test_equality_is_the_callers() -> None:
     ) == [
         (0, 0),
         (1, 1),
+    ]
+
+
+def test_identical_sequences_compare_each_pair_once() -> None:
+    compared: list[tuple[str, str]] = []
+
+    def same(one: str, other: str) -> bool:
+        compared.append((one, other))
+        return one == other
+
+    assert lcs_pairs('abcd', 'abcd', same) == [(0, 0), (1, 1), (2, 2), (3, 3)]
+    assert compared == [('a', 'a'), ('b', 'b'), ('c', 'c'), ('d', 'd')]
+
+
+def test_a_common_suffix_still_yields_to_an_earlier_match() -> None:
+    assert lcs_pairs('yxy', 'y', _SAME) == [(0, 0)]
+    assert lcs_pairs('ab' + 'yxy', 'ab' + 'y', _SAME) == [(0, 0), (1, 1), (2, 2)]
+
+
+def test_gaps_run_between_the_pairs_and_past_the_last() -> None:
+    assert list(lcs_gaps('axbc', 'abyc', _SAME)) == [
+        (range(0), range(0), (0, 0)),
+        (range(1, 2), range(1, 1), (2, 1)),
+        (range(3, 3), range(2, 3), (3, 3)),
+        (range(4, 4), range(4, 4), None),
     ]

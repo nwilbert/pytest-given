@@ -14,7 +14,7 @@ from typing import Literal
 
 type Ancestry = Literal['yes', 'no', 'unknown']
 
-_QUERY_TIMEOUT_SECONDS = 5
+_TIMEOUT_SECONDS = 5
 _COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
 
 _GITHUB_URL_RE = re.compile(
@@ -107,26 +107,19 @@ def _looks_like_option(rev: str) -> bool:
     return rev.startswith('-')
 
 
-def _run(args: list[str], repo: Path) -> subprocess.CompletedProcess[str] | None:
-    """The finished process, or None when git could not run to completion.
-
-    `OSError` covers the whole exec side: a `git` that exists but is not
-    executable raises `PermissionError`, not `FileNotFoundError`.
-    """
-    try:
-        return subprocess.run(
-            ['git', '-C', str(repo), *args],
-            capture_output=True,
-            text=True,
-            timeout=_QUERY_TIMEOUT_SECONDS,
-            check=False,
-        )
-    except OSError, subprocess.SubprocessError:
-        return None
-
-
 def _stdout(*args: str) -> str | None:
-    """The stripped stdout of a `git` call, or None when it cannot answer.
+    """The stripped stdout of a `git` call in the working directory, or None
+    when it cannot answer."""
+    result = _run(list(args))
+    if result is None or result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def _run(
+    args: list[str], repo: Path | None = None
+) -> subprocess.CompletedProcess[str] | None:
+    """The finished process, or None when git could not run to completion.
 
     `OSError` covers the whole exec side: a `git` that exists but is not
     executable raises `PermissionError`, and letting that escape would cost the
@@ -134,14 +127,14 @@ def _stdout(*args: str) -> str | None:
     Timed out rather than left to hang, since a wedged git would hold up an
     already-finished test session.
     """
+    location = [] if repo is None else ['-C', str(repo)]
     try:
-        result = subprocess.run(
-            ['git', *args],
+        return subprocess.run(
+            ['git', *location, *args],
             capture_output=True,
             text=True,
-            timeout=2,
-            check=True,
+            timeout=_TIMEOUT_SECONDS,
+            check=False,
         )
     except OSError, subprocess.SubprocessError:
         return None
-    return result.stdout.strip()

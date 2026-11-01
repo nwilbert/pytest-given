@@ -28,7 +28,7 @@ from ..model import (
     iter_steps,
 )
 from .identity import scenario_identity
-from .lcs import lcs_pairs
+from .lcs import lcs_gaps
 from .narration import Reading, Token, reading_words, tokens, tokens_equal
 from .table import CellKey, cells_of
 
@@ -275,17 +275,11 @@ def _replaced_refs(
     """The ref pairs of the regions that differ between two readings of a step,
     each holding exactly one removed term's ref before and one added term's after."""
     swaps: _Swaps = []
-    start_before = start_after = 0
-    anchors = lcs_pairs(before_tokens, after_tokens, tokens_equal)
-    for index_before, index_after in [
-        *anchors,
-        (len(before_tokens), len(after_tokens)),
-    ]:
-        gone = _refs_to(before_tokens[start_before:index_before], removed)
-        came = _refs_to(after_tokens[start_after:index_after], added)
+    for gap_before, gap_after, _ in lcs_gaps(before_tokens, after_tokens, tokens_equal):
+        gone = _refs_to([before_tokens[index] for index in gap_before], removed)
+        came = _refs_to([after_tokens[index] for index in gap_after], added)
         if len(gone) == 1 and len(came) == 1:
             swaps.append((gone[0], came[0]))
-        start_before, start_after = index_before + 1, index_after + 1
     return swaps
 
 
