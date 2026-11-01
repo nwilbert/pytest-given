@@ -84,22 +84,23 @@ def test_a_listed_scenario_is_shown_from_its_after_side_or_its_before_side_if_re
     [
         ('v0.6.0', 'e4f5a6b7c8d9', 'v0.6.0 e4f5a6b'),
         (None, 'e4f5a6b7c8d9', 'e4f5a6b'),
-        (None, None, '2026-01-01T00:00:00+00:00'),
-        ('v0.6.0', None, 'v0.6.0 2026-01-01T00:00:00+00:00'),
+        (None, None, '2026-01-01 00:00'),
+        ('v0.6.0', None, 'v0.6.0 2026-01-01 00:00'),
     ],
 )
-def test_a_range_side_shows_its_label_and_short_sha_or_its_timestamp(
+def test_a_range_side_shows_its_label_and_short_sha_or_its_timestamp_to_the_minute(
     label: str | None, sha: str | None, expected: str
 ) -> None:
     delta = _delta(report(sha=sha), report(sha=sha), before_label=label)
     assert range_label(delta.metadata.before) == expected
 
 
-def test_the_header_shows_the_range_and_the_after_title() -> None:
+def test_the_header_shows_the_range_the_delta_s_version_and_the_after_title() -> None:
     before = report(sha='a1b2c3d4')
     after = ReportData(metadata=meta('e4f5a6b7', title='Shop'), scenarios=[])
     context = delta_render_context(_delta(before, after, after_label='v2'))
     assert context['range'] == 'a1b2c3d to v2 e4f5a6b'
+    assert context['plugin_version'] == '0.1.0'
     assert context['title'] == 'Shop'
 
 

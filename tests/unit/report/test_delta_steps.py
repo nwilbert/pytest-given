@@ -16,7 +16,6 @@ from pytest_given.report.delta_steps import (
     StepRow,
     StepsView,
     block_keys,
-    shown_runs,
     side_runs,
     steps_view,
 )
@@ -193,7 +192,7 @@ def test_each_side_reads_its_own_text_with_only_its_own_words_marked() -> None:
     ] == ['desk', 'room']
 
 
-def test_an_inline_reading_shows_each_change_from_its_side_and_equal_as_after() -> None:
+def test_a_side_reads_its_own_parts_with_a_changed_stretch_as_one_run() -> None:
     runs = (
         DiffSegment(mark='equal', before=(lit('a  '),), after=(lit('a '),)),
         DiffSegment(mark='removed', before=(lit('X'),)),
@@ -202,12 +201,11 @@ def test_an_inline_reading_shows_each_change_from_its_side_and_equal_as_after() 
         DiffSegment(mark='added', after=(lit('Z'),)),
     )
     # A lone space between two changes of one mark joins them.
-    assert shown_runs(runs) == (
-        MarkedRun('equal', (lit('a '),)),
+    assert side_runs(runs, 'before') == (
+        MarkedRun('equal', (lit('a  '),)),
         MarkedRun('removed', (lit('X Y'),)),
-        MarkedRun('added', (lit('Z'),)),
     )
-    # A side reads its own parts, runs of one mark merged.
+    # Runs of one mark merge, once the other side's are left out.
     assert side_runs(runs, 'after') == (
         MarkedRun('equal', (lit('a  '),)),
         MarkedRun('added', (lit('Z'),)),

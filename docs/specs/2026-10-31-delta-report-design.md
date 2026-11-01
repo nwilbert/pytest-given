@@ -420,8 +420,10 @@ the text of both sides.
 
 The *after* report's title (its project's name without one), then two tabs, Scenarios and Glossary.
 There is no Stories tab, and the Glossary tab appears only when a term is listed. The header's right
-side shows the range in place of the run's pytest and plugin versions:
-`v0.5.0 a1b2c3d to v0.6.0 e4f5a6b`. Each side shows a version label and the short SHA. The label is
+side shows the range, set larger as what the page compares, then the version of pytest-given that
+built the delta: `v0.5.0 a1b2c3d to v0.6.0 e4f5a6b`. Each side's run has its own pytest and plugin
+versions, so neither shows. Each side shows a version label and the short SHA, or the run's
+timestamp to the minute when the report carries no SHA. The label is
 the git tag pointing at that SHA (the highest by version order when several do), or a `--before-label` /
 `--after-label` the caller passes. Without either, the side shows only its SHA, since
 `metadata.plugin_version` is pytest-given's version, not the project's.
@@ -470,15 +472,16 @@ the git tag pointing at that SHA (the highest by version order when several do),
 ### A changed scenario: side by side
 
 A changed scenario shows its two versions side by side, steps above parameter table, under one
-pair of captions: each side's label and short SHA, *before* on the left and *after* on the right.
-Each column stops growing at a reading width, so the two sides stay as close on a wide screen as on
-a laptop. Each column reads as its own scenario does in the normal report, and the column says
-which side a line belongs to:
+pair of captions, *Before* on the left and *After* on the right. The top bar's range names the two
+versions, so the captions don't repeat them. Both columns are as wide as the scenario's wider side,
+up to a reading width, so short steps keep the two sides close whatever the screen. A hairline
+parts the columns, down to the end of each side's own steps and table. Each column reads as its own
+scenario does in the normal report, and the column says which side a line belongs to:
 
 ```
- Before: v0.5.0 a1b2c3d                       After: v0.6.0 e4f5a6b
+ Before                                       After
     Given  our guest Alice                       Given  our guest Alice
-  ~ When   Alice checks in to the                When   Alice checks in to the
+  ~ When   Alice checks in to the             ~ When   Alice checks in to the
            [Deluxe Suite]                               [Garden Suite]
   − Then   the later booking is cancelled     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    + Then   the later Booking is cancelled and
@@ -497,8 +500,8 @@ which side a line belongs to:
 - Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
   side's term refs read from that side's glossary.
 - Nested steps line up the same way, inside their parent.
-- Added and removed scenarios show one side only, under their side's caption, without marks: the
-  row's colour already says it all.
+- Added and removed scenarios show one side only, in one column from the left under their side's
+  caption, without marks: the row's colour already says it all.
 
 ### A changed parameter table: side by side
 
@@ -506,7 +509,7 @@ A changed parameter table sits under the steps of its side, so each side's steps
 beneath them:
 
 ```
- Before: v0.5.0 a1b2c3d                       After: v0.6.0 e4f5a6b
+ Before                                       After
  case ID       euros expect status            case ID       euros +size expect status
  a-euro-short  1     False  ✓                 a-euro-short  1     small False  ✓
  −3̶-̶T̶r̶u̶e̶        3     True   ✓                 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -543,19 +546,35 @@ beneath them:
 ### Glossary tab
 
 The same structure as the normal Glossary tab, grouped by kind under the kinds' headings (muted,
-see [Colour](#colour)), listing only added, changed and removed terms:
+see [Colour](#colour)), listing only added, changed and removed terms. A changed term's card shows
+its two versions side by side, as a changed scenario does, under one pair of captions at the top
+of the tab:
+
+```
+ Before                                       After
+ Room                                         Suite                           mapped by hand
+ A [bookable] room in the hotel.              A [rentable] room in the hotel.
+ rooms                                        suites
+ 5 scenarios                                  7 scenarios
+ Links: A walk-in guest is offered the next free suite
+```
 
 - The left bar shows the kind of change, as on the Scenarios tab. The term's kind comes from the
   section it sits in.
 - The sidebar gets the same *Change* filter and unchanged count. Show kinds and the definitions
   filter stay.
-- A changed definition shows a word-level diff. A renamed term shows `was <old name>` and, when the
-  rename log paired it, `mapped by hand`.
-- Other forms are shown, with added ones marked `+` and removed ones struck through. Changed
-  scenario counts show as `5 → 7 scenarios`. Neither makes a term changed by itself. Story counts
-  are left out with stories.
-- A term card links only the listed scenarios that refer to it. The unchanged ones it counts but
-  doesn't link, since they aren't on the page.
+- Each column shows its side's name, definition, other forms and scenario count. A renamed term
+  shows its old name on the left and its new one on the right and, when the rename log paired it,
+  `mapped by hand`.
+- A changed definition marks its removed words on the *before* side, struck through on red, and its
+  added words on the *after* side, on green, as a modified step does.
+- A removed other form is struck through on the *before* side, and an added one is marked `+` on the
+  *after* side. Other forms and scenario counts don't make a term changed by themselves. Story
+  counts are left out with stories.
+- Added and removed terms show one side only, in their side's column. A removed term's name is
+  struck through, as a removed scenario's title is.
+- A term card links only the listed scenarios that refer to it, in one row under both columns. The
+  unchanged ones it counts but doesn't link, since they aren't on the page.
 - A term whose kind changed is listed twice: removed under its old kind, added under its new one.
 
 ### Colour
@@ -577,8 +596,8 @@ To keep those meanings unambiguous:
 
 Most changes are also marked without colour, by a `+` / `−` / `~` glyph, strike-through or a text
 label. Added words and changed cells are marked by their tint alone. That is accepted: a reader who
-can't tell red from green still sees the tint, and the column says which way the change went. Media that drop background colours, such as print or a high-contrast mode,
-lose those two marks.
+can't tell red from green still sees the tint, and the column says which way the change went.
+Media that drop background colours, such as print or a high-contrast mode, lose those two marks.
 
 ## The agent skill
 

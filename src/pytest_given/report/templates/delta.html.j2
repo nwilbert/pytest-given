@@ -13,7 +13,7 @@
 <div class="main">
 
   {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
-  {%- from '_delta_macros.html.j2' import change_filter, side_source, term_card, delta_sides with context -%}
+  {%- from '_delta_macros.html.j2' import change_filter, side_source, term_card, delta_sides, delta_captions with context -%}
   {{ icon_sprite() }}
 
   {#- The Glossary tab only when a term is listed; no Stories tab. -#}
@@ -34,6 +34,7 @@
     {% endif %}
     <div class="topbar-meta">
       <span class="delta-range">{{ range }}</span>
+      <span class="topbar-version">pytest-given {{ plugin_version }}</span>
       {{ theme_toggle() }}
     </div>
   </header>
@@ -246,6 +247,7 @@
       </div>
 
       <div class="glossary-entries">
+      <div class="delta-sides delta-term-captions">{{ delta_captions(['before', 'after']) }}</div>
       {% for group in grouping.groups %}
       {% call kind_group(group, grouping.all_uncategorized) %}
         {% for card in group.entries %}
@@ -253,7 +255,6 @@
         {% endfor %}
       {% endcall %}
       {% endfor %}
-      <div class="entry-name entry-name-sizer" aria-hidden="true">{% for card in terms %}<span class="term-name">{{ card.shown.canonical }}</span>{% endfor %}</div>
       </div>
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
     </div>

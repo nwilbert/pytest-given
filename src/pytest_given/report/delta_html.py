@@ -10,6 +10,7 @@ __lazy_modules__ = ['jinja2', 'markupsafe']
 import dataclasses
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Literal
 
 import jinja2
@@ -22,7 +23,6 @@ from ..model import (
     ColumnId,
     DeltaData,
     DeltaSide,
-    DiffSegment,
     Glossary,
     GlossaryTerm,
     Mark,
@@ -53,7 +53,7 @@ from .delta_steps import (
     Side,
     StepsView,
     block_keys,
-    shown_runs,
+    side_runs,
     steps_view,
 )
 from .glossary_view import KindGrouping, group_by_kind
@@ -256,34 +256,35 @@ class ListedTerm:
         return prefix + self.shown.id
 
     @property
-    def was(self) -> str | None:
-        """A renamed term's before name."""
-        before, after = self.delta.before, self.delta.after
-        if before is None or after is None or before.canonical == after.canonical:
-            return None
-        return before.canonical
+    def sides(self) -> tuple[Side, ...]:
+        """A changed term's two, or the one it is shown from."""
+        return ('before', 'after') if self.change == 'changed' else (self.side,)
 
-    @property
-    def other_forms(self) -> list[OtherForm]:
-        shown = self._facts(self.side).other_forms
+    def term(self, side: Side) -> GlossaryTerm:
+        term = self.delta.before if side == 'before' else self.delta.after
+        assert term is not None
+        return term
+
+    def definition(self, side: Side) -> tuple[MarkedRun, ...]:
+        """A changed definition on one side, the words only it has marked;
+        empty where the definition reads unmarked."""
+        return side_runs(self.delta.definition, side)
+
+    def other_forms(self, side: Side) -> list[OtherForm]:
+        """A changed term's forms only this side has are marked."""
+        forms = self._facts(side).other_forms
         if self.change != 'changed':
-            return [OtherForm(form) for form in shown]
-        before = self._facts('before').other_forms
-        return [
-            OtherForm(form, None if form in before else 'added') for form in shown
-        ] + [OtherForm(form, 'removed') for form in before if form not in shown]
+            return [OtherForm(form) for form in forms]
+        other = self._facts('after' if side == 'before' else 'before').other_forms
+        mark: FormChange = 'removed' if side == 'before' else 'added'
+        return [OtherForm(form, None if form in other else mark) for form in forms]
 
-    @property
-    def summary(self) -> tuple[str, ...]:
-        """Its counts, a changed scenario count as `5 → 7 scenarios`."""
-        facts = self._facts(self.side)
-        scenarios = _some(facts.scenario_count, 'scenario')
+    def scenario_count(self, side: Side) -> str:
+        """A changed term's on both sides, a none included, so they compare."""
+        count = self._facts(side).scenario_count
         if self.change == 'changed':
-            before_count = self._facts('before').scenario_count
-            if before_count != facts.scenario_count:
-                scenarios = f'{before_count} → {scenarios or "0 scenarios"}'
-        parts = (_some(len(facts.other_forms), 'other form'), scenarios)
-        return tuple(part for part in parts if part)
+            return plural(count, 'scenario')
+        return _some(count, 'scenario')
 
     @property
     def search_text(self) -> str:
@@ -323,14 +324,14 @@ def delta_render_context(
     module_changes = _module_changes(delta, listed)
     reach = _term_reach(delta, listed)
     glossary_view = _glossary_view(delta, listed, reach)
-    side_labels: dict[Side, str] = {
-        'before': range_label(delta.metadata.before),
-        'after': range_label(delta.metadata.after),
-    }
     return {
         'title': after.title or after.project,
-        'range': f'{side_labels["before"]} to {side_labels["after"]}',
-        'side_labels': side_labels,
+        'range': (
+            f'{range_label(delta.metadata.before)} to '
+            f'{range_label(delta.metadata.after)}'
+        ),
+        # The version that built the delta: each side's run has its own.
+        'plugin_version': delta.metadata.plugin_version,
         'listed': listed,
         'change_counts': {
             change: sum(item.change == change for item in listed)
@@ -354,10 +355,14 @@ def delta_render_context(
 
 
 def range_label(side: DeltaSide) -> str:
-    """The side's label and short SHA; the report's timestamp stands in for a
-    SHA it doesn't carry."""
+    """The side's label and short SHA; the report's timestamp, to the minute,
+    stands in for a SHA it doesn't carry."""
     sha = side.metadata.commit_sha
-    when = sha[:_SHORT_SHA] if sha else side.metadata.timestamp
+    when = (
+        sha[:_SHORT_SHA]
+        if sha
+        else f'{datetime.fromisoformat(side.metadata.timestamp):%Y-%m-%d %H:%M}'
+    )
     return f'{side.label} {when}' if side.label else when
 
 
@@ -847,11 +852,11 @@ def _build_env(
             for run in words
         )
 
-    def definition_diff(words: tuple[DiffSegment, ...]) -> Markup:
-        """A changed definition's word diff, inline."""
+    def definition_diff(words: tuple[MarkedRun, ...]) -> Markup:
+        """A changed definition on one side, its changed words marked."""
         return Markup('').join(
             _marked(run.mark, Markup(render_definition(narration_text(run.parts))))
-            for run in shown_runs(words)
+            for run in words
         )
 
     def no_param_color(column: ParameterColumn) -> str:

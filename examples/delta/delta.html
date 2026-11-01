@@ -762,6 +762,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
 
 
+
 .phase-block {
   position: relative;
   display: grid;
@@ -770,7 +771,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   grid-template-columns: 3em minmax(0, auto);
   column-gap: var(--space-sm);
   width: fit-content;
-  max-width: calc(100% - var(--space-sm));
+  margin-right: var(--space-sm);
 }
 
 
@@ -1869,8 +1870,11 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 
 
 .delta-sides {
+  --delta-column: 42rem;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 42rem));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: fit-content;
+  max-width: min(100%, 2 * var(--delta-column) + var(--space-xl));
   column-gap: var(--space-xl);
   align-items: start;
   margin-top: var(--space-md);
@@ -1959,11 +1963,33 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 
 
-.delta .entry-name { display: flex; flex-direction: column; align-items: flex-start; }
-.delta .entry-name del { text-decoration-color: var(--removed-line); }
+
+.delta .glossary-entries { grid-template-columns: auto minmax(0, 1fr); margin-bottom: 0; }
+
+
+.delta .glossary-entries > .delta-term-captions {
+  grid-column: 2;
+  margin: 0 calc(var(--space-lg) + 1px) 0 0;
+}
+.delta-term-captions .delta-caption { padding-left: 0; }
+
+
+.delta .entry-head > .delta-sides,
+.delta-term-captions {
+  grid-template-columns: repeat(2, minmax(0, var(--delta-column)));
+  width: auto;
+}
+.delta .entry-head > .delta-sides { margin-top: 0; }
+.delta .refs-inner { grid-column: 2; }
+.delta-term { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
+.delta-term-head { display: flex; align-items: baseline; gap: var(--space-sm); }
+.delta-term-head .entry-name { min-width: 0; }
+.delta-term-head > .delta-change-label { margin-left: auto; }
+.delta-term-head > .delta-change-label,
+.delta-term-head > .delta-badge { flex-shrink: 0; }
+.delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.delta-term .entry-summary { margin-top: 0; }
 .use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
-.delta .entry-body > .delta-change-label,
-.delta .entry-body > .delta-badge { flex-shrink: 0; margin-top: 2px; }
 
 
 </style>
@@ -2809,6 +2835,9 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       </div>
 
       <div class="glossary-entries">
+      <div class="delta-sides delta-term-captions">
+        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
+        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div></div>
       
       
       <div class="kind-group" x-show="glossaryKindFilter.actor && visibleTermCount('actor') > 0">
@@ -2830,28 +2859,23 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="removed-receptionist" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name"><del>Receptionist</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-receptionist" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Staff member who works the front desk.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <span class="delta-change-label" data-change="removed">removed</span>
-              <div class="entry-summary meta-list"><span>1 other form</span><span>2 scenarios</span></div>
+            <div class="delta-sides">
+              <div class="delta-term" data-side="before">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name"><del>Receptionist</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-receptionist" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
+                  <span class="delta-change-label" data-change="removed">removed</span>
+                </div>
+                <div class="entry-def">Staff member who works the front desk.</div>
+                <div class="delta-term-forms">
+                  <span class="use-chip use-chip--static">Dana</span>
+                </div>
+                <div class="entry-summary">2 scenarios</div>
+              </div>
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-removed-receptionist" data-term-id="removed-receptionist" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  
-                  
-                  <span class="use-chip use-chip--static">Dana</span>
-                  
-                  
-                </div>
-                
                 
                 <div class="refs-line">
                   <span class="refs-label">Listed scenarios:</span>
@@ -2880,19 +2904,20 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="concierge" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Concierge<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=concierge" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Staff member who arranges extras for guests.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <span class="delta-change-label" data-change="added">added</span>
-              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            <div class="delta-sides">
+              <div class="delta-term" data-side="after">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">Concierge<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=concierge" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
+                  <span class="delta-change-label" data-change="added">added</span>
+                </div>
+                <div class="entry-def">Staff member who arranges extras for guests.</div>
+                <div class="entry-summary">1 scenario</div>
+              </div>
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-concierge" data-term-id="concierge" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                
                 
                 <div class="refs-line">
                   <span class="refs-label">Listed scenarios:</span>
@@ -2933,34 +2958,34 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="suite" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Suite<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=suite" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
-              <span class="delta-was">was <del>Room</del></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <span class="delta-change-label" data-change="changed">changed</span>
-              <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
-              <div class="entry-summary meta-list"><span>1 other form</span><span>2 scenarios</span></div>
+            <div class="delta-sides">
+              <div class="delta-term" data-side="before">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">Room</span></span>
+                </div>
+                <div class="entry-def">A bookable hotel room.</div>
+                <div class="delta-term-forms">
+                  <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">Room 101</del>
+                </div>
+                <div class="entry-summary">2 scenarios</div>
+              </div>
+              <div class="delta-term" data-side="after">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">Suite<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=suite" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
+                  <span class="delta-change-label" data-change="changed">changed</span>
+                  <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
+                </div>
+                <div class="entry-def">A bookable hotel room.</div>
+                <div class="delta-term-forms">
+                  <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+Suite 101</span>
+                </div>
+                <div class="entry-summary">2 scenarios</div>
+              </div>
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-suite" data-term-id="suite" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  
-                  
-                  <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+Suite 101</span>
-                  
-                  
-                  
-                  <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">Room 101</del>
-                  
-                  
-                </div>
-                
                 
                 <div class="refs-line">
                   <span class="refs-label">Listed scenarios:</span>
@@ -2987,19 +3012,27 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="invoice" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Invoice<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=invoice" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def"><del class="delta-words">A</del><ins class="delta-words">The itemised </ins>bill <del class="delta-words">for</del><ins class="delta-words">of</ins> a <del class="delta-words">stay.</del><ins class="delta-words">stay, settled at check-out.</ins><span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <span class="delta-change-label" data-change="changed">changed</span>
-              <div class="entry-summary meta-list"><span>1 → 2 scenarios</span></div>
+            <div class="delta-sides">
+              <div class="delta-term" data-side="before">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">Invoice</span></span>
+                </div>
+                <div class="entry-def"><del class="delta-words">A</del> bill <del class="delta-words">for</del> a <del class="delta-words">stay.</del></div>
+                <div class="entry-summary">1 scenario</div>
+              </div>
+              <div class="delta-term" data-side="after">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">Invoice<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=invoice" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
+                  <span class="delta-change-label" data-change="changed">changed</span>
+                </div>
+                <div class="entry-def"><ins class="delta-words">The itemised </ins>bill <ins class="delta-words">of</ins> a <ins class="delta-words">stay, settled at check-out.</ins></div>
+                <div class="entry-summary">2 scenarios</div>
+              </div>
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-invoice" data-term-id="invoice" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                
                 
                 <div class="refs-line">
                   <span class="refs-label">Listed scenarios:</span>
@@ -3028,19 +3061,20 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="removed-upgrade" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name"><del>Upgrade</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">A better room offered at the same rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <span class="delta-change-label" data-change="removed">removed</span>
-              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            <div class="delta-sides">
+              <div class="delta-term" data-side="before">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name"><del>Upgrade</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
+                  <span class="delta-change-label" data-change="removed">removed</span>
+                </div>
+                <div class="entry-def">A better room offered at the same rate.</div>
+                <div class="entry-summary">1 scenario</div>
+              </div>
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-removed-upgrade" data-term-id="removed-upgrade" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                
                 
                 
                 <div class="scenario-source"><span>test_delta_booking.py:23</span></div>
@@ -3074,19 +3108,20 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="upgrade" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">upgrade<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Move a guest to a better room at the same rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <span class="delta-change-label" data-change="added">added</span>
-              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            <div class="delta-sides">
+              <div class="delta-term" data-side="after">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">upgrade<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
+                  <span class="delta-change-label" data-change="added">added</span>
+                </div>
+                <div class="entry-def">Move a guest to a better room at the same rate.</div>
+                <div class="entry-summary">1 scenario</div>
+              </div>
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-upgrade" data-term-id="upgrade" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                
                 
                 
                 <div class="scenario-source"><span>test_delta_booking.py:23</span></div>
@@ -3100,7 +3135,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
         </div>
       </div>
       
-      <div class="entry-name entry-name-sizer" aria-hidden="true"><span class="term-name">Receptionist</span><span class="term-name">Concierge</span><span class="term-name">Suite</span><span class="term-name">Invoice</span><span class="term-name">Upgrade</span><span class="term-name">upgrade</span></div>
       </div>
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
     </div>
@@ -4561,6 +4595,7 @@ function alignOnResize(elements, align) {
 
 
 
+
 function alignRows(before, after) {
   if (!before.getClientRects().length) return;  // a hidden scenario
   const shown = side => [...side.querySelectorAll('[data-row]')]
@@ -4570,9 +4605,15 @@ function alignRows(before, after) {
     console.assert(false, 'delta steps have unequal rows', before, after);
     return;
   }
+  const keyword = row => {
+    const block = row.closest('.phase-block');
+    return block?.querySelector('[data-row]') === row ? block.querySelector(':scope > .phase-label') : null;
+  };
   for (const row of pairs.flat()) {
     row.style.paddingTop = '';
     row.style.height = '';
+    const label = keyword(row);
+    if (label) label.style.paddingTop = '';
   }
   const boxes = pairs.map(pair => pair.map(row => row.getBoundingClientRect()));
   const shift = [0, 0];
@@ -4581,7 +4622,11 @@ function alignRows(before, after) {
     const level = Math.max(...tops);
     pair.forEach((row, side) => {
       const push = level - tops[side] >= 0.5 ? level - tops[side] : 0;
-      if (push) row.style.paddingTop = `${push}px`;
+      if (push) {
+        row.style.paddingTop = `${push}px`;
+        const label = keyword(row);
+        if (label) label.style.paddingTop = `${push}px`;
+      }
       shift[side] += push;
       if (!row.classList.contains('delta-gap')) return;
 

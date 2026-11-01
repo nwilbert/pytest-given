@@ -153,7 +153,8 @@ function alignOnResize(elements, align) {
 // a hatched gap is as tall as the step it stands in for. Every position is
 // read before any is written: a push moves every line below it on its side
 // by as much, which the running shift accounts for. Rows inside closed
-// sub-steps take no room and are left out, alike on both sides.
+// sub-steps take no room and are left out, alike on both sides. A phase's
+// first step shares its line with the keyword, which is pushed along.
 function alignRows(before, after) {
   if (!before.getClientRects().length) return;  // a hidden scenario
   const shown = side => [...side.querySelectorAll('[data-row]')]
@@ -163,9 +164,15 @@ function alignRows(before, after) {
     console.assert(false, 'delta steps have unequal rows', before, after);
     return;
   }
+  const keyword = row => {
+    const block = row.closest('.phase-block');
+    return block?.querySelector('[data-row]') === row ? block.querySelector(':scope > .phase-label') : null;
+  };
   for (const row of pairs.flat()) {
     row.style.paddingTop = '';
     row.style.height = '';
+    const label = keyword(row);
+    if (label) label.style.paddingTop = '';
   }
   const boxes = pairs.map(pair => pair.map(row => row.getBoundingClientRect()));
   const shift = [0, 0];
@@ -174,7 +181,11 @@ function alignRows(before, after) {
     const level = Math.max(...tops);
     pair.forEach((row, side) => {
       const push = level - tops[side] >= 0.5 ? level - tops[side] : 0;
-      if (push) row.style.paddingTop = `${push}px`;
+      if (push) {
+        row.style.paddingTop = `${push}px`;
+        const label = keyword(row);
+        if (label) label.style.paddingTop = `${push}px`;
+      }
       shift[side] += push;
       if (!row.classList.contains('delta-gap')) return;
       // Box-sized: the gap's height holds its push.

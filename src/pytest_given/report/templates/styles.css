@@ -728,8 +728,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 /* One keyword and its run of steps. The gutter is a fixed track in every
    block, so the steps still align across blocks; the step track sizes to its
-   text, which is what lets the hover outline hug it. The width cap leaves room
-   for that outline, which the card's `overflow: hidden` would otherwise clip. */
+   text, which is what lets the hover outline hug it. The right margin leaves
+   room for that outline, which the card's `overflow: hidden` would otherwise
+   clip; a margin, unlike a width cap, counts in a content-sized column. */
 .phase-block {
   position: relative;
   display: grid;
@@ -738,7 +739,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   grid-template-columns: 3em minmax(0, auto);
   column-gap: var(--space-sm);
   width: fit-content;
-  max-width: calc(100% - var(--space-sm));
+  margin-right: var(--space-sm);
 }
 /* A gap at every phase change, so a long scenario reads as Given, When and
    Then blocks rather than one run of steps. */
@@ -1775,7 +1776,8 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 .delta .scenario.multi-case > .scenario-header::before,
 .delta .entry::before { background: var(--change-line); }
 
-.delta-range { font-variant-numeric: tabular-nums; }
+/* What the page compares, so it reads as more than the chrome beside it. */
+.delta-range { font-size: var(--font-size-md); color: var(--text-secondary); }
 .delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
 /* What a change replaced, under what replaced it: quieter than the text it
    sits under, and struck. */
@@ -1834,18 +1836,33 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
    its caption: steps above the side's table. A grid row is as tall as its
    taller side, so the tables start level; within a row `delta.js` lines up
    the steps and the cases. A table that didn't change spans both columns.
-   A column stops growing at a reading width, so a wide screen keeps the
-   sides as close as a laptop's. */
+   Both columns are as wide as the scenario's wider side, up to a reading
+   width: short steps keep the sides close, whatever the screen. A hairline
+   in a middle track parts them, from the captions down to the end of the
+   sides' own content, stopping above a table that spans both. */
 .delta-sides {
+  --delta-column: 42rem;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 42rem));
-  column-gap: var(--space-xl);
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  width: fit-content;
+  max-width: min(100%, 2 * var(--delta-column) + 2 * var(--space-lg) + 1px);
+  column-gap: var(--space-lg);
   align-items: start;
   margin-top: var(--space-md);
 }
 .delta-sides > [data-side="before"] { grid-column: 1; }
-.delta-sides > [data-side="after"] { grid-column: 2; }
+.delta-sides > [data-side="after"] { grid-column: 3; }
 .delta-sides > .delta-shared { grid-column: 1 / -1; }
+.delta-rule {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  background: var(--border);
+}
+.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 3; }
+/* An added or removed scenario's one side reads from the left. */
+.delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
+.delta-one-side > [data-side] { grid-column: 1; }
 .delta-caption {
   padding-left: var(--space-lg);
   font-size: var(--font-size-sm);
@@ -1870,6 +1887,8 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   font-weight: 700;
   color: var(--change-ink);
 }
+/* The glyph is part of its line, so a hovered phase's outline takes it in. */
+.delta-side-steps .phase-block.phase-hover::before { left: calc(-1 * var(--space-lg)); }
 /* Struck in the text's own ink, which reads on the red where a line colour
    would not. The toggle of a step with sub-steps is inline-flex, which a
    strike-through doesn't reach into. */
@@ -1925,10 +1944,33 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
   background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
 }
 
-/* A term card: a renamed term's old name under its name, and its change
-   beside its counts. */
-.delta .entry-name { display: flex; flex-direction: column; align-items: flex-start; }
-.delta .entry-name del { text-decoration-color: var(--removed-line); }
+/* The Glossary tab: a card's disclosure, then the scenarios' two columns,
+   their captions once atop the tab. A column stacks its side's name, with
+   the change beside the shown one, its definition, other forms and count. */
+.delta .glossary-entries { grid-template-columns: auto minmax(0, 1fr); margin-bottom: 0; }
+/* The card's head ends its columns short of the list's border and padding,
+   and the captions stop where they do, to stand over them. */
+.delta .glossary-entries > .delta-term-captions {
+  grid-column: 2;
+  margin: 0 calc(var(--space-lg) + 1px) 0 0;
+}
+.delta-term-captions .delta-caption { padding-left: 0; }
+/* A card's columns can't size to its own content: they must stand under the
+   captions, so every card shares the same two. */
+.delta .entry-head > .delta-sides,
+.delta-term-captions {
+  grid-template-columns: minmax(0, var(--delta-column)) 1px minmax(0, var(--delta-column));
+  width: auto;
+}
+.delta .entry-head > .delta-sides > .delta-rule { grid-row: 1; }
+.delta .entry-head > .delta-sides { margin-top: 0; }
+.delta .refs-inner { grid-column: 2; }
+.delta-term { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
+.delta-term-head { display: flex; align-items: baseline; gap: var(--space-sm); }
+.delta-term-head .entry-name { min-width: 0; }
+.delta-term-head > .delta-change-label { margin-left: auto; }
+.delta-term-head > .delta-change-label,
+.delta-term-head > .delta-badge { flex-shrink: 0; }
+.delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.delta-term .entry-summary { margin-top: 0; }
 .use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
-.delta .entry-body > .delta-change-label,
-.delta .entry-body > .delta-badge { flex-shrink: 0; margin-top: 2px; }

@@ -1,5 +1,6 @@
 """A changed scenario's steps side by side: a row per aligned pair of steps,
-each side reading as its own scenario does, under its own phases."""
+each side reading as its own scenario does, under its own phases. Its sides
+and a side's runs of a word diff serve the tables and the Glossary tab too."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -114,7 +115,8 @@ def steps_view(scenario_delta: ScenarioDelta) -> StepsView:
 
 def block_keys(scenario_delta: ScenarioDelta) -> dict[Side, list[BlockKey]]:
     """Each side's phase blocks' keys, in order. A before block takes the key
-    of the after block holding the first of its steps the after side kept."""
+    of the after block holding the first of its steps the after side kept, so
+    two before blocks can share one when one phase's steps moved into another."""
     before, after = scenario_delta.before, scenario_delta.after
     assert before is not None
     assert after is not None
@@ -142,17 +144,6 @@ def side_runs(runs: Sequence[DiffSegment], side: Side) -> tuple[MarkedRun, ...]:
             MarkedRun(run.mark, run.before if side == 'before' else run.after)
             for run in runs
             if run.mark in ('equal', _SIDE_MARK[side])
-        ]
-    )
-
-
-def shown_runs(runs: Sequence[DiffSegment]) -> tuple[MarkedRun, ...]:
-    """A word diff read inline: each change in its own side's parts, an equal
-    run in the after side's."""
-    return _joined(
-        [
-            MarkedRun(run.mark, run.before if run.mark == 'removed' else run.after)
-            for run in runs
         ]
     )
 

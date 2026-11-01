@@ -30,9 +30,11 @@
     <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>{% else %}<span>{{ source.relpath }}:{{ source.line }}</span>{% endif %}</div>
   {%- endmacro -%}
 
-  {#- A listed term's card: the report's Glossary entry, its bar its change.
-      It links the listed scenarios that refer to it, each into the Scenarios
-      tab (`data-goto-scenario`). -#}
+  {#- A listed term's card: the report's Glossary entry, its bar its change,
+      a changed term's two versions side by side in the scenarios' columns
+      (`delta_captions` heads them once, atop the tab), an added or removed
+      one's in its side's column. Its collapsible links the listed scenarios
+      that refer to it, each into the Scenarios tab (`data-goto-scenario`). -#}
   {%- macro term_card(card) -%}
         {%- set term = card.shown %}
         {%- set key = card.key %}
@@ -45,40 +47,50 @@
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ key }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">{% if card.change == 'removed' %}<del>{{ term.canonical }}</del>{% else %}{{ term.canonical }}{% endif %}{{ anchor_link('view=glossary&term=' ~ key) }}</span>
-              {%- if card.was %}
-              <span class="delta-was">was <del>{{ card.was }}</del></span>
-              {%- endif %}
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">
-                {%- if card.delta.definition %}{{ card.delta.definition | definition_diff }}{% else %}{{ term.definition | inline_md }}{% endif -%}
-                <span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
-              <span class="delta-change-label" data-change="{{ card.change }}">{{ card.change }}</span>
-              {%- if card.delta.paired_by == 'rename-log' %}
-              <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
-              {%- endif %}
-              <div class="entry-summary meta-list">{% for part in card.summary %}<span>{{ part }}</span>{% endfor %}</div>
+            <div class="delta-sides">
+              {{- delta_rule() }}
+              {%- for side in card.sides %}
+              {%- set version = card.term(side) %}
+              {%- set words = card.definition(side) %}
+              {%- set forms = card.other_forms(side) %}
+              {%- set count = card.scenario_count(side) %}
+              <div class="delta-term" data-side="{{ side }}">
+                <div class="delta-term-head">
+                  <span class="entry-name"><span class="term-name">{% if card.change == 'removed' %}<del>{{ version.canonical }}</del>{% else %}{{ version.canonical }}{% endif %}{% if side == card.side %}{{ anchor_link('view=glossary&term=' ~ key) }}{% endif %}</span></span>
+                  {%- if side == card.side %}
+                  <span class="delta-change-label" data-change="{{ card.change }}">{{ card.change }}</span>
+                  {%- if card.delta.paired_by == 'rename-log' %}
+                  <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
+                  {%- endif %}
+                  {%- endif %}
+                </div>
+                <div class="entry-def">
+                  {%- if words %}{{ words | definition_diff }}{% else %}{{ version.definition | inline_md }}{% endif -%}
+                  {%- if version.definition is none %}<span class="entry-def-badge">Undefined</span>{% endif -%}
+                </div>
+                {%- if forms %}
+                <div class="delta-term-forms">
+                  {%- for form in forms %}
+                  {%- if form.change == 'removed' %}
+                  <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">{{ form.text }}</del>
+                  {%- elif form.change == 'added' %}
+                  <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+{{ form.text }}</span>
+                  {%- else %}
+                  <span class="use-chip use-chip--static">{{ form.text }}</span>
+                  {%- endif %}
+                  {%- endfor %}
+                </div>
+                {%- endif %}
+                {%- if count %}
+                <div class="entry-summary">{{ count }}</div>
+                {%- endif %}
+              </div>
+              {%- endfor %}
             </div>
           </div>
           <div class="refs scenario-body" id="term-refs-{{ key }}" data-term-id="{{ key }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                {% if card.other_forms %}
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  {% for form in card.other_forms %}
-                  {% if form.change == 'removed' %}
-                  <del class="use-chip use-chip--static delta-form" data-change="removed" title="Removed form">{{ form.text }}</del>
-                  {% elif form.change == 'added' %}
-                  <span class="use-chip use-chip--static delta-form" data-change="added" title="Added form">+{{ form.text }}</span>
-                  {% else %}
-                  <span class="use-chip use-chip--static">{{ form.text }}</span>
-                  {% endif %}
-                  {% endfor %}
-                </div>
-                {% endif %}
                 {% if card.scenarios %}
                 <div class="refs-line">
                   <span class="refs-label">Listed scenarios:</span>
@@ -96,19 +108,32 @@
         </div>
   {%- endmacro -%}
 
+  {#- Each side's name over its column; the top bar's range says which
+      versions they are. -#}
+  {%- macro delta_captions(sides) -%}
+        {%- for side in sides %}
+        <div class="delta-caption" data-side="{{ side }}">{{ side | capitalize }}</div>
+        {%- endfor %}
+  {%- endmacro -%}
+
+  {#- The hairline between the two columns, in a track of its own. -#}
+  {%- macro delta_rule() -%}
+        <div class="delta-rule" aria-hidden="true"></div>
+  {%- endmacro -%}
+
   {#- A listed scenario's sides in two columns, before on the left, each
       under its caption: a changed scenario's steps side by side above its
-      tables, an added or removed one's own side alone. A table that didn't
+      tables, an added or removed one's own side alone, in one column from
+      the left, since its caption says which side it is. A table that didn't
       change spans both columns. `data-side` scopes a hovered row's preview to
       its own side's text. -#}
   {%- macro delta_sides(item, table, scenario_idx) -%}
       {%- set scenario = item.shown -%}
       {%- set steps = item.steps -%}
       {%- set sides = ['before', 'after'] if steps is not none else [item.side] -%}
-      <div class="delta-sides">
-        {%- for side in sides %}
-        <div class="delta-caption" data-side="{{ side }}">{{ side | capitalize }}: {{ side_labels[side] }}</div>
-        {%- endfor %}
+      <div class="delta-sides{% if steps is none %} delta-one-side{% endif %}">
+        {{- delta_captions(sides) }}
+        {%- if steps is not none %}{{ delta_rule() }}{% endif %}
         {%- for side in sides %}
         <div class="delta-side-steps" data-side="{{ side }}"{% if steps is not none and side == 'before' %} data-term-side="before"{% endif %}>
           {%- if steps is not none %}{{ delta_steps(steps, side, scenario_idx) }}{% else %}{{ scenario_steps(scenario, scenario_idx, side) }}{% endif -%}

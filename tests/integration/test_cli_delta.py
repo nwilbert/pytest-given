@@ -420,7 +420,7 @@ def test_a_before_report_without_a_sha_applies_every_entry_with_one_warning(
     )
     delta = delta_from_dict(_read_delta())
     assert [item.change for item in delta.scenarios] == ['changed']
-    assert range_label(delta.metadata.before) == meta().timestamp
+    assert range_label(delta.metadata.before) == '2026-01-01 00:00'
 
 
 def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
