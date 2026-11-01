@@ -94,6 +94,14 @@
   --term-activity-ink: #5f2d9a; --term-activity-line: #906fc5;
   --term-kindless-ink: #545962; --term-kindless-line: #8c9099;
 
+  
+
+
+
+  --added-ink: #17693f;   --added-line: #3f9e6b;   --added-tint: #e3f3e8;   --added-tint-strong: #bfe4cb;
+  --removed-ink: #a8231c; --removed-line: #d0584f; --removed-tint: #fcebe9; --removed-tint-strong: #f5c6c1;
+  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc; --changed-tint-strong: #f2d89e;
+
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   
   --bg-tip-code: rgba(255, 255, 255, 0.14);
@@ -139,6 +147,10 @@
   --term-object-ink: #7fded0;   --term-object-line: #53a397;
   --term-activity-ink: #cbb5f7; --term-activity-line: #917dbd;
   --term-kindless-ink: #b8b2c2; --term-kindless-line: #7f798a;
+
+  --added-ink: #7ad7a0;   --added-line: #4fae7c;   --added-tint: #1f3329;   --added-tint-strong: #2d5641;
+  --removed-ink: #f4968d; --removed-line: #d8675d; --removed-tint: #3b2228; --removed-tint-strong: #66303a;
+  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f; --changed-tint-strong: #5c4826;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -1764,6 +1776,191 @@ span.param-highlight {
 }
 
 
+
+
+
+
+
+body.delta {
+  --color-passed: var(--text-muted);
+  --color-failed: var(--text-muted);
+  --color-skipped: var(--text-muted);
+  --color-xfailed: var(--text-muted);
+  --color-passed-tint: var(--bg-page);
+  --color-failed-tint: var(--bg-page);
+  --color-skipped-tint: var(--bg-page);
+  --color-xfailed-tint: var(--bg-page);
+  
+  --bg-traceback: var(--bg-page);
+  --term-actor-ink: var(--term-kindless-ink);       --term-actor-line: var(--term-kindless-line);
+  --term-object-ink: var(--term-kindless-ink);      --term-object-line: var(--term-kindless-line);
+  --term-activity-ink: var(--term-kindless-ink);    --term-activity-line: var(--term-kindless-line);
+}
+body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 700; }
+
+
+
+.delta .scenario[data-change="added"], .delta .entry[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
+.delta .scenario[data-change="changed"], .delta .entry[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
+.delta .scenario[data-change="removed"], .delta .entry[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
+.delta .scenario::before,
+.delta .scenario.multi-case > .scenario-header::before,
+.delta .entry::before { background: var(--change-line); }
+
+.delta-range { font-variant-numeric: tabular-nums; }
+.delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
+
+
+.delta-was {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: normal;
+}
+.delta-was del, .delta-title > del.scenario-title { text-decoration-color: var(--removed-line); }
+.delta-change-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--change-ink);
+}
+.delta-badge {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0 7px;
+  white-space: nowrap;
+}
+.scenario-tag.delta-tag-added,
+.use-chip.delta-form[data-change="added"] { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
+.scenario-tag.delta-tag-removed,
+.use-chip.delta-form[data-change="removed"] {
+  cursor: default;
+  color: var(--removed-ink);
+  border-color: var(--removed-line);
+  background: var(--removed-tint);
+}
+.delta-status { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.reason-box .delta-was { margin-top: 2px; }
+
+
+.delta-change-pill[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); --change-tint: var(--added-tint); }
+.delta-change-pill[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); --change-tint: var(--changed-tint); }
+.delta-change-pill[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); --change-tint: var(--removed-tint); }
+.delta-change-pill.active-change { background: var(--change-tint); color: var(--change-ink); border-color: var(--change-line); }
+.delta-unchanged {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+.delta-module-mark {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  padding-left: var(--space-xs);
+  color: var(--change-ink);
+}
+.delta-module-mark[data-change="added"] { --change-ink: var(--added-ink); }
+.delta-module-mark[data-change="changed"] { --change-ink: var(--changed-ink); }
+.delta-module-mark[data-change="removed"] { --change-ink: var(--removed-ink); }
+
+
+
+
+
+
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
+.delta-step[data-change="modified"] > .step-text,
+.delta-step[data-change="added"] .step-text,
+.delta-step[data-change="removed"] .step-text {
+  background: var(--change-tint);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-xs);
+  margin-left: calc(-1 * var(--space-xs));
+  width: fit-content;
+}
+.delta-step:not([data-change="equal"]) > .step-text::before {
+  content: var(--step-glyph);
+  position: absolute;
+  left: calc(-1 * var(--space-md));
+  font-weight: 700;
+  color: var(--change-ink);
+}
+.delta-step[data-change="removed"] .step-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--removed-line);
+}
+
+.delta-words { border-radius: 2px; padding: 0 1px; }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
+del.delta-words + ins.delta-words { margin-left: 2px; }
+.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
+.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
+
+
+.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
+
+
+.delta .step-children { position: relative; }
+.delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
+
+
+
+
+.delta-tables {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  margin: var(--space-md) 0 0 var(--space-xl);
+}
+.delta-table { min-width: 0; }
+.delta-table .param-table { margin: 0; max-width: 100%; }
+.delta-table .param-table th,
+.delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
+.delta-table-caption {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-bottom: var(--space-xs);
+}
+.delta-table .param-table th .delta-was { display: block; }
+.delta-table .param-table del { text-decoration-color: var(--removed-line); }
+
+
+.delta-table .param-table tr[data-change="added"] { --change-ink: var(--added-ink); background: var(--added-tint); }
+.delta-table .param-table tr[data-change="removed"] { --change-ink: var(--removed-ink); background: var(--removed-tint); }
+.delta-row-lead {
+  display: inline-block;
+  width: 1ch;
+  margin-right: var(--space-xs);
+  font-weight: 700;
+  color: var(--change-ink);
+}
+
+
+
+.delta-table .param-table td[data-change="added"]:not(.param-highlight),
+.delta-table .param-table th[data-change="added"]:not(.param-highlight) { background: var(--added-tint); }
+.delta-table .param-table td[data-change="removed"]:not(.param-highlight),
+.delta-table .param-table th[data-change="removed"]:not(.param-highlight) { background: var(--removed-tint); }
+.delta-table .param-table thead th[data-change="added"] { color: var(--added-ink); }
+.delta-table .param-table thead th[data-change="removed"] { color: var(--removed-ink); }
+
+.delta-placeholder-row td {
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
+}
+
+
+
+.delta .entry-name { display: flex; flex-direction: column; align-items: flex-start; }
+.delta .entry-name del { text-decoration-color: var(--removed-line); }
+.use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
+.delta .entry-body > .delta-change-label,
+.delta .entry-body > .delta-badge { flex-shrink: 0; margin-top: 2px; }
+
+
 </style>
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
@@ -1799,7 +1996,8 @@ span.param-highlight {
     <div class="topbar-meta">
       <span class="topbar-version">pytest 9.1.1</span>
       <span class="topbar-version">pytest-given 0.5.1</span>
-      <span x-text="formattedTimestamp"></span><div class="seg-toggle" role="group" aria-label="Theme">
+      <span x-text="formattedTimestamp"></span>
+      <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
@@ -1952,7 +2150,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/test_file_glossary_booking.py#L60">examples/file-glossary-booking/test_file_glossary_booking.py:60</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/test_file_glossary_booking.py#L60">examples/file-glossary-booking/test_file_glossary_booking.py:60</a></div>
       
     </div>
     </div>
@@ -1995,7 +2193,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/test_file_glossary_booking.py#L77">examples/file-glossary-booking/test_file_glossary_booking.py:77</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/test_file_glossary_booking.py#L77">examples/file-glossary-booking/test_file_glossary_booking.py:77</a></div>
       
     </div>
     </div>
@@ -2171,7 +2369,7 @@ span.param-highlight {
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/test_file_glossary_booking.py#L42">examples/file-glossary-booking/test_file_glossary_booking.py:42</a></div>
         
       </div>
       
@@ -2184,12 +2382,12 @@ span.param-highlight {
   <div class="view-layout">
     <div class="sidebar">
       <label class="search-box">
-        <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="text" placeholder="Search terms..." x-model="glossarySearch">
-        <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </label>
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search terms..." x-model="glossarySearch">
+      <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
 
       
       
@@ -2314,13 +2512,14 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L7">examples/file-glossary-booking/GLOSSARY.md:7</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       
@@ -2378,7 +2577,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L9">examples/file-glossary-booking/GLOSSARY.md:9</a></div>
                 
               </div>
             </div>
@@ -2429,13 +2628,14 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L10">examples/file-glossary-booking/GLOSSARY.md:10</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       
@@ -2493,13 +2693,14 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L8">examples/file-glossary-booking/GLOSSARY.md:8</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       
@@ -2550,7 +2751,7 @@ span.param-highlight {
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L11">examples/file-glossary-booking/GLOSSARY.md:11</a></div>
                 
               </div>
             </div>
@@ -2587,13 +2788,14 @@ span.param-highlight {
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/file-glossary-booking/GLOSSARY.md#L12">examples/file-glossary-booking/GLOSSARY.md:12</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       <div class="entry-name entry-name-sizer" aria-hidden="true"><span class="term-name">Guest</span><span class="term-name">book</span><span class="term-name">Room</span><span class="term-name">Confirmation</span><span class="term-name">Cancellation Policy</span><span class="term-name">Overbooking</span></div>
@@ -2627,10 +2829,6 @@ span.param-highlight {
 </div>
 
 
-<!-- Names the parts of an arriving link this report no longer has. The live
-     region stays put so the message inserted into it is announced; the
-     countdown bar's animation is the timer, so hovering or focusing the
-     snackbar pauses both. -->
 <div class="snackbar-region" role="status" aria-live="polite">
   <template x-if="staleLink">
     <div class="snackbar">
@@ -2649,7 +2847,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-31T13:38:02.306038+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T07:40:58.528227+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3042,19 +3240,25 @@ function reportApp() {
       }
     },
     get filterSummary() {
+
+      const parts = this._summaryParts();
+      if (parts.length) return parts.join('\u2003');
+
+
+      return this._chipped() ? '' : 'All Scenarios';
+    },
+    _summaryParts() {
       const parts = [];
       const shown = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shown.length !== statusesPresent.length) {
         parts.push(shown.length ? shown.map(s => STATUS_LABELS[s]).join(', ') : 'no statuses');
       }
       if (this.search) parts.push('"' + this.search + '"');
-
-
-
-      if (parts.length) return parts.join('\u2003');
-      const chipped = this.termFilters.length || this.tagFilters.length
+      return parts;
+    },
+    _chipped() {
+      return this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.sentenceFilter;
-      return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -3073,11 +3277,7 @@ function reportApp() {
 
 
     _visible() {
-      const state = [
-        ...STATUSES.map(s => this.shownStatuses[s]),
-        this.moduleFilter, this.sentenceFilter, this.search,
-        this.tagFilters, this.termFilters,
-      ];
+      const state = this._filterState();
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
         return visibleCache.value;
       }
@@ -3088,6 +3288,14 @@ function reportApp() {
       }
       visibleCache = { state, value };
       return value;
+    },
+
+    _filterState() {
+      return [
+        ...STATUSES.map(s => this.shownStatuses[s]),
+        this.moduleFilter, this.sentenceFilter, this.search,
+        this.tagFilters, this.termFilters,
+      ];
     },
 
 
@@ -3302,7 +3510,7 @@ function reportApp() {
     },
     goToTerm(id) {
 
-      if (!Object.hasOwn(termNames, id)) return;
+      if (!this._hasTermEntry(id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
@@ -3627,7 +3835,7 @@ function reportApp() {
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();
-        this.goToTerm(pill.dataset.termId);
+        this.goToTerm(this._refEntry(pill));
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -3711,7 +3919,7 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = scope.querySelector('.param-table');
+        const table = this._phaseTable(scope);
         if (table) redraw.observe(table);
       });
       document.addEventListener('pointerout', (event) => {
@@ -3725,7 +3933,7 @@ function reportApp() {
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = scope.querySelector('.param-table');
+      const table = this._phaseTable(scope);
       if (!table) return;
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
@@ -3761,6 +3969,24 @@ function reportApp() {
     },
 
 
+    _phaseTable(scope) {
+      return scope.querySelector('.param-table');
+    },
+
+
+    _tipTerm(pill) {
+      return termsById.get(pill.dataset.termId);
+    },
+
+
+    _hasTermEntry(id) {
+      return Object.hasOwn(termNames, id);
+    },
+    _refEntry(pill) {
+      return pill.dataset.termId;
+    },
+
+
 
 
     _initTermTooltip() {
@@ -3772,7 +3998,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = termsById.get(pill.dataset.termId);
+        const term = this._tipTerm(pill);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';
@@ -3847,7 +4073,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => Object.hasOwn(termNames, id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {
@@ -3869,6 +4095,9 @@ function reportApp() {
       this.$nextTick(() => { this.staleLink = stale; });
     },
     _writeHash(mode = 'push') {
+      serializeHash(this._hashParams(), mode);
+    },
+    _hashParams() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
@@ -3883,7 +4112,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      serializeHash(params, mode);
+      return params;
     },
   };
 }

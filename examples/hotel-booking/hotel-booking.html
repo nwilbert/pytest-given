@@ -94,6 +94,14 @@
   --term-activity-ink: #5f2d9a; --term-activity-line: #906fc5;
   --term-kindless-ink: #545962; --term-kindless-line: #8c9099;
 
+  
+
+
+
+  --added-ink: #17693f;   --added-line: #3f9e6b;   --added-tint: #e3f3e8;   --added-tint-strong: #bfe4cb;
+  --removed-ink: #a8231c; --removed-line: #d0584f; --removed-tint: #fcebe9; --removed-tint-strong: #f5c6c1;
+  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc; --changed-tint-strong: #f2d89e;
+
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   
   --bg-tip-code: rgba(255, 255, 255, 0.14);
@@ -139,6 +147,10 @@
   --term-object-ink: #7fded0;   --term-object-line: #53a397;
   --term-activity-ink: #cbb5f7; --term-activity-line: #917dbd;
   --term-kindless-ink: #b8b2c2; --term-kindless-line: #7f798a;
+
+  --added-ink: #7ad7a0;   --added-line: #4fae7c;   --added-tint: #1f3329;   --added-tint-strong: #2d5641;
+  --removed-ink: #f4968d; --removed-line: #d8675d; --removed-tint: #3b2228; --removed-tint-strong: #66303a;
+  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f; --changed-tint-strong: #5c4826;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -1764,6 +1776,191 @@ span.param-highlight {
 }
 
 
+
+
+
+
+
+body.delta {
+  --color-passed: var(--text-muted);
+  --color-failed: var(--text-muted);
+  --color-skipped: var(--text-muted);
+  --color-xfailed: var(--text-muted);
+  --color-passed-tint: var(--bg-page);
+  --color-failed-tint: var(--bg-page);
+  --color-skipped-tint: var(--bg-page);
+  --color-xfailed-tint: var(--bg-page);
+  
+  --bg-traceback: var(--bg-page);
+  --term-actor-ink: var(--term-kindless-ink);       --term-actor-line: var(--term-kindless-line);
+  --term-object-ink: var(--term-kindless-ink);      --term-object-line: var(--term-kindless-line);
+  --term-activity-ink: var(--term-kindless-ink);    --term-activity-line: var(--term-kindless-line);
+}
+body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 700; }
+
+
+
+.delta .scenario[data-change="added"], .delta .entry[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); }
+.delta .scenario[data-change="changed"], .delta .entry[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); }
+.delta .scenario[data-change="removed"], .delta .entry[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); }
+.delta .scenario::before,
+.delta .scenario.multi-case > .scenario-header::before,
+.delta .entry::before { background: var(--change-line); }
+
+.delta-range { font-variant-numeric: tabular-nums; }
+.delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
+
+
+.delta-was {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: normal;
+}
+.delta-was del, .delta-title > del.scenario-title { text-decoration-color: var(--removed-line); }
+.delta-change-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--change-ink);
+}
+.delta-badge {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0 7px;
+  white-space: nowrap;
+}
+.scenario-tag.delta-tag-added,
+.use-chip.delta-form[data-change="added"] { color: var(--added-ink); border-color: var(--added-line); background: var(--added-tint); }
+.scenario-tag.delta-tag-removed,
+.use-chip.delta-form[data-change="removed"] {
+  cursor: default;
+  color: var(--removed-ink);
+  border-color: var(--removed-line);
+  background: var(--removed-tint);
+}
+.delta-status { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.reason-box .delta-was { margin-top: 2px; }
+
+
+.delta-change-pill[data-change="added"] { --change-ink: var(--added-ink); --change-line: var(--added-line); --change-tint: var(--added-tint); }
+.delta-change-pill[data-change="changed"] { --change-ink: var(--changed-ink); --change-line: var(--changed-line); --change-tint: var(--changed-tint); }
+.delta-change-pill[data-change="removed"] { --change-ink: var(--removed-ink); --change-line: var(--removed-line); --change-tint: var(--removed-tint); }
+.delta-change-pill.active-change { background: var(--change-tint); color: var(--change-ink); border-color: var(--change-line); }
+.delta-unchanged {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+.delta-module-mark {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  padding-left: var(--space-xs);
+  color: var(--change-ink);
+}
+.delta-module-mark[data-change="added"] { --change-ink: var(--added-ink); }
+.delta-module-mark[data-change="changed"] { --change-ink: var(--changed-ink); }
+.delta-module-mark[data-change="removed"] { --change-ink: var(--removed-ink); }
+
+
+
+
+
+
+.delta-step[data-change="modified"] { --change-ink: var(--changed-ink); --change-tint: var(--changed-tint); --step-glyph: '~'; }
+.delta-step[data-change="added"] { --change-ink: var(--added-ink); --change-tint: var(--added-tint); --step-glyph: '+'; }
+.delta-step[data-change="removed"] { --change-ink: var(--removed-ink); --change-tint: var(--removed-tint); --step-glyph: '\2212'; }
+.delta-step[data-change="modified"] > .step-text,
+.delta-step[data-change="added"] .step-text,
+.delta-step[data-change="removed"] .step-text {
+  background: var(--change-tint);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-xs);
+  margin-left: calc(-1 * var(--space-xs));
+  width: fit-content;
+}
+.delta-step:not([data-change="equal"]) > .step-text::before {
+  content: var(--step-glyph);
+  position: absolute;
+  left: calc(-1 * var(--space-md));
+  font-weight: 700;
+  color: var(--change-ink);
+}
+.delta-step[data-change="removed"] .step-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--removed-line);
+}
+
+.delta-words { border-radius: 2px; padding: 0 1px; }
+del.delta-words { background: var(--removed-tint-strong); text-decoration-color: var(--removed-line); }
+ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
+del.delta-words + ins.delta-words { margin-left: 2px; }
+.delta-phase { color: var(--text-muted); font-weight: normal; text-decoration-color: var(--removed-line); }
+.delta-phase-inline { color: var(--text-primary); font-weight: 500; }
+
+
+.steps.delta-phase-changed .phase-block { grid-template-columns: 6.5em minmax(0, auto); }
+
+
+.delta .step-children { position: relative; }
+.delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
+
+
+
+
+.delta-tables {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  margin: var(--space-md) 0 0 var(--space-xl);
+}
+.delta-table { min-width: 0; }
+.delta-table .param-table { margin: 0; max-width: 100%; }
+.delta-table .param-table th,
+.delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
+.delta-table-caption {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-bottom: var(--space-xs);
+}
+.delta-table .param-table th .delta-was { display: block; }
+.delta-table .param-table del { text-decoration-color: var(--removed-line); }
+
+
+.delta-table .param-table tr[data-change="added"] { --change-ink: var(--added-ink); background: var(--added-tint); }
+.delta-table .param-table tr[data-change="removed"] { --change-ink: var(--removed-ink); background: var(--removed-tint); }
+.delta-row-lead {
+  display: inline-block;
+  width: 1ch;
+  margin-right: var(--space-xs);
+  font-weight: 700;
+  color: var(--change-ink);
+}
+
+
+
+.delta-table .param-table td[data-change="added"]:not(.param-highlight),
+.delta-table .param-table th[data-change="added"]:not(.param-highlight) { background: var(--added-tint); }
+.delta-table .param-table td[data-change="removed"]:not(.param-highlight),
+.delta-table .param-table th[data-change="removed"]:not(.param-highlight) { background: var(--removed-tint); }
+.delta-table .param-table thead th[data-change="added"] { color: var(--added-ink); }
+.delta-table .param-table thead th[data-change="removed"] { color: var(--removed-ink); }
+
+.delta-placeholder-row td {
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
+}
+
+
+
+.delta .entry-name { display: flex; flex-direction: column; align-items: flex-start; }
+.delta .entry-name del { text-decoration-color: var(--removed-line); }
+.use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
+.delta .entry-body > .delta-change-label,
+.delta .entry-body > .delta-badge { flex-shrink: 0; margin-top: 2px; }
+
+
 :root { --param-color-0: #307400; }
 [data-theme="dark"] { --param-color-0: #4eb300; }
 .param-color-0, th.param-color-0 { color: var(--param-color-0); }
@@ -1805,7 +2002,8 @@ span.param-highlight {
     <div class="topbar-meta">
       <span class="topbar-version">pytest 9.1.1</span>
       <span class="topbar-version">pytest-given 0.5.1</span>
-      <span x-text="formattedTimestamp"></span><div class="seg-toggle" role="group" aria-label="Theme">
+      <span x-text="formattedTimestamp"></span>
+      <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
@@ -1964,7 +2162,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L197">examples/hotel-booking/test_hotel_booking.py:197</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L197">examples/hotel-booking/test_hotel_booking.py:197</a></div>
       
     </div>
     </div>
@@ -2023,7 +2221,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L219">examples/hotel-booking/test_hotel_booking.py:219</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L219">examples/hotel-booking/test_hotel_booking.py:219</a></div>
       
     </div>
     </div>
@@ -2046,7 +2244,7 @@ span.param-highlight {
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">49ms</span>
+        <span class="scenario-duration">44ms</span>
       </span>
     </div>
 
@@ -2073,6 +2271,7 @@ span.param-highlight {
               <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending and no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="confirmation">Confirmation</span> is sent to <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> or <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Bob</span></div>
             </div></div></div>
 
+      
       
       <div class="param-table-scroll">
       <table class="param-table">
@@ -2194,7 +2393,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L258">examples/hotel-booking/test_hotel_booking.py:258</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L258">examples/hotel-booking/test_hotel_booking.py:258</a></div>
       
     </div>
     </div>
@@ -2241,7 +2440,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L312">examples/hotel-booking/test_hotel_booking.py:312</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L312">examples/hotel-booking/test_hotel_booking.py:312</a></div>
       
     </div>
     </div>
@@ -2296,7 +2495,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L331">examples/hotel-booking/test_hotel_booking.py:331</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L331">examples/hotel-booking/test_hotel_booking.py:331</a></div>
       
     </div>
     </div>
@@ -2355,7 +2554,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L351">examples/hotel-booking/test_hotel_booking.py:351</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L351">examples/hotel-booking/test_hotel_booking.py:351</a></div>
       
     </div>
     </div>
@@ -2747,7 +2946,7 @@ E     + unsupported payment method</pre>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L102">examples/hotel-booking/test_hotel_booking.py:102</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L102">examples/hotel-booking/test_hotel_booking.py:102</a></div>
         
       </div>
       <div data-story-id="cancel-a-booking" x-show="selectedStory === $el.dataset.storyId"
@@ -2943,7 +3142,7 @@ E     + unsupported payment method</pre>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L145">examples/hotel-booking/test_hotel_booking.py:145</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L145">examples/hotel-booking/test_hotel_booking.py:145</a></div>
         
       </div>
       
@@ -2956,12 +3155,12 @@ E     + unsupported payment method</pre>
   <div class="view-layout">
     <div class="sidebar">
       <label class="search-box">
-        <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="text" placeholder="Search terms..." x-model="glossarySearch">
-        <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </label>
+      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search terms..." x-model="glossarySearch">
+      <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </label>
 
       
       
@@ -3094,7 +3293,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
                 
               </div>
             </div>
@@ -3156,7 +3355,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L80">examples/hotel-booking/test_hotel_booking.py:80</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L80">examples/hotel-booking/test_hotel_booking.py:80</a></div>
                 
               </div>
             </div>
@@ -3209,13 +3408,14 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       
@@ -3280,7 +3480,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L83">examples/hotel-booking/test_hotel_booking.py:83</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L83">examples/hotel-booking/test_hotel_booking.py:83</a></div>
                 
               </div>
             </div>
@@ -3333,7 +3533,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L84">examples/hotel-booking/test_hotel_booking.py:84</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L84">examples/hotel-booking/test_hotel_booking.py:84</a></div>
                 
               </div>
             </div>
@@ -3386,7 +3586,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
                 
               </div>
             </div>
@@ -3439,7 +3639,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
                 
               </div>
             </div>
@@ -3483,13 +3683,14 @@ E     + unsupported payment method</pre>
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L130">examples/hotel-booking/test_hotel_booking.py:130</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L130">examples/hotel-booking/test_hotel_booking.py:130</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       
@@ -3547,7 +3748,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
                 
               </div>
             </div>
@@ -3591,7 +3792,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L93">examples/hotel-booking/test_hotel_booking.py:93</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L93">examples/hotel-booking/test_hotel_booking.py:93</a></div>
                 
               </div>
             </div>
@@ -3642,7 +3843,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L95">examples/hotel-booking/test_hotel_booking.py:95</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L95">examples/hotel-booking/test_hotel_booking.py:95</a></div>
                 
               </div>
             </div>
@@ -3693,7 +3894,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L96">examples/hotel-booking/test_hotel_booking.py:96</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L96">examples/hotel-booking/test_hotel_booking.py:96</a></div>
                 
               </div>
             </div>
@@ -3751,7 +3952,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L97">examples/hotel-booking/test_hotel_booking.py:97</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L97">examples/hotel-booking/test_hotel_booking.py:97</a></div>
                 
               </div>
             </div>
@@ -3795,13 +3996,14 @@ E     + unsupported payment method</pre>
                 
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/741741809722a78f7a3cb0a7ba30f3b2b5c58b19/examples/hotel-booking/test_hotel_booking.py#L129">examples/hotel-booking/test_hotel_booking.py:129</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/32cc7611707d691f51fee28fe3886ee3e9078773/examples/hotel-booking/test_hotel_booking.py#L129">examples/hotel-booking/test_hotel_booking.py:129</a></div>
                 
               </div>
             </div>
           </div>
         </div>
         
+      
         </div>
       </div>
       <div class="entry-name entry-name-sizer" aria-hidden="true"><span class="term-name">Organizer</span><span class="term-name">Guest</span><span class="term-name">Booking System</span><span class="term-name">Room</span><span class="term-name">Booking</span><span class="term-name">Payment</span><span class="term-name">Confirmation</span><span class="term-name">confirm</span><span class="term-name">decline</span><span class="term-name">cancel</span><span class="term-name">refund</span><span class="term-name">rebook</span><span class="term-name">redeems</span><span class="term-name">loyalty points</span></div>
@@ -3835,10 +4037,6 @@ E     + unsupported payment method</pre>
 </div>
 
 
-<!-- Names the parts of an arriving link this report no longer has. The live
-     region stays put so the message inserted into it is announced; the
-     countdown bar's animation is the timer, so hovering or focusing the
-     snackbar pauses both. -->
 <div class="snackbar-region" role="status" aria-live="polite">
   <template x-if="staleLink">
     <div class="snackbar">
@@ -3857,7 +4055,7 @@ E     + unsupported payment method</pre>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-31T13:38:01.607410+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"rebook\",\"canonical\":\"rebook\",\"kind\":\"activity\",\"definition\":\"Restore a cancelled booking for the same rooms and dates.\",\"definition_html\":\"Restore a cancelled booking for the same rooms and dates.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A search offers only the available rooms\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A paid booking is confirmed to every guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\",\"ticket/HB-17\"],\"status\":\"failed\",\"search_text\":\"A declined payment leaves the booking pending\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Cancelling a paid booking refunds it and notifies the guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"xfailed\",\"search_text\":\"Rebooking restores a cancelled booking\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\"],\"status\":\"passed\",\"search_text\":\"A booking can be cancelled only before its guest checks in\"}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"rebook\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"rebook\":[\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\":{\"cancel-a-booking\":[4]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\",\"cancel-a-booking:4\":\"Cancel a Booking, sentence 4: Alice asks to rebook Booking\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/rebook_cancelled_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"A search offers only the available rooms\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"A paid booking is confirmed to every guest\"],[\"\\u274c\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined\",\"A declined payment leaves the booking pending\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"Cancelling a paid booking refunds it and notifies the guest\"],[\"\\ud83d\\udd35\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"Rebooking restores a cancelled booking\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"A booking can be cancelled only before its guest checks in\"]],\"tag\":{\"error-handling\":[\"\\u274c [error-handling](\",\"#tag=error-handling) (1 \\u2705 \\u00b7 1 \\u274c)\"],\"ticket\":[\"\\u274c [ticket](\",\"#tag=ticket) (1 \\u274c)\"],\"ticket/HB-17\":[\"\\u274c [ticket/HB-17](\",\"#tag=ticket/HB-17) (1 \\u274c)\"]},\"story\":{\"book-a-group-trip\":[\"\\u274c [Book a Group Trip](\",\"#view=stories&story=book-a-group-trip) (3 \\u2705 \\u00b7 1 \\u274c)\"],\"cancel-a-booking\":[\"\\ud83d\\udd35 [Cancel a Booking](\",\"#view=stories&story=cancel-a-booking) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"]}},\"cited_scenario_ids\":{\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T07:40:57.833991+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more rooms.\",\"definition_html\":\"A reservation for one or more rooms.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful booking.\",\"definition_html\":\"Notification of a successful booking.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid booking so its rooms are held for arrival.\",\"definition_html\":\"Guarantee a paid booking so its rooms are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a payment, leaving its booking pending.\",\"definition_html\":\"Refuse a payment, leaving its booking pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a booking before arrival.\",\"definition_html\":\"Withdraw a booking before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the payment for a cancelled booking.\",\"definition_html\":\"Return the payment for a cancelled booking.\"},{\"id\":\"rebook\",\"canonical\":\"rebook\",\"kind\":\"activity\",\"definition\":\"Restore a cancelled booking for the same rooms and dates.\",\"definition_html\":\"Restore a cancelled booking for the same rooms and dates.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A search offers only the available rooms\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A paid booking is confirmed to every guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\",\"ticket/HB-17\"],\"status\":\"failed\",\"search_text\":\"A declined payment leaves the booking pending\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Cancelling a paid booking refunds it and notifies the guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"xfailed\",\"search_text\":\"Rebooking restores a cancelled booking\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\"],\"status\":\"passed\",\"search_text\":\"A booking can be cancelled only before its guest checks in\"}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"rebook\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"rebook\":[\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\":{\"cancel-a-booking\":[4]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\",\"cancel-a-booking:4\":\"Cancel a Booking, sentence 4: Alice asks to rebook Booking\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/rebook_cancelled_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"A search offers only the available rooms\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"A paid booking is confirmed to every guest\"],[\"\\u274c\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined\",\"A declined payment leaves the booking pending\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"Cancelling a paid booking refunds it and notifies the guest\"],[\"\\ud83d\\udd35\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"Rebooking restores a cancelled booking\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"A booking can be cancelled only before its guest checks in\"]],\"tag\":{\"error-handling\":[\"\\u274c [error-handling](\",\"#tag=error-handling) (1 \\u2705 \\u00b7 1 \\u274c)\"],\"ticket\":[\"\\u274c [ticket](\",\"#tag=ticket) (1 \\u274c)\"],\"ticket/HB-17\":[\"\\u274c [ticket/HB-17](\",\"#tag=ticket/HB-17) (1 \\u274c)\"]},\"story\":{\"book-a-group-trip\":[\"\\u274c [Book a Group Trip](\",\"#view=stories&story=book-a-group-trip) (3 \\u2705 \\u00b7 1 \\u274c)\"],\"cancel-a-booking\":[\"\\ud83d\\udd35 [Cancel a Booking](\",\"#view=stories&story=cancel-a-booking) (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"]}},\"cited_scenario_ids\":{\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -4250,19 +4448,25 @@ function reportApp() {
       }
     },
     get filterSummary() {
+
+      const parts = this._summaryParts();
+      if (parts.length) return parts.join('\u2003');
+
+
+      return this._chipped() ? '' : 'All Scenarios';
+    },
+    _summaryParts() {
       const parts = [];
       const shown = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shown.length !== statusesPresent.length) {
         parts.push(shown.length ? shown.map(s => STATUS_LABELS[s]).join(', ') : 'no statuses');
       }
       if (this.search) parts.push('"' + this.search + '"');
-
-
-
-      if (parts.length) return parts.join('\u2003');
-      const chipped = this.termFilters.length || this.tagFilters.length
+      return parts;
+    },
+    _chipped() {
+      return this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.sentenceFilter;
-      return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -4281,11 +4485,7 @@ function reportApp() {
 
 
     _visible() {
-      const state = [
-        ...STATUSES.map(s => this.shownStatuses[s]),
-        this.moduleFilter, this.sentenceFilter, this.search,
-        this.tagFilters, this.termFilters,
-      ];
+      const state = this._filterState();
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
         return visibleCache.value;
       }
@@ -4296,6 +4496,14 @@ function reportApp() {
       }
       visibleCache = { state, value };
       return value;
+    },
+
+    _filterState() {
+      return [
+        ...STATUSES.map(s => this.shownStatuses[s]),
+        this.moduleFilter, this.sentenceFilter, this.search,
+        this.tagFilters, this.termFilters,
+      ];
     },
 
 
@@ -4510,7 +4718,7 @@ function reportApp() {
     },
     goToTerm(id) {
 
-      if (!Object.hasOwn(termNames, id)) return;
+      if (!this._hasTermEntry(id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
@@ -4835,7 +5043,7 @@ function reportApp() {
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();
-        this.goToTerm(pill.dataset.termId);
+        this.goToTerm(this._refEntry(pill));
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -4919,7 +5127,7 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = scope.querySelector('.param-table');
+        const table = this._phaseTable(scope);
         if (table) redraw.observe(table);
       });
       document.addEventListener('pointerout', (event) => {
@@ -4933,7 +5141,7 @@ function reportApp() {
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = scope.querySelector('.param-table');
+      const table = this._phaseTable(scope);
       if (!table) return;
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
@@ -4969,6 +5177,24 @@ function reportApp() {
     },
 
 
+    _phaseTable(scope) {
+      return scope.querySelector('.param-table');
+    },
+
+
+    _tipTerm(pill) {
+      return termsById.get(pill.dataset.termId);
+    },
+
+
+    _hasTermEntry(id) {
+      return Object.hasOwn(termNames, id);
+    },
+    _refEntry(pill) {
+      return pill.dataset.termId;
+    },
+
+
 
 
     _initTermTooltip() {
@@ -4980,7 +5206,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = termsById.get(pill.dataset.termId);
+        const term = this._tipTerm(pill);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';
@@ -5055,7 +5281,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => Object.hasOwn(termNames, id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {
@@ -5077,6 +5303,9 @@ function reportApp() {
       this.$nextTick(() => { this.staleLink = stale; });
     },
     _writeHash(mode = 'push') {
+      serializeHash(this._hashParams(), mode);
+    },
+    _hashParams() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
@@ -5091,7 +5320,7 @@ function reportApp() {
       }
 
       if (this.search) params.set('q', this.search);
-      serializeHash(params, mode);
+      return params;
     },
   };
 }
