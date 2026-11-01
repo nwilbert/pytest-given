@@ -1868,3 +1868,50 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
    children's indent rather than out in the margin, where it would escape. */
 .delta .step-children { position: relative; }
 .delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
+
+/* A changed parameter table: each side's table under its caption, side by
+   side, a case on one line across them (`delta.js` evens out the rows). Top
+   aligned, since evening out grows a row past its content. */
+.delta-tables {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  margin: var(--space-md) 0 0 var(--space-xl);
+}
+.delta-table { min-width: 0; }
+.delta-table .param-table { margin: 0; max-width: 100%; }
+.delta-table .param-table th,
+.delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
+.delta-table-caption {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-bottom: var(--space-xs);
+}
+.delta-table .param-table th .delta-was { display: block; }
+.delta-table .param-table del { text-decoration-color: var(--removed-line); }
+/* An added or removed case's row in its change's tint; every case's ID is led
+   by its change's glyph, a changed one's in the card's amber. */
+.delta-table .param-table tr[data-change="added"] { --change-ink: var(--added-ink); background: var(--added-tint); }
+.delta-table .param-table tr[data-change="removed"] { --change-ink: var(--removed-ink); background: var(--removed-tint); }
+.delta-row-lead {
+  display: inline-block;
+  width: 1ch;
+  margin-right: var(--space-xs);
+  font-weight: 700;
+  color: var(--change-ink);
+}
+/* A changed cell, ID or status, red on the before side and green on the
+   after, so the old and new values face each other; an added column's
+   cells green throughout. A hovered column's highlight still shows. */
+.delta-table .param-table td[data-change="added"]:not(.param-highlight),
+.delta-table .param-table th[data-change="added"]:not(.param-highlight) { background: var(--added-tint); }
+.delta-table .param-table td[data-change="removed"]:not(.param-highlight),
+.delta-table .param-table th[data-change="removed"]:not(.param-highlight) { background: var(--removed-tint); }
+.delta-table .param-table thead th[data-change="added"] { color: var(--added-ink); }
+.delta-table .param-table thead th[data-change="removed"] { color: var(--removed-ink); }
+/* A case the side lacks, hatched; opaque, so a hovered row's tint stays off. */
+.delta-placeholder-row td {
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
+}

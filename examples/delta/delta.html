@@ -1902,6 +1902,53 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 .delta .step-children .delta-step:not([data-change="equal"]) > .step-text::before { left: 2px; }
 
 
+
+
+.delta-tables {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  margin: var(--space-md) 0 0 var(--space-xl);
+}
+.delta-table { min-width: 0; }
+.delta-table .param-table { margin: 0; max-width: 100%; }
+.delta-table .param-table th,
+.delta-table .param-table td { vertical-align: top; padding-inline: var(--space-sm); }
+.delta-table-caption {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-bottom: var(--space-xs);
+}
+.delta-table .param-table th .delta-was { display: block; }
+.delta-table .param-table del { text-decoration-color: var(--removed-line); }
+
+
+.delta-table .param-table tr[data-change="added"] { --change-ink: var(--added-ink); background: var(--added-tint); }
+.delta-table .param-table tr[data-change="removed"] { --change-ink: var(--removed-ink); background: var(--removed-tint); }
+.delta-row-lead {
+  display: inline-block;
+  width: 1ch;
+  margin-right: var(--space-xs);
+  font-weight: 700;
+  color: var(--change-ink);
+}
+
+
+
+.delta-table .param-table td[data-change="added"]:not(.param-highlight),
+.delta-table .param-table th[data-change="added"]:not(.param-highlight) { background: var(--added-tint); }
+.delta-table .param-table td[data-change="removed"]:not(.param-highlight),
+.delta-table .param-table th[data-change="removed"]:not(.param-highlight) { background: var(--removed-tint); }
+.delta-table .param-table thead th[data-change="added"] { color: var(--added-ink); }
+.delta-table .param-table thead th[data-change="removed"] { color: var(--removed-ink); }
+
+.delta-placeholder-row td {
+  background: repeating-linear-gradient(135deg, var(--border) 0 1px, var(--bg-page) 1px 6px);
+}
+
+
 </style>
 </head><body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
@@ -1914,7 +1961,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
   <header class="topbar">
     <div class="topbar-title" title="Delta Example">Delta Example</div>
     <div class="topbar-meta">
-      <span class="delta-range">v1 2026-10-31T18:57:26.661912+00:00 to v2 2026-10-31T18:57:27.067607+00:00</span>
+      <span class="delta-range">v1 2026-11-01T07:17:51.315433+00:00 to v2 2026-11-01T07:17:51.754604+00:00</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
@@ -2245,7 +2292,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
        data-change="changed"
        x-show="isVisible(5)"
        id="scenario-5"
-       data-scenario-id="test_delta_booking.py::test_payment_declined[credit-card]">
+       data-scenario-id="test_delta_booking.py::test_payment_declined[credit]">
     <div class="scenario-header" @click="toggleScenario(5)">
       <div style="display:flex; align-items:center;">
         <button type="button" class="disclosure-btn" aria-controls="scenario-body-5" :aria-expanded="!!expandedScenarios[5]" :aria-label="(expandedScenarios[5] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario(5)"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[5] }"></span></button>
@@ -2258,7 +2305,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">37ms</span>
+        <span class="scenario-duration">46ms</span>
       </span>
     </div>
 
@@ -2272,59 +2319,216 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
               <div class="delta-step" data-change="equal"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="delta-step" data-change="modified"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span><ins class="delta-words"> with a fee of <span class="param-color-3" data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
+              <div class="delta-step" data-change="modified"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> submits the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> by <span class="param-color-0" data-param="payment_method" data-subst="payment_method">{payment_method}</span> with a <del class="delta-words" data-term-side="before">deposit</del><ins class="delta-words">fee</ins> of <del class="delta-words" data-term-side="before"><span class="param-color-1" data-param="before:derived:0">{deposit}</span></del><ins class="delta-words"><span class="param-color-4" data-param="derived:0" data-subst="derived:0">{fee}</span></ins></div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="delta-step" data-change="equal"><div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-4" data-param="reason" data-subst="reason">{reason}</span></div></div>
+              <div class="delta-step" data-change="equal"><div class="step-text">the hotel declines the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">Payment</span> because of <span class="param-color-5" data-param="reason" data-subst="reason">{reason}</span></div></div>
             </div><div class="phase-steps">
               <div class="delta-step" data-change="equal"><div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> stays pending</div></div>
             </div></div></div>
 
       
-      
-      <div class="param-table-scroll">
-      <table class="param-table">
-        <thead>
+      <div class="delta-tables">
+        <div class="delta-table" data-side="before">
+          <div class="delta-table-caption">Before: v1 2026-11-01T07:17:51.315433+00:00</div>
+          <div class="param-table-scroll">
+          <table class="param-table">
+            <thead data-band="head">
+              <tr>
+                <th class="param-id">case ID</th>
+                <th data-param="payment_method">payment_method</th>
+                <th data-param="before:derived:0" data-change="removed"><del>deposit</del></th>
+                <th data-param="reason">decline_reason</th>
+                <th data-param="amount">amount</th>
+                <th class="param-status">status</th>
+              </tr>
+            </thead>
+            <tbody data-band="0">
+              <tr data-case-row>
+                <th scope="row" class="param-id" data-change="removed">
+                  <span class="delta-row-lead">~</span>credit-card</th>
+                
+            
+            <td data-param="payment_method">credit card</td>
+            
+                
+            
+            <td data-param="before:derived:0">60</td>
+            
+                
+            
+            <td data-param="reason">insufficient funds</td>
+            
+                
+            
+            <td data-param="amount">120</td>
+            
+                <td class="param-status"><span class="dot-passed">✓</span></td>
+              </tr>
+              
+          
+          
+          
+          
+          
+          
+          
+          
+            </tbody>
+            <tbody data-band="1">
+              <tr data-case-row>
+                <th scope="row" class="param-id">
+                  <span class="delta-row-lead">~</span>debit-card</th>
+                
+            
+            <td data-param="payment_method">debit card</td>
+            
+                
+            
+            <td data-param="before:derived:0">40</td>
+            
+                
+            
+            <td data-param="reason">expired card</td>
+            
+                
+            
+            <td data-param="amount" data-change="removed">80</td>
+            
+                <td class="param-status"><span class="dot-passed">✓</span></td>
+              </tr>
+              
+          
+          
+          
+          
+          
+          
+          
+          
+            </tbody>
+            <tbody data-band="2">
+              <tr data-case-row data-change="removed">
+                <th scope="row" class="param-id">
+                  <span class="delta-row-lead">−</span><del>bank-transfer</del></th>
+                
+            
+            <td data-param="payment_method">bank transfer</td>
+            
+                
+            
+            <td data-param="before:derived:0">150</td>
+            
+                
+            
+            <td data-param="reason">fraud check failed</td>
+            
+                
+            
+            <td data-param="amount">300</td>
+            
+                <td class="param-status"><span class="dot-passed">✓</span></td>
+              </tr>
+              
+          
+          
+          
+          
+          
+          
+          
+          
+            </tbody>
+            <tbody data-band="3">
+              <tr data-case-row>
+                <th scope="row" class="param-id">
+                  <span class="delta-row-lead">~</span>gift-card</th>
+                
+            
+            <td data-param="payment_method">gift card</td>
+            
+                
+            
+            <td data-param="before:derived:0"></td>
+            
+                
+            
+            <td data-param="reason">partial balance</td>
+            
+                
+            
+            <td data-param="amount">50</td>
+            
+                <td class="param-status" data-change="removed"><span class="dot-xfailed">⊗</span></td>
+              </tr>
+              
           <tr>
-            <th class="param-id" data-block="frame">case ID</th>
-            
-            <th data-param="payment_method" data-block="1">payment_method</th>
-            
-            <th data-param="derived:0" data-block="1">fee</th>
-            
-            <th data-param="reason" data-block="2">reason</th>
-            
-            <th data-param="amount" data-block="2">amount</th>
-            
-            <th class="param-status" data-block="frame">status</th>
+            <td colspan="6">
+              <div class="error-block xfailed">
+      <div class="error-message">gift cards are not wired into payments yet</div><div class="error-frames"><div class="error-frame">
+            <div class="error-frame-loc">test_delta_booking.py:115: in test_payment_declined</div>
+            <pre class="error-frame-code">    response = submit_payment(payment_method, amount, decline_reason)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>
+          </div><div class="error-frame">
+            <div class="error-frame-loc">test_delta_booking.py:87: in submit_payment</div>
+            <pre class="error-frame-code">    raise NotImplementedError(&#39;gift cards are not wired into payments yet&#39;)</pre>
+          </div></div><pre class="error-tail">E   NotImplementedError: gift cards are not wired into payments yet</pre>
+    </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <tr data-case-row class="">
-            <th scope="row" class="param-id" data-block="frame">credit-card</th>
-            
-            
+          
+          
+          
+          
+          
+          
+          
+          
+          
+            </tbody>
+            <tbody data-band="4">
+              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="6"></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <div class="delta-table" data-side="after">
+          <div class="delta-table-caption">After: v2 2026-11-01T07:17:51.754604+00:00</div>
+          <div class="param-table-scroll">
+          <table class="param-table">
+            <thead data-band="head">
+              <tr>
+                <th class="param-id" data-block="frame">case ID</th>
+                <th data-param="payment_method" data-block="1">payment_method</th>
+                <th data-param="derived:0" data-block="1" data-change="added">+fee</th>
+                <th data-param="reason" data-block="2">reason<span class="delta-was">was <del>decline_reason</del></span></th>
+                <th data-param="amount" data-block="2">amount</th>
+                <th class="param-status" data-block="frame">status</th>
+              </tr>
+            </thead>
+            <tbody data-band="0">
+              <tr data-case-row>
+                <th scope="row" class="param-id" data-block="frame" data-change="added">
+                  <span class="delta-row-lead">~</span>credit</th>
+                
             
             <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
             
+                
             
+            <td data-param="derived:0" data-block="1" data-subst="derived:0" data-change="added">12</td>
             
-            
-            <td data-param="derived:0" data-block="1" data-subst="derived:0">12</td>
-            
-            
-            
+                
             
             <td data-param="reason" data-block="2" data-subst="reason">insufficient funds</td>
             
-            
-            
+                
             
             <td data-param="amount" data-block="2" data-subst="amount">120</td>
             
-            
-            <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
-          </tr>
+                <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
+              </tr>
+              
           
           
           
@@ -2333,32 +2537,30 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           
           
           
-          
-          <tr data-case-row class="">
-            <th scope="row" class="param-id" data-block="frame">debit-card</th>
-            
-            
+            </tbody>
+            <tbody data-band="1">
+              <tr data-case-row>
+                <th scope="row" class="param-id" data-block="frame">
+                  <span class="delta-row-lead">~</span>debit-card</th>
+                
             
             <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
             
+                
             
+            <td data-param="derived:0" data-block="1" data-subst="derived:0" data-change="added">9</td>
             
-            
-            <td data-param="derived:0" data-block="1" data-subst="derived:0">9</td>
-            
-            
-            
+                
             
             <td data-param="reason" data-block="2" data-subst="reason">expired card</td>
             
+                
             
+            <td data-param="amount" data-block="2" data-subst="amount" data-change="added">95</td>
             
-            
-            <td data-param="amount" data-block="2" data-subst="amount">95</td>
-            
-            
-            <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
-          </tr>
+                <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
+              </tr>
+              
           
           
           
@@ -2367,33 +2569,33 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           
           
           
-          
-          <tr data-case-row class="failed-row">
-            <th scope="row" class="param-id" data-block="frame">gift-card</th>
-            
-            
+            </tbody>
+            <tbody data-band="2">
+              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="6"></td></tr>
+            </tbody>
+            <tbody data-band="3">
+              <tr data-case-row>
+                <th scope="row" class="param-id" data-block="frame">
+                  <span class="delta-row-lead">~</span>gift-card</th>
+                
             
             <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
             
+                
             
+            <td data-param="derived:0" data-block="1" data-change="added"></td>
             
-            
-            <td data-param="derived:0" data-block="1"></td>
-            
-            
-            
+                
             
             <td data-param="reason" data-block="2" data-subst="reason">partial balance</td>
             
-            
-            
+                
             
             <td data-param="amount" data-block="2" data-subst="amount">50</td>
             
-            
-            <td class="param-status" data-block="frame"><span class="dot-failed">✗</span></td>
-          </tr>
-          
+                <td class="param-status" data-block="frame" data-change="added"><span class="dot-failed">✗</span></td>
+              </tr>
+              
           <tr>
             <td colspan="6">
               <div class="error-block failed">
@@ -2417,31 +2619,30 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           
           
           
-          <tr data-case-row class="">
-            <th scope="row" class="param-id" data-block="frame">voucher</th>
-            
-            
+            </tbody>
+            <tbody data-band="4">
+              <tr data-case-row data-change="added">
+                <th scope="row" class="param-id" data-block="frame">
+                  <span class="delta-row-lead">+</span>voucher</th>
+                
             
             <td data-param="payment_method" data-block="1" data-subst="payment_method">voucher</td>
             
+                
             
+            <td data-param="derived:0" data-block="1" data-subst="derived:0" data-change="added">4</td>
             
-            
-            <td data-param="derived:0" data-block="1" data-subst="derived:0">4</td>
-            
-            
-            
+                
             
             <td data-param="reason" data-block="2" data-subst="reason">voucher expired</td>
             
-            
-            
+                
             
             <td data-param="amount" data-block="2" data-subst="amount">40</td>
             
-            
-            <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
-          </tr>
+                <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
+              </tr>
+              
           
           
           
@@ -2450,10 +2651,10 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
           
           
           
-          
-          
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+          </div>
+        </div>
       </div>
       
 
@@ -2495,7 +2696,7 @@ del.delta-words + ins.delta-words { margin-left: 2px; }
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-10-31T18:57:27.067607+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"}]},\"before_terms\":[{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T07:17:51.754604+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"}]},\"before_terms\":[{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -3567,7 +3768,7 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = scope.querySelector('.param-table');
+        const table = this._phaseTable(scope);
         if (table) redraw.observe(table);
       });
       document.addEventListener('pointerout', (event) => {
@@ -3581,7 +3782,7 @@ function reportApp() {
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = scope.querySelector('.param-table');
+      const table = this._phaseTable(scope);
       if (!table) return;
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
@@ -3614,6 +3815,11 @@ function reportApp() {
         outline.style.height = `${bottom - top}px`;
         wrap.appendChild(outline);
       }
+    },
+
+
+    _phaseTable(scope) {
+      return scope.querySelector('.param-table');
     },
 
 
@@ -3814,9 +4020,36 @@ function deltaApp() {
     goToTerm(id) {
       if (hasTerms()) base.goToTerm.call(this, id);
     },
+
+
+    _phaseTable(scope) {
+      if (!scope.querySelector('.delta-tables')) return base._phaseTable.call(this, scope);
+      return scope.querySelector('.delta-table[data-side="after"] .param-table');
+    },
     init() {
       base.init.call(this);
       this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this._initTableAlignment();
+    },
+
+
+
+
+    _initTableAlignment() {
+      for (const pair of document.querySelectorAll('.delta-tables')) {
+        const tables = pair.querySelectorAll('.param-table');
+        if (tables.length !== 2) continue;
+        let queued = false;
+        const observer = new ResizeObserver(() => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => {
+            queued = false;
+            alignBands(...tables);
+          });
+        });
+        tables.forEach(table => observer.observe(table));
+      }
     },
     _readHash() {
       base._readHash.call(this);
@@ -3839,6 +4072,30 @@ function deltaApp() {
 
   const app = Object.defineProperties({},Object.getOwnPropertyDescriptors(base));
   return Object.defineProperties(app, Object.getOwnPropertyDescriptors(overrides));
+}
+
+
+
+
+function alignBands(before, after) {
+  const beforeBands = before.querySelectorAll('[data-band]');
+  const afterBands = after.querySelectorAll('[data-band]');
+
+  if (beforeBands.length !== afterBands.length) {
+    console.assert(false, 'delta tables have unequal bands', before, after);
+    return;
+  }
+  const pairs = [...beforeBands].map((band, i) => [band, afterBands[i]]);
+  const lastRows = pairs.map(pair => pair.map(band => band.rows[band.rows.length - 1]));
+  for (const row of lastRows.flat()) row.style.height = '';
+  const bandHeights = pairs.map(pair => pair.map(band => band.getBoundingClientRect().height));
+  const rowHeights = lastRows.map(rows => rows.map(row => row.getBoundingClientRect().height));
+  bandHeights.forEach(([beforeHeight, afterHeight], i) => {
+    const gap = Math.abs(beforeHeight - afterHeight);
+    if (gap < 0.5) return;
+    const shorter = beforeHeight < afterHeight ? 0 : 1;
+    lastRows[i][shorter].style.height = `${rowHeights[i][shorter] + gap}px`;
+  });
 }
 
 </script>

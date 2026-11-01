@@ -519,15 +519,18 @@ def make_source_url_filter(
 def make_narration_filter(
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
+    *,
+    substitutes: bool = True,
 ) -> Callable[[Narration], Markup]:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
+    Without `substitutes` a placeholder takes no row's value on hover.
 
     Usage: `{{ step.narration | narration }}`.
     """
 
     def _render(narration: Narration) -> Markup:
         out = [
-            _render_narration_piece(piece, param_color_map, glossary)
+            _render_narration_piece(piece, param_color_map, glossary, substitutes)
             for piece in read_narration(narration)
         ]
         return Markup(''.join(out))
@@ -539,6 +542,7 @@ def _render_narration_piece(
     part: NarrationPiece,
     param_color_map: ParamColorMap,
     glossary: Glossary | None,
+    substitutes: bool,
 ) -> str:
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
@@ -560,10 +564,10 @@ def _render_narration_piece(
             # would be an injection, since Alpine compiles a directive's
             # *decoded* attribute text as JS.
             safe_id = escape(column_id)
+            subst = f' data-subst="{safe_id}"' if substitutes else ''
             return (
                 f'<span class="param-color-{color_idx}" '
-                f'data-param="{safe_id}" '
-                f'data-subst="{safe_id}"'
+                f'data-param="{safe_id}"{subst}'
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():

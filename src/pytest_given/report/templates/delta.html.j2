@@ -12,7 +12,7 @@
 <div class="main">
 
   {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, scenario_steps, param_table, stale_link_snackbar with context -%}
-  {%- from '_delta_macros.html.j2' import delta_steps with context -%}
+  {%- from '_delta_macros.html.j2' import delta_steps, param_table_delta with context -%}
   {{ icon_sprite() }}
   
   <header class="topbar">
@@ -113,7 +113,8 @@
   {%- set before = item.delta.before -%}
   {%- set index = loop.index0 -%}
   {%- set reasons = item.reasons -%}
-  {%- set has_body = scenario.steps or scenario.parameters or scenario.error or reasons -%}
+  {%- set table = item.table -%}
+  {%- set has_body = scenario.steps or scenario.parameters or table or scenario.error or reasons -%}
   <div class="scenario{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
        data-change="{{ item.change }}"{% if item.side == 'before' %} data-term-side="before"{% endif %}
        x-show="isVisible({{ index }})"
@@ -124,7 +125,7 @@
         {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ index }}" :aria-expanded="!!expandedScenarios[{{ index }}]" :aria-label="(expandedScenarios[{{ index }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ index }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ index }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
         <span class="delta-title">
           {%- if item.change == 'removed' %}
-          <del class="scenario-title">{{ scenario.narration | narration('before') }}</del>
+          <del class="scenario-title">{{ scenario.narration | narration(item.text_side) }}</del>
           {%- else %}
           <span class="scenario-title">{{ scenario.narration | narration('after') }}</span>
           {%- if item.delta.title_changed %}
@@ -173,9 +174,11 @@
       </div>
       {%- endfor %}
       {%- set blocks = item.step_blocks %}
-      {% if blocks is not none %}{{ delta_steps(blocks, index) }}{% else %}{{ scenario_steps(scenario, index, item.side) }}{% endif %}
+      {% if blocks is not none %}{{ delta_steps(blocks, index) }}{% else %}{{ scenario_steps(scenario, index, item.text_side) }}{% endif %}
 
-      {% if scenario.parameters %}
+      {% if table %}
+      {{ param_table_delta(table, scenario, index) }}
+      {% elif scenario.parameters %}
       {{ param_table(scenario, index) }}
       {% endif %}
 

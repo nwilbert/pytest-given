@@ -16,7 +16,10 @@ import jinja2
 from markupsafe import Markup
 
 from ..model import (
+    AttachmentRef,
+    CasePair,
     Change,
+    ColumnId,
     DeltaData,
     DeltaSide,
     DiffSegment,
@@ -24,8 +27,13 @@ from ..model import (
     GlossaryTerm,
     Mark,
     Narration,
+    NarrationPart,
+    NarrationPlaceholder,
     NodeId,
+    ParameterCase,
     ParameterColumn,
+    ParameterDelta,
+    ParameterTable,
     Phase,
     ReportData,
     Scenario,
@@ -64,6 +72,16 @@ _CHANGE_GLYPH: dict[Change, str] = {
 }
 
 type Side = Literal['before', 'after']
+# Which glossary a text reads against, and whether a hovered row previews its
+# values in it. `before` is a changed scenario's before text, which no row
+# previews into: its placeholders share their keys with the after table's
+# columns. `removed` is a removed scenario's, previewing from its own table.
+type TextSide = Literal['before', 'after', 'removed']
+type ColumnChange = Literal['added', 'removed']
+
+# Prefixes a column only the before side has, where the page keys it: the after
+# side can hold another column of the same ID.
+_BEFORE_ONLY_KEY = 'before:'
 
 
 @dataclass(frozen=True)
@@ -105,7 +123,55 @@ class StepBlock:
 
 
 @dataclass(frozen=True)
+class TableColumn:
+    column: ParameterColumn
+    # A column only this side's table has. Attachment columns stay unmarked.
+    change: ColumnChange | None = None
+    was: str | None = None  # a renamed column's before name, on the after side
+
+
+@dataclass(frozen=True)
+class TableSide:
+    side: Side
+    parameters: ParameterTable
+    columns: list[TableColumn]
+
+
+@dataclass(frozen=True)
+class TableRow:
+    """A case's line across the tables, None on a side without the case."""
+
+    before_case: ParameterCase | None
+    after_case: ParameterCase | None
+    pair: CasePair
+
+    @property
+    def change(self) -> Change | None:
+        if self.before_case is None:
+            return 'added'
+        if self.after_case is None:
+            return 'removed'
+        pair = self.pair
+        changed = pair.changed_cells or pair.id_changed or pair.status_changed
+        return 'changed' if changed else None
+
+    def case(self, side: Side) -> ParameterCase | None:
+        return self.before_case if side == 'before' else self.after_case
+
+
+@dataclass(frozen=True)
+class TableView:
+    """A changed scenario's parameter tables: a side for each table there is,
+    the rows lined up by case in the after order."""
+
+    sides: list[TableSide]
+    rows: list[TableRow]
+
+
+@dataclass(frozen=True)
 class ListedScenario:
+    # A changed scenario's before side carries its columns as the page keys
+    # them (`_BeforeKeys`).
     delta: ScenarioDelta
     # Prefixed `removed-` for a removed scenario, so a removed and an added
     # scenario sharing one node ID still have a slug each.
@@ -119,6 +185,11 @@ class ListedScenario:
     def side(self) -> Side:
         """The side shown: after, or before for a removed scenario."""
         return 'before' if self.delta.after is None else 'after'
+
+    @property
+    def text_side(self) -> TextSide:
+        """How the shown scenario's own text, title and steps, renders."""
+        return 'removed' if self.delta.after is None else 'after'
 
     @property
     def shown(self) -> Scenario:
@@ -137,6 +208,14 @@ class ListedScenario:
         if self.change != 'changed':
             return None
         return _step_blocks(self.delta)
+
+    @property
+    def table(self) -> TableView | None:
+        """A changed scenario's tables when they changed; None where a table
+        reads unmarked, as in the report, or there is none."""
+        if self.change != 'changed':
+            return None
+        return _table_view(self.delta)
 
     @property
     def reasons(self) -> list[ReasonRow]:
@@ -174,12 +253,14 @@ def delta_render_context(
     after = delta.metadata.after.metadata
     listed = _listed_scenarios(delta)
     module_changes = _module_changes(delta, listed)
+    side_labels: dict[Side, str] = {
+        'before': range_label(delta.metadata.before),
+        'after': range_label(delta.metadata.after),
+    }
     return {
         'title': after.title or after.project,
-        'range': (
-            f'{range_label(delta.metadata.before)} to '
-            f'{range_label(delta.metadata.after)}'
-        ),
+        'range': f'{side_labels["before"]} to {side_labels["after"]}',
+        'side_labels': side_labels,
         'listed': listed,
         'change_counts': {
             change: sum(item.change == change for item in listed)
@@ -217,7 +298,7 @@ def _listed_scenarios(delta: DeltaData) -> list[ListedScenario]:
     )
     return [
         ListedScenario(
-            listed,
+            _keyed(listed),
             after_slugs[listed.after.id]
             if listed.after is not None
             else 'removed-' + before_slugs[_removed(listed).id],
@@ -279,6 +360,193 @@ class _StepRows:
             words=step_delta.words,
             was_phase=was_phase,
             children=tuple(self.row(child) for child in step_delta.children),
+        )
+
+
+def _table_view(scenario_delta: ScenarioDelta) -> TableView | None:
+    before, after = scenario_delta.before, scenario_delta.after
+    assert before is not None
+    assert after is not None
+    parameters = scenario_delta.parameters
+    if parameters is None:
+        return _lone_table(before.parameters, after.parameters)
+    if not parameters.changed:
+        return None
+    assert before.parameters is not None
+    assert after.parameters is not None
+    removed = {pair.before for pair in parameters.columns if pair.after is None}
+    added = {pair.after for pair in parameters.columns if pair.before is None}
+    before_names = {column.id: column.name for column in before.parameters.columns}
+    after_names = {column.id: column.name for column in after.parameters.columns}
+    renamed_from = {
+        pair.after: before_names[pair.before]
+        for pair in parameters.columns
+        if pair.paired_by == 'values'
+        and pair.before is not None
+        and pair.after is not None
+        and before_names[pair.before] != after_names[pair.after]
+    }
+    before_cases = {case.id: case for case in before.parameters.cases}
+    after_cases = {case.id: case for case in after.parameters.cases}
+    return TableView(
+        sides=[
+            TableSide(
+                'before',
+                before.parameters,
+                [
+                    TableColumn(column, 'removed' if column.id in removed else None)
+                    for column in before.parameters.columns
+                ],
+            ),
+            TableSide(
+                'after',
+                after.parameters,
+                [
+                    TableColumn(
+                        column,
+                        'added' if column.id in added else None,
+                        renamed_from.get(column.id),
+                    )
+                    for column in after.parameters.columns
+                ],
+            ),
+        ],
+        rows=[
+            TableRow(
+                before_cases[pair.before] if pair.before is not None else None,
+                after_cases[pair.after] if pair.after is not None else None,
+                pair,
+            )
+            for pair in parameters.cases
+        ],
+    )
+
+
+def _lone_table(
+    before: ParameterTable | None, after: ParameterTable | None
+) -> TableView | None:
+    """The one table a scenario gained or lost with its parametrization, every
+    case of it added or removed."""
+    if before is not None:
+        return TableView(
+            [_unmarked_side('before', before)],
+            [TableRow(case, None, CasePair(before=case.id)) for case in before.cases],
+        )
+    if after is not None:
+        return TableView(
+            [_unmarked_side('after', after)],
+            [TableRow(None, case, CasePair(after=case.id)) for case in after.cases],
+        )
+    return None
+
+
+def _unmarked_side(side: Side, table: ParameterTable) -> TableSide:
+    return TableSide(side, table, [TableColumn(column) for column in table.columns])
+
+
+def _keyed(scenario_delta: ScenarioDelta) -> ScenarioDelta:
+    if scenario_delta.change != 'changed':
+        return scenario_delta
+    columns = scenario_delta.parameters.columns if scenario_delta.parameters else ()
+    keys = _BeforeKeys(
+        {
+            pair.before: pair.after
+            for pair in columns
+            if pair.before is not None and pair.after is not None
+        }
+    )
+    return keys.scenario_delta(scenario_delta)
+
+
+@dataclass(frozen=True)
+class _BeforeKeys:
+    """A changed scenario's before column IDs as the page keys them: a paired
+    column's after ID, so a placeholder on either side finds its column in
+    both tables, any other prefixed `before:`. `data-param` carries the key."""
+
+    paired: dict[ColumnId, ColumnId]
+
+    def scenario_delta(self, scenario_delta: ScenarioDelta) -> ScenarioDelta:
+        before = scenario_delta.before
+        assert before is not None
+        return dataclasses.replace(
+            scenario_delta,
+            before=dataclasses.replace(
+                before,
+                narration=self._narration(before.narration),
+                steps=[self._step(step) for step in before.steps],
+                parameters=self._table(before.parameters),
+            ),
+            steps=tuple(self._step_delta(step) for step in scenario_delta.steps),
+            parameters=self._parameter_delta(scenario_delta.parameters),
+        )
+
+    def _key(self, column_id: ColumnId) -> ColumnId:
+        return self.paired.get(column_id) or ColumnId(_BEFORE_ONLY_KEY + column_id)
+
+    def _parts(self, parts: tuple[NarrationPart, ...]) -> tuple[NarrationPart, ...]:
+        return tuple(
+            dataclasses.replace(part, column_id=self._key(part.column_id))
+            if isinstance(part, NarrationPlaceholder)
+            else part
+            for part in parts
+        )
+
+    def _narration(self, narration: Narration) -> Narration:
+        return dataclasses.replace(narration, parts=self._parts(narration.parts))
+
+    def _step(self, step: Step) -> Step:
+        return dataclasses.replace(
+            step,
+            narration=self._narration(step.narration),
+            children=[self._step(child) for child in step.children],
+            attachments=[
+                dataclasses.replace(
+                    attachment, column_id=self._key(attachment.column_id)
+                )
+                if isinstance(attachment, AttachmentRef)
+                else attachment
+                for attachment in step.attachments
+            ],
+        )
+
+    def _step_delta(self, step_delta: StepDelta) -> StepDelta:
+        """Only removed words read from the before side."""
+        return dataclasses.replace(
+            step_delta,
+            words=tuple(
+                dataclasses.replace(segment, parts=self._parts(segment.parts))
+                if segment.mark == 'removed'
+                else segment
+                for segment in step_delta.words
+            ),
+            children=tuple(self._step_delta(child) for child in step_delta.children),
+        )
+
+    def _table(self, table: ParameterTable | None) -> ParameterTable | None:
+        if table is None:
+            return None
+        return dataclasses.replace(
+            table,
+            columns=[
+                dataclasses.replace(column, id=self._key(column.id))
+                for column in table.columns
+            ],
+        )
+
+    def _parameter_delta(
+        self, parameters: ParameterDelta | None
+    ) -> ParameterDelta | None:
+        if parameters is None:
+            return None
+        return dataclasses.replace(
+            parameters,
+            columns=tuple(
+                dataclasses.replace(pair, before=self._key(pair.before))
+                if pair.before is not None
+                else pair
+                for pair in parameters.columns
+            ),
         )
 
 
@@ -378,13 +646,15 @@ def _build_env(
             if scenario is not None
         ]
     )
-    glossaries: dict[Side, Glossary | None] = {
-        'before': delta.glossary.before,
-        'after': delta.glossary.after,
-    }
     narration_filters = {
-        side: make_narration_filter(param_color_map, glossary)
-        for side, glossary in glossaries.items()
+        side: make_narration_filter(
+            param_color_map, glossary, substitutes=side != 'before'
+        )
+        for side, glossary in (
+            ('before', delta.glossary.before),
+            ('after', delta.glossary.after),
+            ('removed', delta.glossary.before),
+        )
     }
     # Compiled only for a side some scenario is shown from, so a `{sha}`
     # template fails only when a link would need the SHA a side lacks.
@@ -398,7 +668,7 @@ def _build_env(
         if side in shown_sides
     }
 
-    def narration(value: Narration, side: Side) -> Markup:
+    def narration(value: Narration, side: TextSide) -> Markup:
         return narration_filters[side](value)
 
     def source_url(value: SourceLocation | None, side: Side) -> str | None:

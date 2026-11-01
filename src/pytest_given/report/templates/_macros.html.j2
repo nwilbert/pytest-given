@@ -311,11 +311,26 @@
           <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
             {% if show_ids %}<th scope="row" class="param-id" data-block="frame">{{ case.id | case_id }}</th>{% endif %}
             {% for col, val in scenario.parameters.cells(case) %}
+            {{ param_cell(col, val, 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col_blocks[col.id] if col.id in col_blocks else none) }}
+            {% endfor %}
+            {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
+          </tr>
+          {{ case_extras(scenario.parameters, case, 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col', table_width) }}
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+  {%- endmacro -%}
+
+  {#- One cell of a case's row. `cell_id` keys an attachment's payload,
+      `block` is the column's phase block, `subst` whether a hovered row
+      previews the cell in the steps, and `change` the delta page's mark. -#}
+  {%- macro param_cell(col, val, cell_id, block, subst=true, change=none) -%}
             {% if col.kind == 'attachment' %}
-            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>
+            <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
-              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name, val.content_type) }}
+              {{ attachment_badge(cell_id, col.name, val.content_type) }}
               {% endif %}
             </td>
             {% else %}
@@ -324,11 +339,17 @@
                substituting that blank would erase the step's {token} instead of
                replacing it. A `param` cell always substitutes — `None` there is
                a real parametrize value. #}
-            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if subst and (col.kind == 'param' or val is not none) %} data-subst="{{ col.id }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
-            {% endfor %}
-            {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
-          </tr>
+  {%- endmacro -%}
+
+  {#- The rows under a case's own: its error, then a payload panel per
+      attachment, keyed `cell_prefix` and the column's position as its badge
+      is. A payload opens across the whole table rather than inside its
+      cell: an attachment is routinely wider than any column, and a cell that
+      holds one both squeezes the columns beside it (the collapsed content
+      still sizes the column) and clips what it cannot fit. -#}
+  {%- macro case_extras(parameters, case, cell_prefix, table_width) -%}
           {% if case.error %}
           <tr>
             <td colspan="{{ table_width }}">
@@ -336,14 +357,9 @@
             </td>
           </tr>
           {% endif %}
-          {#- A payload opens across the whole table rather than inside its
-              cell: an attachment is routinely wider than any column, and a
-              cell that holds one both squeezes the columns beside it (the
-              collapsed content still sizes the column) and clips what it
-              cannot fit. -#}
-          {% for col, val in scenario.parameters.cells(case) %}
+          {%- for col, val in parameters.cells(case) %}
           {% if col.kind == 'attachment' and val %}
-          {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
+          {% set cell_id = cell_prefix ~ loop.index0 %}
           <tr class="attachment-panel-row">
             <td class="attachment-panel" colspan="{{ table_width }}">
               <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
@@ -363,10 +379,6 @@
           </tr>
           {% endif %}
           {% endfor %}
-          {% endfor %}
-        </tbody>
-      </table>
-      </div>
   {%- endmacro -%}
 
   {#- Names the parts of an arriving link this report no longer has. The live

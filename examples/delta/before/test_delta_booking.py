@@ -3,7 +3,7 @@
 `examples/delta/after/` holds the same suite one release later. The `examples`
 session stages each version under the same relative path, runs both and builds
 the delta from the two reports. The changes between the versions are chosen so
-the delta shows every surface it has. See `given-renames.toml` for the two
+the delta shows every surface it has. See `given-renames.toml` for the
 renames the delta cannot find by itself.
 """
 
@@ -105,9 +105,13 @@ def submit_payment(method, amount, decline_reason):
     ],
 )
 def test_payment_declined(payment_method, decline_reason, amount):
+    deposit = amount // 2
     with given(t'{guest("Alice")} has a pending {booking}'):
         pending = {'paid': False}
-    with when(t'{guest("Alice")} submits the {payment} by {payment_method}'):
+    with when(
+        t'{guest("Alice")} submits the {payment} by {payment_method} '
+        t'with a deposit of {deposit}'
+    ):
         response = submit_payment(payment_method, amount, decline_reason)
     with then(t'the hotel declines the {payment} because of {decline_reason}'):
         assert response == decline_reason

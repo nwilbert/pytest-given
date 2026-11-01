@@ -1069,7 +1069,7 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = scope.querySelector('.param-table');
+        const table = this._phaseTable(scope);
         if (table) redraw.observe(table);
       });
       document.addEventListener('pointerout', (event) => {
@@ -1083,7 +1083,7 @@ function reportApp() {
     _outlinePhase(scope, block) {
       const safe = CSS.escape(block);
       scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = scope.querySelector('.param-table');
+      const table = this._phaseTable(scope);
       if (!table) return;
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
@@ -1116,6 +1116,11 @@ function reportApp() {
         outline.style.height = `${bottom - top}px`;
         wrap.appendChild(outline);
       }
+    },
+    // The table whose columns a phase block narrates; the delta page shows a
+    // before table beside it.
+    _phaseTable(scope) {
+      return scope.querySelector('.param-table');
     },
     // The term a ref's tooltip shows; the delta page reads some refs against
     // its before glossary.

@@ -3,7 +3,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-10-31T18:57:26.661912+00:00",
+        "timestamp": "2026-11-01T07:17:51.315433+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -19,7 +19,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-10-31T18:57:27.067607+00:00",
+        "timestamp": "2026-11-01T07:17:51.754604+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -33,7 +33,7 @@
       ]
     },
     "plugin_version": "0.5.1",
-    "timestamp": "2026-10-31T18:57:27.330686+00:00",
+    "timestamp": "2026-11-01T07:17:52.023644+00:00",
     "kind": "delta",
     "schema_version": 1
   },
@@ -1182,7 +1182,7 @@
           "error-handling"
         ],
         "status": "xfailed",
-        "duration_ms": 37,
+        "duration_ms": 47,
         "steps": [
           {
             "phase": "given",
@@ -1212,7 +1212,7 @@
           {
             "phase": "when",
             "narration": {
-              "text": "Alice submits the Payment by {payment_method}",
+              "text": "Alice submits the Payment by {payment_method} with a deposit of {deposit}",
               "parts": [
                 {
                   "term_id": "guest",
@@ -1233,6 +1233,15 @@
                 {
                   "name": "payment_method",
                   "column_id": "payment_method",
+                  "format_spec": "",
+                  "conversion": null
+                },
+                {
+                  "value": " with a deposit of "
+                },
+                {
+                  "name": "deposit",
+                  "column_id": "derived:0",
                   "format_spec": "",
                   "conversion": null
                 }
@@ -1304,6 +1313,11 @@
               "kind": "param"
             },
             {
+              "id": "derived:0",
+              "name": "deposit",
+              "kind": "derived"
+            },
+            {
               "id": "decline_reason",
               "name": "decline_reason",
               "kind": "param"
@@ -1319,6 +1333,7 @@
               "id": "test_delta_booking.py::test_payment_declined[credit-card]",
               "values": [
                 "credit card",
+                "60",
                 "insufficient funds",
                 120
               ],
@@ -1330,6 +1345,7 @@
               "id": "test_delta_booking.py::test_payment_declined[debit-card]",
               "values": [
                 "debit card",
+                "40",
                 "expired card",
                 80
               ],
@@ -1341,6 +1357,7 @@
               "id": "test_delta_booking.py::test_payment_declined[bank-transfer]",
               "values": [
                 "bank transfer",
+                "150",
                 "fraud check failed",
                 300
               ],
@@ -1352,6 +1369,7 @@
               "id": "test_delta_booking.py::test_payment_declined[gift-card]",
               "values": [
                 "gift card",
+                null,
                 "partial balance",
                 50
               ],
@@ -1361,7 +1379,7 @@
                 "frames": [
                   {
                     "path": "test_delta_booking.py",
-                    "lineno": 111,
+                    "lineno": 115,
                     "func": "test_payment_declined",
                     "code": "    response = submit_payment(payment_method, amount, decline_reason)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
                     "is_internal": false
@@ -1392,7 +1410,7 @@
         "pins": null
       },
       "after": {
-        "id": "test_delta_booking.py::test_payment_declined[credit-card]",
+        "id": "test_delta_booking.py::test_payment_declined[credit]",
         "narration": {
           "text": "A declined payment leaves the booking pending",
           "parts": []
@@ -1402,7 +1420,7 @@
           "error-handling"
         ],
         "status": "failed",
-        "duration_ms": 37,
+        "duration_ms": 46,
         "steps": [
           {
             "phase": "given",
@@ -1550,7 +1568,7 @@
           ],
           "cases": [
             {
-              "id": "test_delta_booking.py::test_payment_declined[credit-card]",
+              "id": "test_delta_booking.py::test_payment_declined[credit]",
               "values": [
                 "credit card",
                 "12",
@@ -1682,6 +1700,17 @@
                   "column_id": "payment_method",
                   "format_spec": "",
                   "conversion": null
+                },
+                {
+                  "value": " with a "
+                }
+              ]
+            },
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "value": "deposit"
                 }
               ]
             },
@@ -1689,8 +1718,32 @@
               "mark": "added",
               "parts": [
                 {
-                  "value": " with a fee of "
-                },
+                  "value": "fee"
+                }
+              ]
+            },
+            {
+              "mark": "equal",
+              "parts": [
+                {
+                  "value": " of "
+                }
+              ]
+            },
+            {
+              "mark": "removed",
+              "parts": [
+                {
+                  "name": "deposit",
+                  "column_id": "derived:0",
+                  "format_spec": "",
+                  "conversion": null
+                }
+              ]
+            },
+            {
+              "mark": "added",
+              "parts": [
                 {
                   "name": "fee",
                   "column_id": "derived:0",
@@ -1735,6 +1788,11 @@
             "paired_by": "name"
           },
           {
+            "before": "derived:0",
+            "after": null,
+            "paired_by": null
+          },
+          {
             "before": null,
             "after": "derived:0",
             "paired_by": null
@@ -1753,10 +1811,10 @@
         "cases": [
           {
             "before": "test_delta_booking.py::test_payment_declined[credit-card]",
-            "after": "test_delta_booking.py::test_payment_declined[credit-card]",
-            "paired_by": "case-id",
+            "after": "test_delta_booking.py::test_payment_declined[credit]",
+            "paired_by": "rename-log",
             "changed_cells": [],
-            "id_changed": false,
+            "id_changed": true,
             "status_changed": false
           },
           {

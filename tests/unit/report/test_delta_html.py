@@ -5,18 +5,27 @@ import dataclasses
 
 from pytest_given.delta import DeltaInputs, build_delta
 from pytest_given.model import (
+    Attachment,
+    AttachmentRef,
+    ColumnId,
     DeltaData,
     DeltaMetadata,
     DeltaSide,
     Glossary,
+    NarrationPlaceholder,
     ReportData,
+    Scenario,
     ScenarioDelta,
+    Status,
+    Step,
 )
 from pytest_given.report.delta_html import (
     ListedScenario,
     ReasonRow,
     StepBlock,
     StepRow,
+    TableSide,
+    TableView,
     delta_render_context,
     render_delta_html,
 )
@@ -292,6 +301,20 @@ def test_added_and_removed_scenarios_read_their_steps_unmarked() -> None:
     ]
 
 
+def test_a_removed_scenario_s_own_text_previews_its_rows_as_the_report_does() -> None:
+    """Unlike a changed scenario's before text (`before`), whose placeholders
+    share their keys with the after table's columns."""
+    before = report(_paying('old', [1]), _paying('pay', [1]))
+    after = report(_paying('pay', [2]), _paying('new', [1]))
+    assert [
+        (item.change, item.text_side) for item in _listed(_delta(before, after))
+    ] == [
+        ('removed', 'removed'),
+        ('changed', 'after'),
+        ('added', 'after'),
+    ]
+
+
 def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_has():
     before = report(
         scn(
@@ -319,3 +342,155 @@ def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_
         'modified',
     ]
     render_delta_html(delta, source_link_template=None)
+
+
+def _rows(view: TableView | None) -> list[tuple[str | None, str | None, str | None]]:
+    assert view is not None
+    return [
+        (
+            row.before_case.id if row.before_case else None,
+            row.after_case.id if row.after_case else None,
+            row.change,
+        )
+        for row in view.rows
+    ]
+
+
+def _columns(side: TableSide) -> list[tuple[str, str | None, str | None]]:
+    return [(column.column.id, column.change, column.was) for column in side.columns]
+
+
+def _paying(name: str, amounts: list[int], status: Status = 'passed') -> Scenario:
+    return scn(
+        f't.py::test_{name}',
+        name,
+        step('when', narr(lit('she pays '), ph('amount'))),
+        parameters=table(
+            [('amount', 'param')],
+            *((f't.py::test_{name}[{amount}]', [amount]) for amount in amounts),
+            status=status,
+        ),
+    )
+
+
+def test_a_removed_case_follows_the_case_it_followed_before_in_the_after_order():
+    before = report(_paying('pay', [1, 2, 3]))
+    after = report(_paying('pay', [3, 1, 4]))
+    [item] = _listed(_delta(before, after))
+    assert _rows(item.table) == [
+        ('t.py::test_pay[3]', 't.py::test_pay[3]', None),
+        ('t.py::test_pay[1]', 't.py::test_pay[1]', None),
+        ('t.py::test_pay[2]', None, 'removed'),
+        (None, 't.py::test_pay[4]', 'added'),
+    ]
+
+
+def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side():
+    """A placeholder in before-side text keys its column as the before table
+    does, so it finds the column in both tables, even renamed; a column only
+    the before side has can't meet an after column of the same generated ID."""
+    receipt = Attachment(label='receipt', content='paid')
+    before = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            Step(
+                phase='when',
+                narration=narr(
+                    lit('she pays a deposit of '),
+                    ph('deposit', 'derived:0'),
+                    lit(' because of '),
+                    ph('decline_reason'),
+                ),
+                attachments=[
+                    AttachmentRef(
+                        label='receipt',
+                        content_type='text',
+                        column_id=ColumnId('attachment:0'),
+                    )
+                ],
+            ),
+            parameters=table(
+                [
+                    ('decline_reason', 'param'),
+                    ('deposit', 'derived'),
+                    ('receipt', 'attachment'),
+                ],
+                ('t.py::test_pay[a]', ['expired', '60', receipt]),
+                ('t.py::test_pay[b]', ['blocked', '40', receipt]),
+            ),
+        )
+    )
+    after = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            step('then', narr(lit('she pays a fee of '), ph('fee', 'derived:0'))),
+            parameters=table(
+                [('reason', 'param'), ('fee', 'derived'), ('receipt', 'attachment')],
+                ('t.py::test_pay[a]', ['expired', '12', receipt]),
+                ('t.py::test_pay[b]', ['blocked', '8', receipt]),
+            ),
+        )
+    )
+    [item] = _listed(_delta(before, after))
+    assert item.table is not None
+    before_side, after_side = item.table.sides
+    assert _columns(before_side) == [
+        ('reason', None, None),
+        ('before:derived:0', 'removed', None),
+        ('before:attachment:0', None, None),
+    ]
+    assert _columns(after_side) == [
+        ('reason', None, 'decline_reason'),
+        ('derived:0', 'added', None),
+        ('attachment:0', None, None),
+    ]
+    # What a removed step renders from, and a modified one's removed words.
+    assert item.delta.before is not None
+    [before_step] = item.delta.before.steps
+    [modified] = item.delta.steps
+    removed_words = [
+        part
+        for segment in modified.words
+        if segment.mark == 'removed'
+        for part in segment.parts
+    ]
+    assert [
+        [part.column_id for part in parts if isinstance(part, NarrationPlaceholder)]
+        for parts in (before_step.narration.parts, removed_words)
+    ] == [['before:derived:0', 'reason'], ['before:derived:0', 'reason']]
+    assert [
+        attachment.column_id
+        for attachment in before_step.attachments
+        if isinstance(attachment, AttachmentRef)
+    ] == ['before:attachment:0']
+
+
+def test_a_table_changed_only_in_statuses_shows_both_sides_and_an_unchanged_one_none():
+    before = report(_paying('status', [1]), _paying('same', [1]))
+    after = report(
+        _paying('status', [1], status='failed'),
+        dataclasses.replace(_paying('same', [1]), tags=['new']),
+    )
+    status_only, unchanged = _listed(_delta(before, after))
+    assert status_only.table is not None
+    assert [side.side for side in status_only.table.sides] == ['before', 'after']
+    assert [row.change for row in status_only.table.rows] == ['changed']
+    assert unchanged.table is None
+
+
+def test_a_table_gained_or_lost_with_its_parametrization_shows_alone():
+    def unparametrized(name: str) -> Scenario:
+        return scn(f't.py::test_{name}', name, step('when', 'she pays'))
+
+    before = report(unparametrized('gains'), _paying('loses', [1, 2]))
+    after = report(_paying('gains', [1, 2]), unparametrized('loses'))
+    gains, loses = (item.table for item in _listed(_delta(before, after)))
+    assert gains is not None
+    assert loses is not None
+    assert [side.side for side in gains.sides] == ['after']
+    assert [row.change for row in gains.rows] == ['added', 'added']
+    assert [side.side for side in loses.sides] == ['before']
+    assert _columns(loses.sides[0]) == [('before:amount', None, None)]
+    assert [row.change for row in loses.rows] == ['removed', 'removed']

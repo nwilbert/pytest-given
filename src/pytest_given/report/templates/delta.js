@@ -60,9 +60,36 @@ function deltaApp() {
     goToTerm(id) {
       if (hasTerms()) base.goToTerm.call(this, id);
     },
+    // A phase block narrates the after table's columns. A lone before table
+    // has none it narrates.
+    _phaseTable(scope) {
+      if (!scope.querySelector('.delta-tables')) return base._phaseTable.call(this, scope);
+      return scope.querySelector('.delta-table[data-side="after"] .param-table');
+    },
     init() {
       base.init.call(this);
       this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
+      this._initTableAlignment();
+    },
+    // Side by side, a case keeps one line across both tables. Re-aligned
+    // whenever a table resizes (a payload opened, the window narrowed), in
+    // the next frame: resizing an observed element inside its own callback
+    // would loop.
+    _initTableAlignment() {
+      for (const pair of document.querySelectorAll('.delta-tables')) {
+        const tables = pair.querySelectorAll('.param-table');
+        if (tables.length !== 2) continue;
+        let queued = false;
+        const observer = new ResizeObserver(() => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => {
+            queued = false;
+            alignBands(...tables);
+          });
+        });
+        tables.forEach(table => observer.observe(table));
+      }
     },
     _readHash() {
       base._readHash.call(this);
@@ -85,4 +112,28 @@ function deltaApp() {
   // once, here, and keep its value instead of the getter.
   const app = Object.defineProperties({},Object.getOwnPropertyDescriptors(base));
   return Object.defineProperties(app, Object.getOwnPropertyDescriptors(overrides));
+}
+
+// Each band (the header, or a case with its error and payload rows) grows its
+// last row on the shorter side by the difference. Every height is read before
+// any is written, so the tables lay out once.
+function alignBands(before, after) {
+  const beforeBands = before.querySelectorAll('[data-band]');
+  const afterBands = after.querySelectorAll('[data-band]');
+  // The template gives both tables a band per row; anything else can't be paired.
+  if (beforeBands.length !== afterBands.length) {
+    console.assert(false, 'delta tables have unequal bands', before, after);
+    return;
+  }
+  const pairs = [...beforeBands].map((band, i) => [band, afterBands[i]]);
+  const lastRows = pairs.map(pair => pair.map(band => band.rows[band.rows.length - 1]));
+  for (const row of lastRows.flat()) row.style.height = '';
+  const bandHeights = pairs.map(pair => pair.map(band => band.getBoundingClientRect().height));
+  const rowHeights = lastRows.map(rows => rows.map(row => row.getBoundingClientRect().height));
+  bandHeights.forEach(([beforeHeight, afterHeight], i) => {
+    const gap = Math.abs(beforeHeight - afterHeight);
+    if (gap < 0.5) return;
+    const shorter = beforeHeight < afterHeight ? 0 : 1;
+    lastRows[i][shorter].style.height = `${rowHeights[i][shorter] + gap}px`;
+  });
 }

@@ -2,9 +2,10 @@
   A changed scenario's steps on the delta page: the report's phase blocks and
   step lines, with each step's change marked in place. The marks' look is
   `.delta-step` in styles.css; `data-term-side="before"` tells the term
-  tooltip (`delta.js`) which glossary a ref inside it was read against.
+  tooltip (`delta.js`) which glossary a ref inside it was read against. Then
+  its parameter tables, side by side.
 #}
-  {%- from '_macros.html.j2' import render_step, step_text, step_children, step_attachments with context -%}
+  {%- from '_macros.html.j2' import render_step, step_text, step_children, step_attachments, param_cell, case_extras, status_dot with context -%}
 
   {#- `step_ids` as `scenario_steps` makes them: a running count, unique
       across blocks. A block of removed steps alone carries no `data-block`:
@@ -54,4 +55,67 @@
       {{ step_attachments(row.step, step_id) }}
     {%- endif -%}
     </div>
+  {%- endmacro -%}
+
+  {#- A changed parameter table: each side's table whole, under its side's
+      caption, the rows lined up by case with a hatched row where a side
+      lacks one. A band, the header or a case with the rows under it, is what
+      `delta.js` evens out across the two tables. Only the after table carries
+      phase blocks and previews a hovered row in the steps, which read from
+      the after side. -#}
+  {%- macro param_table_delta(view, scenario, scenario_idx) -%}
+      <div class="delta-tables">
+        {%- for table in view.sides %}
+        {%- set after = table.side == 'after' %}
+        {%- set col_blocks = scenario | column_phase_blocks if after else {} %}
+        {%- set table_width = table.columns | length + 2 %}
+        {#- The mark a changed cell takes on this side: the old value faces
+            the new one. -#}
+        {%- set cell_mark = 'added' if after else 'removed' %}
+        <div class="delta-table" data-side="{{ table.side }}">
+          <div class="delta-table-caption">{{ table.side | capitalize }}: {{ side_labels[table.side] }}</div>
+          <div class="param-table-scroll">
+          <table class="param-table">
+            <thead data-band="head">
+              <tr>
+                <th class="param-id"{% if after %} data-block="frame"{% endif %}>case ID</th>
+                {%- for column in table.columns %}
+                {%- set col = column.column %}
+                <th data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if column.change %} data-change="{{ column.change }}"{% endif %}>
+                  {%- if column.change == 'removed' %}<del>{{ col.name }}</del>
+                  {%- elif column.change == 'added' %}+{{ col.name }}
+                  {%- else %}{{ col.name }}{% endif %}
+                  {%- if column.was %}<span class="delta-was">was <del>{{ column.was }}</del></span>{% endif -%}
+                </th>
+                {%- endfor %}
+                <th class="param-status"{% if after %} data-block="frame"{% endif %}>status</th>
+              </tr>
+            </thead>
+            {%- for row in view.rows %}
+            {%- set case = row.case(table.side) %}
+            {%- set cell_prefix = 's' ~ scenario_idx ~ '_' ~ table.side ~ '_case' ~ loop.index0 ~ '_col' %}
+            <tbody data-band="{{ loop.index0 }}">
+              {%- if case %}
+              <tr data-case-row{% if row.change in ('added', 'removed') %} data-change="{{ row.change }}"{% endif %}>
+                <th scope="row" class="param-id"{% if after %} data-block="frame"{% endif %}{% if row.pair.id_changed %} data-change="{{ cell_mark }}"{% endif %}>
+                  <span class="delta-row-lead">{{ change_glyph[row.change] if row.change else '' }}</span>
+                  {%- if row.change == 'removed' %}<del>{{ case.id | case_id }}</del>{% else %}{{ case.id | case_id }}{% endif -%}
+                </th>
+                {%- for col, val in table.parameters.cells(case) %}
+                {%- set changed = table.columns[loop.index0].change == 'added' or col.id in row.pair.changed_cells %}
+                {{ param_cell(col, val, cell_prefix ~ loop.index0, col_blocks.get(col.id), after, cell_mark if changed else none) }}
+                {%- endfor %}
+                <td class="param-status"{% if after %} data-block="frame"{% endif %}{% if row.pair.status_changed %} data-change="{{ cell_mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
+              </tr>
+              {{ case_extras(table.parameters, case, cell_prefix, table_width) }}
+              {%- else %}
+              <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="{{ table_width }}"></td></tr>
+              {%- endif %}
+            </tbody>
+            {%- endfor %}
+          </table>
+          </div>
+        </div>
+        {%- endfor %}
+      </div>
   {%- endmacro -%}

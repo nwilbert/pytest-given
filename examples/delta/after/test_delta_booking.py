@@ -3,7 +3,7 @@
 `examples/delta/before/` holds the same suite one release earlier. The `examples`
 session stages each version under the same relative path, runs both and builds
 the delta from the two reports. The changes between the versions are chosen so
-the delta shows every surface it has. See `given-renames.toml` for the two
+the delta shows every surface it has. See `given-renames.toml` for the
 renames the delta cannot find by itself.
 """
 
@@ -93,7 +93,7 @@ def submit_payment(method, amount, reason):
 @pytest.mark.parametrize(
     ('payment_method', 'reason', 'amount'),
     [
-        pytest.param('credit card', 'insufficient funds', 120, id='credit-card'),
+        pytest.param('credit card', 'insufficient funds', 120, id='credit'),
         pytest.param('debit card', 'expired card', 95, id='debit-card'),
         pytest.param('gift card', 'partial balance', 50, id='gift-card'),
         pytest.param('voucher', 'voucher expired', 40, id='voucher'),

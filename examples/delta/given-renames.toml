@@ -1,9 +1,14 @@
 # Identity changes pytest-given can't detect by itself, read by `pytest-given delta`.
-# The example's two renames: a test whose name and title both changed, and a term.
+# The example's renames: a test whose name and title both changed, a case of a
+# test that kept its name, and a term.
 
 [[scenario]]
 old = "test_delta_booking.py::test_walk_in"
 new = "test_delta_booking.py::test_walk_in_booking"
+
+[[scenario]]
+old = "test_delta_booking.py::test_payment_declined"
+cases = { credit-card = "credit" }
 
 [[term]]
 old = "room"
