@@ -79,16 +79,11 @@ def _full_delta() -> DeltaData:
         after=after_scenario,
         paired_by='rename-log',
         title_changed=True,
-        tags_added=('fast',),
-        tags_removed=('slow',),
-        status_changed=True,
-        reason_changed=True,
         steps=(
             StepDelta(
                 change='modified',
                 before=(0,),
                 after=(0, 1),
-                phase_changed=True,
                 words=words,
                 children=(StepDelta(change='equal', before=(0, 0), after=(0, 0)),),
             ),
@@ -322,3 +317,14 @@ def test_a_parameter_delta_is_changed_when_a_pair_is(
     parameters: ParameterDelta, changed: bool
 ) -> None:
     assert parameters.changed is changed
+
+
+def test_a_scenario_delta_derives_what_changed_from_its_two_sides() -> None:
+    before = scn('t.py::t', 'T', tags=['slow', 'db', 'slow'], status='skipped')
+    after = scn('t.py::t', 'T', tags=['db', 'fast'])
+    changed = ScenarioDelta(change='changed', before=before, after=after)
+    assert (changed.tags_added, changed.tags_removed) == (('fast',), ('slow',))
+    assert changed.status_changed
+    added = ScenarioDelta(change='added', after=after)
+    assert (added.tags_added, added.tags_removed) == ((), ())
+    assert (added.status_changed, added.reason_changed) == (False, False)

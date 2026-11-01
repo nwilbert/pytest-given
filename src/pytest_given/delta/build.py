@@ -312,41 +312,26 @@ def _compare(
         comparable_title(before), before_reading, comparable_title(after), after_reading
     )
     steps = align_steps(before.steps, before_reading, after.steps, after_reading)
-    before_tags, after_tags = set(before.tags), set(after.tags)
-    tags_added = tuple(
-        dict.fromkeys(tag for tag in after.tags if tag not in before_tags)
-    )
-    tags_removed = tuple(
-        dict.fromkeys(tag for tag in before.tags if tag not in after_tags)
-    )
-    status_changed = before.status != after.status
-    reason_changed = (before.skip_reason, before.xfail_reason) != (
-        after.skip_reason,
-        after.xfail_reason,
-    )
-    if not (
-        title_changed
-        or steps_changed(steps)
-        or tags_added
-        or tags_removed
-        or status_changed
-        or reason_changed
-        or table_changed
-    ):
-        return None
-    return ScenarioDelta(
+    delta = ScenarioDelta(
         change='changed',
         before=before,
         after=after,
         paired_by=paired_by,
         title_changed=title_changed,
-        tags_added=tags_added,
-        tags_removed=tags_removed,
-        status_changed=status_changed,
-        reason_changed=reason_changed,
         steps=steps,
         parameters=parameters,
     )
+    if (
+        title_changed
+        or steps_changed(steps)
+        or delta.tags_added
+        or delta.tags_removed
+        or delta.status_changed
+        or delta.reason_changed
+        or table_changed
+    ):
+        return delta
+    return None
 
 
 def _column_id(placeholder: NarrationPlaceholder) -> str:

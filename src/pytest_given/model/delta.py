@@ -56,7 +56,6 @@ class StepDelta:
     change: StepChange
     before: StepPath | None = None
     after: StepPath | None = None
-    phase_changed: bool = False
     words: tuple[DiffSegment, ...] = ()  # modified only
     children: tuple[StepDelta, ...] = ()  # equal and modified only
 
@@ -112,12 +111,35 @@ class ScenarioDelta:
     after: Scenario | None = None
     paired_by: ScenarioPairing | None = None
     title_changed: bool = False
-    tags_added: tuple[str, ...] = ()
-    tags_removed: tuple[str, ...] = ()
-    status_changed: bool = False
-    reason_changed: bool = False
     steps: tuple[StepDelta, ...] = ()
     parameters: ParameterDelta | None = None
+
+    @property
+    def tags_added(self) -> tuple[str, ...]:
+        if self.before is None or self.after is None:
+            return ()
+        return _tags_missing(self.after.tags, self.before.tags)
+
+    @property
+    def tags_removed(self) -> tuple[str, ...]:
+        if self.before is None or self.after is None:
+            return ()
+        return _tags_missing(self.before.tags, self.after.tags)
+
+    @property
+    def status_changed(self) -> bool:
+        if self.before is None or self.after is None:
+            return False
+        return self.before.status != self.after.status
+
+    @property
+    def reason_changed(self) -> bool:
+        if self.before is None or self.after is None:
+            return False
+        return (self.before.skip_reason, self.before.xfail_reason) != (
+            self.after.skip_reason,
+            self.after.xfail_reason,
+        )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -183,3 +205,9 @@ class DeltaData:
     unchanged: tuple[IdentityPair, ...] = ()
     suggestions: tuple[Suggestion, ...] = ()
     glossary: GlossaryDelta = GlossaryDelta()
+
+
+def _tags_missing(tags: list[str], other: list[str]) -> tuple[str, ...]:
+    """The tags `other` lacks, each once, in `tags`' order."""
+    others = set(other)
+    return tuple(dict.fromkeys(tag for tag in tags if tag not in others))

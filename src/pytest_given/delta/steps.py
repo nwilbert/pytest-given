@@ -133,7 +133,6 @@ class _Alignment:
             change='modified',
             before=before_path,
             after=after_path,
-            phase_changed=before.step.phase != after.step.phase,
             words=token_diff(before.tokens, after.tokens),
             children=self.siblings(
                 before.step.children, before_path, after.step.children, after_path

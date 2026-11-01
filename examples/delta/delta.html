@@ -1808,7 +1808,8 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 .delta .scenario.multi-case > .scenario-header::before,
 .delta .entry::before { background: var(--change-line); }
 
-.delta-range { font-variant-numeric: tabular-nums; }
+
+.delta-range { font-size: var(--font-size-md); color: var(--text-secondary); }
 .delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
 
 
@@ -1869,19 +1870,31 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
 
 
 
+
+
 .delta-sides {
   --delta-column: 42rem;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   width: fit-content;
-  max-width: min(100%, 2 * var(--delta-column) + var(--space-xl));
-  column-gap: var(--space-xl);
+  max-width: min(100%, 2 * var(--delta-column) + 2 * var(--space-lg) + 1px);
+  column-gap: var(--space-lg);
   align-items: start;
   margin-top: var(--space-md);
 }
 .delta-sides > [data-side="before"] { grid-column: 1; }
-.delta-sides > [data-side="after"] { grid-column: 2; }
+.delta-sides > [data-side="after"] { grid-column: 3; }
 .delta-sides > .delta-shared { grid-column: 1 / -1; }
+.delta-rule {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  background: var(--border);
+}
+.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 3; }
+
+.delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
+.delta-one-side > [data-side] { grid-column: 1; }
 .delta-caption {
   padding-left: var(--space-lg);
   font-size: var(--font-size-sm);
@@ -1906,6 +1919,8 @@ body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 70
   font-weight: 700;
   color: var(--change-ink);
 }
+
+.delta-side-steps .phase-block.phase-hover::before { left: calc(-1 * var(--space-lg)); }
 
 
 
@@ -1976,9 +1991,10 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 .delta .entry-head > .delta-sides,
 .delta-term-captions {
-  grid-template-columns: repeat(2, minmax(0, var(--delta-column)));
+  grid-template-columns: minmax(0, var(--delta-column)) 1px minmax(0, var(--delta-column));
   width: auto;
 }
+.delta .entry-head > .delta-sides > .delta-rule { grid-row: 1; }
 .delta .entry-head > .delta-sides { margin-top: 0; }
 .delta .refs-inner { grid-column: 2; }
 .delta-term { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
@@ -2015,7 +2031,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <span class="delta-range">v1 2026-11-01T12:51:32.821247+00:00 to v2 2026-11-01T12:51:33.229121+00:00</span>
+      <span class="topbar-version">pytest-given 0.5.1</span>
+      <span class="delta-range">v1 2026-11-01 17:30 to v2 2026-11-01 17:30</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
@@ -2162,8 +2179,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
       <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
-        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div>
+        <div class="delta-caption" data-side="before">Before</div>
+        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2212,8 +2229,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body" id="scenario-body-1" :class="{ expanded: expandedScenarios[1] }">
     <div class="scenario-body-inner">
       <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
-        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div>
+        <div class="delta-caption" data-side="before">Before</div>
+        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span> she paid for</div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2265,8 +2282,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body" id="scenario-body-2" :class="{ expanded: expandedScenarios[2] }">
     <div class="scenario-body-inner">
       <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
-        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div>
+        <div class="delta-caption" data-side="before">Before</div>
+        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">Room</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2310,8 +2327,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
     <div class="scenario-body" id="scenario-body-3" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
-      <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
+      <div class="delta-sides delta-one-side">
+        <div class="delta-caption" data-side="before">Before</div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">the next <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Carol</span> arrives at noon</div>
@@ -2351,8 +2368,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
     <div class="scenario-body" id="scenario-body-4" :class="{ expanded: expandedScenarios[4] }">
     <div class="scenario-body-inner">
-      <div class="delta-sides">
-        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div>
+      <div class="delta-sides delta-one-side">
+        <div class="delta-caption" data-side="after">After</div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has stayed three times before</div>
@@ -2397,8 +2414,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
         <div class="delta-was">was expected to fail: <del>gift cards are not wired in yet</del></div>
       </div>
       <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
-        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div>
+        <div class="delta-caption" data-side="before">Before</div>
+        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before" data-term-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2836,8 +2853,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
       <div class="glossary-entries">
       <div class="delta-sides delta-term-captions">
-        <div class="delta-caption" data-side="before">Before: v1 2026-11-01T12:51:32.821247+00:00</div>
-        <div class="delta-caption" data-side="after">After: v2 2026-11-01T12:51:33.229121+00:00</div></div>
+        <div class="delta-caption" data-side="before">Before</div>
+        <div class="delta-caption" data-side="after">After</div></div>
       
       
       <div class="kind-group" x-show="glossaryKindFilter.actor && visibleTermCount('actor') > 0">
@@ -2859,7 +2876,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="removed-receptionist" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <div class="delta-sides">
+            <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
               <div class="delta-term" data-side="before">
                 <div class="delta-term-head">
                   <span class="entry-name"><span class="term-name"><del>Receptionist</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-receptionist" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
@@ -2904,7 +2921,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="concierge" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <div class="delta-sides">
+            <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
               <div class="delta-term" data-side="after">
                 <div class="delta-term-head">
                   <span class="entry-name"><span class="term-name">Concierge<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=concierge" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
@@ -2958,7 +2975,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="suite" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <div class="delta-sides">
+            <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
               <div class="delta-term" data-side="before">
                 <div class="delta-term-head">
                   <span class="entry-name"><span class="term-name">Room</span></span>
@@ -3012,7 +3029,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="invoice" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <div class="delta-sides">
+            <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
               <div class="delta-term" data-side="before">
                 <div class="delta-term-head">
                   <span class="entry-name"><span class="term-name">Invoice</span></span>
@@ -3061,7 +3078,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="removed-upgrade" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <div class="delta-sides">
+            <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
               <div class="delta-term" data-side="before">
                 <div class="delta-term-head">
                   <span class="entry-name"><span class="term-name"><del>Upgrade</del><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=removed-upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
@@ -3108,7 +3125,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="upgrade" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <div class="delta-sides">
+            <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
               <div class="delta-term" data-side="after">
                 <div class="delta-term-head">
                   <span class="entry-name"><span class="term-name">upgrade<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=upgrade" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span></span>
@@ -3168,7 +3185,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T12:51:33.229121+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"}]},\"before_terms\":[{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"term_ids\":[\"removed-receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed-upgrade\",\"upgrade\"],\"term_cards\":[{\"key\":\"removed-receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\",\"before\":\"receptionist\",\"after\":null},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\",\"before\":null,\"after\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\",\"before\":\"room\",\"after\":\"suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\",\"before\":\"invoice\",\"after\":\"invoice\"},{\"key\":\"removed-upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\",\"before\":\"upgrade\",\"after\":null},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\",\"before\":null,\"after\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed-delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed-delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T17:30:28.816595+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"}]},\"before_terms\":[{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"term_ids\":[\"removed-receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed-upgrade\",\"upgrade\"],\"term_cards\":[{\"key\":\"removed-receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\",\"before\":\"receptionist\",\"after\":null},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\",\"before\":null,\"after\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\",\"before\":\"room\",\"after\":\"suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\",\"before\":\"invoice\",\"after\":\"invoice\"},{\"key\":\"removed-upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\",\"before\":\"upgrade\",\"after\":null},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\",\"before\":null,\"after\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed-delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed-delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));

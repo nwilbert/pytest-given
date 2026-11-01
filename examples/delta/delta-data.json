@@ -3,7 +3,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-01T12:51:32.821247+00:00",
+        "timestamp": "2026-11-01T17:30:28.405529+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -19,7 +19,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-01T12:51:33.229121+00:00",
+        "timestamp": "2026-11-01T17:30:28.816595+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -33,7 +33,7 @@
       ]
     },
     "plugin_version": "0.5.1",
-    "timestamp": "2026-11-01T12:51:33.498570+00:00",
+    "timestamp": "2026-11-01T17:30:29.085496+00:00",
     "kind": "delta",
     "schema_version": 1
   },
@@ -216,12 +216,6 @@
       },
       "paired_by": "node-id",
       "title_changed": true,
-      "tags_added": [
-        "digital-key"
-      ],
-      "tags_removed": [],
-      "status_changed": false,
-      "reason_changed": false,
       "steps": [
         {
           "change": "equal",
@@ -231,7 +225,6 @@
           "after": [
             0
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -243,7 +236,6 @@
           "after": [
             1
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -255,7 +247,6 @@
           "after": [
             2
           ],
-          "phase_changed": true,
           "words": [
             {
               "mark": "equal",
@@ -359,7 +350,6 @@
           "after": [
             3
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         }
@@ -618,12 +608,6 @@
       },
       "paired_by": "node-id",
       "title_changed": false,
-      "tags_added": [],
-      "tags_removed": [
-        "legacy"
-      ],
-      "status_changed": false,
-      "reason_changed": false,
       "steps": [
         {
           "change": "equal",
@@ -633,7 +617,6 @@
           "after": [
             0
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -645,7 +628,6 @@
           "after": [
             1
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -657,7 +639,6 @@
           "after": [
             2
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -667,7 +648,6 @@
             3
           ],
           "after": null,
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -677,7 +657,6 @@
           "after": [
             3
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         }
@@ -889,10 +868,6 @@
       },
       "paired_by": "rename-log",
       "title_changed": true,
-      "tags_added": [],
-      "tags_removed": [],
-      "status_changed": false,
-      "reason_changed": false,
       "steps": [
         {
           "change": "modified",
@@ -902,7 +877,6 @@
           "after": [
             0
           ],
-          "phase_changed": false,
           "words": [
             {
               "mark": "removed",
@@ -980,7 +954,6 @@
           "after": [
             1
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -992,7 +965,6 @@
           "after": [
             2
           ],
-          "phase_changed": false,
           "words": [
             {
               "mark": "equal",
@@ -1135,10 +1107,6 @@
       "after": null,
       "paired_by": null,
       "title_changed": false,
-      "tags_added": [],
-      "tags_removed": [],
-      "status_changed": false,
-      "reason_changed": false,
       "steps": [],
       "parameters": null
     },
@@ -1229,10 +1197,6 @@
       },
       "paired_by": null,
       "title_changed": false,
-      "tags_added": [],
-      "tags_removed": [],
-      "status_changed": false,
-      "reason_changed": false,
       "steps": [],
       "parameters": null
     },
@@ -1249,7 +1213,7 @@
           "error-handling"
         ],
         "status": "xfailed",
-        "duration_ms": 36,
+        "duration_ms": 38,
         "steps": [
           {
             "phase": "given",
@@ -1716,10 +1680,6 @@
       },
       "paired_by": "node-id",
       "title_changed": false,
-      "tags_added": [],
-      "tags_removed": [],
-      "status_changed": true,
-      "reason_changed": true,
       "steps": [
         {
           "change": "equal",
@@ -1729,7 +1689,6 @@
           "after": [
             0
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -1741,7 +1700,6 @@
           "after": [
             1
           ],
-          "phase_changed": false,
           "words": [
             {
               "mark": "equal",
@@ -1866,7 +1824,6 @@
           "after": [
             2
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         },
@@ -1878,7 +1835,6 @@
           "after": [
             3
           ],
-          "phase_changed": false,
           "words": [],
           "children": []
         }

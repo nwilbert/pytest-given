@@ -110,10 +110,6 @@ def _scenario_delta_from_dict(d: dict[str, Any]) -> ScenarioDelta:
         if paired_by is None
         else literal(paired_by, SCENARIO_PAIRINGS, 'scenario pairing'),
         title_changed=d.get('title_changed', False),
-        tags_added=tuple(d.get('tags_added', ())),
-        tags_removed=tuple(d.get('tags_removed', ())),
-        status_changed=d.get('status_changed', False),
-        reason_changed=d.get('reason_changed', False),
         steps=tuple(_step_delta_from_dict(s) for s in d.get('steps', ())),
         parameters=_parameter_delta_from_dict(d.get('parameters')),
     )
@@ -124,7 +120,6 @@ def _step_delta_from_dict(d: dict[str, Any]) -> StepDelta:
         change=literal(d['change'], STEP_CHANGES, 'step change'),
         before=_step_path(d.get('before')),
         after=_step_path(d.get('after')),
-        phase_changed=d.get('phase_changed', False),
         words=_segments_from_list(d.get('words', ())),
         children=tuple(_step_delta_from_dict(c) for c in d.get('children', ())),
     )

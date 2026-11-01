@@ -120,12 +120,11 @@ def test_a_modified_step_aligns_its_children_by_full_path() -> None:
     ]
 
 
-def test_a_same_text_step_in_another_phase_is_modified_with_its_phase_changed() -> None:
+def test_a_same_text_step_in_another_phase_is_modified() -> None:
     deltas = _align(
         [step('when', 'the room is booked')], [step('then', 'the room is booked')]
     )
     assert _changes(deltas) == ['modified']
-    assert deltas[0].phase_changed
     assert {segment.mark for segment in deltas[0].words} == {'equal'}
     assert steps_changed(deltas)
 
