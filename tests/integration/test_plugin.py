@@ -853,9 +853,9 @@ def test_a_write_failure_leaves_no_half_written_report(pytester, tmp_path):
     """A sink that cannot be written fails the run the way one that cannot be
     rendered does.
 
-    `write_sinks` writes one file at a time, so a failure on the second leaves
-    the first behind — this run's JSON with no HTML beside it, which reads as a
-    complete report. And an exception escaping `pytest_sessionfinish` is not an
+    Written one file at a time, a failure on the second would leave the first
+    behind — this run's JSON with no HTML beside it, which reads as a complete
+    report. And an exception escaping `pytest_sessionfinish` is not an
     INTERNALERROR: pytest lets it out of `console_main` as a bare traceback with
     no summary line at all.
 

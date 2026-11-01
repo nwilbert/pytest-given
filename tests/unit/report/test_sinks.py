@@ -27,21 +27,21 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report import sinks
-from pytest_given.report.sinks import SinkConfig, discard_stale_sinks
+from pytest_given.report.sinks import SinkConfig, discard_files
 from tests.ubiquitous_language import pg
 
 
-def test_discard_stale_sinks_removes_the_paths_this_run_would_have_written(
+def test_discarding_removes_the_paths_this_run_would_have_written(
     tmp_path,
 ) -> None:
     stale = tmp_path / 'report.html'
     stale.write_text('previous run', encoding='utf-8')
-    notes = discard_stale_sinks(SinkConfig(html_path=stale))
+    notes = discard_files(SinkConfig(html_path=stale).file_paths())
     assert not stale.exists()
     assert notes == [f'Removed the previous {stale} — it would read as current.']
 
 
-def test_discard_stale_sinks_reports_an_unlink_failure_instead_of_raising(
+def test_discarding_reports_an_unlink_failure_instead_of_raising(
     tmp_path, monkeypatch
 ) -> None:
     """The caller is already handling a failed write; the usual reason that
@@ -55,14 +55,14 @@ def test_discard_stale_sinks_reports_an_unlink_failure_instead_of_raising(
         raise PermissionError('read-only file system')
 
     monkeypatch.setattr(Path, 'unlink', refuse)
-    [note] = discard_stale_sinks(SinkConfig(html_path=stale))
+    [note] = discard_files(SinkConfig(html_path=stale).file_paths())
     assert note == f'Could not remove the previous {stale}: read-only file system'
 
 
 def test_a_sink_path_that_cannot_be_a_report_file_is_refused(tmp_path) -> None:
     """A bare `--given-html` consumes the next argument, so a mis-ordered
     invocation would otherwise aim the renderer at the user's own source file —
-    and `discard_stale_sinks` would then unlink it as a stale report."""
+    and the discard would then unlink it as a stale report."""
     source = tmp_path / 'test_demo.py'
     source.write_text('def test_x(): pass', encoding='utf-8')
     with pytest.raises(PytestGivenError) as excinfo:

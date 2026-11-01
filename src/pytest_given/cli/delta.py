@@ -15,7 +15,6 @@ from ..model import (
     DeltaData,
     JsonObject,
     PytestGivenError,
-    delta_from_dict,
     delta_to_dict,
     plural,
     read_report_json,
@@ -122,9 +121,9 @@ def run_delta(args: argparse.Namespace) -> int:
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2
-    for rendered_file in rendered:
+    for rendered_file in rendered.files:
         print(f'Delta generated: {rendered_file.path}')
-    print(_summary(delta_from_dict(delta_dict)))
+    print(_summary(rendered.delta))
     return 0
 
 
@@ -171,10 +170,9 @@ def _refuse_overwriting_an_input(config: DeltaSinkConfig, inputs: list[Path]) ->
 
 
 def _rerender(args: argparse.Namespace) -> tuple[JsonObject, str]:
+    """`emit_delta_sinks` refuses a dict that is no delta."""
     path: Path = args.first
-    delta_dict = read_report_json(path)
-    delta_from_dict(delta_dict, path.as_posix())  # refuses a report
-    return delta_dict, path.as_posix()
+    return read_report_json(path), path.as_posix()
 
 
 def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:

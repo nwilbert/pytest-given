@@ -172,7 +172,7 @@ def test_both_sinks_are_written(tmp_path: Path) -> None:
         delta_to_dict(_delta(report(), report())),
         DeltaSinkConfig(json_path=json_path, html_path=html_path),
     )
-    assert [rendered.path for rendered in written] == [json_path, html_path]
+    assert [rendered.path for rendered in written.files] == [json_path, html_path]
     assert json_path.is_file()
     assert html_path.is_file()
 
