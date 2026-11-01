@@ -52,7 +52,7 @@ def _refused(text: str, label: str) -> None:
 
 
 @scenario(
-    t'A {pg["Rename log"]} entry with neither `new` nor `cases` is refused, '
+    t'A {pg["Rename log"].l} entry with neither `new` nor `cases` is refused, '
     t'naming the entry',
     tags=['delta'],
 )

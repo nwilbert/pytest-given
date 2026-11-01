@@ -123,7 +123,7 @@
 - **then** it exits 1 for that finding
 
 ## ✓ `pytest-given delta` writes a «delta report» as JSON and HTML, and exits 0 whether or not anything changed · 2 cases
-`tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta, cli
+`tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta
 
 - **given** a before «report» with a scenario titled "Pay by card"
 - **given** an after «report» that titles it "{after_title}"
@@ -2924,7 +2924,7 @@
 - **when** the reports are checked
 - **then** the error names both versions and points at the delta skill
 
-## ✓ A «Rename log» chain ends at the last «Scenario identity» present in the after report
+## ✓ A «rename log» chain ends at the last «scenario identity» present in the after report
 `tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after` · delta
 
 - **given** a «rename log» renaming A to B, and later B to C
@@ -2939,14 +2939,14 @@
 - **when** the after report holds neither A nor B
 - **then** nothing is rewritten and nothing is warned about
 
-## ✓ An entry whose rev predates the range is skipped, so a reused «Scenario identity» pairs with its old self
+## ✓ An entry whose rev predates the range is skipped, so a reused «scenario identity» pairs with its old self
 `tests/unit/delta/test_chains.py::test_an_entry_whose_rev_predates_the_range_is_skipped` · delta
 
 - **given** a «rename log» entry renaming A to B at rev v1
 - **when** v1 predates the range and both A and B exist in the after report
 - **then** A is not rewritten
 - **when** the same entry falls inside the range
-- **then** A is rewritten to B, the name a new test later reused
+- **then** A is rewritten to B, though the after report holds an A too
 
 ## ✓ A swap goes through a name neither test has, and a plain swap is a merge
 `tests/unit/delta/test_chains.py::test_a_swap_goes_through_a_name_neither_test_has` · delta
@@ -3003,7 +3003,7 @@
 - **when** the placeholder points at another column in the after narration
 - **then** the placeholder reads removed and added whole
 
-## ✓ A «Rename log» entry with neither `new` nor `cases` is refused, naming the entry
+## ✓ A «rename log» entry with neither `new` nor `cases` is refused, naming the entry
 `tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta
 
 - **given** a «rename log» whose second scenario entry only names `old`
@@ -3017,7 +3017,7 @@
 - **when** the two are aligned
 - **then** the reworded When and Then are modified between the two unchanged steps
 - **then** the modified Then carries the words that changed
-- **when** the second Then is swapped for a wholly different one
+- **when** a Then is swapped for a wholly different one
 - **then** the old Then is removed and the new one added
 
 ## ✓ A removed and an added scenario with nearly the same steps are a «suggested match», never applied

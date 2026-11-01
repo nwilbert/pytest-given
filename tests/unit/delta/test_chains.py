@@ -20,7 +20,7 @@ def _identities(rewrites: Rewrites) -> dict[str, str]:
 
 
 @scenario(
-    t'A {pg["Rename log"]} chain ends at the last {pg["Scenario identity"]} '
+    t'A {pg["Rename log"].l} chain ends at the last {pg["Scenario identity"].l} '
     t'present in the after report',
     tags=['delta'],
 )
@@ -53,7 +53,7 @@ def test_a_chain_that_reaches_nothing_in_after_rewrites_nothing() -> None:
 
 @scenario(
     t'An entry whose rev predates the range is skipped, so a reused '
-    t'{pg["Scenario identity"]} pairs with its old self',
+    t'{pg["Scenario identity"].l} pairs with its old self',
     tags=['delta'],
 )
 def test_an_entry_whose_rev_predates_the_range_is_skipped() -> None:
@@ -66,7 +66,7 @@ def test_an_entry_whose_rev_predates_the_range_is_skipped() -> None:
         assert skipped.warnings == ()
     with when('the same entry falls inside the range'):
         applied = rewrite_identities(['A'], {'A', 'B'}, entries, set())
-    with then('A is rewritten to B, the name a new test later reused'):
+    with then('A is rewritten to B, though the after report holds an A too'):
         assert _identities(applied) == {'A': 'B'}
 
 

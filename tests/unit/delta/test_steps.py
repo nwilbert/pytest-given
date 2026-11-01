@@ -63,7 +63,7 @@ def test_a_reworded_step_reads_as_modified() -> None:
         ]
     with then('the modified Then carries the words that changed'):
         assert any(segment.mark == 'added' for segment in deltas[2].words)
-    with when('the second Then is swapped for a wholly different one'):
+    with when('a Then is swapped for a wholly different one'):
         swapped = _align(
             [step('then', 'the deposit is kept')],
             [step('then', 'a voucher is issued')],

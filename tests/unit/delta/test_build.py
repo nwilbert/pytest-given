@@ -345,9 +345,9 @@ def test_a_schema_version_mismatch_is_refused_naming_both_versions() -> None:
         check_reports(before, after, 'before.json', 'after.json')
     with then('the error names both versions and points at the delta skill'):
         message = str(raised.value)
-        assert f'{REPORT_SCHEMA_VERSION}' in message
-        assert 'none' in message
-        assert 'pytest-given-delta' in message
+        assert f'before.json (report schema version {REPORT_SCHEMA_VERSION})' in message
+        assert 'after.json (report schema version none)' in message
+        assert 'pytest-given-delta skill' in message
 
 
 def _versioned(schema_version: int | None, **overrides: object) -> ReportData:

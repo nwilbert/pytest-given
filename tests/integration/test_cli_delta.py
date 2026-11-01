@@ -48,7 +48,7 @@ def _read_delta() -> dict[str, object]:
 @scenario(
     t'`pytest-given delta` writes a {pg["Delta report"].l} as JSON and HTML, '
     t'and exits 0 whether or not anything changed',
-    tags=['delta', 'cli'],
+    tags=['delta'],
 )
 @pytest.mark.parametrize(
     ('after_title', 'listed'), [('Pay by card', 0), ('Pay by credit card', 1)]
