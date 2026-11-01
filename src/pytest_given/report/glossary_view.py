@@ -66,11 +66,9 @@ class KindGrouping[Entry]:
 class GlossaryView:
     """Everything the Glossary tab renders, computed here rather than in Jinja."""
 
-    groups: list[KindGroup[TermEntry]]
-    kinds: list[KindTally]
+    grouping: KindGrouping[TermEntry]
     term_scenarios: dict[TermId, list[NodeId]]
     undefined_count: int
-    all_uncategorized: bool
 
 
 class _KindRow(NamedTuple):
@@ -108,16 +106,13 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
     """The Glossary view's terms, grouped by kind, each with its cross-references."""
     crossrefs = build_term_crossrefs(report)
     terms = report.glossary.terms if report.glossary is not None else []
-    grouping = group_by_kind(
-        [_term_entry(term, term.kind or 'kindless', crossrefs) for term in terms],
-        lambda entry: entry.term.kind,
-    )
     return GlossaryView(
-        groups=grouping.groups,
-        kinds=grouping.kinds,
+        grouping=group_by_kind(
+            [_term_entry(term, term.kind or 'kindless', crossrefs) for term in terms],
+            lambda entry: entry.term.kind,
+        ),
         term_scenarios=crossrefs.term_scenarios,
         undefined_count=sum(1 for term in terms if term.definition is None),
-        all_uncategorized=grouping.all_uncategorized,
     )
 
 
@@ -190,16 +185,16 @@ def _term_entry(
         summary=tuple(
             part
             for part in (
-                _some(other_forms, 'other form'),
-                _some(len(aggregation.stories), 'story'),
-                _some(len(scenario_ids), 'scenario'),
+                plural_if_any(other_forms, 'other form'),
+                plural_if_any(len(aggregation.stories), 'story'),
+                plural_if_any(len(scenario_ids), 'scenario'),
             )
             if part
         ),
     )
 
 
-def _some(n: int, singular: str) -> str:
-    """`'3 scenarios'`, or empty for a count of zero — the summary lists only
-    what a term actually has."""
-    return plural(n, singular) if n else ''
+def plural_if_any(count: int, singular: str) -> str:
+    """`'3 scenarios'`, or empty for a count of zero — a term's summary lists
+    only what the term actually has."""
+    return plural(count, singular) if count else ''

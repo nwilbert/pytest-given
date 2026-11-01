@@ -91,7 +91,9 @@ class StepsView:
         return on_side(side, self.before, self.after)
 
 
-def steps_view(scenario_delta: ScenarioDelta) -> StepsView:
+def steps_view(
+    scenario_delta: ScenarioDelta, keys: dict[Side, list[BlockKey]]
+) -> StepsView:
     before, after = scenario_delta.before, scenario_delta.after
     assert before is not None
     assert after is not None
@@ -105,7 +107,6 @@ def steps_view(scenario_delta: ScenarioDelta) -> StepsView:
         rows.row(step_delta, (index,))
         for index, step_delta in enumerate(scenario_delta.steps)
     ]
-    keys = block_keys(scenario_delta)
     return StepsView(
         before=_side_blocks(top, 'before', keys['before']),
         after=_side_blocks(top, 'after', keys['after']),
@@ -119,7 +120,8 @@ def block_keys(scenario_delta: ScenarioDelta) -> dict[Side, list[BlockKey]]:
     before, after = scenario_delta.before, scenario_delta.after
     assert before is not None
     assert after is not None
-    before_of, after_of = _block_of(before.steps), _block_of(after.steps)
+    before_blocks, after_blocks = phase_blocks(before.steps), phase_blocks(after.steps)
+    before_of, after_of = _block_of(before_blocks), _block_of(after_blocks)
     paired: dict[int, BlockKey] = {}
     for step_delta in scenario_delta.steps:
         if step_delta.before is not None and step_delta.after is not None:
@@ -129,9 +131,9 @@ def block_keys(scenario_delta: ScenarioDelta) -> dict[Side, list[BlockKey]]:
     return {
         'before': [
             paired.get(index, f'{_BEFORE_ONLY_BLOCK}{index}')
-            for index in range(len(phase_blocks(before.steps)))
+            for index in range(len(before_blocks))
         ],
-        'after': [str(index) for index in range(len(phase_blocks(after.steps)))],
+        'after': [str(index) for index in range(len(after_blocks))],
     }
 
 
@@ -173,9 +175,9 @@ class _Rows:
         return StepLine(step, side_runs(step_delta.words, side))
 
 
-def _block_of(steps: list[Step]) -> list[int]:
+def _block_of(blocks: list[list[Step]]) -> list[int]:
     """Each top-level step's phase block."""
-    return [index for index, block in enumerate(phase_blocks(steps)) for _ in block]
+    return [index for index, block in enumerate(blocks) for _ in block]
 
 
 def _side_blocks(

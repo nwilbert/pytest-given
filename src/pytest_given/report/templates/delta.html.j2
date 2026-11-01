@@ -190,7 +190,7 @@
         {%- endif %}
       </div>
       {%- endfor %}
-      {{ delta_sides(item, table, index) }}
+      {{ delta_sides(item, index) }}
 
       {% if scenario.error %}
       {{ render_error(scenario.error, scenario.status) }}

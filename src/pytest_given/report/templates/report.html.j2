@@ -354,9 +354,9 @@
       {{ search_box('glossarySearch', 'Search terms...') }}
 
       {% set undefined_count = glossary_view.undefined_count %}
-      {% set all_uncategorized = glossary_view.all_uncategorized %}
+      {% set all_uncategorized = glossary_view.grouping.all_uncategorized %}
       {% if not all_uncategorized %}
-      {{ kind_filter(glossary_view.kinds) }}
+      {{ kind_filter(glossary_view.grouping.kinds) }}
       {% endif %}
 
       {# When every term is defined, the Definitions filter can only ever be a
@@ -372,7 +372,7 @@
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
           <div class="header-context meta-list">
-            <span>{{ glossary.terms | length | plural('term') }}</span>{% if not all_uncategorized %}{% for kind in glossary_view.kinds %}
+            <span>{{ glossary.terms | length | plural('term') }}</span>{% if not all_uncategorized %}{% for kind in glossary_view.grouping.kinds %}
             <span>{{ kind.summary }}</span>{% endfor %}{% endif %}
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
@@ -383,7 +383,7 @@
       </div>
 
       <div class="glossary-entries">
-      {% for group in glossary_view.groups %}
+      {% for group in glossary_view.grouping.groups %}
       {% call kind_group(group, all_uncategorized) %}
         {% for entry in group.entries %}
         {% set term = entry.term %}

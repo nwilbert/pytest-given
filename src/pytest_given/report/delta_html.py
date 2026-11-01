@@ -11,6 +11,7 @@ import dataclasses
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
+from functools import cached_property
 from typing import Literal
 
 import jinja2
@@ -50,6 +51,7 @@ from ..model import (
     narration_of,
     narration_text,
     on_side,
+    other_side,
     plural,
 )
 from .delta_steps import (
@@ -60,11 +62,12 @@ from .delta_steps import (
     side_runs,
     steps_view,
 )
-from .glossary_view import KindGrouping, group_by_kind
+from .glossary_view import KindGrouping, group_by_kind, plural_if_any
 from .html_renderer import (
     base_env,
     build_param_color_map,
     bundled_assets,
+    bundled_script,
     column_phase_blocks,
     make_narration_filter,
     make_source_url_filter,
@@ -175,25 +178,25 @@ class ListedScenario:
     def fragment(self) -> str:
         return f'scenario={self.slug}'
 
-    @property
+    @cached_property
     def title_text(self) -> str:
         return shown_text(self.shown.narration)
 
-    @property
+    @cached_property
     def steps(self) -> StepsView | None:
         """A changed scenario's steps side by side; None for an added or
         removed one, whose steps read unmarked."""
         if self.change != 'changed':
             return None
-        return steps_view(self.delta)
+        return steps_view(self.delta, self._block_keys)
 
-    @property
+    @cached_property
     def table(self) -> TableView | None:
         """A changed scenario's tables when they changed; None where a table
         reads unmarked, as in the report, or there is none."""
         if self.change != 'changed':
             return None
-        return _table_view(self.delta)
+        return _table_view(self.delta, self._block_keys)
 
     @property
     def reasons(self) -> list[ReasonRow]:
@@ -213,6 +216,10 @@ class ListedScenario:
             ),
         ]
         return [row for row in rows if row.reason or row.was]
+
+    @cached_property
+    def _block_keys(self) -> dict[Side, list[BlockKey]]:
+        return block_keys(self.delta)
 
 
 @dataclass(frozen=True)
@@ -270,7 +277,7 @@ class ListedTerm:
         forms = self._facts(side).other_forms
         if self.change != 'changed':
             return [OtherForm(form) for form in forms]
-        other = self._facts('after' if side == 'before' else 'before').other_forms
+        other = self._facts(other_side(side)).other_forms
         return [
             OtherForm(form, None if form in other else SIDE_MARK[side])
             for form in forms
@@ -281,7 +288,7 @@ class ListedTerm:
         count = self._facts(side).scenario_count
         if self.change == 'changed':
             return plural(count, 'scenario')
-        return _some(count, 'scenario')
+        return plural_if_any(count, 'scenario')
 
     @property
     def search_text(self) -> str:
@@ -347,6 +354,7 @@ def delta_render_context(
             _app_data(delta, listed, module_changes, reach, glossary_view)
         ),
         **bundled_assets(),
+        'delta_js': bundled_script('delta.js'),
     }
 
 
@@ -394,11 +402,12 @@ def _removed(scenario_delta: ScenarioDelta) -> Scenario:
     return scenario_delta.before
 
 
-def _table_view(scenario_delta: ScenarioDelta) -> TableView | None:
+def _table_view(
+    scenario_delta: ScenarioDelta, keys: dict[Side, list[BlockKey]]
+) -> TableView | None:
     before, after = scenario_delta.before, scenario_delta.after
     assert before is not None
     assert after is not None
-    keys = block_keys(scenario_delta)
     parameters = scenario_delta.parameters
     if parameters is None:
         return _lone_table(before, after, keys)
@@ -636,8 +645,9 @@ def _term_reach(delta: DeltaData, listed: list[ListedScenario]) -> TermReach:
 def _glossary_view(
     delta: DeltaData, listed: list[ListedScenario], reach: TermReach
 ) -> DeltaGlossaryView:
+    position = {item.slug: index for index, item in enumerate(listed)}
     cards = [
-        ListedTerm(term_delta, _referring(term_delta, listed, reach))
+        ListedTerm(term_delta, _referring(term_delta, listed, position, reach))
         for term_delta in delta.glossary.terms
     ]
     return DeltaGlossaryView(
@@ -652,20 +662,20 @@ def _glossary_view(
 
 
 def _referring(
-    term_delta: TermDelta, listed: list[ListedScenario], reach: TermReach
+    term_delta: TermDelta,
+    listed: list[ListedScenario],
+    position: dict[str, int],
+    reach: TermReach,
 ) -> list[ListedScenario]:
     """In the list's order, each scenario once."""
-    sides: tuple[tuple[Side, GlossaryTerm | None], ...] = (
-        ('before', term_delta.before),
-        ('after', term_delta.after),
-    )
-    slugs = {
-        item.slug
-        for side, term in sides
-        if term is not None
+    sides: tuple[Side, ...] = ('before', 'after')
+    found = {
+        position[item.slug]
+        for side in sides
+        if (term := term_delta.on(side)) is not None
         for item in reach[side].get(term.id, [])
     }
-    return [item for item in listed if item.slug in slugs]
+    return [listed[index] for index in sorted(found)]
 
 
 def _module_changes(
@@ -746,11 +756,6 @@ def _search_text(item: ListedScenario) -> str:
     return ' '.join([*titles, *item.delta.tags_removed])
 
 
-def _some(count: int, singular: str) -> str:
-    """Empty for none, as the report's term summary lists only what it has."""
-    return plural(count, singular) if count else ''
-
-
 def _shown_term_scenarios(reach: TermReach) -> dict[TermId, list[str]]:
     """The Terms axis: each listed scenario under the terms of the side it is
     shown from."""
@@ -794,9 +799,9 @@ def _build_env(
     delta: DeltaData, source_link_template: str | None
 ) -> jinja2.Environment:
     env = base_env()
-    listed = _listed_scenarios(delta)
-    # Both sides', so a removed step's placeholder finds its column; only the
-    # keys are read, parameter coloring being off on this page.
+    # Both sides', so a removed step's placeholder finds its column. Parameter
+    # coloring is off on this page: no `--param-color-N` token is emitted, and
+    # the class only carries the placeholder style `body.delta` gives it.
     param_color_map = build_param_color_map(
         [
             scenario
@@ -811,7 +816,7 @@ def _build_env(
     }
     # Compiled only for a side some scenario or term is shown from, so a
     # `{sha}` template fails only when a link would need the SHA a side lacks.
-    shown_sides = {item.side for item in listed} | {
+    shown_sides = {item.shown_side for item in delta.scenarios} | {
         term_delta.shown_side for term_delta in delta.glossary.terms
     }
     source_url_filters = {
@@ -847,14 +852,10 @@ def _build_env(
             for run in words
         )
 
-    def no_param_color(column: ParameterColumn) -> str:
-        return ''
-
     env.filters['narration'] = narration
     env.filters['narration_diff'] = narration_diff
     env.filters['definition_diff'] = definition_diff
     env.filters['source_url'] = source_url
-    env.filters['param_color_class'] = no_param_color
     return env
 
 

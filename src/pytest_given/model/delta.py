@@ -50,6 +50,10 @@ def on_side[T](side: Side, before: T, after: T) -> T:
     return before if side == 'before' else after
 
 
+def other_side(side: Side) -> Side:
+    return 'after' if side == 'before' else 'before'
+
+
 @dataclass(frozen=True, kw_only=True)
 class DiffSegment:
     """A run of one mark, in each side's own parts: an equal run both sides',

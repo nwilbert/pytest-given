@@ -28,6 +28,7 @@ from pytest_given.model import (
     delta_from_dict,
     delta_to_dict,
     is_delta_dict,
+    other_side,
     report_to_dict,
 )
 from tests.unit.delta.builders import (
@@ -328,3 +329,7 @@ def test_a_scenario_delta_derives_what_changed_from_its_two_sides() -> None:
     added = ScenarioDelta(change='added', after=after)
     assert (added.tags_added, added.tags_removed) == ((), ())
     assert (added.status_changed, added.reason_changed) == (False, False)
+
+
+def test_the_other_side_of_a_side_is_the_one_it_is_not() -> None:
+    assert (other_side('before'), other_side('after')) == ('after', 'before')

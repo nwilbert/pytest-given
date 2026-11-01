@@ -188,18 +188,21 @@ def base_env() -> jinja2.Environment:
     env.filters['phase_blocks'] = phase_blocks
     env.filters['column_phase_blocks'] = column_phase_blocks
     env.filters['case_id'] = case_id
+    # No column coloured until a page passes its colour map.
+    env.filters['param_color_class'] = _make_param_color_class(None)
     env.globals['data_url'] = data_url
     return env
 
 
 def _make_param_color_class(
-    param_color_map: ParamColorMap,
+    param_color_map: ParamColorMap | None,
 ) -> Callable[[ParameterColumn], str]:
     """Jinja filter: a column's colour class, or empty for an attachment
-    column — the one place that decides which columns are coloured."""
+    column or without a map — the one place that decides which columns are
+    coloured."""
 
     def _class(column: ParameterColumn) -> str:
-        if column.kind == 'attachment':
+        if param_color_map is None or column.kind == 'attachment':
             return ''
         return f'param-color-{param_color_map[column.name]}'
 
@@ -423,19 +426,21 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
 
 def bundled_assets() -> dict[str, Markup]:
     """The stylesheet and scripts inlined into the page — the whole reason the
-    report needs no server and no external asset. Our own lose their comments;
-    the vendored Alpine bundle is already minified and keeps its licence line.
-    `delta_js` is the delta page's alone."""
-    css, app_js, delta_js, alpine_js = (
-        (_TEMPLATES_DIR / filename).read_text(encoding='utf-8')
-        for filename in ('styles.css', 'app.js', 'delta.js', 'alpine.min.js')
-    )
+    report needs no server and no external asset. The vendored Alpine bundle
+    is already minified and keeps its licence line."""
     return {
-        'css': Markup(_strip_comments(css)),
-        'app_js': Markup(_strip_comments(app_js)),
-        'delta_js': Markup(_strip_comments(delta_js)),
-        'alpine_js': Markup(alpine_js),
+        'css': bundled_script('styles.css'),
+        'app_js': bundled_script('app.js'),
+        'alpine_js': Markup(
+            (_TEMPLATES_DIR / 'alpine.min.js').read_text(encoding='utf-8')
+        ),
     }
+
+
+def bundled_script(filename: str) -> Markup:
+    """One of our own stylesheets or scripts, without its comments."""
+    source = (_TEMPLATES_DIR / filename).read_text(encoding='utf-8')
+    return Markup(_strip_comments(source))
 
 
 _DATA_URL_MIME = {'.woff2': 'font/woff2', '.svg': 'image/svg+xml'}

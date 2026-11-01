@@ -82,7 +82,7 @@ def test_steps_pair_up_in_rows_each_side_under_its_own_phases() -> None:
             step('then', 'her phone opens the door'),
         ),
     )
-    view = steps_view(scenario_delta)
+    view = steps_view(scenario_delta, block_keys(scenario_delta))
     assert _side(view, 'before') == [
         ('given', '0', False, [((0,), 'equal', 'a guest')]),
         ('when', '1', False, [((1,), 'removed', 'she phones the desk')]),
@@ -138,7 +138,7 @@ def test_a_before_block_the_after_side_kept_nothing_of_keys_as_its_own() -> None
         'before': ['1', 'before:1'],
         'after': ['0', '1'],
     }
-    assert _side(steps_view(scenario_delta), 'before') == [
+    assert _side(steps_view(scenario_delta, block_keys(scenario_delta)), 'before') == [
         (None, None, False, [((0,), 'added', None)]),
         ('when', '1', False, [((1,), 'equal', 'it rains hard')]),
         ('then', 'before:1', False, [((2,), 'removed', 'the bell rings loudly')]),
@@ -170,7 +170,7 @@ def test_each_side_reads_its_own_text_with_only_its_own_words_marked() -> None:
         ),
         renames='[[term]]\nold = "room"\nnew = "suite"\n',
     )
-    [block] = steps_view(scenario_delta).before
+    [block] = steps_view(scenario_delta, block_keys(scenario_delta)).before
     [row] = block.rows
     words = {
         side: line.words

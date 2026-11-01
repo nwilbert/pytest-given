@@ -127,9 +127,10 @@
       the left, since its caption says which side it is. A table that didn't
       change spans both columns. `data-side` scopes a hovered row's preview to
       its own side's text. -#}
-  {%- macro delta_sides(item, table, scenario_idx) -%}
+  {%- macro delta_sides(item, scenario_idx) -%}
       {%- set scenario = item.shown -%}
       {%- set steps = item.steps -%}
+      {%- set table = item.table -%}
       {%- set sides = ['before', 'after'] if steps is not none else [item.side] -%}
       <div class="delta-sides{% if steps is none %} delta-one-side{% endif %}">
         {{- delta_captions(sides) }}

@@ -34,6 +34,7 @@ from .delta import (
     TermFacts,
     TermPairing,
     on_side,
+    other_side,
 )
 from .delta_serde import delta_from_dict, delta_to_dict
 from .errors import (
@@ -257,6 +258,7 @@ __all__ = [
     'narration_text',
     'node_base',
     'on_side',
+    'other_side',
     'param_id',
     'placeholder_mismatch',
     'placeholder_token',
