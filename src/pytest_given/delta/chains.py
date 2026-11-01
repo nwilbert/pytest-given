@@ -1,6 +1,7 @@
 """Applying the rename log: following a before identity along its entries to
 the identity it has in the after report."""
 
+from bisect import bisect_right
 from collections.abc import Iterable, Sequence
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
@@ -13,7 +14,6 @@ type CaseMap = tuple[tuple[str, str], ...]
 @dataclass(frozen=True)
 class Rewrite:
     identity: str  # where the before identity ends
-    entries: tuple[RenameEntry, ...]  # the chain followed, up to the stop
     case_maps: tuple[CaseMap, ...]  # the `cases` maps up to the stop, in order
 
 
@@ -38,16 +38,18 @@ def rewrite_identities(
     entries: Sequence[RenameEntry],
     skipped_revs: AbstractSet[str],
 ) -> Rewrites:
-    in_range = [entry for entry in entries if entry.rev not in skipped_revs]
+    by_old: _ByOld = {}
+    for position, entry in enumerate(
+        entry for entry in entries if entry.rev not in skipped_revs
+    ):
+        by_old.setdefault(entry.old, []).append((position, entry))
     chains = {
-        identity: _follow(identity, after, in_range)
-        for identity in dict.fromkeys(before)
+        identity: _follow(identity, after, by_old) for identity in dict.fromkeys(before)
     }
     blocked, warnings = _merges(chains, after)
     by_identity = {
         identity: Rewrite(
             identity=chain.stop.identity,
-            entries=chain.stop.entries,
             case_maps=tuple(chain.stop.case_maps),
         )
         for identity, chain in chains.items()
@@ -127,18 +129,27 @@ def _merges(
             warnings.append(_merge_warning(target, group, chains))
 
 
-def _follow(
-    start: str, after: AbstractSet[str], entries: Sequence[RenameEntry]
-) -> _Chain:
+# The in-range entries by the identity they rename, each with its position
+# in the log.
+type _ByOld = dict[str, list[tuple[int, RenameEntry]]]
+
+
+def _follow(start: str, after: AbstractSet[str], by_old: _ByOld) -> _Chain:
+    """Along the log in its order, through each entry renaming the identity
+    the chain has reached by then."""
     current = start
     recorded: list[RenameEntry] = []
     case_maps: list[CaseMap] = []
     stay_case_maps: list[CaseMap] = []
     moved = False
     stop: _Stop | None = None
-    for entry in entries:
-        if entry.old != current:
-            continue
+    position = -1
+    while True:
+        renaming = by_old.get(current, [])
+        found = bisect_right(renaming, position, key=lambda item: item[0])
+        if found == len(renaming):
+            break
+        position, entry = renaming[found]
         recorded.append(entry)
         if entry.cases:
             case_maps.append(entry.cases)

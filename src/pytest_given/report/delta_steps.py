@@ -4,25 +4,26 @@ and a side's runs of a word diff serve the tables and the Glossary tab too."""
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal
 
 from ..model import (
+    SIDE_MARK,
     DiffSegment,
     Mark,
     NarrationPart,
     Phase,
     ScenarioDelta,
+    Side,
     Step,
     StepChange,
     StepDelta,
     StepPath,
     merged_literals,
     narration_text,
+    on_side,
     walk_steps,
 )
 from .html_renderer import phase_blocks
 
-type Side = Literal['before', 'after']
 # A phase block's `data-block`, which its table columns carry too. An after
 # block's is its index, and a before block takes the key of the after block its
 # steps went to, so a phase hover outlines the phase on both sides.
@@ -30,8 +31,6 @@ type BlockKey = str
 
 # Prefixes a before block none of whose steps the after side still has.
 _BEFORE_ONLY_BLOCK = 'before:'
-# The mark a side's own changed words carry in a word diff.
-_SIDE_MARK: dict[Side, Mark] = {'before': 'removed', 'after': 'added'}
 
 
 @dataclass(frozen=True)
@@ -66,7 +65,7 @@ class StepRow:
     children: tuple[StepRow, ...]
 
     def line(self, side: Side) -> StepLine | None:
-        return self.before if side == 'before' else self.after
+        return on_side(side, self.before, self.after)
 
 
 @dataclass(frozen=True)
@@ -89,7 +88,7 @@ class StepsView:
     after: list[SideBlock]
 
     def side(self, side: Side) -> list[SideBlock]:
-        return self.before if side == 'before' else self.after
+        return on_side(side, self.before, self.after)
 
 
 def steps_view(scenario_delta: ScenarioDelta) -> StepsView:
@@ -141,9 +140,9 @@ def side_runs(runs: Sequence[DiffSegment], side: Side) -> tuple[MarkedRun, ...]:
     ones, each in that side's own parts."""
     return _joined(
         [
-            MarkedRun(run.mark, run.before if side == 'before' else run.after)
+            MarkedRun(run.mark, on_side(side, run.before, run.after))
             for run in runs
-            if run.mark in ('equal', _SIDE_MARK[side])
+            if run.mark in ('equal', SIDE_MARK[side])
         ]
     )
 
@@ -165,7 +164,7 @@ class _Rows:
         )
 
     def _line(self, step_delta: StepDelta, side: Side) -> StepLine | None:
-        at = step_delta.before if side == 'before' else step_delta.after
+        at = on_side(side, step_delta.before, step_delta.after)
         if at is None:
             return None
         step = self.steps[side][at]

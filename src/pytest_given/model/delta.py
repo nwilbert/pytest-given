@@ -21,6 +21,7 @@ from .steps import StepPath
 DELTA_SCHEMA_VERSION: Final = 1
 
 type Change = Literal['added', 'removed', 'changed']
+type Side = Literal['before', 'after']
 type ScenarioPairing = Literal['rename-log', 'node-id', 'title']
 type CasePairing = Literal['rename-log', 'case-id', 'values']
 type ColumnPairing = Literal['name', 'values']
@@ -38,6 +39,15 @@ TERM_PAIRINGS: tuple[TermPairing, ...] = ('rename-log', 'term-id')
 STEP_CHANGES: tuple[StepChange, ...] = ('equal', 'modified', 'added', 'removed')
 MARKS: tuple[Mark, ...] = ('equal', 'removed', 'added')
 SUGGESTION_OFS: tuple[SuggestionOf, ...] = ('scenario', 'case', 'term')
+# The mark a side's own words carry in a word diff.
+SIDE_MARK: Final[dict[Side, Literal['removed', 'added']]] = {
+    'before': 'removed',
+    'after': 'added',
+}
+
+
+def on_side[T](side: Side, before: T, after: T) -> T:
+    return before if side == 'before' else after
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -76,6 +86,18 @@ class CasePair:
     id_changed: bool = False
     status_changed: bool = False
 
+    @property
+    def changed(self) -> bool:
+        """Whether the case reads otherwise on the two sides: unpaired, or
+        with a changed cell, ID or status."""
+        return (
+            self.before is None
+            or self.after is None
+            or bool(self.changed_cells)
+            or self.id_changed
+            or self.status_changed
+        )
+
 
 @dataclass(frozen=True, kw_only=True)
 class ParameterDelta:
@@ -94,14 +116,7 @@ class ParameterDelta:
             or column.after is None
             or column.paired_by == 'values'
             for column in self.columns
-        ) or any(
-            case.before is None
-            or case.after is None
-            or bool(case.changed_cells)
-            or case.id_changed
-            or case.status_changed
-            for case in self.cases
-        )
+        ) or any(case.changed for case in self.cases)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -113,6 +128,20 @@ class ScenarioDelta:
     title_changed: bool = False
     steps: tuple[StepDelta, ...] = ()
     parameters: ParameterDelta | None = None
+
+    def on(self, side: Side) -> Scenario | None:
+        return on_side(side, self.before, self.after)
+
+    @property
+    def shown_side(self) -> Side:
+        """After, or before for a removed scenario."""
+        return 'before' if self.after is None else 'after'
+
+    @property
+    def shown(self) -> Scenario:
+        shown = self.on(self.shown_side)
+        assert shown is not None
+        return shown
 
     @property
     def tags_added(self) -> tuple[str, ...]:
@@ -171,6 +200,20 @@ class TermDelta:
     before_facts: TermFacts | None = None
     after_facts: TermFacts | None = None
     definition: tuple[DiffSegment, ...] = ()  # a changed definition's word diff
+
+    def on(self, side: Side) -> GlossaryTerm | None:
+        return on_side(side, self.before, self.after)
+
+    @property
+    def shown_side(self) -> Side:
+        """After, or before for a removed term."""
+        return 'before' if self.after is None else 'after'
+
+    @property
+    def shown(self) -> GlossaryTerm:
+        shown = self.on(self.shown_side)
+        assert shown is not None
+        return shown
 
 
 @dataclass(frozen=True, kw_only=True)

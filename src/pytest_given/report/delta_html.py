@@ -18,6 +18,7 @@ from markupsafe import Markup
 
 from ..model import (
     CHANGES,
+    SIDE_MARK,
     AttachmentRef,
     CasePair,
     Change,
@@ -38,6 +39,7 @@ from ..model import (
     ReportData,
     Scenario,
     ScenarioDelta,
+    Side,
     SourceLocation,
     Step,
     StepDelta,
@@ -47,12 +49,12 @@ from ..model import (
     build_term_crossrefs,
     narration_of,
     narration_text,
+    on_side,
     plural,
 )
 from .delta_steps import (
     BlockKey,
     MarkedRun,
-    Side,
     StepsView,
     block_keys,
     side_runs,
@@ -133,12 +135,10 @@ class TableRow:
             return 'added'
         if self.after_case is None:
             return 'removed'
-        pair = self.pair
-        changed = pair.changed_cells or pair.id_changed or pair.status_changed
-        return 'changed' if changed else None
+        return 'changed' if self.pair.changed else None
 
     def case(self, side: Side) -> ParameterCase | None:
-        return self.before_case if side == 'before' else self.after_case
+        return on_side(side, self.before_case, self.after_case)
 
 
 @dataclass(frozen=True)
@@ -165,14 +165,11 @@ class ListedScenario:
 
     @property
     def side(self) -> Side:
-        """The side shown: after, or before for a removed scenario."""
-        return 'before' if self.delta.after is None else 'after'
+        return self.delta.shown_side
 
     @property
     def shown(self) -> Scenario:
-        shown = self.delta.after or self.delta.before
-        assert shown is not None
-        return shown
+        return self.delta.shown
 
     @property
     def fragment(self) -> str:
@@ -240,13 +237,11 @@ class ListedTerm:
 
     @property
     def side(self) -> Side:
-        return 'before' if self.delta.after is None else 'after'
+        return self.delta.shown_side
 
     @property
     def shown(self) -> GlossaryTerm:
-        shown = self.delta.after or self.delta.before
-        assert shown is not None
-        return shown
+        return self.delta.shown
 
     @property
     def key(self) -> str:
@@ -261,7 +256,7 @@ class ListedTerm:
         return ('before', 'after') if self.change == 'changed' else (self.side,)
 
     def term(self, side: Side) -> GlossaryTerm:
-        term = self.delta.before if side == 'before' else self.delta.after
+        term = self.delta.on(side)
         assert term is not None
         return term
 
@@ -276,8 +271,10 @@ class ListedTerm:
         if self.change != 'changed':
             return [OtherForm(form) for form in forms]
         other = self._facts('after' if side == 'before' else 'before').other_forms
-        mark: FormChange = 'removed' if side == 'before' else 'added'
-        return [OtherForm(form, None if form in other else mark) for form in forms]
+        return [
+            OtherForm(form, None if form in other else SIDE_MARK[side])
+            for form in forms
+        ]
 
     def scenario_count(self, side: Side) -> str:
         """A changed term's on both sides, a none included, so they compare."""
@@ -293,7 +290,7 @@ class ListedTerm:
         return ' '.join(dict.fromkeys(names)).lower()
 
     def _facts(self, side: Side) -> TermFacts:
-        facts = self.delta.before_facts if side == 'before' else self.delta.after_facts
+        facts = on_side(side, self.delta.before_facts, self.delta.after_facts)
         return facts or TermFacts()
 
 
@@ -620,7 +617,7 @@ def _term_reach(delta: DeltaData, listed: list[ListedScenario]) -> TermReach:
         read = {
             scenario.id: (scenario, item)
             for item in listed
-            if (scenario := _on_side(item.delta, side)) is not None
+            if (scenario := item.delta.on(side)) is not None
         }
         crossrefs = build_term_crossrefs(
             ReportData(
@@ -634,10 +631,6 @@ def _term_reach(delta: DeltaData, listed: list[ListedScenario]) -> TermReach:
             for term_id, node_ids in crossrefs.term_scenarios.items()
         }
     return reach
-
-
-def _on_side(scenario_delta: ScenarioDelta, side: Side) -> Scenario | None:
-    return scenario_delta.before if side == 'before' else scenario_delta.after
 
 
 def _glossary_view(
@@ -819,8 +812,7 @@ def _build_env(
     # Compiled only for a side some scenario or term is shown from, so a
     # `{sha}` template fails only when a link would need the SHA a side lacks.
     shown_sides = {item.side for item in listed} | {
-        'before' if term_delta.after is None else 'after'
-        for term_delta in delta.glossary.terms
+        term_delta.shown_side for term_delta in delta.glossary.terms
     }
     source_url_filters = {
         side: _source_url_filter(source_link_template, side_of)

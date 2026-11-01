@@ -33,8 +33,6 @@ def test_a_chain_ends_at_the_last_identity_present_in_after() -> None:
     with then('A ends at C when C exists, and at B when only B does'):
         assert _identities(to_c) == {'A': 'C'}
         assert _identities(to_b) == {'A': 'B'}
-    with then('the rewrite to C followed both entries'):
-        assert to_c.by_identity['A'].entries == tuple(entries)
 
 
 @scenario(
@@ -190,7 +188,6 @@ def test_a_chain_through_a_name_missing_from_after_still_reaches_the_stop() -> N
     rewrites = rewrite_identities(['A'], {'C'}, entries, set())
 
     assert _identities(rewrites) == {'A': 'C'}
-    assert rewrites.by_identity['A'].entries == tuple(entries)
 
 
 def test_a_rewrite_carries_the_cases_maps_up_to_its_stop() -> None:

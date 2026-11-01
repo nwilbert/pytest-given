@@ -8,11 +8,11 @@ from pytest_given.model import (
     NarrationTermRef,
     Scenario,
     ScenarioDelta,
+    Side,
     narration_text,
 )
 from pytest_given.report.delta_steps import (
     MarkedRun,
-    Side,
     StepRow,
     StepsView,
     block_keys,

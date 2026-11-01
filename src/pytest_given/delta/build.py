@@ -292,12 +292,16 @@ def _compare(
     column_of: dict[ColumnId, ColumnId] = {}
     table_changed = (before.parameters is None) != (after.parameters is None)
     if before.parameters is not None and after.parameters is not None:
-        table = align_table(
+        parameters = align_table(
             before.parameters,
             after.parameters,
             identities.case_rewrite(before, after),
         )
-        parameters, column_of = table.delta, table.column_of
+        column_of = {
+            pair.before: pair.after
+            for pair in parameters.columns
+            if pair.before is not None and pair.after is not None
+        }
         table_changed = parameters.changed
 
     def before_column(placeholder: NarrationPlaceholder) -> str:

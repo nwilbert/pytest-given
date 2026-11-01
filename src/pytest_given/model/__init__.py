@@ -9,6 +9,7 @@ every one of them.
 from .delta import (
     CHANGES,
     DELTA_SCHEMA_VERSION,
+    SIDE_MARK,
     CasePair,
     CasePairing,
     Change,
@@ -24,6 +25,7 @@ from .delta import (
     ParameterDelta,
     ScenarioDelta,
     ScenarioPairing,
+    Side,
     StepChange,
     StepDelta,
     Suggestion,
@@ -31,6 +33,7 @@ from .delta import (
     TermDelta,
     TermFacts,
     TermPairing,
+    on_side,
 )
 from .delta_serde import delta_from_dict, delta_to_dict
 from .errors import (
@@ -152,6 +155,7 @@ __all__ = [
     'INSTANCE_KINDS',
     'PHASES',
     'REPORT_SCHEMA_VERSION',
+    'SIDE_MARK',
     'STATUSES',
     'Attachment',
     'AttachmentLabel',
@@ -214,6 +218,7 @@ __all__ = [
     'Sentence',
     'SentenceId',
     'SentenceName',
+    'Side',
     'SourceLocation',
     'Status',
     'Step',
@@ -251,6 +256,7 @@ __all__ = [
     'narration_of',
     'narration_text',
     'node_base',
+    'on_side',
     'param_id',
     'placeholder_mismatch',
     'placeholder_token',

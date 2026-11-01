@@ -2966,7 +2966,6 @@
 - **given** a «rename log» renaming A to B, and later B to C
 - **when** the before identity A is rewritten against reports that end at B or C
 - **then** A ends at C when C exists, and at B when only B does
-- **then** the rewrite to C followed both entries
 
 ## ✓ A chain that reaches nothing in the after report rewrites nothing, silently
 `tests/unit/delta/test_chains.py::test_a_chain_that_reaches_nothing_in_after_rewrites_nothing` · delta

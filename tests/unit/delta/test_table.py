@@ -2,13 +2,14 @@
 
 from pytest_given import given, scenario, then, when
 from pytest_given.delta.order import interleaved
-from pytest_given.delta.table import TableAlignment, align_table
+from pytest_given.delta.table import align_table
 from pytest_given.model import (
     CasePair,
     CellValue,
     ColumnId,
     ColumnPair,
     NodeId,
+    ParameterDelta,
     ParameterTable,
 )
 from tests.ubiquitous_language import pg
@@ -29,18 +30,18 @@ def _align(
     before: ParameterTable,
     after: ParameterTable,
     rewrites: dict[str, str] | None = None,
-) -> TableAlignment:
+) -> ParameterDelta:
     mapping = rewrites or {}
     return align_table(before, after, lambda case_id: mapping.get(case_id, case_id))
 
 
-def _case_pairs(alignment: TableAlignment) -> list[tuple[str, str]]:
+def _case_pairs(alignment: ParameterDelta) -> list[tuple[str, str]]:
     return [
         (
             pair.before.split('[')[1][:-1] if pair.before else '',
             pair.after.split('[')[1][:-1] if pair.after else '',
         )
-        for pair in alignment.delta.cases
+        for pair in alignment.cases
     ]
 
 
@@ -69,16 +70,16 @@ def test_an_added_column_keeps_the_table_paired_case_by_case() -> None:
         t'the {pg["Pairing"].l} of both {pg["Case"].l.s} is by their values, '
         t'without a changed cell'
     ):
-        assert [pair.paired_by for pair in alignment.delta.cases] == ['values'] * 2
-        assert [pair.changed_cells for pair in alignment.delta.cases] == [(), ()]
+        assert [pair.paired_by for pair in alignment.cases] == ['values'] * 2
+        assert [pair.changed_cells for pair in alignment.cases] == [(), ()]
     with then('the size column is added and the other two pair by name'):
-        assert alignment.delta.columns == (
+        assert alignment.columns == (
             ColumnPair(before=ColumnId('n'), after=ColumnId('n'), paired_by='name'),
             ColumnPair(after=ColumnId('size')),
             ColumnPair(before=ColumnId('big'), after=ColumnId('big'), paired_by='name'),
         )
     with then('the table changed'):
-        assert alignment.delta.changed
+        assert alignment.changed
 
 
 @scenario(
@@ -105,7 +106,7 @@ def test_an_inserted_case_does_not_shift_the_positional_ids_pairing() -> None:
             ('order0', 'order1'),
             ('order1', 'order2'),
         ]
-        assert [pair.paired_by for pair in alignment.delta.cases] == [
+        assert [pair.paired_by for pair in alignment.cases] == [
             None,
             'values',
             'values',
@@ -133,13 +134,12 @@ def test_a_renamed_argname_pairs_when_its_values_did_not_change() -> None:
     with when('the two are aligned'):
         alignment = _align(before, after)
     with then('euros and eur pair as one column, by their values'):
-        assert alignment.delta.columns[0] == ColumnPair(
+        assert alignment.columns[0] == ColumnPair(
             before=ColumnId('euros'), after=ColumnId('eur'), paired_by='values'
         )
-        assert alignment.column_of[ColumnId('euros')] == ColumnId('eur')
     with then('the table changed, though no cell did'):
-        assert alignment.delta.changed
-        assert [pair.changed_cells for pair in alignment.delta.cases] == [(), ()]
+        assert alignment.changed
+        assert [pair.changed_cells for pair in alignment.cases] == [(), ()]
 
 
 @scenario(
@@ -156,7 +156,7 @@ def test_a_value_changed_under_a_generated_case_id_reads_as_removed_and_added() 
     with then('without the rewrite one case is removed and one added'):
         assert _case_pairs(plain) == [('2-True', ''), ('', '3-True')]
     with then('with the rewrite they pair by the rename log, the n cell changed'):
-        assert rewritten.delta.cases == (
+        assert rewritten.cases == (
             CasePair(
                 before=_node('2-True'),
                 after=_node('3-True'),
@@ -182,7 +182,7 @@ def test_cells_differ_by_type() -> None:
         custom=True,
     )
     alignment = _align(before, after)
-    assert [pair.changed_cells for pair in alignment.delta.cases] == [
+    assert [pair.changed_cells for pair in alignment.cases] == [
         (ColumnId('value'),)
     ] * 3
 
@@ -206,10 +206,10 @@ def test_a_changed_custom_case_id_is_an_id_change_and_a_generated_one_is_not() -
         table([('n', 'param')], _case('x', 1)),
         {'1': 'x'},
     )
-    assert [pair.id_changed for pair in custom.delta.cases] == [False, True]
-    assert [pair.paired_by for pair in custom.delta.cases] == ['case-id', 'rename-log']
-    assert [pair.id_changed for pair in generated.delta.cases] == [False]
-    assert not generated.delta.changed
+    assert [pair.id_changed for pair in custom.cases] == [False, True]
+    assert [pair.paired_by for pair in custom.cases] == ['case-id', 'rename-log']
+    assert [pair.id_changed for pair in generated.cases] == [False]
+    assert not generated.changed
 
 
 def test_a_status_change_marks_the_case_changed() -> None:
@@ -217,8 +217,8 @@ def test_a_status_change_marks_the_case_changed() -> None:
         table([('n', 'param')], (_node('1'), [1], 'passed')),
         table([('n', 'param')], (_node('1'), [1], 'failed')),
     )
-    assert alignment.delta.cases[0].status_changed
-    assert alignment.delta.changed
+    assert alignment.cases[0].status_changed
+    assert alignment.changed
 
 
 def test_moved_columns_and_cases_alone_leave_the_table_unchanged() -> None:
@@ -233,16 +233,16 @@ def test_moved_columns_and_cases_alone_leave_the_table_unchanged() -> None:
         _case('1-False', False, 1),
     )
     alignment = _align(before, after)
-    assert not alignment.delta.changed
-    assert [pair.paired_by for pair in alignment.delta.cases] == ['values', 'values']
+    assert not alignment.changed
+    assert [pair.paired_by for pair in alignment.cases] == ['values', 'values']
 
 
 def test_attachment_columns_take_no_part() -> None:
     before = table([('n', 'param'), ('log', 'attachment')], _case('1', 1, None))
     after = table([('n', 'param'), ('trace', 'attachment')], _case('1', 1, None))
     alignment = _align(before, after)
-    assert [pair.before for pair in alignment.delta.columns] == [ColumnId('n')]
-    assert not alignment.delta.changed
+    assert [pair.before for pair in alignment.columns] == [ColumnId('n')]
+    assert not alignment.changed
 
 
 def test_a_renamed_derived_column_pairs_per_kind() -> None:
@@ -250,7 +250,7 @@ def test_a_renamed_derived_column_pairs_per_kind() -> None:
         table([('n', 'param'), ('n * 2', 'derived')], _case('1', 1, 2)),
         table([('n', 'param'), ('n + n', 'derived')], _case('1', 1, 2)),
     )
-    assert alignment.delta.columns[1] == ColumnPair(
+    assert alignment.columns[1] == ColumnPair(
         before=ColumnId('derived:0'), after=ColumnId('derived:0'), paired_by='values'
     )
 
@@ -260,13 +260,13 @@ def test_two_unpaired_columns_of_a_kind_stay_unpaired() -> None:
         table([('a', 'param'), ('b', 'param')], _case('1', 1, 2)),
         table([('c', 'param'), ('d', 'param')], _case('1', 1, 2)),
     )
-    assert [(pair.before, pair.after) for pair in alignment.delta.columns] == [
+    assert [(pair.before, pair.after) for pair in alignment.columns] == [
         (ColumnId('a'), None),
         (ColumnId('b'), None),
         (None, ColumnId('c')),
         (None, ColumnId('d')),
     ]
-    assert [pair.paired_by for pair in alignment.delta.cases] == ['case-id']
+    assert [pair.paired_by for pair in alignment.cases] == ['case-id']
 
 
 def test_a_renamed_column_needs_a_paired_case() -> None:
@@ -274,7 +274,7 @@ def test_a_renamed_column_needs_a_paired_case() -> None:
         table([('a', 'param')], _case('1', 1)),
         table([('b', 'param')], _case('2', 1), _case('3', 1)),
     )
-    assert all(pair.paired_by is None for pair in alignment.delta.columns)
+    assert all(pair.paired_by is None for pair in alignment.columns)
 
 
 def test_cases_with_repeated_values_pair_by_case_id() -> None:
@@ -282,7 +282,7 @@ def test_cases_with_repeated_values_pair_by_case_id() -> None:
         table([('n', 'param')], _case('a', 1), _case('b', 1)),
         table([('n', 'param')], _case('b', 1), _case('a', 1)),
     )
-    assert [pair.paired_by for pair in alignment.delta.cases] == ['case-id', 'case-id']
+    assert [pair.paired_by for pair in alignment.cases] == ['case-id', 'case-id']
     assert _case_pairs(alignment) == [('b', 'b'), ('a', 'a')]
 
 
@@ -314,12 +314,10 @@ def test_cases_are_not_paired_by_values_when_no_param_column_is_shared() -> None
         table([('euros', 'param')], _case('fast', 1), _case('slow', 2), custom=True),
         table([('eur', 'param')], _case('fast', 1), _case('sluggish', 9), custom=True),
     )
-    assert alignment.delta.columns == (
+    assert alignment.columns == (
         ColumnPair(before=ColumnId('euros'), after=ColumnId('eur'), paired_by='values'),
     )
-    assert [
-        (pair.before, pair.after, pair.paired_by) for pair in alignment.delta.cases
-    ] == [
+    assert [(pair.before, pair.after, pair.paired_by) for pair in alignment.cases] == [
         (_node('fast'), _node('fast'), 'case-id'),
         (_node('slow'), None, None),
         (None, _node('sluggish'), None),

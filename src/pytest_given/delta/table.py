@@ -1,7 +1,6 @@
 """Pairing two parameter tables: their columns, then their cases."""
 
 from collections.abc import Callable, Hashable, Sequence
-from dataclasses import dataclass
 
 from ..model import (
     Attachment,
@@ -28,29 +27,17 @@ type CaseCells = dict[ColumnId, CellKey]
 _RENAMEABLE_KINDS: tuple[ColumnKind, ...] = ('param', 'derived')
 
 
-@dataclass(frozen=True)
-class TableAlignment:
-    delta: ParameterDelta
-    column_of: dict[ColumnId, ColumnId]  # before → after, for placeholder keys
-
-
 def align_table(
     before: ParameterTable,
     after: ParameterTable,
     case_rewrite: Callable[[str], str],
-) -> TableAlignment:
+) -> ParameterDelta:
     """`case_rewrite` maps a before case ID to its rename-log rewrite."""
     alignment = _Alignment(before, after, case_rewrite)
     alignment.pair_columns_by_name()
     alignment.pair_cases()
     alignment.pair_renamed_columns()
-    return TableAlignment(
-        delta=alignment.delta(),
-        column_of={
-            before_id: after_id
-            for before_id, (after_id, _) in alignment.columns.items()
-        },
-    )
+    return alignment.delta()
 
 
 class _Alignment:
@@ -137,6 +124,9 @@ class _Alignment:
             [column.id for column in self.before_columns],
             {before_id: after_id for before_id, (after_id, _) in self.columns.items()},
         )
+        before_of = {
+            after_id: before_id for before_id, (after_id, _) in self.columns.items()
+        }
         case_rows = interleaved(
             [case.id for case in self.after.cases],
             [case.id for case in self.before.cases],
@@ -153,15 +143,19 @@ class _Alignment:
                 )
                 for before_id, after_id in column_rows
             ),
-            cases=tuple(self._case_pair(*row) for row in case_rows),
+            cases=tuple(self._case_pair(*row, before_of) for row in case_rows),
         )
 
-    def _case_pair(self, before_id: NodeId | None, after_id: NodeId | None) -> CasePair:
+    def _case_pair(
+        self,
+        before_id: NodeId | None,
+        after_id: NodeId | None,
+        before_of: dict[ColumnId, ColumnId],
+    ) -> CasePair:
         if before_id is None or after_id is None:
             return CasePair(before=before_id, after=after_id)
         before_case = self.before_by_id[before_id]
         after_case = self.after_by_id[after_id]
-        before_of = {after: before for before, (after, _) in self.columns.items()}
         return CasePair(
             before=before_id,
             after=after_id,

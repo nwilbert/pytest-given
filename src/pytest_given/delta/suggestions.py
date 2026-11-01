@@ -6,21 +6,22 @@ import math
 from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
+from itertools import groupby
 
 from ..model import (
     ColumnId,
+    DiffSegment,
     GlossaryDelta,
     GlossaryTerm,
     IdentityPair,
     Narration,
+    NarrationPart,
     NarrationTermRef,
     NodeId,
     ParameterTable,
     Scenario,
     ScenarioDelta,
-    Step,
     StepDelta,
-    StepPath,
     Suggestion,
     TermId,
     TermKind,
@@ -28,8 +29,7 @@ from ..model import (
     iter_steps,
 )
 from .identity import scenario_identity
-from .lcs import lcs_gaps
-from .narration import Reading, Token, reading_words, tokens, tokens_equal
+from .narration import Reading, Token, reading_words
 from .table import CellKey, cells_of
 
 SUGGESTION_SIMILARITY = 0.8  # the least Dice share of words two items must have
@@ -51,15 +51,9 @@ class Suggestions:
 
 
 @dataclass(frozen=True)
-class _Found:
-    suggestions: list[Suggestion]
-    limited: bool
-
-
-@dataclass(frozen=True)
-class _Matches:
-    pairs: list[tuple[int, int]]
-    limited: bool
+class _Found[Item]:
+    items: list[Item]
+    limited: bool  # some candidates went unscored
 
 
 def suggest(
@@ -68,9 +62,7 @@ def suggest(
     before_reading: Reading,
     after_reading: Reading,
 ) -> Suggestions:
-    swaps = _unambiguous(
-        _swapped_terms(scenarios, glossary, before_reading, after_reading)
-    )
+    swaps = _unambiguous(_swapped_terms(scenarios, glossary))
     swapped_before = {before for before, _ in swaps}
     swapped_after = {after for _, after in swaps}
     by_steps = _scenario_suggestions(scenarios, before_reading, after_reading)
@@ -79,13 +71,13 @@ def suggest(
     )
     return Suggestions(
         suggestions=(
-            *by_steps.suggestions,
+            *by_steps.items,
             *_case_suggestions(scenarios),
             *(
                 Suggestion(of='term', before=before, after=after)
                 for before, after in swaps
             ),
-            *by_definition.suggestions,
+            *by_definition.items,
         ),
         warnings=(LIMITED_WARNING,)
         if by_steps.limited or by_definition.limited
@@ -95,7 +87,7 @@ def suggest(
 
 def _scenario_suggestions(
     scenarios: Sequence[ScenarioDelta], before_reading: Reading, after_reading: Reading
-) -> _Found:
+) -> _Found[Suggestion]:
     removed = [
         item.before
         for item in scenarios
@@ -117,7 +109,7 @@ def _scenario_suggestions(
                 before=scenario_identity(removed[index_before]),
                 after=scenario_identity(added[index_after]),
             )
-            for index_before, index_after in matches.pairs
+            for index_before, index_after in matches.items
         ],
         matches.limited,
     )
@@ -219,10 +211,7 @@ def _shared_cells(
 
 
 def _swapped_terms(
-    scenarios: Sequence[ScenarioDelta],
-    glossary: GlossaryDelta,
-    before_reading: Reading,
-    after_reading: Reading,
+    scenarios: Sequence[ScenarioDelta], glossary: GlossaryDelta
 ) -> _Swaps:
     removed = {
         delta.before.id for delta in glossary.terms if delta.before and not delta.after
@@ -235,17 +224,7 @@ def _swapped_terms(
         return swaps
     for item in scenarios:
         for modified in _modified_steps(item.steps):
-            assert item.before is not None
-            assert item.after is not None
-            assert modified.before is not None
-            assert modified.after is not None
-            before_tokens = tokens(
-                _step_at(item.before.steps, modified.before).narration, before_reading
-            )
-            after_tokens = tokens(
-                _step_at(item.after.steps, modified.after).narration, after_reading
-            )
-            swaps.extend(_replaced_refs(before_tokens, after_tokens, removed, added))
+            swaps.extend(_replaced_refs(modified.words, removed, added))
     return swaps
 
 
@@ -261,33 +240,27 @@ def _modified_steps(deltas: Sequence[StepDelta]) -> list[StepDelta]:
     ]
 
 
-def _step_at(steps: list[Step], path: StepPath) -> Step:
-    step = steps[path[0]]
-    return _step_at(step.children, path[1:]) if path[1:] else step
-
-
 def _replaced_refs(
-    before_tokens: list[Token],
-    after_tokens: list[Token],
-    removed: set[TermId],
-    added: set[TermId],
+    words: Sequence[DiffSegment], removed: set[TermId], added: set[TermId]
 ) -> _Swaps:
-    """The ref pairs of the regions that differ between two readings of a step,
-    each holding exactly one removed term's ref before and one added term's after."""
+    """The ref pairs of the stretches a step's word diff changed, each holding
+    exactly one removed term's ref before and one added term's after."""
     swaps: _Swaps = []
-    for gap_before, gap_after, _ in lcs_gaps(before_tokens, after_tokens, tokens_equal):
-        gone = _refs_to([before_tokens[index] for index in gap_before], removed)
-        came = _refs_to([after_tokens[index] for index in gap_after], added)
+    for equal, stretch in groupby(words, key=lambda segment: segment.mark == 'equal'):
+        if equal:
+            continue
+        segments = list(stretch)
+        gone = _refs_to([part for one in segments for part in one.before], removed)
+        came = _refs_to([part for one in segments for part in one.after], added)
         if len(gone) == 1 and len(came) == 1:
             swaps.append((gone[0], came[0]))
     return swaps
 
 
-def _refs_to(region: list[Token], term_ids: set[TermId]) -> list[TermId]:
+def _refs_to(parts: list[NarrationPart], term_ids: set[TermId]) -> list[TermId]:
     return [
         part.term_id
-        for token in region
-        for part in token.parts
+        for part in parts
         if isinstance(part, NarrationTermRef) and part.term_id in term_ids
     ]
 
@@ -310,7 +283,7 @@ def _definition_suggestions(
     after_reading: Reading,
     swapped_before: set[TermId],
     swapped_after: set[TermId],
-) -> _Found:
+) -> _Found[Suggestion]:
     removed: dict[TermKind | None, list[GlossaryTerm]] = {}
     added: dict[TermKind | None, list[GlossaryTerm]] = {}
     for delta in glossary.terms:
@@ -334,7 +307,7 @@ def _definition_suggestions(
                 before=before_terms[index_before].id,
                 after=after_terms[index_after].id,
             )
-            for index_before, index_after in matches.pairs
+            for index_before, index_after in matches.items
         )
     return _Found(suggestions, limited)
 
@@ -345,7 +318,7 @@ def _definition_words(term: GlossaryTerm, reading: Reading) -> list[Token]:
 
 def _mutual_best(
     before_words: list[list[Token]], after_words: list[list[Token]]
-) -> _Matches:
+) -> _Found[tuple[int, int]]:
     """The index pairs each the other's single best match, at the suggestion
     similarity. A tie for best matches nothing.
 
@@ -374,7 +347,7 @@ def _mutual_best(
                 scores[index_before, index_after] = score
     best_after = _best(scores, by_before=True)
     best_before = _best(scores, by_before=False)
-    return _Matches(
+    return _Found(
         [
             (index_before, index_after)
             for index_before, index_after in best_after.items()
