@@ -8,6 +8,21 @@
 - **then** the command succeeds
 - **then** the copy buttons' «citations» link the `/1.0/` URL
 
+## ✓ A subcommand that cannot do its job exits 2, never 1 · 4 cases
+`tests/integration/test_cli.py::test_a_subcommand_that_cannot_do_its_job_exits_2` · diagnostics
+
+- **given** a directory whose only files are `doc.md` and `taken.txt`
+- **when** pytest-given runs {command_line}
+- **then** it exits 2
+- **then** it prints an error to stderr
+
+| command_line |
+|---|
+| report missing.json |
+| delta missing.json after.json |
+| citations check doc.md --report missing.json |
+| skills install --dest taken.txt |
+
 ## ✓ The `citations` exit code says whether a «citation finding» remains, so CI can gate on it · 5 cases
 `tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations, versions/0.5.0
 
@@ -161,6 +176,13 @@
 - **then** the test passes
 - **then** the «scenario» carries its title, its «tag» and its three «steps»
 - **then** the given «step» holds a «term ref» to the term
+
+## ✓ A JSON «report» records the schema version of its shape
+`tests/integration/test_plugin.py::test_the_json_report_records_its_schema_version` · delta
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with --given-json
+- **then** the «report»'s `metadata.schema_version` is this pytest-given's `REPORT_SCHEMA_VERSION`
 
 ## ✓ A chained failure reports the frames of its own error, and its cause apart
 `tests/integration/test_plugin.py::test_chained_failure_keeps_the_frames_of_its_own_error` · validation
@@ -2883,6 +2905,20 @@
 - **when** a «delta report» is built
 - **then** `t[a]` and `t[b]` are unchanged, each under its own node ID
 - **then** `t[c]` is added
+
+## ✓ A «case» pairs by its values, unless it is a «per-case scenario» · 2 cases
+`tests/unit/delta/test_build.py::test_a_per_case_scenario_never_pairs_by_values` · delta, parametrization
+
+- **given** a «case» whose custom «case ID» `happy` becomes `happy-hour`
+    - **given** `group_parametrized` is {group_parametrized}
+- **when** a «delta report» is built
+- **then** the «case» pairs by its values: {group_parametrized}
+- **then** the scenario reads as {changes}
+
+| group_parametrized | changes |
+|---|---|
+| True | changed |
+| False | removed and added |
 
 ## ✓ A moved test file pairs by its unique «scenario title»
 `tests/unit/delta/test_build.py::test_a_moved_test_file_pairs_by_its_unique_title` · delta

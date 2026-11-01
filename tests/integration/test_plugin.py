@@ -58,21 +58,32 @@ def test_a_scenario_reaches_the_report_with_its_tags_and_term_refs(pytester, tmp
         assert [part['term_id'] for part in parts if 'term_id' in part] == ['guest']
 
 
+@scenario(
+    t'A JSON {pg["Report"].l} records the schema version of its shape',
+    tags=['delta'],
+)
 def test_the_json_report_records_its_schema_version(pytester, tmp_path):
-    pytester.makepyfile(
-        """
-        from pytest_given import scenario, when
+    with given(t'a suite with one {pg["Scenario"].l}'):
+        pytester.makepyfile(
+            """
+            from pytest_given import scenario, when
 
-        @scenario("Versioned")
-        def test_versioned():
-            with when("it runs"):
-                pass
-        """
-    )
-    json_path = tmp_path / 'report.json'
-    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=1)
-    metadata = json.loads(json_path.read_text())['metadata']
-    assert metadata['schema_version'] == REPORT_SCHEMA_VERSION
+            @scenario("Versioned")
+            def test_versioned():
+                with when("it runs"):
+                    pass
+            """
+        )
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+    with then(
+        t"the {pg['Report'].l}'s `metadata.schema_version` is this pytest-given's "
+        t'`REPORT_SCHEMA_VERSION`'
+    ):
+        result.assert_outcomes(passed=1)
+        metadata = json.loads(json_path.read_text())['metadata']
+        assert metadata['schema_version'] == REPORT_SCHEMA_VERSION
 
 
 def test_nested_steps(pytester, tmp_path):

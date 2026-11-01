@@ -173,6 +173,50 @@ def test_a_per_case_identity_is_its_full_node_id() -> None:
 
 
 @scenario(
+    t'A {pg["Case"].l} pairs by its values, unless it is a {pg["Per-case scenario"].l}',
+    tags=['delta', 'parametrization'],
+)
+@pytest.mark.parametrize(
+    ('group_parametrized', 'changes'),
+    [(True, 'changed'), (False, 'removed and added')],
+)
+def test_a_per_case_scenario_never_pairs_by_values(
+    group_parametrized: bool, changes: str
+) -> None:
+    with given(
+        t'a {pg["Case"].l} whose custom {pg["Case ID"].l} `happy` becomes `happy-hour`'
+    ):
+        with given(t'`group_parametrized` is {group_parametrized}'):
+            if group_parametrized:
+                before = report(_rated('t.py::t[happy]'))
+                after = report(_rated('t.py::t[happy-hour]'))
+            else:
+                before = report(_per_case('t.py::t[happy]', 'Rates'))
+                after = report(_per_case('t.py::t[happy-hour]', 'Rates'))
+    with when(t'a {pg["Delta report"].l} is built'):
+        delta = _delta(before, after).delta
+    with then(t'the {pg["Case"].l} pairs by its values: {group_parametrized}'):
+        pairings = [
+            case.paired_by
+            for scenario_delta in delta.scenarios
+            if scenario_delta.parameters is not None
+            for case in scenario_delta.parameters.cases
+        ]
+        assert pairings == (['values'] if group_parametrized else [])
+    with then(t'the scenario reads as {changes}'):
+        assert ' and '.join(row[0] for row in _rows(delta)) == changes
+
+
+def _rated(case_id: str) -> Scenario:
+    """A grouped scenario of one custom-ID case, at the same rate either side."""
+    return scn(
+        case_id,
+        'Rates',
+        parameters=table([('rate', 'param')], (case_id, [0.8]), custom=True),
+    )
+
+
+@scenario(
     t'A moved test file pairs by its unique {pg["Scenario title"].l}',
     tags=['delta'],
 )
