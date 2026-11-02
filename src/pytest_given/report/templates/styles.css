@@ -188,8 +188,8 @@ body {
      the report title's edge while leaving room for the rows' bleed and the
      focus rings, which the scroll box would otherwise clip. The top matches
      `.view-main`, so the first control and the view heading stay level. */
-  margin-left: -6px;
-  padding: var(--space-2xl) var(--space-lg) var(--space-lg) 6px;
+  margin: var(--scroll-gap) 0 0 -6px;
+  padding: calc(var(--space-xl) - var(--scroll-gap)) var(--space-lg) var(--space-lg) 6px;
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
@@ -524,7 +524,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 #view-stories,
 #view-glossary { flex: 1; min-height: 0; display: flex; }
 .view-layout { display: flex; flex: 1; min-height: 0; }
-.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-2xl) var(--space-xl) var(--space-xl); overflow-y: auto; }
+/* The scroll boxes start `--scroll-gap` below the tab rule, so scrolled
+   content is cut off short of the rule and the active tab's underline rather
+   than against them. Gap and padding together put the view heading as far
+   below the rule as the content column is inset from the seam. */
+.view-layout { --scroll-gap: var(--space-md); }
+.view-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  margin-top: var(--scroll-gap);
+  padding: calc(var(--space-xl) - var(--scroll-gap)) var(--space-xl) var(--space-xl);
+  overflow-y: auto;
+}
 /* Nearer its own list than the tab rule above it. */
 .header { margin-bottom: var(--space-lg); }
 .header-context {
