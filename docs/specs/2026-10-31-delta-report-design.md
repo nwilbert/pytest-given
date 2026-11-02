@@ -544,37 +544,39 @@ beneath them:
 ### Glossary tab
 
 The same structure as the normal Glossary tab, grouped by kind under the kinds' headings (muted,
-see [Colour](#colour)), listing only added, changed and removed terms. A term card is laid out as a listed scenario is:
-its name and change on one line, then a changed term's two versions side by side, in columns sized
-to the card:
+see [Colour](#colour)), listing only added, changed and removed terms. A term card is one row, as a normal entry is: its
+name, a changed term's two definitions side by side in columns sized to the card, and its change.
+Opening it shows the rest:
 
 ```
- Suite                                                         changed   mapped by hand
- was Room
- A [bookable] room in the hotel.  │  A [rentable] room in the hotel.
- rooms                            │  suites
- 5 scenarios                      │  7 scenarios
- Listed scenarios: A walk-in guest is offered the next free suite
+ > Suite     A [bookable] room in the hotel.  │  A [rentable] room in the hotel.   changed  mapped by hand
+   was Room
+
+ v Suite     A [bookable] room in the hotel.  │  A [rentable] room in the hotel.   changed  mapped by hand
+   was Room  rooms                            │  suites
+             5 scenarios                      │  7 scenarios
+             Listed scenarios: A walk-in guest is offered the next free suite
 ```
 
 - The left bar shows the kind of change, as on the Scenarios tab. The term's kind comes from the
   section it sits in.
 - The sidebar gets the same *Change* filter and unchanged count. Show kinds and the definitions
   filter stay.
-- The card's head shows the term's name, its change and, when the rename log paired it,
-  `mapped by hand`. A renamed term is headed by its new name, its old one under it, as a scenario
-  with a new title is.
-- Each column shows its side's definition, other forms and scenario count.
+- The card's row shows the term's name, its change and, when the rename log paired it,
+  `mapped by hand`. A renamed term shows its new name, its old one under it, as a scenario with a
+  new title is.
+- Each column shows its side's definition. Opening the card shows each side's other forms and
+  scenario count under its definition.
 - A changed definition marks its removed words on the *before* side, struck through on red, and its
   added words on the *after* side, on green, as a modified step does.
 - A removed other form is struck through on the *before* side, and an added one is marked `+` on the
   *after* side. Other forms and scenario counts don't make a term changed by themselves. Story
   counts are left out with stories.
 - Added and removed terms show their one side alone, in one column from the left, as an added or
-  removed scenario does. A removed term's name is struck through, as a removed
-  scenario's title is.
-- A term card links only the listed scenarios that refer to it, in one row under its columns. The
-  unchanged ones it counts but doesn't link, since they aren't on the page.
+  removed scenario does. A removed term's name is struck through, as a removed scenario's title is.
+- An opened card links only the listed scenarios that refer to it, in one row under its columns, or
+  says there are none. The unchanged ones it counts but doesn't link, since they aren't on the
+  page.
 - A term whose kind changed is listed twice: removed under its old kind, added under its new one.
 
 ### Colour

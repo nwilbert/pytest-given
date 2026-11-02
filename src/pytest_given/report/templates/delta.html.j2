@@ -198,6 +198,9 @@
         {% endfor %}
       {% endcall %}
       {% endfor %}
+      {#- Every name, hidden, as on the report's Glossary tab: the name column
+          holds still while the filters hide the cards. -#}
+      <div class="entry-name entry-name-sizer" aria-hidden="true">{% for group in grouping.groups %}{% for card in group.entries %}<span class="term-name">{{ card.shown.canonical }}</span>{% endfor %}{% endfor %}</div>
       </div>
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
     </div>
