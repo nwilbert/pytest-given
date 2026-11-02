@@ -806,12 +806,22 @@ def _build_env(
     delta: DeltaData, source_link_template: str | None
 ) -> jinja2.Environment:
     env = base_env()
-    # Parameter colouring is off on this page.
+    # Parameter colouring is off on this page. A ref links only to a term the
+    # Glossary tab lists: an unchanged one has no card to open.
+    terms = delta.glossary.terms
     narration_filters = {
         'before': make_narration_filter(
-            None, delta.glossary.before, term_side='before'
+            None,
+            delta.glossary.before,
+            term_side='before',
+            linked_terms={term.before.id for term in terms if term.before},
         ),
-        'after': make_narration_filter(None, delta.glossary.after, term_side='after'),
+        'after': make_narration_filter(
+            None,
+            delta.glossary.after,
+            term_side='after',
+            linked_terms={term.after.id for term in terms if term.after},
+        ),
     }
     # Compiled only for a side some scenario or term is shown from, so a
     # `{sha}` template fails only when a link would need the SHA a side lacks.

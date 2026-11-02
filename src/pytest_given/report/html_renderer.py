@@ -12,7 +12,7 @@ __lazy_modules__ = ['jinja2', 'markupsafe']
 import base64
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TypedDict
@@ -558,16 +558,20 @@ def make_narration_filter(
     glossary: Glossary | None,
     *,
     term_side: Side | None = None,
+    linked_terms: Collection[TermId] | None = None,
 ) -> Callable[[Narration], Markup]:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
 
     Without a colour map no placeholder is coloured. `term_side` stamps each
-    term ref with the side whose glossary it was read against.
+    term ref with the side whose glossary it was read against. Given
+    `linked_terms`, a ref to any other term has its tooltip but no link.
     """
 
     def _render(narration: Narration) -> Markup:
         out = [
-            _render_narration_piece(piece, param_color_map, glossary, term_side)
+            _render_narration_piece(
+                piece, param_color_map, glossary, term_side, linked_terms
+            )
             for piece in read_narration(narration)
         ]
         return Markup(''.join(out))
@@ -580,6 +584,7 @@ def _render_narration_piece(
     param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
     term_side: Side | None,
+    linked_terms: Collection[TermId] | None,
 ) -> str:
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
@@ -612,7 +617,7 @@ def _render_narration_piece(
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():
-            return _render_term_ref(part, glossary, term_side)
+            return _render_term_ref(part, glossary, term_side, linked_terms)
 
 
 _TERM_KIND_CLASSES: dict[TermKind, str] = {
@@ -641,7 +646,11 @@ def _unknown_term_span(display: str) -> str:
 
 
 def _term_ref_span(
-    term: GlossaryTerm, term_id: TermId, display: str, side: Side | None = None
+    term: GlossaryTerm,
+    term_id: TermId,
+    display: str,
+    side: Side | None = None,
+    linked: bool = True,
 ) -> str:
     """One term reference the glossary holds.
 
@@ -649,7 +658,8 @@ def _term_ref_span(
     them up by id in the glossary `_app_data` already ships, which is what
     keeps a term used 900 times from carrying 900 copies of its definition.
     """
-    classes = f'{_term_kind_class(term.kind)} term-ref--link has-term-tip'
+    link = ' term-ref--link' if linked else ''
+    classes = f'{_term_kind_class(term.kind)}{link} has-term-tip'
     sided = '' if side is None else f' data-term-side="{side}"'
     return (
         f'<span class="{classes}" data-term-id="{escape(term_id)}"{sided}>'
@@ -658,12 +668,16 @@ def _term_ref_span(
 
 
 def _render_term_ref(
-    part: NarrationTermRef, glossary: Glossary | None, side: Side | None
+    part: NarrationTermRef,
+    glossary: Glossary | None,
+    side: Side | None,
+    linked_terms: Collection[TermId] | None,
 ) -> str:
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    return _term_ref_span(term, part.term_id, part.display, side)
+    linked = linked_terms is None or part.term_id in linked_terms
+    return _term_ref_span(term, part.term_id, part.display, side, linked)
 
 
 def _make_clause_part_filter(

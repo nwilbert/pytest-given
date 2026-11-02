@@ -989,8 +989,9 @@ function reportApp() {
       window.addEventListener('popstate', () => this._readHash());
       // Capture phase + stopPropagation so a term pill inside a clickable
       // container navigates without also triggering that container's click.
+      // A ref without the link class has nowhere to go and lets it through.
       document.addEventListener('click', (event) => {
-        const pill = event.target.closest('[data-term-id]');
+        const pill = event.target.closest('.term-ref--link[data-term-id]');
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();
