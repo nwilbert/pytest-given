@@ -394,8 +394,12 @@ function reportApp() {
       const parts = this._summaryParts();
       if (parts.length) return parts.join('\u2003');
       // Term/tag/module filters each have their own removable chip, so they
-      // are not repeated here — but they do suppress "All Scenarios".
-      return this._chipped() ? '' : 'All Scenarios';
+      // are not repeated here — but they do suppress the unfiltered summary.
+      return this._chipped() ? '' : this._unfilteredSummary();
+    },
+    // The delta page breaks its count down by change instead.
+    _unfilteredSummary() {
+      return 'All Scenarios';
     },
     _summaryParts() {
       const parts = [];

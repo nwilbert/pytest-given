@@ -4,19 +4,18 @@
 // `__REPORT_DATA__` here holds one entry per listed scenario, keyed by its
 // slug, since a removed and an added scenario can share a node ID, and one
 // per term card, keyed likewise.
-const CHANGES = ['added', 'changed', 'removed'];
-
 function deltaApp() {
   const data = window.__REPORT_DATA__;
   const base = reportApp();
-  const allChangesShown = () => Object.fromEntries(CHANGES.map(c => [c, true]));
-  const changeCounts = Object.fromEntries(CHANGES.map(c => [c, 0]));
+  // The changes, in the model's order, which the glyphs' keys keep.
+  const changes = Object.keys(data.change_glyphs);
+  const allChangesShown = () => Object.fromEntries(changes.map(c => [c, true]));
+  const changeCounts = Object.fromEntries(changes.map(c => [c, 0]));
   for (const s of data.scenarios) changeCounts[s.change] += 1;
-  const changesPresent = CHANGES.filter(c => changeCounts[c] > 0);
-  const moduleChanges = data.module_changes || {};
+  const changesPresent = changes.filter(c => changeCounts[c] > 0);
   // The before glossary's terms that read otherwise than the after one's.
-  const beforeTerms = new Map((data.before_terms || []).map(t => [t.id, t]));
-  const termCards = data.term_cards || [];
+  const beforeTerms = new Map(data.before_terms.map(t => [t.id, t]));
+  const termCards = data.term_cards;
   const cardKeys = new Set(termCards.map(card => card.key));
   // A term ref's card, by the side the ref was read on and its term id.
   const cardOf = { before: {}, after: {} };
@@ -27,17 +26,14 @@ function deltaApp() {
     shownChanges: allChangesShown(),
     // The Glossary tab's own, as its search is: not in the URL.
     shownTermChanges: allChangesShown(),
-    get changeCounts() {
-      return changeCounts;
-    },
     moduleChange(module) {
-      return lookup(moduleChanges, module, null);
+      return lookup(data.module_changes, module, null);
     },
     changeGlyph(change) {
       return data.change_glyphs[change];
     },
     _filterState() {
-      return [...base._filterState.call(this), ...CHANGES.map(c => this.shownChanges[c])];
+      return [...base._filterState.call(this), ...changes.map(c => this.shownChanges[c])];
     },
     _matchesFilters(s, index, query) {
       return this.shownChanges[s.change] && base._matchesFilters.call(this, s, index, query);
@@ -48,11 +44,7 @@ function deltaApp() {
       if (shown.length === changesPresent.length) return parts;
       return [shown.length ? shown.join(', ') : 'no changes', ...parts];
     },
-    // Unfiltered, the header breaks the count down by change.
-    get filterSummary() {
-      const parts = this._summaryParts();
-      if (parts.length) return parts.join(' ');
-      if (this._chipped()) return '';
+    _unfilteredSummary() {
       return changesPresent.map(c => changeCounts[c] + ' ' + c).join(', ');
     },
     resetFilters() {
@@ -116,7 +108,7 @@ function deltaApp() {
       const params = parseHash();
       if (params.has('change')) {
         const shown = new Set(params.get('change').split(','));
-        this.shownChanges = Object.fromEntries(CHANGES.map(c => [c, shown.has(c)]));
+        this.shownChanges = Object.fromEntries(changes.map(c => [c, shown.has(c)]));
       } else {
         this.shownChanges = allChangesShown();
       }

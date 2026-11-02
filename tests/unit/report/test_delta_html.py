@@ -6,6 +6,7 @@ import re
 
 from pytest_given.delta import DeltaInputs, build_delta, parse_rename_log
 from pytest_given.model import (
+    CHANGES,
     Attachment,
     AttachmentRef,
     ColumnId,
@@ -219,6 +220,12 @@ def test_each_term_ref_names_the_side_whose_glossary_it_was_read_against() -> No
         ('guest', 'before'),
         ('visitor', 'after'),
     ]
+
+
+def test_the_change_glyphs_reach_delta_js_in_the_model_s_change_order() -> None:
+    """`delta.js` reads its changes' order off the glyphs' keys."""
+    data = embedded_app_data(render_delta_html(_delta(report(), report()), None))
+    assert list(data['change_glyphs']) == list(CHANGES)
 
 
 def _glossary(delta: DeltaData) -> DeltaGlossaryView:
