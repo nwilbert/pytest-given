@@ -220,8 +220,8 @@ body {
 
 
 
-  margin-left: -6px;
-  padding: var(--space-2xl) var(--space-lg) var(--space-lg) 6px;
+  margin: var(--scroll-gap) 0 0 -6px;
+  padding: calc(var(--space-xl) - var(--scroll-gap)) var(--space-lg) var(--space-lg) 6px;
   flex-shrink: 0;
   overflow-y: auto;
   max-height: 100vh;
@@ -556,7 +556,19 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 #view-stories,
 #view-glossary { flex: 1; min-height: 0; display: flex; }
 .view-layout { display: flex; flex: 1; min-height: 0; }
-.view-main { flex: 1; min-width: 0; min-height: 0; padding: var(--space-2xl) var(--space-xl) var(--space-xl); overflow-y: auto; }
+
+
+
+
+.view-layout { --scroll-gap: var(--space-md); }
+.view-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  margin-top: var(--scroll-gap);
+  padding: calc(var(--space-xl) - var(--scroll-gap)) var(--space-xl) var(--space-xl);
+  overflow-y: auto;
+}
 
 .header { margin-bottom: var(--space-lg); }
 .header-context {
