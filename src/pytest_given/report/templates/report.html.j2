@@ -648,6 +648,10 @@
                     Show {{ scn_ids | length | plural('scenario') }} using this term
                   </a>
                 </div>
+                {% else %}
+                {#- Also what keeps an otherwise empty entry open: the source
+                    link alone is out of flow, so the panel would clip it. -#}
+                <div class="refs-line refs-none">No scenario uses this term.</div>
                 {% endif %}
                 {% if term.source %}
                 <div class="scenario-source">{{ source_link(term.source) }}</div>

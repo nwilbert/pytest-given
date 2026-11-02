@@ -1592,6 +1592,10 @@ span.param-highlight {
   font-weight: 500;
   white-space: nowrap;
 }
+.refs-none {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
 
 /* === Term filter chip (active term filter displayed in Scenarios header) === */
 .filter-chip {

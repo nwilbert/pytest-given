@@ -16,6 +16,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - A parameter table no longer shows an id column for a long value that pytest 9.2's `parametrize_long_str_id_strategy = sha256` names by its digest.
+- An HTML report Glossary entry now says when no scenario uses its term, so one without stories or forms no longer opens to an empty panel.
 
 ## [0.5.1] - 2026-10-24
 
