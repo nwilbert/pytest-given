@@ -89,19 +89,7 @@ function deltaApp() {
     init() {
       base.init.call(this);
       this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
-      this._initAlignment();
-    },
-    // Side by side, a step and a case each keep one line across both sides.
-    // Re-aligned whenever a side resizes (sub-steps or a payload opened, the
-    // window narrowed), in the next frame: resizing an observed element
-    // inside its own callback would loop.
-    _initAlignment() {
-      for (const sides of document.querySelectorAll('.delta-sides')) {
-        const steps = sides.querySelectorAll(':scope > .delta-side-steps');
-        const tables = sides.querySelectorAll(':scope > .delta-table .param-table');
-        if (steps.length === 2) alignOnResize(steps, () => alignRows(...steps));
-        if (tables.length === 2) alignOnResize(tables, () => alignBands(...tables));
-      }
+      alignSides();
     },
     _readHash() {
       base._readHash.call(this);
@@ -126,17 +114,82 @@ function deltaApp() {
   return Object.defineProperties(app, Object.getOwnPropertyDescriptors(overrides));
 }
 
-function alignOnResize(elements, align) {
+// Side by side, a step and a case each keep one line across both sides.
+// Re-aligned when a side resizes (sub-steps or a payload opened, the window
+// narrowed), every pair due in one frame: all resets, then all reads, then
+// all writes, so the reads lay the page out once. A pair in a closed
+// scenario waits for it to open, which resizes its body. The sides' sizes
+// are read back after the writes, from the layout the frame needs anyway,
+// so the resize the writes cause aligns nothing again (nor would a change
+// that ends at that same size in that frame, which has nothing to realign).
+// The offset sizes, not the bounding box: like the observer's border box,
+// they leave out transforms.
+function alignSides() {
+  const pairsOf = new Map();
+  const due = new Set();
   let queued = false;
-  const observer = new ResizeObserver(() => {
-    if (queued) return;
+  const observer = new ResizeObserver(entries => {
+    for (const { target, borderBoxSize: [size] } of entries) {
+      // Hidden: shown again as it was, it needs nothing.
+      if (!size.inlineSize && !size.blockSize) continue;
+      for (const pair of pairsOf.get(target)) {
+        if (target === pair.body ? pair.waiting : !pair.holds(target, size)) due.add(pair);
+      }
+    }
+    if (!due.size || queued) return;
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
-      align();
+      alignPairs([...due]);
+      due.clear();
     });
   });
-  elements.forEach(element => observer.observe(element));
+  for (const sides of document.querySelectorAll('.delta-sides')) {
+    const steps = sides.querySelectorAll(':scope > .delta-side-steps');
+    const tables = sides.querySelectorAll(':scope > .delta-table .param-table');
+    const body = sides.closest('.scenario-body-inner');
+    const pairs = [];
+    if (steps.length === 2) pairs.push(sidePair(body, [...steps], rowAligner));
+    if (tables.length === 2) pairs.push(sidePair(body, [...tables], bandAligner));
+    for (const pair of pairs) {
+      for (const element of [...pair.sides, body]) {
+        if (!pairsOf.has(element)) {
+          pairsOf.set(element, []);
+          observer.observe(element);
+        }
+        pairsOf.get(element).push(pair);
+      }
+    }
+  }
+}
+
+function sidePair(body, sides, aligner) {
+  return {
+    body,
+    sides,
+    aligner,
+    waiting: true,
+    sizes: new Map(),
+    holds(side, size) {
+      const kept = this.sizes.get(side);
+      // Within a pixel: the offset sizes are rounded.
+      return !!kept && Math.abs(kept.width - size.inlineSize) < 1
+        && Math.abs(kept.height - size.blockSize) < 1;
+    },
+  };
+}
+
+function alignPairs(pairs) {
+  const open = pairs.filter(pair => {
+    pair.waiting = !pair.body.parentElement.classList.contains('expanded');
+    return !pair.waiting;
+  });
+  const aligners = open.map(pair => pair.aligner(...pair.sides));
+  const reads = aligners.map(aligner => aligner?.read());
+  aligners.forEach((aligner, i) => { if (reads[i]) aligner.write(reads[i]); });
+  for (const pair of open) {
+    pair.sizes = new Map(pair.sides.map(side => [side, { width: side.offsetWidth, height: side.offsetHeight }]));
+  }
 }
 
 // Each row's line starts level on both sides, the higher one pushed down, and
@@ -145,14 +198,14 @@ function alignOnResize(elements, align) {
 // by as much, which the running shift accounts for. Rows inside closed
 // sub-steps take no room and are left out, alike on both sides. A phase's
 // first step shares its line with the keyword, which is pushed along.
-function alignRows(before, after) {
-  if (!before.getClientRects().length) return;  // a hidden scenario
+// Building the aligner resets the rows; null when they don't pair up.
+function rowAligner(before, after) {
   const shown = side => [...side.querySelectorAll('[data-row]')]
     .filter(row => !row.parentElement.closest('.step-expand:not(.expanded)'));
   const pairs = zip(shown(before), shown(after));
   if (!pairs) {
     console.assert(false, 'delta steps have unequal rows', before, after);
-    return;
+    return null;
   }
   const keyword = row => {
     const block = row.closest('.phase-block');
@@ -164,26 +217,33 @@ function alignRows(before, after) {
     const label = keyword(row);
     if (label) label.style.paddingTop = '';
   }
-  const boxes = pairs.map(pair => pair.map(row => row.getBoundingClientRect()));
-  const shift = [0, 0];
-  pairs.forEach((pair, i) => {
-    const tops = boxes[i].map((box, side) => box.top + shift[side]);
-    const level = Math.max(...tops);
-    pair.forEach((row, side) => {
-      const push = level - tops[side] >= 0.5 ? level - tops[side] : 0;
-      if (push) {
-        row.style.paddingTop = `${push}px`;
-        const label = keyword(row);
-        if (label) label.style.paddingTop = `${push}px`;
-      }
-      shift[side] += push;
-      if (!row.classList.contains('delta-gap')) return;
-      // Box-sized: the gap's height holds its push.
-      const height = boxes[i][1 - side].height;
-      row.style.height = `${push + height}px`;
-      shift[side] += height - boxes[i][side].height;
-    });
-  });
+  return {
+    // Null for a hidden scenario.
+    read: () => before.getClientRects().length
+      ? pairs.map(pair => pair.map(row => row.getBoundingClientRect()))
+      : null,
+    write(boxes) {
+      const shift = [0, 0];
+      pairs.forEach((pair, i) => {
+        const tops = boxes[i].map((box, side) => box.top + shift[side]);
+        const level = Math.max(...tops);
+        pair.forEach((row, side) => {
+          const push = level - tops[side] >= 0.5 ? level - tops[side] : 0;
+          if (push) {
+            row.style.paddingTop = `${push}px`;
+            const label = keyword(row);
+            if (label) label.style.paddingTop = `${push}px`;
+          }
+          shift[side] += push;
+          if (!row.classList.contains('delta-gap')) return;
+          // Box-sized: the gap's height holds its push.
+          const height = boxes[i][1 - side].height;
+          row.style.height = `${push + height}px`;
+          shift[side] += height - boxes[i][side].height;
+        });
+      });
+    },
+  };
 }
 
 // The two sides' rows by position, each pair the same row; null when they
@@ -195,25 +255,33 @@ function zip(before, after) {
 }
 
 // Each band (the header, or a case with its error and payload rows) grows its
-// last row on the shorter side by the difference. Every height is read before
-// any is written, so the tables lay out once.
-function alignBands(before, after) {
+// last row on the shorter side by the difference. Building the aligner resets
+// the rows; null when the bands don't pair up.
+function bandAligner(before, after) {
   const beforeBands = before.querySelectorAll('[data-band]');
   const afterBands = after.querySelectorAll('[data-band]');
   // The template gives both tables a band per row; anything else can't be paired.
   if (beforeBands.length !== afterBands.length) {
     console.assert(false, 'delta tables have unequal bands', before, after);
-    return;
+    return null;
   }
   const pairs = [...beforeBands].map((band, i) => [band, afterBands[i]]);
   const lastRows = pairs.map(pair => pair.map(band => band.rows[band.rows.length - 1]));
   for (const row of lastRows.flat()) row.style.height = '';
-  const bandHeights = pairs.map(pair => pair.map(band => band.getBoundingClientRect().height));
-  const rowHeights = lastRows.map(rows => rows.map(row => row.getBoundingClientRect().height));
-  bandHeights.forEach(([beforeHeight, afterHeight], i) => {
-    const gap = Math.abs(beforeHeight - afterHeight);
-    if (gap < 0.5) return;
-    const shorter = beforeHeight < afterHeight ? 0 : 1;
-    lastRows[i][shorter].style.height = `${rowHeights[i][shorter] + gap}px`;
-  });
+  return {
+    read: () => before.getClientRects().length
+      ? {
+        bands: pairs.map(pair => pair.map(band => band.getBoundingClientRect().height)),
+        rows: lastRows.map(rows => rows.map(row => row.getBoundingClientRect().height)),
+      }
+      : null,
+    write({ bands, rows }) {
+      bands.forEach(([beforeHeight, afterHeight], i) => {
+        const gap = Math.abs(beforeHeight - afterHeight);
+        if (gap < 0.5) return;
+        const shorter = beforeHeight < afterHeight ? 0 : 1;
+        lastRows[i][shorter].style.height = `${rows[i][shorter] + gap}px`;
+      });
+    },
+  };
 }
