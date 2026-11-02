@@ -425,14 +425,15 @@ def _table_view(
     removed = {pair.before for pair in parameters.columns if pair.after is None}
     added = {pair.after for pair in parameters.columns if pair.before is None}
     before_names = {column.id: column.name for column in before.parameters.columns}
-    after_names = {column.id: column.name for column in after.parameters.columns}
+    # Paired by values means renamed: a name and kind each table holds once
+    # pairs by name first, and one a table holds twice leaves values more than
+    # one column of the kind to choose from there, so none pairs.
     renamed_from = {
         pair.after: before_names[pair.before]
         for pair in parameters.columns
         if pair.paired_by == 'values'
         and pair.before is not None
         and pair.after is not None
-        and before_names[pair.before] != after_names[pair.after]
     }
     before_cases = {case.id: case for case in before.parameters.cases}
     after_cases = {case.id: case for case in after.parameters.cases}
