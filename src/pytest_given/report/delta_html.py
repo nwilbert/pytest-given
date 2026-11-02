@@ -257,6 +257,14 @@ class ListedTerm:
         return prefix + self.shown.id
 
     @property
+    def renamed_from(self) -> str | None:
+        """A changed term's before name, where its after one differs."""
+        before, after = self.delta.before, self.delta.after
+        if before is None or after is None or before.canonical == after.canonical:
+            return None
+        return before.canonical
+
+    @property
     def sides(self) -> tuple[Side, ...]:
         """A changed term's two, or the one it is shown from."""
         return ('before', 'after') if self.change == 'changed' else (self.side,)

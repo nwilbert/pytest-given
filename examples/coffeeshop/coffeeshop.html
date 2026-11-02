@@ -1882,6 +1882,9 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 
 .delta-sides {
   --delta-column: 42rem;
+  
+
+  --delta-gutter: calc(var(--space-lg) + var(--space-sm));
   display: grid;
   grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   width: fit-content;
@@ -1904,7 +1907,7 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
 .delta-one-side > [data-side] { grid-column: 1; }
 .delta-caption {
-  padding-left: var(--space-lg);
+  padding-left: var(--delta-gutter);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-muted);
@@ -1912,7 +1915,7 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.delta-side-steps .steps { padding-top: var(--space-xs); }
+.delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
 
 
 
@@ -1923,12 +1926,12 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-step:not([data-change="equal"]) > .step-text::before {
   content: var(--step-glyph);
   position: absolute;
-  left: calc(-1 * var(--space-md));
+  left: calc(-1 * var(--space-lg));
   font-weight: 700;
   color: var(--change-ink);
 }
 
-.delta-side-steps .phase-block.phase-hover::before { left: calc(-1 * var(--space-lg)); }
+.delta-side-steps .phase-block.phase-hover::before { left: calc(-1 * var(--delta-gutter)); }
 
 
 
@@ -1985,31 +1988,18 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
 
 .delta .glossary-entries { grid-template-columns: auto minmax(0, 1fr); margin-bottom: 0; }
-
-
-.delta .glossary-entries > .delta-term-captions {
-  grid-column: 2;
-  margin: 0 calc(var(--space-lg) + 1px) 0 0;
-}
-.delta-term-captions .delta-caption { padding-left: 0; }
-
-
-.delta .entry-head > .delta-sides,
-.delta-term-captions {
-  grid-template-columns: minmax(0, var(--delta-column)) 1px minmax(0, var(--delta-column));
-  width: auto;
-}
-.delta .entry-head > .delta-sides > .delta-rule { grid-row: 1; }
-.delta .entry-head > .delta-sides { margin-top: 0; }
 .delta .refs-inner { grid-column: 2; }
-.delta-term { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
+.delta-term { min-width: 0; }
 .delta-term-head { display: flex; align-items: baseline; gap: var(--space-sm); }
-.delta-term-head .entry-name { min-width: 0; }
+.delta-term-head .entry-name { min-width: 0; padding-right: 0; }
 .delta-term-head > .delta-change-label { margin-left: auto; }
 .delta-term-head > .delta-change-label,
 .delta-term-head > .delta-badge { flex-shrink: 0; }
+.delta-term .delta-sides { margin-top: var(--space-xs); }
+.delta-term .delta-caption { padding-left: 0; }
+.delta-term-side { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
-.delta-term .entry-summary { margin-top: 0; }
+.delta-term-side .entry-summary { margin-top: 0; }
 .use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
 
 

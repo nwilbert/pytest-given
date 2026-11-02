@@ -262,6 +262,7 @@ def test_a_term_card_links_only_the_listed_scenarios_that_refer_to_it() -> None:
     delta = _delta(before, after)
     card = _card(_glossary(delta), 'bill')
     assert sorted(item.slug for item in card.scenarios) == ['removed-t/gone', 't/stay']
+    assert card.renamed_from is None
     assert [card.scenario_count(side) for side in card.sides] == [
         '3 scenarios',
         '2 scenarios',
@@ -298,6 +299,8 @@ def test_a_changed_term_reads_each_side_with_only_its_own_changes_marked():
     ).delta
     card = _card(_glossary(delta), 'suite')
     assert (card.change, card.delta.paired_by) == ('changed', 'rename-log')
+    # The card heads with its after name, and says what it was called.
+    assert card.renamed_from == 'Room'
     assert {
         side: (
             card.term(side).canonical,

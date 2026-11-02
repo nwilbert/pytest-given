@@ -1850,6 +1850,9 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
    sides' own content, stopping above a table that spans both. */
 .delta-sides {
   --delta-column: 42rem;
+  /* Left of a keyword: room for a step's change glyph, as far from the
+     hovered phase's outline as from the keyword. */
+  --delta-gutter: calc(var(--space-lg) + var(--space-sm));
   display: grid;
   grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
   width: fit-content;
@@ -1872,7 +1875,7 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
 .delta-one-side > [data-side] { grid-column: 1; }
 .delta-caption {
-  padding-left: var(--space-lg);
+  padding-left: var(--delta-gutter);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-muted);
@@ -1880,7 +1883,7 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.delta-side-steps .steps { padding-top: var(--space-xs); }
+.delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
 
 /* A step's change, by the glyph in the margin left of its keyword: the
    marked words carry the rest. The glyph is positioned against the phase
@@ -1891,12 +1894,12 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-step:not([data-change="equal"]) > .step-text::before {
   content: var(--step-glyph);
   position: absolute;
-  left: calc(-1 * var(--space-md));
+  left: calc(-1 * var(--space-lg));
   font-weight: 700;
   color: var(--change-ink);
 }
 /* The glyph is part of its line, so a hovered phase's outline takes it in. */
-.delta-side-steps .phase-block.phase-hover::before { left: calc(-1 * var(--space-lg)); }
+.delta-side-steps .phase-block.phase-hover::before { left: calc(-1 * var(--delta-gutter)); }
 /* Struck in the text's own ink, which reads on the red where a line colour
    would not. The toggle of a step with sub-steps is inline-flex, which a
    strike-through doesn't reach into. */
@@ -1949,33 +1952,20 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 /* A case the side lacks, hatched; opaque, so a hovered row's tint stays off. */
 .delta-placeholder-row td { background: var(--delta-hatch); }
 
-/* The Glossary tab: a card's disclosure, then the scenarios' two columns,
-   their captions once atop the tab. A column stacks its side's name, with
-   the change beside the shown one, its definition, other forms and count. */
+/* The Glossary tab: a card's disclosure, then its head and its sides, laid
+   out as a listed scenario's: the name and the change on one line, each
+   side's definition, other forms and count under its caption. */
 .delta .glossary-entries { grid-template-columns: auto minmax(0, 1fr); margin-bottom: 0; }
-/* The card's head ends its columns short of the list's border and padding,
-   and the captions stop where they do, to stand over them. */
-.delta .glossary-entries > .delta-term-captions {
-  grid-column: 2;
-  margin: 0 calc(var(--space-lg) + 1px) 0 0;
-}
-.delta-term-captions .delta-caption { padding-left: 0; }
-/* A card's columns can't size to its own content: they must stand under the
-   captions, so every card shares the same two. */
-.delta .entry-head > .delta-sides,
-.delta-term-captions {
-  grid-template-columns: minmax(0, var(--delta-column)) 1px minmax(0, var(--delta-column));
-  width: auto;
-}
-.delta .entry-head > .delta-sides > .delta-rule { grid-row: 1; }
-.delta .entry-head > .delta-sides { margin-top: 0; }
 .delta .refs-inner { grid-column: 2; }
-.delta-term { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
+.delta-term { min-width: 0; }
 .delta-term-head { display: flex; align-items: baseline; gap: var(--space-sm); }
-.delta-term-head .entry-name { min-width: 0; }
+.delta-term-head .entry-name { min-width: 0; padding-right: 0; }
 .delta-term-head > .delta-change-label { margin-left: auto; }
 .delta-term-head > .delta-change-label,
 .delta-term-head > .delta-badge { flex-shrink: 0; }
+.delta-term .delta-sides { margin-top: var(--space-xs); }
+.delta-term .delta-caption { padding-left: 0; }
+.delta-term-side { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
-.delta-term .entry-summary { margin-top: 0; }
+.delta-term-side .entry-summary { margin-top: 0; }
 .use-chip.delta-form[data-change="removed"] { text-decoration: line-through; text-decoration-color: var(--removed-line); }
