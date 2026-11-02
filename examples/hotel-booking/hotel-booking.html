@@ -2337,31 +2337,19 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="payment_method" data-block="1" data-subst="payment_method">credit card</td>
             
-            
-            
-            
             <td data-param="decline_reason" data-block="2" data-subst="decline_reason">insufficient funds</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
           </tr>
           
           <tr data-case-row class="">
-            
-            
             
             
             <td data-param="payment_method" data-block="1" data-subst="payment_method">debit card</td>
             
-            
-            
-            
             <td data-param="decline_reason" data-block="2" data-subst="decline_reason">expired card</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
           </tr>
@@ -2369,15 +2357,9 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="payment_method" data-block="1" data-subst="payment_method">bank transfer</td>
             
-            
-            
-            
             <td data-param="decline_reason" data-block="2" data-subst="decline_reason">fraud check failed</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
           </tr>
@@ -2385,15 +2367,9 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
           <tr data-case-row class="failed-row">
             
             
-            
-            
             <td data-param="payment_method" data-block="1" data-subst="payment_method">gift card</td>
             
-            
-            
-            
             <td data-param="decline_reason" data-block="2" data-subst="decline_reason">partial balance</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-failed">✗</span></td>
           </tr>
@@ -5082,8 +5058,9 @@ function reportApp() {
       window.addEventListener('popstate', () => this._readHash());
 
 
+
       document.addEventListener('click', (event) => {
-        const pill = event.target.closest('[data-term-id]');
+        const pill = event.target.closest('.term-ref--link[data-term-id]');
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();

@@ -2369,15 +2369,9 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             <th scope="row" class="param-id" data-block="frame">a-euro-short</th>
             
-            
-            
             <td data-param="euros" data-block="1" data-subst="euros">1</td>
             
-            
-            
-            
             <td data-param="expect" data-block="2" data-subst="expect">False</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
           </tr>
@@ -2385,15 +2379,9 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             <th scope="row" class="param-id" data-block="frame">2-True</th>
             
-            
-            
             <td data-param="euros" data-block="1" data-subst="euros">2</td>
             
-            
-            
-            
             <td data-param="expect" data-block="2" data-subst="expect">True</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
           </tr>
@@ -2401,15 +2389,9 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             <th scope="row" class="param-id" data-block="frame">3-True</th>
             
-            
-            
             <td data-param="euros" data-block="1" data-subst="euros">3</td>
             
-            
-            
-            
             <td data-param="expect" data-block="2" data-subst="expect">True</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
           </tr>
@@ -2417,15 +2399,9 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="xfailed-row">
             <th scope="row" class="param-id" data-block="frame">happy-hour</th>
             
-            
-            
             <td data-param="euros" data-block="1" data-subst="euros">1.5</td>
             
-            
-            
-            
             <td data-param="expect" data-block="2" data-subst="expect">True</td>
-            
             
             <td class="param-status" data-block="frame"><span class="dot-xfailed">⊗</span></td>
           </tr>
@@ -2557,10 +2533,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="cup_size" data-block="0" data-subst="cup_size">200</td>
-            
             
             
           </tr>
@@ -2568,10 +2541,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="cup_size" data-block="0" data-subst="cup_size">350</td>
-            
             
             
           </tr>
@@ -2685,10 +2655,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="cup_size" data-block="1" data-subst="cup_size">200</td>
-            
             
             
           </tr>
@@ -2696,10 +2663,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="cup_size" data-block="1" data-subst="cup_size">300</td>
-            
             
             
           </tr>
@@ -2866,11 +2830,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="flavor" data-block="0" data-subst="flavor">vanilla</td>
-            
-            
             
             <td data-param="attachment:0" data-block="0">
               
@@ -2881,11 +2841,7 @@ Total:        $2.00</pre></div>
               
             </td>
             
-            
-            
-            
             <td data-param="derived:0" data-block="2" data-subst="derived:0">2</td>
-            
             
             
           </tr>
@@ -2917,11 +2873,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="flavor" data-block="0" data-subst="flavor">mocha</td>
-            
-            
             
             <td data-param="attachment:0" data-block="0">
               
@@ -2932,11 +2884,7 @@ Total:        $2.00</pre></div>
               
             </td>
             
-            
-            
-            
             <td data-param="derived:0" data-block="2" data-subst="derived:0">3</td>
-            
             
             
           </tr>
@@ -3558,10 +3506,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="n" data-subst="n">1</td>
-            
             
             
           </tr>
@@ -3569,10 +3514,7 @@ Total:        $2.00</pre></div>
           <tr data-case-row class="">
             
             
-            
-            
             <td data-param="n" data-subst="n">2</td>
-            
             
             
           </tr>
@@ -4638,8 +4580,9 @@ function reportApp() {
       window.addEventListener('popstate', () => this._readHash());
 
 
+
       document.addEventListener('click', (event) => {
-        const pill = event.target.closest('[data-term-id]');
+        const pill = event.target.closest('.term-ref--link[data-term-id]');
         if (!pill) return;
         if (pill.closest('.entry')) return;  // don't self-jump inside a glossary entry
         event.stopPropagation();
