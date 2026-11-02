@@ -1840,14 +1840,14 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
   color: var(--change-ink);
 }
 
-/* A listed scenario's sides in two columns, before on the left, each under
-   its caption: steps above the side's table. A grid row is as tall as its
+/* A listed scenario's sides in two columns, before on the left: steps
+   above the side's table. A grid row is as tall as its
    taller side, so the tables start level; within a row `delta.js` lines up
    the steps and the cases. A table that didn't change spans both columns.
    Both columns are as wide as the scenario's wider side, up to a reading
    width: short steps keep the sides close, whatever the screen. A hairline
-   in a middle track parts them, from the captions down to the end of the
-   sides' own content, stopping above a table that spans both. */
+   in a middle track parts them, down to the end of the sides' own
+   content, stopping above a table that spans both. */
 .delta-sides {
   --delta-column: 42rem;
   /* Left of a keyword: room for a step's change glyph, as far from the
@@ -1866,23 +1866,14 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-sides > .delta-shared { grid-column: 1 / -1; }
 .delta-rule {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   align-self: stretch;
   background: var(--border);
 }
-.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 3; }
+.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 2; }
 /* An added or removed scenario's one side reads from the left. */
 .delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
 .delta-one-side > [data-side] { grid-column: 1; }
-.delta-caption {
-  padding-left: var(--delta-gutter);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
 
 /* A step's change, by the glyph in the margin left of its keyword: the
@@ -1953,8 +1944,8 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-placeholder-row td { background: var(--delta-hatch); }
 
 /* The Glossary tab: a card's disclosure, then its head and its sides, laid
-   out as a listed scenario's: the name and the change on one line, each
-   side's definition, other forms and count under its caption. */
+   out as a listed scenario's: the name and the change on one line, then
+   each side's definition, other forms and count. */
 .delta .glossary-entries { grid-template-columns: auto minmax(0, 1fr); margin-bottom: 0; }
 .delta .refs-inner { grid-column: 2; }
 .delta-term { min-width: 0; }
@@ -1964,7 +1955,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-term-head > .delta-change-label,
 .delta-term-head > .delta-badge { flex-shrink: 0; }
 .delta-term .delta-sides { margin-top: var(--space-xs); }
-.delta-term .delta-caption { padding-left: 0; }
 .delta-term-side { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .delta-term-side .entry-summary { margin-top: 0; }

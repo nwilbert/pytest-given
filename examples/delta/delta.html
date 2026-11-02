@@ -1898,23 +1898,14 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-sides > .delta-shared { grid-column: 1 / -1; }
 .delta-rule {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   align-self: stretch;
   background: var(--border);
 }
-.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 3; }
+.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 2; }
 
 .delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
 .delta-one-side > [data-side] { grid-column: 1; }
-.delta-caption {
-  padding-left: var(--delta-gutter);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
 
 
@@ -1996,7 +1987,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-term-head > .delta-change-label,
 .delta-term-head > .delta-badge { flex-shrink: 0; }
 .delta-term .delta-sides { margin-top: var(--space-xs); }
-.delta-term .delta-caption { padding-left: 0; }
 .delta-term-side { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .delta-term-side .entry-summary { margin-top: 0; }
@@ -2170,9 +2160,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
     <div class="scenario-body" id="scenario-body-0" :class="{ expanded: expandedScenarios[0] }">
     <div class="scenario-body-inner">
-      <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before</div>
-        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
+      <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s0_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-side="before">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2220,9 +2208,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
     <div class="scenario-body" id="scenario-body-1" :class="{ expanded: expandedScenarios[1] }">
     <div class="scenario-body-inner">
-      <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before</div>
-        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
+      <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s1_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> has a confirmed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-side="before">Booking</span> she paid for</div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2273,9 +2259,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 
     <div class="scenario-body" id="scenario-body-2" :class="{ expanded: expandedScenarios[2] }">
     <div class="scenario-body-inner">
-      <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before</div>
-        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
+      <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="modified" data-row="s2_0"><div class="step-text"><del class="delta-words"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="receptionist" data-term-side="before">Dana</span></del> has one free <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room" data-term-side="before">Room</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2320,7 +2304,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body" id="scenario-body-3" :class="{ expanded: expandedScenarios[3] }">
     <div class="scenario-body-inner">
       <div class="delta-sides delta-one-side">
-        <div class="delta-caption" data-side="before">Before</div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">the next <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-side="before">Carol</span> arrives at noon</div>
@@ -2361,7 +2344,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     <div class="scenario-body" id="scenario-body-4" :class="{ expanded: expandedScenarios[4] }">
     <div class="scenario-body-inner">
       <div class="delta-sides delta-one-side">
-        <div class="delta-caption" data-side="after">After</div>
         <div class="delta-side-steps" data-side="after"><div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-side="after">Alice</span> has stayed three times before</div>
@@ -2405,9 +2387,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
       <div class="reason-box xfailed">
         <div class="delta-was">was expected to fail: <del>gift cards are not wired in yet</del></div>
       </div>
-      <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before</div>
-        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
+      <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
         <div class="delta-side-steps" data-side="before"><div class="steps"><div class="phase-block" data-block="0"><div class="phase-label">Given</div><div class="phase-steps">
               <div class="delta-step" data-change="equal" data-row="s5_0"><div class="step-text"><span class="term-ref-actor term-ref--link has-term-tip" data-term-id="guest" data-term-side="before">Alice</span> has a pending <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking" data-term-side="before">Booking</span></div></div>
             </div></div><div class="phase-block" data-block="1"><div class="phase-label">When</div><div class="phase-steps">
@@ -2825,7 +2805,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <span class="delta-change-label" data-change="removed">removed</span>
               </div>
               <div class="delta-sides delta-one-side">
-        <div class="delta-caption" data-side="before">Before</div>
                 <div class="delta-term-side" data-side="before">
                   <div class="entry-def">Staff member who works the front desk.</div>
                   <div class="delta-term-forms">
@@ -2875,7 +2854,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <span class="delta-change-label" data-change="added">added</span>
               </div>
               <div class="delta-sides delta-one-side">
-        <div class="delta-caption" data-side="after">After</div>
                 <div class="delta-term-side" data-side="after">
                   <div class="entry-def">Staff member who arranges extras for guests.</div>
                   <div class="entry-summary">1 scenario</div>
@@ -2935,9 +2913,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <span class="delta-change-label" data-change="changed">changed</span>
                 <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
               </div>
-              <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before</div>
-        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
+              <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
                 <div class="delta-term-side" data-side="before">
                   <div class="entry-def">A bookable hotel room.</div>
                   <div class="delta-term-forms">
@@ -2991,9 +2967,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 </span>
                 <span class="delta-change-label" data-change="changed">changed</span>
               </div>
-              <div class="delta-sides">
-        <div class="delta-caption" data-side="before">Before</div>
-        <div class="delta-caption" data-side="after">After</div><div class="delta-rule" aria-hidden="true"></div>
+              <div class="delta-sides"><div class="delta-rule" aria-hidden="true"></div>
                 <div class="delta-term-side" data-side="before">
                   <div class="entry-def"><del class="delta-words">A</del> bill <del class="delta-words">for</del> a <del class="delta-words">stay.</del></div>
                   <div class="entry-summary">1 scenario</div>
@@ -3044,7 +3018,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <span class="delta-change-label" data-change="removed">removed</span>
               </div>
               <div class="delta-sides delta-one-side">
-        <div class="delta-caption" data-side="before">Before</div>
                 <div class="delta-term-side" data-side="before">
                   <div class="entry-def">A better room offered at the same rate.</div>
                   <div class="entry-summary">1 scenario</div>
@@ -3096,7 +3069,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <span class="delta-change-label" data-change="added">added</span>
               </div>
               <div class="delta-sides delta-one-side">
-        <div class="delta-caption" data-side="after">After</div>
                 <div class="delta-term-side" data-side="after">
                   <div class="entry-def">Move a guest to a better room at the same rate.</div>
                   <div class="entry-summary">1 scenario</div>

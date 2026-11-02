@@ -1898,23 +1898,14 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta-sides > .delta-shared { grid-column: 1 / -1; }
 .delta-rule {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   align-self: stretch;
   background: var(--border);
 }
-.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 3; }
+.delta-sides:has(> .delta-table) > .delta-rule { grid-row: 1 / span 2; }
 
 .delta-one-side { grid-template-columns: minmax(0, var(--delta-column)); }
 .delta-one-side > [data-side] { grid-column: 1; }
-.delta-caption {
-  padding-left: var(--delta-gutter);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .delta-side-steps .steps { padding-top: var(--space-xs); padding-left: var(--delta-gutter); }
 
 
@@ -1996,7 +1987,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 .delta-term-head > .delta-change-label,
 .delta-term-head > .delta-badge { flex-shrink: 0; }
 .delta-term .delta-sides { margin-top: var(--space-xs); }
-.delta-term .delta-caption { padding-left: 0; }
 .delta-term-side { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
 .delta-term-forms { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
 .delta-term-side .entry-summary { margin-top: 0; }

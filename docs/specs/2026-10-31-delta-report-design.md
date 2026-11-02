@@ -471,15 +471,14 @@ the git tag pointing at that SHA (the highest by version order when several do),
 
 ### A changed scenario: side by side
 
-A changed scenario shows its two versions side by side, steps above parameter table, under one
-pair of captions, *Before* on the left and *After* on the right. The top bar's range names the two
-versions, so the captions don't repeat them. Both columns are as wide as the scenario's wider side,
+A changed scenario shows its two versions side by side, steps above parameter table, *before* on
+the left and *after* on the right, uncaptioned: the top bar's range names the two versions, and
+the marks say which way each change went. Both columns are as wide as the scenario's wider side,
 up to a reading width, so short steps keep the two sides close whatever the screen. A hairline
 parts the columns, down to the end of each side's own steps and table. Each column reads as its own
 scenario does in the normal report, and the column says which side a line belongs to:
 
 ```
- Before                                       After
     Given  our guest Alice                       Given  our guest Alice
   ~ When   Alice checks in to the             ~ When   Alice checks in to the
            [Deluxe Suite]                               [Garden Suite]
@@ -500,8 +499,8 @@ scenario does in the normal report, and the column says which side a line belong
 - Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
   side's term refs read from that side's glossary.
 - Nested steps line up the same way, inside their parent.
-- Added and removed scenarios show one side only, in one column from the left under their side's
-  caption, without marks: the row's colour already says it all.
+- Added and removed scenarios show one side only, in one column from the left, without marks: the
+  row's colour already says it all.
 
 ### A changed parameter table: side by side
 
@@ -509,7 +508,6 @@ A changed parameter table sits under the steps of its side, so each side's steps
 beneath them:
 
 ```
- Before                                       After
  case ID       euros expect status            case ID       euros +size expect status
  a-euro-short  1     False  ✓                 a-euro-short  1     small False  ✓
  −3̶-̶T̶r̶u̶e̶        3     True   ✓                 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -517,7 +515,7 @@ beneath them:
  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░               +large-cup    4     large True   ✓
 ```
 
-- Two complete tables, one in each column under the scenario's captions.
+- Two complete tables, one in each column under its side's steps.
 - Rows line up by case, in the *after* table's case order, a removed case placed after the case that
   preceded it on the *before* side. A hatched row marks a case missing on that side.
 - Both tables always show the case ID column and the status column, whether or not any case ID is
@@ -547,13 +545,12 @@ beneath them:
 
 The same structure as the normal Glossary tab, grouped by kind under the kinds' headings (muted,
 see [Colour](#colour)), listing only added, changed and removed terms. A term card is laid out as a listed scenario is:
-its name and change on one line, then a changed term's two versions side by side under the card's
-own captions, in columns sized to the card:
+its name and change on one line, then a changed term's two versions side by side, in columns sized
+to the card:
 
 ```
  Suite                                                         changed   mapped by hand
  was Room
- Before                              After
  A [bookable] room in the hotel.  │  A [rentable] room in the hotel.
  rooms                            │  suites
  5 scenarios                      │  7 scenarios
@@ -573,8 +570,8 @@ own captions, in columns sized to the card:
 - A removed other form is struck through on the *before* side, and an added one is marked `+` on the
   *after* side. Other forms and scenario counts don't make a term changed by themselves. Story
   counts are left out with stories.
-- Added and removed terms show their one side alone, in one column from the left under its caption,
-  as an added or removed scenario does. A removed term's name is struck through, as a removed
+- Added and removed terms show their one side alone, in one column from the left, as an added or
+  removed scenario does. A removed term's name is struck through, as a removed
   scenario's title is.
 - A term card links only the listed scenarios that refer to it, in one row under its columns. The
   unchanged ones it counts but doesn't link, since they aren't on the page.

@@ -24,8 +24,7 @@
   {#- A listed term's card, laid out as a listed scenario is: the report's
       Glossary entry, its bar its change, headed by its name (a renamed
       term's old one under it) and its change. Below, a changed term's two
-      versions side by side under their captions, an added or removed one's
-      own side alone. Its collapsible links the listed scenarios that refer
+      versions side by side, an added or removed one's own side alone. Its collapsible links the listed scenarios that refer
       to it, each into the Scenarios tab (`data-goto-scenario`). -#}
   {%- macro term_card(card) -%}
         {%- set term = card.shown %}
@@ -53,7 +52,6 @@
                 {%- endif %}
               </div>
               <div class="delta-sides{% if card.sides | length == 1 %} delta-one-side{% endif %}">
-                {{- delta_captions(card.sides) }}
                 {%- if card.sides | length == 2 %}{{ delta_rule() }}{% endif %}
                 {%- for side in card.sides %}
                 {%- set version = card.term(side) %}
@@ -106,24 +104,16 @@
         </div>
   {%- endmacro -%}
 
-  {#- Each side's name over its column; the top bar's range says which
-      versions they are. -#}
-  {%- macro delta_captions(sides) -%}
-        {%- for side in sides %}
-        <div class="delta-caption" data-side="{{ side }}">{{ side | capitalize }}</div>
-        {%- endfor %}
-  {%- endmacro -%}
-
   {#- The hairline between the two columns, in a track of its own. -#}
   {%- macro delta_rule() -%}
         <div class="delta-rule" aria-hidden="true"></div>
   {%- endmacro -%}
 
-  {#- A listed scenario's sides in two columns, before on the left, each
-      under its caption: a changed scenario's steps side by side above its
-      tables, an added or removed one's own side alone, in one column from
-      the left, since its caption says which side it is. A table that didn't
-      change spans both columns. `data-side` scopes a hovered row's preview to
+  {#- A listed scenario's sides in two columns, before on the left: a
+      changed scenario's steps side by side above its tables, an added or
+      removed one's own side alone, in one column from the left, since its
+      change says which side it is. A table that didn't change spans both
+      columns. `data-side` scopes a hovered row's preview to
       its own side's text. -#}
   {%- macro delta_sides(item, scenario_idx) -%}
       {%- set scenario = item.shown -%}
@@ -131,7 +121,6 @@
       {%- set table = item.table -%}
       {%- set sides = ['before', 'after'] if steps is not none else [item.side] -%}
       <div class="delta-sides{% if steps is none %} delta-one-side{% endif %}">
-        {{- delta_captions(sides) }}
         {%- if steps is not none %}{{ delta_rule() }}{% endif %}
         {%- for side in sides %}
         <div class="delta-side-steps" data-side="{{ side }}">
