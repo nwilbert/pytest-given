@@ -12,8 +12,8 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
-  {%- from '_delta_macros.html.j2' import change_filter, side_source, term_card, delta_sides, delta_captions with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
+  {%- from '_delta_macros.html.j2' import change_filter, term_card, delta_sides, delta_captions with context -%}
   {{ icon_sprite() }}
 
   {#- The Glossary tab only when a term is listed; no Stories tab. -#}
@@ -133,7 +133,7 @@
   {%- set table = item.table -%}
   {%- set has_body = scenario.steps or (before and before.steps) or scenario.parameters or table or scenario.error or reasons -%}
   <div class="scenario{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
-       data-change="{{ item.change }}"{% if item.side == 'before' %} data-term-side="before"{% endif %}
+       data-change="{{ item.change }}"
        x-show="isVisible({{ index }})"
        id="scenario-{{ index }}"
        data-scenario-id="{{ scenario.id }}">
@@ -146,7 +146,7 @@
           {%- else %}
           <span class="scenario-title" data-side="after">{{ scenario.narration | narration('after') }}</span>
           {%- if item.delta.title_changed %}
-          <span class="delta-was" data-side="before" data-term-side="before">was <del>{{ before.narration | narration('before') }}</del></span>
+          <span class="delta-was" data-side="before">was <del>{{ before.narration | narration('before') }}</del></span>
           {%- endif %}
           {%- endif %}
         </span>
@@ -197,7 +197,7 @@
       {% endif %}
 
       {%- if scenario.source %}
-      {{ side_source(scenario.source, item.side) }}
+      <div class="scenario-source">{{ source_link(scenario.source, item.side) }}</div>
       {%- endif %}
     </div>
     </div>

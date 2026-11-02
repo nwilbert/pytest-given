@@ -2,6 +2,7 @@
 `delta.js` read, never the markup."""
 
 import dataclasses
+import re
 
 from pytest_given.delta import DeltaInputs, build_delta, parse_rename_log
 from pytest_given.model import (
@@ -191,6 +192,33 @@ def test_a_before_side_ref_finds_its_term_where_the_after_one_reads_otherwise() 
         (entry['id'], entry['canonical'], entry['definition'])
         for entry in data['before_terms']
     ] == [('guest', 'Guest', None), ('bill', 'Bill', 'Old.')]
+
+
+def test_each_term_ref_names_the_side_whose_glossary_it_was_read_against() -> None:
+    """`delta.js` reads the side off the ref, for its tooltip and its card."""
+    before = report(
+        scn('t.py::test_stay', 'Stay', step('given', narr(ref('guest', 'a guest')))),
+        scn('t.py::test_leave', narr(lit('A '), ref('guest', 'guest'), lit(' leaves'))),
+        glossary=Glossary(terms=[term('guest', 'Guest')]),
+    )
+    after = report(
+        scn(
+            't.py::test_stay', 'Stay', step('given', narr(ref('visitor', 'a visitor')))
+        ),
+        glossary=Glossary(terms=[term('visitor', 'Visitor')]),
+    )
+    html = render_delta_html(_delta(before, after), None)
+    refs = [
+        (attrs['data-term-id'], attrs.get('data-term-side'))
+        for tag in re.findall(r'<[^>]* data-term-id="[^>]*>', html)
+        for attrs in [dict(re.findall(r'([\w-]+)="([^"]*)"', tag))]
+        if 'has-term-tip' in attrs.get('class', '')
+    ]
+    assert sorted(refs) == [
+        ('guest', 'before'),
+        ('guest', 'before'),
+        ('visitor', 'after'),
+    ]
 
 
 def _glossary(delta: DeltaData) -> DeltaGlossaryView:

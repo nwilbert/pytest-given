@@ -1765,7 +1765,7 @@ body.delta {
   --term-object-ink: var(--term-kindless-ink);      --term-object-line: var(--term-kindless-line);
   --term-activity-ink: var(--term-kindless-ink);    --term-activity-line: var(--term-kindless-line);
 }
-body.delta [class*="param-color-"] { color: var(--text-primary); font-weight: 700; }
+body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 
 /* A row's bar is its change, and so is a term card's: its kind is the
    heading it sits under. */

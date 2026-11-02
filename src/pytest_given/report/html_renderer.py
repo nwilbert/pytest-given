@@ -37,6 +37,7 @@ from ..model import (
     ParameterColumn,
     ReportData,
     Scenario,
+    Side,
     SourceLocation,
     Step,
     TermId,
@@ -153,16 +154,17 @@ def _build_env(
     # for the jump button and `app.js` looks the label up by it, so both sides
     # go through the one constructor.
     env.globals['sentence_key'] = sentence_key
-    env.filters['source_url'] = make_source_url_filter(
+    source_url = make_source_url_filter(
         template=source_link_template,
         project=report.metadata.project,
         commit_sha=report.metadata.commit_sha,
         root=source_root,
     )
-    env.filters['narration'] = make_narration_filter(
-        param_color_map,
-        glossary=report.glossary,
-    )
+    narration = make_narration_filter(param_color_map, glossary=report.glossary)
+    # The macros the delta page shares pass the side they read; a report has
+    # one.
+    env.filters['source_url'] = lambda source, side=None: source_url(source)
+    env.filters['narration'] = lambda value, side=None: narration(value)
     env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     return env
@@ -522,17 +524,20 @@ def make_source_url_filter(
 
 
 def make_narration_filter(
-    param_color_map: ParamColorMap,
+    param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
+    *,
+    term_side: Side | None = None,
 ) -> Callable[[Narration], Markup]:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
 
-    Usage: `{{ step.narration | narration }}`.
+    Without a colour map no placeholder is coloured. `term_side` stamps each
+    term ref with the side whose glossary it was read against.
     """
 
     def _render(narration: Narration) -> Markup:
         out = [
-            _render_narration_piece(piece, param_color_map, glossary)
+            _render_narration_piece(piece, param_color_map, glossary, term_side)
             for piece in read_narration(narration)
         ]
         return Markup(''.join(out))
@@ -542,8 +547,9 @@ def make_narration_filter(
 
 def _render_narration_piece(
     part: NarrationPiece,
-    param_color_map: ParamColorMap,
+    param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
+    term_side: Side | None,
 ) -> str:
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
@@ -552,7 +558,6 @@ def _render_narration_piece(
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
-            color_idx = param_color_map[name]
             label = placeholder_token(part)
             # `data-param` keys the hover highlight and carries the column *id*
             # — two steps can interpolate the same expression with different
@@ -565,14 +570,19 @@ def _render_narration_piece(
             # would be an injection, since Alpine compiles a directive's
             # *decoded* attribute text as JS.
             safe_id = escape(column_id)
+            color = (
+                ''
+                if param_color_map is None
+                else f'class="param-color-{param_color_map[name]}" '
+            )
             return (
-                f'<span class="param-color-{color_idx}" '
+                f'<span {color}'
                 f'data-param="{safe_id}" '
                 f'data-subst="{safe_id}"'
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():
-            return _render_term_ref(part, glossary)
+            return _render_term_ref(part, glossary, term_side)
 
 
 _TERM_KIND_CLASSES: dict[TermKind, str] = {
@@ -600,7 +610,9 @@ def _unknown_term_span(display: str) -> str:
     return f'<span class="term-ref-unknown">{escape(display)}</span>'
 
 
-def _term_ref_span(term: GlossaryTerm, term_id: TermId, display: str) -> str:
+def _term_ref_span(
+    term: GlossaryTerm, term_id: TermId, display: str, side: Side | None = None
+) -> str:
     """One term reference the glossary holds.
 
     The tooltip's name and definition are *not* written here — `app.js` looks
@@ -608,17 +620,20 @@ def _term_ref_span(term: GlossaryTerm, term_id: TermId, display: str) -> str:
     keeps a term used 900 times from carrying 900 copies of its definition.
     """
     classes = f'{_term_kind_class(term.kind)} term-ref--link has-term-tip'
+    sided = '' if side is None else f' data-term-side="{side}"'
     return (
-        f'<span class="{classes}" data-term-id="{escape(term_id)}">'
+        f'<span class="{classes}" data-term-id="{escape(term_id)}"{sided}>'
         f'{escape(display)}</span>'
     )
 
 
-def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
+def _render_term_ref(
+    part: NarrationTermRef, glossary: Glossary | None, side: Side | None
+) -> str:
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    return _term_ref_span(term, part.term_id, part.display)
+    return _term_ref_span(term, part.term_id, part.display, side)
 
 
 def _make_clause_part_filter(

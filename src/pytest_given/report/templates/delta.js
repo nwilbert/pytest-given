@@ -59,10 +59,9 @@ function deltaApp() {
       base.resetFilters.call(this);
       this.shownChanges = allChangesShown();
     },
-    // A ref inside `data-term-side="before"` was read against the before
-    // glossary; every other against the after one.
+    // A ref carries the side whose glossary it was read against.
     _tipTerm(pill) {
-      const before = pill.closest('[data-term-side="before"]') && beforeTerms.get(pill.dataset.termId);
+      const before = pill.dataset.termSide === 'before' && beforeTerms.get(pill.dataset.termId);
       return before || base._tipTerm.call(this, pill);
     },
     // The Glossary tab lists only the terms that changed; a term ref to any
@@ -71,8 +70,7 @@ function deltaApp() {
       return cardKeys.has(key);
     },
     _refEntry(pill) {
-      const side = pill.closest('[data-term-side="before"]') ? 'before' : 'after';
-      return lookup(cardOf[side], pill.dataset.termId, null);
+      return lookup(cardOf[pill.dataset.termSide], pill.dataset.termId, null);
     },
     // Over the cards, which the Change filter narrows too, rather than over a
     // glossary's terms.

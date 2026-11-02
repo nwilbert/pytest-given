@@ -1262,6 +1262,32 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
     assert term['definition_html'] == 'A person staying at the hotel.'
 
 
+def test_a_term_ref_carries_the_side_it_was_read_on_only_when_given_one() -> None:
+    n = Narration(
+        text='Guest',
+        parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
+    )
+    sided = make_narration_filter(
+        param_color_map={}, glossary=_glossary(), term_side='before'
+    )
+    plain = make_narration_filter(param_color_map={}, glossary=_glossary())
+    assert 'data-term-side="before"' in str(sided(n))
+    assert 'data-term-side' not in str(plain(n))
+
+
+def test_a_placeholder_takes_no_colour_without_a_colour_map() -> None:
+    n = Narration(
+        text='pays {amount}',
+        parts=(
+            NarrationLiteral(value='pays '),
+            NarrationPlaceholder(name='amount', column_id=ColumnId('amount')),
+        ),
+    )
+    out = str(make_narration_filter(param_color_map=None, glossary=None)(n))
+    assert 'data-subst="amount"' in out
+    assert 'param-color' not in out
+
+
 def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
     g = _glossary()
     f = make_narration_filter(param_color_map={}, glossary=g)

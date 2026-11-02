@@ -3,10 +3,8 @@
   changed scenario's two sides (the report's phase blocks and step lines,
   each step's change marked on its side, styled as `.delta-step`, and the
   parameter tables), and a listed term's card.
-  `data-term-side="before"` tells the term tooltip (`delta.js`) which glossary
-  a ref inside it was read against.
 #}
-  {%- from '_macros.html.j2' import anchor_link, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, param_cell, case_extras, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, param_cell, case_extras, status_dot with context -%}
 
   {#- The Change filter's pills, each disabled at zero, and how many items
       matched with no change. `model` is the Alpine property the pills
@@ -21,13 +19,6 @@
       </div>
       <div class="delta-unchanged">{{ unchanged_count }} unchanged</div>
     </div>
-  {%- endmacro -%}
-
-  {#- A source link on the commit of the side its scenario or term is shown
-      from. -#}
-  {%- macro side_source(source, side) -%}
-    {%- set url = source | source_url(side) -%}
-    <div class="scenario-source">{% if url %}<a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>{% else %}<span>{{ source.relpath }}:{{ source.line }}</span>{% endif %}</div>
   {%- endmacro -%}
 
   {#- A listed term's card: the report's Glossary entry, its bar its change,
@@ -100,7 +91,7 @@
                 </div>
                 {% endif %}
                 {% if term.source %}
-                {{ side_source(term.source, card.side) }}
+                <div class="scenario-source">{{ source_link(term.source, card.side) }}</div>
                 {% endif %}
               </div>
             </div>
@@ -136,7 +127,7 @@
         {{- delta_captions(sides) }}
         {%- if steps is not none %}{{ delta_rule() }}{% endif %}
         {%- for side in sides %}
-        <div class="delta-side-steps" data-side="{{ side }}"{% if steps is not none and side == 'before' %} data-term-side="before"{% endif %}>
+        <div class="delta-side-steps" data-side="{{ side }}">
           {%- if steps is not none %}{{ delta_steps(steps, side, scenario_idx) }}{% else %}{{ scenario_steps(scenario, scenario_idx, side) }}{% endif -%}
         </div>
         {%- endfor %}

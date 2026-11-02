@@ -65,7 +65,6 @@ from .delta_steps import (
 from .glossary_view import KindGrouping, group_by_kind, plural_if_any
 from .html_renderer import (
     base_env,
-    build_param_color_map,
     bundled_assets,
     bundled_script,
     column_phase_blocks,
@@ -799,20 +798,12 @@ def _build_env(
     delta: DeltaData, source_link_template: str | None
 ) -> jinja2.Environment:
     env = base_env()
-    # Both sides', so a removed step's placeholder finds its column. Parameter
-    # coloring is off on this page: no `--param-color-N` token is emitted, and
-    # the class only carries the placeholder style `body.delta` gives it.
-    param_color_map = build_param_color_map(
-        [
-            scenario
-            for item in delta.scenarios
-            for scenario in (item.before, item.after)
-            if scenario is not None
-        ]
-    )
+    # Parameter colouring is off on this page.
     narration_filters = {
-        'before': make_narration_filter(param_color_map, delta.glossary.before),
-        'after': make_narration_filter(param_color_map, delta.glossary.after),
+        'before': make_narration_filter(
+            None, delta.glossary.before, term_side='before'
+        ),
+        'after': make_narration_filter(None, delta.glossary.after, term_side='after'),
     }
     # Compiled only for a side some scenario or term is shown from, so a
     # `{sha}` template fails only when a link would need the SHA a side lacks.

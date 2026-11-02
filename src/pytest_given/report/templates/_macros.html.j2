@@ -37,9 +37,11 @@
          @keydown.home.prevent="resetSidebar()"></div>
   {%- endmacro -%}
 
-  {%- macro source_link(source) -%}
+  {#- `side` names the delta page's side the source is read from, as for
+      `render_step`. -#}
+  {%- macro source_link(source, side=none) -%}
     {%- if source -%}
-      {%- set url = source | source_url -%}
+      {%- set url = source | source_url(side) -%}
       {%- if url -%}
       <a href="{{ url }}">{{ source.relpath }}:{{ source.line }}</a>
       {%- else -%}
@@ -168,10 +170,10 @@
     </div>
   {%- endmacro -%}
 
-  {#- `side` names the delta page's side the step is read from; the report
-      page's narration filter takes none. -#}
+  {#- `side` names the delta page's side the step is read from; the report's
+      filters ignore it. -#}
   {%- macro render_step(step, step_id, side=none) -%}
-  {{- step_text(step, step_id, step.narration | narration(side) if side else step.narration | narration) -}}
+  {{- step_text(step, step_id, step.narration | narration(side)) -}}
   {%- if step.children and step.children | length > 0 -%}
     {%- call step_children(step_id) -%}
         {%- for child in step.children -%}
