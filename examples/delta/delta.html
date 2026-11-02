@@ -1808,7 +1808,7 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 .delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, .delta-step, tr)[data-change="added"] {
   --change-ink: var(--added-ink); --change-line: var(--added-line); --change-tint: var(--added-tint);
 }
-.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark, tr)[data-change="changed"],
+.delta :is(.scenario, .entry, .delta-change-pill, .delta-module-mark)[data-change="changed"],
 .delta .delta-step[data-change="modified"] {
   --change-ink: var(--changed-ink); --change-line: var(--changed-line); --change-tint: var(--changed-tint);
 }
@@ -2036,7 +2036,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <span class="delta-range">v1 2026-11-01 17:30 to v2 2026-11-01 17:30</span>
+      <span class="delta-range">v1 2026-11-02 18:19 to v2 2026-11-02 18:19</span>
       <span class="topbar-version">pytest-given 0.5.1</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
         <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
@@ -2131,8 +2131,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
   <div class="header">
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' change' + (filteredCount !== 1 ? 's' : '')"></div>
-      <div class="header-context" x-text="filterSummary"></div>
-      <span class="filter-chip" x-show="moduleFilter" x-cloak>
+      <div class="header-context" x-text="filterSummary"></div><span class="filter-chip" x-show="moduleFilter" x-cloak>
         Module: <span x-text="moduleFilter"></span>
         <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
       </span>
@@ -2474,14 +2473,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
-          
-          
-          
-          
-          
-          
-          
-          
             </tbody>
             <tbody data-band="1">
               <tr data-case-row>
@@ -2506,14 +2497,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
-          
-          
-          
-          
-          
-          
-          
-          
             </tbody>
             <tbody data-band="2">
               <tr data-case-row data-change="removed">
@@ -2538,14 +2521,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
-          
-          
-          
-          
-          
-          
-          
-          
             </tbody>
             <tbody data-band="3">
               <tr data-case-row>
@@ -2636,14 +2611,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
-          
-          
-          
-          
-          
-          
-          
-          
             </tbody>
             <tbody data-band="1">
               <tr data-case-row>
@@ -2668,14 +2635,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
-          
-          
-          
-          
-          
-          
-          
-          
             </tbody>
             <tbody data-band="2">
               <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="6"></td></tr>
@@ -2750,14 +2709,6 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
                 <td class="param-status" data-block="frame"><span class="dot-passed">✓</span></td>
               </tr>
               
-          
-          
-          
-          
-          
-          
-          
-          
             </tbody>
           </table>
           </div>
@@ -3188,7 +3139,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-01T17:30:28.816595+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"}]},\"before_terms\":[{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"term_ids\":[\"removed-receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed-upgrade\",\"upgrade\"],\"term_cards\":[{\"key\":\"removed-receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\",\"before\":\"receptionist\",\"after\":null},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\",\"before\":null,\"after\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\",\"before\":\"room\",\"after\":\"suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\",\"before\":\"invoice\",\"after\":\"invoice\"},{\"key\":\"removed-upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\",\"before\":\"upgrade\",\"after\":null},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\",\"before\":null,\"after\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed-delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed-delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-02T18:19:37.215238+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Person staying at the hotel.\",\"definition_html\":\"Person staying at the hotel.\"},{\"id\":\"concierge\",\"canonical\":\"Concierge\",\"kind\":\"actor\",\"definition\":\"Staff member who arranges extras for guests.\",\"definition_html\":\"Staff member who arranges extras for guests.\"},{\"id\":\"suite\",\"canonical\":\"Suite\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one room.\",\"definition_html\":\"A reservation for one room.\"},{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"The itemised bill of a stay, settled at check-out.\",\"definition_html\":\"The itemised bill of a stay, settled at check-out.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a booking.\",\"definition_html\":\"Money transferred for a booking.\"},{\"id\":\"upgrade\",\"canonical\":\"upgrade\",\"kind\":\"activity\",\"definition\":\"Move a guest to a better room at the same rate.\",\"definition_html\":\"Move a guest to a better room at the same rate.\"},{\"id\":\"receptionist\",\"canonical\":\"Receptionist\",\"kind\":\"actor\",\"definition\":\"Staff member who works the front desk.\",\"definition_html\":\"Staff member who works the front desk.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"}]},\"before_terms\":[{\"id\":\"invoice\",\"canonical\":\"Invoice\",\"kind\":\"object\",\"definition\":\"A bill for a stay.\",\"definition_html\":\"A bill for a stay.\"},{\"id\":\"upgrade\",\"canonical\":\"Upgrade\",\"kind\":\"object\",\"definition\":\"A better room offered at the same rate.\",\"definition_html\":\"A better room offered at the same rate.\"}],\"term_ids\":[\"removed-receptionist\",\"concierge\",\"suite\",\"invoice\",\"removed-upgrade\",\"upgrade\"],\"term_cards\":[{\"key\":\"removed-receptionist\",\"kind\":\"actor\",\"change\":\"removed\",\"defined\":true,\"search\":\"receptionist\",\"before\":\"receptionist\",\"after\":null},{\"key\":\"concierge\",\"kind\":\"actor\",\"change\":\"added\",\"defined\":true,\"search\":\"concierge\",\"before\":null,\"after\":\"concierge\"},{\"key\":\"suite\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"room suite\",\"before\":\"room\",\"after\":\"suite\"},{\"key\":\"invoice\",\"kind\":\"object\",\"change\":\"changed\",\"defined\":true,\"search\":\"invoice\",\"before\":\"invoice\",\"after\":\"invoice\"},{\"key\":\"removed-upgrade\",\"kind\":\"object\",\"change\":\"removed\",\"defined\":true,\"search\":\"upgrade\",\"before\":\"upgrade\",\"after\":null},{\"key\":\"upgrade\",\"kind\":\"activity\",\"change\":\"added\",\"defined\":true,\"search\":\"upgrade\",\"before\":null,\"after\":\"upgrade\"}],\"term_scenarios\":{\"guest\":[\"removed-delta_booking/late_checkout\",\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\",\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\"],\"receptionist\":[\"removed-delta_booking/late_checkout\"],\"booking\":[\"delta_booking/check_in\",\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"payment\":[\"delta_booking/cancel_booking\",\"delta_booking/payment_declined\"],\"invoice\":[\"delta_booking/cancel_booking\",\"delta_booking/loyalty_discount\"],\"suite\":[\"delta_booking/walk_in_booking\"],\"concierge\":[\"delta_booking/loyalty_discount\"]},\"scenarios\":[{\"id\":\"delta_booking/check_in\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\",\"digital-key\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Guests check in at the front desk Guests check in with a digital key\"},{\"id\":\"delta_booking/cancel_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"cancellation\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"Cancelling a paid booking refunds it Cancelling a paid booking refunds it legacy\"},{\"id\":\"delta_booking/walk_in_booking\",\"module\":\"test_delta_booking\",\"tags\":[\"front-desk\"],\"status\":\"passed\",\"change\":\"changed\",\"search_text\":\"A walk-in guest gets the next free room A walk-in guest is offered the next free suite\"},{\"id\":\"removed-delta_booking/late_checkout\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"removed\",\"search_text\":\"Late check-out is refused when the next guest arrives early\"},{\"id\":\"delta_booking/loyalty_discount\",\"module\":\"test_delta_booking\",\"tags\":[],\"status\":\"passed\",\"change\":\"added\",\"search_text\":\"Returning guests get a loyalty discount on the invoice\"},{\"id\":\"delta_booking/payment_declined\",\"module\":\"test_delta_booking\",\"tags\":[\"error-handling\"],\"status\":\"failed\",\"change\":\"changed\",\"search_text\":\"A declined payment leaves the booking pending A declined payment leaves the booking pending\"}],\"scenario_slugs\":{\"delta_booking/check_in\":\"delta_booking/check_in\",\"delta_booking/cancel_booking\":\"delta_booking/cancel_booking\",\"delta_booking/walk_in_booking\":\"delta_booking/walk_in_booking\",\"removed-delta_booking/late_checkout\":\"removed-delta_booking/late_checkout\",\"delta_booking/loyalty_discount\":\"delta_booking/loyalty_discount\",\"delta_booking/payment_declined\":\"delta_booking/payment_declined\"},\"module_changes\":{\"test_delta_booking\":\"changed\"},\"change_glyphs\":{\"added\":\"+\",\"changed\":\"~\",\"removed\":\"\\u2212\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -4586,6 +4537,9 @@ function deltaApp() {
 
 
 
+
+
+
 function alignSides() {
   const pairsOf = new Map();
   const due = new Set();
@@ -4634,8 +4588,9 @@ function sidePair(body, sides, aligner) {
     sizes: new Map(),
     holds(side, size) {
       const kept = this.sizes.get(side);
-      return !!kept && Math.abs(kept.width - size.inlineSize) < 0.5
-        && Math.abs(kept.height - size.blockSize) < 0.5;
+
+      return !!kept && Math.abs(kept.width - size.inlineSize) < 1
+        && Math.abs(kept.height - size.blockSize) < 1;
     },
   };
 }
@@ -4649,7 +4604,7 @@ function alignPairs(pairs) {
   const reads = aligners.map(aligner => aligner?.read());
   aligners.forEach((aligner, i) => { if (reads[i]) aligner.write(reads[i]); });
   for (const pair of open) {
-    pair.sizes = new Map(pair.sides.map(side => [side, side.getBoundingClientRect()]));
+    pair.sizes = new Map(pair.sides.map(side => [side, { width: side.offsetWidth, height: side.offsetHeight }]));
   }
 }
 
