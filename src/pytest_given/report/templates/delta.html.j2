@@ -12,7 +12,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
   {%- from '_delta_macros.html.j2' import change_filter, term_card, delta_sides, delta_captions with context -%}
   {{ icon_sprite() }}
 
@@ -48,51 +48,14 @@
 
     {{ status_filter() }}
 
-    <div class="sidebar-section">
-      <div class="sidebar-label-row">
-        <div class="sidebar-label">Browse by</div>
-        <div class="sort-toggle">
-          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'name' }"
-                  :aria-pressed="sortBy === 'name'" @click="sortBy = 'name'"
-                  aria-label="Sort groups by name">A&ndash;Z</button>
-          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'count' }"
-                  :aria-pressed="sortBy === 'count'" @click="sortBy = 'count'"
-                  aria-label="Sort groups by scenario count">Count</button>
-        </div>
-      </div>
-      <div class="seg-toggle">
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
-        {% if browse_terms %}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'terms' }" :aria-pressed="view === 'terms'" @click="view = 'terms'">Terms</button>
-        {% endif %}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
-      </div>
-      <div class="nav-tree">
-        {#- As in the report, plus a module's change: by which sides have the
-            module at all, so a package row, which is no module, has none. -#}
-        <template x-for="group in groups" :key="group.id">
-          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-bucket': group.bucket }"
-               :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
-            <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
-                    :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
-                    :aria-expanded="!!expandedGroups[group.id]"
-                    :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
-                    @click.stop="toggleGroup(group.id)"></button>
-            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && groupsNest"></span>
-            <button type="button" class="btn-reset nav-group-select"
-                    :aria-pressed="isGroupActive(group)"
-                    @click.stop="onGroupClick(group)">
-              <span class="nav-group-name" x-text="group.name"></span>
-            </button>
+    {% call browse_by(browse_terms) %}
+            {#- As in the report, plus a module's change: by which sides have the
+                module at all, so a package row, which is no module, has none. #}
             <template x-if="view === 'modules' && moduleChange(group.id)">
               <span class="delta-module-mark" :data-change="moduleChange(group.id)" :title="'Module ' + moduleChange(group.id)"
                     x-text="changeGlyph(moduleChange(group.id))"></span>
             </template>
-            <span class="nav-group-count" x-text="group.count"></span>
-          </div>
-        </template>
-      </div>
-    </div>
+    {%- endcall %}
   </div>
   {{ sidebar_resizer() }}
   <div class="view-main">
@@ -101,26 +64,7 @@
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' change' + (filteredCount !== 1 ? 's' : '')"></div>
       <div class="header-context" x-text="filterSummary"></div>
-      <span class="filter-chip" x-show="moduleFilter" x-cloak>
-        Module: <span x-text="moduleFilter"></span>
-        <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
-      </span>
-      <template x-for="tag in tagFilters" :key="tag">
-        <span class="filter-chip" x-cloak>
-          Tag: <span x-text="tagLabel(tag)"></span>
-          <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
-        </span>
-      </template>
-      <template x-for="termId in termFilters" :key="termId">
-        <span class="filter-chip" x-cloak>
-          Term: <span x-text="termLabel(termId)"></span>
-          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
-        </span>
-      </template>
-      <button class="collapse-all-btn" @click="toggleAllScenarios()">
-        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
-        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
-      </button>
+      {{- filter_chips() }}
     </div>
   </div>
 

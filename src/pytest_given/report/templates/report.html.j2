@@ -8,7 +8,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -56,58 +56,7 @@
 
     {{ status_filter() }}
 
-    <div class="sidebar-section">
-      <div class="sidebar-label-row">
-        <div class="sidebar-label">Browse by</div>
-        {#- Sort applies to the group rows below, whatever axis is showing:
-            "A–Z" reads the name column, "Count" the count column. -#}
-        <div class="sort-toggle">
-          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'name' }"
-                  :aria-pressed="sortBy === 'name'" @click="sortBy = 'name'"
-                  aria-label="Sort groups by name">A&ndash;Z</button>
-          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'count' }"
-                  :aria-pressed="sortBy === 'count'" @click="sortBy = 'count'"
-                  aria-label="Sort groups by scenario count">Count</button>
-        </div>
-      </div>
-      <div class="seg-toggle">
-        {#- Modules leads and opens by default: it is the one axis every report
-            has, so no report opens on an empty tree. The Terms axis needs a
-            glossary to browse; without one the segment is simply absent. -#}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
-        {% if tab_visibility.glossary %}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'terms' }" :aria-pressed="view === 'terms'" @click="view = 'terms'">Terms</button>
-        {% endif %}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
-      </div>
-      <div class="nav-tree">
-        {#- Rows key on `group.id`, not the display name: a term row shows its
-            canonical name but filters by term id, and a module row shows one
-            path segment but filters by the whole path. The row filters and the
-            chevron expands — the chevron stops propagation so it opens a
-            package without filtering by it, and selecting a package opens it
-            too (see `onGroupClick`), so the common case needs no aim. Only a
-            module package or tag prefix has children, so only those render a
-            chevron; the spacer aligns the leaves beside them and stays out
-            of an axis that does not nest at all.
-            `--nav-indent` is what makes the flat row list read as a tree.
-            The row keeps its own @click so the padding stays clickable; the
-            inner button is what the keyboard reaches, and stops propagation so
-            the two do not both fire. -#}
-        <template x-for="group in groups" :key="group.id">
-          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-bucket': group.bucket }"
-               :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
-            <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
-                    :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
-                    :aria-expanded="!!expandedGroups[group.id]"
-                    :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
-                    @click.stop="toggleGroup(group.id)"></button>
-            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && groupsNest"></span>
-            <button type="button" class="btn-reset nav-group-select"
-                    :aria-pressed="isGroupActive(group)"
-                    @click.stop="onGroupClick(group)">
-              <span class="nav-group-name" x-text="group.name"></span>
-            </button>
+    {% call browse_by(tab_visibility.glossary) %}
             {#- A tag row's copy button sits beside its name, as a story's does
                 beside its title, and opens the same menu. -#}
             {% if citations %}
@@ -123,11 +72,7 @@
                     x-show="view === 'tags'" :data-anchor="tagAnchor(group.id)"
                     @click.stop="copyAnchor($el)">{{ icon('link') }}</button>
             {% endif %}
-            <span class="nav-group-count" x-text="group.count"></span>
-          </div>
-        </template>
-      </div>
-    </div>
+    {%- endcall %}
   </div>
   {{ sidebar_resizer() }}
   <div class="view-main">
@@ -135,34 +80,7 @@
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
       <div class="header-context" x-text="filterSummary"></div>
-      {#- One chip per active filter, each dismissable on its own. Tags and
-          terms intersect (AND) and so can stack; module is single-select. -#}
-      <span class="filter-chip" x-show="moduleFilter" x-cloak>
-        Module: <span x-text="moduleFilter"></span>
-        <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
-      </span>
-      <template x-for="tag in tagFilters" :key="tag">
-        <span class="filter-chip" x-cloak>
-          Tag: <span x-text="tagLabel(tag)"></span>
-          <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
-        </span>
-      </template>
-      <template x-for="termId in termFilters" :key="termId">
-        <span class="filter-chip" x-cloak>
-          Term: <span x-text="termLabel(termId)"></span>
-          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
-        </span>
-      </template>
-      {#- The sentence label is its whole prose, so it truncates and carries
-          the full prose in a title rather than pushing the chips off the row. -#}
-      <span class="filter-chip" x-show="sentenceFilter" x-cloak>
-        <span class="filter-chip-text" x-text="sentenceLabel(sentenceFilter)" :title="sentenceLabel(sentenceFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearSentenceFilter()" aria-label="Clear sentence filter">×</button>
-      </span>
-      <button class="collapse-all-btn" @click="toggleAllScenarios()">
-        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
-        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
-      </button>
+      {{- filter_chips(sentence=true) }}
     </div>
   </div>
 
