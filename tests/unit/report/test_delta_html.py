@@ -1,5 +1,5 @@
-"""The delta page's context (`report/delta_html.py`): the data its template and
-`delta.js` read, never the markup."""
+"""The delta page's context (`report/delta_html.py`, its listed scenarios and
+term cards): the data its template and `delta.js` read, never the markup."""
 
 import dataclasses
 import re
@@ -22,16 +22,13 @@ from pytest_given.model import (
     Step,
     narration_text,
 )
-from pytest_given.report.delta_html import (
-    DeltaGlossaryView,
+from pytest_given.report.delta_glossary import DeltaGlossaryView, ListedTerm, OtherForm
+from pytest_given.report.delta_html import delta_render_context, render_delta_html
+from pytest_given.report.delta_scenarios import (
     ListedScenario,
-    ListedTerm,
-    OtherForm,
     ReasonRow,
     TableSide,
     TableView,
-    delta_render_context,
-    render_delta_html,
 )
 from tests.unit.delta.builders import (
     lit,
