@@ -187,7 +187,7 @@
           {%- endfor -%}
         {%- endcall -%}
       {%- endif -%}
-      {{ step_attachments(line.step, step_id) }}
+      {% if line.step.attachments %}{{ step_attachments(line.step, step_id) }}{% endif %}
     {%- endif -%}
     </div>
   {%- endmacro -%}
@@ -234,11 +234,11 @@
                 </th>
                 {%- for col, val in table.parameters.cells(case) %}
                 {%- set changed = table.columns[loop.index0].change == 'added' or col.id in row.pair.changed_cells %}
-                {{ param_cell(col, val, cell_prefix ~ loop.index0, col_blocks.get(col.id), cell_mark if changed else none) }}
+                {{ param_cell(col, val, cell_prefix, loop.index0, col_blocks.get(col.id), cell_mark if changed else none) }}
                 {%- endfor %}
                 <td class="param-status" data-block="frame"{% if row.pair.status_changed %} data-change="{{ cell_mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
               </tr>
-              {{ case_extras(table.parameters, case, cell_prefix, table_width) }}
+              {% if case.error or 'attachment' in table.parameters.columns | map(attribute='kind') %}{{ case_extras(table.parameters, case, cell_prefix, table_width) }}{% endif %}
               {%- else %}
               <tr class="delta-placeholder-row" aria-hidden="true"><td colspan="{{ table_width }}"></td></tr>
               {%- endif %}

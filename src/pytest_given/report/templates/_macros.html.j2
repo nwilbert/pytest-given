@@ -181,7 +181,7 @@
         {%- endfor -%}
     {%- endcall -%}
   {%- endif -%}
-  {{- step_attachments(step, step_id) -}}
+  {%- if step.attachments %}{{ step_attachments(step, step_id) }}{% endif -%}
   {%- endmacro -%}
 
   {#- A step's line, `text` its rendered narration, with the toggle that opens
@@ -210,8 +210,9 @@
     </div>
   {%- endmacro -%}
 
+  {#- Called only for a step with attachments: a macro call per step costs
+      the large report's render more than the guard. -#}
   {%- macro step_attachments(step, step_id) -%}
-  {%- if step.attachments -%}
     {%- for att in step.attachments -%}
     {%- if att is attachment_ref -%}
     <div>
@@ -223,7 +224,6 @@
     </div>
     {%- endif -%}
     {%- endfor -%}
-  {%- endif -%}
   {%- endmacro -%}
 
   {#- Text, not an icon: the current state has to be readable without
@@ -436,6 +436,7 @@
           narration and its columns together. The id and status columns share
           one of their own: they frame the row, at its two ends. -#}
       {%- set col_blocks = scenario | column_phase_blocks %}
+      {%- set has_attachments = 'attachment' in scenario.parameters.columns | map(attribute='kind') %}
       <div class="param-table-scroll">
       <table class="param-table">
         <thead>
@@ -449,30 +450,30 @@
         </thead>
         <tbody>
           {% for case in scenario.parameters.cases %}
-          {%- set case_idx = loop.index0 -%}
+          {%- set cell_prefix = 's' ~ scenario_idx ~ '_case' ~ loop.index0 ~ '_col' -%}
           <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
             {% if show_ids %}<th scope="row" class="param-id" data-block="frame">{{ case.id | case_id }}</th>{% endif %}
             {% for col, val in scenario.parameters.cells(case) %}
-            {{ param_cell(col, val, 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col_blocks[col.id] if col.id in col_blocks else none) }}
+            {{ param_cell(col, val, cell_prefix, loop.index0, col_blocks[col.id] if col.id in col_blocks else none) }}
             {% endfor %}
             {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
           </tr>
-          {{ case_extras(scenario.parameters, case, 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col', table_width) }}
+          {% if case.error or has_attachments %}{{ case_extras(scenario.parameters, case, cell_prefix, table_width) }}{% endif %}
           {% endfor %}
         </tbody>
       </table>
       </div>
   {%- endmacro -%}
 
-  {#- One cell of a case's row. `cell_id` keys an attachment's payload,
-      `block` is the column's phase block, and `change` the delta page's
-      mark. -#}
-  {%- macro param_cell(col, val, cell_id, block, change=none) -%}
+  {#- One cell of a case's row. `cell_prefix` and the column's position key
+      an attachment's payload, joined only for an attachment cell. `block` is
+      the column's phase block, and `change` the delta page's mark. -#}
+  {%- macro param_cell(col, val, cell_prefix, col_idx, block, change=none) -%}
             {% if col.kind == 'attachment' %}
             <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
-              {{ attachment_badge(cell_id, col.name, val.content_type) }}
+              {{ attachment_badge(cell_prefix ~ col_idx, col.name, val.content_type) }}
               {% endif %}
             </td>
             {% else %}
@@ -490,7 +491,9 @@
       is. A payload opens across the whole table rather than inside its
       cell: an attachment is routinely wider than any column, and a cell that
       holds one both squeezes the columns beside it (the collapsed content
-      still sizes the column) and clips what it cannot fit. -#}
+      still sizes the column) and clips what it cannot fit. Called only for a
+      case with an error or a table with an attachment column, as
+      `step_attachments` is. -#}
   {%- macro case_extras(parameters, case, cell_prefix, table_width) -%}
           {% if case.error %}
           <tr>
