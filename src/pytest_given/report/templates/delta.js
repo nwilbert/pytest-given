@@ -90,6 +90,7 @@ function deltaApp() {
       base.init.call(this);
       this.$watch('shownChanges', () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       alignSides();
+      scrollTablesTogether();
     },
     _readHash() {
       base._readHash.call(this);
@@ -159,6 +160,28 @@ function alignSides() {
         }
         pairsOf.get(element).push(pair);
       }
+    }
+  }
+}
+
+// Too narrow for its column, each side's table scrolls; the two scroll as
+// one, so a case's two rows show the same stretch, as diff tools do. A
+// scroll this sets fires the other's handler, which skips that echo rather
+// than set the first back: the narrower table's limit would cap the wider.
+function scrollTablesTogether() {
+  for (const sides of document.querySelectorAll('.delta-sides')) {
+    const scrollers = [...sides.querySelectorAll(':scope > .delta-table .param-table-scroll')];
+    if (scrollers.length !== 2) continue;
+    const echoes = new Set();
+    for (const [from, to] of [scrollers, [...scrollers].reverse()]) {
+      from.addEventListener('scroll', () => {
+        if (echoes.delete(from)) return;
+        const left = Math.min(from.scrollLeft, to.scrollWidth - to.clientWidth);
+        // Within a pixel nothing scrolls, so no echo would come to skip.
+        if (Math.abs(to.scrollLeft - left) < 1) return;
+        echoes.add(to);
+        to.scrollLeft = left;
+      }, { passive: true });
     }
   }
 }
