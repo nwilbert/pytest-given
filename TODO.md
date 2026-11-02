@@ -6,7 +6,6 @@
 
 - [ ] pytest-xdist support for reports and lint under `-n --dist loadfile` / `loadscope`, which keep a test function's cases on one worker (other `--dist` modes stay refused). Each worker groups its own scenarios, since `ParamSpec.values` are live Python objects, and ships them (with `Step.source`, which serde excludes), its stories and glossary to the controller via `workeroutput`. The controller merges them in collection order, then lints and writes the sinks.
 - [ ] Support the glossary format of https://github.com/mattpocock/skills
-- [ ] `pytest-given report X.json -o X.json` overwrites the JSON report it reads. Refuse an output that resolves to the input, as `pytest-given delta` does.
 
 ## Later
 
