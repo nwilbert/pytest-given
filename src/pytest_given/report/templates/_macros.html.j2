@@ -172,9 +172,13 @@
 
   {#- `side` names the delta page's side the step is read from; the report's
       filters ignore it. -#}
+  {#- A leaf's line is `step_text`'s, written out: a macro call per step
+      costs the large report's render a twentieth. -#}
   {%- macro render_step(step, step_id, side=none) -%}
+  {%- if not step.children -%}
+  <div class="step-text">{{ step.narration | narration(side) }}</div>
+  {%- else -%}
   {{- step_text(step, step_id, step.narration | narration(side)) -}}
-  {%- if step.children and step.children | length > 0 -%}
     {%- call step_children(step_id) -%}
         {%- for child in step.children -%}
           {{ render_step(child, step_id ~ '_' ~ loop.index0, side) }}
@@ -454,7 +458,8 @@
           <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
             {% if show_ids %}<th scope="row" class="param-id" data-block="frame">{{ case.id | case_id }}</th>{% endif %}
             {% for col, val in scenario.parameters.cells(case) %}
-            {{ param_cell(col, val, cell_prefix, loop.index0, col_blocks[col.id] if col.id in col_blocks else none) }}
+            {%- set block = col_blocks.get(col.id) %}
+            {% if col.kind == 'attachment' %}{{ attachment_cell(col, val, cell_prefix ~ loop.index0, block) }}{% else %}{{ col | value_cell(val, block) }}{% endif %}
             {% endfor %}
             {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
           </tr>
@@ -465,25 +470,16 @@
       </div>
   {%- endmacro -%}
 
-  {#- One cell of a case's row. `cell_prefix` and the column's position key
-      an attachment's payload, joined only for an attachment cell. `block` is
-      the column's phase block, and `change` the delta page's mark. -#}
-  {%- macro param_cell(col, val, cell_prefix, col_idx, block, change=none) -%}
-            {% if col.kind == 'attachment' %}
+  {#- An attachment column's cell, its badge keyed `cell_id` as its payload
+      is; every other cell is the `value_cell` filter's. `block` is the
+      column's phase block, and `change` the delta page's mark. -#}
+  {%- macro attachment_cell(col, val, cell_id, block, change=none) -%}
             <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>
               {% if val %}
               {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
-              {{ attachment_badge(cell_prefix ~ col_idx, col.name, val.content_type) }}
+              {{ attachment_badge(cell_id, col.name, val.content_type) }}
               {% endif %}
             </td>
-            {% else %}
-            {# `data-subst` only where the cell has something to substitute: a
-               generated column is blank for a case that recorded no value, and
-               substituting that blank would erase the step's {token} instead of
-               replacing it. A `param` cell always substitutes — `None` there is
-               a real parametrize value. #}
-            <td data-param="{{ col.id }}"{% if block is not none %} data-block="{{ block }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}{% if change %} data-change="{{ change }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
-            {% endif %}
   {%- endmacro -%}
 
   {#- The rows under a case's own: its error, then a payload panel per

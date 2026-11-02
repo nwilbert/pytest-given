@@ -23,6 +23,8 @@ from markupsafe import Markup, escape
 from ..markdown import CodeSpan, EmphasisSpan, PlainSpan
 from ..model import (
     AttachmentRef,
+    CellValue,
+    Change,
     ClausePart,
     ClauseTermRef,
     ClauseWord,
@@ -190,6 +192,7 @@ def base_env() -> jinja2.Environment:
     env.filters['phase_blocks'] = phase_blocks
     env.filters['column_phase_blocks'] = column_phase_blocks
     env.filters['case_id'] = case_id
+    env.filters['value_cell'] = value_cell
     # No column coloured until a page passes its colour map.
     env.filters['param_color_class'] = _make_param_color_class(None)
     env.globals['data_url'] = data_url
@@ -247,6 +250,33 @@ def column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
         current = met_in.get(column.id, current)
         blocks[column.id] = current
     return blocks
+
+
+def value_cell(
+    column: ParameterColumn,
+    value: CellValue,
+    block: int | None,
+    change: Change | None = None,
+) -> Markup:
+    """A parameter table's `<td>` for any column but an attachment one. A
+    filter, not a macro: a table has one per cell, and a macro call each cost
+    the large report's render a twentieth.
+
+    `data-subst` only where the cell has something to substitute: a generated
+    column is blank for a case that recorded no value, and substituting that
+    blank would erase the step's {token} instead of replacing it. A `param`
+    cell always substitutes, as `None` there is a real parametrize value."""
+    column_id = escape(column.id)
+    substitutes = column.kind == 'param' or value is not None
+    parts = [f'<td data-param="{column_id}"']
+    if block is not None:
+        parts.append(f' data-block="{block}"')
+    if substitutes:
+        parts.append(f' data-subst="{column_id}"')
+    if change:
+        parts.append(f' data-change="{change}"')
+    parts.append(f'>{escape(value) if substitutes else ""}</td>')
+    return Markup(''.join(parts))
 
 
 def _render_context(

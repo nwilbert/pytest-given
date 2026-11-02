@@ -4,7 +4,7 @@
   each step's change marked on its side, styled as `.delta-step`, and the
   parameter tables), and a listed term's card.
 #}
-  {%- from '_macros.html.j2' import source_link, anchor_link, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, param_cell, case_extras, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, attachment_cell, case_extras, status_dot with context -%}
 
   {#- The Change filter's pills, each disabled at zero, and how many items
       matched with no change. `model` is the Alpine property the pills
@@ -240,7 +240,8 @@
                 </th>
                 {%- for col, val in table.parameters.cells(case) %}
                 {%- set changed = table.columns[loop.index0].change == 'added' or col.id in row.pair.changed_cells %}
-                {{ param_cell(col, val, cell_prefix, loop.index0, col_blocks.get(col.id), cell_mark if changed else none) }}
+                {%- set block, change = col_blocks.get(col.id), cell_mark if changed else none %}
+                {% if col.kind == 'attachment' %}{{ attachment_cell(col, val, cell_prefix ~ loop.index0, block, change) }}{% else %}{{ col | value_cell(val, block, change) }}{% endif %}
                 {%- endfor %}
                 <td class="param-status" data-block="frame"{% if row.pair.status_changed %} data-change="{{ cell_mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
               </tr>

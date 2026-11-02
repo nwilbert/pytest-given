@@ -441,6 +441,37 @@ def test_a_removed_case_follows_the_case_it_followed_before_in_the_after_order()
     ]
 
 
+def test_a_changed_value_is_marked_in_its_cell_on_each_side() -> None:
+    """The old value faces the new one; a case whose values held is unmarked."""
+
+    def paying(fee: int) -> ReportData:
+        return report(
+            scn(
+                't.py::test_pay',
+                'Pay',
+                step('when', narr(lit('she pays '), ph('amount'))),
+                parameters=table(
+                    [('amount', 'param')],
+                    ('t.py::test_pay[a]', [fee]),
+                    ('t.py::test_pay[b]', [5]),
+                ),
+            )
+        )
+
+    html = render_delta_html(_delta(paying(1), paying(2)), None)
+    cells = [
+        (attrs['data-param'], attrs.get('data-change'))
+        for tag in re.findall(r'<td [^>]*data-subst="[^>]*>', html)
+        for attrs in [dict(re.findall(r'([\w-]+)="([^"]*)"', tag))]
+    ]
+    assert cells == [
+        ('amount', 'removed'),
+        ('amount', None),
+        ('amount', 'added'),
+        ('amount', None),
+    ]
+
+
 def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side():
     """A placeholder in before-side text keys its column as the before table
     does, so it finds the column in both tables, even renamed; a column only
