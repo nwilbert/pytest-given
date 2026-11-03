@@ -63,7 +63,7 @@ The **rename log** records the renames the delta cannot see. It is `given-rename
 old = "tests/test_pricing.py::test_pricing"
 new = "tests/test_prices.py::test_price_list"
 cases = { "1.5-True" = "2.0-True" }
-rev = "v0.6.0"
+rev = "3f2a9c1e5b7d40a8c6f2e19b4d7a0c3e8f5b6d21"  # v0.6.0
 
 [[scenario]]  # only cases changed: leave `new` out
 old = "tests/test_prices.py::test_price_list"
@@ -72,7 +72,7 @@ cases = { "happy-hour" = "happy-hour-weekdays" }
 [[term]]
 old = "room"
 new = "suite"
-rev = "v0.6.0"
+rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 ```
 
 - `[[scenario]]` holds scenario identities. `old` and `new` are node IDs without the `[…]` tail. For a `group_parametrized=False` scenario, that is the part all its cases share.
@@ -87,13 +87,15 @@ When two before identities would end at the same one, the delta pairs neither an
 
 ### rev
 
-`rev` is a git revision, a tag or a SHA, at which the rename had already happened. It is optional.
+`rev` is the commit that made the rename. It is optional, and an entry without it applies to every comparison.
 
 An entry whose `rev` is the before commit or an ancestor of it is skipped. The rename predates the range, so a later test that reuses the old ID is not paired with it by mistake. An entry whose `rev` is not the after commit or an ancestor of it is skipped too. The rename postdates the range.
 
 The delta asks git once per distinct `rev`. It applies the entry and warns when the `rev` does not resolve, when the clone is shallow, when the before report has no SHA, or when git cannot answer. When only the after report has no SHA, it checks the before commit alone and warns.
 
-Write the tightest lasting `rev`. That is the earliest release tag containing the commit that made the rename. Otherwise it is that commit's SHA, when it is on the default branch. Never write the SHA of a pull request run, because a squash merge drops it. An entry written in the renaming pull request may leave `rev` out.
+A SHA is the most precise `rev`. Write the renaming commit's full SHA on the default branch. A short one can turn ambiguous as the repository grows. Never write one from a pull request branch, because a squash merge drops it. A comment can name the release that shipped it, as in the example above. Any other git revision works too, but a release tag places the rename at the release, so a delta that ends before the tag skips the entry.
+
+An entry written in the renaming pull request leaves `rev` out. Fill it in once the commit is on the default branch, for example as a release step.
 
 ### Malformed logs
 

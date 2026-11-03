@@ -44,7 +44,13 @@ mistake shipped to PyPI is permanent.
       impossible, so such a release keeps none, and the next range starts at it.
       Add a line to the release's `CHANGELOG.md` section that links
       `https://nwilbert.github.io/pytest-given/latest/deltas/<version>.html`.
-- [ ] Commit the bump, the changelog, the delta and the regenerated reports as one commit,
+- [ ] Mark the `given-renames.toml` entries added since the last release. An
+      entry without a `rev` was written in its renaming pull request, so its
+      `rev` is the full SHA of the commit that added it to `main`:
+      `git log --reverse --format=%H -S '<its old line>' -- given-renames.toml`,
+      the first line. Then end each of these entries' `rev` line with
+      `# v<version>`.
+- [ ] Commit the bump, the changelog, the delta, the rename log and the regenerated reports as one commit,
       land it on `main`, and wait for CI to go green. Releases can only be
       dispatched from `main`.
 - [ ] Actions → **Compat** → Run workflow on `main`, and wait for both jobs to

@@ -52,7 +52,7 @@ Re-run the delta after adding entries, until each remaining removed and added pa
 old = "tests/test_pricing.py::test_pricing"
 new = "tests/test_prices.py::test_price_list"
 cases = { "1.5-True" = "2.0-True" }
-rev = "v0.6.0"
+rev = "3f2a9c1e5b7d40a8c6f2e19b4d7a0c3e8f5b6d21"
 
 [[scenario]]  # only cases changed: leave `new` out
 old = "tests/test_prices.py::test_price_list"
@@ -61,7 +61,7 @@ cases = { "happy-hour" = "happy-hour-weekdays" }
 [[term]]
 old = "room"
 new = "suite"
-rev = "v0.6.0"
+rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"
 ```
 
 - `old` and `new` are node IDs without the `[…]` tail. For a per-case scenario (`group_parametrized=False`), that is the part all its cases share.
@@ -69,13 +69,9 @@ rev = "v0.6.0"
 - `[[term]]` holds term IDs (`Late fee` is `late-fee`).
 - Entries apply in file order, so chains work (`A → B`, later `B → C`). A swap goes through a name neither test has: `A → tmp`, `B → A`, `tmp → B`.
 
-**`rev`** is a revision at which the rename had already happened. An entry whose `rev` is the *before* commit or an ancestor of it is skipped, so a later test reusing the old ID isn't paired with it. So is one whose `rev` the *after* commit doesn't contain: that rename comes after the range. A `rev` that doesn't resolve, or a shallow clone, applies the entry with a warning. Write the tightest lasting one you can find:
+**`rev`** is the commit that made the rename. An entry without it applies to every comparison. An entry whose `rev` is the *before* commit or an ancestor of it is skipped, so a later test reusing the old ID isn't paired with it. So is one whose `rev` the *after* commit doesn't contain: that rename comes after the range. A `rev` that doesn't resolve, or a shallow clone, applies the entry with a warning.
 
-1. the earliest release tag that contains the commit that made the rename (`git tag --contains <commit>`)
-2. otherwise that commit's SHA, when it is on the default branch
-3. when you can't find that commit, the *after* release's tag or default-branch SHA
-
-Never write a pull request run's SHA: a squash merge drops a branch commit, and on GitHub it names a temporary merge commit. An entry written in the renaming pull request may leave `rev` out.
+Write that commit's full SHA on the default branch (`git log -1 --format=%H <commit>`), since a short one can turn ambiguous. When you can't find the commit, write the *after* commit's, if it is on the default branch. Never write a pull request run's SHA: a squash merge drops a branch commit, and on GitHub it names a temporary merge commit. In the renaming pull request, leave `rev` out. The project's release checklist may fill it in later.
 
 ## Values that differ on every run
 

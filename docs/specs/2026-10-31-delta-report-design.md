@@ -151,7 +151,7 @@ test later took the name `A`, the old `A` pairs with `B`, and the new `A` reads 
 ### Applying the rename log
 
 From each *before* identity, the delta follows the chain of entries in file order (`A → B`, then a
-later `B → C`), leaving out entries whose `rev` predates the range. It stops at the last identity
+later `B → C`), leaving out entries whose `rev` lies outside the range. It stops at the last identity
 along the chain that exists in *after*, and rewrites the *before* identity to it. Comparing v1 to v3
 rewrites `A` to `C`, and comparing v1 to v2 rewrites `A` to `B`.
 
@@ -241,23 +241,23 @@ current checkout, never in a worktree of an older commit.
 [[scenario]]
 old = "examples/hotel-booking/test_hotel_booking.py::test_declined_payment"
 new = "examples/hotel-booking/test_payments.py::test_declined_payment_holds_booking"
-rev = "v0.6.0"
+rev = "1c7e4b9a2f8d6035e1a4c7b9d2f0e8a6c3b5d7f9"  # v0.6.0
 
 [[scenario]]  # renamed, and one case's generated ID changed with its value
 old = "examples/coffeeshop/test_coffeeshop.py::test_pricing"
 new = "examples/coffeeshop/test_coffeeshop.py::test_price_list"
 cases = { "1.5-True" = "2.0-True" }
-rev = "v0.6.0"
+rev = "3f2a9c1e5b7d40a8c6f2e19b4d7a0c3e8f5b6d21"  # v0.6.0
 
 [[scenario]]  # only cases changed: `new` left out means the identity stayed
 old = "examples/coffeeshop/test_coffeeshop.py::test_price_list"
 cases = { "happy-hour" = "happy-hour-weekdays" }
-rev = "v0.7.0"
+rev = "a95d3e7f1b2c4086d9e3f5a7c1b8e2d4f6a0c3e5"  # v0.7.0
 
 [[term]]
 old = "room"
 new = "suite"
-rev = "v0.6.0"
+rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 ```
 
 - `[[scenario]]` holds a scenario's identity (see [Scenario identity](#scenario-identity)). For
@@ -268,26 +268,27 @@ rev = "v0.6.0"
 - `cases` maps old *case IDs* to new ones, relative to the entry. A case it doesn't name keeps its
   case ID under the new identity.
 - `[[term]]` holds term IDs.
-- `rev`, optional, is any git revision (a tag or a SHA) at which the rename had already happened.
-  An entry whose `rev` is an ancestor of, or equal to, the *before* report's commit is skipped: the
-  rename predates the range, so a later test that reuses the old ID isn't paired by mistake. The
-  check runs `git merge-base --is-ancestor <rev> <before SHA>` once per distinct `rev`, before
-  chains are followed. When the answer is unknown, the entry applies as if it had no `rev`, and the
-  delta warns: once for each `rev` that doesn't resolve, naming it, and once in all when no ancestry
-  answer is possible. That happens without git, without a *before* SHA, in a shallow clone, or when
-  git can't resolve the *before* SHA (see [The `git/` package](#the-git-package)).
-- There is no upper-bound check. `rev` only bounds the rename from above (it happened at or before
-  `rev`), so a `rev` that isn't an ancestor of *after* proves nothing: the rename may still lie
-  inside the range. An entry from the future is harmless anyway, since its old identity and old
-  case IDs still exist in *after*, and both chains stop at their start.
-- The skill writes the tightest lasting `rev` it can find: the earliest release tag containing the
-  commit that made the rename (`git tag --contains`), otherwise that commit's SHA when it is on the
-  default branch. When it can't find that commit, the *after* report's release tag or
-  default-branch SHA is a looser bound that still holds. The tighter the `rev`, the fewer ranges
-  consider the entry. A pull request run's SHA is never written. A branch commit vanishes in a
-  squash merge, and on GitHub a pull request run's `GITHUB_SHA` names a temporary merge commit that
-  no later clone resolves. An entry written by hand in the pull request that does the rename may
-  leave `rev` out too.
+- `rev`, optional, is the commit that made the rename. An entry without it applies to every
+  comparison. An entry whose `rev` is an ancestor of, or equal to, the *before* report's commit is
+  skipped: the rename predates the range, so a later test that reuses the old ID isn't paired by
+  mistake. An entry whose `rev` is neither the *after* report's commit nor an ancestor of it is
+  skipped too: the rename postdates the range. The checks run `git merge-base --is-ancestor` once
+  per distinct `rev` and side, before chains are followed. When an answer is unknown, the entry
+  applies as if that side had no bound, and the delta warns: once for each `rev` that doesn't
+  resolve, naming it, and once in all when no ancestry answer is possible. That happens without
+  git, without a *before* SHA, in a shallow clone, or when git can't resolve the *before* SHA (see
+  [The `git/` package](#the-git-package)). An *after* report without a SHA checks the *before*
+  side alone, with a warning.
+- `rev` accepts any git revision, but only the renaming commit makes "in the range" exact. A full
+  SHA on the default branch is that commit, and a short one can turn ambiguous as the repository
+  grows. A release tag places the rename at the release, so a delta ending before the tag skips
+  the entry. A comment after the SHA can name the release that shipped the rename.
+- The skill writes the renaming commit's full SHA on the default branch, or the *after* commit's
+  when it can't find that commit. A pull request run's SHA is never written. A branch commit
+  vanishes in a squash merge, and on GitHub a pull request run's `GITHUB_SHA` names a temporary
+  merge commit that no later clone resolves. An entry written in the renaming pull request leaves
+  `rev` out. The project's release checklist fills it in with the commit that added the entry to
+  the default branch, and names the release in a comment.
 - `rev` also makes the log prunable: an entry whose `rev` is older than the oldest *before* the
   project still compares against can never apply again and may be deleted. Pruning is manual.
 - A malformed file exits 2 naming the entry. Malformed means bad TOML, an entry missing `old`, an
@@ -669,7 +670,7 @@ The delta adds three queries:
 
 | Query | Command | What is read |
 |---|---|---|
-| Is `rev` an ancestor of the *before* SHA? | `git merge-base --is-ancestor` | the exit code only |
+| Is `rev` an ancestor of the *before* SHA, and of the *after* SHA? | `git merge-base --is-ancestor` | the exit code only |
 | Which tags point at a SHA? | `git tag --points-at <sha> --sort=-version:refname` | one ref name per line |
 | Does a revision resolve? | `git rev-parse --verify --quiet <rev>^{commit}` | the exit code and one SHA |
 
@@ -678,7 +679,7 @@ the answers honest:
 
 - An ancestry answer has three values: yes (exit 0), no (exit 1), and unknown (any other exit, no
   `git` executable, a repository `git` refuses to read). Exit 1 and exit 128 must never be
-  confused, since reading "unknown" as "no" applies an entry that should have been skipped.
+  confused, since reading "unknown" as "no" decides an entry the answer can't decide.
 - A shallow clone (`git rev-parse --is-shallow-repository`) answers "unknown" for every ancestry
   query, since a truncated history can't show a rev as an ancestor.
 - Before the ancestry queries, `git/` checks that the *before* SHA and each `rev` resolve, so a
