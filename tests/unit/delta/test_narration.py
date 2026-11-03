@@ -67,14 +67,33 @@ def _segment(mark: Mark, *parts: NarrationPart) -> DiffSegment:
     tags=['delta'],
 )
 def test_a_value_compares_by_what_it_renders() -> None:
-    with given(t'a {pg["Narration"].l} that interpolates 200 from the expression ml'):
-        valued = narr(lit('Brew '), NarrationValue(rendered='200', expression='ml'))
+    with given(
+        t'a {pg["Narration"].l} that interpolates 200 ml from the expression volume'
+    ):
+        valued = narr(
+            lit('Brew '), NarrationValue(rendered='200 ml', expression='volume')
+        )
     with given('a plain narration that reads the same'):
-        plain = _plain('Brew 200')
+        plain = _plain('Brew 200 ml')
     with when('the two are compared'):
         same = _equal(valued, plain)
     with then('they are equal'):
         assert same
+
+
+def test_a_value_s_changed_word_is_marked_alone_and_keeps_it_a_value() -> None:
+    def price(rendered: str) -> Narration:
+        return narr(lit('pays '), NarrationValue(rendered=rendered, expression='p'))
+
+    def value(rendered: str) -> NarrationValue:
+        return NarrationValue(rendered=rendered, expression='p')
+
+    assert word_diff(price('5 EUR'), _reading(), price('6 EUR'), _reading()) == (
+        _segment('equal', lit('pays ')),
+        _segment('removed', value('5')),
+        _segment('added', value('6')),
+        _segment('equal', value(' EUR')),
+    )
 
 
 @scenario(

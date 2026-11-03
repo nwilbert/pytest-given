@@ -8,7 +8,7 @@ authored.
 
 import re
 from collections.abc import Callable, Iterator, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from itertools import groupby
 from typing import Literal
 
@@ -17,7 +17,6 @@ from ..model import (
     DiffSegment,
     Glossary,
     GlossaryTerm,
-    InterpolatedPart,
     Mark,
     Narration,
     NarrationLiteral,
@@ -80,6 +79,8 @@ def tokens(narration: Narration, reading: Reading) -> list[Token]:
         if isinstance(part, NarrationLiteral):
             before, after = whole[max(start - 1, 0) : start], whole[end : end + 1]
             read.extend(_literal_tokens(part.value, before, after))
+        elif isinstance(part, NarrationValue):
+            read.extend(_value_tokens(part))
         else:
             read.append(_interpolated_token(part, reading))
     return read
@@ -168,10 +169,19 @@ _LINK = re.compile(r'\[[^\[\]]+\]\([^()\s]+\)')
 _SPACES = re.compile(r'(\s+)')
 
 
-def _interpolated_token(part: InterpolatedPart, reading: Reading) -> Token:
+def _value_tokens(value: NarrationValue) -> Iterator[Token]:
+    """Read by word, as a literal reading the same is: each word keeps the
+    value it is a piece of."""
+    for piece in _SPACES.split(value.rendered):
+        if piece:
+            kind: TokenKind = 'space' if piece.isspace() else 'word'
+            yield Token(kind, piece, parts=(replace(value, rendered=piece),))
+
+
+def _interpolated_token(
+    part: NarrationPlaceholder | NarrationTermRef, reading: Reading
+) -> Token:
     match part:
-        case NarrationValue(rendered=rendered):
-            return Token('word', rendered, parts=(part,))
         case NarrationPlaceholder():
             return Token('placeholder', reading.column(part), parts=(part,))
         case NarrationTermRef(term_id=term_id, display=display):
@@ -248,4 +258,16 @@ def _segment(mark: Mark, pairs: list[_Pair]) -> DiffSegment:
 
 
 def _parts(shown: list[Token]) -> tuple[NarrationPart, ...]:
-    return merged_literals(part for token in shown for part in token.parts)
+    """A value's adjacent words joined back into one value."""
+    joined: list[NarrationPart] = []
+    for part in merged_literals(part for token in shown for part in token.parts):
+        last = joined[-1] if joined else None
+        if (
+            isinstance(part, NarrationValue)
+            and isinstance(last, NarrationValue)
+            and replace(last, rendered=part.rendered) == part
+        ):
+            joined[-1] = replace(last, rendered=last.rendered + part.rendered)
+        else:
+            joined.append(part)
+    return tuple(joined)

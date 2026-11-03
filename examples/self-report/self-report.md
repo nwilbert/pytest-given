@@ -3004,7 +3004,7 @@
 ## ✓ A value compares by what it renders, not its source expression
 `tests/unit/delta/test_narration.py::test_a_value_compares_by_what_it_renders` · delta
 
-- **given** a «narration» that interpolates 200 from the expression ml
+- **given** a «narration» that interpolates 200 ml from the expression volume
 - **given** a plain narration that reads the same
 - **when** the two are compared
 - **then** they are equal
