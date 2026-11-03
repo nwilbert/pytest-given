@@ -1059,11 +1059,26 @@ span.param-highlight {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-/* In a scenario card the link stays in flow, under whatever the card ends
-   with: anchored to the corner it fought every full-width last element,
+/* In a scenario card the link stays in flow: anchored to the corner it
+   fought every full-width last element,
    covering a parameter table's rightmost cells and needing its own chip to
    stay legible over an error box. A refs panel ends in short chip lines that
    never reach the corner, so there the anchor still pays for itself. */
+/* After narration the link shares the last line when the steps leave room for
+   it, and wraps under them only when they don't. A flex line breaks on the
+   steps' widest line, collapsed sub-steps included, so a fit never overlaps. */
+.scenario-body-inner:has(> .steps + .scenario-source) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.scenario-body-inner:has(> .steps + .scenario-source) > * { flex: 1 0 100%; }
+/* The padding is the room the last phase's hover outline reaches below it. */
+.scenario-body-inner:has(> .steps + .scenario-source) > .steps {
+  flex: 1 1 auto;
+  padding-bottom: calc(var(--space-sm) / 2);
+}
+.scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
 .refs-content > .scenario-source {
   position: absolute;
   right: 0;

@@ -15,7 +15,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
-- The HTML report is visually tidied: scrolled content now stops short of the tab rule, and a step's attachments no longer crowd the step below.
+- The HTML report is visually tidied: scrolled content now stops short of the tab rule, a step's attachments no longer crowd the step below, and a scenario's source link shares its last step's line when there is room.
 
 ### Fixed
 
