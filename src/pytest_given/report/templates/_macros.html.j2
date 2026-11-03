@@ -192,6 +192,7 @@
     </div>
   {%- endif -%}
   {%- if step.attachments -%}
+    <div class="step-attachments">
     {%- for att in step.attachments -%}
     {%- if att is attachment_ref -%}
     <div>
@@ -203,5 +204,6 @@
     </div>
     {%- endif -%}
     {%- endfor -%}
+    </div>
   {%- endif -%}
   {%- endmacro -%}

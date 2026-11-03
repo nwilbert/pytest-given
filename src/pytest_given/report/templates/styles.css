@@ -964,6 +964,11 @@ span.param-highlight {
 }
 
 /* Attachments */
+/* More room below a step's attachments than above them, so they read as
+   belonging to the step they hang off rather than the one that follows. */
+.step-attachments { padding-bottom: var(--space-sm); }
+/* At a phase's end the gap between phases already does that. */
+.phase-steps:last-child > .step-attachments:last-child { padding-bottom: 0; }
 .attachment-badge {
   color: var(--text-muted);
   font-size: var(--font-size-sm);
