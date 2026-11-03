@@ -312,15 +312,39 @@ def _column_blocks(
 def _keyed(scenario_delta: ScenarioDelta) -> ScenarioDelta:
     if scenario_delta.change != 'changed':
         return scenario_delta
-    columns = scenario_delta.parameters.columns if scenario_delta.parameters else ()
-    keys = _BeforeKeys(
-        {
-            pair.before: pair.after
-            for pair in columns
-            if pair.before is not None and pair.after is not None
-        }
-    )
-    return keys.scenario_delta(scenario_delta)
+    parameters = scenario_delta.parameters
+    columns = parameters.columns if parameters else ()
+    paired = {
+        pair.before: pair.after
+        for pair in columns
+        if pair.before is not None and pair.after is not None
+    }
+    if parameters is not None and not parameters.changed:
+        paired |= _shared_attachment_columns(scenario_delta)
+    return _BeforeKeys(paired).scenario_delta(scenario_delta)
+
+
+def _shared_attachment_columns(
+    scenario_delta: ScenarioDelta,
+) -> dict[ColumnId, ColumnId]:
+    """An unchanged table shows its after side alone, so a before badge keys
+    the after attachment column of its ID and name, which the pairing of
+    columns leaves out."""
+    before, after = scenario_delta.before, scenario_delta.after
+    assert before is not None
+    assert before.parameters is not None
+    assert after is not None
+    assert after.parameters is not None
+    after_columns = {
+        (column.id, column.name)
+        for column in after.parameters.columns
+        if column.kind == 'attachment'
+    }
+    return {
+        column.id: column.id
+        for column in before.parameters.columns
+        if column.kind == 'attachment' and (column.id, column.name) in after_columns
+    }
 
 
 @dataclass(frozen=True)

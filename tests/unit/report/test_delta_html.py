@@ -556,6 +556,46 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
     ] == ['before:attachment:0']
 
 
+def test_an_unchanged_table_s_attachment_column_is_keyed_alike_on_both_sides():
+    """The page shows the after table alone, so a before-side badge keys the
+    column it holds."""
+    receipt = Attachment(label='receipt', content='paid')
+    parameters = table(
+        [('reason', 'param'), ('receipt', 'attachment')],
+        ('t.py::test_pay[a]', ['expired', receipt]),
+    )
+
+    def side(text: str) -> ReportData:
+        return report(
+            scn(
+                't.py::test_pay',
+                'Pay',
+                Step(
+                    phase='when',
+                    narration=narr(lit(text), ph('reason')),
+                    attachments=[
+                        AttachmentRef(
+                            label='receipt',
+                            content_type='text',
+                            column_id=ColumnId('attachment:0'),
+                        )
+                    ],
+                ),
+                parameters=parameters,
+            )
+        )
+
+    [item] = _listed(_delta(side('she pays for '), side('she settles for ')))
+    assert item.table is None
+    assert item.delta.before is not None
+    [before_step] = item.delta.before.steps
+    assert [
+        attachment.column_id
+        for attachment in before_step.attachments
+        if isinstance(attachment, AttachmentRef)
+    ] == ['attachment:0']
+
+
 def test_a_table_changed_only_in_statuses_shows_both_sides_and_an_unchanged_one_none():
     before = report(_paying('status', [1]), _paying('same', [1]))
     after = report(
