@@ -8,15 +8,15 @@ The [example delta](examples/delta.html){ target=_blank } compares two versions 
 pytest-given delta before.json after.json
 ```
 
-The command writes `given-report/delta-data.json` and `given-report/delta.html`. The HTML looks and works like the [HTML report](html-report.md), with added, removed and changed shown in green, red and amber. It has a Scenarios tab and, when a term changed, a Glossary tab.
+The command writes `given-report/delta-data.json` and `given-report/delta.html`. The HTML looks and works like the [HTML report](html-report.md), with added, removed and changed shown in green, red and amber. It has a Scenarios tab and, when a term changed, a Glossary tab. Warnings go to stderr, as `Warning: …` lines, and do not stop the command.
 
-The command takes its flags from the command line only. See [Standalone CLI](cli.md#delta) for each flag and its default. The [`pytest-given-delta` agent skill](ai-agents.md#agent-skills) teaches an agent the whole loop. It builds the two reports in git worktrees, finds renames with `git`, and records them in the rename log.
+The command takes its flags from the command line only. See [Standalone CLI](cli.md#delta) for each flag and its default. The [`pytest-given-delta` agent skill](ai-agents.md#agent-skills) guides an agent through a delta. The agent builds the two reports in git worktrees, finds renames with `git`, and records them in the rename log.
 
 ## Getting the two reports
 
-Both reports come from `--given-json`, from full runs of the whole suite. A scenario that a partial run left out reads as removed.
+Both reports come from `--given-json`, from full runs of the whole suite. A scenario that a partial run left out is listed as removed.
 
-Build both with the same pytest-given and the same pytest. Another version can narrate a test or name its cases differently, and the delta cannot tell that from a change to the suite. When the two versions differ, the delta warns.
+Build both with the same pytest-given and the same pytest. Another version can narrate a test or name its cases differently, and the delta cannot tell that from a change to the suite. When the two versions differ, the command prints a warning.
 
 Both reports must have the report format (the schema version) of the pytest-given that compares them. Otherwise the delta exits 2, and the older report needs regenerating.
 
@@ -40,13 +40,13 @@ A scenario found on both sides is *changed* when any of these differ:
 
 A case ID that pytest generates from the values does not count on its own, only the values do. A custom case ID counts.
 
-Steps compare by how they read: their text and their values as shown. A term ref compares by its term, so renaming a term alone does not make a scenario changed.
+Steps compare by their text, with each value as the report shows it. A term ref compares by its term, so renaming a term alone does not make a scenario changed.
 
 Nothing else counts. That includes the node ID, the module, the source location, the duration, the error, the fixtures, the stories and the attachments.
 
 A term is *changed* when its name or definition differs.
 
-A value that differs on every run reads as changed in every delta. An example is a timestamp, or an object's default `str()` with its memory address. Fix it at its source, with a fixed clock or a stable `__str__`.
+A value that differs on every run makes its scenario changed in every delta. An example is a timestamp, or an object's default `str()` with its memory address. Fix it at its source, with a fixed clock or a stable `__str__`.
 
 ## How scenarios pair
 
@@ -54,17 +54,17 @@ A scenario pairs by its **scenario identity**. That is its node ID without the p
 
 A scenario still unpaired then pairs by title, if exactly one unpaired scenario on each side has it. That covers a test moved to another file.
 
-Whatever stays unpaired is removed on the before side and added on the after side. A test renamed with a new title therefore reads as one scenario removed and one added.
+Whatever stays unpaired is removed on the before side and added on the after side. A test renamed with a new title is therefore listed as one scenario removed and one added.
 
-Inside a paired parametrized scenario, columns pair by name first. Cases then pair by custom case ID, then by their values, then by generated case ID. A case whose value changed under a generated ID, such as `2-True` to `3-True`, reads as one removed and one added.
+Inside a paired parametrized scenario, columns pair by name first. Cases then pair by custom case ID, then by their values, then by generated case ID. A case whose value changed under a generated ID, such as `2-True` to `3-True`, is listed as one case removed and one added.
 
-Glossary terms pair by term ID. A term whose kind changed reads as removed under its old kind and added under its new one.
+Glossary terms pair by term ID. A term whose kind changed is listed as removed under its old kind and added under its new one.
 
 The delta JSON lists a `suggestions` entry for each removed and added pair that looks like one rename. A suggestion is never applied. To accept one, add it to the rename log.
 
 ## The rename log
 
-The **rename log** records the renames the delta cannot see. It is `given-renames.toml` in the working directory, or the file `--renames` names. Commit it and review it like source. It grows over the project's life.
+The **rename log** records the renames the delta cannot detect: a test renamed together with its title, a case whose generated ID changed with its value, a renamed term. It is `given-renames.toml` in the working directory, or the file `--renames` names. Commit it and review it like source.
 
 ```toml
 [[scenario]]  # renamed, and one case's generated ID changed
@@ -90,7 +90,7 @@ rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 - Entries apply in file order, so renames chain. `A` to `B`, then later `B` to `C`, pairs `A` with `C`. A delta that ends before the second rename pairs `A` with `B`.
 - A swap goes through a name neither test has: `A` to `tmp`, `B` to `A`, `tmp` to `B`.
 - An entry that matches nothing in the compared reports is skipped silently, so one log serves every comparison.
-- When two before identities would end at the same one, the delta pairs neither and warns.
+- When two before identities would end at the same one, the delta pairs neither and prints a warning.
 
 ### When an entry applies
 
@@ -98,7 +98,7 @@ rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 
 An entry applies only when its `rev` lies in the compared range, after the before commit and up to the after commit. A rename before the range is skipped, so a later test that reuses the old name is not paired with it. A rename after the range is skipped too.
 
-When git cannot tell, the delta warns and does not skip the entry for that reason. That happens when the `rev` does not resolve, when the clone is shallow, or when a report has no commit SHA.
+Where git cannot answer, the `rev` counts as inside the range, and the command prints a warning. That happens when the `rev` does not resolve, when the clone is shallow, or when a report has no commit SHA.
 
 Write the renaming commit's full SHA from the default branch. A short one can turn ambiguous as the repository grows. A comment can name the release that shipped it, as in the example above. An entry written in the renaming pull request leaves `rev` out, since a squash merge drops the branch's commits. Fill it in once the commit is on the default branch, for example as a release step.
 
