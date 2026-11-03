@@ -585,22 +585,20 @@ def _check_delta_example_current(session: nox.Session) -> None:
     """Fail when the regenerated example delta differs from the staged one in
     more than what every regeneration rewrites. The delta has no Markdown, so
     this comparison is where a contributor reads its real change."""
-    staged = session.run(
-        'git',
-        'show',
-        f':{_DELTA_EXAMPLE_JSON.as_posix()}',
-        external=True,
-        silent=True,
-        success_codes=[0, 128],
+    # subprocess, since session.run folds git's stderr into the output it returns.
+    staged = subprocess.run(
+        ['git', 'show', f':{_DELTA_EXAMPLE_JSON.as_posix()}'],
+        capture_output=True,
+        encoding='utf-8',
+        check=False,
     )
-    if not staged:
+    if staged.returncode != 0:
         session.log(f'{_DELTA_EXAMPLE_JSON} is not staged yet; nothing to compare')
         return
-    assert isinstance(staged, str)
     regenerated = _stable_part(
         json.loads(_DELTA_EXAMPLE_JSON.read_text(encoding='utf-8'))
     )
-    if _stable_part(json.loads(staged)) != regenerated:
+    if _stable_part(json.loads(staged.stdout)) != regenerated:
         session.error(
             f'{_DELTA_EXAMPLE_JSON} differs from its staged version beyond its '
             'metadata and durations: read `git diff` on it, then stage it if the '
