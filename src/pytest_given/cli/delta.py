@@ -15,6 +15,7 @@ from ..model import (
     DeltaData,
     JsonObject,
     PytestGivenError,
+    Side,
     delta_to_dict,
     plural,
     read_report_json,
@@ -185,8 +186,10 @@ def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:
     )
     renames = read_rename_log(args.renames)
     repo = Path.cwd()
-    before_sha = before.metadata.commit_sha
-    skipped_revs, rev_warnings = _skipped_revs(renames.revs(), before_sha, repo)
+    before_sha, after_sha = before.metadata.commit_sha, after.metadata.commit_sha
+    skipped_revs, rev_warnings = _skipped_revs(
+        renames.revs(), before_sha, after_sha, repo
+    )
     result = build_delta(
         DeltaInputs(
             before=before,
@@ -194,7 +197,7 @@ def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:
             renames=renames,
             skipped_revs=skipped_revs,
             before_label=args.before_label or _tag_label(before_sha, repo),
-            after_label=args.after_label or _tag_label(after.metadata.commit_sha, repo),
+            after_label=args.after_label or _tag_label(after_sha, repo),
             plugin_version=version('pytest-given'),
             timestamp=datetime.now(tz=UTC).isoformat(),
         )
@@ -205,13 +208,14 @@ def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:
 
 
 def _skipped_revs(
-    revs: frozenset[str], before_sha: str | None, repo: Path
+    revs: frozenset[str], before_sha: str | None, after_sha: str | None, repo: Path
 ) -> tuple[frozenset[str], list[str]]:
-    """The rename-log revs that are ancestors of the before commit, whose
-    entries predate the range. A rev git can't answer for applies."""
+    """The rename-log revs outside the range: an ancestor of the before commit,
+    whose rename predates it, or a rev the after commit doesn't reach, whose
+    rename postdates it. A rev git can't answer for applies."""
     if not revs:
         return frozenset(), []
-    reason = _no_ancestry_reason(before_sha, repo)
+    reason = _no_ancestry_reason('before', before_sha, repo)
     if reason is not None:
         return frozenset(), [
             f'no ancestry answer ({reason}); rename-log entries with `rev` all apply'
@@ -220,19 +224,27 @@ def _skipped_revs(
     skipped: set[str] = set()
     unknown: list[str] = []
     warnings: list[str] = []
+    after_reason = _no_ancestry_reason('after', after_sha, repo)
+    if after_reason is not None:
+        warnings.append(
+            f'no ancestry answer ({after_reason}); rename-log entries with a `rev` '
+            'later than the after commit apply'
+        )
     for rev in sorted(revs):
         if resolve_revision(rev, repo) is None:
             warnings.append(
                 f'rename-log rev {rev!r} does not resolve; its entries apply'
             )
             continue
-        match is_ancestor(rev, before_sha, repo):
-            case 'yes':
-                skipped.add(rev)
-            case 'unknown':
-                unknown.append(rev)
-            case 'no':
-                pass
+        predates = is_ancestor(rev, before_sha, repo)
+        reached = 'yes'
+        if after_reason is None:
+            assert after_sha is not None
+            reached = is_ancestor(rev, after_sha, repo)
+        if predates == 'yes' or reached == 'no':
+            skipped.add(rev)
+        elif 'unknown' in (predates, reached):
+            unknown.append(rev)
     if unknown:
         warnings.append(
             f'no ancestry answer for {plural(len(unknown), "rename-log rev")}; '
@@ -241,9 +253,9 @@ def _skipped_revs(
     return frozenset(skipped), warnings
 
 
-def _no_ancestry_reason(before_sha: str | None, repo: Path) -> str | None:
-    if before_sha is None:
-        return 'the before report has no commit SHA'
+def _no_ancestry_reason(side: Side, sha: str | None, repo: Path) -> str | None:
+    if sha is None:
+        return f'the {side} report has no commit SHA'
     match is_shallow(repo):
         case None:
             return 'git cannot read a repository here'
@@ -251,8 +263,8 @@ def _no_ancestry_reason(before_sha: str | None, repo: Path) -> str | None:
             return 'a shallow clone'
         case False:
             pass
-    if resolve_revision(before_sha, repo) is None:
-        return f'git cannot resolve the before commit {before_sha}'
+    if resolve_revision(sha, repo) is None:
+        return f'git cannot resolve the {side} commit {sha}'
     return None
 
 

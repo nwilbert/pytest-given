@@ -392,17 +392,29 @@ def _renamed_pair(before_sha: str | None, after_sha: str) -> list[str]:
 
 
 @pytest.mark.parametrize(
-    ('rev', 'changes'),
-    [('v1', ['added', 'removed']), ('v1.9', ['changed'])],
-    ids=['rev an ancestor of before: skipped', 'rev after before: applies'],
+    ('rev', 'range_', 'changes'),
+    [
+        ('v1', ('head', 'head'), ['added', 'removed']),
+        ('v1.9', ('first', 'first'), ['added', 'removed']),
+        ('v1.9', ('first', 'head'), ['changed']),
+    ],
+    ids=[
+        'rev an ancestor of before: skipped',
+        'rev past after: skipped',
+        'rev in the range: applies',
+    ],
 )
-def test_a_rename_entry_whose_rev_predates_the_range_is_skipped(
-    git_repo: GitRepo, monkeypatch: pytest.MonkeyPatch, rev: str, changes: list[str]
+def test_a_rename_entry_whose_rev_is_outside_the_range_is_skipped(
+    git_repo: GitRepo,
+    monkeypatch: pytest.MonkeyPatch,
+    rev: str,
+    range_: tuple[str, str],
+    changes: list[str],
 ) -> None:
     monkeypatch.chdir(git_repo.path)
     Path('given-renames.toml').write_text(_RENAME.format(rev=rev), encoding='utf-8')
-    before_sha = git_repo.head if rev == 'v1' else git_repo.first
-    assert main(['delta', *_renamed_pair(before_sha, git_repo.head)]) == 0
+    before_sha, after_sha = (getattr(git_repo, end) for end in range_)
+    assert main(['delta', *_renamed_pair(before_sha, after_sha)]) == 0
     listed = _read_delta()['scenarios']
     assert sorted(item['change'] for item in listed) == changes
 
@@ -440,14 +452,14 @@ class TestSkippedRevs:
     """`_skipped_revs` keeps every entry whose ancestry it can't establish."""
 
     def test_no_revs_ask_git_nothing(self, tmp_path: Path) -> None:
-        assert cli_delta._skipped_revs(frozenset(), None, tmp_path) == (
+        assert cli_delta._skipped_revs(frozenset(), None, None, tmp_path) == (
             frozenset(),
             [],
         )
 
     def test_outside_a_repository_every_rev_applies(self, tmp_path: Path) -> None:
         skipped, warnings = cli_delta._skipped_revs(
-            frozenset({'v1'}), 'a' * 40, tmp_path
+            frozenset({'v1'}), 'a' * 40, 'a' * 40, tmp_path
         )
         assert skipped == frozenset()
         assert warnings == [
@@ -462,7 +474,7 @@ class TestSkippedRevs:
     ) -> None:
         monkeypatch.setattr(cli_delta, 'is_shallow', lambda repo: True)
         skipped, [warning] = cli_delta._skipped_revs(
-            frozenset({'v1'}), git_repo.head, git_repo.path
+            frozenset({'v1'}), git_repo.head, git_repo.head, git_repo.path
         )
         assert skipped == frozenset()
         assert '(a shallow clone)' in warning
@@ -471,14 +483,26 @@ class TestSkippedRevs:
         self, git_repo: GitRepo
     ) -> None:
         skipped, [warning] = cli_delta._skipped_revs(
-            frozenset({'v1'}), 'f' * 40, git_repo.path
+            frozenset({'v1'}), 'f' * 40, git_repo.head, git_repo.path
         )
         assert skipped == frozenset()
         assert f'git cannot resolve the before commit {"f" * 40}' in warning
 
+    def test_an_after_report_without_a_sha_checks_the_before_commit_alone(
+        self, git_repo: GitRepo
+    ) -> None:
+        skipped, [warning] = cli_delta._skipped_revs(
+            frozenset({'v1', 'v1.9'}), git_repo.first, None, git_repo.path
+        )
+        assert skipped == frozenset({'v1'})
+        assert warning == (
+            'no ancestry answer (the after report has no commit SHA); rename-log '
+            'entries with a `rev` later than the after commit apply'
+        )
+
     def test_an_unresolvable_rev_is_named_and_applies(self, git_repo: GitRepo) -> None:
         skipped, warnings = cli_delta._skipped_revs(
-            frozenset({'v1', 'nope'}), git_repo.head, git_repo.path
+            frozenset({'v1', 'nope'}), git_repo.head, git_repo.head, git_repo.path
         )
         assert skipped == frozenset({'v1'})
         assert warnings == ["rename-log rev 'nope' does not resolve; its entries apply"]
@@ -488,7 +512,7 @@ class TestSkippedRevs:
     ) -> None:
         monkeypatch.setattr(cli_delta, 'is_ancestor', lambda rev, sha, repo: 'unknown')
         skipped, warnings = cli_delta._skipped_revs(
-            frozenset({'v1', 'v1.9'}), git_repo.head, git_repo.path
+            frozenset({'v1', 'v1.9'}), git_repo.head, git_repo.head, git_repo.path
         )
         assert skipped == frozenset()
         assert warnings == [

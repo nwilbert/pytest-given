@@ -69,7 +69,7 @@ rev = "v0.6.0"
 - `[[term]]` holds term IDs (`Late fee` is `late-fee`).
 - Entries apply in file order, so chains work (`A → B`, later `B → C`). A swap goes through a name neither test has: `A → tmp`, `B → A`, `tmp → B`.
 
-**`rev`** is a revision at which the rename had already happened. An entry whose `rev` is the *before* commit or an ancestor of it is skipped, so a later test reusing the old ID isn't paired with it. A `rev` that doesn't resolve, or a shallow clone, applies the entry with a warning. Write the tightest lasting one you can find:
+**`rev`** is a revision at which the rename had already happened. An entry whose `rev` is the *before* commit or an ancestor of it is skipped, so a later test reusing the old ID isn't paired with it. So is one whose `rev` the *after* commit doesn't contain: that rename comes after the range. A `rev` that doesn't resolve, or a shallow clone, applies the entry with a warning. Write the tightest lasting one you can find:
 
 1. the earliest release tag that contains the commit that made the rename (`git tag --contains <commit>`)
 2. otherwise that commit's SHA, when it is on the default branch

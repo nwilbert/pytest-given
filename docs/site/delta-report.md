@@ -89,9 +89,9 @@ When two before identities would end at the same one, the delta pairs neither an
 
 `rev` is a git revision, a tag or a SHA, at which the rename had already happened. It is optional.
 
-An entry whose `rev` is the before commit or an ancestor of it is skipped. The rename predates the range, so a later test that reuses the old ID is not paired with it by mistake.
+An entry whose `rev` is the before commit or an ancestor of it is skipped. The rename predates the range, so a later test that reuses the old ID is not paired with it by mistake. An entry whose `rev` is not the after commit or an ancestor of it is skipped too. The rename postdates the range.
 
-The delta asks git once per distinct `rev`. It applies the entry and warns when the `rev` does not resolve, when the clone is shallow, when the before report has no SHA, or when git cannot answer.
+The delta asks git once per distinct `rev`. It applies the entry and warns when the `rev` does not resolve, when the clone is shallow, when the before report has no SHA, or when git cannot answer. When only the after report has no SHA, it checks the before commit alone and warns.
 
 Write the tightest lasting `rev`. That is the earliest release tag containing the commit that made the rename. Otherwise it is that commit's SHA, when it is on the default branch. Never write the SHA of a pull request run, because a squash merge drops it. An entry written in the renaming pull request may leave `rev` out.
 
