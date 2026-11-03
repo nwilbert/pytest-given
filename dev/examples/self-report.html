@@ -996,6 +996,11 @@ span.param-highlight {
 }
 
 
+
+
+.step-attachments { padding-bottom: var(--space-sm); }
+
+.phase-steps:last-child > .step-attachments:last-child { padding-bottom: 0; }
 .attachment-badge {
   color: var(--text-muted);
   font-size: var(--font-size-sm);
@@ -1091,6 +1096,21 @@ span.param-highlight {
 
 
 
+
+
+
+.scenario-body-inner:has(> .steps + .scenario-source) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.scenario-body-inner:has(> .steps + .scenario-source) > * { flex: 1 0 100%; }
+
+.scenario-body-inner:has(> .steps + .scenario-source) > .steps {
+  flex: 1 1 auto;
+  padding-bottom: calc(var(--space-sm) / 2);
+}
+.scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
 .refs-content > .scenario-source {
   position: absolute;
   right: 0;
@@ -2248,9 +2268,9 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a document with a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> that is <span class="param-color-0" data-param="citation" data-subst="citation">{citation}</span></div><div>
+              <div class="step-text">a document with a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> that is <span class="param-color-0" data-param="citation" data-subst="citation">{citation}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</span>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">a JSON <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> that is <span class="param-color-1" data-param="report_state" data-subst="report_state">{report_state}</span></div>
             </div></div><div class="phase-block" data-block="1">
@@ -2668,7 +2688,7 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a document whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> links another URL</div><div>
+              <div class="step-text">a document whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> links another URL</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s2_0_att_0']"
             @click="toggleAttachment('s2_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -2678,7 +2698,7 @@ span.param-highlight {
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">a JSON <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> served from <span class="value-highlight">https://example.org/report.html</span></div>
             </div></div><div class="phase-block" data-block="1">
@@ -2727,7 +2747,7 @@ span.param-highlight {
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a JSON <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> at <code>given-report/report-data.json</code></div>
             </div><div class="phase-steps">
-              <div class="step-text">a document with a stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span></div><div>
+              <div class="step-text">a document with a stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s3_1_att_0']"
             @click="toggleAttachment('s3_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -2737,7 +2757,7 @@ span.param-highlight {
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text"><code>pytest-given citations update</code> runs on it without <code>--report</code></div>
@@ -2786,7 +2806,7 @@ span.param-highlight {
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a document with two <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citations</span>, one of them stale, and a plain <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="report-link">report link</span></div><div>
+              <div class="step-text">a document with two <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citations</span>, one of them stale, and a plain <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="report-link">report link</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s4_0_att_0']"
             @click="toggleAttachment('s4_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -2798,12 +2818,12 @@ See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [e
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">a JSON <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> of its scenarios</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><code>pytest-given citations check --list</code> runs on the document</div><div>
+              <div class="step-text"><code>pytest-given citations check --list</code> runs on the document</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s4_2_att_0']"
             @click="toggleAttachment('s4_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>output</button>
@@ -2818,7 +2838,7 @@ citations: 1 finding; `citations update` fixes 1
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">each <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="report-link">report link</span> is a line, with each finding indented under its own</div>
@@ -2864,7 +2884,7 @@ citations: 1 finding; `citations update` fixes 1
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a document whose stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> cites <code>test_refund</code>, not <code>test_pay</code></div><div>
+              <div class="step-text">a document whose stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> cites <code>test_refund</code>, not <code>test_pay</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s5_0_att_0']"
             @click="toggleAttachment('s5_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -2876,12 +2896,12 @@ See [refunds](https://example.org/report.html#scenario=t.py::test_refund) and [e
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">a JSON <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> of its scenarios</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text"><code>pytest-given citations check --covering</code> names <code>test_pay</code></div><div>
+              <div class="step-text"><code>pytest-given citations check --covering</code> names <code>test_pay</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s5_2_att_0']"
             @click="toggleAttachment('s5_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>output</button>
@@ -2892,7 +2912,7 @@ citations: 1 finding, 1 of them left out by --covering; `citations update` fixes
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">only the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> of <code>test_pay</code> is listed</div>
@@ -2936,7 +2956,7 @@ citations: 1 finding, 1 of them left out by --covering; `citations update` fixes
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> with a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="tag">tag</span>, whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> names a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="glossary">glossary</span> term</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> with a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="tag">tag</span>, whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> names a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="glossary">glossary</span> term</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s6_0_att_0']"
             @click="toggleAttachment('s6_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -2957,7 +2977,7 @@ def test_check_in():
         assert keys == 1</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -3053,7 +3073,7 @@ def test_check_in():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite that nests across phases and mistypes a term</div><div>
+              <div class="step-text">a suite that nests across phases and mistypes a term</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s8_0_att_0']"
             @click="toggleAttachment('s8_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3078,7 +3098,7 @@ def test_check_in():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -3168,7 +3188,7 @@ def test_check_in():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> consuming a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span></div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> consuming a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s10_0_att_0']"
             @click="toggleAttachment('s10_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3188,7 +3208,7 @@ def test_fixture(value):
         assert value == 42</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -3233,7 +3253,7 @@ def test_fixture(value):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span> takes half a second</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span> takes half a second</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s11_0_att_0']"
             @click="toggleAttachment('s11_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3255,7 +3275,7 @@ def test_quick(slow):
         assert slow == 1</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -3302,7 +3322,7 @@ def test_quick(slow):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parametrized-scenario">parametrized scenario</span> over two <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span></div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parametrized-scenario">parametrized scenario</span> over two <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s12_0_att_0']"
             @click="toggleAttachment('s12_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3320,7 +3340,7 @@ def test_add(a, b, expected):
         assert a + b == expected</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -3530,7 +3550,7 @@ def test_add(a, b, expected):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose narration varies across parametrize cases</div><div>
+              <div class="step-text">a suite whose narration varies across parametrize cases</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s15_0_att_0']"
             @click="toggleAttachment('s15_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3546,7 +3566,7 @@ def test_brew(cup_size):
         assert cup_size &gt; 0</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> on disk from a previous run</div>
             </div></div><div class="phase-block" data-block="1">
@@ -3595,7 +3615,7 @@ def test_brew(cup_size):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite that would otherwise pass</div><div>
+              <div class="step-text">a suite that would otherwise pass</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s16_0_att_0']"
             @click="toggleAttachment('s16_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3609,7 +3629,7 @@ def test_brew():
         assert True</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-source-link=<span class="param-color-7" data-param="value" data-subst="value">{value}</span></div>
@@ -3807,7 +3827,7 @@ def test_brew():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose fixture raises after its yield</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose fixture raises after its yield</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s19_0_att_0']"
             @click="toggleAttachment('s19_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -3829,7 +3849,7 @@ def test_a(resource):
         assert value == 1</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -3876,9 +3896,9 @@ def test_a(resource):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span> that adds a <span class="param-color-9" data-param="late" data-subst="late">{late}</span> after its yield</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span> that adds a <span class="param-color-9" data-param="late" data-subst="late">{late}</span> after its yield</div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs</div>
@@ -4044,9 +4064,9 @@ def test_use(thing):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a fixture decorated with @<span class="param-color-10" data-param="decorator" data-subst="decorator">{decorator}</span></div><div>
+              <div class="step-text">a fixture decorated with @<span class="param-color-10" data-param="decorator" data-subst="decorator">{decorator}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs</div>
@@ -4283,7 +4303,7 @@ def test_use(coin):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> marked xfail whose body fails</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> marked xfail whose body fails</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s22_0_att_0']"
             @click="toggleAttachment('s22_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4301,7 +4321,7 @@ def test_planned():
         assert value == 2</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -4389,7 +4409,7 @@ def test_planned():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> binding two <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">stories</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span> its <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narration">narration</span> fits</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> binding two <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">stories</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span> its <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narration">narration</span> fits</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s24_0_att_0']"
             @click="toggleAttachment('s24_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4410,7 +4430,7 @@ def test_both():
         pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -4455,7 +4475,7 @@ def test_both():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite declaring a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> that no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> names or <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="pin">pins</span></div><div>
+              <div class="step-text">a suite declaring a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> that no <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> names or <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="pin">pins</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s25_0_att_0']"
             @click="toggleAttachment('s25_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4475,7 +4495,7 @@ def test_x():
         pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -4518,7 +4538,7 @@ def test_x():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> pinning one <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span>, whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">steps</span> pin a second and narrate a third</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> pinning one <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span>, whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">steps</span> pin a second and narrate a third</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s26_0_att_0']"
             @click="toggleAttachment('s26_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4543,7 +4563,7 @@ def test_x():
         pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -4586,7 +4606,7 @@ def test_x():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> pinning a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> does not name</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> pinning a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> does not name</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s27_0_att_0']"
             @click="toggleAttachment('s27_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4607,7 +4627,7 @@ def test_x():
         pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -4650,7 +4670,7 @@ def test_x():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a module-scoped <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span> pinning a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span>, set up first by an unannotated test</div><div>
+              <div class="step-text">a module-scoped <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step-fixture">step fixture</span> pinning a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span>, set up first by an unannotated test</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s28_0_att_0']"
             @click="toggleAttachment('s28_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4685,7 +4705,7 @@ def test_second(wide):
     pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -4728,7 +4748,7 @@ def test_second(wide):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="given-annotation">given annotation</span> on a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="plain-fixture">plain fixture</span> carries a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="pin">pin</span></div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="given-annotation">given annotation</span> on a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="plain-fixture">plain fixture</span> carries a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="pin">pin</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s29_0_att_0']"
             @click="toggleAttachment('s29_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4753,7 +4773,7 @@ def test_x(room_number: Annotated[int, given(&#39;a room&#39;, pins=s[1])]):
     pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs</div>
@@ -4973,7 +4993,7 @@ def test_x(room_number: Annotated[int, given(&#39;a room&#39;, pins=s[1])]):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <code>Template</code> <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="given-annotation">given annotation</span> on a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="plain-fixture">plain fixture</span> parameter</div><div>
+              <div class="step-text">a <code>Template</code> <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="given-annotation">given annotation</span> on a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="plain-fixture">plain fixture</span> parameter</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s32_0_att_0']"
             @click="toggleAttachment('s32_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -4993,7 +5013,7 @@ def test_it(room: Annotated[int, given(Template(&#39;room {room} is free&#39;))]
         pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with an HTML <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span></div>
@@ -5189,7 +5209,7 @@ def test_it(room: Annotated[int, given(Template(&#39;room {room} is free&#39;))]
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite with one <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span></div><div>
+              <div class="step-text">a suite with one <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s34_0_att_0']"
             @click="toggleAttachment('s34_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -5210,7 +5230,7 @@ def test_it(room: Annotated[int, given(Template(&#39;room {room} is free&#39;))]
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with no output flag</div>
@@ -5479,7 +5499,7 @@ def test_it(room: Annotated[int, given(Template(&#39;room {room} is free&#39;))]
               <div class="step-text">the suite runs with --given-md and --given-md-source</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narration">narration</span> is followed by the test function, decorator included, each line numbered as in the file</div><div>
+              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narration">narration</span> is followed by the test function, decorator included, each line numbered as in the file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s38_2_att_0']"
             @click="toggleAttachment('s38_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -5507,7 +5527,7 @@ def test_it(room: Annotated[int, given(Template(&#39;room {room} is free&#39;))]
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -5640,7 +5660,7 @@ def test_it(room: Annotated[int, given(Template(&#39;room {room} is free&#39;))]
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose narration varies across parametrize cases</div><div>
+              <div class="step-text">a suite whose narration varies across parametrize cases</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s41_0_att_0']"
             @click="toggleAttachment('s41_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -5658,7 +5678,7 @@ def test_brew(cup_size):
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with all three output flags</div>
@@ -6095,7 +6115,7 @@ def test_brew(cup_size):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parametrized-scenario">parametrized scenario</span> over two <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span> that declines the <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="group">grouping</span></div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parametrized-scenario">parametrized scenario</span> over two <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span> that declines the <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="group">grouping</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s47_0_att_0']"
             @click="toggleAttachment('s47_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6111,7 +6131,7 @@ def test_brew(cup_size):
         assert cup_size</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -6160,7 +6180,7 @@ def test_brew(cup_size):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose f-string narration records no parts</div><div>
+              <div class="step-text">a suite whose f-string narration records no parts</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s48_0_att_0']"
             @click="toggleAttachment('s48_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6176,7 +6196,7 @@ def test_brew(cup_size):
         assert cup_size</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with no output flag</div>
@@ -6221,7 +6241,7 @@ def test_brew(cup_size):
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite with a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span>, a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parametrized-scenario">parametrized scenario</span> and a plain test</div><div>
+              <div class="step-text">a suite with a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span>, a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parametrized-scenario">parametrized scenario</span> and a plain test</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s49_0_att_0']"
             @click="toggleAttachment('s49_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6245,7 +6265,7 @@ def test_plain():
     assert True</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with -m pytest_given</div>
@@ -6290,7 +6310,7 @@ def test_plain():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> of <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="kindless">kindless</span> <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">terms</span> and a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span> uses them</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> of <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="kindless">kindless</span> <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">terms</span> and a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span> uses them</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s50_0_att_0']"
             @click="toggleAttachment('s50_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>GLOSSARY.md</button>
@@ -6323,7 +6343,7 @@ def test_guest_searches():
         pass</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with --given-json</div>
@@ -6368,7 +6388,7 @@ def test_guest_searches():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite with one flawed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span></div><div>
+              <div class="step-text">a suite with one flawed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s51_0_att_0']"
             @click="toggleAttachment('s51_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6388,7 +6408,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs without the lint flag</div>
@@ -6433,7 +6453,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> has an empty body</div><div>
+              <div class="step-text">a suite whose given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> has an empty body</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s52_0_att_0']"
             @click="toggleAttachment('s52_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6453,7 +6473,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with the lint enabled</div>
@@ -6498,7 +6518,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">steps</span> are all sound</div><div>
+              <div class="step-text">a suite whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">steps</span> are all sound</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s53_0_att_0']"
             @click="toggleAttachment('s53_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6518,7 +6538,7 @@ def test_clean():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with the lint enabled</div>
@@ -6565,7 +6585,7 @@ def test_clean():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> has an empty body</div><div>
+              <div class="step-text">a suite whose given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> has an empty body</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s54_0_att_0']"
             @click="toggleAttachment('s54_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6585,7 +6605,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with that <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rule</span> set to warn</div>
@@ -6632,9 +6652,9 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite with <span class="param-color-20" data-param="suite" data-subst="suite">{suite}</span></div><div>
+              <div class="step-text">a suite with <span class="param-color-20" data-param="suite" data-subst="suite">{suite}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>test file</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with the lint and given_lint_ignore=<span class="param-color-21" data-param="entry" data-subst="entry">{entry}</span></div>
@@ -6960,7 +6980,7 @@ def test_clean():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite with one flawed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span></div><div>
+              <div class="step-text">a suite with one flawed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s56_0_att_0']"
             @click="toggleAttachment('s56_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -6980,7 +7000,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs with the lint enabled by ini but off by flag</div>
@@ -7029,7 +7049,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a suite whose lint would fail, under a stale ignore entry</div><div>
+              <div class="step-text">a suite whose lint would fail, under a stale ignore entry</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s57_0_att_0']"
             @click="toggleAttachment('s57_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>suite</button>
@@ -7049,7 +7069,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the suite runs deselected, so nothing is collected</div>
@@ -7708,7 +7728,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s72_0_att_0']"
             @click="toggleAttachment('s72_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -7724,7 +7744,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the same <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span> is looked up in three different cases</div>
@@ -7767,7 +7787,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s73_0_att_0']"
             @click="toggleAttachment('s73_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -7783,7 +7803,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the same <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span> is looked up twice</div>
@@ -7826,7 +7846,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a Markdown glossary file with no kind column</div><div>
+              <div class="step-text">a Markdown glossary file with no kind column</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s74_0_att_0']"
             @click="toggleAttachment('s74_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -7842,7 +7862,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loads it</div>
@@ -7889,7 +7909,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s75_0_att_0']"
             @click="toggleAttachment('s75_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -7905,7 +7925,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">a misspelt <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span> is looked up</div>
@@ -7948,7 +7968,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s76_0_att_0']"
             @click="toggleAttachment('s76_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -7964,7 +7984,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">its handles build a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="sentence">sentence</span></div>
@@ -8007,7 +8027,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s77_0_att_0']"
             @click="toggleAttachment('s77_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8023,7 +8043,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">a handle is called to name an <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="instance">instance</span></div>
@@ -8066,7 +8086,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a Markdown glossary with an explicit Kind column</div><div>
+              <div class="step-text">a Markdown glossary with an explicit Kind column</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s78_0_att_0']"
             @click="toggleAttachment('s78_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8080,7 +8100,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> reads the Kind column</div>
@@ -8123,7 +8143,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a Markdown glossary with the kind in the third column</div><div>
+              <div class="step-text">a Markdown glossary with the kind in the third column</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s79_0_att_0']"
             @click="toggleAttachment('s79_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8136,7 +8156,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> selects the kind column by index</div>
@@ -8179,7 +8199,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a glossary whose Kind cell says work_object</div><div>
+              <div class="step-text">a glossary whose Kind cell says work_object</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s80_0_att_0']"
             @click="toggleAttachment('s80_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8191,7 +8211,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> parses the kind</div>
@@ -8238,7 +8258,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a glossary whose Kind cell holds an unknown value</div><div>
+              <div class="step-text">a glossary whose Kind cell holds an unknown value</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s81_0_att_0']"
             @click="toggleAttachment('s81_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8250,7 +8270,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loads the file</div>
@@ -8342,7 +8362,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a row whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span> cell has no id-able characters</div><div>
+              <div class="step-text">a row whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span> cell has no id-able characters</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s83_0_att_0']"
             @click="toggleAttachment('s83_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8354,7 +8374,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loads the file</div>
@@ -8403,9 +8423,9 @@ def test_empty_given():
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a glossary file with <span class="param-color-22" data-param="problem" data-subst="problem">{problem}</span></div>
             </div><div class="phase-steps">
-              <div class="step-text">that file on disk as bad.md</div><div>
+              <div class="step-text">that file on disk as bad.md</div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loads it</div>
@@ -8615,9 +8635,9 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">two rows for one <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span>, with identical definitions: <span class="param-color-24" data-param="identical" data-subst="identical">{identical}</span></div><div>
+              <div class="step-text">two rows for one <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span>, with identical definitions: <span class="param-color-24" data-param="identical" data-subst="identical">{identical}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loads the file</div>
@@ -8783,7 +8803,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a row whose definition cell is blank</div><div>
+              <div class="step-text">a row whose definition cell is blank</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s86_0_att_0']"
             @click="toggleAttachment('s86_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8795,7 +8815,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> parses it</div>
@@ -8838,7 +8858,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s87_0_att_0']"
             @click="toggleAttachment('s87_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8854,7 +8874,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">a known <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term">term</span> is looked up by call</div>
@@ -8899,7 +8919,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span> loaded from a Markdown file</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s88_0_att_0']"
             @click="toggleAttachment('s88_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Glossary file</button>
@@ -8915,7 +8935,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">an unknown name is called</div>
@@ -11119,7 +11139,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a Markdown document with one pipe table</div><div>
+              <div class="step-text">a Markdown document with one pipe table</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s108_0_att_0']"
             @click="toggleAttachment('s108_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</button>
@@ -11134,7 +11154,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the parser reads it into rows for a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="file-glossary">file glossary</span></div>
@@ -11177,7 +11197,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a document containing two separate pipe tables</div><div>
+              <div class="step-text">a document containing two separate pipe tables</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s109_0_att_0']"
             @click="toggleAttachment('s109_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</button>
@@ -11198,7 +11218,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the parser reads the whole document</div>
@@ -11241,7 +11261,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a table with custom, differently-cased header names</div><div>
+              <div class="step-text">a table with custom, differently-cased header names</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s110_0_att_0']"
             @click="toggleAttachment('s110_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</button>
@@ -11253,7 +11273,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the parser selects columns by header name</div>
@@ -11296,7 +11316,7 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">cells containing escaped pipe characters (\|)</div><div>
+              <div class="step-text">cells containing escaped pipe characters (\|)</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s111_0_att_0']"
             @click="toggleAttachment('s111_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</button>
@@ -11308,7 +11328,7 @@ def test_empty_given():
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the parser splits the row</div>
@@ -11355,9 +11375,9 @@ def test_empty_given():
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a Markdown document with <span class="param-color-38" data-param="document" data-subst="document">{document}</span></div><div>
+              <div class="step-text">a Markdown document with <span class="param-color-38" data-param="document" data-subst="document">{document}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</span>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">the columns selected as <span class="param-color-39" data-param="columns" data-subst="columns">{columns}</span>, the rest left at their defaults</div>
             </div></div><div class="phase-block" data-block="1">
@@ -11600,9 +11620,9 @@ No tables here.</pre></div>
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a Markdown document with <span class="param-color-38" data-param="document" data-subst="document">{document}</span></div><div>
+              <div class="step-text">a Markdown document with <span class="param-color-38" data-param="document" data-subst="document">{document}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the parser reads the document</div>
@@ -12257,7 +12277,7 @@ Next line is not a separator.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a definition cell rich with inline code</div><div>
+              <div class="step-text">a definition cell rich with inline code</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s115_0_att_0']"
             @click="toggleAttachment('s115_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Markdown document</button>
@@ -12269,7 +12289,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the parser reads the row</div>
@@ -15571,7 +15591,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> where the tag <code>checkout</code> has a passed and an xfailed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span></div>
             </div><div class="phase-steps">
-              <div class="step-text">a document citing the tag under another name, as all passed</div><div>
+              <div class="step-text">a document citing the tag under another name, as all passed</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s160_1_att_0']"
             @click="toggleAttachment('s160_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15581,13 +15601,13 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">its glyph, text and summary read what the report says</div><div>
+              <div class="step-text">its glyph, text and summary read what the report says</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s160_3_att_0']"
             @click="toggleAttachment('s160_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -15597,7 +15617,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">no finding remains</div>
             </div></div></div>
@@ -15636,7 +15656,7 @@ Next line is not a separator.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> to rewrite</div><div>
+              <div class="step-text">a stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> to rewrite</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s161_0_att_0']"
             @click="toggleAttachment('s161_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15646,7 +15666,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">another writer saves the document while the update analyzes it</div>
@@ -15697,7 +15717,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose one <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> fails</div>
             </div><div class="phase-steps">
-              <div class="step-text">a document linking it, and a deleted test, in its own words</div><div>
+              <div class="step-text">a document linking it, and a deleted test, in its own words</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s162_1_att_0']"
             @click="toggleAttachment('s162_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15707,7 +15727,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
@@ -15756,7 +15776,7 @@ Next line is not a separator.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> of a passing <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span></div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> of a passing <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s163_0_att_0']"
             @click="toggleAttachment('s163_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15766,13 +15786,13 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">it is updated against a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> that lacks the scenario</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">it is marked ❓, keeping its target and text</div><div>
+              <div class="step-text">it is marked ❓, keeping its target and text</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s163_2_att_0']"
             @click="toggleAttachment('s163_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>marked document</button>
@@ -15782,7 +15802,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">it stays a finding</div>
             </div></div><div class="phase-block" data-block="3">
@@ -15833,7 +15853,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> where the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span> <code>[a]</code> and <code>[c]</code> of <code>test_pour</code> group into one <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span></div>
             </div><div class="phase-steps">
-              <div class="step-text">a document citing the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">case</span> <code>[c]</code></div><div>
+              <div class="step-text">a document citing the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">case</span> <code>[c]</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s164_1_att_0']"
             @click="toggleAttachment('s164_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15843,13 +15863,13 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> names its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> by the node ID of <code>test_pour</code></div><div>
+              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> names its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> by the node ID of <code>test_pour</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s164_3_att_0']"
             @click="toggleAttachment('s164_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -15859,7 +15879,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">no finding remains</div>
             </div></div></div>
@@ -15904,7 +15924,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="scenario-title">scenario title</span> sets a word in bold</div>
             </div><div class="phase-steps">
-              <div class="step-text">a document with a placeholder <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> of it</div><div>
+              <div class="step-text">a document with a placeholder <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> of it</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s165_1_att_0']"
             @click="toggleAttachment('s165_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15914,13 +15934,13 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">its link text sets the word in bold too</div><div>
+              <div class="step-text">its link text sets the word in bold too</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s165_3_att_0']"
             @click="toggleAttachment('s165_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -15930,7 +15950,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -15973,7 +15993,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> where <code>test_pay</code> was renamed <code>test_pay_by_card</code>, still titled &#34;Pay by card&#34;</div>
             </div><div class="phase-steps">
-              <div class="step-text">a document whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> still names <code>test_pay</code></div><div>
+              <div class="step-text">a document whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> still names <code>test_pay</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s166_1_att_0']"
             @click="toggleAttachment('s166_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -15983,7 +16003,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is checked</div>
@@ -15995,7 +16015,7 @@ Next line is not a separator.
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="4">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> names <code>test_pay_by_card</code></div><div>
+              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> names <code>test_pay_by_card</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s166_5_att_0']"
             @click="toggleAttachment('s166_5_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -16005,7 +16025,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">no finding remains</div>
             </div></div></div>
@@ -16050,7 +16070,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> that stores no URL, placed at <code>examples/r.html</code></div>
             </div><div class="phase-steps">
-              <div class="step-text">a stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> in <code>guide/doc.md</code> linking <code>../examples/r.html</code></div><div>
+              <div class="step-text">a stale <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> in <code>guide/doc.md</code> linking <code>../examples/r.html</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s167_1_att_0']"
             @click="toggleAttachment('s167_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -16060,13 +16080,13 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated with that <code>--report-path</code></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> is read as one and its glyph rewritten</div><div>
+              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> is read as one and its glyph rewritten</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s167_3_att_0']"
             @click="toggleAttachment('s167_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -16076,7 +16096,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -16367,7 +16387,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> has two steps</div>
             </div><div class="phase-steps">
-              <div class="step-text">a document holding a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of it, copied with an empty body</div><div>
+              <div class="step-text">a document holding a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of it, copied with an empty body</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s169_1_att_0']"
             @click="toggleAttachment('s169_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -16382,13 +16402,13 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">its body holds the scenario&#39;s narration between blank lines</div><div>
+              <div class="step-text">its body holds the scenario&#39;s narration between blank lines</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s169_3_att_0']"
             @click="toggleAttachment('s169_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -16406,7 +16426,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">no finding remains</div>
             </div></div></div>
@@ -16451,7 +16471,7 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> ends in &#34;it is paid&#34;</div>
             </div><div class="phase-steps">
-              <div class="step-text">a document whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of it still ends in &#34;it is charged&#34;</div><div>
+              <div class="step-text">a document whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of it still ends in &#34;it is charged&#34;</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s170_1_att_0']"
             @click="toggleAttachment('s170_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -16467,7 +16487,7 @@ Next line is not a separator.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is checked</div>
@@ -16518,9 +16538,9 @@ Next line is not a separator.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> is tagged <code>checkout</code> and covers the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> <code>checkout</code></div>
             </div><div class="phase-steps">
-              <div class="step-text">a document with a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of the <span class="param-color-55" data-param="target" data-subst="target">{target}</span>, its glyph and body stale</div><div>
+              <div class="step-text">a document with a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of the <span class="param-color-55" data-param="target" data-subst="target">{target}</span>, its glyph and body stale</div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
@@ -16678,9 +16698,9 @@ The checkout.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a document whose <code>&lt;details&gt;</code> block cites the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> with <span class="param-color-56" data-param="shape" data-subst="shape">{shape}</span></div><div>
+              <div class="step-text">a document whose <code>&lt;details&gt;</code> block cites the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> with <span class="param-color-56" data-param="shape" data-subst="shape">{shape}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
@@ -16962,7 +16982,7 @@ After.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="scenario-title">scenario title</span> holds a code span and an ampersand</div>
             </div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> the copy menu copies, pasted into a document</div><div>
+              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> the copy menu copies, pasted into a document</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s173_1_att_0']"
             @click="toggleAttachment('s173_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -16975,13 +16995,13 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">its body holds the scenario&#39;s narration</div><div>
+              <div class="step-text">its body holds the scenario&#39;s narration</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s173_3_att_0']"
             @click="toggleAttachment('s173_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -16997,7 +17017,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="3">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the updated document is checked</div>
@@ -17046,7 +17066,7 @@ After.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> fails</div>
             </div><div class="phase-steps">
-              <div class="step-text">a document holding a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of it, copied with an empty body</div><div>
+              <div class="step-text">a document holding a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> of it, copied with an empty body</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s174_1_att_0']"
             @click="toggleAttachment('s174_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</button>
@@ -17059,13 +17079,13 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">its glyph reads ❌ and its body holds the narration</div><div>
+              <div class="step-text">its glyph reads ❌ and its body holds the narration</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s174_3_att_0']"
             @click="toggleAttachment('s174_3_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</button>
@@ -17081,7 +17101,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">the failure is the only finding that remains</div>
             </div></div></div>
@@ -17296,17 +17316,17 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> copied with an empty body into a <span class="param-color-59" data-param="container" data-subst="container">{container}</span></div><div>
+              <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="narrated-citation">narrated citation</span> copied with an empty body into a <span class="param-color-59" data-param="container" data-subst="container">{container}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>document</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the document is updated</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">each body line carries the container&#39;s prefix</div><div>
+              <div class="step-text">each body line carries the container&#39;s prefix</div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:1"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>updated document</span>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">a check of the updated document finds nothing</div>
             </div></div></div>
@@ -17522,7 +17542,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body is only <code>pass</code></div><div>
+              <div class="step-text">a given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body is only <code>pass</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s177_0_att_0']"
             @click="toggleAttachment('s177_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>step body</button>
@@ -17534,7 +17554,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the AST <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rules</span> parse that source</div>
@@ -17579,7 +17599,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a then <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body only calls</div><div>
+              <div class="step-text">a then <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body only calls</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s178_0_att_0']"
             @click="toggleAttachment('s178_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>step body</button>
@@ -17592,7 +17612,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the AST <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rules</span> parse that source</div>
@@ -17637,7 +17657,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a then <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose only assert sits under an <code>if</code></div><div>
+              <div class="step-text">a then <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose only assert sits under an <code>if</code></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s179_0_att_0']"
             @click="toggleAttachment('s179_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>step body</button>
@@ -17650,7 +17670,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the AST <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rules</span> parse that source</div>
@@ -17695,9 +17715,9 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="param-color-60" data-param="phase" data-subst="phase">{phase}</span> <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body asserts</div><div>
+              <div class="step-text">a <span class="param-color-60" data-param="phase" data-subst="phase">{phase}</span> <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body asserts</div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>step body</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the AST <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rules</span> parse that source</div>
@@ -17911,7 +17931,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> with no when, acting inside its then</div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> with no when, acting inside its then</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s181_0_att_0']"
             @click="toggleAttachment('s181_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>step body</button>
@@ -17925,7 +17945,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the AST <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rules</span> parse that source</div>
@@ -17968,7 +17988,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body never loads the name</div><div>
+              <div class="step-text">a given <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> whose body never loads the name</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s182_0_att_0']"
             @click="toggleAttachment('s182_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>step body</button>
@@ -17980,7 +18000,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the AST <span class="term-ref-object term-ref--link has-term-tip" data-term-id="lint-rule">lint rules</span> parse that source</div>
@@ -19184,7 +19204,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> and <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> reference <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="instance">instances</span> of an actor and a work object, and an <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="inflection">inflection</span></div><div>
+              <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> whose <span class="term-ref-object term-ref--link has-term-tip" data-term-id="story">story</span> and <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> reference <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="instance">instances</span> of an actor and a work object, and an <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="inflection">inflection</span></div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s198_0_att_0']"
             @click="toggleAttachment('s198_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-json"/></svg>Report data</button>
@@ -19310,7 +19330,7 @@ After.
 }</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="glossary">glossary</span> aggregations are built</div>
@@ -19712,7 +19732,7 @@ After.
               <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="scenario-title">scenario title</span> with a bold word and a code span</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">the HTML, the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> and a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> show it</div><div>
+              <div class="step-text">the HTML, the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> and a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> show it</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s207_1_att_0']"
             @click="toggleAttachment('s207_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>outputs</button>
@@ -19723,7 +19743,7 @@ After.
 ✅ [Books a **suite** with `late_checkout`](</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the HTML renders the word bold and the code as code</div>
@@ -19772,7 +19792,7 @@ After.
               <div class="step-text">a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="scenario-title">scenario title</span> whose <code>**</code> markers enclose a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term-ref">term ref</span></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">the HTML, the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> and a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> show it</div><div>
+              <div class="step-text">the HTML, the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> and a <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="citation">citation</span> show it</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s208_1_att_0']"
             @click="toggleAttachment('s208_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>outputs</button>
@@ -19783,7 +19803,7 @@ After.
 ✅ [\*\*Guest books\*\*](</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the HTML shows both markers as written</div>
@@ -19831,7 +19851,7 @@ After.
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the heading is checked and each <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> is a phase bullet</div><div>
+              <div class="step-text">the heading is checked and each <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span> is a phase bullet</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s209_2_att_0']"
             @click="toggleAttachment('s209_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -19848,7 +19868,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -19890,7 +19910,7 @@ After.
               <div class="step-text">a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> whose title, and a value in its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="step">step</span>, break across lines</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div><div>
+              <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s210_1_att_0']"
             @click="toggleAttachment('s210_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -19905,7 +19925,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the heading reads on one line</div>
@@ -19953,7 +19973,7 @@ After.
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term-ref">term ref</span> renders in guillemets, the value verbatim and the placeholder in braces</div><div>
+              <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="term-ref">term ref</span> renders in guillemets, the value verbatim and the placeholder in braces</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s211_2_att_0']"
             @click="toggleAttachment('s211_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -19968,7 +19988,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -20013,7 +20033,7 @@ After.
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the heading counts the cases and the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parameter-table">parameter table</span> lists each row</div><div>
+              <div class="step-text">the heading counts the cases and the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="parameter-table">parameter table</span> lists each row</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s212_2_att_0']"
             @click="toggleAttachment('s212_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -20033,7 +20053,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -20078,9 +20098,9 @@ After.
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the table header reads <span class="param-color-71" data-param="header" data-subst="header">{header}</span></div><div>
+              <div class="step-text">the table header reads <span class="param-color-71" data-param="header" data-subst="header">{header}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</span>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -20460,7 +20480,7 @@ After.
       
       <div class="steps"><div class="phase-block" data-block="0">
             <div class="phase-label">Given</div><div class="phase-steps">
-              <div class="step-text">a failed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> carrying a two-line error and an internal frame</div><div>
+              <div class="step-text">a failed <span class="term-ref-object term-ref--link has-term-tip" data-term-id="scenario">scenario</span> carrying a two-line error and an internal frame</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s214_0_att_0']"
             @click="toggleAttachment('s214_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-json"/></svg>Error record</button>
@@ -20489,13 +20509,13 @@ After.
 }</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the heading is crossed and the error follows the steps</div><div>
+              <div class="step-text">the heading is crossed and the error follows the steps</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s214_2_att_0']"
             @click="toggleAttachment('s214_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -20513,7 +20533,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div><div class="phase-steps">
               <div class="step-text">only the first message line and the non-internal frame are quoted</div>
             </div></div></div>
@@ -20558,7 +20578,7 @@ After.
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="attachment">attachment</span> content sits in an indented fence, not inline</div><div>
+              <div class="step-text">the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="attachment">attachment</span> content sits in an indented fence, not inline</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s215_2_att_0']"
             @click="toggleAttachment('s215_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -20578,7 +20598,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -20621,7 +20641,7 @@ After.
               <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the heading is marked skipped and the reason follows the node ID</div><div>
+              <div class="step-text">the heading is marked skipped and the reason follows the node ID</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s216_2_att_0']"
             @click="toggleAttachment('s216_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -20636,7 +20656,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -20678,7 +20698,7 @@ After.
               <div class="step-text">three failed <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span>: one with the custom ID 11, one with no ID whose value is 11, and one with the ID 3</div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
-              <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div><div>
+              <div class="step-text">the Markdown <span class="term-ref-object term-ref--link has-term-tip" data-term-id="report">report</span> is rendered</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s217_1_att_0']"
             @click="toggleAttachment('s217_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Rendered Markdown</button>
@@ -20708,7 +20728,7 @@ After.
 </pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
               <div class="step-text">the two notes keyed 11 each add their row number</div>
@@ -22917,9 +22937,9 @@ After.
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a passed <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">case</span> that loads its items, then checks it is hot</div>
             </div><div class="phase-steps">
-              <div class="step-text">a failed <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">case</span> that loads its items, then retries instead of checking it is hot: <span class="param-color-80" data-param="retries" data-subst="retries">{retries}</span></div><div>
+              <div class="step-text">a failed <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">case</span> that loads its items, then retries instead of checking it is hot: <span class="param-color-80" data-param="retries" data-subst="retries">{retries}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>failed steps</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the <span class="term-ref-unknown term-ref--link has-term-tip" data-term-id="case">cases</span> are <span class="term-ref-activity term-ref--link has-term-tip" data-term-id="group">grouped</span></div>

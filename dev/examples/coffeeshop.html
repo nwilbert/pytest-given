@@ -996,6 +996,11 @@ span.param-highlight {
 }
 
 
+
+
+.step-attachments { padding-bottom: var(--space-sm); }
+
+.phase-steps:last-child > .step-attachments:last-child { padding-bottom: 0; }
 .attachment-badge {
   color: var(--text-muted);
   font-size: var(--font-size-sm);
@@ -1091,6 +1096,21 @@ span.param-highlight {
 
 
 
+
+
+
+.scenario-body-inner:has(> .steps + .scenario-source) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.scenario-body-inner:has(> .steps + .scenario-source) > * { flex: 1 0 100%; }
+
+.scenario-body-inner:has(> .steps + .scenario-source) > .steps {
+  flex: 1 1 auto;
+  padding-bottom: calc(var(--space-sm) / 2);
+}
+.scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
 .refs-content > .scenario-source {
   position: absolute;
   right: 0;
@@ -1958,7 +1978,7 @@ span.param-highlight {
               <div class="step-text">I buy a coffee</div>
             </div></div><div class="phase-block" data-block="2">
             <div class="phase-label">Then</div><div class="phase-steps">
-              <div class="step-text">the machine has 9 coffees left</div><div>
+              <div class="step-text">the machine has 9 coffees left</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s0_2_att_0']"
             @click="toggleAttachment('s0_2_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-json"/></svg>Machine state</button>
@@ -1971,7 +1991,7 @@ span.param-highlight {
 }</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       
@@ -2010,7 +2030,7 @@ span.param-highlight {
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a coffee machine with 10 coffees</div>
             </div><div class="phase-steps">
-              <div class="step-text">a printed receipt</div><div>
+              <div class="step-text">a printed receipt</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s1_1_att_0']"
             @click="toggleAttachment('s1_1_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>Receipt</button>
@@ -2021,7 +2041,7 @@ span.param-highlight {
 Total:        $2.00</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">the total line is read back</div>
@@ -2622,9 +2642,9 @@ Total:        $2.00</pre></div>
             <div class="phase-label">Given</div><div class="phase-steps">
               <div class="step-text">a coffee machine with 10 coffees</div>
             </div><div class="phase-steps">
-              <div class="step-text">the machine is primed for <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span></div><div>
+              <div class="step-text">the machine is primed for <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span></div><div class="step-attachments"><div>
       <span class="attachment-badge attachment-badge--static" data-param="attachment:0"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-text"/></svg>brew log</span>
-    </div>
+    </div></div>
             </div></div><div class="phase-block" data-block="1">
             <div class="phase-label">When</div><div class="phase-steps">
               <div class="step-text">I brew a <span class="param-color-3" data-param="flavor" data-subst="flavor">{flavor}</span> coffee</div>
@@ -2819,7 +2839,7 @@ Total:        $2.00</pre></div>
                 @click.stop="toggleStep('s10_3')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s10_3'] }"></span></button>
         a coffee is dispensed
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s10_3'] }">
-      <div class="step-children"><div class="step-text">the machine state is consistent</div><div>
+      <div class="step-children"><div class="step-text">the machine state is consistent</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s10_3_0_att_0']"
             @click="toggleAttachment('s10_3_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-json"/></svg>Final state</button>
@@ -2832,7 +2852,7 @@ Total:        $2.00</pre></div>
 }</pre></div>
       </div>
     </div>
-    </div></div>
+    </div></div></div>
     </div>
             </div></div></div>
 
@@ -2916,7 +2936,7 @@ Total:        $2.00</pre></div>
                 @click.stop="toggleStep('s11_3_1')"><span class="step-chevron" :class="{ 'step-chevron-open': expandedSteps['s11_3_1'] }"></span></button>
         the loyalty points are deducted
       </span></div><div class="step-expand" :class="{ expanded: expandedSteps['s11_3_1'] }">
-      <div class="step-children"><div class="step-text">the remaining points are valid</div><div>
+      <div class="step-children"><div class="step-text">the remaining points are valid</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s11_3_1_0_att_0']"
             @click="toggleAttachment('s11_3_1_0_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-json"/></svg>Loyalty state</button>
@@ -2927,11 +2947,11 @@ Total:        $2.00</pre></div>
 }</pre></div>
       </div>
     </div>
-    </div></div>
+    </div></div></div>
     </div></div>
     </div>
             </div><div class="phase-steps">
-              <div class="step-text">the machine state is consistent</div><div>
+              <div class="step-text">the machine state is consistent</div><div class="step-attachments"><div>
       <button type="button" class="btn-reset attachment-badge"
             :aria-expanded="!!expandedAttachments['s11_4_att_0']"
             @click="toggleAttachment('s11_4_att_0')"><svg class="attachment-badge-icon" aria-hidden="true"><use href="#icon-json"/></svg>Final machine state</button>
@@ -2944,7 +2964,7 @@ Total:        $2.00</pre></div>
 }</pre></div>
       </div>
     </div>
-    </div>
+    </div></div>
             </div></div></div>
 
       

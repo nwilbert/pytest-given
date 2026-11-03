@@ -996,6 +996,11 @@ span.param-highlight {
 }
 
 
+
+
+.step-attachments { padding-bottom: var(--space-sm); }
+
+.phase-steps:last-child > .step-attachments:last-child { padding-bottom: 0; }
 .attachment-badge {
   color: var(--text-muted);
   font-size: var(--font-size-sm);
@@ -1091,6 +1096,21 @@ span.param-highlight {
 
 
 
+
+
+
+.scenario-body-inner:has(> .steps + .scenario-source) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: last baseline;
+}
+.scenario-body-inner:has(> .steps + .scenario-source) > * { flex: 1 0 100%; }
+
+.scenario-body-inner:has(> .steps + .scenario-source) > .steps {
+  flex: 1 1 auto;
+  padding-bottom: calc(var(--space-sm) / 2);
+}
+.scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
 .refs-content > .scenario-source {
   position: absolute;
   right: 0;
