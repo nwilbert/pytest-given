@@ -14,7 +14,10 @@ from typing import Literal
 
 type Ancestry = Literal['yes', 'no', 'unknown']
 
-_TIMEOUT_SECONDS = 5
+# Session finish asks the working directory's git, and a wedged one holds up an
+# already-finished test session, so it gets less time than the delta's queries.
+_SESSION_TIMEOUT_SECONDS = 2
+_QUERY_TIMEOUT_SECONDS = 5
 _COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
 
 _GITHUB_URL_RE = re.compile(
@@ -110,22 +113,23 @@ def _looks_like_option(rev: str) -> bool:
 def _stdout(*args: str) -> str | None:
     """The stripped stdout of a `git` call in the working directory, or None
     when it cannot answer."""
-    result = _run(list(args))
+    result = _run(list(args), timeout=_SESSION_TIMEOUT_SECONDS)
     if result is None or result.returncode != 0:
         return None
     return result.stdout.strip()
 
 
 def _run(
-    args: list[str], repo: Path | None = None
+    args: list[str],
+    repo: Path | None = None,
+    timeout: float = _QUERY_TIMEOUT_SECONDS,
 ) -> subprocess.CompletedProcess[str] | None:
     """The finished process, or None when git could not run to completion.
 
     `OSError` covers the whole exec side: a `git` that exists but is not
     executable raises `PermissionError`, and letting that escape would cost the
     entire report — session finish catches `OSError` and discards every sink.
-    Timed out rather than left to hang, since a wedged git would hold up an
-    already-finished test session.
+    Timed out rather than left to hang.
     """
     location = [] if repo is None else ['-C', str(repo)]
     try:
@@ -133,7 +137,7 @@ def _run(
             ['git', *location, *args],
             capture_output=True,
             text=True,
-            timeout=_TIMEOUT_SECONDS,
+            timeout=timeout,
             check=False,
         )
     except OSError, subprocess.SubprocessError:

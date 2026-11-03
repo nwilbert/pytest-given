@@ -5,6 +5,7 @@ import pytest
 
 from pytest_given.git import (
     detect_commit_sha,
+    detect_github_repo,
     is_ancestor,
     is_shallow,
     resolve_revision,
@@ -203,6 +204,28 @@ def test_every_query_runs_in_the_repository_with_an_argument_list(
         assert cmd[:3] == ['git', '-C', str(git_repo.path)]
         assert not kwargs.get('shell')
         assert not kwargs.get('check')
+
+
+def test_session_finish_gives_git_less_time_than_a_delta_query(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A wedged git holds up an already-finished test session."""
+    _clear_ci_vars(monkeypatch)
+    monkeypatch.delenv('GITHUB_REPOSITORY', raising=False)
+    timeouts: list[object] = []
+
+    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        timeouts.append(kwargs['timeout'])
+        return subprocess.CompletedProcess(cmd, 1, stdout='', stderr='')
+
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    detect_commit_sha()
+    detect_github_repo()
+    session = list(timeouts)
+    timeouts.clear()
+    resolve_revision('v1', tmp_path)
+    assert session == [2, 2]
+    assert timeouts == [5]
 
 
 _UNANSWERABLE: list[Exception] = [
