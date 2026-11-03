@@ -207,10 +207,9 @@ def test_each_term_ref_names_the_side_whose_glossary_it_was_read_against() -> No
     )
     html = render_delta_html(_delta(before, after), None)
     refs = [
-        (attrs['data-term-id'], attrs.get('data-term-side'))
-        for tag in re.findall(r'<[^>]* data-term-id="[^>]*>', html)
+        (attrs['data-term-id'], attrs['data-term-side'])
+        for tag in re.findall(r'<[^>]* data-term-side="[^>]*>', html)
         for attrs in [dict(re.findall(r'([\w-]+)="([^"]*)"', tag))]
-        if 'has-term-tip' in attrs.get('class', '')
     ]
     assert sorted(refs) == [
         ('guest', 'before'),
