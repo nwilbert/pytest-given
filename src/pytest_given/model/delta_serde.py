@@ -2,6 +2,8 @@
 
 The writer is `serde`'s reflective walk. The reader checks no schema version:
 rendering a delta computes nothing, so a field it lacks cannot read as a change.
+What rendering looks up it does check: the sides a change shows, and each step
+path, column and case a scenario's pairing names.
 """
 
 from typing import Any
@@ -16,6 +18,7 @@ from .delta import (
     SUGGESTION_OFS,
     TERM_PAIRINGS,
     CasePair,
+    Change,
     ColumnPair,
     DeltaData,
     DeltaMetadata,
@@ -31,7 +34,7 @@ from .delta import (
     TermFacts,
 )
 from .errors import PytestGivenError
-from .schema import ColumnId, NodeId
+from .schema import ColumnId, NodeId, ParameterTable, Scenario
 from .serde import (
     JsonObject,
     asdict_filtered,
@@ -43,7 +46,7 @@ from .serde import (
     narration_part_from_dict,
     scenario_from_dict,
 )
-from .steps import StepPath
+from .steps import StepPath, walk_steps
 
 
 def delta_to_dict(delta: DeltaData) -> JsonObject:
@@ -73,7 +76,7 @@ def delta_from_dict(d: dict[str, Any], source: str | None = None) -> DeltaData:
             suggestions=tuple(_suggestion_from_dict(s) for s in d['suggestions']),
             glossary=_glossary_delta_from_dict(d['glossary']),
         )
-    except (AttributeError, KeyError, TypeError) as error:
+    except (AttributeError, KeyError, TypeError, ValueError) as error:
         raise PytestGivenError(
             f'{source + " is" if source else "input is"} not a pytest-given '
             f'delta, or was written by an incompatible version '
@@ -100,6 +103,13 @@ def _side_from_dict(d: dict[str, Any], source: str | None) -> DeltaSide:
 
 
 def _scenario_delta_from_dict(d: dict[str, Any]) -> ScenarioDelta:
+    scenario_delta = _read_scenario_delta(d)
+    _check_sides(scenario_delta.change, scenario_delta.before, scenario_delta.after)
+    _check_lookups(scenario_delta)
+    return scenario_delta
+
+
+def _read_scenario_delta(d: dict[str, Any]) -> ScenarioDelta:
     before, after = d.get('before'), d.get('after')
     paired_by = d.get('paired_by')
     return ScenarioDelta(
@@ -202,6 +212,12 @@ def _glossary_delta_from_dict(d: dict[str, Any]) -> GlossaryDelta:
 
 
 def _term_delta_from_dict(d: dict[str, Any]) -> TermDelta:
+    term_delta = _read_term_delta(d)
+    _check_sides(term_delta.change, term_delta.before, term_delta.after)
+    return term_delta
+
+
+def _read_term_delta(d: dict[str, Any]) -> TermDelta:
     before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return TermDelta(
         change=literal(d['change'], CHANGES, 'term change'),
@@ -223,3 +239,62 @@ def _facts_from_dict(d: dict[str, Any] | None) -> TermFacts | None:
         other_forms=tuple(d.get('other_forms', ())),
         scenario_count=d.get('scenario_count', 0),
     )
+
+
+def _check_sides(change: Change, before: object, after: object) -> None:
+    """An added entry has its after side alone, a removed one its before side
+    alone, a changed one both."""
+    if (before is not None, after is not None) != _SIDES_SHOWN[change]:
+        raise ValueError(f'a {change} entry in the delta lacks a side.')
+
+
+_SIDES_SHOWN: dict[Change, tuple[bool, bool]] = {
+    'added': (False, True),
+    'removed': (True, False),
+    'changed': (True, True),
+}
+
+
+def _check_lookups(scenario_delta: ScenarioDelta) -> None:
+    before, after = scenario_delta.before, scenario_delta.after
+    if before is None or after is None:
+        return
+    paths = (_step_paths(before), _step_paths(after))
+    for step_delta in scenario_delta.steps:
+        _check_step_paths(step_delta, *paths)
+    parameters = scenario_delta.parameters
+    if parameters is None:
+        return
+    if before.parameters is None or after.parameters is None:
+        raise ValueError('a table pairing in the delta lacks a table.')
+    before_columns, before_cases = _table_ids(before.parameters)
+    after_columns, after_cases = _table_ids(after.parameters)
+    named: list[tuple[str | None, set[str]]] = []
+    for column in parameters.columns:
+        named += [(column.before, before_columns), (column.after, after_columns)]
+    for case in parameters.cases:
+        named += [(case.before, before_cases), (case.after, after_cases)]
+        named += [(cell, after_columns) for cell in case.changed_cells]
+    if any(name is not None and name not in ids for name, ids in named):
+        raise ValueError(
+            'a table pairing in the delta names a column or case its table lacks.'
+        )
+
+
+def _step_paths(scenario: Scenario) -> set[StepPath]:
+    return {path for path, _step in walk_steps(scenario.steps)}
+
+
+def _check_step_paths(
+    step_delta: StepDelta, before: set[StepPath], after: set[StepPath]
+) -> None:
+    if (step_delta.before is not None and step_delta.before not in before) or (
+        step_delta.after is not None and step_delta.after not in after
+    ):
+        raise ValueError('a step in the delta names a step its scenario lacks.')
+    for child in step_delta.children:
+        _check_step_paths(child, before, after)
+
+
+def _table_ids(table: ParameterTable) -> tuple[set[str], set[str]]:
+    return {column.id for column in table.columns}, {case.id for case in table.cases}

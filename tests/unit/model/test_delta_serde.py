@@ -61,13 +61,18 @@ def _full_delta() -> DeltaData:
     before_scenario = scn(
         'tests/test_a.py::test_a[1]',
         'A brew',
-        step('given', narr(lit('a '), ref('coffee', 'coffee'))),
-        parameters=table([('size', 'param')], ('1', [1]), custom=True),
+        step(
+            'given', narr(lit('a '), ref('coffee', 'coffee')), step('when', 'it pours')
+        ),
+        step('when', 'it cools'),
+        step('then', 'it is gone'),
+        parameters=table([('size', 'param')], ('1', [1]), ('gone', [2]), custom=True),
     )
     after_scenario = scn(
         'tests/test_a.py::test_a[2]',
         'A brew',
-        step('given', 'a cup', step('when', 'it fills')),
+        step('given', 'a cup', step('when', 'it fills'), step('when', 'it brews')),
+        step('then', 'it is served'),
         tags=['fast'],
         status='failed',
         parameters=table(
@@ -100,8 +105,8 @@ def _full_delta() -> DeltaData:
             ),
             cases=(
                 CasePair(
-                    before=NodeId('a'),
-                    after=NodeId('b'),
+                    before=NodeId('1'),
+                    after=NodeId('2'),
                     paired_by='values',
                     changed_cells=(ColumnId('size'),),
                     id_changed=True,
@@ -245,6 +250,77 @@ def _add_a_scenario(delta_dict: JsonObject, scenario: object) -> None:
 def test_a_malformed_delta_raises_a_pytest_given_error(
     mutate: Callable[[JsonObject], None],
 ) -> None:
+    delta_dict = _through_json(_full_delta())
+    mutate(delta_dict)
+
+    with pytest.raises(PytestGivenError, match='not a pytest-given delta'):
+        delta_from_dict(delta_dict, 'delta.json')
+
+
+def _changed_scenario(delta_dict: JsonObject) -> JsonObject:
+    scenarios = delta_dict['scenarios']
+    assert isinstance(scenarios, list)
+    changed = scenarios[0]
+    assert isinstance(changed, dict)
+    return changed
+
+
+def _drop_the_after_scenario(delta_dict: JsonObject) -> None:
+    del _changed_scenario(delta_dict)['after']
+
+
+def _point_a_step_past_its_scenario(delta_dict: JsonObject) -> None:
+    steps = _changed_scenario(delta_dict)['steps']
+    assert isinstance(steps, list)
+    steps.append({'change': 'removed', 'before': [9]})
+
+
+def _name_a_missing_case(delta_dict: JsonObject) -> None:
+    parameters = _changed_scenario(delta_dict)['parameters']
+    assert isinstance(parameters, dict)
+    cases = parameters['cases']
+    assert isinstance(cases, list)
+    cases.append({'before': 'nowhere'})
+
+
+def _drop_the_after_table(delta_dict: JsonObject) -> None:
+    after = _changed_scenario(delta_dict)['after']
+    assert isinstance(after, dict)
+    del after['parameters']
+
+
+def _drop_the_after_term(delta_dict: JsonObject) -> None:
+    glossary = delta_dict['glossary']
+    assert isinstance(glossary, dict)
+    terms = glossary['terms']
+    assert isinstance(terms, list)
+    changed = terms[0]
+    assert isinstance(changed, dict)
+    del changed['after']
+
+
+@pytest.mark.parametrize(
+    'mutate',
+    [
+        _drop_the_after_scenario,
+        _point_a_step_past_its_scenario,
+        _name_a_missing_case,
+        _drop_the_after_table,
+        _drop_the_after_term,
+    ],
+    ids=[
+        'changed-scenario-one-side',
+        'step-path',
+        'case-id',
+        'table',
+        'changed-term-one-side',
+    ],
+)
+def test_a_delta_naming_what_it_lacks_is_refused_before_rendering(
+    mutate: Callable[[JsonObject], None],
+) -> None:
+    """A delta whose shape a later version changed reads as malformed, not as
+    a render that fails half-way."""
     delta_dict = _through_json(_full_delta())
     mutate(delta_dict)
 
