@@ -50,10 +50,15 @@ def align_terms(
         return TermId(rewrite.identity) if rewrite else term_id
 
     paired: dict[TermId, TermId] = {}
+    warnings = list(rewrites.warnings)
     for term in before_terms:
         partner = after.glossary.get(rewritten(term.id)) if after.glossary else None
-        if partner is not None and partner.kind == term.kind:
+        if partner is None:
+            continue
+        if partner.kind == term.kind:
             paired[term.id] = partner.id
+        elif partner.id != term.id:
+            warnings.append(_kind_changed_warning(term, partner))
 
     before_facts = term_facts(before)
     after_facts = term_facts(after)
@@ -116,7 +121,17 @@ def align_terms(
             unchanged=tuple(unchanged),
         ),
         term_id=rewritten,
-        warnings=rewrites.warnings,
+        warnings=tuple(warnings),
+    )
+
+
+def _kind_changed_warning(before: GlossaryTerm, after: GlossaryTerm) -> str:
+    """A term whose kind changed is listed as removed and added. Where the
+    rename log renamed it too, nothing else on the page joins the two cards."""
+    return (
+        f'rename log: term "{before.id}" became "{after.id}" and its kind changed '
+        f'from {before.kind} to {after.kind}, so the glossary lists it removed '
+        'and added; its term refs still compare as one term'
     )
 
 

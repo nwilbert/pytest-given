@@ -300,6 +300,24 @@ def test_a_rev_skipped_entry_does_not_pair() -> None:
     assert alignment.term_id(TermId('guest')) == 'guest'
 
 
+def test_a_renamed_term_whose_kind_changed_is_listed_twice_with_a_warning() -> None:
+    """Its refs still follow the rename, as a kind change alone keeps them."""
+    before = report(glossary=_glossary(term('guest', 'Guest', kind='actor')))
+    after = report(glossary=_glossary(term('visitor', 'Visitor', kind='object')))
+
+    alignment = align_terms(before, after, _log(('guest', 'visitor')), set())
+
+    assert [delta.change for delta in alignment.delta.terms] == ['removed', 'added']
+    assert alignment.term_id(TermId('guest')) == 'visitor'
+    assert alignment.warnings == (
+        (
+            'rename log: term "guest" became "visitor" and its kind changed from '
+            'actor to object, so the glossary lists it removed and added; its '
+            'term refs still compare as one term'
+        ),
+    )
+
+
 def test_a_merging_rename_warns_and_pairs_nothing_by_it() -> None:
     before = report(glossary=_glossary(term('a', 'A'), term('b', 'B')))
     after = report(glossary=_glossary(term('c', 'C')))
