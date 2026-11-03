@@ -22,7 +22,7 @@ from ..model import (
     other_side,
     plural,
 )
-from .delta_scenarios import ListedScenario
+from .delta_scenarios import REMOVED, ListedScenario
 from .delta_steps import MarkedRun, side_runs
 from .glossary_view import KindGrouping, group_by_kind, plural_if_any
 
@@ -59,9 +59,9 @@ class ListedTerm:
 
     @property
     def key(self) -> str:
-        """Its card's ID, prefixed `removed-` as a removed scenario's slug is:
+        """Its card's ID, prefixed as a removed scenario's slug is (`REMOVED`):
         a term whose kind changed has a card under each kind."""
-        prefix = 'removed-' if self.delta.after is None else ''
+        prefix = REMOVED if self.delta.after is None else ''
         return prefix + self.shown.id
 
     @property

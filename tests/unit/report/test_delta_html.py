@@ -76,12 +76,12 @@ def test_a_removed_and_an_added_scenario_sharing_a_node_id_have_a_fragment_each(
         ),
     )
     assert [item.fragment for item in _listed(delta)] == [
-        'scenario=removed-t/x',
+        'scenario=removed:t/x',
         'scenario=t/x',
     ]
     app_data = embedded_app_data(render_delta_html(delta, source_link_template=None))
-    assert [entry['id'] for entry in app_data['scenarios']] == ['removed-t/x', 't/x']
-    assert app_data['scenario_slugs'] == {'removed-t/x': 'removed-t/x', 't/x': 't/x'}
+    assert [entry['id'] for entry in app_data['scenarios']] == ['removed:t/x', 't/x']
+    assert app_data['scenario_slugs'] == {'removed:t/x': 'removed:t/x', 't/x': 't/x'}
 
 
 def test_modules_are_marked_by_which_sides_have_them_and_a_moved_file_is_not():
@@ -258,7 +258,7 @@ def test_a_term_card_links_only_the_listed_scenarios_that_refer_to_it() -> None:
     )
     delta = _delta(before, after)
     card = _card(_glossary(delta), 'bill')
-    assert sorted(item.slug for item in card.scenarios) == ['removed-t/gone', 't/stay']
+    assert sorted(item.slug for item in card.scenarios) == ['removed:t/gone', 't/stay']
     assert card.renamed_from is None
     assert [card.scenario_count(side) for side in card.sides] == [
         '3 scenarios',
@@ -266,7 +266,7 @@ def test_a_term_card_links_only_the_listed_scenarios_that_refer_to_it() -> None:
     ]
     # The Terms axis takes each scenario's terms from the side it is shown from.
     data = embedded_app_data(render_delta_html(delta, None))
-    assert sorted(data['term_scenarios']['bill']) == ['removed-t/gone', 't/stay']
+    assert sorted(data['term_scenarios']['bill']) == ['removed:t/gone', 't/stay']
 
 
 def test_a_changed_term_reads_each_side_with_only_its_own_changes_marked():
@@ -333,14 +333,23 @@ def test_a_term_whose_kind_changed_is_listed_under_each_kind() -> None:
         (group.key, [(card.key, card.change) for card in group.entries])
         for group in view.grouping.groups
     ] == [
-        ('object', [('removed-upgrade', 'removed')]),
+        ('object', [('removed:upgrade', 'removed')]),
         ('activity', [('upgrade', 'added')]),
     ]
     # Each on its own side alone.
     assert {card.key: card.sides for card in view.listed} == {
-        'removed-upgrade': ('before',),
+        'removed:upgrade': ('before',),
         'upgrade': ('after',),
     }
+
+
+def test_a_removed_term_s_card_key_is_no_other_term_s_id() -> None:
+    before = report(glossary=Glossary(terms=[term('booking', 'Booking')]))
+    after = report(
+        glossary=Glossary(terms=[term('removed-booking', 'Removed booking')])
+    )
+    keys = [card.key for card in _glossary(_delta(before, after)).listed]
+    assert len(set(keys)) == len(keys) == 2
 
 
 def test_a_side_without_a_glossary_lists_the_other_side_s_terms() -> None:

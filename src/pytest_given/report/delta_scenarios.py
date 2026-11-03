@@ -35,6 +35,9 @@ from .slugs import build_scenario_slug_index
 
 type ColumnChange = Literal['added', 'removed']
 
+# Prefixes a removed scenario's slug and a removed term's card ID. A term ID
+# never holds a `:`, nor a slug's leading file or directory name.
+REMOVED = 'removed:'
 
 # Prefixes a column only the before side has, where the page keys it: the after
 # side can hold another column of the same ID.
@@ -103,7 +106,7 @@ class ListedScenario:
     # A changed scenario's before side carries its columns as the page keys
     # them (`_BeforeKeys`).
     delta: ScenarioDelta
-    # Prefixed `removed-` for a removed scenario, so a removed and an added
+    # Prefixed `REMOVED` for a removed scenario, so a removed and an added
     # scenario sharing one node ID still have a slug each.
     slug: str
 
@@ -182,7 +185,7 @@ def listed_scenarios(delta: DeltaData) -> list[ListedScenario]:
             _keyed(listed),
             after_slugs[listed.after.id]
             if listed.after is not None
-            else 'removed-' + before_slugs[_removed(listed).id],
+            else REMOVED + before_slugs[_removed(listed).id],
         )
         for listed in delta.scenarios
     ]
