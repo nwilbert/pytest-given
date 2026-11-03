@@ -1,5 +1,6 @@
 """Two step trees aligned: which steps are unchanged, reworded, added or removed."""
 
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -36,6 +37,8 @@ class _Read:
     step: Step
     tokens: list[Token]
     words: list[Token]
+    # Two words can be equal only with the same kind and key.
+    word_keys: Counter[tuple[str, str]]
 
 
 class _Alignment:
@@ -142,7 +145,8 @@ class _Alignment:
 
 def _read(step: Step, reading: Reading) -> _Read:
     read = tokens(step.narration, reading)
-    return _Read(step, read, [token for token in read if token.kind != 'space'])
+    words = [token for token in read if token.kind != 'space']
+    return _Read(step, read, words, Counter((word.kind, word.key) for word in words))
 
 
 def _same(before: _Read, after: _Read) -> bool:
@@ -152,4 +156,11 @@ def _same(before: _Read, after: _Read) -> bool:
 
 
 def _similar(before: _Read, after: _Read) -> bool:
+    """The shared word keys bound the shared words from above, which rules out
+    most dissimilar pairs before the LCS that `similarity` builds."""
+    total = len(before.words) + len(after.words)
+    if total and 2 * (before.word_keys & after.word_keys).total() < (
+        MODIFIED_SIMILARITY * total
+    ):
+        return False
     return similarity(before.words, after.words) >= MODIFIED_SIMILARITY
