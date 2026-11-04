@@ -6,7 +6,8 @@ What rendering looks up it does check: the sides a change shows, and each step
 path, column and case a scenario's pairing names.
 """
 
-from typing import Any
+from collections.abc import Sequence
+from typing import NotRequired, TypedDict, cast
 
 from .delta import (
     CASE_PAIRINGS,
@@ -55,7 +56,7 @@ def delta_to_dict(delta: DeltaData) -> JsonObject:
     return result
 
 
-def delta_from_dict(d: dict[str, Any], source: str | None = None) -> DeltaData:
+def delta_from_dict(d: JsonObject, source: str | None = None) -> DeltaData:
     """Rebuild a delta from its serialized form.
 
     Anything that is not one raises `PytestGivenError`, as `report_from_dict`
@@ -68,13 +69,14 @@ def delta_from_dict(d: dict[str, Any], source: str | None = None) -> DeltaData:
                 'a second report: `pytest-given delta BEFORE.json AFTER.json`.'
             )
         raise PytestGivenError(f'{source or "input"} is not a delta report.')
+    delta = cast(_DeltaJson, d)
     try:
         return DeltaData(
-            metadata=_delta_metadata_from_dict(d['metadata'], source),
-            scenarios=tuple(_scenario_delta_from_dict(s) for s in d['scenarios']),
-            unchanged=_identity_pairs(d['unchanged']),
-            suggestions=tuple(_suggestion_from_dict(s) for s in d['suggestions']),
-            glossary=_glossary_delta_from_dict(d['glossary']),
+            metadata=_delta_metadata_from_dict(delta['metadata'], source),
+            scenarios=tuple(_scenario_delta_from_dict(s) for s in delta['scenarios']),
+            unchanged=_identity_pairs(delta['unchanged']),
+            suggestions=tuple(_suggestion_from_dict(s) for s in delta['suggestions']),
+            glossary=_glossary_delta_from_dict(delta['glossary']),
         )
     except (AttributeError, KeyError, TypeError, ValueError) as error:
         raise PytestGivenError(
@@ -84,7 +86,7 @@ def delta_from_dict(d: dict[str, Any], source: str | None = None) -> DeltaData:
         ) from error
 
 
-def _delta_metadata_from_dict(d: dict[str, Any], source: str | None) -> DeltaMetadata:
+def _delta_metadata_from_dict(d: _MetadataJson, source: str | None) -> DeltaMetadata:
     return DeltaMetadata(
         before=_side_from_dict(d['before'], source),
         after=_side_from_dict(d['after'], source),
@@ -95,7 +97,7 @@ def _delta_metadata_from_dict(d: dict[str, Any], source: str | None) -> DeltaMet
     )
 
 
-def _side_from_dict(d: dict[str, Any], source: str | None) -> DeltaSide:
+def _side_from_dict(d: _SideJson, source: str | None) -> DeltaSide:
     return DeltaSide(
         metadata=metadata_from_dict(d['metadata'], source),
         label=d.get('label'),
@@ -103,14 +105,14 @@ def _side_from_dict(d: dict[str, Any], source: str | None) -> DeltaSide:
     )
 
 
-def _scenario_delta_from_dict(d: dict[str, Any]) -> ScenarioDelta:
+def _scenario_delta_from_dict(d: _ScenarioDeltaJson) -> ScenarioDelta:
     scenario_delta = _read_scenario_delta(d)
     _check_sides(scenario_delta.change, scenario_delta.before, scenario_delta.after)
     _check_lookups(scenario_delta)
     return scenario_delta
 
 
-def _read_scenario_delta(d: dict[str, Any]) -> ScenarioDelta:
+def _read_scenario_delta(d: _ScenarioDeltaJson) -> ScenarioDelta:
     before, after = d.get('before'), d.get('after')
     paired_by = d.get('paired_by')
     return ScenarioDelta(
@@ -126,7 +128,7 @@ def _read_scenario_delta(d: dict[str, Any]) -> ScenarioDelta:
     )
 
 
-def _step_delta_from_dict(d: dict[str, Any]) -> StepDelta:
+def _step_delta_from_dict(d: _StepDeltaJson) -> StepDelta:
     return StepDelta(
         change=literal(d['change'], STEP_CHANGES, 'step change'),
         before=_step_path(d.get('before')),
@@ -136,11 +138,11 @@ def _step_delta_from_dict(d: dict[str, Any]) -> StepDelta:
     )
 
 
-def _step_path(path: list[int] | None) -> StepPath | None:
+def _step_path(path: Sequence[int] | None) -> StepPath | None:
     return None if path is None else tuple(path)
 
 
-def _segments_from_list(items: list[dict[str, Any]]) -> tuple[DiffSegment, ...]:
+def _segments_from_list(items: Sequence[_SegmentJson]) -> tuple[DiffSegment, ...]:
     return tuple(
         DiffSegment(
             mark=literal(item['mark'], MARKS, 'diff mark'),
@@ -151,7 +153,9 @@ def _segments_from_list(items: list[dict[str, Any]]) -> tuple[DiffSegment, ...]:
     )
 
 
-def _parameter_delta_from_dict(d: dict[str, Any] | None) -> ParameterDelta | None:
+def _parameter_delta_from_dict(
+    d: _ParameterDeltaJson | None,
+) -> ParameterDelta | None:
     if d is None:
         return None
     return ParameterDelta(
@@ -160,7 +164,7 @@ def _parameter_delta_from_dict(d: dict[str, Any] | None) -> ParameterDelta | Non
     )
 
 
-def _column_pair_from_dict(d: dict[str, Any]) -> ColumnPair:
+def _column_pair_from_dict(d: _ColumnPairJson) -> ColumnPair:
     before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return ColumnPair(
         before=None if before is None else ColumnId(before),
@@ -171,7 +175,7 @@ def _column_pair_from_dict(d: dict[str, Any]) -> ColumnPair:
     )
 
 
-def _case_pair_from_dict(d: dict[str, Any]) -> CasePair:
+def _case_pair_from_dict(d: _CasePairJson) -> CasePair:
     before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return CasePair(
         before=None if before is None else NodeId(before),
@@ -185,15 +189,15 @@ def _case_pair_from_dict(d: dict[str, Any]) -> CasePair:
     )
 
 
-def _identity_pairs(items: list[dict[str, Any]]) -> tuple[IdentityPair, ...]:
+def _identity_pairs(items: Sequence[_IdentityPairJson]) -> tuple[IdentityPair, ...]:
     return tuple(_identity_pair_from_dict(item) for item in items)
 
 
-def _identity_pair_from_dict(d: dict[str, Any]) -> IdentityPair:
+def _identity_pair_from_dict(d: _IdentityPairJson) -> IdentityPair:
     return IdentityPair(before=d['before'], after=d['after'])
 
 
-def _suggestion_from_dict(d: dict[str, Any]) -> Suggestion:
+def _suggestion_from_dict(d: _SuggestionJson) -> Suggestion:
     scenario = d.get('scenario')
     return Suggestion(
         of=literal(d['of'], SUGGESTION_OFS, 'suggestion kind'),
@@ -203,7 +207,7 @@ def _suggestion_from_dict(d: dict[str, Any]) -> Suggestion:
     )
 
 
-def _glossary_delta_from_dict(d: dict[str, Any]) -> GlossaryDelta:
+def _glossary_delta_from_dict(d: _GlossaryDeltaJson) -> GlossaryDelta:
     return GlossaryDelta(
         before=glossary_from_dict(d.get('before')),
         after=glossary_from_dict(d.get('after')),
@@ -212,13 +216,13 @@ def _glossary_delta_from_dict(d: dict[str, Any]) -> GlossaryDelta:
     )
 
 
-def _term_delta_from_dict(d: dict[str, Any]) -> TermDelta:
+def _term_delta_from_dict(d: _TermDeltaJson) -> TermDelta:
     term_delta = _read_term_delta(d)
     _check_sides(term_delta.change, term_delta.before, term_delta.after)
     return term_delta
 
 
-def _read_term_delta(d: dict[str, Any]) -> TermDelta:
+def _read_term_delta(d: _TermDeltaJson) -> TermDelta:
     before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return TermDelta(
         change=literal(d['change'], CHANGES, 'term change'),
@@ -233,7 +237,7 @@ def _read_term_delta(d: dict[str, Any]) -> TermDelta:
     )
 
 
-def _facts_from_dict(d: dict[str, Any] | None) -> TermFacts | None:
+def _facts_from_dict(d: _TermFactsJson | None) -> TermFacts | None:
     if d is None:
         return None
     return TermFacts(
@@ -299,3 +303,108 @@ def _check_step_paths(
 
 def _table_ids(table: ParameterTable) -> tuple[set[str], set[str]]:
     return {column.id for column in table.columns}, {case.id for case in table.cases}
+
+
+# The delta's JSON shapes, as `delta_to_dict` writes them. A report's scenario,
+# term and metadata stay `JsonObject`: `serde` reads those.
+
+
+class _SideJson(TypedDict):
+    metadata: JsonObject
+    label: NotRequired[str | None]
+    modules: NotRequired[list[str]]
+
+
+class _MetadataJson(TypedDict):
+    before: _SideJson
+    after: _SideJson
+    plugin_version: str
+    timestamp: str
+    title: str | None
+    schema_version: int
+
+
+class _SegmentJson(TypedDict):
+    mark: str
+    before: NotRequired[list[JsonObject]]
+    after: NotRequired[list[JsonObject]]
+
+
+class _StepDeltaJson(TypedDict):
+    change: str
+    before: NotRequired[list[int] | None]
+    after: NotRequired[list[int] | None]
+    words: NotRequired[list[_SegmentJson]]
+    children: NotRequired[list[_StepDeltaJson]]
+
+
+class _ColumnPairJson(TypedDict):
+    before: NotRequired[str | None]
+    after: NotRequired[str | None]
+    paired_by: NotRequired[str | None]
+
+
+class _CasePairJson(TypedDict):
+    before: NotRequired[str | None]
+    after: NotRequired[str | None]
+    paired_by: NotRequired[str | None]
+    changed_cells: NotRequired[list[str]]
+    id_changed: NotRequired[bool]
+    status_changed: NotRequired[bool]
+
+
+class _ParameterDeltaJson(TypedDict):
+    columns: list[_ColumnPairJson]
+    cases: list[_CasePairJson]
+
+
+class _ScenarioDeltaJson(TypedDict):
+    change: str
+    before: NotRequired[JsonObject | None]
+    after: NotRequired[JsonObject | None]
+    paired_by: NotRequired[str | None]
+    title_changed: NotRequired[bool]
+    steps: NotRequired[list[_StepDeltaJson]]
+    parameters: NotRequired[_ParameterDeltaJson | None]
+
+
+class _IdentityPairJson(TypedDict):
+    before: str
+    after: str
+
+
+class _SuggestionJson(TypedDict):
+    of: str
+    before: str
+    after: str
+    scenario: NotRequired[_IdentityPairJson | None]
+
+
+class _TermFactsJson(TypedDict):
+    other_forms: NotRequired[list[str]]
+    scenario_count: NotRequired[int]
+
+
+class _TermDeltaJson(TypedDict):
+    change: str
+    before: NotRequired[JsonObject | None]
+    after: NotRequired[JsonObject | None]
+    paired_by: NotRequired[str | None]
+    before_facts: NotRequired[_TermFactsJson | None]
+    after_facts: NotRequired[_TermFactsJson | None]
+    definition: NotRequired[list[_SegmentJson]]
+
+
+class _GlossaryDeltaJson(TypedDict):
+    before: NotRequired[JsonObject | None]
+    after: NotRequired[JsonObject | None]
+    terms: NotRequired[list[_TermDeltaJson]]
+    unchanged: NotRequired[list[_IdentityPairJson]]
+
+
+class _DeltaJson(TypedDict):
+    metadata: _MetadataJson
+    scenarios: list[_ScenarioDeltaJson]
+    unchanged: list[_IdentityPairJson]
+    suggestions: list[_SuggestionJson]
+    glossary: _GlossaryDeltaJson
