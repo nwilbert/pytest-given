@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -137,6 +138,42 @@ def test_is_ancestor_never_reads_an_error_as_no(git_repo: GitRepo) -> None:
 def test_tags_pointing_at_highest_version_first(git_repo: GitRepo) -> None:
     assert tags_pointing_at(git_repo.head, git_repo.path) == ['v1.10', 'v1.9']
     assert tags_pointing_at(git_repo.first, git_repo.path) == ['v1']
+
+
+def test_tags_pointing_at_put_a_release_above_its_pre_releases(
+    git_repo: GitRepo,
+) -> None:
+    tags = ['v2.0.0.dev1', 'v2.0.0a1', 'v2.0.0b2', 'v2.0.0rc1', 'v2.0.0', 'v2.0.0-rc.2']
+    for tag in tags:
+        run_git(git_repo.path, 'tag', tag, git_repo.first)
+
+    assert tags_pointing_at(git_repo.first, git_repo.path)[:6] == [
+        'v2.0.0',
+        'v2.0.0-rc.2',
+        'v2.0.0rc1',
+        'v2.0.0b2',
+        'v2.0.0a1',
+        'v2.0.0.dev1',
+    ]
+
+
+def test_tags_pointing_at_reads_a_non_ascii_tag_as_utf8(git_repo: GitRepo) -> None:
+    """Outside UTF-8 mode, a cp1252 locale cannot decode the 0x81 in 'Á'."""
+    run_git(git_repo.path, 'tag', 'v1-Á', git_repo.first)
+    code = (
+        'import sys; from pathlib import Path; '
+        'from pytest_given.git import tags_pointing_at; '
+        'print(ascii(tags_pointing_at(sys.argv[1], Path(sys.argv[2]))))'
+    )
+
+    printed = subprocess.run(
+        [sys.executable, '-X', 'utf8=0', '-c', code, git_repo.first, git_repo.path],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+
+    assert ascii('v1-Á') in printed
 
 
 def test_tags_pointing_at_an_untagged_commit(tmp_path: Path) -> None:

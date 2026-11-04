@@ -27,6 +27,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - A parameter table no longer shows an id column for a long value that pytest 9.2's `parametrize_long_str_id_strategy = sha256` names by its digest.
+- A test session writing a report no longer crashes on a git remote URL that the system's locale encoding can't decode.
 
 ## [0.5.1] - 2026-10-24
 

@@ -19,6 +19,12 @@ type Ancestry = Literal['yes', 'no', 'unknown']
 _SESSION_TIMEOUT_SECONDS = 2
 _QUERY_TIMEOUT_SECONDS = 5
 _COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
+# Without these, version sort puts `v1.0rc1` above `v1.0`. Listed lowest first.
+_PRE_RELEASES_FIRST = tuple(
+    arg
+    for suffix in ('.dev', 'a', 'b', 'rc', '-alpha', '-beta', '-rc')
+    for arg in ('-c', f'versionsort.suffix={suffix}')
+)
 
 _GITHUB_URL_RE = re.compile(
     r'(?:https://github\.com/|git@github\.com:)'
@@ -99,7 +105,10 @@ def tags_pointing_at(sha: str, repo: Path) -> list[str]:
     """The tags on `sha`, highest version first; empty when git can't answer."""
     if _looks_like_option(sha):
         return []
-    result = _run(['tag', '--points-at', sha, '--sort=-version:refname'], repo)
+    result = _run(
+        [*_PRE_RELEASES_FIRST, 'tag', '--points-at', sha, '--sort=-version:refname'],
+        repo,
+    )
     if result is None or result.returncode != 0:
         return []
     return result.stdout.splitlines()
@@ -129,14 +138,16 @@ def _run(
     `OSError` covers the whole exec side: a `git` that exists but is not
     executable raises `PermissionError`, and letting that escape would cost the
     entire report — session finish catches `OSError` and discards every sink.
-    Timed out rather than left to hang.
+    Timed out rather than left to hang. Git writes ref names as UTF-8 whatever
+    the locale's codec.
     """
     location = [] if repo is None else ['-C', str(repo)]
     try:
         return subprocess.run(
             ['git', *location, *args],
             capture_output=True,
-            text=True,
+            encoding='utf-8',
+            errors='replace',
             timeout=timeout,
             check=False,
         )
