@@ -81,6 +81,30 @@ def rewrite_case_id(
     return result
 
 
+def undo_case_merges(
+    names: Sequence[str], starts: Sequence[str], ends: Sequence[str]
+) -> tuple[list[str], list[str]]:
+    """`ends`, the rewritten IDs of the cases `names`, with each merge the
+    `cases` maps make undone, and a warning for each. Where distinct cases
+    would end at one ID, each moved there stays at its start instead, which
+    can make another merge, so to a fixpoint."""
+    current = list(ends)
+    warnings: list[str] = []
+    while True:
+        reached: dict[str, dict[str, None]] = {}
+        for name, end in zip(names, current, strict=True):
+            reached.setdefault(end, {})[name] = None
+        merged = {end: list(group) for end, group in reached.items() if len(group) > 1}
+        undone = [
+            start if end in merged else end
+            for start, end in zip(starts, current, strict=True)
+        ]
+        if undone == current:
+            return current, warnings
+        warnings += [_merge_message(group, end) for end, group in merged.items()]
+        current = undone
+
+
 @dataclass
 class _Stop:
     identity: str
@@ -175,9 +199,15 @@ def _merge_warning(
         if (stop := chains[identity].stop) and stop.identity == target
         for entry in stop.entries
     }
-    entries = f' through {", ".join(involved)}' if involved else ''
+    return _merge_message(identities, target, tuple(involved))
+
+
+def _merge_message(
+    identities: Sequence[str], target: str, entries: Sequence[str] = ()
+) -> str:
+    through = f' through {", ".join(entries)}' if entries else ''
     names = ', '.join(f'"{identity}"' for identity in identities)
     return (
-        f'rename log: {names} would all end at "{target}"{entries}, a merge it '
+        f'rename log: {names} would all end at "{target}"{through}, a merge it '
         f'does not model, so none is rewritten to it'
     )

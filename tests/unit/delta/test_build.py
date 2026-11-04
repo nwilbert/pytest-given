@@ -628,6 +628,67 @@ def test_a_cases_map_pairs_cases_of_a_grouped_scenario() -> None:
     )
 
 
+def test_a_cases_map_onto_a_grouped_case_that_stays_is_a_merge() -> None:
+    before = report(
+        scn(
+            't.py::t[a]',
+            'T',
+            parameters=table(
+                [('n', 'param')], ('t.py::t[a]', [1]), ('t.py::t[b]', [2])
+            ),
+        )
+    )
+    after = report(
+        scn(
+            't.py::t[b]',
+            'T',
+            parameters=table(
+                [('n', 'param')], ('t.py::t[b]', [2]), ('t.py::t[c]', [3])
+            ),
+        )
+    )
+
+    result = _delta(before, after, _move('t.py::t', None, (('a', 'b'),)))
+
+    (changed,) = result.delta.scenarios
+    assert changed.parameters is not None
+    assert [(case.before, case.after) for case in changed.parameters.cases] == [
+        ('t.py::t[a]', None),
+        ('t.py::t[b]', 't.py::t[b]'),
+        (None, 't.py::t[c]'),
+    ]
+    (warning,) = result.warnings
+    assert '"t.py::t[a]", "t.py::t[b]" would all end at "t.py::t[b]"' in warning
+
+
+def test_a_cases_map_onto_a_per_case_scenario_that_stays_is_a_merge() -> None:
+    before = report(_per_case('t.py::t[a]', 'Cases'), _per_case('t.py::t[b]', 'Cases'))
+    after = report(_per_case('t.py::t[b]', 'Cases'), _per_case('t.py::t[c]', 'Cases'))
+
+    result = _delta(before, after, _move('t.py::t', None, (('a', 'b'),)))
+
+    assert _pairs(result.delta) == [('t.py::t[b]', 't.py::t[b]')]
+    assert _rows(result.delta) == [
+        ('removed', 't.py::t[a]', None),
+        ('added', None, 't.py::t[c]'),
+    ]
+    (warning,) = result.warnings
+    assert '"t.py::t[a]", "t.py::t[b]" would all end at "t.py::t[b]"' in warning
+
+
+def test_two_cases_mapped_onto_one_are_a_merge() -> None:
+    before = report(_per_case('t.py::t[a]', 'Cases'), _per_case('t.py::t[b]', 'Cases'))
+    after = report(_per_case('t.py::u[c]', 'Cases'))
+
+    result = _delta(
+        before, after, _move('t.py::t', 't.py::u', (('a', 'c'), ('b', 'c')))
+    )
+
+    assert _pairs(result.delta) == []
+    (warning,) = result.warnings
+    assert '"t.py::t[a]", "t.py::t[b]" would all end at "t.py::u[c]"' in warning
+
+
 def test_a_per_case_scenario_follows_its_base_and_case_through_the_log() -> None:
     before = report(_per_case('t.py::t[x]', 'Cases'))
     after = report(_per_case('t.py::u[y]', 'Cases'), _per_case('t.py::u[z]', 'Cases'))
@@ -734,12 +795,12 @@ def test_a_removed_scenario_carries_its_before_side_only() -> None:
 
 
 def test_a_per_case_title_pairs_only_with_its_case_suffix() -> None:
-    before = report(_per_case('t.py::t[a]', 'Cases'), _per_case('t.py::t[b]', 'Cases'))
-    after = report(_per_case('t.py::t[b]', 'Cases'), _per_case('t.py::t[c]', 'Cases'))
+    before = report(_per_case('t.py::t[b]', 'Cases'))
+    after = report(_per_case('t.py::t[c]', 'Cases'))
 
-    delta = _delta(before, after, _move('t.py::t', None, (('a', 'b'),))).delta
+    delta = _delta(before, after).delta
 
-    assert _pairs(delta) == [('t.py::t[a]', 't.py::t[b]')]
+    assert _pairs(delta) == []
     assert _rows(delta) == [
         ('removed', 't.py::t[b]', None),
         ('added', None, 't.py::t[c]'),

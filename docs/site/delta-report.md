@@ -92,7 +92,7 @@ rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 - Entries apply in file order, so renames chain. `A` to `B`, then later `B` to `C`, pairs `A` with `C`. A delta that ends before the second rename pairs `A` with `B`.
 - A swap goes through a name neither test has: `A` to `tmp`, `B` to `A`, `tmp` to `B`.
 - An entry that matches nothing in the compared reports is skipped silently, so one log serves every comparison.
-- When two before identities would end at the same one, the delta pairs neither and prints a warning.
+- When two before identities would end at the same one, the delta pairs neither and prints a warning. So does a `cases` map that takes two cases to the same case ID.
 
 ### When an entry applies
 

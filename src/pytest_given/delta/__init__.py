@@ -12,7 +12,14 @@ from .build import (
     comparable_title,
     is_per_case,
 )
-from .chains import CaseMap, Rewrite, Rewrites, rewrite_case_id, rewrite_identities
+from .chains import (
+    CaseMap,
+    Rewrite,
+    Rewrites,
+    rewrite_case_id,
+    rewrite_identities,
+    undo_case_merges,
+)
 from .check import check_reports
 from .identity import scenario_identity
 from .renames import (
@@ -43,4 +50,5 @@ __all__ = [
     'rewrite_case_id',
     'rewrite_identities',
     'scenario_identity',
+    'undo_case_merges',
 ]

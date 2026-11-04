@@ -7,6 +7,7 @@ from pytest_given.delta import (
     parse_rename_log,
     rewrite_case_id,
     rewrite_identities,
+    undo_case_merges,
 )
 from tests.ubiquitous_language import pg
 
@@ -277,3 +278,15 @@ def test_a_rewrite_onto_an_identity_a_merge_kept_in_place_is_a_merge_too() -> No
     assert '"C"' in second
     assert entries[2].label in second
     assert entries[1].label not in second
+
+
+def test_an_undone_case_merge_can_make_another_merge() -> None:
+    """a moves onto b, which stays; a then stays, and c moving onto a is a merge."""
+    ids = ['t[a]', 't[b]', 't[c]']
+
+    ends, warnings = undo_case_merges(ids, ids, ['t[b]', 't[b]', 't[a]'])
+
+    assert ends == ids
+    first, second = warnings
+    assert '"t[a]", "t[b]" would all end at "t[b]"' in first
+    assert '"t[a]", "t[c]" would all end at "t[a]"' in second

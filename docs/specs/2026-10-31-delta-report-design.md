@@ -170,6 +170,8 @@ whose entry keeps the identity, leaves an earlier range alone.
 - When two *before* identities would end at the same one, whether both are rewritten or one already
   has it (a merge, which the log doesn't model), no *before* identity is rewritten to it, and the
   delta warns naming the entries involved.
+- A `cases` map is held to the same rule: when two *before* cases would end at the same case ID,
+  neither is rewritten to it, and the delta warns naming both cases.
 
 ### Cases and columns
 

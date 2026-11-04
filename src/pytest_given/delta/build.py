@@ -20,7 +20,7 @@ from ..model import (
     node_base,
     without_case_id,
 )
-from .chains import Rewrites, rewrite_case_id, rewrite_identities
+from .chains import Rewrites, rewrite_case_id, rewrite_identities, undo_case_merges
 from .identity import scenario_identity
 from .narration import (
     Reading,
@@ -134,7 +134,7 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
         delta=delta,
         warnings=(
             *terms.warnings,
-            *identities.rewrites.warnings,
+            *identities.warnings,
             *suggested.warnings,
         ),
     )
@@ -152,7 +152,8 @@ class _Identities:
     """Each before scenario's identity once the rename log has rewritten it.
 
     The log names a `node_base`: a per-case scenario's tail is rewritten
-    through the `cases` maps against the after cases sharing its new base."""
+    through the `cases` maps against the after cases sharing its new base.
+    A `cases` map merging two cases is undone, as a merge of identities is."""
 
     def __init__(
         self, before: Sequence[Scenario], after: Sequence[Scenario], inputs: DeltaInputs
@@ -169,28 +170,51 @@ class _Identities:
                 per_case_ids.setdefault(node_base(scenario.id), set()).add(
                     case_id(scenario.id)
                 )
-        self.rewritten = [
-            self._rewritten(scenario, per_case_ids) for scenario in before
-        ]
+        moves = [self._rewritten(scenario, per_case_ids) for scenario in before]
+        self.rewritten, case_warnings = undo_case_merges(
+            [scenario_identity(scenario) for scenario in before],
+            [start for start, _ in moves],
+            [end for _, end in moves],
+        )
+        self.warnings = [*self.rewrites.warnings, *case_warnings]
 
-    def _rewritten(self, scenario: Scenario, per_case_ids: dict[str, set[str]]) -> str:
+    def _rewritten(
+        self, scenario: Scenario, per_case_ids: dict[str, set[str]]
+    ) -> tuple[str, str]:
+        """The identity with its base rewritten alone, and with its case ID too."""
         base = node_base(scenario.id)
         rewrite = self.rewrites.by_identity.get(base)
         new_base = rewrite.identity if rewrite else base
         if not is_per_case(scenario):
-            return new_base
+            return new_base, new_base
         tail = rewrite_case_id(
             case_id(scenario.id),
             self.rewrites.case_maps_of(base),
             per_case_ids.get(new_base, set()),
         )
-        return f'{new_base}[{tail}]'
+        return f'{new_base}[{case_id(scenario.id)}]', f'{new_base}[{tail}]'
 
-    def case_rewrite(self, scenario: Scenario, after: Scenario) -> Callable[[str], str]:
+    def case_rewrite(self, before: Scenario, after: Scenario) -> Callable[[str], str]:
+        assert before.parameters is not None
         assert after.parameters is not None
-        case_maps = self.rewrites.case_maps_of(node_base(scenario.id))
+        case_maps = self.rewrites.case_maps_of(node_base(before.id))
         after_ids = {case_id(case.id) for case in after.parameters.cases}
-        return lambda before_id: rewrite_case_id(before_id, case_maps, after_ids)
+        before_ids = [case_id(case.id) for case in before.parameters.cases]
+        base = node_base(after.id)
+        ends, warnings = undo_case_merges(
+            [case.id for case in before.parameters.cases],
+            [f'{base}[{before_id}]' for before_id in before_ids],
+            [
+                f'{base}[{rewrite_case_id(before_id, case_maps, after_ids)}]'
+                for before_id in before_ids
+            ],
+        )
+        self.warnings += warnings
+        rewritten = {
+            before_id: case_id(end)
+            for before_id, end in zip(before_ids, ends, strict=True)
+        }
+        return lambda before_id: rewritten.get(before_id, before_id)
 
 
 type _Pairing = dict[int, tuple[int, ScenarioPairing]]  # before index → after index
