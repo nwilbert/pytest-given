@@ -55,6 +55,8 @@ from .narration import (
     rebuilt,
     render_interpolation,
     spanned_part,
+    with_case_id,
+    without_case_id,
 )
 from .report_url import ReportUrl, resolve_report_url
 from .runtime import (
@@ -276,4 +278,6 @@ __all__ = [
     'snapshot_param_value',
     'spanned_part',
     'walk_steps',
+    'with_case_id',
+    'without_case_id',
 ]

@@ -28,6 +28,7 @@ from .schema import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    case_id,
 )
 from .steps import PartIndex
 
@@ -138,6 +139,30 @@ def narration_of(parts: Iterable[NarrationPart]) -> Narration:
     """
     parts = tuple(parts)
     return Narration(text=narration_text(parts), parts=parts)
+
+
+def with_case_id(narration: Narration, node_id: str) -> Narration:
+    """A per-case title: the case ID appended as a value, so it is never read
+    for Markdown."""
+    parts = narration.parts or (NarrationLiteral(value=narration.text),)
+    return narration_of((*parts, *_case_id_parts(node_id)))
+
+
+def without_case_id(narration: Narration, node_id: str) -> Narration:
+    """`with_case_id` undone, or the narration as it is when it doesn't end in
+    that case ID."""
+    suffix = _case_id_parts(node_id)
+    if narration.parts[-len(suffix) :] == suffix:
+        return narration_of(narration.parts[: -len(suffix)])
+    return narration
+
+
+def _case_id_parts(node_id: str) -> tuple[NarrationPart, ...]:
+    return (
+        NarrationLiteral(value=' ['),
+        NarrationValue(rendered=case_id(node_id), expression=''),
+        NarrationLiteral(value=']'),
+    )
 
 
 def merged_literals(parts: Iterable[NarrationPart]) -> tuple[NarrationPart, ...]:

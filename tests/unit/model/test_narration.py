@@ -13,8 +13,11 @@ from pytest_given.model import (
     NarrationValue,
     TermId,
     merged_literals,
+    narration_of,
     narration_text,
     spanned_part,
+    with_case_id,
+    without_case_id,
 )
 
 
@@ -131,3 +134,13 @@ def test_merged_literals_joins_each_run_of_adjacent_literals() -> None:
             NarrationLiteral(value=' c'),
         ]
     ) == (NarrationLiteral(value='a b '), value, NarrationLiteral(value=' c'))
+
+
+def test_without_case_id_undoes_with_case_id_for_that_case_only() -> None:
+    title = narration_of([NarrationLiteral(value='Stay')])
+
+    suffixed = with_case_id(title, 't.py::test_stay[1-2]')
+
+    assert suffixed.text == 'Stay [1-2]'
+    assert without_case_id(suffixed, 't.py::test_stay[1-2]') == title
+    assert without_case_id(suffixed, 't.py::test_stay[3]') == suffixed

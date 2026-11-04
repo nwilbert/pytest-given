@@ -10,17 +10,15 @@ from ..model import (
     DeltaSide,
     IdentityPair,
     Narration,
-    NarrationLiteral,
     NarrationPlaceholder,
-    NarrationValue,
     ReportData,
     Scenario,
     ScenarioDelta,
     ScenarioPairing,
     case_id,
     case_suffix,
-    narration_of,
     node_base,
+    without_case_id,
 )
 from .chains import Rewrites, rewrite_case_id, rewrite_identities
 from .identity import scenario_identity
@@ -51,15 +49,8 @@ def comparable_title(scenario: Scenario) -> Narration:
     """A per-case scenario's title without the case ID grouping appends to it,
     for comparing two paired scenarios, whose identities already tell it.
     Pairing by title keeps it."""
-    parts = scenario.narration.parts
     if is_per_case(scenario):
-        match parts[-3:]:
-            case (
-                NarrationLiteral(value=' ['),
-                NarrationValue(rendered=rendered, expression=''),
-                NarrationLiteral(value=']'),
-            ) if rendered == case_id(scenario.id):
-                return narration_of(parts[:-3])
+        return without_case_id(scenario.narration, scenario.id)
     return scenario.narration
 
 
