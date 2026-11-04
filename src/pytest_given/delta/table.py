@@ -1,5 +1,6 @@
 """Pairing two parameter tables: their columns, then their cases."""
 
+import math
 from collections.abc import Callable, Hashable, Sequence
 
 from ..model import (
@@ -207,6 +208,8 @@ def _custom_id(case: ParameterCase) -> str | None:
 
 def _cell_key(value: CellValue) -> CellKey:
     assert not isinstance(value, Attachment)
+    if isinstance(value, float) and math.isnan(value):
+        return ('float', 'nan')  # NaN equals no NaN, itself read twice included
     return (type(value).__name__, value)
 
 

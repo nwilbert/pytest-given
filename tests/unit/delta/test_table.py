@@ -187,6 +187,17 @@ def test_cells_differ_by_type() -> None:
     ] * 3
 
 
+def test_a_nan_cell_equals_a_nan_read_separately() -> None:
+    before = table([('x', 'param')], _case('x0', float('nan')))
+    after = table([('x', 'param')], _case('renamed', float('nan')))
+
+    alignment = _align(before, after)
+
+    assert _case_pairs(alignment) == [('x0', 'renamed')]
+    assert [pair.paired_by for pair in alignment.cases] == ['values']
+    assert not alignment.changed
+
+
 def test_a_changed_custom_case_id_is_an_id_change_and_a_generated_one_is_not() -> None:
     before = table(
         [('n', 'param')],
