@@ -517,7 +517,7 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
         scn(
             't.py::test_pay',
             'Pay',
-            step('then', narr(lit('she pays a fee of '), ph('fee', 'derived:0'))),
+            step('when', narr(lit('she pays a fee of '), ph('fee', 'derived:0'))),
             parameters=table(
                 [('reason', 'param'), ('fee', 'derived'), ('receipt', 'attachment')],
                 ('t.py::test_pay[a]', ['expired', '12', receipt]),

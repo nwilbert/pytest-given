@@ -156,8 +156,11 @@ def _same(before: _Read, after: _Read) -> bool:
 
 
 def _similar(before: _Read, after: _Read) -> bool:
-    """The shared word keys bound the shared words from above, which rules out
-    most dissimilar pairs before the LCS that `similarity` builds."""
+    """Across phases only the same text: a reworded Given is not the Then that
+    reads like it. The shared word keys bound the shared words from above, which
+    rules out most dissimilar pairs before the LCS that `similarity` builds."""
+    if before.step.phase != after.step.phase:
+        return token_lists_equal(before.tokens, after.tokens)
     total = len(before.words) + len(after.words)
     if total and 2 * (before.word_keys & after.word_keys).total() < (
         MODIFIED_SIMILARITY * total

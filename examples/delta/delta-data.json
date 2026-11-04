@@ -3,7 +3,7 @@
     "before": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-04T20:42:10.766444+00:00",
+        "timestamp": "2026-11-04T21:11:18.998197+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -19,7 +19,7 @@
     "after": {
       "metadata": {
         "project": "delta-example",
-        "timestamp": "2026-11-04T20:42:11.191628+00:00",
+        "timestamp": "2026-11-04T21:11:19.411915+00:00",
         "pytest_version": "9.1.1",
         "plugin_version": "0.5.1",
         "commit_sha": null,
@@ -33,7 +33,7 @@
       ]
     },
     "plugin_version": "0.5.1",
-    "timestamp": "2026-11-04T20:42:11.465316+00:00",
+    "timestamp": "2026-11-04T21:11:19.681021+00:00",
     "title": "Delta Example for v2",
     "kind": "delta",
     "schema_version": 1
@@ -241,108 +241,21 @@
           "children": []
         },
         {
-          "change": "modified",
+          "change": "removed",
           "before": [
             2
           ],
+          "after": null,
+          "words": [],
+          "children": []
+        },
+        {
+          "change": "added",
+          "before": null,
           "after": [
             2
           ],
-          "words": [
-            {
-              "mark": "equal",
-              "before": [
-                {
-                  "value": "the hotel "
-                }
-              ],
-              "after": [
-                {
-                  "value": "the hotel "
-                }
-              ]
-            },
-            {
-              "mark": "removed",
-              "before": [
-                {
-                  "value": "hands"
-                }
-              ],
-              "after": []
-            },
-            {
-              "mark": "added",
-              "before": [],
-              "after": [
-                {
-                  "value": "sends"
-                }
-              ]
-            },
-            {
-              "mark": "equal",
-              "before": [
-                {
-                  "value": " her a "
-                }
-              ],
-              "after": [
-                {
-                  "value": " her a "
-                }
-              ]
-            },
-            {
-              "mark": "removed",
-              "before": [
-                {
-                  "value": "key"
-                }
-              ],
-              "after": []
-            },
-            {
-              "mark": "added",
-              "before": [],
-              "after": [
-                {
-                  "value": "digital"
-                }
-              ]
-            },
-            {
-              "mark": "equal",
-              "before": [
-                {
-                  "value": " "
-                }
-              ],
-              "after": [
-                {
-                  "value": " "
-                }
-              ]
-            },
-            {
-              "mark": "removed",
-              "before": [
-                {
-                  "value": "card"
-                }
-              ],
-              "after": []
-            },
-            {
-              "mark": "added",
-              "before": [],
-              "after": [
-                {
-                  "value": "key"
-                }
-              ]
-            }
-          ],
+          "words": [],
           "children": []
         },
         {
@@ -1452,7 +1365,7 @@
           "error-handling"
         ],
         "status": "failed",
-        "duration_ms": 36,
+        "duration_ms": 37,
         "steps": [
           {
             "phase": "given",

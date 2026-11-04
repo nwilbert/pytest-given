@@ -78,7 +78,7 @@ def test_steps_pair_up_in_rows_each_side_under_its_own_phases() -> None:
             step('given', 'a guest', step('given', 'with her passport and visa')),
             step('given', 'a free room'),
             step('when', 'she checks in'),
-            step('when', 'she gets a digital key card'),
+            step('when', 'she gets a key card'),
             step('then', 'her phone opens the door'),
         ),
     )
@@ -102,7 +102,7 @@ def test_steps_pair_up_in_rows_each_side_under_its_own_phases() -> None:
             False,
             [
                 ((3,), 'equal', 'she checks in'),
-                ((4,), 'modified', 'she gets a digital key card'),
+                ((4,), 'modified', 'she gets a key card'),
             ],
         ),
         ('then', '2', False, [((5,), 'added', 'her phone opens the door')]),

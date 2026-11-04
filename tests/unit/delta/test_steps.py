@@ -129,6 +129,14 @@ def test_a_same_text_step_in_another_phase_is_modified() -> None:
     assert steps_changed(deltas)
 
 
+def test_a_reworded_step_in_another_phase_is_removed_and_added() -> None:
+    deltas = _align(
+        [step('given', 'the guest has 2 rooms')],
+        [step('then', 'the guest has 3 rooms')],
+    )
+    assert _changes(deltas) == ['removed', 'added']
+
+
 def test_an_unrelated_step_before_a_match_is_added_first() -> None:
     deltas = _align(
         [step('given', 'a room is free'), step('then', 'the bill is paid')],
