@@ -9,6 +9,7 @@ __lazy_modules__ = ['jinja2', 'markupsafe']
 
 from collections.abc import Callable
 from datetime import datetime
+from typing import NamedTuple
 
 import jinja2
 from markupsafe import Markup
@@ -80,11 +81,8 @@ def delta_render_context(
     reach = term_reach(delta, listed)
     glossary_view = delta_glossary_view(delta, listed, reach)
     return {
-        'title': after.title or after.project,
-        'range': (
-            f'{range_label(delta.metadata.before)} to '
-            f'{range_label(delta.metadata.after)}'
-        ),
+        'title': delta.metadata.title or after.title or after.project,
+        'range': (range_side(delta.metadata.before), range_side(delta.metadata.after)),
         # The version that built the delta: each side's run has its own.
         'plugin_version': delta.metadata.plugin_version,
         'listed': listed,
@@ -109,16 +107,21 @@ def delta_render_context(
     }
 
 
-def range_label(side: DeltaSide) -> str:
-    """The side's label and short SHA; the report's timestamp, to the minute,
-    stands in for a SHA it doesn't carry."""
+class RangeSide(NamedTuple):
+    name: str
+    detail: str | None = None
+
+
+def range_side(side: DeltaSide) -> RangeSide:
+    """The side's label over its short SHA; the report's timestamp, to the
+    minute, stands in for a SHA it doesn't carry."""
     sha = side.metadata.commit_sha
     when = (
         sha[:_SHORT_SHA]
         if sha
         else f'{datetime.fromisoformat(side.metadata.timestamp):%Y-%m-%d %H:%M}'
     )
-    return f'{side.label} {when}' if side.label else when
+    return RangeSide(side.label, when) if side.label else RangeSide(when)
 
 
 def _module_changes(

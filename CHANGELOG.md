@@ -22,6 +22,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - **Breaking.** `pytest-given report` and `pytest-given skills` exit 2 on an error, where they exited 1. A script checking for 1 needs to check for 2.
+- The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".
 
 ### Fixed
 

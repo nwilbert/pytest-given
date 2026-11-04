@@ -241,6 +241,7 @@ class DeltaMetadata:
     after: DeltaSide
     plugin_version: str
     timestamp: str
+    title: str | None = None
     kind: Literal['delta'] = 'delta'
     schema_version: int = DELTA_SCHEMA_VERSION
 

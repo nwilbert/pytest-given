@@ -22,6 +22,8 @@ Both reports must have the report format (the schema version) of the pytest-give
 
 Each report carries the commit SHA it ran at. The delta header shows the SHAs and a version label for each side. The label is the git tag on that commit, or what `--before-label` and `--after-label` name. For a release not tagged yet, pass `--after-label v<version>`.
 
+The delta's title is the after report's title. Pass `--title` to name what the delta covers in words its readers know, such as `--title "Hotel booking changes for v2.4"`.
+
 ### Picking the range
 
 A project that keeps its deltas starts each one where the last kept one ended. That is the *after* SHA in `.metadata.after.metadata.commit_sha` of its JSON. Without a kept delta, start at the previous release tag.

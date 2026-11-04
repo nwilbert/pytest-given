@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-03T18:17:37.188366+00:00",
+    "timestamp": "2026-11-04T18:32:25.136857+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.1",
-    "commit_sha": "a283a57cd41e20612e94a206447eface1b95b587",
+    "commit_sha": "8d219c0580243936909092e18dec7284cd69b2b0",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html",
     "schema_version": 1
@@ -127,7 +127,7 @@
         "diagnostics"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -265,7 +265,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -684,7 +684,7 @@
       "module": "tests.integration.test_cli_citations",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -816,7 +816,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -1113,7 +1113,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 134,
+      "duration_ms": 138,
       "steps": [
         {
           "phase": "given",
@@ -1316,7 +1316,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -1502,7 +1502,7 @@
         "delta"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -1585,7 +1585,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 87,
+      "duration_ms": 109,
       "steps": [
         {
           "phase": "given",
@@ -1678,7 +1678,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -1760,7 +1760,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -1869,7 +1869,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -1998,7 +1998,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 542,
+      "duration_ms": 554,
       "steps": [
         {
           "phase": "given",
@@ -2126,7 +2126,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -2313,7 +2313,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 98,
       "steps": [
         {
           "phase": "given",
@@ -2566,7 +2566,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -2676,7 +2676,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 38,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -2818,7 +2818,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 10,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -2888,7 +2888,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -3008,7 +3008,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -3143,7 +3143,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 63,
       "steps": [
         {
           "phase": "given",
@@ -3271,7 +3271,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 68,
       "steps": [
         {
           "phase": "given",
@@ -3441,7 +3441,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -3558,7 +3558,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 151,
+      "duration_ms": 166,
       "steps": [
         {
           "phase": "given",
@@ -3631,7 +3631,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3803,7 +3803,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3942,7 +3942,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -4087,7 +4087,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4240,7 +4240,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -4385,7 +4385,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -4532,7 +4532,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 127,
+      "duration_ms": 152,
       "steps": [
         {
           "phase": "given",
@@ -4703,7 +4703,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -4833,7 +4833,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 96,
+      "duration_ms": 101,
       "steps": [
         {
           "phase": "given",
@@ -4962,7 +4962,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 106,
+      "duration_ms": 134,
       "steps": [
         {
           "phase": "given",
@@ -5242,7 +5242,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -5321,7 +5321,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 174,
+      "duration_ms": 202,
       "steps": [
         {
           "phase": "given",
@@ -5503,7 +5503,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -5593,7 +5593,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -5648,7 +5648,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 test_given_md_source_shows_the_test_function0\n\n## \u2713 Buy coffee\n`test_given_md_source_shows_the_test_function.py:4::test_buy`\n\n- **given** a machine\n- **when** I insert money\n- **then** I get coffee\n\n```python\n 4  @scenario('Buy coffee')\n 5  def test_buy():\n 6      with given('a machine'):\n 7          pass\n 8      with when('I insert money'):\n 9          pass\n10      with then('I get coffee'):\n11          assert True\n```\n",
+              "content": "# test_given_md_source_shows_the_test_function0\n\n## \u2713 Buy coffee\n`test_given_md_source_shows_the_test_function.py:4::test_buy`\n\n- **given** a machine\n- **when** I insert money\n- **then** I get coffee\n\n```python\n 4  @scenario('Buy coffee')\n 5  def test_buy():\n 6      with given('a machine'):\n 7          pass\n 8      with when('I insert money'):\n 9          pass\n10      with then('I get coffee'):\n11          assert True\n```\n",
               "content_type": "text"
             }
           ],
@@ -5685,7 +5685,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 80,
+      "duration_ms": 93,
       "steps": [
         {
           "phase": "given",
@@ -5767,7 +5767,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -5859,7 +5859,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -5944,7 +5944,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -6051,7 +6051,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 153,
+      "duration_ms": 163,
       "steps": [
         {
           "phase": "given",
@@ -6158,7 +6158,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 547,
+      "duration_ms": 592,
       "steps": [
         {
           "phase": "given",
@@ -6349,7 +6349,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 377,
+      "duration_ms": 416,
       "steps": [
         {
           "phase": "given",
@@ -6430,7 +6430,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -6544,7 +6544,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -6697,7 +6697,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -6773,7 +6773,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -6922,7 +6922,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 395,
+      "duration_ms": 420,
       "steps": [
         {
           "phase": "given",
@@ -7081,7 +7081,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 21,
       "steps": [
         {
           "phase": "given",
@@ -7183,7 +7183,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -7290,7 +7290,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -7540,7 +7540,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 75,
+      "duration_ms": 82,
       "steps": [
         {
           "phase": "given",
@@ -7770,7 +7770,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 37,
       "steps": [
         {
           "phase": "given",
@@ -7978,7 +7978,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 88,
+      "duration_ms": 98,
       "steps": [
         {
           "phase": "given",
@@ -9545,7 +9545,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9765,7 +9765,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9952,7 +9952,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -10496,7 +10496,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -10597,7 +10597,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -10781,7 +10781,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -10953,7 +10953,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -19490,7 +19490,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -20825,7 +20825,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -21225,7 +21225,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -21852,7 +21852,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -22100,7 +22100,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22601,7 +22601,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -22816,7 +22816,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -23106,7 +23106,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -26632,7 +26632,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -30780,7 +30780,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 142,
+      "duration_ms": 143,
       "steps": [
         {
           "phase": "given",
@@ -31237,7 +31237,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 Buy coffee\n`tests/t.py::test_buy` \u00b7 billing, happy-path\n\n- **given** a machine\n- **when** I insert \\$2\n- **then** I get a coffee\n",
+              "content": "# proj\n\n## \u2713 Buy coffee\n`tests/t.py::test_buy` \u00b7 billing, happy-path\n\n- **given** a machine\n- **when** I insert \\$2\n- **then** I get a coffee\n",
               "content_type": "text"
             }
           ],
@@ -31347,7 +31347,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 line one line two\n`tests/t.py::test_x`\n\n- **when** act one act two\n",
+              "content": "# proj\n\n## \u2713 line one line two\n`tests/t.py::test_x`\n\n- **when** act one act two\n",
               "content_type": "text"
             }
           ],
@@ -31515,7 +31515,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 ignored\n`tests/t.py::test_parts`\n\n- **when** a \u00abGuest\u00bb42{amount}\n",
+              "content": "# proj\n\n## \u2713 ignored\n`tests/t.py::test_parts`\n\n- **when** a \u00abGuest\u00bb42{amount}\n",
               "content_type": "text"
             }
           ],
@@ -31645,7 +31645,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 Pricing \u00b7 2 cases\n`tests/t.py::test_price`\n\n- **when** insert\n\n| euros | expect |\n|---|---|\n| 1 | False |\n| 2 | True |\n",
+              "content": "# proj\n\n## \u2713 Pricing \u00b7 2 cases\n`tests/t.py::test_price`\n\n- **when** insert\n\n| euros | expect |\n|---|---|\n| 1 | False |\n| 2 | True |\n",
               "content_type": "text"
             }
           ],
@@ -31818,7 +31818,7 @@
               "| coin |",
               {
                 "label": "Rendered Markdown",
-                "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
+                "content": "# proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
                 "content_type": "text"
               }
             ],
@@ -31834,7 +31834,7 @@
               "| coin |",
               {
                 "label": "Rendered Markdown",
-                "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
+                "content": "# proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
                 "content_type": "text"
               }
             ],
@@ -31850,7 +31850,7 @@
               "| coin |",
               {
                 "label": "Rendered Markdown",
-                "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
+                "content": "# proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin |\n|---|\n| euro |\n| token |\n",
                 "content_type": "text"
               }
             ],
@@ -31866,7 +31866,7 @@
               "| coin | |",
               {
                 "label": "Rendered Markdown",
-                "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin | |\n|---|---|\n| euro | \u2713 |\n| token | \u25cb |\n",
+                "content": "# proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin | |\n|---|---|\n| euro | \u2713 |\n| token | \u25cb |\n",
                 "content_type": "text"
               }
             ],
@@ -31882,7 +31882,7 @@
               "| coin | |",
               {
                 "label": "Rendered Markdown",
-                "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin | |\n|---|---|\n| euro | \u2713 |\n| token | \u2717 |\n",
+                "content": "# proj\n\n## \u2713 Att \u00b7 2 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| coin | |\n|---|---|\n| euro | \u2713 |\n| token | \u2717 |\n",
                 "content_type": "text"
               }
             ],
@@ -31987,7 +31987,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2717 Sold out\n`tests/t.py::test_sold_out`\n\n- **then** reports sold out\n\n> ValueError: not sold out\n> test_shop.py:88 in test_sold_out\n",
+              "content": "# proj\n\n## \u2717 Sold out\n`tests/t.py::test_sold_out`\n\n- **then** reports sold out\n\n> ValueError: not sold out\n> test_shop.py:88 in test_sold_out\n",
               "content_type": "text"
             }
           ],
@@ -32113,7 +32113,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 Multi\n`tests/t.py::test_multiline`\n\n- **then** result\n    - \ud83d\udcce Doc:\n        ```\n        line1\n        line2\n        ```\n",
+              "content": "# proj\n\n## \u2713 Multi\n`tests/t.py::test_multiline`\n\n- **then** result\n    - \ud83d\udcce Doc:\n        ```\n        line1\n        line2\n        ```\n",
               "content_type": "text"
             }
           ],
@@ -32199,7 +32199,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u25cb Later \u00b7 skipped\n`tests/t.py::test_skip` \u2014 reason: needs fixture data\n\n- **when** act\n",
+              "content": "# proj\n\n## \u25cb Later \u00b7 skipped\n`tests/t.py::test_skip` \u2014 reason: needs fixture data\n\n- **when** act\n",
               "content_type": "text"
             }
           ],
@@ -32288,7 +32288,7 @@
           "attachments": [
             {
               "label": "Rendered Markdown",
-              "content": "# pytest-given \u2014 proj\n\n## \u2713 Att \u00b7 3 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| case ID | hours |\n|---|---|\n| 11 | 5 |\n|  | 11 |\n| 3 | 3 |\n\n- **11 (row 1)** \u2014 failed:\n    > clash\n\n- **11 (row 2)** \u2014 failed:\n    > clash\n\n- **3** \u2014 failed:\n    > clash\n",
+              "content": "# proj\n\n## \u2713 Att \u00b7 3 cases\n`tests/t.py::test_att`\n\n- **when** act\n\n| case ID | hours |\n|---|---|\n| 11 | 5 |\n|  | 11 |\n| 3 | 3 |\n\n- **11 (row 1)** \u2014 failed:\n    > clash\n\n- **11 (row 2)** \u2014 failed:\n    > clash\n\n- **3** \u2014 failed:\n    > clash\n",
               "content_type": "text"
             }
           ],
@@ -35501,7 +35501,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",

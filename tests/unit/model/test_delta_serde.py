@@ -122,6 +122,7 @@ def _full_delta() -> DeltaData:
             after=DeltaSide(metadata=meta('bbb'), modules=('m.a', 'm.b')),
             plugin_version='0.2.0',
             timestamp='2026-02-02T00:00:00+00:00',
+            title='Coffee changes for v2',
         ),
         scenarios=(
             changed,

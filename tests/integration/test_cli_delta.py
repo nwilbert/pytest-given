@@ -17,7 +17,7 @@ from pytest_given.model import (
     report_to_dict,
 )
 from pytest_given.report import DEFAULT_DELTA_HTML_PATH, DEFAULT_DELTA_JSON_PATH
-from pytest_given.report.delta_html import delta_render_context, range_label
+from pytest_given.report.delta_html import RangeSide, delta_render_context, range_side
 from tests.git_repo import GitRepo
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import meta, report, scn, step, term
@@ -195,6 +195,10 @@ def _delta_file(tmp_path: Path) -> Path:
             '--after-label needs two reports to compare',
         ),
         (
+            lambda tmp: ['delta', str(_delta_file(tmp)), '--title', 'Shop'],
+            '--title needs two reports to compare',
+        ),
+        (
             lambda tmp: [
                 'delta',
                 *_write_pair(report(), report(), tmp),
@@ -230,6 +234,7 @@ def _delta_file(tmp_path: Path) -> Path:
         '--renames with one input',
         '--before-label with one input',
         '--after-label with one input',
+        '--title with one input',
         '--renames that does not exist',
         'an unknown theme',
         'an unknown source-link preset',
@@ -432,7 +437,7 @@ def test_a_before_report_without_a_sha_applies_every_entry_with_one_warning(
     )
     delta = delta_from_dict(_read_delta())
     assert [item.change for item in delta.scenarios] == ['changed']
-    assert range_label(delta.metadata.before) == '2026-01-01 00:00'
+    assert range_side(delta.metadata.before) == RangeSide('2026-01-01 00:00')
 
 
 def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
@@ -442,10 +447,27 @@ def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
     inputs = _write_pair(report(sha=git_repo.first), report(sha=git_repo.head))
     assert main(['delta', *inputs]) == 0
     context = delta_render_context(delta_from_dict(_read_delta()))
-    assert context['range'] == (f'v1 {git_repo.first[:7]} to v1.10 {git_repo.head[:7]}')
+    assert context['range'] == (
+        RangeSide('v1', git_repo.first[:7]),
+        RangeSide('v1.10', git_repo.head[:7]),
+    )
     assert main(['delta', *inputs, '--after-label', 'next']) == 0
     delta = delta_from_dict(_read_delta())
-    assert range_label(delta.metadata.after) == f'next {git_repo.head[:7]}'
+    assert range_side(delta.metadata.after) == RangeSide('next', git_repo.head[:7])
+
+
+def test_the_delta_is_titled_by_title_or_else_by_the_after_report(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    after = ReportData(metadata=meta(title='Shop'), scenarios=[])
+    inputs = _write_pair(report(), after)
+    assert main(['delta', *inputs]) == 0
+    assert delta_render_context(delta_from_dict(_read_delta()))['title'] == 'Shop'
+    assert main(['delta', *inputs, '--title', 'Shop changes for v2']) == 0
+    delta = delta_from_dict(_read_delta())
+    assert delta.metadata.title == 'Shop changes for v2'
+    assert delta_render_context(delta)['title'] == 'Shop changes for v2'
 
 
 class TestSkippedRevs:

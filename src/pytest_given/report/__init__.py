@@ -15,7 +15,7 @@ from .citation_index import (
     report_fragment,
 )
 from .console import write_console_as_utf8
-from .delta_html import range_label, render_delta_html
+from .delta_html import render_delta_html
 from .delta_sinks import (
     DEFAULT_DELTA_HTML_PATH,
     DEFAULT_DELTA_JSON_PATH,
@@ -67,7 +67,6 @@ __all__ = [
     'emit_sinks',
     'html_link_text',
     'link_text',
-    'range_label',
     'render_delta_html',
     'report_fragment',
     'resolve_source_link_template',

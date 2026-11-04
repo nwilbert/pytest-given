@@ -1,4 +1,4 @@
-# pytest-given — pytest-given Self-Report
+# pytest-given Self-Report
 
 ## ✓ `pytest-given report --report-url` re-renders a saved «report» for another URL
 `tests/integration/test_cli.py::test_cli_report_url_replaces_the_saved_one` · spec/citations, versions/0.5.0
@@ -821,7 +821,7 @@
 - **then** the «narration» is followed by the test function, decorator included, each line numbered as in the file
     - 📎 Rendered Markdown:
         ````
-        # pytest-given — test_given_md_source_shows_the_test_function0
+        # test_given_md_source_shows_the_test_function0
 
         ## ✓ Buy coffee
         `test_given_md_source_shows_the_test_function.py:4::test_buy`
@@ -3591,7 +3591,7 @@
 - **then** the heading is checked and each «step» is a phase bullet
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ Buy coffee
         `tests/t.py::test_buy` · billing, happy-path
@@ -3608,7 +3608,7 @@
 - **when** the Markdown «report» is rendered
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ line one line two
         `tests/t.py::test_x`
@@ -3626,7 +3626,7 @@
 - **then** the «term ref» renders in guillemets, the value verbatim and the placeholder in braces
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ ignored
         `tests/t.py::test_parts`
@@ -3642,7 +3642,7 @@
 - **then** the heading counts the cases and the «parameter table» lists each row
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ Pricing · 2 cases
         `tests/t.py::test_price`
@@ -3673,7 +3673,7 @@
 
 - **passed, passed, \| coin \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -3688,7 +3688,7 @@
 
 - **skipped, skipped, \| coin \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -3703,7 +3703,7 @@
 
 - **failed, failed, \| coin \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -3718,7 +3718,7 @@
 
 - **passed, skipped, \| coin \| \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -3733,7 +3733,7 @@
 
 - **passed, failed, \| coin \| \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -3778,7 +3778,7 @@
 - **then** the heading is crossed and the error follows the steps
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✗ Sold out
         `tests/t.py::test_sold_out`
@@ -3798,7 +3798,7 @@
 - **then** the «attachment» content sits in an indented fence, not inline
     - 📎 Rendered Markdown:
         ````
-        # pytest-given — proj
+        # proj
 
         ## ✓ Multi
         `tests/t.py::test_multiline`
@@ -3819,7 +3819,7 @@
 - **then** the heading is marked skipped and the reason follows the node ID
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ○ Later · skipped
         `tests/t.py::test_skip` — reason: needs fixture data
@@ -3834,7 +3834,7 @@
 - **when** the Markdown «report» is rendered
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ Att · 3 cases
         `tests/t.py::test_att`

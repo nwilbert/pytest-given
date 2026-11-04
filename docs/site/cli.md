@@ -51,16 +51,17 @@ The same command also installs the agent skills with `pytest-given skills instal
 ```bash
 pytest-given delta before.json after.json [--json PATH] [--html PATH] \
     [--renames PATH] [--before-label LABEL] [--after-label LABEL] \
-    [--source-link PRESET] [--theme light|dark|auto]
+    [--title TITLE] [--source-link PRESET] [--theme light|dark|auto]
 pytest-given delta given-report/delta-data.json [--html PATH]
 ```
 
 - `--json` and `--html` name the delta JSON and HTML paths. With neither, two inputs write `given-report/delta-data.json` and `given-report/delta.html`, and one input writes the HTML. With only one of them, only that file is written.
 - `--renames` names the [rename log](delta-report.md#the-rename-log). It defaults to `given-renames.toml` in the working directory, when that exists.
 - `--before-label` and `--after-label` set the version label of each side. They default to the git tag on that side's commit.
+- `--title` sets the delta's title, kept in its JSON. It defaults to the after report's title.
 - `--source-link` and `--theme` work as for `report`. The source link defaults to none.
 
-One input only re-renders, so `--json`, `--renames`, `--before-label` and `--after-label` with one input are refused. Run the command from your current checkout, so it reads the current rename log.
+One input only re-renders, so `--json`, `--renames`, `--before-label`, `--after-label` and `--title` with one input are refused. Run the command from your current checkout, so it reads the current rename log.
 
 It prints a summary of the counts. It exits 0 whether or not anything changed, and 2 when it cannot build the delta. The [exit status](#exit-status) rule applies, and the command never exits 1. A report without the schema version of the pytest-given that compares it, a report where a delta JSON is expected (or the reverse), and a malformed rename log all exit 2. A report from a pytest-given that predates the schema version has none, so regenerate it.
 

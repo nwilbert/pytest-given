@@ -349,7 +349,8 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
     "before": { /* the before report's metadata, commit_sha included, plus its label */ },
     "after": { /* the after report's metadata, plus its label */ },
     "plugin_version": "…",
-    "timestamp": "…"
+    "timestamp": "…",
+    "title": "…"   /* what --title names; absent without it */
   },
   "scenarios": [
     {
@@ -419,12 +420,15 @@ the text of both sides.
 
 ### Header
 
-The *after* report's title (its project's name without one), then two tabs, Scenarios and Glossary.
+The delta's title, then two tabs, Scenarios and Glossary. The title is what `--title` names, kept in
+the delta JSON's `metadata.title`, or else the *after* report's title (its project's name without
+one). It is the browser tab's title too.
 There is no Stories tab, and the Glossary tab appears only when a term is listed. The header's right
-side shows the range, set larger as what the page compares, then the version of pytest-given that
-built the delta: `v0.5.0 a1b2c3d to v0.6.0 e4f5a6b`. Each side's run has its own pytest and plugin
-versions, so neither shows. Each side shows a version label and the short SHA, or the run's
-timestamp to the minute when the report carries no SHA. The label is
+side shows the range, then the version of pytest-given that built the delta.
+The range is the two sides joined by an arrow, each side its version label in the title's colour
+and then its short SHA, or the run's timestamp to the minute when the report carries no SHA. A
+copy of it reads `v0.5.0 a1b2c3d to v0.6.0 e4f5a6b`. Each side's run has its own pytest and plugin
+versions, so neither shows. The label is
 the git tag pointing at that SHA (the highest by version order when several do), or a `--before-label` /
 `--after-label` the caller passes. Without either, the side shows only its SHA, since
 `metadata.plugin_version` is pytest-given's version, not the project's.

@@ -41,7 +41,7 @@ def render_md(
     ends its section.
     """
     name = report.metadata.title or report.metadata.project
-    blocks = [_heading(1, f'pytest-given — {_text(name)}')]
+    blocks = [_heading(1, _text(name))]
     blocks.extend(
         _scenario_md(scenario, with_lines, sources) for scenario in report.scenarios
     )

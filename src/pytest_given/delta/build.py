@@ -71,6 +71,7 @@ class DeltaInputs:
     skipped_revs: frozenset[str] = frozenset()
     before_label: str | None = None
     after_label: str | None = None
+    title: str | None = None
     plugin_version: str
     timestamp: str
 
@@ -131,6 +132,7 @@ def build_delta(inputs: DeltaInputs) -> DeltaResult:
             after=_side(after, inputs.after_label),
             plugin_version=inputs.plugin_version,
             timestamp=inputs.timestamp,
+            title=inputs.title,
         ),
         scenarios=tuple(listed),
         unchanged=tuple(unchanged),

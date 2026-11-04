@@ -3809,9 +3809,7 @@ def test_given_title_cli_flag_names_the_report(pytester, tmp_path):
         data = json.loads(json_path.read_text())
         assert data['metadata']['title'] == 'Coffee Shop Example'
     with then('the title also heads the Markdown rendering'):
-        assert md_path.read_text(encoding='utf-8').startswith(
-            '# pytest-given — Coffee Shop Example'
-        )
+        assert md_path.read_text(encoding='utf-8').startswith('# Coffee Shop Example')
 
 
 def test_given_title_absent_leaves_the_title_unset(pytester, tmp_path):

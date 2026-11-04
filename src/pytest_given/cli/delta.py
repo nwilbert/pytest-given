@@ -96,6 +96,11 @@ def add_delta_parser(
         default=None,
         help='Version label of the after side (default: the tag on its commit)',
     )
+    delta_parser.add_argument(
+        '--title',
+        default=None,
+        help="The delta's title (default: the after report's title)",
+    )
 
 
 # What only a comparison uses, as `--flag`: Namespace attribute.
@@ -104,6 +109,7 @@ _COMPARE_ONLY_FLAGS = {
     '--renames': 'renames',
     '--before-label': 'before_label',
     '--after-label': 'after_label',
+    '--title': 'title',
 }
 
 
@@ -198,6 +204,7 @@ def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:
             skipped_revs=skipped_revs,
             before_label=args.before_label or _tag_label(before_sha, repo),
             after_label=args.after_label or _tag_label(after_sha, repo),
+            title=args.title,
             plugin_version=version('pytest-given'),
             timestamp=datetime.now(tz=UTC).isoformat(),
         )

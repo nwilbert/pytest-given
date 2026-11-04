@@ -19,8 +19,9 @@ from pytest_given.model import (
 from pytest_given.report import delta_sinks
 from pytest_given.report.delta_html import (
     ListedScenario,
+    RangeSide,
     delta_render_context,
-    range_label,
+    range_side,
     render_delta_html,
 )
 from pytest_given.report.delta_sinks import DeltaSinkConfig, emit_delta_sinks
@@ -82,24 +83,24 @@ def test_a_listed_scenario_is_shown_from_its_after_side_or_its_before_side_if_re
 @pytest.mark.parametrize(
     ('label', 'sha', 'expected'),
     [
-        ('v0.6.0', 'e4f5a6b7c8d9', 'v0.6.0 e4f5a6b'),
-        (None, 'e4f5a6b7c8d9', 'e4f5a6b'),
-        (None, None, '2026-01-01 00:00'),
-        ('v0.6.0', None, 'v0.6.0 2026-01-01 00:00'),
+        ('v0.6.0', 'e4f5a6b7c8d9', RangeSide('v0.6.0', 'e4f5a6b')),
+        (None, 'e4f5a6b7c8d9', RangeSide('e4f5a6b')),
+        (None, None, RangeSide('2026-01-01 00:00')),
+        ('v0.6.0', None, RangeSide('v0.6.0', '2026-01-01 00:00')),
     ],
 )
-def test_a_range_side_shows_its_label_and_short_sha_or_its_timestamp_to_the_minute(
-    label: str | None, sha: str | None, expected: str
+def test_a_range_side_is_named_by_its_label_short_sha_or_timestamp_to_the_minute(
+    label: str | None, sha: str | None, expected: RangeSide
 ) -> None:
     delta = _delta(report(sha=sha), report(sha=sha), before_label=label)
-    assert range_label(delta.metadata.before) == expected
+    assert range_side(delta.metadata.before) == expected
 
 
 def test_the_header_shows_the_range_the_delta_s_version_and_the_after_title() -> None:
     before = report(sha='a1b2c3d4')
     after = ReportData(metadata=meta('e4f5a6b7', title='Shop'), scenarios=[])
     context = delta_render_context(_delta(before, after, after_label='v2'))
-    assert context['range'] == 'a1b2c3d to v2 e4f5a6b'
+    assert context['range'] == (RangeSide('a1b2c3d'), RangeSide('v2', 'e4f5a6b'))
     assert context['plugin_version'] == '0.1.0'
     assert context['title'] == 'Shop'
 

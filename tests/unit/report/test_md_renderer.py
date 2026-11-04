@@ -49,7 +49,7 @@ def _report(
 
 def test_header_names_the_project() -> None:
     md = render_md(_report(project='hotel'))
-    assert md.startswith('# pytest-given — hotel')
+    assert md.startswith('# hotel')
 
 
 @scenario(
@@ -909,7 +909,7 @@ def test_an_attachment_cell_at_the_inline_limit_still_sits_inline() -> None:
 
 def test_header_prefers_the_title_over_the_project() -> None:
     md = render_md(_report(project='pytest-given', title='Coffee Shop Example'))
-    assert md.startswith('# pytest-given — Coffee Shop Example')
+    assert md.startswith('# Coffee Shop Example')
 
 
 def test_a_heading_ending_in_a_hash_keeps_it() -> None:
@@ -919,7 +919,7 @@ def test_a_heading_ending_in_a_hash_keeps_it() -> None:
         module='tests/t.py',
     )
     rendered = MarkdownIt('commonmark').render(render_md(_report(scn, title='C #')))
-    assert '<h1>pytest-given — C #</h1>' in rendered
+    assert '<h1>C #</h1>' in rendered
     assert '<h2>✓ fix issue ##</h2>' in rendered
 
 
@@ -979,7 +979,7 @@ def test_every_other_text_is_literal() -> None:
         ),
     )
     md = render_md(_report(scn, project='**proj**'))
-    assert md.startswith('# pytest-given — \\*\\*proj\\*\\*')
+    assert md.startswith('# \\*\\*proj\\*\\*')
     assert '· a\\*b\\*, snake_case — reason: needs \\<b>data\\</b>' in md
     assert '📎 \\*\\*raw\\*\\* — `*v*`' in md
     assert '> AssertionError: assert \\*x\\* == \\[1\\]' in md

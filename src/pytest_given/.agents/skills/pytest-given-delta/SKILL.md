@@ -15,6 +15,7 @@ A scenario pairs by its **scenario identity**, its node ID without the parametri
 - Keep a delta only when it lists a change. A release that changed no scenario adds none, and the next delta starts at the same commit.
 - Without a kept delta, start at the previous release tag.
 - For a release not tagged yet, pass `--after-label v<version>`.
+- Pass `--title` naming the product and the release, in words its stakeholders know: `--title "Hotel booking changes for v2.4"`. It defaults to the after report's title.
 
 ## Getting the two reports
 

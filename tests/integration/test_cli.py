@@ -285,7 +285,7 @@ def test_cli_md_inferred_from_output_extension(tmp_path, name) -> None:
     out = tmp_path / name
     rc = main(['report', str(json_path), '-o', str(out)])
     assert rc == 0
-    assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
+    assert out.read_text(encoding='utf-8').startswith('# cli')
 
 
 def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
@@ -306,7 +306,7 @@ def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
     out = tmp_path / 'nested' / 'dir' / 'r.md'
     rc = main(['report', str(json_path), '--format', 'md', '-o', str(out)])
     assert rc == 0
-    assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
+    assert out.read_text(encoding='utf-8').startswith('# cli')
 
 
 def _minimal_report() -> dict:

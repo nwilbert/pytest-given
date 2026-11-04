@@ -578,6 +578,8 @@ def _regenerate_delta_example(session: nox.Session) -> None:
             'v1',
             '--after-label',
             'v2',
+            '--title',
+            'Delta Example for v2',
         )
 
 

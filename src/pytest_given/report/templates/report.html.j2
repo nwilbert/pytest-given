@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme-default="{{ theme_default }}">
 <head>
-{%- set page_title = (metadata.title or metadata.project) ~ ' — pytest-given Report' %}
+{%- set page_title = metadata.title or metadata.project %}
 {% include '_head.html.j2' %}
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
