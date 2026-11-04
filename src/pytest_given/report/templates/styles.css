@@ -1795,26 +1795,19 @@ body.delta span[data-subst] { color: var(--text-primary); font-weight: 700; }
 /* The compared sides, the page's subject: spaced off from the run meta, each
    side's name in the title's colour, then its SHA or time. */
 .delta-range {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-md);
   margin: 0 var(--space-md) 0 0;
+  white-space: nowrap;
 }
-.delta-range-side { display: flex; align-items: baseline; gap: 6px; }
 .delta-range-name {
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-primary);
 }
-.delta-range-arrow { font-size: var(--font-size-md); }
-.delta-range-arrow::before { content: "\2192"; }
-.delta-range-to {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+.delta-range-to { font-size: 0; }
+.delta-range-to::before {
+  content: "\2192" / "";
+  margin: 0 var(--space-md);
+  font-size: var(--font-size-md);
 }
 .delta-title { display: inline-flex; flex-direction: column; min-width: 0; }
 /* What a change replaced, under what replaced it: quieter than the text it

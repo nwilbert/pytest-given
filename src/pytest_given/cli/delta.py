@@ -204,7 +204,7 @@ def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:
             skipped_revs=skipped_revs,
             before_label=args.before_label or _tag_label(before_sha, repo),
             after_label=args.after_label or _tag_label(after_sha, repo),
-            title=args.title,
+            title=args.title or None,
             plugin_version=version('pytest-given'),
             timestamp=datetime.now(tz=UTC).isoformat(),
         )

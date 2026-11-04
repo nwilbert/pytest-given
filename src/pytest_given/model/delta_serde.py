@@ -90,7 +90,7 @@ def _delta_metadata_from_dict(d: dict[str, Any], source: str | None) -> DeltaMet
         after=_side_from_dict(d['after'], source),
         plugin_version=d['plugin_version'],
         timestamp=d['timestamp'],
-        title=d.get('title'),
+        title=d['title'],
         schema_version=d['schema_version'],
     )
 

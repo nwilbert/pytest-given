@@ -371,8 +371,9 @@ def _narration_md(narration: Narration) -> str:
     return narration_markdown(narration, term_ref=lambda display: f'«{display}»')
 
 
-# A heading's trailing run of `#` after a space, which would close it unseen.
-_CLOSING_SEQUENCE = re.compile(r'(?<=[ \t])#+[ \t]*$')
+# A heading's trailing run of `#`, after a space or as its whole text, which
+# would close it unseen.
+_CLOSING_SEQUENCE = re.compile(r'(?:^|(?<=[ \t]))#+[ \t]*$')
 
 
 def _heading(level: int, text: str) -> str:

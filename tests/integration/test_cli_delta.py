@@ -456,18 +456,41 @@ def test_each_side_is_labelled_with_its_highest_tag_unless_a_label_is_passed(
     assert range_side(delta.metadata.after) == RangeSide('next', git_repo.head[:7])
 
 
+@scenario(
+    t'A {pg["Delta report"].l} is titled by `--title`, '
+    t'or else by the title of the after {pg["Report"].l}',
+    tags=['delta'],
+)
+@pytest.mark.parametrize(
+    ('extra_args', 'shown'),
+    [([], 'Shop'), (['--title', 'Shop changes for v2'], 'Shop changes for v2')],
+)
 def test_the_delta_is_titled_by_title_or_else_by_the_after_report(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    extra_args: list[str],
+    shown: str,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    with given(t'an after {pg["Report"].l} titled "Shop"'):
+        after = ReportData(metadata=meta(title='Shop'), scenarios=[])
+        inputs = _write_pair(report(), after)
+    with when(
+        t'`pytest-given delta` compares it to a before one, '
+        t'with the extra arguments {extra_args}'
+    ):
+        assert main(['delta', *inputs, *extra_args]) == 0
+    with then(t'the delta is titled "{shown}"'):
+        assert delta_render_context(delta_from_dict(_read_delta()))['title'] == shown
+
+
+def test_an_empty_title_counts_as_none(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
     after = ReportData(metadata=meta(title='Shop'), scenarios=[])
-    inputs = _write_pair(report(), after)
-    assert main(['delta', *inputs]) == 0
-    assert delta_render_context(delta_from_dict(_read_delta()))['title'] == 'Shop'
-    assert main(['delta', *inputs, '--title', 'Shop changes for v2']) == 0
-    delta = delta_from_dict(_read_delta())
-    assert delta.metadata.title == 'Shop changes for v2'
-    assert delta_render_context(delta)['title'] == 'Shop changes for v2'
+    assert main(['delta', *_write_pair(report(), after), '--title', '']) == 0
+    assert delta_from_dict(_read_delta()).metadata.title is None
 
 
 class TestSkippedRevs:

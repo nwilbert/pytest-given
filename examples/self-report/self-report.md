@@ -152,6 +152,18 @@
 | Pay by card | 0 |
 | Pay by credit card | 1 |
 
+## ✓ A «delta report» is titled by `--title`, or else by the title of the after «report» · 2 cases
+`tests/integration/test_cli_delta.py::test_the_delta_is_titled_by_title_or_else_by_the_after_report` · delta
+
+- **given** an after «report» titled "Shop"
+- **when** `pytest-given delta` compares it to a before one, with the extra arguments {extra_args}
+- **then** the delta is titled "{shown}"
+
+| extra_args | shown |
+|---|---|
+| \[\] | Shop |
+| \['--title', 'Shop changes for v2'\] | Shop changes for v2 |
+
 ## ✓ A «scenario» reaches the «report» with its «tags» and «term refs»
 `tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
 

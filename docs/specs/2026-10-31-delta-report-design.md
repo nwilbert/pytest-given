@@ -350,7 +350,7 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
     "after": { /* the after report's metadata, plus its label */ },
     "plugin_version": "…",
     "timestamp": "…",
-    "title": "…"   /* what --title names; absent without it */
+    "title": "…"   /* what --title names; null without it */
   },
   "scenarios": [
     {

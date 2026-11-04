@@ -34,14 +34,14 @@
     {% endif %}
     <div class="topbar-meta">
       {#- The two compared sides, each its name and its SHA or time. The
-          arrow is drawn by CSS; a screen reader and a copy get " to ". #}
+          arrow is drawn by CSS over a zero-size " to ", so a screen reader
+          and a copy get one line. Inline throughout: a block box would break
+          that line. #}
       <p class="delta-range">
         {%- for side in range %}
-        {%- if not loop.first %}<span class="delta-range-arrow" aria-hidden="true"></span><span class="delta-range-to"> to </span>{% endif %}
-        <span class="delta-range-side">
-          <span class="delta-range-name">{{ side.name }}</span>
-          {%- if side.detail %}<span class="delta-range-detail"> {{ side.detail }}</span>{% endif %}
-        </span>
+        {%- if not loop.first %}<span class="delta-range-to"> to </span>{% endif -%}
+        <span class="delta-range-name">{{ side.name }}</span>
+        {%- if side.detail %} <span class="delta-range-detail">{{ side.detail }}</span>{% endif %}
         {%- endfor %}
       </p>
       <span class="topbar-version">pytest-given {{ plugin_version }}</span>
