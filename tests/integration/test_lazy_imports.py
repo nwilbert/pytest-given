@@ -23,3 +23,18 @@ def test_an_entry_point_loads_no_renderer_or_parser_until_used(
         check=True,
     ).stdout
     assert loaded.strip() == '[]'
+
+
+def test_the_plugin_loads_no_delta_renderer() -> None:
+    code = (
+        'import sys, pytest_given.plugin; '
+        'print(sorted(name for name in sys.modules '
+        "if name.startswith('pytest_given.report.delta')))"
+    )
+    loaded = subprocess.run(
+        [sys.executable, '-c', code],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    assert loaded.strip() == '[]'

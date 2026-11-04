@@ -6,6 +6,12 @@ entry points in `cli/`, which is where the `pytest-given report` subcommand
 lives — importing this package must not drag argparse in behind it.
 """
 
+# Only `pytest-given delta` renders a delta: a test session never loads it.
+__lazy_modules__ = [
+    'pytest_given.report.delta_html',
+    'pytest_given.report.delta_sinks',
+]
+
 from .citation_index import (
     NO_SCENARIOS_SUMMARY,
     SUMMARY_SEPARATOR,
