@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from pytest_given import given, scenario, then, when
-from pytest_given.cli import delta as cli_delta
 from pytest_given.cli import main
 from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
@@ -492,75 +491,3 @@ def test_an_empty_title_counts_as_none(
     after = ReportData(metadata=meta(title='Shop'), scenarios=[])
     assert main(['delta', *_write_pair(report(), after), '--title', '']) == 0
     assert delta_from_dict(_read_delta()).metadata.title is None
-
-
-class TestSkippedRevs:
-    """`_skipped_revs` keeps every entry whose ancestry it can't establish."""
-
-    def test_no_revs_ask_git_nothing(self, tmp_path: Path) -> None:
-        assert cli_delta._skipped_revs(frozenset(), None, None, tmp_path) == (
-            frozenset(),
-            [],
-        )
-
-    def test_outside_a_repository_every_rev_applies(self, tmp_path: Path) -> None:
-        skipped, warnings = cli_delta._skipped_revs(
-            frozenset({'v1'}), 'a' * 40, 'a' * 40, tmp_path
-        )
-        assert skipped == frozenset()
-        assert warnings == [
-            (
-                'no ancestry answer (git cannot read a repository here); '
-                'rename-log entries with `rev` all apply'
-            )
-        ]
-
-    def test_in_a_shallow_clone_every_rev_applies(
-        self, git_repo: GitRepo, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(cli_delta, 'is_shallow', lambda repo: True)
-        skipped, [warning] = cli_delta._skipped_revs(
-            frozenset({'v1'}), git_repo.head, git_repo.head, git_repo.path
-        )
-        assert skipped == frozenset()
-        assert '(a shallow clone)' in warning
-
-    def test_an_unresolvable_before_sha_applies_every_rev(
-        self, git_repo: GitRepo
-    ) -> None:
-        skipped, [warning] = cli_delta._skipped_revs(
-            frozenset({'v1'}), 'f' * 40, git_repo.head, git_repo.path
-        )
-        assert skipped == frozenset()
-        assert f'git cannot resolve the before commit {"f" * 40}' in warning
-
-    def test_an_after_report_without_a_sha_checks_the_before_commit_alone(
-        self, git_repo: GitRepo
-    ) -> None:
-        skipped, [warning] = cli_delta._skipped_revs(
-            frozenset({'v1', 'v1.9'}), git_repo.first, None, git_repo.path
-        )
-        assert skipped == frozenset({'v1'})
-        assert warning == (
-            'no ancestry answer (the after report has no commit SHA); rename-log '
-            'entries with a `rev` later than the after commit apply'
-        )
-
-    def test_an_unresolvable_rev_is_named_and_applies(self, git_repo: GitRepo) -> None:
-        skipped, warnings = cli_delta._skipped_revs(
-            frozenset({'v1', 'nope'}), git_repo.head, git_repo.head, git_repo.path
-        )
-        assert skipped == frozenset({'v1'})
-        assert warnings == ["rename-log rev 'nope' does not resolve; its entries apply"]
-
-    def test_unknown_ancestry_applies_with_one_warning_in_all(
-        self, git_repo: GitRepo, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(cli_delta, 'is_ancestor', lambda rev, sha, repo: 'unknown')
-        skipped, warnings = cli_delta._skipped_revs(
-            frozenset({'v1', 'v1.9'}), git_repo.head, git_repo.head, git_repo.path
-        )
-        assert skipped == frozenset()
-        assert warnings == [
-            'no ancestry answer for 2 rename-log revs; their entries apply'
-        ]

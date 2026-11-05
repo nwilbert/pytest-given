@@ -9,7 +9,7 @@ from pytest_given.git import (
     detect_github_repo,
     is_ancestor,
     is_shallow,
-    resolve_revision,
+    revision_exists,
     tags_pointing_at,
 )
 from tests.git_repo import GitRepo, make_git_repo, run_git
@@ -101,15 +101,20 @@ def test_detect_commit_sha_unrunnable_git_returns_none(
     assert detect_commit_sha() is None
 
 
-def test_resolve_revision(git_repo: GitRepo) -> None:
-    assert resolve_revision('v1', git_repo.path) == git_repo.first
-    assert resolve_revision('v1.9', git_repo.path) == git_repo.head
-    assert resolve_revision('nope', git_repo.path) is None
+def test_revision_exists(git_repo: GitRepo) -> None:
+    assert revision_exists('v1', git_repo.path)
+    assert revision_exists(git_repo.head, git_repo.path)
+    assert not revision_exists('nope', git_repo.path)
 
 
-def test_resolve_revision_peels_a_tag_to_its_commit(git_repo: GitRepo) -> None:
+def test_revision_exists_takes_a_tag_only_when_it_leads_to_a_commit(
+    git_repo: GitRepo,
+) -> None:
     run_git(git_repo.path, 'tag', '-a', 'annotated', '-m', 'm', git_repo.first)
-    assert resolve_revision('annotated', git_repo.path) == git_repo.first
+    tree = run_git(git_repo.path, 'rev-parse', 'HEAD^{tree}')
+    run_git(git_repo.path, 'tag', 'on-a-tree', tree)
+    assert revision_exists('annotated', git_repo.path)
+    assert not revision_exists('on-a-tree', git_repo.path)
 
 
 def test_is_shallow(git_repo: GitRepo, tmp_path: Path) -> None:
@@ -197,7 +202,7 @@ def test_the_test_repository_ignores_an_inherited_git_dir(
 
 def test_outside_a_repository(tmp_path: Path) -> None:
     assert is_shallow(tmp_path) is None
-    assert resolve_revision('HEAD', tmp_path) is None
+    assert not revision_exists('HEAD', tmp_path)
     assert is_ancestor('HEAD', 'HEAD', tmp_path) == 'unknown'
     assert tags_pointing_at('HEAD', tmp_path) == []
 
@@ -213,7 +218,7 @@ def test_a_revision_that_looks_like_an_option_never_reaches_git(
         raise AssertionError('git must not run')
 
     monkeypatch.setattr(subprocess, 'run', spy)
-    assert resolve_revision(rev, git_repo.path) is None
+    assert not revision_exists(rev, git_repo.path)
     assert is_ancestor(rev, git_repo.head, git_repo.path) == 'unknown'
     assert is_ancestor(git_repo.head, rev, git_repo.path) == 'unknown'
     assert tags_pointing_at(rev, git_repo.path) == []
@@ -231,7 +236,7 @@ def test_every_query_runs_in_the_repository_with_an_argument_list(
         return real_run(cmd, **kwargs)  # type: ignore[call-overload, no-any-return]
 
     monkeypatch.setattr(subprocess, 'run', spy)
-    resolve_revision('v1', git_repo.path)
+    revision_exists('v1', git_repo.path)
     is_shallow(git_repo.path)
     is_ancestor('v1', git_repo.head, git_repo.path)
     tags_pointing_at(git_repo.head, git_repo.path)
@@ -260,7 +265,7 @@ def test_session_finish_gives_git_less_time_than_a_delta_query(
     detect_github_repo()
     session = list(timeouts)
     timeouts.clear()
-    resolve_revision('v1', tmp_path)
+    revision_exists('v1', tmp_path)
     assert session == [2, 2]
     assert timeouts == [5]
 
@@ -280,7 +285,7 @@ def test_a_git_that_cannot_run_answers_unknown(
         raise error
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert resolve_revision('v1', tmp_path) is None
+    assert not revision_exists('v1', tmp_path)
     assert is_shallow(tmp_path) is None
     assert is_ancestor('v1', 'v2', tmp_path) == 'unknown'
     assert tags_pointing_at('v1', tmp_path) == []

@@ -66,11 +66,14 @@ def detect_github_repo() -> tuple[str, str] | None:
     return (match['org'], match['repo'])
 
 
-def resolve_revision(rev: str, repo: Path) -> str | None:
-    """The commit SHA `rev` names in `repo`, or None when it doesn't resolve."""
+def revision_exists(rev: str, repo: Path) -> bool:
+    """Whether `rev` names a commit in `repo`; False when git can't answer."""
     if _looks_like_option(rev):
-        return None
-    return _stdout('rev-parse', '--verify', '--quiet', f'{rev}^{{commit}}', repo=repo)
+        return False
+    verified = _stdout(
+        'rev-parse', '--verify', '--quiet', f'{rev}^{{commit}}', repo=repo
+    )
+    return verified is not None
 
 
 def is_shallow(repo: Path) -> bool | None:

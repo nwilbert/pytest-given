@@ -656,15 +656,16 @@ for renamed tests. The builder decides whether to share a reference file or rest
   `delta/` needs them and may not import `report/`.
 - **`delta/`**, a new package on `model/` and `markdown/`, computes a delta: matching, the rename
   log, step and table alignment, word-level diffs, suggestions. It needs `markdown/` for word diffs
-  that keep inline Markdown spans whole. It imports no pytest and runs no git, so it is
-  unit-testable without a session or a repository.
+  that keep inline Markdown spans whole. It imports no pytest, so it is unit-testable without a
+  session. It asks `git/` which `rev`s fall outside the range, and takes the answer as plain data
+  when it compares the reports, so the comparison needs no repository.
 - **`report/`** renders the delta HTML and writes the delta JSON through the same staged-write path
   as `emit_sinks`, so a failure leaves no half-written file. The delta page reuses the report's
   templates, CSS and `app.js` wherever it can, rather than forking them.
 - **`git/`**, a new leaf package like `markdown/`, imports none of the others, and any of them may
   import it. It holds every git call the package makes (see [The `git/` package](#the-git-package)).
 - **`cli/`** adds the `delta` subcommand and wires `delta/`, `report/` and `git/` together. It asks
-  `git/` for the `rev` ancestry answers and the tag labels, and hands them to `delta/`.
+  `git/` for the tag labels, and hands them to `delta/`.
 
 ### The `git/` package
 
@@ -680,7 +681,7 @@ The delta adds three queries:
 |---|---|---|
 | Is `rev` an ancestor of the *before* SHA, and of the *after* SHA? | `git merge-base --is-ancestor` | the exit code only |
 | Which tags point at a SHA? | `git tag --points-at <sha> --sort=-version:refname` | one ref name per line |
-| Does a revision resolve? | `git rev-parse --verify --quiet <rev>^{commit}` | the exit code and one SHA |
+| Does a revision resolve? | `git rev-parse --verify --quiet <rev>^{commit}` | the exit code only |
 
 Nothing parses prose output, so the locale and the git version's wording don't matter. What keeps
 the answers honest:
@@ -690,7 +691,7 @@ the answers honest:
   confused, since reading "unknown" as "no" decides an entry the answer can't decide.
 - A shallow clone (`git rev-parse --is-shallow-repository`) answers "unknown" for every ancestry
   query, since a truncated history can't show a rev as an ancestor.
-- Before the ancestry queries, `git/` checks that the *before* SHA and each `rev` resolve, so a
+- Before the ancestry queries, `delta/` checks that the *before* SHA and each `rev` resolve, so a
   warning can name the revision that doesn't.
 - A `rev` that starts with `-` is a malformed entry, so no revision from the rename log can be read
   as an option.

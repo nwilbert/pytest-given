@@ -1,8 +1,8 @@
 """The delta report: what changed in a suite's scenarios and glossary between
 two reports.
 
-Imports `model/` and `markdown/` only. It runs no pytest and calls no git; the
-entry points hand it what those would have told it.
+Imports `model/`, `markdown/` and `git/`. It runs no pytest. Only `revs` asks
+git anything, so the comparison itself runs from the two reports alone.
 """
 
 from .build import DeltaInputs, DeltaResult, build_delta
@@ -20,6 +20,7 @@ from .renames import (
     parse_rename_log,
     read_rename_log,
 )
+from .revs import revs_outside_range
 
 __all__ = [
     'DEFAULT_RENAMES_PATH',
@@ -32,6 +33,7 @@ __all__ = [
     'check_reports',
     'parse_rename_log',
     'read_rename_log',
+    'revs_outside_range',
     'rewrite_case_id',
     'rewrite_identities',
     'undo_case_merges',
