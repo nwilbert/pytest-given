@@ -67,6 +67,9 @@ class StepRow:
     def line(self, side: Side) -> StepLine | None:
         return on_side(side, self.before, self.after)
 
+    def row_id(self, scenario_idx: int) -> str:
+        return f's{scenario_idx}_' + '_'.join(map(str, self.path))
+
 
 @dataclass(frozen=True)
 class SideBlock:
@@ -94,9 +97,7 @@ class StepsView:
 def steps_view(
     scenario_delta: ScenarioDelta, keys: dict[Side, list[BlockKey]]
 ) -> StepsView:
-    before, after = scenario_delta.before, scenario_delta.after
-    assert before is not None
-    assert after is not None
+    before, after = scenario_delta.paired()
     rows = _Rows(
         {
             'before': dict(walk_steps(before.steps)),
@@ -117,9 +118,7 @@ def block_keys(scenario_delta: ScenarioDelta) -> dict[Side, list[BlockKey]]:
     """Each side's phase blocks' keys, in order. A before block takes the key
     of the after block holding the first of its steps the after side kept, so
     two before blocks can share one when one phase's steps moved into another."""
-    before, after = scenario_delta.before, scenario_delta.after
-    assert before is not None
-    assert after is not None
+    before, after = scenario_delta.paired()
     before_blocks, after_blocks = phase_blocks(before.steps), phase_blocks(after.steps)
     before_of, after_of = _block_of(before_blocks), _block_of(after_blocks)
     paired: dict[int, BlockKey] = {}
@@ -185,6 +184,7 @@ def _side_blocks(
 ) -> list[SideBlock]:
     blocks: list[SideBlock] = []
     opened: SideBlock | None = None  # the phase block last opened
+    unopened = iter(keys)
     for row in rows:
         line = row.line(side)
         phase = None if line is None else line.step.phase
@@ -195,18 +195,11 @@ def _side_blocks(
             elif opened is not None and opened.phase == phase:
                 blocks.append(SideBlock(phase, opened.key, [], continued=True))
             else:
-                opened = SideBlock(phase, keys[len(_opened(blocks))], [])
+                opened = SideBlock(phase, next(unopened), [])
                 blocks.append(opened)
         blocks[-1].rows.append(row)
-    assert len(_opened(blocks)) == len(keys)
+    assert next(unopened, None) is None
     return blocks
-
-
-def _opened(blocks: list[SideBlock]) -> list[SideBlock]:
-    """The blocks that open a phase, one per phase block of the side."""
-    return [
-        block for block in blocks if block.phase is not None and not block.continued
-    ]
 
 
 def _joined(runs: list[MarkedRun]) -> tuple[MarkedRun, ...]:

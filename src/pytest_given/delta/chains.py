@@ -2,34 +2,22 @@
 the identity it has in the after report."""
 
 from bisect import bisect_right
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
 
 from .renames import RenameEntry
 
-type CaseMap = tuple[tuple[str, str], ...]
-
-
-@dataclass(frozen=True)
-class Rewrite:
-    identity: str  # where the before identity ends
-    case_maps: tuple[CaseMap, ...]  # the `cases` maps up to the stop, in order
+type CaseMap = Mapping[str, str]
 
 
 @dataclass(frozen=True)
 class Rewrites:
-    by_identity: dict[str, Rewrite]  # only identities actually rewritten
+    targets: dict[str, str]  # where each identity actually rewritten ends
+    # Each identity's `cases` maps in order, up to its stop. One that stays put
+    # still renames case IDs inside the scenario paired by the same identity.
+    case_maps: dict[str, tuple[CaseMap, ...]]
     warnings: tuple[str, ...]
-    # The `cases` maps of identities that stay put: they still rename case IDs
-    # inside the scenario paired by the same identity.
-    unmoved_case_maps: dict[str, tuple[CaseMap, ...]]
-
-    def case_maps_of(self, identity: str) -> tuple[CaseMap, ...]:
-        rewrite = self.by_identity.get(identity)
-        if rewrite is not None:
-            return rewrite.case_maps
-        return self.unmoved_case_maps.get(identity, ())
 
 
 def rewrite_identities(
@@ -47,35 +35,27 @@ def rewrite_identities(
         identity: _follow(identity, after, by_old) for identity in dict.fromkeys(before)
     }
     blocked, warnings = _merges(chains, after)
-    by_identity = {
-        identity: Rewrite(
-            identity=chain.stop.identity,
-            case_maps=tuple(chain.stop.case_maps),
-        )
-        for identity, chain in chains.items()
-        if identity not in blocked and chain.stop and chain.stop.identity != identity
-    }
-    unmoved_case_maps = {
-        identity: maps
-        for identity, chain in chains.items()
-        if identity not in by_identity and (maps := chain.unmoved_case_maps(identity))
-    }
-    return Rewrites(
-        by_identity=by_identity,
-        warnings=tuple(warnings),
-        unmoved_case_maps=unmoved_case_maps,
-    )
+    targets: dict[str, str] = {}
+    case_maps: dict[str, tuple[CaseMap, ...]] = {}
+    for identity, chain in chains.items():
+        maps = chain.unmoved_case_maps(identity)
+        if identity not in blocked and chain.stop and chain.stop.identity != identity:
+            targets[identity] = chain.stop.identity
+            maps = tuple(chain.stop.case_maps)
+        if maps:
+            case_maps[identity] = maps
+    return Rewrites(targets=targets, case_maps=case_maps, warnings=tuple(warnings))
 
 
 def rewrite_case_id(
     case_id: str,
-    case_maps: Sequence[Sequence[tuple[str, str]]],
+    case_maps: Sequence[CaseMap],
     after_case_ids: AbstractSet[str],
 ) -> str:
     result = case_id
     current = case_id
     for case_map in case_maps:
-        current = dict(case_map).get(current, current)
+        current = case_map.get(current, current)
         if current in after_case_ids:
             result = current
     return result
@@ -117,11 +97,6 @@ class _Chain:
     stop: _Stop | None
     stay_case_maps: tuple[CaseMap, ...]
 
-    def target(self, start: str, after: AbstractSet[str]) -> str | None:
-        if self.stop is not None:
-            return self.stop.identity
-        return start if start in after else None
-
     def unmoved_case_maps(self, start: str) -> tuple[CaseMap, ...]:
         """A chain back to its start still renamed cases on the way."""
         if self.stop is not None and self.stop.identity == start:
@@ -139,10 +114,10 @@ def _merges(
     while True:
         reached: dict[str, list[str]] = {}
         for identity, chain in chains.items():
-            if identity in blocked:
-                target = identity if identity in after else None
+            if identity not in blocked and chain.stop is not None:
+                target: str | None = chain.stop.identity
             else:
-                target = chain.target(identity, after)
+                target = identity if identity in after else None
             if target is not None:
                 reached.setdefault(target, []).append(identity)
         merged = {target: group for target, group in reached.items() if len(group) > 1}

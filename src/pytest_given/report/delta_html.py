@@ -7,7 +7,6 @@ resolve in that side's glossary, and its source link names that side's commit.
 # A CLI command that renders no HTML never loads Jinja or MarkupSafe.
 __lazy_modules__ = ['jinja2', 'markupsafe']
 
-from collections.abc import Callable
 from datetime import datetime
 from typing import NamedTuple
 
@@ -15,7 +14,6 @@ import jinja2
 from markupsafe import Markup
 
 from ..model import (
-    CHANGES,
     Change,
     DeltaData,
     DeltaSide,
@@ -23,6 +21,7 @@ from ..model import (
     Narration,
     Side,
     SourceLocation,
+    change_counts,
     narration_of,
     narration_text,
 )
@@ -86,9 +85,7 @@ def delta_render_context(
         # The version that built the delta: each side's run has its own.
         'plugin_version': delta.metadata.plugin_version,
         'listed': listed,
-        'change_counts': {
-            change: sum(item.change == change for item in listed) for change in CHANGES
-        },
+        'change_counts': change_counts(item.change for item in listed),
         'unchanged_count': len(delta.unchanged),
         'module_changes': module_changes,
         'glossary_view': glossary_view,
@@ -103,6 +100,7 @@ def delta_render_context(
             _app_data(delta, listed, module_changes, reach, glossary_view)
         ),
         **bundled_assets(),
+        'css': bundled_script('styles.css') + bundled_script('delta.css'),
         'delta_js': bundled_script('delta.js'),
     }
 
@@ -151,7 +149,6 @@ def _app_data(
     entry per listed scenario keyed by its slug, since a removed and an added
     scenario can share a node ID, and one per term card, keyed likewise."""
     return {
-        'metadata': {'timestamp': delta.metadata.after.metadata.timestamp},
         'status_labels': STATUS_LABEL,
         'glossary': {'terms': [term_app_data(term) for term in tip_terms(delta)]},
         'before_terms': [term_app_data(term) for term in before_tip_terms(delta)],
@@ -220,7 +217,12 @@ def _build_env(
         term_delta.shown_side for term_delta in delta.glossary.terms
     }
     source_url_filters = {
-        side: _source_url_filter(source_link_template, side_of)
+        side: make_source_url_filter(
+            template=source_link_template,
+            project=side_of.metadata.project,
+            commit_sha=side_of.metadata.commit_sha,
+            root=None,
+        )
         for side, side_of in (
             ('before', delta.metadata.before),
             ('after', delta.metadata.after),
@@ -267,14 +269,3 @@ def _marked(mark: Mark, text: Markup) -> Markup:
             return Markup('<del class="delta-words">{}</del>').format(text)
         case 'added':
             return Markup('<ins class="delta-words">{}</ins>').format(text)
-
-
-def _source_url_filter(
-    template: str | None, side: DeltaSide
-) -> Callable[[SourceLocation | None], str | None]:
-    return make_source_url_filter(
-        template=template,
-        project=side.metadata.project,
-        commit_sha=side.metadata.commit_sha,
-        root=None,
-    )

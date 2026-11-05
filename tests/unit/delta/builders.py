@@ -3,10 +3,12 @@
 import dataclasses
 from collections.abc import Sequence
 
+from pytest_given.delta import DeltaInputs, build_delta
 from pytest_given.model import (
     CellValue,
     ColumnId,
     ColumnKind,
+    DeltaData,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -138,3 +140,26 @@ def table(
 
 def _narration(text: str | Narration) -> Narration:
     return text if isinstance(text, Narration) else narr(lit(text))
+
+
+def glossary_of(*terms: GlossaryTerm) -> Glossary:
+    return Glossary(list(terms))
+
+
+def built_delta(
+    before: ReportData,
+    after: ReportData,
+    *,
+    before_label: str | None = None,
+    after_label: str | None = None,
+) -> DeltaData:
+    return build_delta(
+        DeltaInputs(
+            before=before,
+            after=after,
+            before_label=before_label,
+            after_label=after_label,
+            plugin_version='0.1.0',
+            timestamp='2026-01-02T00:00:00+00:00',
+        )
+    ).delta

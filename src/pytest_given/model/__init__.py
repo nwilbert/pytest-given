@@ -6,6 +6,9 @@ and `citations` all depend on this, so anything landing here is reachable from
 every one of them.
 """
 
+# Only the delta's code reads the delta's schema: a test session never loads it.
+__lazy_modules__ = ['pytest_given.model.delta', 'pytest_given.model.delta_serde']
+
 from .delta import (
     CHANGES,
     DELTA_SCHEMA_VERSION,
@@ -33,8 +36,10 @@ from .delta import (
     TermDelta,
     TermFacts,
     TermPairing,
+    change_counts,
     on_side,
     other_side,
+    walk_step_deltas,
 )
 from .delta_serde import delta_from_dict, delta_to_dict
 from .errors import (
@@ -49,6 +54,7 @@ from .narration import (
     merged_literals,
     narration_of,
     narration_text,
+    parts_in_context,
     placeholder_token,
     placeholder_value,
     read_narration,
@@ -114,11 +120,13 @@ from .schema import (
     TermKind,
     TracebackFrame,
     case_id,
+    case_node_id,
     case_suffix,
     location_suffix,
     node_base,
     param_id,
     rolled_up_status,
+    scenario_identity,
 )
 from .serde import (
     JsonObject,
@@ -138,10 +146,7 @@ from .term_refs import (
     INSTANCE_KINDS,
     GlossaryAggregation,
     TermCrossRefs,
-    TermForm,
-    TermOccurrence,
     build_term_crossrefs,
-    is_own_name,
 )
 from .text import (
     derived_id,
@@ -236,21 +241,20 @@ __all__ = [
     'TermCrossRefs',
     'TermDelta',
     'TermFacts',
-    'TermForm',
     'TermId',
     'TermKind',
-    'TermOccurrence',
     'TermPairing',
     'TracebackFrame',
     'build_term_crossrefs',
     'case_id',
+    'case_node_id',
     'case_suffix',
+    'change_counts',
     'delta_from_dict',
     'delta_to_dict',
     'derived_id',
     'id_derive',
     'is_delta_dict',
-    'is_own_name',
     'iter_narrations',
     'iter_steps',
     'l_form',
@@ -262,6 +266,7 @@ __all__ = [
     'on_side',
     'other_side',
     'param_id',
+    'parts_in_context',
     'placeholder_mismatch',
     'placeholder_token',
     'placeholder_value',
@@ -275,8 +280,10 @@ __all__ = [
     'resolve_report_url',
     'rolled_up_status',
     's_form',
+    'scenario_identity',
     'snapshot_param_value',
     'spanned_part',
+    'walk_step_deltas',
     'walk_steps',
     'with_case_id',
     'without_case_id',

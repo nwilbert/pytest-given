@@ -87,9 +87,9 @@ def test_the_spec_example_parses_verbatim() -> None:
         new='examples/hotel-booking/test_payments.py::test_declined_payment_holds_booking',
         rev='v0.6.0',
     )
-    assert second.cases == (('1.5-True', '2.0-True'),)
+    assert second.cases == {'1.5-True': '2.0-True'}
     assert third.new is None
-    assert third.cases == (('happy-hour', 'happy-hour-weekdays'),)
+    assert third.cases == {'happy-hour': 'happy-hour-weekdays'}
     assert log.of('term') == (
         RenameEntry(table='term', position=1, old='room', new='suite', rev='v0.6.0'),
     )
@@ -103,7 +103,7 @@ def test_a_case_key_may_hold_brackets_separators_and_non_ascii() -> None:
 
     (entry,) = parse_rename_log(text, SOURCE).entries
 
-    assert entry.cases == (('a]b', 'x::y'), ('größe-☕', 'ü'))
+    assert entry.cases == {'a]b': 'x::y', 'größe-☕': 'ü'}
 
 
 def test_an_empty_log_has_no_entries_and_no_revs() -> None:

@@ -46,6 +46,24 @@ function deserializeStory(params) {
 
 // Own keys only: these are read from the URL fragment, and a bare `map[key]`
 // answers `#term-filter=toString` with a function off Object.prototype.
+// A filter over one field's values: what the rows hold, and which values show.
+function shownFacet(values, rows, field) {
+  const counts = Object.fromEntries(values.map(v => [v, 0]));
+  for (const row of rows) counts[row[field]] += 1;
+  const present = values.filter(v => counts[v] > 0);
+  return {
+    counts,
+    present,
+    allShown: () => Object.fromEntries(values.map(v => [v, true])),
+    only: shown => Object.fromEntries(values.map(v => [v, shown.has(v)])),
+    // In the URL only when it narrows what the rows hold.
+    writeHash(params, name, shown) {
+      const on = present.filter(v => shown[v]);
+      if (on.length !== present.length) params.set(name, on.join(','));
+    },
+  };
+}
+
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
@@ -183,10 +201,8 @@ function reportApp() {
   // Every status in filter order, labelled as the Markdown report words them.
   const STATUS_LABELS = data.status_labels;
   const STATUSES = Object.keys(STATUS_LABELS);
-  const allStatusesShown = () => Object.fromEntries(STATUSES.map(s => [s, true]));
-  const statusCounts = Object.fromEntries(STATUSES.map(s => [s, 0]));
-  for (const s of data.scenarios) statusCounts[s.status] += 1;
-  const statusesPresent = STATUSES.filter(s => statusCounts[s] > 0);
+  const statusFacet = shownFacet(STATUSES, data.scenarios, 'status');
+  const { counts: statusCounts, present: statusesPresent, allShown: allStatusesShown } = statusFacet;
   const moduleSkipDepth = commonDepth(allModules);
   function termLabel(id) {
     if (id === NO_TERMS) return 'no terms';
@@ -229,6 +245,11 @@ function reportApp() {
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
   let termCountCache = null;
+  const termRows = glossaryTerms.map(t => ({
+    kind: t.kind || 'kindless',
+    defined: t.definition !== null && t.definition !== undefined,
+    search: t.canonical.toLowerCase(),
+  }));
   // The shared copy menu, and the button it is open for, or null.
   let copyMenu = null;
   let copyMenuTrigger = null;
@@ -353,20 +374,31 @@ function reportApp() {
     // One pass per filter change, not the twelve the four kind sections ask
     // for. Cached as `_visible` is, and for the same reason.
     _termCounts() {
-      const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
+      const key = this._termFilterState().join('\u0000');
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
-      const q = this.glossarySearch.toLowerCase();
-      const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
       const counts = {};
-      for (const t of glossaryTerms) {
-        if (this.glossaryDefinitionFilter !== 'all'
-            && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
-        if (q && !t.canonical.toLowerCase().includes(q)) continue;
-        const kind = t.kind || 'kindless';
-        counts[kind] = (counts[kind] || 0) + 1;
+      for (const row of this._termRows()) {
+        if (this._termMatches(row)) counts[row.kind] = (counts[row.kind] || 0) + 1;
       }
       termCountCache = { key, value: counts };
       return counts;
+    },
+    _termRows() {
+      return termRows;
+    },
+    _termFilterState() {
+      return [this.glossarySearch, this.glossaryDefinitionFilter];
+    },
+    // One rule for an entry's own visibility and its kind's count, which have
+    // to agree. `row` is a `termRows` row, or an entry's data attributes.
+    _termMatches(row) {
+      const definitions = this.glossaryDefinitionFilter;
+      if (definitions !== 'all' && (definitions === 'defined') !== row.defined) return false;
+      const query = this.glossarySearch.toLowerCase();
+      return !query || row.search.includes(query);
+    },
+    termEntryShown(entry) {
+      return this._termMatches({ ...entry.dataset, defined: entry.dataset.defined === 'true' });
     },
     visibleTermLabel(kind) {
       const n = this.visibleTermCount(kind);
@@ -1203,7 +1235,7 @@ function reportApp() {
       if (params.has('status')) {
         const shown = new Set(keep('status', params.get('status').split(',').filter(Boolean),
           s => STATUSES.includes(s)));
-        this.shownStatuses = Object.fromEntries(STATUSES.map(s => [s, shown.has(s)]));
+        this.shownStatuses = statusFacet.only(shown);
       } else {
         this.shownStatuses = allStatusesShown();
       }
@@ -1262,10 +1294,7 @@ function reportApp() {
       for (const termId of this.termFilters) params.append('term-filter', termId);
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
 
-      const shownInReport = statusesPresent.filter(s => this.shownStatuses[s]);
-      if (shownInReport.length !== statusesPresent.length) {
-        params.set('status', shownInReport.join(','));
-      }
+      statusFacet.writeHash(params, 'status', this.shownStatuses);
 
       if (this.search) params.set('q', this.search);
       return params;

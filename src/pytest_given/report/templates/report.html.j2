@@ -8,7 +8,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar, nav_tab, term_disclosure with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -23,22 +23,9 @@
     {#- The class paints the active tab; `aria-selected` announces it. No roving
         tabindex: three tabs do not earn the arrow-key handling. -#}
     <nav class="frame-nav" role="tablist" aria-label="Report views">
-      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
-              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-              :aria-selected="mainView === 'scenarios'"
-              @click="mainView = 'scenarios'">Scenarios</button>
-      {% if tab_visibility.stories %}
-      <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
-              :class="{ 'nav-tab-active': mainView === 'stories' }"
-              :aria-selected="mainView === 'stories'"
-              @click="mainView = 'stories'">Stories</button>
-      {% endif %}
-      {% if tab_visibility.glossary %}
-      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
-              :class="{ 'nav-tab-active': mainView === 'glossary' }"
-              :aria-selected="mainView === 'glossary'"
-              @click="mainView = 'glossary'">Glossary</button>
-      {% endif %}
+      {{ nav_tab('scenarios', 'Scenarios') }}
+      {% if tab_visibility.stories %}{{ nav_tab('stories', 'Stories') }}{% endif %}
+      {% if tab_visibility.glossary %}{{ nav_tab('glossary', 'Glossary') }}{% endif %}
     </nav>
     {% endif %}
     <div class="topbar-meta">
@@ -311,13 +298,10 @@
         {% set show_forms = entry.show_forms %}
         <div class="entry" id="term-{{ term.id }}"
              data-search="{{ term.canonical | lower }}"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+             data-defined="{{ 'false' if term.definition is none else 'true' }}"
+             x-show="termEntryShown($el)">
           <div class="entry-head" data-term-id="{{ term.id }}" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="{{ term.id }}"
-                    aria-controls="term-refs-{{ term.id }}"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            {{ term_disclosure(term.id) }}
             <span class="entry-name">
               <span class="term-name">{{ term.canonical }}{{ anchor_link('view=glossary&term=' ~ term.id) }}</span>
             </span>

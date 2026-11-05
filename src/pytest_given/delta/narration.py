@@ -7,8 +7,10 @@ authored.
 """
 
 import re
-from collections.abc import Callable, Iterator, Sequence
+from collections import Counter
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass, field, replace
+from functools import lru_cache
 from itertools import groupby
 from typing import Literal
 
@@ -27,7 +29,7 @@ from ..model import (
     TermId,
     l_form,
     merged_literals,
-    narration_text,
+    parts_in_context,
     s_form,
 )
 from .lcs import lcs_gaps, lcs_pairs
@@ -54,6 +56,7 @@ def placeholder_name(placeholder: NarrationPlaceholder) -> str:
 type TokenKind = Literal[
     'word', 'space', 'code', 'emphasis', 'link', 'placeholder', 'term'
 ]
+type WordKey = tuple[TokenKind, str]
 type TokenBucket = tuple[tuple[TokenKind, str], ...]
 
 
@@ -69,15 +72,9 @@ class Token:
 def tokens(narration: Narration, reading: Reading) -> list[Token]:
     """Each literal is read with its neighbouring parts' text as context, as
     `model.read_narration` reads it, so a span never crosses into a value."""
-    parts = narration.parts or (NarrationLiteral(value=narration.text),)
-    texts = [narration_text((part,)) for part in parts]
-    whole = ''.join(texts)
     read: list[Token] = []
-    end = 0
-    for part, text in zip(parts, texts, strict=True):
-        start, end = end, end + len(text)
+    for part, before, after in parts_in_context(narration):
         if isinstance(part, NarrationLiteral):
-            before, after = whole[max(start - 1, 0) : start], whole[end : end + 1]
             read.extend(_literal_tokens(part.value, before, after))
         elif isinstance(part, NarrationValue):
             read.extend(_value_tokens(part))
@@ -128,7 +125,16 @@ def similarity(words_a: Sequence[Token], words_b: Sequence[Token]) -> float:
 
 
 def reading_words(narration: Narration, reading: Reading) -> list[Token]:
-    return [token for token in tokens(narration, reading) if token.kind != 'space']
+    return words_of(tokens(narration, reading))
+
+
+def words_of(read: Iterable[Token]) -> list[Token]:
+    return [token for token in read if token.kind != 'space']
+
+
+def word_counts(words: Iterable[Token]) -> Counter[WordKey]:
+    """Two words can be equal only with the same kind and key."""
+    return Counter((word.kind, word.key) for word in words)
 
 
 def word_diff(
@@ -172,10 +178,8 @@ _SPACES = re.compile(r'(\s+)')
 def _value_tokens(value: NarrationValue) -> Iterator[Token]:
     """Read by word, as a literal reading the same is: each word keeps the
     value it is a piece of."""
-    for piece in _SPACES.split(value.rendered):
-        if piece:
-            kind: TokenKind = 'space' if piece.isspace() else 'word'
-            yield Token(kind, piece, parts=(replace(value, rendered=piece),))
+    for kind, piece in _pieces(value.rendered):
+        yield Token(kind, piece, parts=(replace(value, rendered=piece),))
 
 
 def _interpolated_token(
@@ -196,16 +200,21 @@ def _interpolated_token(
             )
 
 
-def _literal_tokens(text: str, before: str, after: str) -> Iterator[Token]:
+@lru_cache(maxsize=8192)
+def _literal_tokens(text: str, before: str, after: str) -> tuple[Token, ...]:
+    """Cached: an unchanged literal is read on both sides, and many recur across
+    a suite's scenarios."""
+    read: list[Token] = []
     for span, chars in located_spans(text, before=before, after=after):
         source = text[chars.start : chars.stop]
         match span:
             case CodeSpan():
-                yield _literal('code', source)
+                read.append(_literal('code', source))
             case EmphasisSpan():
-                yield _literal('emphasis', source)
+                read.append(_literal('emphasis', source))
             case PlainSpan():
-                yield from _plain_tokens(source)
+                read.extend(_plain_tokens(source))
+    return tuple(read)
 
 
 def _plain_tokens(text: str) -> Iterator[Token]:
@@ -218,9 +227,14 @@ def _plain_tokens(text: str) -> Iterator[Token]:
 
 
 def _word_tokens(text: str) -> Iterator[Token]:
+    for kind, piece in _pieces(text):
+        yield _literal(kind, piece)
+
+
+def _pieces(text: str) -> Iterator[tuple[TokenKind, str]]:
     for piece in _SPACES.split(text):
         if piece:
-            yield _literal('space' if piece.isspace() else 'word', piece)
+            yield ('space' if piece.isspace() else 'word'), piece
 
 
 def _literal(kind: TokenKind, source: str) -> Token:

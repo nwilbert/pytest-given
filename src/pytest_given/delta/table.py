@@ -1,7 +1,7 @@
 """Pairing two parameter tables: their columns, then their cases."""
 
 import math
-from collections.abc import Callable, Hashable, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 
 from ..model import (
     Attachment,
@@ -31,10 +31,10 @@ _RENAMEABLE_KINDS: tuple[ColumnKind, ...] = ('param', 'derived')
 def align_table(
     before: ParameterTable,
     after: ParameterTable,
-    case_rewrite: Callable[[str], str],
+    case_renames: Mapping[str, str],
 ) -> ParameterDelta:
-    """`case_rewrite` maps a before case ID to its rename-log rewrite."""
-    alignment = _Alignment(before, after, case_rewrite)
+    """`case_renames` maps a before case ID to its rename-log rewrite."""
+    alignment = _Alignment(before, after, case_renames)
     alignment.pair_columns_by_name()
     alignment.pair_cases()
     alignment.pair_renamed_columns()
@@ -46,11 +46,11 @@ class _Alignment:
         self,
         before: ParameterTable,
         after: ParameterTable,
-        case_rewrite: Callable[[str], str],
+        case_renames: Mapping[str, str],
     ) -> None:
         self.before = before
         self.after = after
-        self.case_rewrite = case_rewrite
+        self.case_renames = case_renames
         self.before_columns = _comparable(before.columns)
         self.after_columns = _comparable(after.columns)
         self.before_by_id = {case.id: case for case in before.cases}
@@ -174,8 +174,7 @@ class _Alignment:
         )
 
     def _rewritten_id(self, case: ParameterCase) -> str | None:
-        rewritten = self.case_rewrite(case_id(case.id))
-        return rewritten if rewritten != case_id(case.id) else None
+        return self.case_renames.get(case_id(case.id))
 
     def _agree_in_paired_cases(
         self, before_column: ParameterColumn, after_column: ParameterColumn

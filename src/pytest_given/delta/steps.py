@@ -4,15 +4,18 @@ from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from ..model import Step, StepDelta, StepPath
+from ..model import Step, StepDelta, StepPath, walk_step_deltas
 from .lcs import lcs_gaps
 from .narration import (
     Reading,
     Token,
+    WordKey,
     similarity,
     token_diff,
     token_lists_equal,
     tokens,
+    word_counts,
+    words_of,
 )
 
 MODIFIED_SIMILARITY = 0.5
@@ -25,9 +28,7 @@ def align_steps(
 
 
 def steps_changed(deltas: Sequence[StepDelta]) -> bool:
-    return any(
-        delta.change != 'equal' or steps_changed(delta.children) for delta in deltas
-    )
+    return any(delta.change != 'equal' for delta in walk_step_deltas(deltas))
 
 
 @dataclass(frozen=True)
@@ -37,8 +38,7 @@ class _Read:
     step: Step
     tokens: list[Token]
     words: list[Token]
-    # Two words can be equal only with the same kind and key.
-    word_keys: Counter[tuple[str, str]]
+    word_keys: Counter[WordKey]
 
 
 class _Alignment:
@@ -145,8 +145,8 @@ class _Alignment:
 
 def _read(step: Step, reading: Reading) -> _Read:
     read = tokens(step.narration, reading)
-    words = [token for token in read if token.kind != 'space']
-    return _Read(step, read, words, Counter((word.kind, word.key) for word in words))
+    words = words_of(read)
+    return _Read(step, read, words, word_counts(words))
 
 
 def _same(before: _Read, after: _Read) -> bool:

@@ -3,13 +3,18 @@
 from pytest_given import given, scenario, then, when
 from pytest_given.delta import RenameEntry, RenameLog
 from pytest_given.delta.terms import align_terms, term_facts
-from pytest_given.model import Glossary, GlossaryTerm, TermFacts, TermId
+from pytest_given.model import GlossaryTerm, TermFacts, TermId
 from tests.ubiquitous_language import pg
-from tests.unit.delta.builders import lit, narr, ref, report, scn, step, term
-
-
-def _glossary(*terms: GlossaryTerm) -> Glossary:
-    return Glossary(list(terms))
+from tests.unit.delta.builders import (
+    glossary_of,
+    lit,
+    narr,
+    ref,
+    report,
+    scn,
+    step,
+    term,
+)
 
 
 def _log(*moves: tuple[str, str]) -> RenameLog:
@@ -32,7 +37,7 @@ def _facts_of(
         )
         for index, (term_id, display) in enumerate(mentions)
     ]
-    return term_facts(report(*scenarios, glossary=_glossary(*terms)))
+    return term_facts(report(*scenarios, glossary=glossary_of(*terms)))
 
 
 @scenario(
@@ -45,8 +50,8 @@ def test_a_renamed_term_pairs_only_through_a_term_entry() -> None:
         t'a {pg["Glossary"].l} whose guest term is called visitor in the next one, '
         t'and a {pg["Rename log"].l} with a `[[term]]` entry for guest'
     ):
-        before = report(glossary=_glossary(term('guest', 'Guest')))
-        after = report(glossary=_glossary(term('visitor', 'Visitor')))
+        before = report(glossary=glossary_of(term('guest', 'Guest')))
+        after = report(glossary=glossary_of(term('visitor', 'Visitor')))
         log = _log(('guest', 'visitor'))
     with when('the terms are aligned with and without the entry'):
         with_entry = align_terms(before, after, log, set())
@@ -75,8 +80,8 @@ def test_a_term_whose_kind_changed_is_listed_twice() -> None:
         t'a {pg["Term"].l} that is an object in one {pg["Glossary"].l} and an actor '
         t'in the next'
     ):
-        before = report(glossary=_glossary(term('guest', 'Guest', kind='object')))
-        after = report(glossary=_glossary(term('guest', 'Guest', kind='actor')))
+        before = report(glossary=glossary_of(term('guest', 'Guest', kind='object')))
+        after = report(glossary=glossary_of(term('guest', 'Guest', kind='actor')))
     with when('the terms are aligned'):
         alignment = align_terms(before, after, RenameLog(), set())
     with then('it is removed under its old kind and added under its new one'):
@@ -98,10 +103,10 @@ def test_a_term_whose_kind_changed_is_listed_twice() -> None:
 
 def test_a_kindless_term_pairs_with_itself_and_unpairs_from_a_kinded_one() -> None:
     before = report(
-        glossary=_glossary(term('a', 'A', kind=None), term('b', 'B', kind=None))
+        glossary=glossary_of(term('a', 'A', kind=None), term('b', 'B', kind=None))
     )
     after = report(
-        glossary=_glossary(term('a', 'A', kind=None), term('b', 'B', kind='actor'))
+        glossary=glossary_of(term('a', 'A', kind=None), term('b', 'B', kind='actor'))
     )
 
     alignment = align_terms(before, after, RenameLog(), set())
@@ -118,9 +123,9 @@ def test_a_kindless_term_pairs_with_itself_and_unpairs_from_a_kinded_one() -> No
 
 
 def test_a_changed_definition_is_a_word_diff_of_the_two() -> None:
-    before = report(glossary=_glossary(term('guest', 'Guest', definition='a person')))
+    before = report(glossary=glossary_of(term('guest', 'Guest', definition='a person')))
     after = report(
-        glossary=_glossary(term('guest', 'Guest', definition='a paying person'))
+        glossary=glossary_of(term('guest', 'Guest', definition='a paying person'))
     )
 
     alignment = align_terms(before, after, RenameLog(), set())
@@ -137,8 +142,10 @@ def test_a_changed_definition_is_a_word_diff_of_the_two() -> None:
 
 
 def test_a_changed_canonical_name_alone_is_changed_without_a_definition_diff() -> None:
-    before = report(glossary=_glossary(term('guest', 'Guest', definition='a person')))
-    after = report(glossary=_glossary(term('guest', 'Visitor', definition='a person')))
+    before = report(glossary=glossary_of(term('guest', 'Guest', definition='a person')))
+    after = report(
+        glossary=glossary_of(term('guest', 'Visitor', definition='a person'))
+    )
 
     alignment = align_terms(before, after, RenameLog(), set())
 
@@ -148,8 +155,8 @@ def test_a_changed_canonical_name_alone_is_changed_without_a_definition_diff() -
 
 
 def test_a_missing_definition_reads_as_empty() -> None:
-    before = report(glossary=_glossary(term('guest', 'Guest')))
-    after = report(glossary=_glossary(term('guest', 'Guest', definition='a person')))
+    before = report(glossary=glossary_of(term('guest', 'Guest')))
+    after = report(glossary=glossary_of(term('guest', 'Guest', definition='a person')))
 
     (delta,) = align_terms(before, after, RenameLog(), set()).delta.terms
 
@@ -160,12 +167,12 @@ def test_a_facts_only_difference_leaves_the_term_unchanged() -> None:
     guest = term('guest', 'Guest')
     before = report(
         scn('t.py::test_a', 'a', step('given', narr(ref('guest', 'Guest')))),
-        glossary=_glossary(guest),
+        glossary=glossary_of(guest),
     )
     after = report(
         scn('t.py::test_a', 'a', step('given', narr(ref('guest', 'Guest')))),
         scn('t.py::test_b', 'b', step('given', narr(ref('guest', 'Alice')))),
-        glossary=_glossary(guest),
+        glossary=glossary_of(guest),
     )
 
     alignment = align_terms(before, after, RenameLog(), set())
@@ -179,12 +186,12 @@ def test_a_facts_only_difference_leaves_the_term_unchanged() -> None:
 def test_facts_are_stored_for_each_side_a_listed_term_has() -> None:
     before = report(
         scn('t.py::test_a', 'a', step('given', narr(ref('room', 'Room')))),
-        glossary=_glossary(term('room', 'Room'), term('gone', 'Gone')),
+        glossary=glossary_of(term('room', 'Room'), term('gone', 'Gone')),
     )
     after = report(
         scn('t.py::test_a', 'a', step('given', narr(ref('room', 'Room')))),
         scn('t.py::test_b', 'b', step('given', narr(ref('room', 'Suite')))),
-        glossary=_glossary(
+        glossary=glossary_of(
             term('room', 'Room', definition='a place'), term('new', 'New')
         ),
     )
@@ -226,7 +233,7 @@ def test_a_report_without_a_glossary_has_no_facts() -> None:
 
 
 def test_without_a_before_glossary_every_after_term_is_added() -> None:
-    after = report(glossary=_glossary(term('guest', 'Guest'), term('room', 'Room')))
+    after = report(glossary=glossary_of(term('guest', 'Guest'), term('room', 'Room')))
 
     alignment = align_terms(report(), after, _log(('x', 'guest')), set())
 
@@ -241,7 +248,7 @@ def test_without_a_before_glossary_every_after_term_is_added() -> None:
 
 
 def test_without_an_after_glossary_every_before_term_is_removed() -> None:
-    before = report(glossary=_glossary(term('guest', 'Guest')))
+    before = report(glossary=glossary_of(term('guest', 'Guest')))
 
     alignment = align_terms(before, report(), _log(('guest', 'visitor')), set())
 
@@ -264,12 +271,12 @@ def test_terms_follow_the_after_order_with_removed_ones_after_their_predecessor(
     None
 ):
     before = report(
-        glossary=_glossary(
+        glossary=glossary_of(
             term('a', 'A'), term('gone', 'Gone'), term('b', 'B', definition='x')
         )
     )
     after = report(
-        glossary=_glossary(
+        glossary=glossary_of(
             term('b', 'B', definition='y'), term('a', 'A'), term('c', 'C')
         )
     )
@@ -286,8 +293,8 @@ def test_terms_follow_the_after_order_with_removed_ones_after_their_predecessor(
 
 
 def test_a_rev_skipped_entry_does_not_pair() -> None:
-    before = report(glossary=_glossary(term('guest', 'Guest')))
-    after = report(glossary=_glossary(term('visitor', 'Visitor')))
+    before = report(glossary=glossary_of(term('guest', 'Guest')))
+    after = report(glossary=glossary_of(term('visitor', 'Visitor')))
     log = RenameLog(
         entries=(
             RenameEntry(table='term', position=1, old='guest', new='visitor', rev='r1'),
@@ -302,8 +309,8 @@ def test_a_rev_skipped_entry_does_not_pair() -> None:
 
 def test_a_renamed_term_whose_kind_changed_is_listed_twice_with_a_warning() -> None:
     """Its refs still follow the rename, as a kind change alone keeps them."""
-    before = report(glossary=_glossary(term('guest', 'Guest', kind='actor')))
-    after = report(glossary=_glossary(term('visitor', 'Visitor', kind='object')))
+    before = report(glossary=glossary_of(term('guest', 'Guest', kind='actor')))
+    after = report(glossary=glossary_of(term('visitor', 'Visitor', kind='object')))
 
     alignment = align_terms(before, after, _log(('guest', 'visitor')), set())
 
@@ -319,8 +326,8 @@ def test_a_renamed_term_whose_kind_changed_is_listed_twice_with_a_warning() -> N
 
 
 def test_a_merging_rename_warns_and_pairs_nothing_by_it() -> None:
-    before = report(glossary=_glossary(term('a', 'A'), term('b', 'B')))
-    after = report(glossary=_glossary(term('c', 'C')))
+    before = report(glossary=glossary_of(term('a', 'A'), term('b', 'B')))
+    after = report(glossary=glossary_of(term('c', 'C')))
 
     alignment = align_terms(before, after, _log(('a', 'c'), ('b', 'c')), set())
 
@@ -333,8 +340,8 @@ def test_a_merging_rename_warns_and_pairs_nothing_by_it() -> None:
 
 
 def test_a_missing_definition_and_an_empty_one_are_the_same() -> None:
-    before = report(glossary=_glossary(term('guest', 'Guest', definition=None)))
-    after = report(glossary=_glossary(term('guest', 'Guest', definition='')))
+    before = report(glossary=glossary_of(term('guest', 'Guest', definition=None)))
+    after = report(glossary=glossary_of(term('guest', 'Guest', definition='')))
 
     alignment = align_terms(before, after, RenameLog(), set())
 

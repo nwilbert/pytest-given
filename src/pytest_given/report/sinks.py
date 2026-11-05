@@ -42,6 +42,8 @@ from .theme import DEFAULT_THEME, Theme
 # each spelling their own.
 DEFAULT_JSON_PATH = Path('given-report/report-data.json')
 DEFAULT_HTML_PATH = Path('given-report/report.html')
+DEFAULT_DELTA_JSON_PATH = Path('given-report/delta-data.json')
+DEFAULT_DELTA_HTML_PATH = Path('given-report/delta.html')
 
 # What a Markdown sink path may end in — also how `pytest-given report` tells
 # a Markdown `-o` from an HTML one.
@@ -154,7 +156,7 @@ def emit_files[Files: Rendered](
         # A truncated file would read as current, so none is written in place.
         write_all_or_none(rendered.files)
     except (PytestGivenError, OSError) as error:
-        raise PytestGivenError(failure_discarding(error, paths)) from error
+        raise PytestGivenError(_failure_discarding(error, paths)) from error
     except BaseException:
         # A renderer bug (an undefined template name, a missing color key) or
         # a Ctrl-C is not a user error and keeps its own traceback — but it
@@ -225,10 +227,10 @@ def sink_failure(error: Exception, config: SinkConfig) -> str:
     *build* never reaches it and leaves the same stale files behind — so the
     plugin needs this composition too.
     """
-    return failure_discarding(error, config.file_paths())
+    return _failure_discarding(error, config.file_paths())
 
 
-def failure_discarding(error: Exception, paths: Sequence[Path]) -> str:
+def _failure_discarding(error: Exception, paths: Sequence[Path]) -> str:
     return '\n'.join([str(error), *discard_files(paths)])
 
 

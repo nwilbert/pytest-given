@@ -31,6 +31,7 @@ from pytest_given.report.delta_scenarios import (
     TableView,
 )
 from tests.unit.delta.builders import (
+    built_delta,
     lit,
     meta,
     narr,
@@ -43,17 +44,6 @@ from tests.unit.delta.builders import (
     term,
 )
 from tests.unit.report.app_data import embedded_app_data
-
-
-def _delta(before: ReportData, after: ReportData) -> DeltaData:
-    return build_delta(
-        DeltaInputs(
-            before=before,
-            after=after,
-            plugin_version='0.1.0',
-            timestamp='2026-01-02T00:00:00+00:00',
-        )
-    ).delta
 
 
 def _listed(delta: DeltaData) -> list[ListedScenario]:
@@ -95,7 +85,7 @@ def test_modules_are_marked_by_which_sides_have_them_and_a_moved_file_is_not():
         scn('new.py::test_new', 'New'),
         scn('both.py::test_pay', 'Pay by card'),
     )
-    context = delta_render_context(_delta(before, after))
+    context = delta_render_context(built_delta(before, after))
     assert context['module_changes'] == {
         'gone': 'removed',
         'new': 'added',
@@ -115,7 +105,7 @@ def test_the_sidebar_counts_listed_scenarios_by_change_and_the_unchanged_ones():
         scn('t.py::test_new', 'New'),
         scn('t.py::test_newer', 'Newer'),
     )
-    context = delta_render_context(_delta(before, after))
+    context = delta_render_context(built_delta(before, after))
     assert context['change_counts'] == {'added': 2, 'changed': 1, 'removed': 1}
     assert context['unchanged_count'] == 1
 
@@ -123,7 +113,7 @@ def test_the_sidebar_counts_listed_scenarios_by_change_and_the_unchanged_ones():
 def test_a_search_matches_either_side_s_title_and_a_removed_tag() -> None:
     before = report(scn('t.py::test_pay', 'Pay at the desk', tags=['legacy']))
     after = report(scn('t.py::test_pay', 'Pay online'))
-    data = embedded_app_data(render_delta_html(_delta(before, after), None))
+    data = embedded_app_data(render_delta_html(built_delta(before, after), None))
     [entry] = data['scenarios']
     assert entry['search_text'] == 'Pay at the desk Pay online legacy'
     assert (entry['change'], entry['tags']) == ('changed', [])
@@ -137,7 +127,7 @@ def test_a_changed_reason_keeps_the_one_it_replaced() -> None:
 
     before = report(skipped('no card reader'))
     after = report(skipped('no network'))
-    [item] = _listed(_delta(before, after))
+    [item] = _listed(built_delta(before, after))
     assert item.reasons == [
         ReasonRow('skipped', 'Skipped:', 'no network', was='no card reader')
     ]
@@ -150,7 +140,7 @@ def test_a_reason_the_after_side_dropped_is_kept_as_what_it_was() -> None:
         )
     )
     after = report(scn('t.py::test_pay', 'Pay', status='failed'))
-    [item] = _listed(_delta(before, after))
+    [item] = _listed(built_delta(before, after))
     assert item.reasons == [
         ReasonRow('xfailed', 'Expected to fail:', None, was='bug 12')
     ]
@@ -177,7 +167,7 @@ def test_a_before_side_ref_finds_its_term_where_the_after_one_reads_otherwise() 
             ]
         ),
     )
-    data = embedded_app_data(render_delta_html(_delta(before, after), None))
+    data = embedded_app_data(render_delta_html(built_delta(before, after), None))
     # A term only the before side has can't be read otherwise by the after
     # one, so it stands with the after terms, where the Terms axis names it.
     assert [entry['id'] for entry in data['glossary']['terms']] == [
@@ -205,7 +195,7 @@ def test_each_term_ref_names_the_side_whose_glossary_it_was_read_against() -> No
         ),
         glossary=Glossary(terms=[term('visitor', 'Visitor')]),
     )
-    html = render_delta_html(_delta(before, after), None)
+    html = render_delta_html(built_delta(before, after), None)
     refs = [
         (attrs['data-term-id'], attrs['data-term-side'])
         for tag in re.findall(r'<[^>]* data-term-side="[^>]*>', html)
@@ -220,7 +210,7 @@ def test_each_term_ref_names_the_side_whose_glossary_it_was_read_against() -> No
 
 def test_the_change_glyphs_reach_delta_js_in_the_model_s_change_order() -> None:
     """`delta.js` reads its changes' order off the glyphs' keys."""
-    data = embedded_app_data(render_delta_html(_delta(report(), report()), None))
+    data = embedded_app_data(render_delta_html(built_delta(report(), report()), None))
     assert list(data['change_glyphs']) == list(CHANGES)
 
 
@@ -255,7 +245,7 @@ def test_a_term_card_links_only_the_listed_scenarios_that_refer_to_it() -> None:
         scn('t.py::test_other', 'Other, renamed'),
         glossary=Glossary(terms=[term('bill', 'Bill', definition='New.')]),
     )
-    delta = _delta(before, after)
+    delta = built_delta(before, after)
     card = _card(_glossary(delta), 'bill')
     assert sorted(item.slug for item in card.scenarios) == ['removed:t/gone', 't/stay']
     assert card.renamed_from is None
@@ -327,7 +317,7 @@ def test_a_changed_term_reads_each_side_with_only_its_own_changes_marked():
 def test_a_term_whose_kind_changed_is_listed_under_each_kind() -> None:
     before = report(glossary=Glossary(terms=[term('upgrade', 'Upgrade', 'object')]))
     after = report(glossary=Glossary(terms=[term('upgrade', 'upgrade', 'activity')]))
-    view = _glossary(_delta(before, after))
+    view = _glossary(built_delta(before, after))
     assert [
         (group.key, [(card.key, card.change) for card in group.entries])
         for group in view.grouping.groups
@@ -347,7 +337,7 @@ def test_a_removed_term_s_card_key_is_no_other_term_s_id() -> None:
     after = report(
         glossary=Glossary(terms=[term('removed-booking', 'Removed booking')])
     )
-    keys = [card.key for card in _glossary(_delta(before, after)).listed]
+    keys = [card.key for card in _glossary(built_delta(before, after)).listed]
     assert len(set(keys)) == len(keys) == 2
 
 
@@ -359,12 +349,12 @@ def test_a_side_without_a_glossary_lists_the_other_side_s_terms() -> None:
         (with_terms, without, 'removed'),
         (without, with_terms, 'added'),
     ):
-        data = embedded_app_data(render_delta_html(_delta(before, after), None))
+        data = embedded_app_data(render_delta_html(built_delta(before, after), None))
         [card] = data['term_cards']
         assert (card['change'], data['term_ids']) == (change, [card['key']])
         assert [entry['id'] for entry in data['glossary']['terms']] == ['desk']
     unchanged = embedded_app_data(
-        render_delta_html(_delta(with_terms, with_terms), None)
+        render_delta_html(built_delta(with_terms, with_terms), None)
     )
     assert unchanged['term_ids'] == []
 
@@ -372,7 +362,7 @@ def test_a_side_without_a_glossary_lists_the_other_side_s_terms() -> None:
 def test_added_and_removed_scenarios_read_their_steps_unmarked() -> None:
     before = report(scn('t.py::test_old', 'Old', step('given', 'a guest')))
     after = report(scn('t.py::test_new', 'New', step('given', 'a host')))
-    assert [item.steps for item in _listed(_delta(before, after))] == [None, None]
+    assert [item.steps for item in _listed(built_delta(before, after))] == [None, None]
 
 
 def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_has():
@@ -394,7 +384,7 @@ def test_a_removed_step_renders_a_placeholder_whose_column_only_the_before_side_
         ),
         glossary=Glossary(terms=[term('card', 'Card')]),
     )
-    delta = _delta(before, after)
+    delta = built_delta(before, after)
     [item] = _listed(delta)
     assert item.steps is not None
     assert [row.change for block in item.steps.before for row in block.rows] == [
@@ -437,7 +427,7 @@ def _paying(name: str, amounts: list[int], status: Status = 'passed') -> Scenari
 def test_a_removed_case_follows_the_case_it_followed_before_in_the_after_order():
     before = report(_paying('pay', [1, 2, 3]))
     after = report(_paying('pay', [3, 1, 4]))
-    [item] = _listed(_delta(before, after))
+    [item] = _listed(built_delta(before, after))
     assert _rows(item.table) == [
         ('t.py::test_pay[3]', 't.py::test_pay[3]', None),
         ('t.py::test_pay[1]', 't.py::test_pay[1]', None),
@@ -463,7 +453,7 @@ def test_a_changed_value_is_marked_in_its_cell_on_each_side() -> None:
             )
         )
 
-    html = render_delta_html(_delta(paying(1), paying(2)), None)
+    html = render_delta_html(built_delta(paying(1), paying(2)), None)
     cells = [
         (attrs['data-param'], attrs.get('data-change'))
         for tag in re.findall(r'<td [^>]*data-subst="[^>]*>', html)
@@ -525,7 +515,7 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
             ),
         )
     )
-    [item] = _listed(_delta(before, after))
+    [item] = _listed(built_delta(before, after))
     assert item.table is not None
     before_side, after_side = item.table.sides
     assert _columns(before_side) == [
@@ -584,7 +574,7 @@ def test_an_unchanged_table_s_attachment_column_is_keyed_alike_on_both_sides():
             )
         )
 
-    [item] = _listed(_delta(side('she pays for '), side('she settles for ')))
+    [item] = _listed(built_delta(side('she pays for '), side('she settles for ')))
     assert item.table is None
     assert item.delta.before is not None
     [before_step] = item.delta.before.steps
@@ -601,7 +591,7 @@ def test_a_table_changed_only_in_statuses_shows_both_sides_and_an_unchanged_one_
         _paying('status', [1], status='failed'),
         dataclasses.replace(_paying('same', [1]), tags=['new']),
     )
-    status_only, unchanged = _listed(_delta(before, after))
+    status_only, unchanged = _listed(built_delta(before, after))
     assert status_only.table is not None
     assert [side.side for side in status_only.table.sides] == ['before', 'after']
     assert [row.change for row in status_only.table.rows] == ['changed']
@@ -614,7 +604,7 @@ def test_a_table_gained_or_lost_with_its_parametrization_shows_alone():
 
     before = report(unparametrized('gains'), _paying('loses', [1, 2]))
     after = report(_paying('gains', [1, 2]), unparametrized('loses'))
-    gains, loses = (item.table for item in _listed(_delta(before, after)))
+    gains, loses = (item.table for item in _listed(built_delta(before, after)))
     assert gains is not None
     assert loses is not None
     assert [side.side for side in gains.sides] == ['after']
@@ -654,7 +644,7 @@ def test_each_table_s_columns_key_their_phase_as_their_side_s_steps_do() -> None
             ),
         )
     )
-    [item] = _listed(_delta(before, after))
+    [item] = _listed(built_delta(before, after))
     assert item.table is not None
     assert [side.column_blocks for side in item.table.sides] == [
         {'amount': '0', 'before:deposit': 'before:1'},

@@ -1,6 +1,11 @@
 """The `pytest-given delta` subcommand: compare two JSON reports, or re-render a
 delta JSON."""
 
+# Only `pytest-given delta` builds a delta: no other command loads it. Each name
+# from the shared packages resolves on first use, so parser setup reads only the
+# ones it needs.
+__lazy_modules__ = ['pytest_given.delta', 'pytest_given.model', 'pytest_given.report']
+
 import argparse
 import sys
 from datetime import UTC, datetime
@@ -10,12 +15,12 @@ from pathlib import Path
 from ..delta import DeltaInputs, build_delta, check_reports, read_rename_log
 from ..git import is_ancestor, is_shallow, resolve_revision, tags_pointing_at
 from ..model import (
-    CHANGES,
     Change,
     DeltaData,
     JsonObject,
     PytestGivenError,
     Side,
+    change_counts,
     delta_to_dict,
     plural,
     read_report_json,
@@ -28,7 +33,6 @@ from ..report import (
     SOURCE_LINK_HELP,
     THEME_HELP,
     DeltaSinkConfig,
-    delta_sink_failure,
     emit_delta_sinks,
     resolve_source_link_template,
     resolve_theme,
@@ -114,17 +118,14 @@ _COMPARE_ONLY_FLAGS = {
 
 
 def run_delta(args: argparse.Namespace) -> int:
-    """A delta that cannot be built takes the previous one with it, as a
-    failure inside `emit_delta_sinks` does: a stale delta would read as
-    current. The config refuses an output that is an input before that."""
+    """The config refuses an output that is an input before `emit_delta_sinks`
+    discards anything."""
     rerender = args.second is None
     try:
         config = _sink_config(args, rerender)
-        try:
-            delta_dict, source = _rerender(args) if rerender else _compare(args)
-        except (PytestGivenError, OSError) as error:
-            raise PytestGivenError(delta_sink_failure(error, config)) from error
-        rendered = emit_delta_sinks(delta_dict, config, source)
+        rendered = emit_delta_sinks(
+            lambda: _rerender(args) if rerender else _compare(args), config
+        )
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2
@@ -176,13 +177,13 @@ def _refuse_overwriting_an_input(config: DeltaSinkConfig, inputs: list[Path]) ->
                 )
 
 
-def _rerender(args: argparse.Namespace) -> tuple[JsonObject, str]:
+def _rerender(args: argparse.Namespace) -> tuple[JsonObject, str | None]:
     """`emit_delta_sinks` refuses a dict that is no delta."""
     path: Path = args.first
     return read_report_json(path), path.as_posix()
 
 
-def _compare(args: argparse.Namespace) -> tuple[JsonObject, None]:
+def _compare(args: argparse.Namespace) -> tuple[JsonObject, str | None]:
     before_path: Path = args.first
     after_path: Path = args.second
     before = report_from_dict(read_report_json(before_path), before_path.as_posix())
@@ -222,7 +223,8 @@ def _skipped_revs(
     rename postdates it. A rev git can't answer for applies."""
     if not revs:
         return frozenset(), []
-    reason = _no_ancestry_reason('before', before_sha, repo)
+    repo_reason = _no_repo_answer_reason(repo)
+    reason = _no_ancestry_reason('before', before_sha, repo_reason, repo)
     if reason is not None:
         return frozenset(), [
             f'no ancestry answer ({reason}); rename-log entries with `rev` all apply'
@@ -231,7 +233,7 @@ def _skipped_revs(
     skipped: set[str] = set()
     unknown: list[str] = []
     warnings: list[str] = []
-    after_reason = _no_ancestry_reason('after', after_sha, repo)
+    after_reason = _no_ancestry_reason('after', after_sha, repo_reason, repo)
     if after_reason is not None:
         warnings.append(
             f'no ancestry answer ({after_reason}); rename-log entries with a `rev` '
@@ -244,11 +246,14 @@ def _skipped_revs(
             )
             continue
         predates = is_ancestor(rev, before_sha, repo)
+        if predates == 'yes':
+            skipped.add(rev)
+            continue
         reached = 'yes'
         if after_reason is None:
             assert after_sha is not None
             reached = is_ancestor(rev, after_sha, repo)
-        if predates == 'yes' or reached == 'no':
+        if reached == 'no':
             skipped.add(rev)
         elif 'unknown' in (predates, reached):
             unknown.append(rev)
@@ -260,16 +265,23 @@ def _skipped_revs(
     return frozenset(skipped), warnings
 
 
-def _no_ancestry_reason(side: Side, sha: str | None, repo: Path) -> str | None:
-    if sha is None:
-        return f'the {side} report has no commit SHA'
+def _no_repo_answer_reason(repo: Path) -> str | None:
     match is_shallow(repo):
         case None:
             return 'git cannot read a repository here'
         case True:
             return 'a shallow clone'
         case False:
-            pass
+            return None
+
+
+def _no_ancestry_reason(
+    side: Side, sha: str | None, repo_reason: str | None, repo: Path
+) -> str | None:
+    if sha is None:
+        return f'the {side} report has no commit SHA'
+    if repo_reason is not None:
+        return repo_reason
     if resolve_revision(sha, repo) is None:
         return f'git cannot resolve the {side} commit {sha}'
     return None
@@ -299,4 +311,6 @@ def _summary(delta: DeltaData) -> str:
 
 
 def _counts(changes: list[Change]) -> str:
-    return ', '.join(f'{changes.count(change)} {change}' for change in CHANGES)
+    return ', '.join(
+        f'{count} {change}' for change, count in change_counts(changes).items()
+    )

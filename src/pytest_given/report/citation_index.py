@@ -17,8 +17,8 @@ from ..model import (
     ReportData,
     Scenario,
     StoryId,
-    node_base,
     rolled_up_status,
+    scenario_identity,
 )
 from .coverage import build_coverage_map
 from .link_text import html_link_text, link_text
@@ -210,10 +210,7 @@ def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
     a whole, by its base node ID, as its own `id` is its first case's. A title
     is fixed at decoration, so a test function groups into one scenario."""
     return {
-        NodeId(node_base(scenario.id))
-        if scenario.parameters is not None
-        else scenario.id: scenario
-        for scenario in report.scenarios
+        NodeId(scenario_identity(scenario)): scenario for scenario in report.scenarios
     }
 
 

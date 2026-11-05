@@ -15,7 +15,7 @@ import re
 from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict
+from typing import TYPE_CHECKING, Protocol, TypedDict
 
 import jinja2
 from markupsafe import Markup, escape
@@ -24,7 +24,6 @@ from ..markdown import CodeSpan, EmphasisSpan, PlainSpan
 from ..model import (
     AttachmentRef,
     CellValue,
-    Change,
     ClausePart,
     ClauseTermRef,
     ClauseWord,
@@ -39,7 +38,6 @@ from ..model import (
     ParameterColumn,
     ReportData,
     Scenario,
-    Side,
     SourceLocation,
     Step,
     TermId,
@@ -71,6 +69,9 @@ from .story_view import (
 )
 from .text import STATUS_GLYPH, STATUS_LABEL
 from .theme import DEFAULT_THEME, Theme
+
+if TYPE_CHECKING:
+    from ..model import Change, Side
 
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
@@ -156,17 +157,15 @@ def _build_env(
     # for the jump button and `app.js` looks the label up by it, so both sides
     # go through the one constructor.
     env.globals['sentence_key'] = sentence_key
-    source_url = make_source_url_filter(
+    env.filters['source_url'] = make_source_url_filter(
         template=source_link_template,
         project=report.metadata.project,
         commit_sha=report.metadata.commit_sha,
         root=source_root,
     )
-    narration = make_narration_filter(param_color_map, glossary=report.glossary)
-    # The macros the delta page shares pass the side they read; a report has
-    # one.
-    env.filters['source_url'] = lambda source, side=None: source_url(source)
-    env.filters['narration'] = lambda value, side=None: narration(value)
+    env.filters['narration'] = make_narration_filter(
+        param_color_map, glossary=report.glossary
+    )
     env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     return env
@@ -289,7 +288,7 @@ def _render_context(
     coverage = build_coverage_map(report)
     scn_covers = build_scenario_sentence_index(coverage)
     sentence_labels = build_sentence_labels(report)
-    scenario_slugs = build_scenario_slug_index(report)
+    scenario_slugs = build_scenario_slug_index(report.scenarios)
     story_rollups = build_story_rollups(report, coverage)
     citation_index = CitationIndex(
         report,
@@ -524,18 +523,31 @@ def build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     return color_map
 
 
+class _SourceUrlFilter(Protocol):
+    def __call__(
+        self, source: SourceLocation | None, _side: Side | None = None, /
+    ) -> str | None: ...
+
+
+class _NarrationFilter(Protocol):
+    def __call__(
+        self, narration: Narration, _side: Side | None = None, /
+    ) -> Markup: ...
+
+
 def make_source_url_filter(
     *,
     template: str | None,
     project: str,
     commit_sha: str | None,
     root: Path | None,
-) -> Callable[[SourceLocation | None], str | None]:
+) -> _SourceUrlFilter:
     """Build a Jinja filter that resolves a SourceLocation to a URL string.
 
     Returns None when source linking is disabled or the source is absent — the
     template reads that as "render a plain `<span>`". The template itself is
-    validated and parsed once here, not per location.
+    validated and parsed once here, not per location. The `side` the shared
+    macros pass is ignored: this filter serves one side.
     """
     substitute = (
         None
@@ -545,7 +557,7 @@ def make_source_url_filter(
         )
     )
 
-    def _filter(source: SourceLocation | None) -> str | None:
+    def _filter(source: SourceLocation | None, _side: Side | None = None) -> str | None:
         if source is None or substitute is None:
             return None
         return substitute(source)
@@ -559,15 +571,16 @@ def make_narration_filter(
     *,
     term_side: Side | None = None,
     linked_terms: Collection[TermId] | None = None,
-) -> Callable[[Narration], Markup]:
+) -> _NarrationFilter:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
 
     Without a colour map no placeholder is coloured. `term_side` stamps each
     term ref with the side whose glossary it was read against. Given
-    `linked_terms`, a ref to any other term has its tooltip but no link.
+    `linked_terms`, a ref to any other term has its tooltip but no link. The
+    `side` the shared macros pass is ignored: this filter serves one side.
     """
 
-    def _render(narration: Narration) -> Markup:
+    def _render(narration: Narration, _side: Side | None = None) -> Markup:
         out = [
             _render_narration_piece(
                 piece, param_color_map, glossary, term_side, linked_terms

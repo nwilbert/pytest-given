@@ -95,6 +95,16 @@ def case_id(node_id: str) -> str:
     return case_suffix(node_id)[1:-1]
 
 
+def case_node_id(base: str, case: str) -> str:
+    return f'{base}[{case}]'
+
+
+def scenario_identity(scenario: Scenario) -> str:
+    """What names a scenario across reports: a grouped one as a whole, by its
+    base node ID, as its own `id` is its first case's."""
+    return node_base(scenario.id) if scenario.parameters is not None else scenario.id
+
+
 def _tail_start(node_id: str) -> int:
     """Where the parametrize tail starts, or -1: the first `[` past the path,
     which may hold one, where a class or function name cannot."""

@@ -46,8 +46,7 @@ def align_terms(
     )
 
     def rewritten(term_id: TermId) -> TermId:
-        rewrite = rewrites.by_identity.get(term_id)
-        return TermId(rewrite.identity) if rewrite else term_id
+        return TermId(rewrites.targets.get(term_id, term_id))
 
     paired: dict[TermId, TermId] = {}
     warnings = list(rewrites.warnings)
@@ -104,7 +103,7 @@ def align_terms(
                     before=before_term,
                     after=after_term,
                     paired_by='rename-log'
-                    if before_term.id in rewrites.by_identity
+                    if before_term.id in rewrites.targets
                     else 'term-id',
                     before_facts=before_facts[before_term.id],
                     after_facts=after_facts[after_term.id],
@@ -140,7 +139,7 @@ def term_facts(report: ReportData) -> dict[TermId, TermFacts]:
     glossary: Glossary | None = report.glossary
     if glossary is None:
         return {}
-    crossrefs = build_term_crossrefs(report)
+    crossrefs = build_term_crossrefs(report.scenarios, glossary, report.stories)
     facts: dict[TermId, TermFacts] = {}
     for term in glossary.terms:
         aggregation = crossrefs.aggregations.get(term.id)

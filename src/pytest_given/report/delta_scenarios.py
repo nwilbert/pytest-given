@@ -2,26 +2,26 @@
 its steps and tables lined up side by side."""
 
 import dataclasses
+from collections.abc import Iterator
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Literal
 
 from ..model import (
+    SIDE_MARK,
     AttachmentRef,
     CasePair,
+    CellValue,
     Change,
     ColumnId,
     DeltaData,
-    DeltaSide,
     Narration,
     NarrationPart,
     NarrationPlaceholder,
-    NodeId,
     ParameterCase,
     ParameterColumn,
     ParameterDelta,
     ParameterTable,
-    ReportData,
     Scenario,
     ScenarioDelta,
     Side,
@@ -70,6 +70,28 @@ class TableSide:
     columns: list[TableColumn]
     # Each column's phase block, keyed as the side's steps key theirs.
     column_blocks: dict[ColumnId, BlockKey]
+
+    @property
+    def mark(self) -> Literal['removed', 'added']:
+        """The mark a changed cell takes here: the old value faces the new one."""
+        return SIDE_MARK[self.side]
+
+    def cells(
+        self, case: ParameterCase, pair: CasePair
+    ) -> Iterator[
+        tuple[ParameterColumn, CellValue, BlockKey | None, ColumnChange | None]
+    ]:
+        """A case's cells, each with its column's phase block and its change."""
+        for (column, value), shown in zip(
+            self.parameters.cells(case), self.columns, strict=True
+        ):
+            changed = shown.change == 'added' or column.id in pair.changed_cells
+            yield (
+                column,
+                value,
+                self.column_blocks.get(column.id),
+                self.mark if changed else None,
+            )
 
 
 @dataclass(frozen=True)
@@ -147,6 +169,19 @@ class ListedScenario:
         return _table_view(self.delta, self._block_keys)
 
     @property
+    def has_body(self) -> bool:
+        before = self.delta.before
+        shown = self.shown
+        return bool(
+            shown.steps
+            or (before and before.steps)
+            or shown.parameters
+            or self.table
+            or shown.error
+            or self.reasons
+        )
+
+    @property
     def reasons(self) -> list[ReasonRow]:
         replaced = self.delta.before if self.delta.reason_changed else None
         rows = [
@@ -172,13 +207,11 @@ class ListedScenario:
 
 def listed_scenarios(delta: DeltaData) -> list[ListedScenario]:
     # Slugged per side, each from the scenarios it shows.
-    before_slugs = _slugs(
-        delta.metadata.before,
-        [_removed(listed) for listed in delta.scenarios if listed.after is None],
+    before_slugs = build_scenario_slug_index(
+        [_removed(listed) for listed in delta.scenarios if listed.after is None]
     )
-    after_slugs = _slugs(
-        delta.metadata.after,
-        [listed.after for listed in delta.scenarios if listed.after is not None],
+    after_slugs = build_scenario_slug_index(
+        [listed.after for listed in delta.scenarios if listed.after is not None]
     )
     return [
         ListedScenario(
@@ -191,12 +224,6 @@ def listed_scenarios(delta: DeltaData) -> list[ListedScenario]:
     ]
 
 
-def _slugs(side: DeltaSide, scenarios: list[Scenario]) -> dict[NodeId, str]:
-    return build_scenario_slug_index(
-        ReportData(metadata=side.metadata, scenarios=scenarios)
-    )
-
-
 def _removed(scenario_delta: ScenarioDelta) -> Scenario:
     assert scenario_delta.before is not None
     return scenario_delta.before
@@ -205,9 +232,7 @@ def _removed(scenario_delta: ScenarioDelta) -> Scenario:
 def _table_view(
     scenario_delta: ScenarioDelta, keys: dict[Side, list[BlockKey]]
 ) -> TableView | None:
-    before, after = scenario_delta.before, scenario_delta.after
-    assert before is not None
-    assert after is not None
+    before, after = scenario_delta.paired()
     parameters = scenario_delta.parameters
     if parameters is None:
         return _lone_table(before, after, keys)

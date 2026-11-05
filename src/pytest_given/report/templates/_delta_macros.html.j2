@@ -4,7 +4,7 @@
   each step's change marked on its side, styled as `.delta-step`, and the
   parameter tables), and a listed term's card.
 #}
-  {%- from '_macros.html.j2' import source_link, anchor_link, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, attachment_cell, case_extras, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, term_disclosure, render_step, step_text, step_children, step_attachments, scenario_steps, param_table, attachment_cell, case_extras, status_dot with context -%}
 
   {#- The Change filter's pills, each disabled at zero, and how many items
       matched with no change. `model` is the Alpine property the pills
@@ -33,13 +33,10 @@
         {%- set key = card.key %}
         <div class="entry" id="term-{{ key }}" data-change="{{ card.change }}"
              data-search="{{ card.search_text }}"
-             x-show="shownTermChanges.{{ card.change }} && (glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+             data-defined="{{ 'false' if term.definition is none else 'true' }}"
+             x-show="termEntryShown($el)">
           <div class="entry-head" data-term-id="{{ key }}" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="{{ key }}"
-                    aria-controls="term-refs-{{ key }}"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ key }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            {{ term_disclosure(key) }}
             <span class="entry-name delta-title">
               <span class="term-name">{% if card.change == 'removed' %}<del>{{ term.canonical }}</del>{% else %}{{ term.canonical }}{% endif %}{{ anchor_link('view=glossary&term=' ~ key) }}</span>
               {%- if card.renamed_from %}
@@ -157,14 +154,14 @@
         {%- for block in view.side(side) -%}
           {%- if block.phase is none -%}
           <div class="delta-gaps">
-            {%- for row in block.rows %}{{ step_gap('s' ~ scenario_idx ~ '_' ~ row.path | join('_')) }}{% endfor -%}
+            {%- for row in block.rows %}{{ step_gap(row.row_id(scenario_idx)) }}{% endfor -%}
           </div>
           {%- else -%}
           <div class="phase-block{% if block.continued %} delta-continued{% endif %}" data-block="{{ block.key }}">
             {%- if not block.continued %}<div class="phase-label">{{ block.phase | capitalize }}</div>{% endif -%}
             {%- for row in block.rows -%}
             <div class="phase-steps">
-              {{ render_step_row(row, side, 's' ~ scenario_idx ~ '_' ~ row.path | join('_')) }}
+              {{ render_step_row(row, side, scenario_idx) }}
             </div>
             {%- endfor -%}
           </div>
@@ -178,8 +175,9 @@
   {%- endmacro -%}
 
   {#- An added or removed row is its step's whole subtree, rendered as one. -#}
-  {%- macro render_step_row(row, side, step_id) -%}
+  {%- macro render_step_row(row, side, scenario_idx) -%}
     {%- set line = row.line(side) -%}
+    {%- set step_id = row.row_id(scenario_idx) -%}
     <div class="delta-step" data-change="{{ row.change }}" data-row="{{ step_id }}">
     {%- if row.change in ('added', 'removed') -%}
       {{ render_step(line.step, step_id, side) }}
@@ -188,8 +186,7 @@
       {%- if row.children -%}
         {%- call step_children(step_id) -%}
           {%- for child in row.children -%}
-            {%- set child_id = step_id ~ '_' ~ loop.index0 -%}
-            {%- if child.line(side) is none %}{{ step_gap(child_id) }}{% else %}{{ render_step_row(child, side, child_id) }}{% endif -%}
+            {%- if child.line(side) is none %}{{ step_gap(child.row_id(scenario_idx)) }}{% else %}{{ render_step_row(child, side, scenario_idx) }}{% endif -%}
           {%- endfor -%}
         {%- endcall -%}
       {%- endif -%}
@@ -204,12 +201,8 @@
       `delta.js` evens out across the two tables. -#}
   {%- macro param_table_delta(view, scenario_idx) -%}
         {%- for table in view.sides %}
-        {%- set after = table.side == 'after' %}
         {%- set col_blocks = table.column_blocks %}
         {%- set table_width = table.columns | length + 2 %}
-        {#- The mark a changed cell takes on this side: the old value faces
-            the new one. -#}
-        {%- set cell_mark = 'added' if after else 'removed' %}
         <div class="delta-table" data-side="{{ table.side }}">
           <div class="param-table-scroll">
           <table class="param-table">
@@ -234,16 +227,14 @@
             <tbody data-band="{{ loop.index0 }}">
               {%- if case %}
               <tr data-case-row{% if row.change in ('added', 'removed') %} data-change="{{ row.change }}"{% endif %}>
-                <th scope="row" class="param-id" data-block="frame"{% if row.pair.id_changed %} data-change="{{ cell_mark }}"{% endif %}>
+                <th scope="row" class="param-id" data-block="frame"{% if row.pair.id_changed %} data-change="{{ table.mark }}"{% endif %}>
                   <span class="delta-row-lead">{{ change_glyph[row.change] if row.change else '' }}</span>
                   {%- if row.change == 'removed' %}<del>{{ case.id | case_id }}</del>{% else %}{{ case.id | case_id }}{% endif -%}
                 </th>
-                {%- for col, val in table.parameters.cells(case) %}
-                {%- set changed = table.columns[loop.index0].change == 'added' or col.id in row.pair.changed_cells %}
-                {%- set block, change = col_blocks.get(col.id), cell_mark if changed else none %}
+                {%- for col, val, block, change in table.cells(case, row.pair) %}
                 {% if col.kind == 'attachment' %}{{ attachment_cell(col, val, cell_prefix ~ loop.index0, block, change) }}{% else %}{{ col | value_cell(val, block, change) }}{% endif %}
                 {%- endfor %}
-                <td class="param-status" data-block="frame"{% if row.pair.status_changed %} data-change="{{ cell_mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
+                <td class="param-status" data-block="frame"{% if row.pair.status_changed %} data-change="{{ table.mark }}"{% endif %}>{{ status_dot(case.status) }}</td>
               </tr>
               {% if case.error or 'attachment' in table.parameters.columns | map(attribute='kind') %}{{ case_extras(table.parameters, case, cell_prefix, table_width) }}{% endif %}
               {%- else %}

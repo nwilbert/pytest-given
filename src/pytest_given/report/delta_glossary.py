@@ -5,19 +5,17 @@ from dataclasses import dataclass
 from typing import Literal
 
 from ..model import (
-    CHANGES,
     SIDE_MARK,
     Change,
     DeltaData,
-    DeltaSide,
     Glossary,
     GlossaryTerm,
-    ReportData,
     Side,
     TermDelta,
     TermFacts,
     TermId,
     build_term_crossrefs,
+    change_counts,
     on_side,
     other_side,
     plural,
@@ -130,23 +128,19 @@ type TermReach = dict[Side, dict[TermId, list[ListedScenario]]]
 
 
 def term_reach(delta: DeltaData, listed: list[ListedScenario]) -> TermReach:
-    sides: tuple[tuple[Side, DeltaSide, Glossary | None], ...] = (
-        ('before', delta.metadata.before, delta.glossary.before),
-        ('after', delta.metadata.after, delta.glossary.after),
+    sides: tuple[tuple[Side, Glossary | None], ...] = (
+        ('before', delta.glossary.before),
+        ('after', delta.glossary.after),
     )
     reach: TermReach = {}
-    for side, side_of, glossary in sides:
+    for side, glossary in sides:
         read = {
             scenario.id: (scenario, item)
             for item in listed
             if (scenario := item.delta.on(side)) is not None
         }
         crossrefs = build_term_crossrefs(
-            ReportData(
-                metadata=side_of.metadata,
-                scenarios=[scenario for scenario, _ in read.values()],
-                glossary=glossary,
-            )
+            [scenario for scenario, _ in read.values()], glossary
         )
         reach[side] = {
             term_id: [read[node_id][1] for node_id in node_ids]
@@ -166,9 +160,7 @@ def delta_glossary_view(
     return DeltaGlossaryView(
         listed=cards,
         grouping=group_by_kind(cards, lambda card: card.shown.kind),
-        change_counts={
-            change: sum(card.change == change for card in cards) for change in CHANGES
-        },
+        change_counts=change_counts(card.change for card in cards),
         unchanged_count=len(delta.glossary.unchanged),
         undefined_count=sum(card.shown.definition is None for card in cards),
     )

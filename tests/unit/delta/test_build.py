@@ -15,7 +15,6 @@ from pytest_given.delta import (
     check_reports,
     comparable_title,
     is_per_case,
-    scenario_identity,
 )
 from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
@@ -35,6 +34,7 @@ from pytest_given.model import (
     SentenceId,
     SourceLocation,
     StoryId,
+    scenario_identity,
 )
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import (
@@ -70,9 +70,11 @@ def _delta(
 
 
 def _move(
-    old: str, new: str | None, cases: tuple[tuple[str, str], ...] = ()
+    old: str, new: str | None, cases: dict[str, str] | None = None
 ) -> RenameEntry:
-    return RenameEntry(table='scenario', position=1, old=old, new=new, cases=cases)
+    return RenameEntry(
+        table='scenario', position=1, old=old, new=new, cases=cases or {}
+    )
 
 
 def _per_case(node_id: str, title: str, tags: Sequence[str] = ()) -> Scenario:
@@ -615,7 +617,7 @@ def test_a_cases_map_pairs_cases_of_a_grouped_scenario() -> None:
     )
 
     (changed,) = _delta(
-        before, after, _move('t.py::t', None, (('x', 'y'),))
+        before, after, _move('t.py::t', None, {'x': 'y'})
     ).delta.scenarios
 
     assert changed.paired_by == 'node-id'
@@ -648,7 +650,7 @@ def test_a_cases_map_onto_a_grouped_case_that_stays_is_a_merge() -> None:
         )
     )
 
-    result = _delta(before, after, _move('t.py::t', None, (('a', 'b'),)))
+    result = _delta(before, after, _move('t.py::t', None, {'a': 'b'}))
 
     (changed,) = result.delta.scenarios
     assert changed.parameters is not None
@@ -665,7 +667,7 @@ def test_a_cases_map_onto_a_per_case_scenario_that_stays_is_a_merge() -> None:
     before = report(_per_case('t.py::t[a]', 'Cases'), _per_case('t.py::t[b]', 'Cases'))
     after = report(_per_case('t.py::t[b]', 'Cases'), _per_case('t.py::t[c]', 'Cases'))
 
-    result = _delta(before, after, _move('t.py::t', None, (('a', 'b'),)))
+    result = _delta(before, after, _move('t.py::t', None, {'a': 'b'}))
 
     assert _pairs(result.delta) == [('t.py::t[b]', 't.py::t[b]')]
     assert _rows(result.delta) == [
@@ -680,9 +682,7 @@ def test_two_cases_mapped_onto_one_are_a_merge() -> None:
     before = report(_per_case('t.py::t[a]', 'Cases'), _per_case('t.py::t[b]', 'Cases'))
     after = report(_per_case('t.py::u[c]', 'Cases'))
 
-    result = _delta(
-        before, after, _move('t.py::t', 't.py::u', (('a', 'c'), ('b', 'c')))
-    )
+    result = _delta(before, after, _move('t.py::t', 't.py::u', {'a': 'c', 'b': 'c'}))
 
     assert _pairs(result.delta) == []
     (warning,) = result.warnings
@@ -693,7 +693,7 @@ def test_a_per_case_scenario_follows_its_base_and_case_through_the_log() -> None
     before = report(_per_case('t.py::t[x]', 'Cases'))
     after = report(_per_case('t.py::u[y]', 'Cases'), _per_case('t.py::u[z]', 'Cases'))
 
-    delta = _delta(before, after, _move('t.py::t', 't.py::u', (('x', 'y'),))).delta
+    delta = _delta(before, after, _move('t.py::t', 't.py::u', {'x': 'y'})).delta
 
     assert _pairs(delta) == [('t.py::t[x]', 't.py::u[y]')]
     assert _rows(delta) == [('added', None, 't.py::u[z]')]
@@ -704,7 +704,7 @@ def test_a_per_case_scenario_whose_case_alone_is_mapped_pairs_by_rename_log() ->
     after = report(_per_case('t.py::t[y]', 'Cases'))
 
     (changed,) = _delta(
-        before, after, _move('t.py::t', None, (('x', 'y'),))
+        before, after, _move('t.py::t', None, {'x': 'y'})
     ).delta.scenarios
 
     assert (changed.paired_by, changed.title_changed) == ('rename-log', False)

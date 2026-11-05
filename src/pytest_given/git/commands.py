@@ -70,19 +70,14 @@ def resolve_revision(rev: str, repo: Path) -> str | None:
     """The commit SHA `rev` names in `repo`, or None when it doesn't resolve."""
     if _looks_like_option(rev):
         return None
-    result = _run(['rev-parse', '--verify', '--quiet', f'{rev}^{{commit}}'], repo)
-    if result is None or result.returncode != 0:
-        return None
-    return result.stdout.strip()
+    return _stdout('rev-parse', '--verify', '--quiet', f'{rev}^{{commit}}', repo=repo)
 
 
 def is_shallow(repo: Path) -> bool | None:
     """Whether `repo` is a shallow clone; None when git can't answer."""
-    result = _run(['rev-parse', '--is-shallow-repository'], repo)
-    if result is None or result.returncode != 0:
-        return None
+    answer = _stdout('rev-parse', '--is-shallow-repository', repo=repo)
     # A git too old for the flag echoes it back, which is no answer.
-    return {'true': True, 'false': False}.get(result.stdout.strip())
+    return {'true': True, 'false': False}.get(answer or '')
 
 
 def is_ancestor(rev: str, sha: str, repo: Path) -> Ancestry:
@@ -105,13 +100,15 @@ def tags_pointing_at(sha: str, repo: Path) -> list[str]:
     """The tags on `sha`, highest version first; empty when git can't answer."""
     if _looks_like_option(sha):
         return []
-    result = _run(
-        [*_PRE_RELEASES_FIRST, 'tag', '--points-at', sha, '--sort=-version:refname'],
-        repo,
+    listed = _stdout(
+        *_PRE_RELEASES_FIRST,
+        'tag',
+        '--points-at',
+        sha,
+        '--sort=-version:refname',
+        repo=repo,
     )
-    if result is None or result.returncode != 0:
-        return []
-    return result.stdout.splitlines()
+    return listed.splitlines() if listed else []
 
 
 def _looks_like_option(rev: str) -> bool:
@@ -119,10 +116,11 @@ def _looks_like_option(rev: str) -> bool:
     return rev.startswith('-')
 
 
-def _stdout(*args: str) -> str | None:
-    """The stripped stdout of a `git` call in the working directory, or None
-    when it cannot answer."""
-    result = _run(list(args), timeout=_SESSION_TIMEOUT_SECONDS)
+def _stdout(*args: str, repo: Path | None = None) -> str | None:
+    """The stripped stdout of a `git` call, or None when it cannot answer.
+    Without a `repo` it asks the working directory, for session finish."""
+    timeout = _QUERY_TIMEOUT_SECONDS if repo else _SESSION_TIMEOUT_SECONDS
+    result = _run(list(args), repo, timeout)
     if result is None or result.returncode != 0:
         return None
     return result.stdout.strip()

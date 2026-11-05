@@ -93,11 +93,34 @@
   {%- endmacro -%}
 
   {#- Why a scenario was skipped or expected to fail, in its status colour. -#}
-  {%- macro reason_box(status, label, reason) -%}
+  {%- macro reason_box(status, label, reason, was=none) -%}
     <div class="reason-box {{ status }}">
+      {%- if reason %}
       <span class="reason-box-label">{{ label }}</span>
       <span>{{ reason }}</span>
+      {%- endif %}
+      {%- if was %}
+      <div class="delta-was">was {% if not reason %}{{ label | lower }} {% endif %}<del>{{ was }}</del></div>
+      {%- endif %}
     </div>
+  {%- endmacro -%}
+
+  {#- A tab of the top bar, `view` its `mainView` value: a name from the
+      template, never report data. -#}
+  {%- macro nav_tab(view, label) -%}
+      <button class="nav-tab" role="tab" id="tab-{{ view }}" aria-controls="view-{{ view }}"
+              :class="{ 'nav-tab-active': mainView === '{{ view }}' }"
+              :aria-selected="mainView === '{{ view }}'"
+              @click="mainView = '{{ view }}'">{{ label }}</button>
+  {%- endmacro -%}
+
+  {#- The chevron that opens a term's references. -#}
+  {%- macro term_disclosure(key) -%}
+            <button type="button" class="disclosure-btn" data-term-id="{{ key }}"
+                    aria-controls="term-refs-{{ key }}"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ key }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
   {%- endmacro -%}
 
   {#- The status colours the block: an xfailed one is not an alarm. -#}

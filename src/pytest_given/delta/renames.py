@@ -2,7 +2,8 @@
 detect by itself, authored and committed with the project."""
 
 import tomllib
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, get_args
 
@@ -25,7 +26,7 @@ class RenameEntry:
     position: int  # 1-based within its table, for messages
     old: str
     new: str | None = None
-    cases: tuple[tuple[str, str], ...] = ()
+    cases: Mapping[str, str] = field(default_factory=dict)
     rev: str | None = None
 
     @property
@@ -127,19 +128,17 @@ def _string(raw: dict[str, object], key: str, where: str) -> str | None:
     return value
 
 
-def _cases(raw: object, where: str) -> tuple[tuple[str, str], ...]:
+def _cases(raw: object, where: str) -> dict[str, str]:
     if not isinstance(raw, dict):
         raise PytestGivenError(
             f'{where}: `cases` must be a table of old = "new" case IDs'
         )
-    pairs: list[tuple[str, str]] = []
     for old_id, new_id in raw.items():
         if not isinstance(new_id, str):
             raise PytestGivenError(
                 f'{where}: `cases` value for {old_id!r} must be a string'
             )
-        pairs.append((old_id, new_id))
-    return tuple(pairs)
+    return raw
 
 
 def _entry_name(table: EntryTable, position: int) -> str:

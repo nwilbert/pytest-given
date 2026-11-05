@@ -9,10 +9,8 @@ function deltaApp() {
   const base = reportApp();
   // The changes, in the model's order, which the glyphs' keys keep.
   const changes = Object.keys(data.change_glyphs);
-  const allChangesShown = () => Object.fromEntries(changes.map(c => [c, true]));
-  const changeCounts = Object.fromEntries(changes.map(c => [c, 0]));
-  for (const s of data.scenarios) changeCounts[s.change] += 1;
-  const changesPresent = changes.filter(c => changeCounts[c] > 0);
+  const changeFacet = shownFacet(changes, data.scenarios, 'change');
+  const { counts: changeCounts, present: changesPresent, allShown: allChangesShown } = changeFacet;
   // The before glossary's terms that read otherwise than the after one's.
   const beforeTerms = new Map(data.before_terms.map(t => [t.id, t]));
   const termCards = data.term_cards;
@@ -66,17 +64,14 @@ function deltaApp() {
     },
     // Over the cards, which the Change filter narrows too, rather than over a
     // glossary's terms.
-    _termCounts() {
-      const query = this.glossarySearch.toLowerCase();
-      const definitions = this.glossaryDefinitionFilter;
-      const counts = {};
-      for (const card of termCards) {
-        if (!this.shownTermChanges[card.change]) continue;
-        if (definitions !== 'all' && (definitions === 'defined') !== card.defined) continue;
-        if (query && !card.search.includes(query)) continue;
-        counts[card.kind] = (counts[card.kind] || 0) + 1;
-      }
-      return counts;
+    _termRows() {
+      return termCards;
+    },
+    _termFilterState() {
+      return [...base._termFilterState.call(this), ...changes.map(c => this.shownTermChanges[c])];
+    },
+    _termMatches(row) {
+      return this.shownTermChanges[row.change] && base._termMatches.call(this, row);
     },
     // A side's table previews into its own side's text; the one table of a
     // scenario whose table didn't change, into both.
@@ -95,17 +90,13 @@ function deltaApp() {
     _readHash() {
       base._readHash.call(this);
       const params = parseHash();
-      if (params.has('change')) {
-        const shown = new Set(params.get('change').split(','));
-        this.shownChanges = Object.fromEntries(changes.map(c => [c, shown.has(c)]));
-      } else {
-        this.shownChanges = allChangesShown();
-      }
+      this.shownChanges = params.has('change')
+        ? changeFacet.only(new Set(params.get('change').split(',')))
+        : allChangesShown();
     },
     _hashParams() {
       const params = base._hashParams.call(this);
-      const shown = changesPresent.filter(c => this.shownChanges[c]);
-      if (shown.length !== changesPresent.length) params.set('change', shown.join(','));
+      changeFacet.writeHash(params, 'change', this.shownChanges);
       return params;
     },
   };

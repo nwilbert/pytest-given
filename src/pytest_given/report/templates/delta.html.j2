@@ -12,7 +12,7 @@
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
   {%- from '_delta_macros.html.j2' import change_filter, term_card, delta_sides with context -%}
   {{ icon_sprite() }}
 
@@ -22,14 +22,8 @@
     <div class="topbar-title" title="{{ title }}">{{ title }}</div>
     {% if terms %}
     <nav class="frame-nav" role="tablist" aria-label="Delta views">
-      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
-              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-              :aria-selected="mainView === 'scenarios'"
-              @click="mainView = 'scenarios'">Scenarios</button>
-      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
-              :class="{ 'nav-tab-active': mainView === 'glossary' }"
-              :aria-selected="mainView === 'glossary'"
-              @click="mainView = 'glossary'">Glossary</button>
+      {{ nav_tab('scenarios', 'Scenarios') }}
+      {{ nav_tab('glossary', 'Glossary') }}
     </nav>
     {% endif %}
     <div class="topbar-meta">
@@ -83,14 +77,11 @@
   {%- set scenario = item.shown -%}
   {%- set before = item.delta.before -%}
   {%- set index = loop.index0 -%}
-  {%- set reasons = item.reasons -%}
-  {%- set table = item.table -%}
-  {%- set has_body = scenario.steps or (before and before.steps) or scenario.parameters or table or scenario.error or reasons -%}
+  {%- set has_body = item.has_body -%}
   <div class="scenario{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
        data-change="{{ item.change }}"
        x-show="isVisible({{ index }})"
-       id="scenario-{{ index }}"
-       data-scenario-id="{{ scenario.id }}">
+       id="scenario-{{ index }}">
     <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ index }})"{% endif %}>
       <div style="display:flex; align-items:center;">
         {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ index }}" :aria-expanded="!!expandedScenarios[{{ index }}]" :aria-label="(expandedScenarios[{{ index }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ index }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ index }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
@@ -133,16 +124,8 @@
 
     <div class="scenario-body" id="scenario-body-{{ index }}" :class="{ expanded: expandedScenarios[{{ index }}] }">
     <div class="scenario-body-inner">
-      {%- for row in reasons %}
-      <div class="reason-box {{ row.status }}">
-        {%- if row.reason %}
-        <span class="reason-box-label">{{ row.label }}</span>
-        <span>{{ row.reason }}</span>
-        {%- endif %}
-        {%- if row.was %}
-        <div class="delta-was">was {% if not row.reason %}{{ row.label | lower }} {% endif %}<del>{{ row.was }}</del></div>
-        {%- endif %}
-      </div>
+      {%- for row in item.reasons %}
+      {{ reason_box(row.status, row.label, row.reason, row.was) }}
       {%- endfor %}
       {{ delta_sides(item, index) }}
 

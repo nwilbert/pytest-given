@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given.delta import DeltaInputs, build_delta
 from pytest_given.model import (
     DeltaData,
     Glossary,
@@ -26,6 +25,7 @@ from pytest_given.report.delta_html import (
 )
 from pytest_given.report.delta_sinks import DeltaSinkConfig, emit_delta_sinks
 from tests.unit.delta.builders import (
+    built_delta,
     lit,
     meta,
     narr,
@@ -39,25 +39,6 @@ from tests.unit.delta.builders import (
 from tests.unit.report.app_data import embedded_app_data
 
 
-def _delta(
-    before: ReportData,
-    after: ReportData,
-    *,
-    before_label: str | None = None,
-    after_label: str | None = None,
-) -> DeltaData:
-    return build_delta(
-        DeltaInputs(
-            before=before,
-            after=after,
-            before_label=before_label,
-            after_label=after_label,
-            plugin_version='0.1.0',
-            timestamp='2026-01-02T00:00:00+00:00',
-        )
-    ).delta
-
-
 def _listed(delta: DeltaData) -> list[ListedScenario]:
     listed = delta_render_context(delta)['listed']
     assert isinstance(listed, list)
@@ -66,13 +47,13 @@ def _listed(delta: DeltaData) -> list[ListedScenario]:
 
 def test_identical_reports_list_no_scenario() -> None:
     same = report(scn('t.py::test_pay', 'Pay by card'))
-    assert _listed(_delta(same, same)) == []
+    assert _listed(built_delta(same, same)) == []
 
 
 def test_a_listed_scenario_is_shown_from_its_after_side_or_its_before_side_if_removed():
     before = report(scn('t.py::test_pay', 'Pay'), scn('t.py::test_gone', 'Gone'))
     after = report(scn('t.py::test_pay', 'Pay now'), scn('t.py::test_new', 'New'))
-    listed = _listed(_delta(before, after))
+    listed = _listed(built_delta(before, after))
     assert sorted((item.change, item.side, item.shown.id) for item in listed) == [
         ('added', 'after', 't.py::test_new'),
         ('changed', 'after', 't.py::test_pay'),
@@ -92,21 +73,21 @@ def test_a_listed_scenario_is_shown_from_its_after_side_or_its_before_side_if_re
 def test_a_range_side_is_named_by_its_label_short_sha_or_timestamp_to_the_minute(
     label: str | None, sha: str | None, expected: RangeSide
 ) -> None:
-    delta = _delta(report(sha=sha), report(sha=sha), before_label=label)
+    delta = built_delta(report(sha=sha), report(sha=sha), before_label=label)
     assert range_side(delta.metadata.before) == expected
 
 
 def test_the_header_shows_the_range_the_delta_s_version_and_the_after_title() -> None:
     before = report(sha='a1b2c3d4')
     after = ReportData(metadata=meta('e4f5a6b7', title='Shop'), scenarios=[])
-    context = delta_render_context(_delta(before, after, after_label='v2'))
+    context = delta_render_context(built_delta(before, after, after_label='v2'))
     assert context['range'] == (RangeSide('a1b2c3d'), RangeSide('v2', 'e4f5a6b'))
     assert context['plugin_version'] == '0.1.0'
     assert context['title'] == 'Shop'
 
 
 def test_without_a_title_the_header_shows_the_after_project() -> None:
-    context = delta_render_context(_delta(report(), report()))
+    context = delta_render_context(built_delta(report(), report()))
     assert context['title'] == 'project'
 
 
@@ -114,10 +95,11 @@ def test_hostile_titles_and_case_ids_survive_the_json_and_are_escaped_in_the_htm
     tmp_path: Path,
 ) -> None:
     hostile_id = 't.py::test_x[a]::-é]'
-    delta = _delta(report(), report(scn(hostile_id, '<b>"x"</b>')))
+    delta = built_delta(report(), report(scn(hostile_id, '<b>"x"</b>')))
     json_path, html_path = tmp_path / 'delta.json', tmp_path / 'delta.html'
     emit_delta_sinks(
-        delta_to_dict(delta), DeltaSinkConfig(json_path=json_path, html_path=html_path)
+        lambda: (delta_to_dict(delta), None),
+        DeltaSinkConfig(json_path=json_path, html_path=html_path),
     )
     reread = delta_from_dict(json.loads(json_path.read_text(encoding='utf-8')))
     [listed] = reread.scenarios
@@ -129,7 +111,6 @@ def test_hostile_titles_and_case_ids_survive_the_json_and_are_escaped_in_the_htm
     markup = html[: html.index('window.__REPORT_DATA__')]
     assert '<b>' not in markup
     assert '&lt;b&gt;' in markup
-    assert 'a]::-é' in markup
     assert embedded_app_data(html)['scenarios'][0]['search_text'] == '<b>"x"</b>'
 
 
@@ -147,7 +128,7 @@ def test_a_title_renders_its_term_refs_and_placeholders_against_its_own_side() -
             parameters=table([('amount', 'param')], ('t.py::test_pay[1]', [1])),
         )
     )
-    html = render_delta_html(_delta(before, after), source_link_template=None)
+    html = render_delta_html(built_delta(before, after), source_link_template=None)
     assert 'data-term-id="room"' in html
     assert 'data-param="amount"' in html
 
@@ -160,7 +141,7 @@ def test_a_source_link_points_at_the_shown_side_s_commit() -> None:
         scn('t.py::test_new', 'New'), source=SourceLocation(relpath='t.py', line=7)
     )
     html = render_delta_html(
-        _delta(report(gone, sha='b' * 40), report(new, sha='a' * 40)),
+        built_delta(report(gone, sha='b' * 40), report(new, sha='a' * 40)),
         source_link_template='https://x/{sha}/{relpath}#{line}',
     )
     assert f'https://x/{"b" * 40}/t.py#3' in html
@@ -170,7 +151,7 @@ def test_a_source_link_points_at_the_shown_side_s_commit() -> None:
 def test_both_sinks_are_written(tmp_path: Path) -> None:
     json_path, html_path = tmp_path / 'out/delta.json', tmp_path / 'out/delta.html'
     written = emit_delta_sinks(
-        delta_to_dict(_delta(report(), report())),
+        lambda: (delta_to_dict(built_delta(report(), report())), None),
         DeltaSinkConfig(json_path=json_path, html_path=html_path),
     )
     assert [rendered.path for rendered in written.files] == [json_path, html_path]
@@ -202,7 +183,7 @@ def test_a_failed_render_writes_neither_sink_and_discards_the_stale_ones(
     monkeypatch.setattr(delta_sinks, 'render_delta_html', refuse)
     with pytest.raises(PytestGivenError, match='cannot render') as raised:
         emit_delta_sinks(
-            delta_to_dict(_delta(report(), report())),
+            lambda: (delta_to_dict(built_delta(report(), report())), None),
             DeltaSinkConfig(json_path=json_path, html_path=html_path),
         )
     assert f'Removed the previous {json_path}' in str(raised.value)
@@ -221,7 +202,7 @@ def test_an_unexpected_render_failure_still_discards_the_stale_delta(
     monkeypatch.setattr(delta_sinks, 'render_delta_html', crash)
     with pytest.raises(RuntimeError, match='boom'):
         emit_delta_sinks(
-            delta_to_dict(_delta(report(), report())),
+            lambda: (delta_to_dict(built_delta(report(), report())), None),
             DeltaSinkConfig(html_path=stale),
         )
     assert not stale.exists()

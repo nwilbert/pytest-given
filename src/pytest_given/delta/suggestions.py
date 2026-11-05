@@ -4,7 +4,7 @@ applied."""
 
 import math
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from itertools import groupby
 
@@ -21,15 +21,15 @@ from ..model import (
     ParameterTable,
     Scenario,
     ScenarioDelta,
-    StepDelta,
     Suggestion,
     TermId,
     TermKind,
     case_id,
     iter_steps,
+    scenario_identity,
+    walk_step_deltas,
 )
-from .identity import scenario_identity
-from .narration import Reading, Token, reading_words
+from .narration import Reading, Token, WordKey, reading_words, word_counts
 from .table import CellKey, cells_of
 
 SUGGESTION_SIMILARITY = 0.8  # the least Dice share of words two items must have
@@ -40,7 +40,6 @@ LIMITED_WARNING = (
     'terms share words to compare every pair'
 )
 
-type _Key = tuple[str, str]
 type _Swaps = list[tuple[TermId, TermId]]
 
 
@@ -126,15 +125,11 @@ def _step_words(scenario: Scenario, reading: Reading) -> list[Token]:
 def _case_suggestions(scenarios: Sequence[ScenarioDelta]) -> list[Suggestion]:
     suggestions: list[Suggestion] = []
     for item in scenarios:
-        before, after = item.before, item.after
-        if (
-            item.parameters is None
-            or before is None
-            or after is None
-            or before.parameters is None
-            or after.parameters is None
-        ):
+        if item.parameters is None:
             continue
+        before, after = item.paired()
+        assert before.parameters is not None
+        assert after.parameters is not None
         param_ids = {
             column.id for column in before.parameters.columns if column.kind == 'param'
         }
@@ -162,8 +157,6 @@ def _case_suggestions(scenarios: Sequence[ScenarioDelta]) -> list[Suggestion]:
             after.parameters, added, [other for _, other in shared]
         )
         near = _near_cases(before_cells, after_cells, len(shared))
-        near_before = Counter(index_before for index_before, _ in near)
-        near_after = Counter(index_after for _, index_after in near)
         suggestions.extend(
             Suggestion(
                 of='case',
@@ -173,8 +166,7 @@ def _case_suggestions(scenarios: Sequence[ScenarioDelta]) -> list[Suggestion]:
                     before=scenario_identity(before), after=scenario_identity(after)
                 ),
             )
-            for index_before, index_after in near
-            if near_before[index_before] == 1 and near_after[index_after] == 1
+            for index_before, index_after in _unambiguous(near)
         )
     return suggestions
 
@@ -223,21 +215,10 @@ def _swapped_terms(
     if not (removed and added):
         return swaps
     for item in scenarios:
-        for modified in _modified_steps(item.steps):
-            swaps.extend(_replaced_refs(modified.words, removed, added))
+        for step in walk_step_deltas(item.steps):
+            if step.change == 'modified':
+                swaps.extend(_replaced_refs(step.words, removed, added))
     return swaps
-
-
-def _modified_steps(deltas: Sequence[StepDelta]) -> list[StepDelta]:
-    return [
-        found
-        for delta in deltas
-        for found in (
-            [delta, *_modified_steps(delta.children)]
-            if delta.change == 'modified'
-            else _modified_steps(delta.children)
-        )
-    ]
 
 
 def _replaced_refs(
@@ -265,9 +246,11 @@ def _refs_to(parts: list[NarrationPart], term_ids: set[TermId]) -> list[TermId]:
     ]
 
 
-def _unambiguous(swaps: _Swaps) -> _Swaps:
-    """Each swap once, and only where neither term has another partner."""
-    distinct = list(dict.fromkeys(swaps))
+def _unambiguous[Before, After](
+    pairs: Iterable[tuple[Before, After]],
+) -> list[tuple[Before, After]]:
+    """Each pair once, and only where neither side has another partner."""
+    distinct = list(dict.fromkeys(pairs))
     befores = Counter(before for before, _ in distinct)
     afters = Counter(after for _, after in distinct)
     return [
@@ -325,15 +308,15 @@ def _mutual_best(
     Similarity is the Dice share of words, order ignored. A removed item is
     scored only against the added items sharing its rarest words, at most
     `MAX_SUGGESTION_CANDIDATES` of them, so many look-alikes cost bounded work."""
-    after_counts = [_counts(words) for words in after_words]
-    postings: dict[_Key, list[int]] = {}
+    after_counts = [word_counts(words) for words in after_words]
+    postings: dict[WordKey, list[int]] = {}
     for index_after, counts in enumerate(after_counts):
         for key in counts:
             postings.setdefault(key, []).append(index_after)
     scores: dict[tuple[int, int], float] = {}
     limited = False
     for index_before, words in enumerate(before_words):
-        counts_before = _counts(words)
+        counts_before = word_counts(words)
         candidates, cut = _candidates(counts_before, postings)
         limited = limited or cut
         for index_after in candidates:
@@ -358,7 +341,7 @@ def _mutual_best(
 
 
 def _candidates(
-    counts: Counter[_Key], postings: dict[_Key, list[int]]
+    counts: Counter[WordKey], postings: dict[WordKey, list[int]]
 ) -> tuple[list[int], bool]:
     """The added items that could reach the suggestion similarity, from the
     rarest word up, and whether more than the limit could.
@@ -400,7 +383,3 @@ def _best(scores: dict[tuple[int, int], float], *, by_before: bool) -> dict[int,
         if len(leaders) == 1:
             best[own] = leaders[0]
     return best
-
-
-def _counts(words: list[Token]) -> Counter[_Key]:
-    return Counter((token.kind, token.key) for token in words)

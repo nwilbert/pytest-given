@@ -4,6 +4,8 @@
 package that computes it, so the shape lives in the leaf both depend on.
 """
 
+from collections import Counter
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import Final, Literal
 
@@ -54,6 +56,11 @@ def other_side(side: Side) -> Side:
     return 'after' if side == 'before' else 'before'
 
 
+def change_counts(changes: Iterable[Change]) -> dict[Change, int]:
+    counted = Counter(changes)
+    return {change: counted[change] for change in CHANGES}
+
+
 @dataclass(frozen=True, kw_only=True)
 class DiffSegment:
     """A run of one mark, in each side's own parts: an equal run both sides',
@@ -72,6 +79,12 @@ class StepDelta:
     after: StepPath | None = None
     words: tuple[DiffSegment, ...] = ()  # modified only
     children: tuple[StepDelta, ...] = ()  # equal and modified only
+
+
+def walk_step_deltas(deltas: Iterable[StepDelta]) -> Iterator[StepDelta]:
+    for delta in deltas:
+        yield delta
+        yield from walk_step_deltas(delta.children)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -123,8 +136,36 @@ class ParameterDelta:
         ) or any(case.changed for case in self.cases)
 
 
+class _Sided[T]:
+    """A listed entry's two sides: an added one has its after side alone, a
+    removed one its before side alone, a changed one both."""
+
+    before: T | None
+    after: T | None
+
+    def on(self, side: Side) -> T | None:
+        return on_side(side, self.before, self.after)
+
+    @property
+    def shown_side(self) -> Side:
+        """After, or before for a removed entry."""
+        return 'before' if self.after is None else 'after'
+
+    @property
+    def shown(self) -> T:
+        shown = self.on(self.shown_side)
+        assert shown is not None
+        return shown
+
+    def paired(self) -> tuple[T, T]:
+        """Both sides, of a changed entry."""
+        assert self.before is not None
+        assert self.after is not None
+        return self.before, self.after
+
+
 @dataclass(frozen=True, kw_only=True)
-class ScenarioDelta:
+class ScenarioDelta(_Sided[Scenario]):
     change: Change
     before: Scenario | None = None
     after: Scenario | None = None
@@ -132,20 +173,6 @@ class ScenarioDelta:
     title_changed: bool = False
     steps: tuple[StepDelta, ...] = ()
     parameters: ParameterDelta | None = None
-
-    def on(self, side: Side) -> Scenario | None:
-        return on_side(side, self.before, self.after)
-
-    @property
-    def shown_side(self) -> Side:
-        """After, or before for a removed scenario."""
-        return 'before' if self.after is None else 'after'
-
-    @property
-    def shown(self) -> Scenario:
-        shown = self.on(self.shown_side)
-        assert shown is not None
-        return shown
 
     @property
     def tags_added(self) -> tuple[str, ...]:
@@ -196,7 +223,7 @@ class TermFacts:
 
 
 @dataclass(frozen=True, kw_only=True)
-class TermDelta:
+class TermDelta(_Sided[GlossaryTerm]):
     change: Change
     before: GlossaryTerm | None = None
     after: GlossaryTerm | None = None
@@ -204,20 +231,6 @@ class TermDelta:
     before_facts: TermFacts | None = None
     after_facts: TermFacts | None = None
     definition: tuple[DiffSegment, ...] = ()  # a changed definition's word diff
-
-    def on(self, side: Side) -> GlossaryTerm | None:
-        return on_side(side, self.before, self.after)
-
-    @property
-    def shown_side(self) -> Side:
-        """After, or before for a removed term."""
-        return 'before' if self.after is None else 'after'
-
-    @property
-    def shown(self) -> GlossaryTerm:
-        shown = self.on(self.shown_side)
-        assert shown is not None
-        return shown
 
 
 @dataclass(frozen=True, kw_only=True)

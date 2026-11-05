@@ -104,11 +104,11 @@ _KIND_GROUPS: tuple[_KindRow, ...] = (
 
 def build_glossary_view(report: ReportData) -> GlossaryView:
     """The Glossary view's terms, grouped by kind, each with its cross-references."""
-    crossrefs = build_term_crossrefs(report)
+    crossrefs = build_term_crossrefs(report.scenarios, report.glossary, report.stories)
     terms = report.glossary.terms if report.glossary is not None else []
     return GlossaryView(
         grouping=group_by_kind(
-            [_term_entry(term, term.kind or 'kindless', crossrefs) for term in terms],
+            [_term_entry(term, crossrefs) for term in terms],
             lambda entry: entry.term.kind,
         ),
         term_scenarios=crossrefs.term_scenarios,
@@ -160,13 +160,11 @@ def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
     ]
 
 
-def _term_entry(
-    term: GlossaryTerm, kind_key: KindKey, crossrefs: TermCrossRefs
-) -> TermEntry:
+def _term_entry(term: GlossaryTerm, crossrefs: TermCrossRefs) -> TermEntry:
     aggregation = crossrefs.aggregations.get(term.id, GlossaryAggregation())
     scenario_ids = crossrefs.term_scenarios.get(term.id, [])
-    show_instances = kind_key in INSTANCE_KINDS and bool(aggregation.instances)
-    show_forms = kind_key == 'activity' and bool(aggregation.forms)
+    show_instances = term.kind in INSTANCE_KINDS and bool(aggregation.instances)
+    show_forms = term.kind == 'activity' and bool(aggregation.forms)
     # An instance and an activity's inflection are both a term's other forms:
     # the card lists and counts them under one label.
     other_forms = (

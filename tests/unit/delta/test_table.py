@@ -31,8 +31,7 @@ def _align(
     after: ParameterTable,
     rewrites: dict[str, str] | None = None,
 ) -> ParameterDelta:
-    mapping = rewrites or {}
-    return align_table(before, after, lambda case_id: mapping.get(case_id, case_id))
+    return align_table(before, after, rewrites or {})
 
 
 def _case_pairs(alignment: ParameterDelta) -> list[tuple[str, str]]:

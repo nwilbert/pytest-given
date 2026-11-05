@@ -1,6 +1,6 @@
 """Two reports built into a delta: scenarios paired, then compared."""
 
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from ..model import (
@@ -16,12 +16,13 @@ from ..model import (
     ScenarioDelta,
     ScenarioPairing,
     case_id,
+    case_node_id,
     case_suffix,
     node_base,
+    scenario_identity,
     without_case_id,
 )
 from .chains import Rewrites, rewrite_case_id, rewrite_identities, undo_case_merges
-from .identity import scenario_identity
 from .narration import (
     Reading,
     Token,
@@ -183,38 +184,41 @@ class _Identities:
     ) -> tuple[str, str]:
         """The identity with its base rewritten alone, and with its case ID too."""
         base = node_base(scenario.id)
-        rewrite = self.rewrites.by_identity.get(base)
-        new_base = rewrite.identity if rewrite else base
+        new_base = self.rewrites.targets.get(base, base)
         if not is_per_case(scenario):
             return new_base, new_base
         tail = rewrite_case_id(
             case_id(scenario.id),
-            self.rewrites.case_maps_of(base),
+            self.rewrites.case_maps.get(base, ()),
             per_case_ids.get(new_base, set()),
         )
-        return f'{new_base}[{case_id(scenario.id)}]', f'{new_base}[{tail}]'
+        return (
+            case_node_id(new_base, case_id(scenario.id)),
+            case_node_id(new_base, tail),
+        )
 
-    def case_rewrite(self, before: Scenario, after: Scenario) -> Callable[[str], str]:
+    def case_renames(self, before: Scenario, after: Scenario) -> dict[str, str]:
+        """The before case IDs the rename log rewrites, to what."""
         assert before.parameters is not None
         assert after.parameters is not None
-        case_maps = self.rewrites.case_maps_of(node_base(before.id))
+        case_maps = self.rewrites.case_maps.get(node_base(before.id), ())
         after_ids = {case_id(case.id) for case in after.parameters.cases}
         before_ids = [case_id(case.id) for case in before.parameters.cases]
         base = node_base(after.id)
         ends, warnings = undo_case_merges(
             [case.id for case in before.parameters.cases],
-            [f'{base}[{before_id}]' for before_id in before_ids],
+            [case_node_id(base, before_id) for before_id in before_ids],
             [
-                f'{base}[{rewrite_case_id(before_id, case_maps, after_ids)}]'
+                case_node_id(base, rewrite_case_id(before_id, case_maps, after_ids))
                 for before_id in before_ids
             ],
         )
         self.warnings += warnings
-        rewritten = {
+        return {
             before_id: case_id(end)
             for before_id, end in zip(before_ids, ends, strict=True)
+            if case_id(end) != before_id
         }
-        return lambda before_id: rewritten.get(before_id, before_id)
 
 
 type _Pairing = dict[int, tuple[int, ScenarioPairing]]  # before index → after index
@@ -312,7 +316,7 @@ def _compare(
         parameters = align_table(
             before.parameters,
             after.parameters,
-            identities.case_rewrite(before, after),
+            identities.case_renames(before, after),
         )
         column_of = {
             pair.before: pair.after

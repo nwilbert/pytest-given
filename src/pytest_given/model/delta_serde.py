@@ -6,7 +6,7 @@ What rendering looks up it does check: the sides a change shows, and each step
 path, column and case a scenario's pairing names.
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import NotRequired, TypedDict, cast
 
 from .delta import (
@@ -33,6 +33,7 @@ from .delta import (
     Suggestion,
     TermDelta,
     TermFacts,
+    walk_step_deltas,
 )
 from .errors import PytestGivenError
 from .schema import ColumnId, NodeId, ParameterTable, Scenario
@@ -46,6 +47,7 @@ from .serde import (
     metadata_from_dict,
     narration_part_from_dict,
     scenario_from_dict,
+    unreadable,
 )
 from .steps import StepPath, walk_steps
 
@@ -79,11 +81,7 @@ def delta_from_dict(d: JsonObject, source: str | None = None) -> DeltaData:
             glossary=_glossary_delta_from_dict(delta['glossary']),
         )
     except (AttributeError, KeyError, TypeError, ValueError) as error:
-        raise PytestGivenError(
-            f'{source + " is" if source else "input is"} not a pytest-given '
-            f'delta, or was written by an incompatible version '
-            f'({type(error).__name__}: {error}).'
-        ) from error
+        raise unreadable('delta', source, error) from error
 
 
 def _delta_metadata_from_dict(d: _MetadataJson, source: str | None) -> DeltaMetadata:
@@ -113,15 +111,14 @@ def _scenario_delta_from_dict(d: _ScenarioDeltaJson) -> ScenarioDelta:
 
 
 def _read_scenario_delta(d: _ScenarioDeltaJson) -> ScenarioDelta:
-    before, after = d.get('before'), d.get('after')
-    paired_by = d.get('paired_by')
     return ScenarioDelta(
         change=literal(d['change'], CHANGES, 'scenario change'),
-        before=None if before is None else scenario_from_dict(before),
-        after=None if after is None else scenario_from_dict(after),
-        paired_by=None
-        if paired_by is None
-        else literal(paired_by, SCENARIO_PAIRINGS, 'scenario pairing'),
+        before=_optional(scenario_from_dict, d.get('before')),
+        after=_optional(scenario_from_dict, d.get('after')),
+        paired_by=_optional(
+            lambda value: literal(value, SCENARIO_PAIRINGS, 'scenario pairing'),
+            d.get('paired_by'),
+        ),
         title_changed=d.get('title_changed', False),
         steps=tuple(_step_delta_from_dict(s) for s in d.get('steps', ())),
         parameters=_parameter_delta_from_dict(d.get('parameters')),
@@ -136,6 +133,10 @@ def _step_delta_from_dict(d: _StepDeltaJson) -> StepDelta:
         words=_segments_from_list(d.get('words', ())),
         children=tuple(_step_delta_from_dict(c) for c in d.get('children', ())),
     )
+
+
+def _optional[Raw, Read](read: Callable[[Raw], Read], value: Raw | None) -> Read | None:
+    return None if value is None else read(value)
 
 
 def _step_path(path: Sequence[int] | None) -> StepPath | None:
@@ -165,24 +166,24 @@ def _parameter_delta_from_dict(
 
 
 def _column_pair_from_dict(d: _ColumnPairJson) -> ColumnPair:
-    before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return ColumnPair(
-        before=None if before is None else ColumnId(before),
-        after=None if after is None else ColumnId(after),
-        paired_by=None
-        if paired_by is None
-        else literal(paired_by, COLUMN_PAIRINGS, 'column pairing'),
+        before=_optional(ColumnId, d.get('before')),
+        after=_optional(ColumnId, d.get('after')),
+        paired_by=_optional(
+            lambda value: literal(value, COLUMN_PAIRINGS, 'column pairing'),
+            d.get('paired_by'),
+        ),
     )
 
 
 def _case_pair_from_dict(d: _CasePairJson) -> CasePair:
-    before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return CasePair(
-        before=None if before is None else NodeId(before),
-        after=None if after is None else NodeId(after),
-        paired_by=None
-        if paired_by is None
-        else literal(paired_by, CASE_PAIRINGS, 'case pairing'),
+        before=_optional(NodeId, d.get('before')),
+        after=_optional(NodeId, d.get('after')),
+        paired_by=_optional(
+            lambda value: literal(value, CASE_PAIRINGS, 'case pairing'),
+            d.get('paired_by'),
+        ),
         changed_cells=tuple(ColumnId(c) for c in d.get('changed_cells', ())),
         id_changed=d.get('id_changed', False),
         status_changed=d.get('status_changed', False),
@@ -198,12 +199,11 @@ def _identity_pair_from_dict(d: _IdentityPairJson) -> IdentityPair:
 
 
 def _suggestion_from_dict(d: _SuggestionJson) -> Suggestion:
-    scenario = d.get('scenario')
     return Suggestion(
         of=literal(d['of'], SUGGESTION_OFS, 'suggestion kind'),
         before=d['before'],
         after=d['after'],
-        scenario=None if scenario is None else _identity_pair_from_dict(scenario),
+        scenario=_optional(_identity_pair_from_dict, d.get('scenario')),
     )
 
 
@@ -223,14 +223,14 @@ def _term_delta_from_dict(d: _TermDeltaJson) -> TermDelta:
 
 
 def _read_term_delta(d: _TermDeltaJson) -> TermDelta:
-    before, after, paired_by = d.get('before'), d.get('after'), d.get('paired_by')
     return TermDelta(
         change=literal(d['change'], CHANGES, 'term change'),
-        before=None if before is None else glossary_term_from_dict(before),
-        after=None if after is None else glossary_term_from_dict(after),
-        paired_by=None
-        if paired_by is None
-        else literal(paired_by, TERM_PAIRINGS, 'term pairing'),
+        before=_optional(glossary_term_from_dict, d.get('before')),
+        after=_optional(glossary_term_from_dict, d.get('after')),
+        paired_by=_optional(
+            lambda value: literal(value, TERM_PAIRINGS, 'term pairing'),
+            d.get('paired_by'),
+        ),
         before_facts=_facts_from_dict(d.get('before_facts')),
         after_facts=_facts_from_dict(d.get('after_facts')),
         definition=_segments_from_list(d.get('definition', ())),
@@ -264,9 +264,12 @@ def _check_lookups(scenario_delta: ScenarioDelta) -> None:
     before, after = scenario_delta.before, scenario_delta.after
     if before is None or after is None:
         return
-    paths = (_step_paths(before), _step_paths(after))
-    for step_delta in scenario_delta.steps:
-        _check_step_paths(step_delta, *paths)
+    before_paths, after_paths = _step_paths(before), _step_paths(after)
+    for step_delta in walk_step_deltas(scenario_delta.steps):
+        if (
+            step_delta.before is not None and step_delta.before not in before_paths
+        ) or (step_delta.after is not None and step_delta.after not in after_paths):
+            raise ValueError('a step in the delta names a step its scenario lacks.')
     parameters = scenario_delta.parameters
     if parameters is None:
         return
@@ -288,17 +291,6 @@ def _check_lookups(scenario_delta: ScenarioDelta) -> None:
 
 def _step_paths(scenario: Scenario) -> set[StepPath]:
     return {path for path, _step in walk_steps(scenario.steps)}
-
-
-def _check_step_paths(
-    step_delta: StepDelta, before: set[StepPath], after: set[StepPath]
-) -> None:
-    if (step_delta.before is not None and step_delta.before not in before) or (
-        step_delta.after is not None and step_delta.after not in after
-    ):
-        raise ValueError('a step in the delta names a step its scenario lacks.')
-    for child in step_delta.children:
-        _check_step_paths(child, before, after)
 
 
 def _table_ids(table: ParameterTable) -> tuple[set[str], set[str]]:

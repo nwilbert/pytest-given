@@ -17,7 +17,7 @@ def _move(position: int, old: str, new: str, rev: str | None = None) -> RenameEn
 
 
 def _identities(rewrites: Rewrites) -> dict[str, str]:
-    return {old: rewrite.identity for old, rewrite in rewrites.by_identity.items()}
+    return rewrites.targets
 
 
 @scenario(
@@ -46,7 +46,7 @@ def test_a_chain_that_reaches_nothing_in_after_rewrites_nothing() -> None:
     with when('the after report holds neither A nor B'):
         rewrites = rewrite_identities(['A'], {'X'}, entries, set())
     with then('nothing is rewritten and nothing is warned about'):
-        assert rewrites.by_identity == {}
+        assert rewrites.targets == {}
         assert rewrites.warnings == ()
 
 
@@ -61,7 +61,7 @@ def test_an_entry_whose_rev_predates_the_range_is_skipped() -> None:
     with when('v1 predates the range and both A and B exist in the after report'):
         skipped = rewrite_identities(['A'], {'A', 'B'}, entries, {'v1'})
     with then('A is not rewritten'):
-        assert skipped.by_identity == {}
+        assert skipped.targets == {}
         assert skipped.warnings == ()
     with when('the same entry falls inside the range'):
         applied = rewrite_identities(['A'], {'A', 'B'}, entries, set())
@@ -84,7 +84,7 @@ def test_a_swap_goes_through_a_name_neither_test_has() -> None:
     with then('the routed swap rewrites A to B and B to A'):
         assert _identities(swapped) == {'A': 'B', 'B': 'A'}
     with then('the plain swap rewrites neither, and warns once naming both entries'):
-        assert merged.by_identity == {}
+        assert merged.targets == {}
         (warning,) = merged.warnings
         assert '"A"' in warning
         assert plain[0].label in warning
@@ -118,7 +118,7 @@ def test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone() -> Non
         'v0.5, where the test is still test_pricing, is compared with a later one'
     ):
         rewrites = rewrite_identities([pricing], {price_list}, log.entries, set())
-        maps = rewrites.case_maps_of(pricing)
+        maps = rewrites.case_maps[pricing]
     with then('test_pricing is rewritten to test_price_list'):
         assert _identities(rewrites) == {pricing: price_list}
     with then('against v0.6, happy-hour keeps its ID and 1.5-True becomes 2.0-True'):
@@ -136,7 +136,7 @@ def test_a_rewrite_onto_an_identity_that_exists_unrewritten_is_a_merge() -> None
 
     rewrites = rewrite_identities(['A', 'B'], {'B'}, entries, set())
 
-    assert rewrites.by_identity == {}
+    assert rewrites.targets == {}
     (warning,) = rewrites.warnings
     assert '"B"' in warning
     assert entries[0].label in warning
@@ -147,7 +147,7 @@ def test_two_identities_ending_at_one_are_a_merge_naming_every_entry() -> None:
 
     rewrites = rewrite_identities(['A', 'B'], {'C'}, entries, set())
 
-    assert rewrites.by_identity == {}
+    assert rewrites.targets == {}
     (warning,) = rewrites.warnings
     assert '"C"' in warning
     assert all(entry.label in warning for entry in entries)
@@ -172,7 +172,7 @@ def test_duplicate_before_identities_are_one_identity() -> None:
 def test_an_identity_with_no_entries_is_left_alone() -> None:
     rewrites = rewrite_identities(['A'], {'A'}, [_move(1, 'X', 'Y')], set())
 
-    assert rewrites == Rewrites(by_identity={}, warnings=(), unmoved_case_maps={})
+    assert rewrites == Rewrites(targets={}, case_maps={}, warnings=())
 
 
 def test_an_entry_applies_only_after_the_chain_has_reached_its_old() -> None:
@@ -193,54 +193,47 @@ def test_a_chain_through_a_name_missing_from_after_still_reaches_the_stop() -> N
 
 def test_a_rewrite_carries_the_cases_maps_up_to_its_stop() -> None:
     entries = [
-        RenameEntry(
-            table='scenario', position=1, old='A', new='B', cases=(('x', 'y'),)
-        ),
-        RenameEntry(table='scenario', position=2, old='B', cases=(('y', 'z'),)),
+        RenameEntry(table='scenario', position=1, old='A', new='B', cases={'x': 'y'}),
+        RenameEntry(table='scenario', position=2, old='B', cases={'y': 'z'}),
         RenameEntry(table='scenario', position=3, old='B', new='C'),
-        RenameEntry(table='scenario', position=4, old='C', cases=(('z', 'w'),)),
+        RenameEntry(table='scenario', position=4, old='C', cases={'z': 'w'}),
     ]
 
     to_b = rewrite_identities(['A'], {'B'}, entries, set())
     to_c = rewrite_identities(['A'], {'C'}, entries, set())
 
-    assert to_b.by_identity['A'].case_maps == ((('x', 'y'),), (('y', 'z'),))
-    assert to_c.by_identity['A'].case_maps == (
-        (('x', 'y'),),
-        (('y', 'z'),),
-        (('z', 'w'),),
-    )
-    assert to_c.case_maps_of('A') == to_c.by_identity['A'].case_maps
+    assert to_b.case_maps['A'] == ({'x': 'y'}, {'y': 'z'})
+    assert to_c.case_maps['A'] == ({'x': 'y'}, {'y': 'z'}, {'z': 'w'})
 
 
 def test_a_cases_only_entry_for_a_stay_put_identity_still_maps_its_cases() -> None:
     entries = [
-        RenameEntry(table='scenario', position=1, old='A', cases=(('x', 'y'),)),
+        RenameEntry(table='scenario', position=1, old='A', cases={'x': 'y'}),
         _move(2, 'A', 'B'),
-        RenameEntry(table='scenario', position=3, old='A', cases=(('p', 'q'),)),
+        RenameEntry(table='scenario', position=3, old='A', cases={'p': 'q'}),
     ]
 
     rewrites = rewrite_identities(['A'], {'A'}, entries, set())
 
-    assert rewrites.by_identity == {}
-    assert rewrites.case_maps_of('A') == ((('x', 'y'),),)
-    assert rewrites.case_maps_of('unknown') == ()
+    assert rewrites.targets == {}
+    assert rewrites.case_maps['A'] == ({'x': 'y'},)
+    assert 'unknown' not in rewrites.case_maps
 
 
 def test_a_merge_keeps_the_cases_maps_of_the_identity_that_stayed() -> None:
     entries = [
-        RenameEntry(table='scenario', position=1, old='A', cases=(('x', 'y'),)),
+        RenameEntry(table='scenario', position=1, old='A', cases={'x': 'y'}),
         _move(2, 'A', 'B'),
     ]
 
     rewrites = rewrite_identities(['A', 'B'], {'B'}, entries, set())
 
-    assert rewrites.by_identity == {}
-    assert rewrites.case_maps_of('A') == ((('x', 'y'),),)
+    assert rewrites.targets == {}
+    assert rewrites.case_maps['A'] == ({'x': 'y'},)
 
 
 def test_a_case_id_follows_the_maps_to_the_last_id_present_in_after() -> None:
-    maps = [(('a', 'b'),), (('b', 'c'),)]
+    maps = [{'a': 'b'}, {'b': 'c'}]
 
     assert rewrite_case_id('a', maps, {'b', 'c'}) == 'c'
     assert rewrite_case_id('a', maps, {'b'}) == 'b'
@@ -251,19 +244,15 @@ def test_a_case_id_follows_the_maps_to_the_last_id_present_in_after() -> None:
 
 def test_a_chain_back_to_its_start_keeps_the_cases_maps_up_to_the_stop() -> None:
     entries = [
-        RenameEntry(
-            table='scenario', position=1, old='A', new='B', cases=(('x', 'y'),)
-        ),
-        RenameEntry(
-            table='scenario', position=2, old='B', new='A', cases=(('y', 'z'),)
-        ),
+        RenameEntry(table='scenario', position=1, old='A', new='B', cases={'x': 'y'}),
+        RenameEntry(table='scenario', position=2, old='B', new='A', cases={'y': 'z'}),
     ]
 
     rewrites = rewrite_identities(['A'], {'A'}, entries, set())
 
-    assert rewrites.by_identity == {}
-    assert rewrites.case_maps_of('A') == ((('x', 'y'),), (('y', 'z'),))
-    assert rewrite_case_id('x', rewrites.case_maps_of('A'), {'z'}) == 'z'
+    assert rewrites.targets == {}
+    assert rewrites.case_maps['A'] == ({'x': 'y'}, {'y': 'z'})
+    assert rewrite_case_id('x', rewrites.case_maps['A'], {'z'}) == 'z'
 
 
 def test_a_rewrite_onto_an_identity_a_merge_kept_in_place_is_a_merge_too() -> None:
@@ -271,7 +260,7 @@ def test_a_rewrite_onto_an_identity_a_merge_kept_in_place_is_a_merge_too() -> No
 
     rewrites = rewrite_identities(['A', 'B', 'C'], {'B', 'D'}, entries, set())
 
-    assert rewrites.by_identity == {}
+    assert rewrites.targets == {}
     first, second = rewrites.warnings
     assert '"D"' in first
     assert '"B"' in second

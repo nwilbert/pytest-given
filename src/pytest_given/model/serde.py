@@ -112,11 +112,15 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
             glossary=glossary_from_dict(d.get('glossary')),
         )
     except (AttributeError, KeyError, TypeError) as error:
-        raise PytestGivenError(
-            f'{source + " is" if source else "input is"} not a pytest-given '
-            f'report, or was written by an incompatible version '
-            f'({type(error).__name__}: {error}).'
-        ) from error
+        raise unreadable('report', source, error) from error
+
+
+def unreadable(kind: str, source: str | None, error: Exception) -> PytestGivenError:
+    return PytestGivenError(
+        f'{source + " is" if source else "input is"} not a pytest-given '
+        f'{kind}, or was written by an incompatible version '
+        f'({type(error).__name__}: {error}).'
+    )
 
 
 type JsonValue = (

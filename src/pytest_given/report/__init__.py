@@ -7,10 +7,7 @@ lives — importing this package must not drag argparse in behind it.
 """
 
 # Only `pytest-given delta` renders a delta: a test session never loads it.
-__lazy_modules__ = [
-    'pytest_given.report.delta_html',
-    'pytest_given.report.delta_sinks',
-]
+__lazy_modules__ = ['pytest_given.report.delta_sinks']
 
 from .citation_index import (
     NO_SCENARIOS_SUMMARY,
@@ -21,16 +18,11 @@ from .citation_index import (
     report_fragment,
 )
 from .console import write_console_as_utf8
-from .delta_html import render_delta_html
-from .delta_sinks import (
-    DEFAULT_DELTA_HTML_PATH,
-    DEFAULT_DELTA_JSON_PATH,
-    DeltaSinkConfig,
-    delta_sink_failure,
-    emit_delta_sinks,
-)
+from .delta_sinks import DeltaSinkConfig, emit_delta_sinks
 from .link_text import html_link_text, link_text
 from .sinks import (
+    DEFAULT_DELTA_HTML_PATH,
+    DEFAULT_DELTA_JSON_PATH,
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
     MD_SUFFIXES,
@@ -68,12 +60,10 @@ __all__ = [
     'Target',
     'Theme',
     'build_scenario_slug_index',
-    'delta_sink_failure',
     'emit_delta_sinks',
     'emit_sinks',
     'html_link_text',
     'link_text',
-    'render_delta_html',
     'report_fragment',
     'resolve_source_link_template',
     'resolve_theme',

@@ -8,8 +8,6 @@ from pytest_given import given, scenario, then, when
 from pytest_given.delta import DeltaInputs, DeltaResult, build_delta, suggestions
 from pytest_given.model import (
     DeltaData,
-    Glossary,
-    GlossaryTerm,
     IdentityPair,
     ParameterTable,
     ReportData,
@@ -19,6 +17,7 @@ from pytest_given.model import (
 )
 from tests.ubiquitous_language import pg
 from tests.unit.delta.builders import (
+    glossary_of,
     lit,
     narr,
     ph,
@@ -50,10 +49,6 @@ def _built(before: ReportData, after: ReportData) -> DeltaResult:
 
 def _delta(before: ReportData, after: ReportData) -> DeltaData:
     return _built(before, after).delta
-
-
-def _glossary(*terms: GlossaryTerm) -> Glossary:
-    return Glossary(list(terms))
 
 
 def _steps(*texts: str) -> list[Step]:
@@ -191,8 +186,10 @@ def test_a_case_with_two_candidates_is_no_match() -> None:
 
 def test_a_term_swapped_in_a_modified_step_is_a_match() -> None:
     delta = _delta(
-        report(_swapping('room', 'room'), glossary=_glossary(term('room', 'room'))),
-        report(_swapping('suite', 'suite'), glossary=_glossary(term('suite', 'suite'))),
+        report(_swapping('room', 'room'), glossary=glossary_of(term('room', 'room'))),
+        report(
+            _swapping('suite', 'suite'), glossary=glossary_of(term('suite', 'suite'))
+        ),
     )
     assert delta.suggestions == (Suggestion(of='term', before='room', after='suite'),)
 
@@ -201,11 +198,11 @@ def test_a_swap_of_a_term_that_is_not_removed_is_no_match() -> None:
     delta = _delta(
         report(
             _swapping('room', 'room'),
-            glossary=_glossary(term('room', 'room'), term('suite', 'suite')),
+            glossary=glossary_of(term('room', 'room'), term('suite', 'suite')),
         ),
         report(
             _swapping('suite', 'suite'),
-            glossary=_glossary(term('room', 'room'), term('suite', 'suite')),
+            glossary=glossary_of(term('room', 'room'), term('suite', 'suite')),
         ),
     )
     assert delta.suggestions == ()
@@ -239,11 +236,11 @@ def test_a_region_swapping_two_refs_is_no_match() -> None:
     delta = _delta(
         report(
             before,
-            glossary=_glossary(term('room', 'room'), term('bed', 'bed')),
+            glossary=glossary_of(term('room', 'room'), term('bed', 'bed')),
         ),
         report(
             after,
-            glossary=_glossary(term('suite', 'suite'), term('cot', 'cot')),
+            glossary=glossary_of(term('suite', 'suite'), term('cot', 'cot')),
         ),
     )
     assert delta.suggestions == ()
@@ -270,11 +267,11 @@ def test_a_renamed_column_s_placeholder_parts_two_swaps_beside_it() -> None:
     delta = _delta(
         report(
             paying('card', 'cost', 'wallet'),
-            glossary=_glossary(term('card', 'card'), term('wallet', 'wallet')),
+            glossary=glossary_of(term('card', 'card'), term('wallet', 'wallet')),
         ),
         report(
             paying('credit', 'price', 'purse'),
-            glossary=_glossary(term('credit', 'credit'), term('purse', 'purse')),
+            glossary=glossary_of(term('credit', 'credit'), term('purse', 'purse')),
         ),
     )
     assert delta.suggestions == (
@@ -303,8 +300,8 @@ def test_a_term_swapped_in_a_nested_step_is_a_match() -> None:
         )
 
     delta = _delta(
-        report(nested('room', 'room'), glossary=_glossary(term('room', 'room'))),
-        report(nested('suite', 'suite'), glossary=_glossary(term('suite', 'suite'))),
+        report(nested('room', 'room'), glossary=glossary_of(term('room', 'room'))),
+        report(nested('suite', 'suite'), glossary=glossary_of(term('suite', 'suite'))),
     )
     assert delta.suggestions == (Suggestion(of='term', before='room', after='suite'),)
 
@@ -314,9 +311,9 @@ DEFINITION = 'a place where a guest sleeps during a stay at the hotel'
 
 def test_terms_of_one_kind_with_nearly_the_same_definition_are_a_match() -> None:
     delta = _delta(
-        report(glossary=_glossary(term('room', 'room', 'object', DEFINITION))),
+        report(glossary=glossary_of(term('room', 'room', 'object', DEFINITION))),
         report(
-            glossary=_glossary(
+            glossary=glossary_of(
                 term('suite', 'suite', 'object', DEFINITION + ' for two')
             )
         ),
@@ -326,16 +323,16 @@ def test_terms_of_one_kind_with_nearly_the_same_definition_are_a_match() -> None
 
 def test_terms_of_different_kinds_are_no_match() -> None:
     delta = _delta(
-        report(glossary=_glossary(term('room', 'room', 'object', DEFINITION))),
-        report(glossary=_glossary(term('suite', 'suite', 'actor', DEFINITION))),
+        report(glossary=glossary_of(term('room', 'room', 'object', DEFINITION))),
+        report(glossary=glossary_of(term('suite', 'suite', 'actor', DEFINITION))),
     )
     assert delta.suggestions == ()
 
 
 def test_terms_without_a_definition_are_no_match() -> None:
     delta = _delta(
-        report(glossary=_glossary(term('room', 'room'))),
-        report(glossary=_glossary(term('suite', 'suite', 'object', DEFINITION))),
+        report(glossary=glossary_of(term('room', 'room'))),
+        report(glossary=glossary_of(term('suite', 'suite', 'object', DEFINITION))),
     )
     assert delta.suggestions == ()
 
@@ -344,11 +341,11 @@ def test_a_term_already_suggested_by_a_swap_is_suggested_once() -> None:
     delta = _delta(
         report(
             _swapping('room', 'room'),
-            glossary=_glossary(term('room', 'room', 'object', DEFINITION)),
+            glossary=glossary_of(term('room', 'room', 'object', DEFINITION)),
         ),
         report(
             _swapping('suite', 'suite'),
-            glossary=_glossary(term('suite', 'suite', 'object', DEFINITION)),
+            glossary=glossary_of(term('suite', 'suite', 'object', DEFINITION)),
         ),
     )
     assert delta.suggestions == (Suggestion(of='term', before='room', after='suite'),)

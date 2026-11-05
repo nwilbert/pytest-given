@@ -13,18 +13,14 @@ from .build import (
     is_per_case,
 )
 from .chains import (
-    CaseMap,
-    Rewrite,
     Rewrites,
     rewrite_case_id,
     rewrite_identities,
     undo_case_merges,
 )
 from .check import check_reports
-from .identity import scenario_identity
 from .renames import (
     DEFAULT_RENAMES_PATH,
-    EntryTable,
     RenameEntry,
     RenameLog,
     parse_rename_log,
@@ -33,13 +29,10 @@ from .renames import (
 
 __all__ = [
     'DEFAULT_RENAMES_PATH',
-    'CaseMap',
     'DeltaInputs',
     'DeltaResult',
-    'EntryTable',
     'RenameEntry',
     'RenameLog',
-    'Rewrite',
     'Rewrites',
     'build_delta',
     'check_reports',
@@ -49,6 +42,5 @@ __all__ = [
     'read_rename_log',
     'rewrite_case_id',
     'rewrite_identities',
-    'scenario_identity',
     'undo_case_merges',
 ]
