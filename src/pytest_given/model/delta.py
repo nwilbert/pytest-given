@@ -119,7 +119,8 @@ class CasePair:
 @dataclass(frozen=True, kw_only=True)
 class ParameterDelta:
     """The alignment of two parameter tables, for a scenario with one on each
-    side. Attachment columns are left out."""
+    side. An attachment column appears only when paired, by name, and its
+    cells are never compared."""
 
     columns: tuple[ColumnPair, ...]
     cases: tuple[CasePair, ...]

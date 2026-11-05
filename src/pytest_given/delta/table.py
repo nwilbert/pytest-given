@@ -1,7 +1,7 @@
 """Pairing two parameter tables: their columns, then their cases."""
 
 import math
-from collections.abc import Callable, Hashable, Mapping, Sequence
+from collections.abc import Callable, Container, Hashable, Mapping, Sequence
 
 from ..model import (
     Attachment,
@@ -63,7 +63,7 @@ class _Alignment:
 
     def pair_columns_by_name(self) -> None:
         for before_column, after_column in _unique_matches(
-            self.before_columns, self.after_columns, _name_and_kind, _name_and_kind
+            self.before.columns, self.after.columns, _name_and_kind, _name_and_kind
         ):
             self.columns[before_column.id] = (after_column.id, 'name')
 
@@ -120,14 +120,18 @@ class _Alignment:
                 self.columns[before_unpaired[0].id] = (after_unpaired[0].id, 'values')
 
     def delta(self) -> ParameterDelta:
-        column_rows = interleaved(
-            [column.id for column in self.after_columns],
-            [column.id for column in self.before_columns],
-            {before_id: after_id for before_id, (after_id, _) in self.columns.items()},
-        )
         before_of = {
             after_id: before_id for before_id, (after_id, _) in self.columns.items()
         }
+        column_rows = interleaved(
+            [column.id for column in self.after.columns if _listed(column, before_of)],
+            [
+                column.id
+                for column in self.before.columns
+                if _listed(column, self.columns)
+            ],
+            {before_id: after_id for before_id, (after_id, _) in self.columns.items()},
+        )
         case_rows = interleaved(
             [case.id for case in self.after.cases],
             [case.id for case in self.before.cases],
@@ -191,6 +195,12 @@ type _CaseKey = Callable[[ParameterCase], Hashable | None]
 
 def _comparable(columns: Sequence[ParameterColumn]) -> list[ParameterColumn]:
     return [column for column in columns if column.kind != 'attachment']
+
+
+def _listed(column: ParameterColumn, paired: Container[ColumnId]) -> bool:
+    """An attachment column gained or lost is no change, so only a paired one
+    has a place among the pairs."""
+    return column.kind != 'attachment' or column.id in paired
 
 
 def _name_and_kind(column: ParameterColumn) -> tuple[str, ColumnKind]:

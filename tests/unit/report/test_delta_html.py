@@ -521,7 +521,7 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
     assert _columns(before_side) == [
         ('reason', None, None),
         ('before:derived:0', 'removed', None),
-        ('before:attachment:0', None, None),
+        ('attachment:0', None, None),
     ]
     assert _columns(after_side) == [
         ('reason', None, 'decline_reason'),
@@ -542,7 +542,71 @@ def test_each_side_marks_its_own_columns_and_keys_a_paired_one_as_the_after_side
         attachment.column_id
         for attachment in before_step.attachments
         if isinstance(attachment, AttachmentRef)
-    ] == ['before:attachment:0']
+    ] == ['attachment:0']
+
+
+def test_a_changed_table_s_attachment_column_of_another_name_keeps_its_own_key():
+    """Attachment IDs are positional, so one ID can name another attachment on
+    the other side: only the name tells them apart."""
+    payload = Attachment(label='payload', content='paid')
+
+    def side(amount: int, name: str) -> ReportData:
+        return report(
+            scn(
+                't.py::test_pay',
+                'Pay',
+                parameters=table(
+                    [('amount', 'param'), (name, 'attachment')],
+                    ('t.py::test_pay[a]', [amount, payload]),
+                ),
+            )
+        )
+
+    [item] = _listed(built_delta(side(1, 'receipt'), side(2, 'invoice')))
+    assert item.table is not None
+    before_side, after_side = item.table.sides
+    assert _columns(before_side)[1][0] == 'before:attachment:0'
+    assert _columns(after_side)[1][0] == 'attachment:0'
+
+
+def test_an_attachment_column_that_changed_position_keeps_its_after_key():
+    payload = Attachment(label='payload', content='paid')
+    before = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            parameters=table(
+                [('amount', 'param'), ('receipt', 'attachment')],
+                ('t.py::test_pay[a]', [1, payload]),
+            ),
+        )
+    )
+    after = report(
+        scn(
+            't.py::test_pay',
+            'Pay',
+            parameters=table(
+                [
+                    ('amount', 'param'),
+                    ('invoice', 'attachment'),
+                    ('receipt', 'attachment'),
+                ],
+                ('t.py::test_pay[a]', [2, payload, payload]),
+            ),
+        )
+    )
+    [item] = _listed(built_delta(before, after))
+    assert item.table is not None
+    before_side, after_side = item.table.sides
+    assert _columns(before_side) == [
+        ('amount', None, None),
+        ('attachment:1', None, None),
+    ]
+    assert _columns(after_side) == [
+        ('amount', None, None),
+        ('attachment:0', None, None),
+        ('attachment:1', None, None),
+    ]
 
 
 def test_an_unchanged_table_s_attachment_column_is_keyed_alike_on_both_sides():

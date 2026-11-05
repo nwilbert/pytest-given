@@ -247,11 +247,25 @@ def test_moved_columns_and_cases_alone_leave_the_table_unchanged() -> None:
     assert [pair.paired_by for pair in alignment.cases] == ['values', 'values']
 
 
-def test_attachment_columns_take_no_part() -> None:
+def test_an_attachment_column_without_a_namesake_takes_no_part() -> None:
     before = table([('n', 'param'), ('log', 'attachment')], _case('1', 1, None))
     after = table([('n', 'param'), ('trace', 'attachment')], _case('1', 1, None))
     alignment = _align(before, after)
     assert [pair.before for pair in alignment.columns] == [ColumnId('n')]
+    assert not alignment.changed
+
+
+def test_an_attachment_column_pairs_by_name_whatever_its_position() -> None:
+    before = table([('n', 'param'), ('receipt', 'attachment')], _case('1', 1, None))
+    after = table(
+        [('n', 'param'), ('invoice', 'attachment'), ('receipt', 'attachment')],
+        _case('1', 1, None, None),
+    )
+    alignment = _align(before, after)
+    assert [(pair.before, pair.after) for pair in alignment.columns] == [
+        ('n', 'n'),
+        ('attachment:0', 'attachment:1'),
+    ]
     assert not alignment.changed
 
 

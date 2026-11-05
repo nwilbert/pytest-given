@@ -181,7 +181,8 @@ still unpaired:
 1. **Columns by name and kind.** A column's name is its header: a `param` column's argname, a
    `derived` column's expression or placeholder name. Its ID never pairs it, since a `derived`
    column's generated ID (`derived:0`) shifts when another derived column comes or goes.
-   `attachment` columns take no part (see [What counts as a change](#what-counts-as-a-change)).
+   An `attachment` column pairs by name too, but gaining or losing one is no change, and its cells
+   are never compared (see [What counts as a change](#what-counts-as-a-change)).
 2. **Cases by custom case ID**, and by a case ID the rename log's `cases` maps rewrote.
 3. **Cases by values.** Two unpaired cases pair when each is the only unpaired case on its side
    with those values in the `param` columns both tables share. This keeps a table paired case by
@@ -537,7 +538,8 @@ beneath them:
 - An added column's header is marked `+` and its cells tinted green. A removed column's header is
   struck through on the *before* side. A renamed column shows its new name, with `was <old name>`
   beneath it.
-- `attachment` columns appear in each side's table, unmarked.
+- `attachment` columns appear in each side's table, unmarked. Hovering one of the same name on both
+  sides highlights it in both tables.
 - Hovering a placeholder in either side's steps highlights its column in both tables, a renamed
   column included. Hovering a row previews its values in its own side's steps, as in the normal
   report.
