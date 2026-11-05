@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-24T11:47:10.500455+00:00",
+    "timestamp": "2026-11-05T18:14:18.391096+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.1",
-    "commit_sha": "c823364d0a12a3a8b797f47d3d4efc3487a16389",
+    "commit_sha": "455cb9d9e49e116b9fa49841959e8e9fe227ed3b",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 139,
+      "duration_ms": 132,
       "steps": [
         {
           "phase": "given",
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -432,7 +432,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -690,7 +690,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -836,7 +836,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -1006,7 +1006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 68,
       "steps": [
         {
           "phase": "given",
@@ -1184,7 +1184,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 107,
+      "duration_ms": 109,
       "steps": [
         {
           "phase": "given",
@@ -1359,7 +1359,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 73,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -1597,7 +1597,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 552,
+      "duration_ms": 555,
       "steps": [
         {
           "phase": "given",
@@ -1725,7 +1725,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -1912,7 +1912,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 110,
       "steps": [
         {
           "phase": "given",
@@ -2098,7 +2098,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -2165,7 +2165,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -2275,7 +2275,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -2417,7 +2417,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -2487,7 +2487,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -2607,7 +2607,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 80,
       "steps": [
         {
           "phase": "given",
@@ -2742,7 +2742,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 86,
       "steps": [
         {
           "phase": "given",
@@ -2870,7 +2870,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 88,
+      "duration_ms": 100,
       "steps": [
         {
           "phase": "given",
@@ -3040,7 +3040,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -3230,7 +3230,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -3402,7 +3402,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -3686,7 +3686,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -3839,7 +3839,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 53,
+      "duration_ms": 56,
       "steps": [
         {
           "phase": "given",
@@ -3984,7 +3984,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -4131,7 +4131,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 160,
+      "duration_ms": 172,
       "steps": [
         {
           "phase": "given",
@@ -4302,7 +4302,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -4432,7 +4432,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 99,
+      "duration_ms": 104,
       "steps": [
         {
           "phase": "given",
@@ -4561,7 +4561,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 133,
+      "duration_ms": 162,
       "steps": [
         {
           "phase": "given",
@@ -4747,7 +4747,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 27,
       "steps": [
         {
           "phase": "given",
@@ -4841,7 +4841,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -4920,7 +4920,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 220,
+      "duration_ms": 238,
       "steps": [
         {
           "phase": "given",
@@ -5102,7 +5102,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -5192,7 +5192,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 58,
       "steps": [
         {
           "phase": "given",
@@ -5284,7 +5284,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 107,
       "steps": [
         {
           "phase": "given",
@@ -5366,7 +5366,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -5458,7 +5458,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -5543,7 +5543,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -5650,7 +5650,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 167,
+      "duration_ms": 166,
       "steps": [
         {
           "phase": "given",
@@ -5757,7 +5757,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 562,
+      "duration_ms": 611,
       "steps": [
         {
           "phase": "given",
@@ -5948,7 +5948,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 379,
+      "duration_ms": 403,
       "steps": [
         {
           "phase": "given",
@@ -6143,7 +6143,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 48,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -6296,7 +6296,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -6521,7 +6521,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 382,
+      "duration_ms": 417,
       "steps": [
         {
           "phase": "given",
@@ -6680,7 +6680,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -6782,7 +6782,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -6889,7 +6889,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -7139,7 +7139,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 107,
+      "duration_ms": 111,
       "steps": [
         {
           "phase": "given",
@@ -7369,7 +7369,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -7481,7 +7481,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -7577,7 +7577,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 87,
+      "duration_ms": 97,
       "steps": [
         {
           "phase": "given",
@@ -7644,7 +7644,7 @@
       "module": "tests.integration.test_skills_cli",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -9058,7 +9058,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -9459,7 +9459,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -9551,7 +9551,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -9658,7 +9658,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -9745,7 +9745,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -9831,7 +9831,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -9924,7 +9924,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -10095,7 +10095,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -10196,7 +10196,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -10380,7 +10380,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -10552,7 +10552,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -19089,7 +19089,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -20313,7 +20313,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -20424,7 +20424,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -20524,7 +20524,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -20824,7 +20824,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -20994,7 +20994,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -21125,7 +21125,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -21313,7 +21313,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -21451,7 +21451,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -21699,7 +21699,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -21841,7 +21841,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -21989,7 +21989,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -22200,7 +22200,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -22415,7 +22415,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -22568,7 +22568,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -22705,7 +22705,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -22903,7 +22903,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -23075,7 +23075,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -23228,7 +23228,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -23352,7 +23352,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -23494,7 +23494,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 11,
       "steps": [
         {
           "phase": "given",
@@ -23696,7 +23696,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -23818,7 +23818,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -27642,7 +27642,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 148,
+      "duration_ms": 145,
       "steps": [
         {
           "phase": "given",
@@ -33830,7 +33830,7 @@
         "id": "scenario",
         "kind": "object",
         "canonical": "Scenario",
-        "definition": "A test function decorated with `@scenario(...)`. Not every pytest test is a scenario \u2014 undecorated tests are tolerated but not collected.",
+        "definition": "A test that narrates the rule it demonstrates, marked with `@scenario`. Tests without the mark stay out of the report.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 13
@@ -33840,7 +33840,7 @@
         "id": "scenario-title",
         "kind": null,
         "canonical": "Scenario title",
-        "definition": "The text `@scenario` takes first: the statement of the rule a *Scenario* demonstrates, shown as its heading in the report. A plain string, a t-string of glossary handles, or a `Template` filled per *Case*; recorded as the scenario's *Narration*. Not the test function's name, which the node ID carries.",
+        "definition": "The statement of the rule a *Scenario* demonstrates. Not the test function's name, which the *Node ID* carries.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 14
@@ -33850,7 +33850,7 @@
         "id": "step",
         "kind": "object",
         "canonical": "Step",
-        "definition": "A unit of narration: a `with given(...)` / `when(...)` / `then(...)` block, or the root recording from a step fixture. Steps nest, and each carries a phase, narration, attachments and children \u2014 but no status or error of its own: a failure is recorded on the *Scenario*, and per *Case* on the *Parameter table*.",
+        "definition": "A unit of narration in one *Phase*. Steps nest and may carry *Attachments*, but have no status or error of their own: a failure belongs to the *Scenario*, and to its *Case* in a *Parameter table*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 15
@@ -33860,7 +33860,7 @@
         "id": "narration",
         "kind": null,
         "canonical": "Narration",
-        "definition": "The human-readable text on a step or scenario title. A `Narration` bundles the flat rendered `text` with `parts` \u2014 empty for plain-string authoring, and for a t-string or `pytest_given.Template` a list of `NarrationLiteral` / `NarrationValue` / `NarrationPlaceholder` / `NarrationTermRef` pieces.",
+        "definition": "The human-readable text on a step or scenario title, which may mix plain text with values, placeholders and *term refs*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 16
@@ -33880,7 +33880,7 @@
         "id": "when-then",
         "kind": null,
         "canonical": "when_then",
-        "definition": "A step-authoring helper that emits a `when` action and its `then` outcome as two sibling steps from a single `with` block. Used mainly to narrate an expected raise (`with when_then('the action', 'the error is raised'), pytest.raises(...)`), so the action and its outcome stay distinct steps.",
+        "definition": "One block that narrates a `when` action and its `then` outcome as two sibling steps. Used mainly to narrate an expected raise, so the action and its outcome stay distinct steps.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 18
@@ -33890,7 +33890,7 @@
         "id": "tag",
         "kind": "object",
         "canonical": "Tag",
-        "definition": "Free-form string label attached via `@scenario(title, tags=[...])`. A `/` nests it: `ticket/ABC-123` sits under `ticket`.",
+        "definition": "A free-form label on a scenario. A `/` nests it: `ticket/ABC-123` sits under `ticket`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 19
@@ -33900,7 +33900,7 @@
         "id": "attachment",
         "kind": "object",
         "canonical": "Attachment",
-        "definition": "A labeled blob (text or JSON) bound to the currently-active step via `attach(label, content)`.",
+        "definition": "A labeled piece of text or JSON bound to the step being narrated.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 20
@@ -33910,7 +33910,7 @@
         "id": "parametrized-scenario",
         "kind": "object",
         "canonical": "Parametrized scenario",
-        "definition": "A `@scenario`-decorated test that also carries `@pytest.mark.parametrize(...)`. Produces multiple scenario records during a run; pytest-given groups them.",
+        "definition": "A *Scenario* whose test is parametrized, so it runs once per *Case*. pytest-given groups the results.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 26
@@ -33920,7 +33920,7 @@
         "id": "case",
         "kind": null,
         "canonical": "Case",
-        "definition": "One row of a parametrized scenario \u2014 its node ID, a single tuple of parameter values, its status, and any error.",
+        "definition": "One row of a parametrized scenario: its node ID, its parameter values, its status and any error.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 27
@@ -33940,7 +33940,7 @@
         "id": "parameter-table",
         "kind": "object",
         "canonical": "Parameter table",
-        "definition": "The per-scenario grouping of typed columns + cases. A column is a `param` (a `@pytest.mark.parametrize` input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies).",
+        "definition": "The per-scenario table of cases and columns. A column is a `param` (a parametrize input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 29
@@ -33950,7 +33950,7 @@
         "id": "group",
         "kind": "activity",
         "canonical": "Group",
-        "definition": "Collapsing the N scenario records of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share both the same name and the same *Node ID* without its parametrize tail \u2014 one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
+        "definition": "Collapsing the cases of a parametrized scenario into one logical scenario carrying a *Parameter table*. Cases group when they share both the same name and the same *Node ID* without its parametrize tail \u2014 one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 30
@@ -33960,7 +33960,7 @@
         "id": "templatize",
         "kind": null,
         "canonical": "Templatize",
-        "definition": "Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies becomes a `{name}` placeholder or attachment badge pointing at a parameter-table column. The baseline tree comes from the first passed case, and every other passed case must narrate that same template \u2014 a failed case too, over the steps it shares with the baseline.",
+        "definition": "Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies points at a parameter-table column. The baseline comes from the first passed case, and every other passed case must narrate that same template \u2014 a failed case too, over the steps it shares with the baseline.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 31
@@ -33970,7 +33970,7 @@
         "id": "step-fixture",
         "kind": "object",
         "canonical": "Step fixture",
-        "definition": "A pytest fixture whose function is wrapped with `@given(text)`. Only `@given` is allowed on fixtures; `@when` / `@then` are rejected.",
+        "definition": "A pytest fixture that narrates its setup as a `given` *Step*. A fixture cannot narrate `when` or `then`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 37
@@ -34000,7 +34000,7 @@
         "id": "fixture-recording",
         "kind": "object",
         "canonical": "Fixture recording",
-        "definition": "A captured subtree of steps + attachments produced while a step fixture is being set up. A generator fixture's teardown records nothing \u2014 it refuses steps and attachments.",
+        "definition": "The steps and attachments a step fixture narrates during setup. A generator fixture's teardown records nothing \u2014 it refuses steps and attachments.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 40
@@ -34020,7 +34020,7 @@
         "id": "collector",
         "kind": "actor",
         "canonical": "Collector",
-        "definition": "The per-session object accumulating scenarios, fixture recordings, and parameter info.",
+        "definition": "What gathers a session's scenarios, fixture recordings and parameter info.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 47
@@ -34050,7 +34050,7 @@
         "id": "step-stack",
         "kind": "object",
         "canonical": "Step stack",
-        "definition": "The chain of currently-open steps. A `with given(...)` pushes one, and leaving the block pops it.",
+        "definition": "The chain of currently-open steps. Opening a step adds it, and leaving its block removes it.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 50
@@ -34100,7 +34100,7 @@
         "id": "source-link",
         "kind": null,
         "canonical": "Source link",
-        "definition": "A clickable file:line anchor on a scenario card, a story panel, or an expanded glossary term card. It points at a scenario's test function, or at the declaration of a *Story* or *Term*.",
+        "definition": "A link to a file and line: a scenario's test function, or the declaration of a *Story* or *Term*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 60
@@ -34110,7 +34110,7 @@
         "id": "report-link",
         "kind": null,
         "canonical": "Report link",
-        "definition": "A Markdown link to a scenario, tag or story in the HTML *Report*: the report's URL with a `#scenario=<node ID>`, `#tag=<tag>` or `#view=stories&story=<story id>` fragment. Without a glyph it is a plain one, which claims only that its target exists.",
+        "definition": "A Markdown link to a scenario, tag or story in the HTML *Report*. Without a glyph it is a plain one, which claims only that its target exists.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 61
@@ -34130,7 +34130,7 @@
         "id": "narrated-citation",
         "kind": null,
         "canonical": "Narrated citation",
-        "definition": "A *Citation* of a scenario written as a `<details markdown=\"1\">` block, the citation in its `<summary>` and the scenario's Markdown narration in its body.",
+        "definition": "A *Citation* of a scenario written as a collapsible block, the citation as its summary and the scenario's Markdown narration as its body.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 63
@@ -34200,7 +34200,7 @@
         "id": "glossary",
         "kind": "object",
         "canonical": "Glossary",
-        "definition": "The Ubiquitous-Language concept \u2014 the shared vocabulary a domain speaks in \u2014 and the class that realizes it in code: `Glossary()`, on which terms are registered.",
+        "definition": "The shared vocabulary a domain speaks in: its Ubiquitous Language.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 84
@@ -34210,7 +34210,7 @@
         "id": "file-glossary",
         "kind": null,
         "canonical": "File glossary",
-        "definition": "A glossary loaded from the GFM pipe tables of a Markdown file, via the `FileGlossary(path)` class.",
+        "definition": "A glossary loaded from the GFM pipe tables of a Markdown file.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 85
@@ -34220,7 +34220,7 @@
         "id": "deferred-term",
         "kind": null,
         "canonical": "Deferred term",
-        "definition": "A term handed over before its kind is settled \u2014 what `g('foo')` and `g['foo']` on a code glossary return, and every *file glossary* lookup. The handle is the same `TermHandle` the typed registrations (`g.actor(...)` and friends) hand back; `declared_kind is None` is what marks the deferral. The deferral is in the handing over, not the term: a row with an explicit `kind_column` arrives through the same handle already kinded, while the rest stay `None` until *kind inference* runs.",
+        "definition": "A term handed over before its kind is settled: what `g('foo')` and `g['foo']` on a code glossary return, and a *file glossary* lookup of a row with no declared kind. *Kind inference* settles it later.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 86
@@ -34230,7 +34230,7 @@
         "id": "term",
         "kind": null,
         "canonical": "Term",
-        "definition": "A registered glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind (`None` when kindless), and an optional definition.",
+        "definition": "A glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind unless kindless, and an optional definition.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 87
@@ -34240,7 +34240,7 @@
         "id": "handle",
         "kind": null,
         "canonical": "Handle",
-        "definition": "The Python object a glossary hands back for a *term* \u2014 `TermHandle`, the same type from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of four surface forms: **bare** (`room` \u2014 the canonical display), **`.l`** (`room.l` \u2014 capitalized words lowercased, acronyms kept), **`.s`** (`room.s` \u2014 the *S-form*), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). `.l` and `.s` also apply to a called form and chain (`room.l.s` reads *rooms*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
+        "definition": "What a glossary hands back for a *term*, the same from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of four surface forms: **bare** (`room` \u2014 the canonical display), **`.l`** (`room.l` \u2014 capitalized words lowercased, acronyms kept), **`.s`** (`room.s` \u2014 the *S-form*), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). `.l` and `.s` also apply to a called form and chain (`room.l.s` reads *rooms*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 88
@@ -34290,7 +34290,7 @@
         "id": "term-ref",
         "kind": null,
         "canonical": "Term ref",
-        "definition": "An occurrence of a term inside narration. Modeled as `NarrationTermRef` in step text and as `ClauseTermRef` inside a clause.",
+        "definition": "An occurrence of a term inside narration or a clause.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 93
@@ -34320,7 +34320,7 @@
         "id": "story",
         "kind": "object",
         "canonical": "Story",
-        "definition": "A named flow modeled as a sequence of sentences. Constructed by `story('Title', [sentence(...), ...])`. Stories are the unit of coverage.",
+        "definition": "A named flow modeled as a sequence of sentences. Stories are the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 96
@@ -34330,7 +34330,7 @@
         "id": "sentence",
         "kind": "object",
         "canonical": "Sentence",
-        "definition": "What Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. One row in a story, numbered by its position (1..N, never set by hand) and optionally named with `sentence(..., name='cancel')`, a name that stays put when rows are inserted. Constructed by `sentence(...)`. Usually one clause, built implicitly; several when the sentence has several arrows under one number.",
+        "definition": "What Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. One row in a story, numbered by its position and optionally named, a name that stays put when rows are inserted. Usually one clause; several when the sentence has several arrows under one number.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 97
@@ -34340,7 +34340,7 @@
         "id": "clause-part",
         "kind": null,
         "canonical": "Clause part",
-        "definition": "The two-variant union making up a clause's prose (`ClausePart` = `ClauseTermRef` or `ClauseWord`): a reference to a glossary term, whose kind resolves via the glossary, or a bare clause word \u2014 a node label or edge connective that carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
+        "definition": "A piece of a clause's prose: a *term ref*, or a bare clause word. A bare clause word \u2014 a node label or edge connective \u2014 carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 98
@@ -34350,7 +34350,7 @@
         "id": "clause",
         "kind": null,
         "canonical": "Clause",
-        "definition": "One linear walk through a sentence's arrows, a node/edge alternation starting actor \u2192 verb \u2192 noun, constructed by `clause(...)`. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit.",
+        "definition": "One linear walk through a sentence's arrows, a node/edge alternation starting actor \u2192 verb \u2192 noun. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 99
@@ -34380,7 +34380,7 @@
         "id": "pin",
         "kind": null,
         "canonical": "Pin",
-        "definition": "What a *sentence handle* passed to `pins=` is recorded as, the way a term handle in narration is recorded as a *term ref*: a `Pin` naming a story and a sentence number. A pin binds explicitly and replaces narration matching \u2014 a step pin for that step, a scenario pin (`@scenario(pins=...)`) for every step of the scenario, which then covers its own pins plus its steps'. `pins=[]` pins nothing but still opts out of narration matching. A pin reaches under-anchored sentences too.",
+        "definition": "What a *sentence handle* passed to `pins=` is recorded as, the way a term handle in narration is recorded as a *term ref*: a reference to a story and a sentence number. A pin binds explicitly and replaces narration matching \u2014 a step pin for that step, a scenario pin (`@scenario(pins=...)`) for every step of the scenario, which then covers its own pins plus its steps'. `pins=[]` pins nothing but still opts out of narration matching. A pin reaches under-anchored sentences too.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 102
@@ -34390,7 +34390,7 @@
         "id": "coverage",
         "kind": null,
         "canonical": "Coverage",
-        "definition": "The \"did this scenario touch that sentence\" relation. Computed by the *A_refs \u2286 S* rule: a sentence is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A *pin* covers its sentences directly instead, regardless of narration or term count.",
+        "definition": "The \"did this scenario touch that sentence\" relation. A sentence is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A *pin* covers its sentences directly instead, regardless of narration or term count.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 103
@@ -34400,7 +34400,7 @@
         "id": "kind-inference",
         "kind": null,
         "canonical": "Kind inference",
-        "definition": "The post-collection pass (`infer_glossary_kinds`) that assigns each undeclared term a kind from the *slot* positions it occupies across all story sentences; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any sentence stays *kindless*.",
+        "definition": "The pass that assigns each undeclared term a kind from the *slot* positions it occupies across all story sentences; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any sentence stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 104
@@ -34410,7 +34410,7 @@
         "id": "kindless",
         "kind": null,
         "canonical": "Kindless",
-        "definition": "A term with `kind=None` \u2014 left unset when *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence).",
+        "definition": "A term with no kind, because *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence).",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 105
@@ -34420,7 +34420,7 @@
         "id": "undefined",
         "kind": null,
         "canonical": "Undefined",
-        "definition": "A term with `definition is None`. Orthogonal to *kindless*.",
+        "definition": "A term with no definition. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 106
