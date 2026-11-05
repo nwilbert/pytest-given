@@ -152,9 +152,8 @@ def term_reach(delta: DeltaData, listed: list[ListedScenario]) -> TermReach:
 def delta_glossary_view(
     delta: DeltaData, listed: list[ListedScenario], reach: TermReach
 ) -> DeltaGlossaryView:
-    position = {item.slug: index for index, item in enumerate(listed)}
     cards = [
-        ListedTerm(term_delta, _referring(term_delta, listed, position, reach))
+        ListedTerm(term_delta, _referring(term_delta, listed, reach))
         for term_delta in delta.glossary.terms
     ]
     return DeltaGlossaryView(
@@ -202,20 +201,17 @@ def before_tip_terms(delta: DeltaData) -> list[GlossaryTerm]:
 
 
 def _referring(
-    term_delta: TermDelta,
-    listed: list[ListedScenario],
-    position: dict[str, int],
-    reach: TermReach,
+    term_delta: TermDelta, listed: list[ListedScenario], reach: TermReach
 ) -> list[ListedScenario]:
     """In the list's order, each scenario once."""
     sides: tuple[Side, ...] = ('before', 'after')
     found = {
-        position[item.slug]
+        item.slug
         for side in sides
         if (term := term_delta.on(side)) is not None
         for item in reach[side].get(term.id, [])
     }
-    return [listed[index] for index in sorted(found)]
+    return [item for item in listed if item.slug in found]
 
 
 def _terms(glossary: Glossary | None) -> list[GlossaryTerm]:

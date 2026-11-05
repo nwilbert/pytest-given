@@ -5,13 +5,7 @@ Imports `model/` and `markdown/` only. It runs no pytest and calls no git; the
 entry points hand it what those would have told it.
 """
 
-from .build import (
-    DeltaInputs,
-    DeltaResult,
-    build_delta,
-    comparable_title,
-    is_per_case,
-)
+from .build import DeltaInputs, DeltaResult, build_delta
 from .chains import (
     Rewrites,
     rewrite_case_id,
@@ -36,8 +30,6 @@ __all__ = [
     'Rewrites',
     'build_delta',
     'check_reports',
-    'comparable_title',
-    'is_per_case',
     'parse_rename_log',
     'read_rename_log',
     'rewrite_case_id',

@@ -13,9 +13,8 @@ from pytest_given.delta import (
     RenameLog,
     build_delta,
     check_reports,
-    comparable_title,
-    is_per_case,
 )
+from pytest_given.delta.build import comparable_title, is_per_case
 from pytest_given.model import (
     REPORT_SCHEMA_VERSION,
     Attachment,

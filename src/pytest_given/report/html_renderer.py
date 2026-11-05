@@ -191,10 +191,10 @@ def base_env() -> jinja2.Environment:
     env.filters['phase_blocks'] = phase_blocks
     env.filters['column_phase_blocks'] = column_phase_blocks
     env.filters['case_id'] = case_id
-    env.filters['value_cell'] = value_cell
+    env.filters['value_cell'] = _value_cell
     # No column coloured until a page passes its colour map.
     env.filters['param_color_class'] = _make_param_color_class(None)
-    env.globals['data_url'] = data_url
+    env.globals['data_url'] = _data_url
     return env
 
 
@@ -251,7 +251,7 @@ def column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
     return blocks
 
 
-def value_cell(
+def _value_cell(
     column: ParameterColumn,
     value: CellValue,
     block: int | None,
@@ -477,7 +477,7 @@ def bundled_script(filename: str) -> Markup:
 _DATA_URL_MIME = {'.woff2': 'font/woff2', '.svg': 'image/svg+xml'}
 
 
-def data_url(filename: str) -> Markup:
+def _data_url(filename: str) -> Markup:
     """Jinja global: a binary asset under `templates/` as a `data:` URL, so
     the template names each font and the logo beside the rule that uses it.
     The files stay the only copies to update — the docs site stages its logo
