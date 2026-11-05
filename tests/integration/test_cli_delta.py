@@ -479,8 +479,9 @@ def test_the_delta_is_titled_by_title_or_else_by_the_after_report(
         t'`pytest-given delta` compares it to a before one, '
         t'with the extra arguments {extra_args}'
     ):
-        assert main(['delta', *inputs, *extra_args]) == 0
+        exit_code = main(['delta', *inputs, *extra_args])
     with then(t'the delta is titled "{shown}"'):
+        assert exit_code == 0
         assert delta_render_context(delta_from_dict(_read_delta()))['title'] == shown
 
 
