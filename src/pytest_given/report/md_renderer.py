@@ -11,6 +11,7 @@ from ..model import (
     AttachmentRef,
     CellValue,
     ErrorInfo,
+    GlossaryTerm,
     Narration,
     NodeId,
     ParameterCase,
@@ -25,7 +26,12 @@ from ..model import (
     plural,
 )
 from .function_source import FunctionSource, SourceExcerpt
-from .markdown_writer import code_span_markdown, literal_markdown, narration_markdown
+from .markdown_writer import (
+    code_span_markdown,
+    definition_markdown,
+    literal_markdown,
+    narration_markdown,
+)
 from .text import STATUS_GLYPH, STATUS_LABEL
 
 
@@ -52,6 +58,12 @@ def narration_body_md(scenario: Scenario) -> str:
     """The steps and, for a grouped scenario, the parameter table: the
     narration without heading, subtitle or any error block."""
     return '\n'.join(_body_lines(scenario, with_errors=False))
+
+
+def definition_body_md(term: GlossaryTerm) -> str:
+    """The one line a defining citation's body holds, empty for an undefined
+    term: nothing in a definition can open a block or close the citation's."""
+    return _block_marker_escaped(definition_markdown((term.definition or '').strip()))
 
 
 def _scenario_md(
@@ -358,7 +370,10 @@ _BLOCK_MARKER = re.compile(
 def _quoted(text: str) -> str:
     """A line of a quote, shown literally: a block marker at its start is
     escaped too, and its indent, which would open a code block, dropped."""
-    line = literal_markdown(text.lstrip())
+    return _block_marker_escaped(literal_markdown(text.lstrip()))
+
+
+def _block_marker_escaped(line: str) -> str:
     marker = _BLOCK_MARKER.match(line)
     if marker is None:
         return line

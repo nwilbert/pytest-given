@@ -77,7 +77,7 @@
     <button type="button" class="anchor-link" title="Copy link" data-anchor="{{ hash }}" @click.stop="copyAnchor($el)" aria-label="Copy link">{{ icon('link') }}</button>
   {%- endmacro -%}
 
-  {#- A scenario card's or story header's copy button. Without a report URL a
+  {#- A scenario card's, story header's or term row's copy button. Without a report URL a
       link is all there is to copy, so the button copies it directly; with
       one, it opens the shared copy menu. Keys travel as data-* and are read
       back from the dataset: Alpine compiles a directive's decoded attribute

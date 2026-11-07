@@ -58,9 +58,10 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | **Parameter coloring** | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
 | **Value highlight** | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
 | **Source link** | A link to a file and line: a scenario's test function, or the declaration of a *Story* or *Term*. |
-| **Report link** | A Markdown link to a scenario, tag or story in the HTML *Report*. Without a glyph it is a plain one, which claims only that its target exists. |
-| **Citation** | A *Report link* led by its target's status glyph, citing a scenario, tag or story from a Markdown document: `✅ [title](<report URL>#scenario=…)`. A tag or story citation adds a summary after it, `(5 ✅ · 2 🔵)`. A target the *Report* lacks reads `❓`. |
+| **Report link** | A Markdown link to a scenario, tag, story or term in the HTML *Report*. Without a glyph it is a plain one, which claims only that its target exists. |
+| **Citation** | A *Report link* led by its target's status glyph, citing a scenario, tag, story or term from a Markdown document: `✅ [title](<report URL>#scenario=…)`. A tag, story or term citation adds a summary after it, `(5 ✅ · 2 🔵)`. A target the *Report* lacks reads `❓`. |
 | **Narrated citation** | A *Citation* of a scenario written as a collapsible block, the citation as its summary and the scenario's Markdown narration as its body. |
+| **Defining citation** | A *Citation* of a term written as a collapsible block, the citation as its summary and the term's definition as its body. |
 | **Citation finding** | One problem `pytest-given citations check` reports on one *Report link*: its kind (`stale`, `missing`, `failed`, `mistyped`, …), the document location and a message. |
 | **Theme** | The HTML report's colour scheme — `light`, `dark`, or `auto` (follow the viewer's system). |
 

@@ -22,8 +22,22 @@ from ..markdown import (
     code_span_at,
     text_runs,
 )
+from ..model import STATUSES
+from ..report import CITATION_GLYPH, NO_SCENARIOS_SUMMARY, SUMMARY_SEPARATOR
 
 VARIATION_SELECTOR = '\ufe0f'
+
+_SUMMARY_COUNT = (
+    r'\d+ (?:'
+    + '|'.join(CITATION_GLYPH[status] for status in STATUSES)
+    + f'){VARIATION_SELECTOR}?'
+)
+# Only text of this shape counts as a summary, so a parenthetical of the
+# author's own after a citation stays theirs.
+SUMMARY_PATTERN = (
+    rf'{re.escape(NO_SCENARIOS_SUMMARY)}'
+    rf'|\({_SUMMARY_COUNT}(?:{re.escape(SUMMARY_SEPARATOR)}{_SUMMARY_COUNT})*\)'
+)
 
 
 class Glyph(NamedTuple):
@@ -35,6 +49,11 @@ class Glyph(NamedTuple):
     @property
     def bare(self) -> str:
         return self.text.removesuffix(VARIATION_SELECTOR)
+
+
+class WrittenSummary(NamedTuple):
+    text: str
+    span: Span
 
 
 @dataclass(frozen=True, kw_only=True)

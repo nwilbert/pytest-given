@@ -608,7 +608,7 @@
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">{{ term.canonical }}{{ anchor_link('view=glossary&term=' ~ term.id) }}</span>
+              <span class="term-name">{{ term.canonical }}{{ copy_button('term', term.id, 'view=glossary&term=' ~ term.id) }}</span>
             </span>
             <div class="entry-body">
               <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
@@ -685,16 +685,18 @@
 </div>
 
 {% if citations %}
-<!-- The menu a scenario card's, story header's or tag row's copy button opens;
-     positioned by app.js beside the button that opened it. One shared node,
-     as the tooltip is: a menu per card would repeat its markup hundreds of
-     times. The narrated citation is a scenario's alone, and the untagged
-     row, which no citation covers, has only its link. -->
+<!-- The menu a scenario card's, story header's, tag row's or term row's copy
+     button opens; positioned by app.js beside the button that opened it. One
+     shared node, as the tooltip is: a menu per card would repeat its markup
+     hundreds of times. The narrated citation is a scenario's alone, the
+     defining citation a defined term's, and the untagged row, which no citation
+     covers, has only its link. -->
 <div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link">{{ icon('link') }}Copy link</button>
   <div class="copy-menu-separator" role="separator" data-copy-citations></div>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="{{ citation_title }}">{{ icon('citation') }}Copy citation</button>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in.">{{ icon('narrated') }}Copy narrated citation</button>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="defining" title="Copy a Markdown block for the term's definition, which pytest-given citations update fills in.">{{ icon('narrated') }}Copy defining citation</button>
 </div>
 {% endif %}
 

@@ -504,8 +504,6 @@ area tag.
   show `main`'s state in every commit's copy of a document, depend on a third party, and lag behind
   image-proxy caches.
 - **Updating from CI** — a job that runs `citations update` and commits the result.
-- **Citing a glossary term.** Terms have deep links (`#view=glossary&term=…`), but a term states
-  vocabulary, not behavior, so it has no status for a document to track.
 - Embedding a scenario's steps or parameter table; citing a single case of a grouped scenario;
   generating citation lists from a tag, term or story; links combining several filters; checking
   against several reports in one run.

@@ -1,16 +1,19 @@
 """`citations check` and `update`: the report links in Markdown documents,
 held to a JSON report."""
 
+import functools
 import re
 from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
+from markdown_it import MarkdownIt
 
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.citations import CitationsResult, check_citations, markdown_documents
 from pytest_given.citations import check as check_module
 from pytest_given.model import (
+    GlossaryTerm,
     Narration,
     NarrationLiteral,
     NarrationTermRef,
@@ -25,11 +28,19 @@ from pytest_given.model import (
 from pytest_given.report import Target
 from pytest_given.report.citation_index import (
     CitationIndex,
-    scenario_citation_templates,
+    citation_templates,
 )
+from pytest_given.report.inline_markdown import render_definition
 from tests.ubiquitous_language import pg
-from tests.unit.citation_reports import URL, report_, scenario_, story_
-from tests.unit.report.test_citation_index import _filled
+from tests.unit.citation_reports import (
+    URL,
+    filled,
+    report_,
+    scenario_,
+    story_,
+    term_,
+    using_,
+)
 
 
 def _run(
@@ -927,6 +938,7 @@ def test_every_report_link_is_listed_in_document_order(tmp_path: Path) -> None:
         for line, head in [
             (1, '✅ scenario t.py::test_pay'),
             (2, 'link story gone'),
+            (3, 'link term guest'),
             (4, '? tag x'),
             (5, '✅ #q=pay'),
         ]
@@ -1067,6 +1079,7 @@ def _block(
     *,
     glyph: str = '✅',
     text: str = 'Pay by card',
+    summary: str = '',
     fragment: str = 'scenario=t.py::test_pay',
     url: str = URL,
     opening: str = '<details markdown="1">',
@@ -1074,7 +1087,7 @@ def _block(
     """A narrated citation; `body` is the source between its summary line and
     its closing tag, a freshly copied block's blank line by default."""
     return (
-        f'{opening}\n<summary>{glyph} <a href="{url}#{fragment}">{text}</a>'
+        f'{opening}\n<summary>{glyph} <a href="{url}#{fragment}">{text}</a>{summary}'
         f'</summary>\n{body}</details>\n'
     )
 
@@ -1246,8 +1259,8 @@ def test_a_narrated_citation_copied_from_the_report_is_current_once_filled(
         citation = CitationIndex.of(report).citation(
             Target('scenario', 't.py::test_pay')
         )
-        template = scenario_citation_templates(URL)['narrated']
-        document = f'{_filled(template, citation.scenario_row())}\n'
+        template = citation_templates(URL)['narrated']
+        document = f'{filled(template, citation.template_row())}\n'
         attach('document', document)
     with when('the document is updated'):
         _, written = _run(tmp_path, document, report, update=True)
@@ -1467,6 +1480,16 @@ def test_a_grouped_scenario_in_a_blockquote_is_clean_after_an_update(
     assert rechecked.findings == []
 
 
+def test_a_scenario_without_steps_has_an_empty_body(tmp_path: Path) -> None:
+    report = report_(scenario_('t.py::test_pay', 'Pay by card'))
+    copied, written = _run(tmp_path, _block(), report, update=True)
+    assert copied.findings == []
+    assert written == _block()
+    held, written = _run(tmp_path, _block('\nold\n\n'), report, update=True)
+    assert [f.message for f in held.findings] == ['stale narration']
+    assert written == _block()
+
+
 def test_a_report_link_in_a_stale_body_is_not_read(tmp_path: Path) -> None:
     document = _block(f'\n✓ [old]({URL}#scenario=t.py::test_gone)\n\n')
     checked, _ = _run(tmp_path, document, report_(PAID))
@@ -1609,3 +1632,439 @@ def test_a_narrated_citation_is_listed_and_covered_as_a_one_line_one(
     ]
     covered, _ = _run(tmp_path, document, report, covering=['t.py::test_pay'])
     assert [listed.line for listed in covered.listed] == [4]
+
+
+# --- Term citations ---
+
+
+GUEST_LINK = f'{URL}#view=glossary&term=guest'
+DEFINITION = 'Someone staying at the hotel.'
+DEFINED = term_('Guest', DEFINITION)
+
+
+def _stay(status: Status = 'passed') -> Scenario:
+    return using_('guest', scenario_('t.py::test_stay', 'Stay', status=status))
+
+
+def _guest_report() -> ReportData:
+    return report_(_stay(), terms=(DEFINED,))
+
+
+_defining = functools.partial(
+    _block, text='Guest', summary=' (1 ✅)', fragment='view=glossary&term=guest'
+)
+DEFINED_BODY = f'\n{DEFINITION}\n\n'
+
+
+@scenario(
+    t'A {pg["Citation"].l} of a {pg["Term"].l} rolls up the {pg["Scenario"].l.s} that '
+    t'reference it',
+    tags=['spec/term-citations'],
+)
+def test_a_term_citation_rolls_up_the_scenarios_that_reference_it(
+    tmp_path: Path,
+) -> None:
+    with given(
+        t'a {pg["Report"].l} with a passed and an xfailed {pg["Scenario"].l} holding '
+        t'a {pg["Term ref"].l} to the {pg["Term"].l} `Guest`, and a failed one holding '
+        t'none'
+    ):
+        report = report_(
+            _stay(),
+            using_('guest', scenario_('t.py::test_leave', status='xfailed')),
+            scenario_('t.py::test_pay', status='failed'),
+            terms=(DEFINED,),
+        )
+    with given(t'a document with a {pg["Citation"].l} of the term, its glyph typed'):
+        document = f'? [guests]({GUEST_LINK})\n'
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('it reads the canonical name, and the rollup of the two scenarios'):
+        attach('updated document', written)
+        assert written == f'🔵 [Guest]({GUEST_LINK}) (1 ✅ · 1 🔵)\n'
+    with then('no finding remains'):
+        assert result.remaining == []
+
+
+@scenario(
+    t'A {pg["Term"].l} no {pg["Scenario"].l} references reads as having no '
+    t'{pg["Scenario"].l.s}',
+    tags=['spec/term-citations'],
+)
+def test_a_term_no_scenario_references_reads_as_having_no_scenarios(
+    tmp_path: Path,
+) -> None:
+    with given(t'a {pg["Report"].l} whose {pg["Glossary"].l} holds an unused term'):
+        report = report_(scenario_('t.py::test_pay'), terms=(DEFINED,))
+    with given(t'a document with a {pg["Citation"].l} of the term'):
+        document = f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n'
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('it reads `🟠` and `(no scenarios)`'):
+        attach('updated document', written)
+        assert written == f'🟠 [Guest]({GUEST_LINK}) (no scenarios)\n'
+    with then('no finding remains'):
+        assert result.remaining == []
+
+
+@scenario(
+    t'A {pg["Term"].l} missing from the {pg["Report"].l} is a '
+    t'{pg["Citation finding"].l}, for a {pg["Citation"].l} and a plain '
+    t'{pg["Report link"].l} alike',
+    tags=['spec/term-citations'],
+)
+def test_a_term_missing_from_the_report_is_a_finding(tmp_path: Path) -> None:
+    with given(t'a {pg["Report"].l} whose {pg["Glossary"].l} lacks the term `Guest`'):
+        report = report_(terms=(term_('Host'),))
+    with given(
+        t'a document with a {pg["Citation"].l} of the term and a plain '
+        t'{pg["Report link"].l} to it'
+    ):
+        document = f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n\n[our guests]({GUEST_LINK})\n'
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('each link is a `missing` finding'):
+        assert [(f.line, f.kind) for f in result.remaining] == [
+            (1, 'missing'),
+            (3, 'missing'),
+        ]
+    with then("the citation's glyph becomes `❓` and its summary goes"):
+        attach('updated document', written)
+        assert written == f'❓ [Guest]({GUEST_LINK})\n\n[our guests]({GUEST_LINK})\n'
+
+
+@scenario(
+    t"`citations update` writes a {pg['Defining citation'].l}'s body from the "
+    t"{pg['Term'].l}'s definition",
+    tags=['spec/term-citations'],
+)
+def test_update_writes_a_defining_citations_body(tmp_path: Path) -> None:
+    with given(t'a {pg["Report"].l} with a defined {pg["Term"].l}'):
+        report = _guest_report()
+    with given(
+        t'a document holding a {pg["Defining citation"].l} of it, copied with an '
+        t'empty body'
+    ):
+        document = _defining()
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('its body holds the definition between blank lines'):
+        attach('updated document', written)
+        assert written == _defining(DEFINED_BODY)
+    with then('no finding remains'):
+        assert result.remaining == []
+
+
+@scenario(
+    t"An undefined {pg['Term'].l}'s {pg['Defining citation'].l} has an empty body, "
+    t'and `citations update` empties one that holds text',
+    tags=['spec/term-citations'],
+)
+def test_an_undefined_terms_defining_citation_has_an_empty_body(
+    tmp_path: Path,
+) -> None:
+    with given(t'a {pg["Report"].l} whose {pg["Term"].l} has no definition'):
+        report = report_(_stay(), terms=(term_('Guest'),))
+    with given(
+        t'a document with a {pg["Defining citation"].l} of it whose body holds an old '
+        t'definition'
+    ):
+        document = _defining(DEFINED_BODY)
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('a stale definition is reported'):
+        assert [(f.kind, f.message) for f in result.findings] == [
+            ('stale', 'stale definition')
+        ]
+    with then('its body is empty'):
+        attach('updated document', written)
+        assert written == _defining()
+    with then(t'the emptied block has no {pg["Citation finding"].l}'):
+        current, _ = _run(tmp_path, written, report)
+        assert current.findings == []
+
+
+@scenario(
+    t"A {pg['Defining citation'].l}'s body shows the definition as the "
+    t'{pg["Report"].l} shows it',
+    tags=['spec/term-citations'],
+)
+def test_a_defining_citations_body_shows_the_definition_as_the_report_does(
+    tmp_path: Path,
+) -> None:
+    with given(
+        t'a {pg["Term"].l} whose definition has a code span, emphasis, a link, an '
+        t'HTML tag and a line break'
+    ):
+        definition = (
+            'Reads `x` *closely*, see [docs](y)\nand <b>never</b> close </details>'
+        )
+        attach('definition', definition)
+        report = report_(_stay(), terms=(term_('Guest', definition),))
+    with when(t'a {pg["Defining citation"].l} of it is updated'):
+        _, written = _run(tmp_path, _defining(), report, update=True)
+    with then('the spans stay markup, and the link and the tags stay literal text'):
+        attach('updated document', written)
+        assert written == _defining(
+            '\nReads `x` *closely*, see \\[docs\\](y)<br>'
+            'and \\<b>never\\</b> close \\</details>\n\n'
+        )
+    with then(
+        t'rendered, the body reads as the {pg["Report"].l} renders the definition'
+    ):
+        body = written.splitlines()[3]
+        rendered = MarkdownIt('commonmark', {'html': True}).renderInline(body)
+        assert rendered == render_definition(definition)
+    with then('the updated document is current'):
+        result, _ = _run(tmp_path, written, report)
+        assert result.findings == []
+
+
+@scenario(
+    t'`--covering` keeps a {pg["Citation"].l} of a {pg["Term"].l} that counts the '
+    t'{pg["Scenario"].l}',
+    tags=['spec/term-citations'],
+)
+def test_covering_keeps_a_term_citation_that_counts_the_scenario(
+    tmp_path: Path,
+) -> None:
+    with given(
+        t'a {pg["Report"].l} with two {pg["Term"].l.s}, one used by the '
+        t'{pg["Scenario"].l} `test_stay`'
+    ):
+        report = report_(_stay(), terms=(DEFINED, term_('Host')))
+    with given('a document citing both terms, and plainly linking the used one'):
+        host = f'{URL}#view=glossary&term=host'
+        document = (
+            f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n\n🟠 [Host]({host}) (no scenarios)\n\n'
+            f'[our guests]({GUEST_LINK})\n'
+        )
+        attach('document', document)
+    with when('the document is checked with `--covering` that scenario'):
+        result, _ = _run(tmp_path, document, report, covering=['t.py::test_stay'])
+    with then('the used term is listed, as a citation and as a plain link'):
+        assert [listed.line for listed in result.listed] == [1, 5]
+
+
+@scenario(
+    t'A failed {pg["Scenario"].l} holding a {pg["Term ref"].l} fails the '
+    t'{pg["Citation"].l} of its {pg["Term"].l}',
+    tags=['spec/term-citations'],
+)
+def test_a_failed_scenario_using_a_term_fails_its_citation(tmp_path: Path) -> None:
+    with given(t'a {pg["Report"].l} where a failed {pg["Scenario"].l} uses `Guest`'):
+        report = report_(_stay('failed'), terms=(DEFINED,))
+    with given(t'a document with a {pg["Citation"].l} of the term, read as passed'):
+        document = f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n'
+        attach('document', document)
+    with when('the document is updated'):
+        result, written = _run(tmp_path, document, report, update=True)
+    with then('its glyph and summary read `❌`'):
+        attach('updated document', written)
+        assert written == f'❌ [Guest]({GUEST_LINK}) (1 ❌)\n'
+    with then(
+        t'a `failed` {pg["Citation finding"].l} remains, blaming a scenario using the '
+        t'term'
+    ):
+        assert [(f.kind, f.message) for f in result.remaining] == [
+            ('failed', 'a scenario using cited term fails: Guest')
+        ]
+
+
+def test_a_current_term_citation_in_either_parameter_order_is_silent(
+    tmp_path: Path,
+) -> None:
+    report = _guest_report()
+    swapped = f'{URL}#term=guest&view=glossary'
+    document = f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n\n✅ [Guest]({swapped}) (1 ✅)\n'
+    result, written = _run(tmp_path, document, report, update=True)
+    assert result.findings == []
+    assert written == document
+
+
+def test_a_missing_term_suggests_the_closest_ids_and_names(tmp_path: Path) -> None:
+    report = report_(_stay(), terms=(term_('Guests'),))
+    result, _ = _run(tmp_path, f'✅ [Guest]({GUEST_LINK})\n', report)
+    assert result.findings[0].details == (
+        'closest by term id: guests',
+        'closest by term name: guests ("Guests")',
+    )
+
+
+def test_a_term_is_missing_from_a_report_without_a_glossary(tmp_path: Path) -> None:
+    result, written = _run(
+        tmp_path, f'✅ [Guest]({GUEST_LINK})\n', report_(PAY), update=True
+    )
+    assert [f.kind for f in result.remaining] == ['missing']
+    assert written == f'❓ [Guest]({GUEST_LINK})\n'
+
+
+def test_a_term_back_in_the_report_recovers_glyph_and_summary(tmp_path: Path) -> None:
+    report = _guest_report()
+    result, written = _run(tmp_path, f'❓ [Guest]({GUEST_LINK})\n', report, update=True)
+    assert result.remaining == []
+    assert written == f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n'
+
+
+def test_a_bare_term_fragment_is_held_to_the_report_and_stays_as_written(
+    tmp_path: Path,
+) -> None:
+    report = report_(PAY, terms=(DEFINED,))
+    dead, _ = _run(tmp_path, f'[guests]({URL}#term=gone)\n', report)
+    assert [(link.named, [f.kind for f in link.findings]) for link in dead.links] == [
+        ('term gone', ['missing'])
+    ]
+    plain = f'[guests]({URL}#term=guest)\n'
+    current, written = _run(tmp_path, plain, report, update=True)
+    assert current.findings == []
+    assert written == plain
+    cited = f'🟠 [Guest]({URL}#term=guest) (no scenarios)\n'
+    current, written = _run(tmp_path, cited, report, update=True)
+    assert current.findings == []
+    assert written == cited
+
+
+def test_a_term_link_is_listed_by_its_id(tmp_path: Path) -> None:
+    report = _guest_report()
+    document = f'✅ [Guest]({GUEST_LINK}) (1 ✅)\n\n[our guests]({GUEST_LINK})\n'
+    result, _ = _run(tmp_path, document, report)
+    assert [listed.lines()[0].split(': ', 1)[1] for listed in result.listed] == [
+        '✅ term guest',
+        'link term guest',
+    ]
+
+
+def test_a_current_defining_citation_is_silent(tmp_path: Path) -> None:
+    report = _guest_report()
+    document = _defining(DEFINED_BODY)
+    result, written = _run(tmp_path, document, report, update=True)
+    assert result.findings == []
+    assert written == document
+
+
+@pytest.mark.parametrize(
+    ('summary', 'message'),
+    [('', 'missing summary'), (' (3 ✅)', 'stale summary')],
+)
+def test_a_defining_citations_summary_is_kept_current(
+    tmp_path: Path, summary: str, message: str
+) -> None:
+    report = _guest_report()
+    document = _defining(DEFINED_BODY, summary=summary)
+    result, written = _run(tmp_path, document, report, update=True)
+    assert [f.message for f in result.findings] == [message]
+    assert written == _defining(DEFINED_BODY)
+
+
+def test_a_wrapped_summary_in_a_defining_citation_is_current(tmp_path: Path) -> None:
+    report = _guest_report()
+    document = _defining(DEFINED_BODY, summary='\n(1 ✅)\n')
+    result, _ = _run(tmp_path, document, report)
+    assert result.findings == []
+
+
+def test_a_defining_citation_of_a_missing_term_keeps_its_body_and_its_links_are_read(
+    tmp_path: Path,
+) -> None:
+    report = report_(PAY, terms=(term_('Host'),))
+    body = f'\nMine, see [pay]({URL}#scenario=t.py::test_gone).\n\n'
+    result, written = _run(tmp_path, _defining(body), report, update=True)
+    assert [(f.line, f.kind) for f in result.remaining] == [
+        (2, 'missing'),
+        (4, 'missing'),
+    ]
+    assert written == _defining(body, glyph='❓', summary='')
+
+
+def test_a_resolved_defining_citations_body_is_not_read(tmp_path: Path) -> None:
+    report = _guest_report()
+    body = f'\n[gone]({URL}#scenario=t.py::test_gone)\n\n'
+    result, written = _run(tmp_path, _defining(body), report, update=True)
+    assert [(f.kind, f.message) for f in result.findings] == [
+        ('stale', 'stale definition')
+    ]
+    assert written == _defining(DEFINED_BODY)
+
+
+def test_a_defining_citation_without_markdown_1_is_stale(tmp_path: Path) -> None:
+    report = _guest_report()
+    document = _defining(DEFINED_BODY, opening='<details open>')
+    result, written = _run(tmp_path, document, report, update=True)
+    assert [f.message for f in result.findings] == ['stale opening tag']
+    assert written == _defining(DEFINED_BODY, opening='<details markdown="1" open>')
+
+
+def test_a_term_title_with_markup_is_current_as_rendered(tmp_path: Path) -> None:
+    term = GlossaryTerm(id=TermId('t'), kind=None, canonical='A<B')
+    document = _defining(
+        glyph='🟠',
+        text='A&lt;B',
+        fragment='view=glossary&term=t',
+        summary=' (no scenarios)',
+    )
+    result, _ = _run(tmp_path, document, report_(PAY, terms=(term,)))
+    assert result.findings == []
+
+
+def test_a_defining_citations_body_follows_crlf(tmp_path: Path) -> None:
+    report = _guest_report()
+    document = _defining().replace('\n', '\r\n')
+    result, written = _run(tmp_path, document, report, update=True)
+    assert [f.message for f in result.findings] == ['stale definition']
+    assert written == _defining(DEFINED_BODY).replace('\n', '\r\n')
+    current, _ = _run(tmp_path, written, report)
+    assert current.findings == []
+
+
+def test_a_defining_citations_body_keeps_a_list_items_indent(tmp_path: Path) -> None:
+    report = _guest_report()
+    head = f'<summary>✅ <a href="{GUEST_LINK}">Guest</a> (1 ✅)</summary>'
+    document = f'- <details markdown="1">\n  {head}\n\n  </details>\n'
+    _, written = _run(tmp_path, document, report, update=True)
+    assert written == (
+        f'- <details markdown="1">\n  {head}\n\n  {DEFINITION}\n\n  </details>\n'
+    )
+    current, _ = _run(tmp_path, written, report)
+    assert current.findings == []
+
+
+def test_a_summary_on_a_narrated_citation_is_a_stray_summary(tmp_path: Path) -> None:
+    document = _defining(FILLED, text='Pay by card', fragment='scenario=t.py::test_pay')
+    result, written = _run(tmp_path, document, report_(PAID), update=True)
+    assert [(f.kind, f.message) for f in result.remaining] == [
+        ('stray-summary', 'a scenario citation takes no summary: (1 ✅)')
+    ]
+    assert written == document
+
+
+@pytest.mark.parametrize(
+    ('fragment', 'kind'), [('tag=spec', 'tag'), ('view=stories&story=s', 'story')]
+)
+def test_a_summary_on_a_tag_or_story_details_block_stays_stray_narration(
+    tmp_path: Path, fragment: str, kind: str
+) -> None:
+    report = report_(
+        scenario_('t.py::test_a', tags=('spec',), stories=('s',)),
+        stories=(story_('s'),),
+    )
+    document = _defining('\nbody\n\n', text='x', fragment=fragment)
+    result, written = _run(tmp_path, document, report, update=True)
+    assert [(f.kind, f.message) for f in result.remaining] == [
+        ('stray-narration', f'a {kind} citation takes no narration')
+    ]
+    assert written == document
+
+
+def test_other_text_after_a_defining_citations_anchor_is_mistyped(
+    tmp_path: Path,
+) -> None:
+    report = _guest_report()
+    document = _defining(DEFINED_BODY, summary=' (see the glossary)')
+    result, _ = _run(tmp_path, document, report)
+    assert [f.kind for f in result.findings] == ['mistyped']
+    assert 'text follows </a>' in result.findings[0].message

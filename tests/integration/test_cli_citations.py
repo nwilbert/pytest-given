@@ -43,6 +43,16 @@ def _write_report(
                         'module': 'm',
                     },
                 ],
+                'glossary': {
+                    'terms': [
+                        {
+                            'id': 'guest',
+                            'kind': 'actor',
+                            'canonical': 'Guest',
+                            'definition': 'Someone staying.',
+                        }
+                    ]
+                },
             }
         ),
         encoding='utf-8',
@@ -304,6 +314,30 @@ def test_check_exits_1_on_a_stale_narrated_body(tmp_path: Path, capsys) -> None:
     out = capsys.readouterr().out
     assert f'{doc.as_posix()}:2: stale narration' in out
     assert 'written: - **then** it is charged' in out
+
+
+def _defining(body: str) -> str:
+    return (
+        '<details markdown="1">\n'
+        f'<summary>🟠 <a href="{URL}#view=glossary&term=guest">Guest</a> '
+        f'(no scenarios)</summary>\n{body}</details>\n'
+    )
+
+
+def test_update_fills_a_defining_citations_empty_body(tmp_path: Path) -> None:
+    report = _write_report(tmp_path)
+    doc = _doc(tmp_path, _defining('\n'))
+    assert main(['citations', 'update', str(doc), '--report', str(report)]) == 0
+    assert doc.read_text(encoding='utf-8') == _defining('\nSomeone staying.\n\n')
+
+
+def test_check_exits_1_on_a_stale_defining_body(tmp_path: Path, capsys) -> None:
+    report = _write_report(tmp_path)
+    doc = _doc(tmp_path, _defining('\nSomeone leaving.\n\n'))
+    assert main(['citations', 'check', str(doc), '--report', str(report)]) == 1
+    out = capsys.readouterr().out
+    assert f'{doc.as_posix()}:2: stale definition' in out
+    assert 'written: Someone leaving.' in out
 
 
 # --- Listing ---

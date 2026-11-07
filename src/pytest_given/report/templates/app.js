@@ -50,12 +50,12 @@ function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
 
-// A scenario citation template alternates literal text and slot names. The
-// row is `scenario_row`'s: glyph, fragment, title, and an HTML title only
-// where it differs.
+// A citation template alternates literal text and slot names. The row is
+// `template_row`'s: glyph, fragment, title, the summary, and the HTML title,
+// the last two left out when empty or matching.
 function fillCitation(template, row) {
-  const [glyph, fragment, title, htmlTitle = title] = row;
-  const slots = { glyph, fragment, title, html_title: htmlTitle };
+  const [glyph, fragment, title, summary = '', htmlTitle = title] = row;
+  const slots = { glyph, fragment, title, html_title: htmlTitle, summary };
   return template.map((part, position) => (position % 2 ? slots[part] : part)).join('');
 }
 
@@ -753,17 +753,11 @@ function reportApp() {
     hasCitation(kind, key) {
       return Object.hasOwn(window.__REPORT_DATA__.citations[kind], key);
     },
-    // Python renders a tag's or story's line either side of the report's
-    // public URL — the setting's, never `window.location` — and a scenario's
-    // forms as templates, the URL in place, that its row fills.
-    copyCitation(kind, key, btn) {
+    // Python renders each form as a template holding the report's public URL —
+    // the setting's, never `window.location` — that a target's row fills.
+    copyCitation(kind, form, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
-      const halves = lookup(citations[kind], key, null);
-      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
-    },
-    _copyScenarioCitation(form, key, btn) {
-      const citations = window.__REPORT_DATA__.citations;
-      const row = lookup(citations.scenario, key, null);
+      const row = lookup(citations[kind], key, null);
       if (row) this._copyAndFlash(fillCitation(citations.templates[form], row), btn);
     },
     // A second click on the button that opened the menu closes it. The first
@@ -778,6 +772,7 @@ function reportApp() {
       copyMenu.querySelector('[data-copy-citations]').hidden = !cited;
       copyMenu.querySelector('[data-copy-entry="citation"]').hidden = !cited;
       copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = !cited || kind !== 'scenario';
+      copyMenu.querySelector('[data-copy-entry="defining"]').hidden = !cited || kind !== 'term' || !termsById.get(key)?.definition;
       copyMenu.hidden = false;
       copyMenuTrigger = trigger;
       trigger.setAttribute('aria-expanded', 'true');
@@ -817,8 +812,7 @@ function reportApp() {
       this._closeCopyMenu(true);
       const { citationKind: kind, citationKey: key } = trigger.dataset;
       if (entry === 'link') this.copyAnchor(trigger);
-      else if (kind === 'scenario') this._copyScenarioCitation(entry, key, trigger);
-      else this.copyCitation(kind, key, trigger);
+      else this.copyCitation(kind, entry, key, trigger);
     },
     // Tab closes the menu onto its button rather than moving on from the
     // menu's place at the end of the page.

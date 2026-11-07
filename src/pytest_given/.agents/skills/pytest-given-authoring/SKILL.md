@@ -47,7 +47,7 @@ Each kind of artifact works on its own; using scenarios only is a perfectly good
 
 - Render the scenarios you changed and read the output as a spec. Every step text must describe something its body actually does: `pytest <selection> --given-md`
 - If the project uses the narration lint, run it on the whole suite: `pytest --given-lint`. A selection fails on a `given_lint_ignore` entry for a test it skips. The lint catches structural lies, such as empty steps or a `then` that checks nothing. It can't check whether the narration is true; that is the author's job.
-- If Markdown documents cite the report, run `pytest-given citations check`. A renamed test, a reworded title, or reworded steps under a narrated citation change their citations; the `pytest-given-citing` skill handles the citation findings. A changed step body under the same narration changes none: reread each sentence that `citations check --covering <node ID>` lists.
+- If Markdown documents cite the report, run `pytest-given citations check`. A renamed test or term, a reworded title, reworded steps under a narrated citation, a reworded definition under a defining citation, or a new term ref to a cited term changes those citations; the `pytest-given-citing` skill handles the citation findings. A changed step body under the same narration changes none: reread each sentence that `citations check --covering <node ID>` lists.
 
 Reviewing someone else's narration rather than writing your own? Use the `pytest-given-reviewing` skill. It restates these rules as a review rubric.
 

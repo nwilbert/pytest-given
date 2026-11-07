@@ -1,5 +1,5 @@
 """What a citation of each kind says — glyph, link text, fragment, summary —
-and which scenarios, tags and stories a report holds to cite."""
+and which scenarios, tags, stories and terms a report holds to cite."""
 
 import html
 import re
@@ -12,23 +12,26 @@ from urllib.parse import quote
 
 from ..model import (
     STATUSES,
+    GlossaryTerm,
     Narration,
     NodeId,
     ReportData,
     Scenario,
     StoryId,
+    TermId,
     node_base,
     rolled_up_status,
 )
 from .coverage import build_coverage_map
+from .glossary_view import build_term_crossrefs
 from .link_text import html_link_text, link_text
-from .md_renderer import narration_body_md
+from .md_renderer import definition_body_md, narration_body_md
 from .story_view import scenarios_by_story
 from .text import CITATION_GLYPH, CitationState
 
-type TargetKind = Literal['scenario', 'tag', 'story']
+type TargetKind = Literal['scenario', 'tag', 'story', 'term']
 
-# A tag or story citation's summary is built of these, and read back by them.
+# A rollup citation's summary is built of these, and read back by them.
 SUMMARY_SEPARATOR = ' · '
 NO_SCENARIOS_SUMMARY = '(no scenarios)'
 
@@ -38,7 +41,8 @@ _TAG_SEPARATOR = '/'
 @dataclass(frozen=True)
 class Target:
     """What a report link's fragment names: a scenario by node ID — or by
-    slug, until `citations update` rewrites it — a tag, or a story by id."""
+    slug, until `citations update` rewrites it — a tag, or a story or term by
+    id."""
 
     kind: TargetKind
     key: str
@@ -48,7 +52,7 @@ class Target:
 class Citation:
     state: CitationState
     # A scenario's title keeps its pieces, so its link text keeps the spans
-    # each plain-text piece renders; a tag or story title is literal.
+    # each plain-text piece renders; a tag's, story's or term's is literal.
     title: Narration | str
     fragment: str
     summary: str | None
@@ -63,64 +67,47 @@ class Citation:
 
     @property
     def html_link_text(self) -> str:
-        assert isinstance(self.title, Narration)
         return html_link_text(self.title)
 
-    def markdown_halves(self) -> tuple[str, str]:
-        """The one-line citation a copy button puts on the clipboard, either
-        side of the report URL — which a page citing thousands of targets
-        carries once."""
-        summary = f' {self.summary}' if self.summary else ''
-        return _markdown_halves(
-            self.glyph, link_text(self.title), self.fragment, summary
-        )
-
-    def scenario_row(self) -> list[str]:
-        """What `scenario_citation_templates` leave to fill: glyph, fragment,
-        title, and the HTML title only where it differs from the Markdown."""
+    def template_row(self) -> list[str]:
+        """What `citation_templates` leave to fill: glyph, fragment, title, the
+        summary, and the HTML title. The last two are left out when empty or
+        when the HTML title matches the Markdown one, which keeps a page citing
+        thousands of targets small."""
         title = link_text(self.title)
         html_title = self.html_link_text
-        return [
-            self.glyph,
-            self.fragment,
-            title,
-            *([html_title] if html_title != title else []),
-        ]
+        summary = f' {self.summary}' if self.summary else ''
+        row = [self.glyph, self.fragment, title, summary]
+        if html_title != title:
+            return [*row, html_title]
+        return row if summary else row[:3]
 
 
 type CitationTemplate = list[str]
 
 
-def scenario_citation_templates(report_url: str) -> dict[str, CitationTemplate]:
-    """Each form a scenario citation is copied in, keyed by its copy menu
-    entry, as literal text and slot names alternating, so a page carries the
-    forms once and each scenario only its `scenario_row`."""
-    glyph, fragment, title, html_title = (
-        f'\0{slot}\0' for slot in ('glyph', 'fragment', 'title', 'html_title')
+def citation_templates(report_url: str) -> dict[str, CitationTemplate]:
+    """Each form a citation is copied in, keyed by its copy menu entry, as
+    literal text and slot names alternating, so a page carries the forms and
+    the report URL once and each target only its `template_row`."""
+    glyph, fragment, title, html_title, summary = (
+        f'\0{slot}\0'
+        for slot in ('glyph', 'fragment', 'title', 'html_title', 'summary')
     )
-    markdown = _markdown_halves(glyph, title, fragment, '')
-    narrated = _narrated_halves(glyph, html_title, fragment)
+    # A `<details>` form's body stays empty for `citations update` to fill.
+    details = (
+        f'<details markdown="1">\n<summary>{glyph} '
+        f'<a href="{html.escape(report_url)}#{fragment}">{html_title}</a>'
+    )
+    closing = '</summary>\n\n</details>'
     return {
-        'citation': _SLOT.split(report_url.join(markdown)),
-        'narrated': _SLOT.split(html.escape(report_url).join(narrated)),
+        'citation': _SLOT.split(f'{glyph} [{title}]({report_url}#{fragment}){summary}'),
+        'narrated': _SLOT.split(f'{details}{closing}'),
+        'defining': _SLOT.split(f'{details}{summary}{closing}'),
     }
 
 
 _SLOT = re.compile(r'\0(\w+)\0')
-
-
-def _markdown_halves(
-    glyph: str, title: str, fragment: str, summary: str
-) -> tuple[str, str]:
-    return (f'{glyph} [{title}](', f'#{fragment}){summary}')
-
-
-def _narrated_halves(glyph: str, html_title: str, fragment: str) -> tuple[str, str]:
-    """The `<details>` block, its body empty for `citations update` to fill."""
-    return (
-        f'<details markdown="1">\n<summary>{glyph} <a href="',
-        f'#{fragment}">{html_title}</a></summary>\n\n</details>',
-    )
 
 
 def report_fragment(target: Target) -> str:
@@ -134,17 +121,23 @@ def report_fragment(target: Target) -> str:
             return f'tag={value}'
         case 'story':
             return f'view=stories&story={value}'
+        case 'term':
+            return f'view=glossary&term={value}'
 
 
 class CitationIndex:
-    """The scenarios, tags and stories a report lets a document cite. The tags
-    and stories are built on first use: a report without a URL needs neither."""
+    """The scenarios, tags, stories and terms a report lets a document cite. All
+    but the scenarios are built on first use: a report without a URL needs none."""
 
     def __init__(
-        self, report: ReportData, story_scenarios: Mapping[StoryId, list[Scenario]]
+        self,
+        report: ReportData,
+        story_scenarios: Mapping[StoryId, list[Scenario]],
+        term_scenarios: Mapping[TermId, list[NodeId]],
     ) -> None:
         self._report = report
         self._story_scenarios = story_scenarios
+        self._term_scenarios = term_scenarios
         self.scenarios = _citable_scenarios(report)
 
     @cached_property
@@ -165,10 +158,28 @@ class CitationIndex:
             for story in self._report.stories
         }
 
+    @cached_property
+    def terms(self) -> dict[TermId, tuple[GlossaryTerm, list[Scenario]]]:
+        """Each with the scenarios the Glossary view lists for it."""
+        glossary = self._report.glossary
+        by_id = {scenario.id: scenario for scenario in self._report.scenarios}
+        return {
+            term.id: (
+                term,
+                [by_id[node_id] for node_id in self._term_scenarios.get(term.id, [])],
+            )
+            for term in (glossary.terms if glossary is not None else [])
+        }
+
     @classmethod
     def of(cls, report: ReportData) -> Self:
-        """For a caller that has not built the coverage already."""
-        return cls(report, scenarios_by_story(report, build_coverage_map(report)))
+        """For a caller that has not built the coverage and cross-references
+        already."""
+        return cls(
+            report,
+            scenarios_by_story(report, build_coverage_map(report)),
+            build_term_crossrefs(report).term_scenarios,
+        )
 
     def citation(self, target: Target) -> Citation:
         """What a citation of a resolved `target` says."""
@@ -187,15 +198,25 @@ class CitationIndex:
             case 'story':
                 title, told = self.stories[StoryId(target.key)]
                 return _rollup(title, fragment, told)
+            case 'term':
+                term, using = self.terms[TermId(target.key)]
+                return _rollup(term.canonical, fragment, using)
 
-    def narration(self, target: Target) -> str:
-        """The Markdown body of a narrated citation of a scenario `target`."""
-        assert target.kind == 'scenario'
-        return narration_body_md(self.scenarios[NodeId(target.key)])
+    def body(self, target: Target) -> str:
+        """What a `<details>` citation of a resolved scenario or term holds
+        between its summary and closing tag, blank lines framing it so its
+        Markdown renders: empty when there is nothing to show."""
+        assert target.kind in ('scenario', 'term')
+        text = (
+            narration_body_md(self.scenarios[NodeId(target.key)])
+            if target.kind == 'scenario'
+            else definition_body_md(self.terms[TermId(target.key)][0])
+        )
+        return f'\n{text}\n' if text else ''
 
     def counted(self, target: Target) -> list[Scenario]:
         """The scenarios a resolved `target` names: a scenario itself, or those
-        a tag's or story's summary counts."""
+        a tag's, story's or term's summary counts."""
         match target.kind:
             case 'scenario':
                 return [self.scenarios[NodeId(target.key)]]
@@ -203,6 +224,8 @@ class CitationIndex:
                 return self.tags[target.key]
             case 'story':
                 return self.stories[StoryId(target.key)][1]
+            case 'term':
+                return self.terms[TermId(target.key)][1]
 
 
 def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:

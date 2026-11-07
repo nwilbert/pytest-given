@@ -5,13 +5,19 @@ from urllib.parse import parse_qs
 import pytest
 
 from pytest_given.model import (
+    Clause,
+    ClauseTermRef,
+    GlossaryTerm,
     NarrationLiteral,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
     Scenario,
+    Sentence,
+    SentenceId,
     Status,
     Story,
+    StoryId,
     TermId,
     narration_of,
     param_id,
@@ -19,13 +25,20 @@ from pytest_given.model import (
 from pytest_given.report.citation_index import (
     Citation,
     CitationIndex,
-    CitationTemplate,
     Target,
+    citation_templates,
     report_fragment,
-    scenario_citation_templates,
 )
 from pytest_given.report.md_renderer import narration_body_md
-from tests.unit.citation_reports import URL, report_, scenario_, story_
+from tests.unit.citation_reports import (
+    URL,
+    filled,
+    report_,
+    scenario_,
+    story_,
+    term_,
+    using_,
+)
 
 
 def _index(*scenarios: Scenario, stories: tuple[Story, ...] = ()) -> CitationIndex:
@@ -145,8 +158,7 @@ def test_a_per_case_title_writes_its_case_id_literally() -> None:
         ]
     )
     citation = _index(scenario).citation(Target('scenario', 't.py::test_split[a*b*c]'))
-    before, _ = citation.markdown_halves()
-    assert before == '✅ [Split *it* \\[a\\*b\\*c\\]]('
+    assert citation.template_row()[2] == 'Split *it* \\[a\\*b\\*c\\]'
 
 
 def test_a_tag_and_a_story_title_are_written_literally() -> None:
@@ -154,10 +166,10 @@ def test_a_tag_and_a_story_title_are_written_literally() -> None:
     index = _index(
         scenario_('t.py::test_a', tags=('a*b*',), stories=('s',)), stories=(story,)
     )
-    tag_before, _ = index.citation(Target('tag', 'a*b*')).markdown_halves()
-    story_before, _ = index.citation(Target('story', 's')).markdown_halves()
-    assert tag_before == '✅ [a\\*b\\*]('
-    assert story_before == '✅ [Book a \\*suite\\*]('
+    assert index.citation(Target('tag', 'a*b*')).template_row()[2] == 'a\\*b\\*'
+    assert index.citation(Target('story', 's')).template_row()[2] == (
+        'Book a \\*suite\\*'
+    )
 
 
 @pytest.mark.parametrize(
@@ -183,8 +195,9 @@ def test_a_citation_renders_as_one_markdown_line_around_the_report_url() -> None
     citation = Citation(
         state='xfailed', title='spec/x', fragment='tag=spec/x', summary='(1 🔵)'
     )
-    before, after = citation.markdown_halves()
-    assert before + URL + after == f'🔵 [spec/x]({URL}#tag=spec/x) (1 🔵)'
+    assert filled(citation_templates(URL)['citation'], citation.template_row()) == (
+        f'🔵 [spec/x]({URL}#tag=spec/x) (1 🔵)'
+    )
 
 
 def under_prefix(key: str, prefix: str) -> bool:
@@ -218,30 +231,15 @@ def test_a_target_counts_the_scenario_or_those_its_summary_counts() -> None:
     assert index.counted(Target('story', 's')) == [pay]
 
 
-def _filled(template: CitationTemplate, row: list[str]) -> str:
-    """As `app.js` fills a template: literal text and slot names alternate."""
-    glyph, fragment, title, *html_title = row
-    values = {
-        'glyph': glyph,
-        'fragment': fragment,
-        'title': title,
-        'html_title': html_title[0] if html_title else title,
-    }
-    return ''.join(
-        part if position % 2 == 0 else values[part]
-        for position, part in enumerate(template)
-    )
-
-
 def test_a_scenario_row_fills_each_template_to_its_copied_form() -> None:
     scenario = scenario_('t.py::test_pay', 'Pay `by` card & cash')
     citation = _index(scenario).citation(Target('scenario', 't.py::test_pay'))
-    templates = scenario_citation_templates(URL)
-    row = citation.scenario_row()
-    assert _filled(templates['citation'], row) == (
+    templates = citation_templates(URL)
+    row = citation.template_row()
+    assert filled(templates['citation'], row) == (
         f'✅ [Pay `by` card \\& cash]({URL}#scenario=t.py::test_pay)'
     )
-    assert _filled(templates['narrated'], row) == (
+    assert filled(templates['narrated'], row) == (
         '<details markdown="1">\n'
         f'<summary>✅ <a href="{URL}#scenario=t.py::test_pay">'
         'Pay <code>by</code> card &amp; cash</a></summary>'
@@ -249,40 +247,146 @@ def test_a_scenario_row_fills_each_template_to_its_copied_form() -> None:
     )
 
 
-def test_the_scenario_template_matches_a_one_line_citation() -> None:
-    citation = _index(scenario_('t.py::test_pay', 'Pay *now*')).citation(
-        Target('scenario', 't.py::test_pay')
-    )
-    before, after = citation.markdown_halves()
-    filled = _filled(
-        scenario_citation_templates(URL)['citation'], citation.scenario_row()
-    )
-    assert filled == before + URL + after
-
-
 def test_a_scenario_row_leaves_out_an_html_title_its_markdown_title_matches() -> None:
     citation = _index(scenario_('t.py::test_pay', 'Pay by card')).citation(
         Target('scenario', 't.py::test_pay')
     )
-    assert citation.scenario_row() == ['✅', 'scenario=t.py::test_pay', 'Pay by card']
+    assert citation.template_row() == ['✅', 'scenario=t.py::test_pay', 'Pay by card']
 
 
-def test_the_narrated_template_escapes_the_url_as_an_attribute() -> None:
+@pytest.mark.parametrize('form', ['narrated', 'defining'])
+def test_a_details_template_escapes_the_url_as_an_attribute(form: str) -> None:
     citation = _index(scenario_('t.py::test_pay', 'Pay')).citation(
         Target('scenario', 't.py::test_pay')
     )
     url = 'https://example.org/r.html?a=1&b="2"'
-    filled = _filled(
-        scenario_citation_templates(url)['narrated'], citation.scenario_row()
-    )
+    copied = filled(citation_templates(url)[form], citation.template_row())
     assert (
-        'href="https://example.org/r.html?a=1&amp;b=&quot;2&quot;#scenario=' in filled
+        'href="https://example.org/r.html?a=1&amp;b=&quot;2&quot;#scenario=' in copied
     )
 
 
-def test_narration_is_the_scenarios_markdown_body() -> None:
+def test_a_scenarios_body_is_its_markdown_narration_framed_by_blank_lines() -> None:
     grouped = scenario_('t.py::test_pour[water]', grouped=True)
     index = _index(grouped)
-    assert index.narration(Target('scenario', 't.py::test_pour')) == (
-        narration_body_md(grouped)
+    assert index.body(Target('scenario', 't.py::test_pour')) == (
+        f'\n{narration_body_md(grouped)}\n'
     )
+
+
+def test_a_scenario_without_steps_has_an_empty_body() -> None:
+    index = _index(scenario_('t.py::test_pay'))
+    assert index.body(Target('scenario', 't.py::test_pay')) == ''
+
+
+# --- Term citations ---
+
+
+GUEST = term_('Guest', 'Someone staying at the hotel.')
+
+
+def test_a_term_citation_rolls_up_the_scenarios_that_reference_it() -> None:
+    index = CitationIndex.of(
+        report_(
+            using_('guest', scenario_('t.py::test_a')),
+            using_('guest', scenario_('t.py::test_b', status='xfailed')),
+            scenario_('t.py::test_c', status='failed'),
+            terms=(GUEST,),
+        )
+    )
+    target = Target('term', 'guest')
+    citation = index.citation(target)
+    assert (citation.glyph, citation.title_text, citation.summary) == (
+        '🔵',
+        'Guest',
+        '(1 ✅ · 1 🔵)',
+    )
+    assert citation.fragment == 'view=glossary&term=guest'
+    assert [scenario.id for scenario in index.counted(target)] == [
+        't.py::test_a',
+        't.py::test_b',
+    ]
+
+
+def test_a_term_ref_in_a_scenario_title_counts_as_a_reference() -> None:
+    titled = scenario_('t.py::test_a')
+    titled.narration = narration_of(
+        [NarrationTermRef(term_id=TermId('guest'), display='guest')]
+    )
+    index = CitationIndex.of(report_(titled, terms=(GUEST,)))
+    assert index.citation(Target('term', 'guest')).summary == '(1 ✅)'
+
+
+def test_a_grouped_scenario_counts_once_under_a_term() -> None:
+    grouped = scenario_(
+        't.py::test_a[1]', grouped=True, other_cases=('t.py::test_a[2]',)
+    )
+    index = CitationIndex.of(report_(using_('guest', grouped), terms=(GUEST,)))
+    assert index.citation(Target('term', 'guest')).summary == '(1 ✅)'
+
+
+def test_a_term_no_scenario_references_reads_as_having_no_scenarios() -> None:
+    index = CitationIndex.of(report_(scenario_('t.py::test_a'), terms=(GUEST,)))
+    citation = index.citation(Target('term', 'guest'))
+    assert (citation.glyph, citation.summary) == ('🟠', '(no scenarios)')
+
+
+def test_a_reference_from_a_story_sentence_alone_does_not_count() -> None:
+    told = Story(
+        id=StoryId('stay'),
+        title='Stay',
+        sentences=(
+            Sentence(
+                id=SentenceId(1),
+                clauses=(
+                    Clause(
+                        parts=(ClauseTermRef(term_id=TermId('guest'), display='guest'),)
+                    ),
+                ),
+            ),
+        ),
+    )
+    index = CitationIndex.of(report_(stories=(told,), terms=(GUEST,)))
+    assert index.citation(Target('term', 'guest')).summary == '(no scenarios)'
+
+
+def test_a_report_without_a_glossary_holds_no_terms() -> None:
+    assert CitationIndex.of(report_(scenario_('t.py::test_a'))).terms == {}
+
+
+@pytest.mark.parametrize(
+    ('canonical', 'markdown', 'html_text'),
+    [
+        ('Guest', 'Guest', 'Guest'),
+        ('A<B & *c*', 'A\\<B \\& \\*c\\*', 'A&lt;B &amp; *c*'),
+    ],
+)
+def test_a_term_title_is_literal_in_both_forms(
+    canonical: str, markdown: str, html_text: str
+) -> None:
+    term = GlossaryTerm(id=TermId('t'), kind=None, canonical=canonical)
+    citation = CitationIndex.of(report_(terms=(term,))).citation(Target('term', 't'))
+    assert filled(citation_templates(URL)['citation'], citation.template_row()) == (
+        f'🟠 [{markdown}]({URL}#view=glossary&term=t) (no scenarios)'
+    )
+    assert citation.html_link_text == html_text
+
+
+def test_a_defining_citation_is_the_block_with_its_summary_and_an_empty_body() -> None:
+    index = CitationIndex.of(
+        report_(using_('guest', scenario_('t.py::test_a')), terms=(GUEST,))
+    )
+    row = index.citation(Target('term', 'guest')).template_row()
+    assert filled(citation_templates(URL)['defining'], row) == (
+        '<details markdown="1">\n'
+        f'<summary>✅ <a href="{URL}#view=glossary&term=guest">Guest</a> (1 ✅)'
+        '</summary>\n'
+        '\n'
+        '</details>'
+    )
+
+
+def test_a_terms_body_is_its_definition_framed_by_blank_lines() -> None:
+    index = CitationIndex.of(report_(terms=(GUEST, term_('Host'))))
+    assert index.body(Target('term', 'guest')) == '\nSomeone staying at the hotel.\n'
+    assert index.body(Target('term', 'host')) == ''

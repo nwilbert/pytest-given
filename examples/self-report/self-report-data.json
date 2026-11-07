@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-07T13:01:52.477138+00:00",
+    "timestamp": "2026-11-07T16:38:57.112059+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "1b5c74282d934f30c480d3884ca9bb432f688470",
+    "commit_sha": "0b6acd3861e5d030873dd4a55d60a92e213aff8c",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 121,
+      "duration_ms": 149,
       "steps": [
         {
           "phase": "given",
@@ -110,7 +110,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli.py",
-        "line": 48
+        "line": 49
       },
       "story_ids": [],
       "pins": null
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 23,
       "steps": [
         {
           "phase": "given",
@@ -403,7 +403,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 68
+        "line": 78
       },
       "story_ids": [],
       "pins": null
@@ -432,7 +432,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -532,7 +532,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 101
+        "line": 111
       },
       "story_ids": [],
       "pins": null
@@ -661,7 +661,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 126
+        "line": 136
       },
       "story_ids": [],
       "pins": null
@@ -690,7 +690,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -807,7 +807,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 320
+        "line": 354
       },
       "story_ids": [],
       "pins": null
@@ -836,7 +836,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -959,7 +959,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_cli_citations.py",
-        "line": 357
+        "line": 391
       },
       "story_ids": [],
       "pins": null
@@ -1006,7 +1006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -1184,7 +1184,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 103,
+      "duration_ms": 126,
       "steps": [
         {
           "phase": "given",
@@ -1277,7 +1277,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 87,
       "steps": [
         {
           "phase": "given",
@@ -1359,7 +1359,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -1468,7 +1468,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -1597,7 +1597,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 560,
+      "duration_ms": 571,
       "steps": [
         {
           "phase": "given",
@@ -1725,7 +1725,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -1912,7 +1912,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 109,
+      "duration_ms": 137,
       "steps": [
         {
           "phase": "given",
@@ -2098,7 +2098,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 42,
       "steps": [
         {
           "phase": "given",
@@ -2165,7 +2165,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -2275,7 +2275,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -2417,7 +2417,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -2487,7 +2487,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -2607,7 +2607,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -2742,7 +2742,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 117,
       "steps": [
         {
           "phase": "given",
@@ -2870,7 +2870,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 70,
+      "duration_ms": 93,
       "steps": [
         {
           "phase": "given",
@@ -2997,7 +2997,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 59,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -3114,7 +3114,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 170,
+      "duration_ms": 214,
       "steps": [
         {
           "phase": "given",
@@ -3187,7 +3187,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -3359,7 +3359,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -3498,7 +3498,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -3643,7 +3643,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 63,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -3796,7 +3796,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 65,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -3941,7 +3941,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 62,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -4088,7 +4088,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 185,
+      "duration_ms": 217,
       "steps": [
         {
           "phase": "given",
@@ -4309,7 +4309,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 67,
       "steps": [
         {
           "phase": "given",
@@ -4439,7 +4439,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 112,
+      "duration_ms": 125,
       "steps": [
         {
           "phase": "given",
@@ -4568,7 +4568,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 105,
+      "duration_ms": 153,
       "steps": [
         {
           "phase": "given",
@@ -4736,7 +4736,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -4830,7 +4830,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 63,
       "steps": [
         {
           "phase": "given",
@@ -4909,7 +4909,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 256,
+      "duration_ms": 311,
       "steps": [
         {
           "phase": "given",
@@ -5091,7 +5091,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 68,
       "steps": [
         {
           "phase": "given",
@@ -5181,7 +5181,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 62,
       "steps": [
         {
           "phase": "given",
@@ -5273,7 +5273,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 96,
+      "duration_ms": 113,
       "steps": [
         {
           "phase": "given",
@@ -5355,7 +5355,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -5447,7 +5447,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -5532,7 +5532,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -5639,7 +5639,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 174,
+      "duration_ms": 206,
       "steps": [
         {
           "phase": "given",
@@ -5746,7 +5746,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 641,
+      "duration_ms": 882,
       "steps": [
         {
           "phase": "given",
@@ -5937,7 +5937,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 411,
+      "duration_ms": 561,
       "steps": [
         {
           "phase": "given",
@@ -6018,7 +6018,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -6132,7 +6132,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -6285,7 +6285,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 40,
       "steps": [
         {
           "phase": "given",
@@ -6361,7 +6361,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -6510,7 +6510,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 483,
+      "duration_ms": 560,
       "steps": [
         {
           "phase": "given",
@@ -6669,7 +6669,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -6771,7 +6771,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -6878,7 +6878,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 32,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -6998,7 +6998,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 38,
       "steps": [
         {
           "phase": "given",
@@ -7128,7 +7128,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 203,
+      "duration_ms": 153,
       "steps": [
         {
           "phase": "given",
@@ -7358,7 +7358,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 164,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -7470,7 +7470,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 46,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -7566,7 +7566,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 149,
+      "duration_ms": 119,
       "steps": [
         {
           "phase": "given",
@@ -7633,7 +7633,7 @@
       "module": "tests.integration.test_skills_cli",
       "tags": [],
       "status": "passed",
-      "duration_ms": 20,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -9047,7 +9047,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -9353,7 +9353,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9448,7 +9448,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -9540,7 +9540,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9734,7 +9734,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -10084,7 +10084,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10185,7 +10185,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -10541,7 +10541,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -10765,7 +10765,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -20309,7 +20309,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -20402,7 +20402,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 68
+        "line": 79
       },
       "story_ids": [],
       "pins": null
@@ -20420,7 +20420,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -20491,7 +20491,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 94
+        "line": 105
       },
       "story_ids": [],
       "pins": null
@@ -20520,7 +20520,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -20610,7 +20610,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 152
+        "line": 163
       },
       "story_ids": [],
       "pins": null
@@ -20647,7 +20647,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -20775,7 +20775,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 175
+        "line": 186
       },
       "story_ids": [],
       "pins": null
@@ -20820,7 +20820,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -20953,7 +20953,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 199
+        "line": 210
       },
       "story_ids": [],
       "pins": null
@@ -20990,7 +20990,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -21087,7 +21087,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 232
+        "line": 243
       },
       "story_ids": [],
       "pins": null
@@ -21121,7 +21121,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -21275,7 +21275,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 255
+        "line": 266
       },
       "story_ids": [],
       "pins": null
@@ -21309,7 +21309,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -21410,7 +21410,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 611
+        "line": 622
       },
       "story_ids": [],
       "pins": null
@@ -21447,7 +21447,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -21661,7 +21661,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 881
+        "line": 892
       },
       "story_ids": [],
       "pins": null
@@ -21695,7 +21695,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21803,7 +21803,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1085
+        "line": 1098
       },
       "story_ids": [],
       "pins": null
@@ -21948,7 +21948,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1108
+        "line": 1121
       },
       "story_ids": [],
       "pins": null
@@ -22159,7 +22159,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1135
+        "line": 1148
       },
       "story_ids": [],
       "pins": null
@@ -22196,7 +22196,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -22374,7 +22374,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1193
+        "line": 1206
       },
       "story_ids": [],
       "pins": null
@@ -22411,7 +22411,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -22530,7 +22530,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1230
+        "line": 1243
       },
       "story_ids": [],
       "pins": null
@@ -22672,7 +22672,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1292
+        "line": 1305
       },
       "story_ids": [],
       "pins": null
@@ -22701,7 +22701,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -22870,7 +22870,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1333
+        "line": 1346
       },
       "story_ids": [],
       "pins": null
@@ -22899,7 +22899,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 10,
       "steps": [
         {
           "phase": "given",
@@ -23040,7 +23040,1250 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/citations/test_check.py",
-        "line": 1426
+        "line": 1439
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_term_citation_rolls_up_the_scenarios_that_reference_it",
+      "narration": {
+        "text": "A citation of a term rolls up the scenarios that reference it",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg[\"Citation\"].l"
+          },
+          {
+            "value": " of a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " rolls up the "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenarios",
+            "expression": "pg[\"Scenario\"].l.s"
+          },
+          {
+            "value": " that reference it"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 2,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report with a passed and an xfailed scenario holding a term ref to the term `Guest`, and a failed one holding none",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " with a passed and an xfailed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " holding a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "term ref",
+                "expression": "pg[\"Term ref\"].l"
+              },
+              {
+                "value": " to the "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " `Guest`, and a failed one holding none"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document with a citation of the term, its glyph typed",
+            "parts": [
+              {
+                "value": "a document with a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " of the term, its glyph typed"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "? [guests](https://example.org/report.html#view=glossary&term=guest)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it reads the canonical name, and the rollup of the two scenarios",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\ud83d\udd35 [Guest](https://example.org/report.html#view=glossary&term=guest) (1 \u2705 \u00b7 1 \ud83d\udd35)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no finding remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1649
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_term_no_scenario_references_reads_as_having_no_scenarios",
+      "narration": {
+        "text": "A term no scenario references reads as having no scenarios",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " no "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].l"
+          },
+          {
+            "value": " references reads as having no "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenarios",
+            "expression": "pg[\"Scenario\"].l.s"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 2,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report whose glossary holds an unused term",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].l"
+              },
+              {
+                "value": " holds an unused term"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document with a citation of the term",
+            "parts": [
+              {
+                "value": "a document with a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " of the term"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Guest](https://example.org/report.html#view=glossary&term=guest) (1 \u2705)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "it reads `\ud83d\udfe0` and `(no scenarios)`",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\ud83d\udfe0 [Guest](https://example.org/report.html#view=glossary&term=guest) (no scenarios)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no finding remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1680
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_term_missing_from_the_report_is_a_finding",
+      "narration": {
+        "text": "A term missing from the report is a citation finding, for a citation and a plain report link alike",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " missing from the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": " is a "
+          },
+          {
+            "term_id": "citation-finding",
+            "display": "citation finding",
+            "expression": "pg[\"Citation finding\"].l"
+          },
+          {
+            "value": ", for a "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg[\"Citation\"].l"
+          },
+          {
+            "value": " and a plain "
+          },
+          {
+            "term_id": "report-link",
+            "display": "report link",
+            "expression": "pg[\"Report link\"].l"
+          },
+          {
+            "value": " alike"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 7,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report whose glossary lacks the term `Guest`",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].l"
+              },
+              {
+                "value": " lacks the term `Guest`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document with a citation of the term and a plain report link to it",
+            "parts": [
+              {
+                "value": "a document with a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " of the term and a plain "
+              },
+              {
+                "term_id": "report-link",
+                "display": "report link",
+                "expression": "pg[\"Report link\"].l"
+              },
+              {
+                "value": " to it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Guest](https://example.org/report.html#view=glossary&term=guest) (1 \u2705)\n\n[our guests](https://example.org/report.html#view=glossary&term=guest)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each link is a `missing` finding",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the citation's glyph becomes `\u2753` and its summary goes",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\u2753 [Guest](https://example.org/report.html#view=glossary&term=guest)\n\n[our guests](https://example.org/report.html#view=glossary&term=guest)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1702
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_update_writes_a_defining_citations_body",
+      "narration": {
+        "text": "`citations update` writes a defining citation's body from the term's definition",
+        "parts": [
+          {
+            "value": "`citations update` writes a "
+          },
+          {
+            "term_id": "defining-citation",
+            "display": "defining citation",
+            "expression": "pg['Defining citation'].l"
+          },
+          {
+            "value": "'s body from the "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg['Term'].l"
+          },
+          {
+            "value": "'s definition"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 3,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report with a defined term",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " with a defined "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document holding a defining citation of it, copied with an empty body",
+            "parts": [
+              {
+                "value": "a document holding a "
+              },
+              {
+                "term_id": "defining-citation",
+                "display": "defining citation",
+                "expression": "pg[\"Defining citation\"].l"
+              },
+              {
+                "value": " of it, copied with an empty body"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#view=glossary&term=guest\">Guest</a> (1 \u2705)</summary>\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its body holds the definition between blank lines",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#view=glossary&term=guest\">Guest</a> (1 \u2705)</summary>\n\nSomeone staying at the hotel.\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "no finding remains",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1729
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_an_undefined_terms_defining_citation_has_an_empty_body",
+      "narration": {
+        "text": "An undefined term's defining citation has an empty body, and `citations update` empties one that holds text",
+        "parts": [
+          {
+            "value": "An undefined "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg['Term'].l"
+          },
+          {
+            "value": "'s "
+          },
+          {
+            "term_id": "defining-citation",
+            "display": "defining citation",
+            "expression": "pg['Defining citation'].l"
+          },
+          {
+            "value": " has an empty body, and `citations update` empties one that holds text"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 6,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report whose term has no definition",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " whose "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " has no definition"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document with a defining citation of it whose body holds an old definition",
+            "parts": [
+              {
+                "value": "a document with a "
+              },
+              {
+                "term_id": "defining-citation",
+                "display": "defining citation",
+                "expression": "pg[\"Defining citation\"].l"
+              },
+              {
+                "value": " of it whose body holds an old definition"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#view=glossary&term=guest\">Guest</a> (1 \u2705)</summary>\n\nSomeone staying at the hotel.\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a stale definition is reported",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its body is empty",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#view=glossary&term=guest\">Guest</a> (1 \u2705)</summary>\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the emptied block has no citation finding",
+            "parts": [
+              {
+                "value": "the emptied block has no "
+              },
+              {
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1752
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_defining_citations_body_shows_the_definition_as_the_report_does",
+      "narration": {
+        "text": "A defining citation's body shows the definition as the report shows it",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "defining-citation",
+            "display": "defining citation",
+            "expression": "pg['Defining citation'].l"
+          },
+          {
+            "value": "'s body shows the definition as the "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg[\"Report\"].l"
+          },
+          {
+            "value": " shows it"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 4,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a term whose definition has a code span, emphasis, a link, an HTML tag and a line break",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " whose definition has a code span, emphasis, a link, an HTML tag and a line break"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "definition",
+              "content": "Reads `x` *closely*, see [docs](y)\nand <b>never</b> close </details>",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a defining citation of it is updated",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "defining-citation",
+                "display": "defining citation",
+                "expression": "pg[\"Defining citation\"].l"
+              },
+              {
+                "value": " of it is updated"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the spans stay markup, and the link and the tags stay literal text",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "<details markdown=\"1\">\n<summary>\u2705 <a href=\"https://example.org/report.html#view=glossary&term=guest\">Guest</a> (1 \u2705)</summary>\n\nReads `x` *closely*, see \\[docs\\](y)<br>and \\<b>never\\</b> close \\</details>\n\n</details>\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "rendered, the body reads as the report renders the definition",
+            "parts": [
+              {
+                "value": "rendered, the body reads as the "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " renders the definition"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the updated document is current",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1782
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_covering_keeps_a_term_citation_that_counts_the_scenario",
+      "narration": {
+        "text": "`--covering` keeps a citation of a term that counts the scenario",
+        "parts": [
+          {
+            "value": "`--covering` keeps a "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg[\"Citation\"].l"
+          },
+          {
+            "value": " of a "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " that counts the "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 1,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report with two terms, one used by the scenario `test_stay`",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " with two "
+              },
+              {
+                "term_id": "term",
+                "display": "terms",
+                "expression": "pg[\"Term\"].l.s"
+              },
+              {
+                "value": ", one used by the "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " `test_stay`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document citing both terms, and plainly linking the used one",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Guest](https://example.org/report.html#view=glossary&term=guest) (1 \u2705)\n\n\ud83d\udfe0 [Host](https://example.org/report.html#view=glossary&term=host) (no scenarios)\n\n[our guests](https://example.org/report.html#view=glossary&term=guest)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is checked with `--covering` that scenario",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the used term is listed, as a citation and as a plain link",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1818
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/citations/test_check.py::test_a_failed_scenario_using_a_term_fails_its_citation",
+      "narration": {
+        "text": "A failed scenario holding a term ref fails the citation of its term",
+        "parts": [
+          {
+            "value": "A failed "
+          },
+          {
+            "term_id": "scenario",
+            "display": "scenario",
+            "expression": "pg[\"Scenario\"].l"
+          },
+          {
+            "value": " holding a "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].l"
+          },
+          {
+            "value": " fails the "
+          },
+          {
+            "term_id": "citation",
+            "display": "citation",
+            "expression": "pg[\"Citation\"].l"
+          },
+          {
+            "value": " of its "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          }
+        ]
+      },
+      "module": "tests.unit.citations.test_check",
+      "tags": [
+        "spec/term-citations"
+      ],
+      "status": "passed",
+      "duration_ms": 2,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a report where a failed scenario uses `Guest`",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " where a failed "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " uses `Guest`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a document with a citation of the term, read as passed",
+            "parts": [
+              {
+                "value": "a document with a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " of the term, read as passed"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "document",
+              "content": "\u2705 [Guest](https://example.org/report.html#view=glossary&term=guest) (1 \u2705)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the document is updated",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its glyph and summary read `\u274c`",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "updated document",
+              "content": "\u274c [Guest](https://example.org/report.html#view=glossary&term=guest) (1 \u274c)\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "a `failed` citation finding remains, blaming a scenario using the term",
+            "parts": [
+              {
+                "value": "a `failed` "
+              },
+              {
+                "term_id": "citation-finding",
+                "display": "citation finding",
+                "expression": "pg[\"Citation finding\"].l"
+              },
+              {
+                "value": " remains, blaming a scenario using the term"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/citations/test_check.py",
+        "line": 1844
       },
       "story_ids": [],
       "pins": null
@@ -23224,7 +24467,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -23348,7 +24591,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -23490,7 +24733,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 16,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -23814,7 +25057,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -25967,7 +27210,7 @@
       "module": "tests.unit.report.test_coverage",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -27382,7 +28625,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 171,
+      "duration_ms": 172,
       "steps": [
         {
           "phase": "given",
@@ -27731,7 +28974,7 @@
           "attachments": [
             {
               "label": "outputs",
-              "content": "Books a <strong>suite</strong> with <code>late_checkout</code>\n## \u2713 Books a **suite** with `late_checkout`\n\u2705 [Books a **suite** with `late_checkout`](",
+              "content": "Books a <strong>suite</strong> with <code>late_checkout</code>\n## \u2713 Books a **suite** with `late_checkout`\n\u2705 [Books a **suite** with `late_checkout`](https://example.org/report.html#scenario=t.py::test_book)",
               "content_type": "text"
             }
           ],
@@ -27767,7 +29010,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_inline_markdown.py",
-        "line": 29
+        "line": 34
       },
       "story_ids": [],
       "pins": null
@@ -27856,7 +29099,7 @@
           "attachments": [
             {
               "label": "outputs",
-              "content": "**Guest books**\n## \u2713 \\*\\*\u00abGuest\u00bb books\\*\\*\n\u2705 [\\*\\*Guest books\\*\\*](",
+              "content": "**Guest books**\n## \u2713 \\*\\*\u00abGuest\u00bb books\\*\\*\n\u2705 [\\*\\*Guest books\\*\\*](https://example.org/report.html#scenario=t.py::test_book)",
               "content_type": "text"
             }
           ],
@@ -27892,7 +29135,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_inline_markdown.py",
-        "line": 50
+        "line": 55
       },
       "story_ids": [],
       "pins": null
@@ -28018,7 +29261,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 55
+        "line": 61
       },
       "story_ids": [],
       "pins": null
@@ -28059,7 +29302,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -28162,7 +29405,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 87
+        "line": 93
       },
       "story_ids": [],
       "pins": null
@@ -28296,7 +29539,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 187
+        "line": 193
       },
       "story_ids": [],
       "pins": null
@@ -28426,7 +29669,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 260
+        "line": 266
       },
       "story_ids": [],
       "pins": null
@@ -28664,7 +29907,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 301
+        "line": 307
       },
       "story_ids": [],
       "pins": null
@@ -28779,7 +30022,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 344
+        "line": 350
       },
       "story_ids": [],
       "pins": null
@@ -28894,7 +30137,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 415
+        "line": 421
       },
       "story_ids": [],
       "pins": null
@@ -28980,7 +30223,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 594
+        "line": 600
       },
       "story_ids": [],
       "pins": null
@@ -29091,7 +30334,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1154
+        "line": 1160
       },
       "story_ids": [],
       "pins": null
@@ -29186,7 +30429,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1185
+        "line": 1191
       },
       "story_ids": [],
       "pins": null
@@ -29308,7 +30551,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_md_renderer.py",
-        "line": 1256
+        "line": 1262
       },
       "story_ids": [],
       "pins": null
@@ -32351,7 +33594,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -33967,7 +35210,7 @@
         "id": "report-link",
         "kind": null,
         "canonical": "Report link",
-        "definition": "A Markdown link to a scenario, tag or story in the HTML *Report*. Without a glyph it is a plain one, which claims only that its target exists.",
+        "definition": "A Markdown link to a scenario, tag, story or term in the HTML *Report*. Without a glyph it is a plain one, which claims only that its target exists.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 61
@@ -33977,7 +35220,7 @@
         "id": "citation",
         "kind": null,
         "canonical": "Citation",
-        "definition": "A *Report link* led by its target's status glyph, citing a scenario, tag or story from a Markdown document: `\u2705 [title](<report URL>#scenario=\u2026)`. A tag or story citation adds a summary after it, `(5 \u2705 \u00b7 2 \ud83d\udd35)`. A target the *Report* lacks reads `\u2753`.",
+        "definition": "A *Report link* led by its target's status glyph, citing a scenario, tag, story or term from a Markdown document: `\u2705 [title](<report URL>#scenario=\u2026)`. A tag, story or term citation adds a summary after it, `(5 \u2705 \u00b7 2 \ud83d\udd35)`. A target the *Report* lacks reads `\u2753`.",
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 62
@@ -33994,13 +35237,23 @@
         }
       },
       {
+        "id": "defining-citation",
+        "kind": null,
+        "canonical": "Defining citation",
+        "definition": "A *Citation* of a term written as a collapsible block, the citation as its summary and the term's definition as its body.",
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 64
+        }
+      },
+      {
         "id": "citation-finding",
         "kind": null,
         "canonical": "Citation finding",
         "definition": "One problem `pytest-given citations check` reports on one *Report link*: its kind (`stale`, `missing`, `failed`, `mistyped`, \u2026), the document location and a message.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 64
+          "line": 65
         }
       },
       {
@@ -34010,7 +35263,7 @@
         "definition": "The HTML report's colour scheme \u2014 `light`, `dark`, or `auto` (follow the viewer's system).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 65
+          "line": 66
         }
       },
       {
@@ -34020,7 +35273,7 @@
         "definition": "The `--given-lint` pass that checks recorded scenarios against the *Lint rule* catalog. It enforces the structural subset of the narration conventions \u2014 it cannot check whether a *Step*'s text is semantically true.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 71
+          "line": 72
         }
       },
       {
@@ -34030,7 +35283,7 @@
         "definition": "One named check, carrying a surface and a default *Severity*. A `runtime` rule reads the recorded scenarios; an `ast` rule parses the step bodies' source.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 72
+          "line": 73
         }
       },
       {
@@ -34040,7 +35293,7 @@
         "definition": "One *Lint rule* firing on one subject: the rule id, the *Severity* it fired at, the subject, a *Source link* location and a message naming the offender.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 73
+          "line": 74
         }
       },
       {
@@ -34050,7 +35303,7 @@
         "definition": "A *Lint rule*'s level \u2014 `off`, `warn` or `error`. Only `error` fails the run, `warn` reports in the terminal summary, and an `off` rule is not evaluated at all.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 74
+          "line": 75
         }
       },
       {
@@ -34060,7 +35313,7 @@
         "definition": "The shared vocabulary a domain speaks in: its Ubiquitous Language.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 84
+          "line": 85
         }
       },
       {
@@ -34070,7 +35323,7 @@
         "definition": "A glossary loaded from the GFM pipe tables of a Markdown file.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 85
+          "line": 86
         }
       },
       {
@@ -34080,7 +35333,7 @@
         "definition": "A term handed over before its kind is settled: what `g('foo')` and `g['foo']` on a code glossary return, and a *file glossary* lookup of a row with no declared kind. *Kind inference* settles it later.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 86
+          "line": 87
         }
       },
       {
@@ -34090,7 +35343,7 @@
         "definition": "A glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind unless kindless, and an optional definition.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 87
+          "line": 88
         }
       },
       {
@@ -34100,7 +35353,7 @@
         "definition": "What a glossary hands back for a *term*, the same from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of four surface forms: **bare** (`room` \u2014 the canonical display), **`.l`** (`room.l` \u2014 capitalized words lowercased, acronyms kept), **`.s`** (`room.s` \u2014 the *S-form*), or **called** (`room('Deluxe Suite')` \u2014 an *instance* on an Actor or Work Object, an inflection on an *Activity*). `.l` and `.s` also apply to a called form and chain (`room.l.s` reads *rooms*). Each form renders as a *term ref*. A story hands out a **sentence handle** the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 88
+          "line": 89
         }
       },
       {
@@ -34110,7 +35363,7 @@
         "definition": "A term's name with the regular English -s ending, from the `.s` handle form: the plural of an Actor or Work Object (*rooms*), the third person singular of an Activity (*books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies, but an acronym takes a plain -s (*APIs*); anything else, such as *people* or *checks in*, needs the called form. An S-form reference, in any case, is a reference to the term itself \u2014 not an *instance* or an *inflection*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 89
+          "line": 90
         }
       },
       {
@@ -34120,7 +35373,7 @@
         "definition": "A glossary term for a participant in the domain (e.g., *Guest*).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 90
+          "line": 91
         }
       },
       {
@@ -34130,7 +35383,7 @@
         "definition": "A glossary term for a thing acted on (e.g., *Room*, *Booking*).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 91
+          "line": 92
         }
       },
       {
@@ -34140,7 +35393,7 @@
         "definition": "A glossary term for what an actor does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept inflections: calling `search('searches for')` records *searches for* as a surface form of the canonical *search*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 92
+          "line": 93
         }
       },
       {
@@ -34150,7 +35403,7 @@
         "definition": "An occurrence of a term inside narration or a clause.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 93
+          "line": 94
         }
       },
       {
@@ -34160,7 +35413,7 @@
         "definition": "A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 94
+          "line": 95
         }
       },
       {
@@ -34170,7 +35423,7 @@
         "definition": "A surface form of an Activity term other than its canonical name or *S-form* (e.g., *searches for* as an inflection of *search*).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 95
+          "line": 96
         }
       },
       {
@@ -34180,7 +35433,7 @@
         "definition": "A named flow modeled as a sequence of sentences. Stories are the unit of coverage.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 96
+          "line": 97
         }
       },
       {
@@ -34190,7 +35443,7 @@
         "definition": "What Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. One row in a story, numbered by its position and optionally named, a name that stays put when rows are inserted. Usually one clause; several when the sentence has several arrows under one number.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 97
+          "line": 98
         }
       },
       {
@@ -34200,7 +35453,7 @@
         "definition": "A piece of a clause's prose: a *term ref*, or a bare clause word. A bare clause word \u2014 a node label or edge connective \u2014 carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 98
+          "line": 99
         }
       },
       {
@@ -34210,7 +35463,7 @@
         "definition": "One linear walk through a sentence's arrows, a node/edge alternation starting actor \u2192 verb \u2192 noun. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 99
+          "line": 100
         }
       },
       {
@@ -34220,7 +35473,7 @@
         "definition": "A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions \u2265 2 are noun slots.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 100
+          "line": 101
         }
       },
       {
@@ -34230,7 +35483,7 @@
         "definition": "The link between a scenario (or step) and story sentences. `@scenario(stories=...)` names the stories a scenario is narration-matched against; a *pin* (`pins=` on `@scenario` or on `given`/`when`/`then`) binds sentences explicitly, in any story, whether `stories=` names it or not.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 101
+          "line": 102
         }
       },
       {
@@ -34240,7 +35493,7 @@
         "definition": "What a *sentence handle* passed to `pins=` is recorded as, the way a term handle in narration is recorded as a *term ref*: a reference to a story and a sentence number. A pin binds explicitly and replaces narration matching \u2014 a step pin for that step, a scenario pin (`@scenario(pins=...)`) for every step of the scenario, which then covers its own pins plus its steps'. `pins=[]` pins nothing but still opts out of narration matching. A pin reaches under-anchored sentences too.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 102
+          "line": 103
         }
       },
       {
@@ -34250,7 +35503,7 @@
         "definition": "The \"did this scenario touch that sentence\" relation. A sentence is covered when the set of terms it references is a subset of the terms a single step references \u2014 matching is per step, not against the union across steps, and on terms, not surface forms: an *instance* or *inflection* counts as its term. A *pin* covers its sentences directly instead, regardless of narration or term count.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 103
+          "line": 104
         }
       },
       {
@@ -34260,7 +35513,7 @@
         "definition": "The pass that assigns each undeclared term a kind from the *slot* positions it occupies across all story sentences; declared kinds are verified against observed positions instead. A term used in incompatible slots (or conflicting with its declared kind) raises. A term never referenced by any sentence stays *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 104
+          "line": 105
         }
       },
       {
@@ -34270,7 +35523,7 @@
         "definition": "A term with no kind, because *kind inference* finds no story *slot* to infer from (a term used only in t-string steps, never in a sentence).",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 105
+          "line": 106
         }
       },
       {
@@ -34280,7 +35533,7 @@
         "definition": "A term with no definition. Orthogonal to *kindless*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 106
+          "line": 107
         }
       },
       {
@@ -34290,7 +35543,7 @@
         "definition": "Person who writes the application code and \u2014 together with the *Agent* \u2014 the scenarios; curates the glossary with the *Domain Expert*.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 114
+          "line": 115
         }
       },
       {
@@ -34300,7 +35553,7 @@
         "definition": "Person who owns the domain knowledge and the ubiquitous language; source of domain stories and reviewer of scenarios and reports. A stakeholder in the broad sense.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 115
+          "line": 116
         }
       },
       {
@@ -34310,7 +35563,7 @@
         "definition": "AI coding agent that authors and maintains scenarios alongside the *Developer*, guided by the pytest-given skills.",
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 116
+          "line": 117
         }
       }
     ]

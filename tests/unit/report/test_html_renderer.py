@@ -41,7 +41,7 @@ from pytest_given.model import (
 from pytest_given.report.citation_index import (
     CitationIndex,
     Target,
-    scenario_citation_templates,
+    citation_templates,
 )
 from pytest_given.report.html_renderer import (
     _BLOCK_COMMENT,
@@ -2079,24 +2079,15 @@ def _citable_report(report_url: str | None) -> ReportData:
     )
 
 
-def test_a_report_url_puts_every_citation_line_in_the_page_data() -> None:
+def test_a_report_url_puts_a_row_for_every_tag_at_each_level_in_the_page_data() -> None:
     url = 'https://example.org/report.html'
     data = embedded_app_data(render_html_string(_citable_report(url), None))
     citations = data['citations']
-
-    def line(halves: list[str]) -> str:
-        before, after = halves
-        return before + citations['report_url'] + after
-
-    def lines(kind: str) -> dict[str, str]:
-        return {key: line(halves) for key, halves in citations[kind].items()}
-
-    assert citations['report_url'] == url
-    assert lines('tag') == {
-        'spec': f'✅ [spec]({url}#tag=spec) (1 ✅)',
-        'spec/x': f'✅ [spec/x]({url}#tag=spec/x) (1 ✅)',
+    assert citations['tag'] == {
+        'spec': ['✅', 'tag=spec', 'spec', ' (1 ✅)'],
+        'spec/x': ['✅', 'tag=spec/x', 'spec/x', ' (1 ✅)'],
     }
-    assert lines('story') == {}
+    assert citations['story'] == {}
 
 
 def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() -> None:
@@ -2104,11 +2095,11 @@ def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() 
     data = embedded_app_data(render_html_string(report, None))
     citations = data['citations']
     index = CitationIndex.of(report)
-    assert citations['templates'] == scenario_citation_templates(
+    assert citations['templates'] == citation_templates(
         'https://example.org/report.html'
     )
     assert citations['scenario'] == [
-        index.citation(Target('scenario', cited)).scenario_row()
+        index.citation(Target('scenario', cited)).template_row()
         for cited in index.scenarios
     ]
 
@@ -2116,6 +2107,19 @@ def test_citation_data_carries_the_scenario_templates_once_and_a_row_per_card() 
 def test_a_report_without_a_url_carries_no_citations() -> None:
     data = embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['citations'] is None
+
+
+def test_citation_data_carries_a_row_per_term() -> None:
+    report = replace(
+        _citable_report('https://example.org/report.html'),
+        glossary=Glossary(
+            terms=[GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')]
+        ),
+    )
+    citations = embedded_app_data(render_html_string(report, None))['citations']
+    assert citations['term'] == {
+        'guest': ['🟠', 'view=glossary&term=guest', 'Guest', ' (no scenarios)']
+    }
 
 
 def test_a_grouped_scenarios_base_node_id_opens_it() -> None:

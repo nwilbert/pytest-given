@@ -2971,6 +2971,168 @@
     > </details>
     ```
 
+## ✓ A «citation» of a «term» rolls up the «scenarios» that reference it
+`tests/unit/citations/test_check.py::test_a_term_citation_rolls_up_the_scenarios_that_reference_it` · spec/term-citations
+
+- **given** a «report» with a passed and an xfailed «scenario» holding a «term ref» to the «term» `Guest`, and a failed one holding none
+- **given** a document with a «citation» of the term, its glyph typed
+    - 📎 document:
+        ```
+        ? [guests](https://example.org/report.html#view=glossary&term=guest)
+        ```
+- **when** the document is updated
+- **then** it reads the canonical name, and the rollup of the two scenarios
+    - 📎 updated document:
+        ```
+        🔵 [Guest](https://example.org/report.html#view=glossary&term=guest) (1 ✅ · 1 🔵)
+        ```
+- **then** no finding remains
+
+## ✓ A «term» no «scenario» references reads as having no «scenarios»
+`tests/unit/citations/test_check.py::test_a_term_no_scenario_references_reads_as_having_no_scenarios` · spec/term-citations
+
+- **given** a «report» whose «glossary» holds an unused term
+- **given** a document with a «citation» of the term
+    - 📎 document:
+        ```
+        ✅ [Guest](https://example.org/report.html#view=glossary&term=guest) (1 ✅)
+        ```
+- **when** the document is updated
+- **then** it reads `🟠` and `(no scenarios)`
+    - 📎 updated document:
+        ```
+        🟠 [Guest](https://example.org/report.html#view=glossary&term=guest) (no scenarios)
+        ```
+- **then** no finding remains
+
+## ✓ A «term» missing from the «report» is a «citation finding», for a «citation» and a plain «report link» alike
+`tests/unit/citations/test_check.py::test_a_term_missing_from_the_report_is_a_finding` · spec/term-citations
+
+- **given** a «report» whose «glossary» lacks the term `Guest`
+- **given** a document with a «citation» of the term and a plain «report link» to it
+    - 📎 document:
+        ```
+        ✅ [Guest](https://example.org/report.html#view=glossary&term=guest) (1 ✅)
+
+        [our guests](https://example.org/report.html#view=glossary&term=guest)
+        ```
+- **when** the document is updated
+- **then** each link is a `missing` finding
+- **then** the citation's glyph becomes `❓` and its summary goes
+    - 📎 updated document:
+        ```
+        ❓ [Guest](https://example.org/report.html#view=glossary&term=guest)
+
+        [our guests](https://example.org/report.html#view=glossary&term=guest)
+        ```
+
+## ✓ `citations update` writes a «defining citation»'s body from the «term»'s definition
+`tests/unit/citations/test_check.py::test_update_writes_a_defining_citations_body` · spec/term-citations
+
+- **given** a «report» with a defined «term»
+- **given** a document holding a «defining citation» of it, copied with an empty body
+    - 📎 document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#view=glossary&term=guest">Guest</a> (1 ✅)</summary>
+
+        </details>
+        ```
+- **when** the document is updated
+- **then** its body holds the definition between blank lines
+    - 📎 updated document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#view=glossary&term=guest">Guest</a> (1 ✅)</summary>
+
+        Someone staying at the hotel.
+
+        </details>
+        ```
+- **then** no finding remains
+
+## ✓ An undefined «term»'s «defining citation» has an empty body, and `citations update` empties one that holds text
+`tests/unit/citations/test_check.py::test_an_undefined_terms_defining_citation_has_an_empty_body` · spec/term-citations
+
+- **given** a «report» whose «term» has no definition
+- **given** a document with a «defining citation» of it whose body holds an old definition
+    - 📎 document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#view=glossary&term=guest">Guest</a> (1 ✅)</summary>
+
+        Someone staying at the hotel.
+
+        </details>
+        ```
+- **when** the document is updated
+- **then** a stale definition is reported
+- **then** its body is empty
+    - 📎 updated document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#view=glossary&term=guest">Guest</a> (1 ✅)</summary>
+
+        </details>
+        ```
+- **then** the emptied block has no «citation finding»
+
+## ✓ A «defining citation»'s body shows the definition as the «report» shows it
+`tests/unit/citations/test_check.py::test_a_defining_citations_body_shows_the_definition_as_the_report_does` · spec/term-citations
+
+- **given** a «term» whose definition has a code span, emphasis, a link, an HTML tag and a line break
+    - 📎 definition:
+        ```
+        Reads `x` *closely*, see [docs](y)
+        and <b>never</b> close </details>
+        ```
+- **when** a «defining citation» of it is updated
+- **then** the spans stay markup, and the link and the tags stay literal text
+    - 📎 updated document:
+        ```
+        <details markdown="1">
+        <summary>✅ <a href="https://example.org/report.html#view=glossary&term=guest">Guest</a> (1 ✅)</summary>
+
+        Reads `x` *closely*, see \[docs\](y)<br>and \<b>never\</b> close \</details>
+
+        </details>
+        ```
+- **then** rendered, the body reads as the «report» renders the definition
+- **then** the updated document is current
+
+## ✓ `--covering` keeps a «citation» of a «term» that counts the «scenario»
+`tests/unit/citations/test_check.py::test_covering_keeps_a_term_citation_that_counts_the_scenario` · spec/term-citations
+
+- **given** a «report» with two «terms», one used by the «scenario» `test_stay`
+- **given** a document citing both terms, and plainly linking the used one
+    - 📎 document:
+        ```
+        ✅ [Guest](https://example.org/report.html#view=glossary&term=guest) (1 ✅)
+
+        🟠 [Host](https://example.org/report.html#view=glossary&term=host) (no scenarios)
+
+        [our guests](https://example.org/report.html#view=glossary&term=guest)
+        ```
+- **when** the document is checked with `--covering` that scenario
+- **then** the used term is listed, as a citation and as a plain link
+
+## ✓ A failed «scenario» holding a «term ref» fails the «citation» of its «term»
+`tests/unit/citations/test_check.py::test_a_failed_scenario_using_a_term_fails_its_citation` · spec/term-citations
+
+- **given** a «report» where a failed «scenario» uses `Guest`
+- **given** a document with a «citation» of the term, read as passed
+    - 📎 document:
+        ```
+        ✅ [Guest](https://example.org/report.html#view=glossary&term=guest) (1 ✅)
+        ```
+- **when** the document is updated
+- **then** its glyph and summary read `❌`
+    - 📎 updated document:
+        ```
+        ❌ [Guest](https://example.org/report.html#view=glossary&term=guest) (1 ❌)
+        ```
+- **then** a `failed` «citation finding» remains, blaming a scenario using the term
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 
@@ -3421,7 +3583,7 @@
         ```
         Books a <strong>suite</strong> with <code>late_checkout</code>
         ## ✓ Books a **suite** with `late_checkout`
-        ✅ [Books a **suite** with `late_checkout`](
+        ✅ [Books a **suite** with `late_checkout`](https://example.org/report.html#scenario=t.py::test_book)
         ```
 - **then** the HTML renders the word bold and the code as code
 - **then** the Markdown keeps the same markers, so a viewer renders the same
@@ -3435,7 +3597,7 @@
         ```
         **Guest books**
         ## ✓ \*\*«Guest» books\*\*
-        ✅ [\*\*Guest books\*\*](
+        ✅ [\*\*Guest books\*\*](https://example.org/report.html#scenario=t.py::test_book)
         ```
 - **then** the HTML shows both markers as written
 - **then** the Markdown escapes them, so a viewer shows them as written

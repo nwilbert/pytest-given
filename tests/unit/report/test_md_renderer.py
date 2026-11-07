@@ -9,6 +9,7 @@ from pytest_given.model import (
     Attachment,
     AttachmentRef,
     ErrorInfo,
+    GlossaryTerm,
     Metadata,
     Narration,
     NarrationLiteral,
@@ -24,11 +25,16 @@ from pytest_given.model import (
     SourceLocation,
     Status,
     Step,
+    TermId,
     TracebackFrame,
     report_to_dict,
 )
 from pytest_given.report.function_source import FunctionSource, UnreadableSource
-from pytest_given.report.md_renderer import narration_body_md, render_md
+from pytest_given.report.md_renderer import (
+    definition_body_md,
+    narration_body_md,
+    render_md,
+)
 from tests.ubiquitous_language import pg
 
 
@@ -1347,3 +1353,36 @@ def test_a_source_line_holding_a_unicode_line_separator_stays_one_line() -> None
     source = FunctionSource(first_line=1, lines=(line,))
     md = render_md(_report(scn), sources={scn.id: source})
     assert f'```python\n1  {line}\n```' in md
+
+
+@pytest.mark.parametrize(
+    ('definition', 'body'),
+    [
+        (None, ''),
+        ('', ''),
+        (' \n ', ''),
+        ('Someone *staying* at the `hotel`.', 'Someone *staying* at the `hotel`.'),
+        ('**A** `b` *c `d`*', '**A** `b` *c `d`*'),
+        ('See [the docs](x)', 'See \\[the docs\\](x)'),
+        ('a <b>c</b> tag', 'a \\<b>c\\</b> tag'),
+        ('</details> first', '\\</details> first'),
+        ('- not an item', '\\- not an item'),
+        ('# not a heading', '\\# not a heading'),
+        ('1. not an item', '1\\. not an item'),
+        ('    not code', 'not code'),
+        ('> not a quote', '\\> not a quote'),
+        ('---', '\\---'),
+        ('line one\nline two', 'line one<br>line two'),
+        ('line one\r\nline two', 'line one<br>line two'),
+        ('line one<br>line two', 'line one<br>line two'),
+        ('line one<BR />line two', 'line one<br>line two'),
+        ('*line one\nline two*', '*line one<br>line two*'),
+        ('`<br>` as text', '`<br>` as text'),
+        ('a `code\nspan`', 'a `code span`'),
+    ],
+)
+def test_a_definition_body_shows_what_the_glossary_view_shows(
+    definition: str | None, body: str
+) -> None:
+    term = GlossaryTerm(id=TermId('t'), kind=None, canonical='T', definition=definition)
+    assert definition_body_md(term) == body

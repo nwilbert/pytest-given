@@ -59,7 +59,7 @@ pytest-given goes beyond JGiven by tying tests to the domain itself. A [glossary
 
 ### Documents that stay true
 
-A design spec or a README can [cite](guide/citations.md) scenarios, tags and stories as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run. `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
+A design spec or a README can [cite](guide/citations.md) scenarios, tags, stories and glossary terms as links into the report, each led by its current status. `pytest-given citations update` keeps the citations in line with the latest run. `pytest-given citations check` in CI fails when a cited scenario stops passing or disappears, so the document can't quietly claim what the code no longer does.
 
 ## Example reports
 

@@ -31,7 +31,7 @@ The Glossary view lists the terms by kind, with a search and filters for kind an
 
 ## Links
 
-The address bar always holds the current view: its filters, status toggles and search. Copy it to share exactly what you see. A link can also open a single scenario, tag or story. The copy button on a scenario card, a story header or a Tags sidebar row copies such a link, or a [citation](guide/citations.md) for a Markdown document. When a link names something the report no longer has, the report says so and opens without it.
+The address bar always holds the current view: its filters, status toggles and search. Copy it to share exactly what you see. A link can also open a single scenario, tag, story or glossary term. The copy button on a scenario card, a story header, a Tags sidebar row or a Glossary term row copies such a link, or a [citation](guide/citations.md) for a Markdown document. When a link names something the report no longer has, the report says so and opens without it.
 
 ## Publishing
 

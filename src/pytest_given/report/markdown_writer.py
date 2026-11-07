@@ -4,7 +4,14 @@ report shows."""
 import re
 from collections.abc import Callable
 
-from ..markdown import LINE_BREAK, CodeSpan, EmphasisSpan, InlineSpan, PlainSpan
+from ..markdown import (
+    LINE_BREAK,
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
+    read_spans,
+)
 from ..model import (
     Narration,
     NarrationPiece,
@@ -14,6 +21,7 @@ from ..model import (
     placeholder_token,
     read_narration,
 )
+from .text import DEFINITION_BREAK
 
 # What CommonMark or GFM give inline meaning: a link, emphasis,
 # strikethrough, a code span, raw HTML, an entity, a table cell, GitHub math —
@@ -37,6 +45,15 @@ def narration_markdown(
         for piece, before, after in zip(
             pieces, ['', *edges[:-1]], [*edges[1:], ''], strict=True
         )
+    )
+
+
+def definition_markdown(text: str) -> str:
+    """A glossary definition on one line, as the report shows it: its spans kept
+    as markup, everything else literal, an author's `<br>` or a newline as `<br>`."""
+    return ''.join(
+        _span_markdown(span, in_table_row=False, plain=_literal_with_breaks)
+        for span in read_spans(text)
     )
 
 
@@ -86,20 +103,32 @@ def _piece_markdown(
         case PlainSpan(text=text) | NarrationValue(rendered=text):
             return literal_markdown(one_line(text), before=before, after=after)
         case CodeSpan() | EmphasisSpan():
-            return _span_markdown(part, in_table_row)
+            return _span_markdown(part, in_table_row, _literal_line)
         case NarrationPlaceholder():
             return literal_markdown(placeholder_token(part))
         case NarrationTermRef(display=display):
             return term_ref(literal_markdown(one_line(display)))
 
 
-def _span_markdown(span: InlineSpan, in_table_row: bool) -> str:
+def _span_markdown(
+    span: InlineSpan, in_table_row: bool, plain: Callable[[str], str]
+) -> str:
     match span:
         case PlainSpan(text=text):
-            return literal_markdown(one_line(text))
+            return plain(text)
         case CodeSpan(text=text):
             return code_span_markdown(one_line(text), in_table_row=in_table_row)
         case EmphasisSpan(strong=strong, content=content):
             marker = '**' if strong else '*'
-            inner = ''.join(_span_markdown(part, in_table_row) for part in content)
+            inner = ''.join(
+                _span_markdown(part, in_table_row, plain) for part in content
+            )
             return f'{marker}{inner}{marker}'
+
+
+def _literal_line(text: str) -> str:
+    return literal_markdown(one_line(text))
+
+
+def _literal_with_breaks(text: str) -> str:
+    return '<br>'.join(literal_markdown(line) for line in DEFINITION_BREAK.split(text))

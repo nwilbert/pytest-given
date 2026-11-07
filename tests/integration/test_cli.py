@@ -42,7 +42,8 @@ def test_cli_rerender_keeps_the_report_url(tmp_path: Path) -> None:
     html_path = tmp_path / 'out.html'
     assert main(['report', str(json_path), '-o', str(html_path)]) == 0
     app_data = embedded_app_data(html_path.read_text(encoding='utf-8'))
-    assert app_data['citations']['report_url'] == 'https://example.org/report.html'
+    template = app_data['citations']['templates']['citation']
+    assert 'https://example.org/report.html' in ''.join(template)
 
 
 @scenario(
@@ -66,9 +67,8 @@ def test_cli_report_url_replaces_the_saved_one(tmp_path: Path) -> None:
         citations = embedded_app_data(html_path.read_text(encoding='utf-8'))[
             'citations'
         ]
-        assert citations['report_url'] == url
         copied = [''.join(form) for form in citations['templates'].values()]
-        assert len(copied) == 2
+        assert len(copied) == 3
         assert all(url in form and '/dev/' not in form for form in copied)
 
 

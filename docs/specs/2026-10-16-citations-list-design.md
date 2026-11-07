@@ -52,9 +52,9 @@ citations: 2 findings; `citations update` fixes 1
 Every unindented line is a link, so `grep -v '^ '` keeps the bare list.
 
 **Which links are listed:** every citation — a typed `?` placeholder and a mistyped citation
-included — and every plain report link. A link to the report whose fragment names no scenario, tag
-or story and that carries no glyph is not a report link (a glossary term link, say), so it is not
-listed, as `check` does not check it.
+included — and every plain report link. A link to the report whose fragment names no target and
+that carries no glyph is not a report link (a search link, say), so it is not listed, as `check`
+does not check it.
 
 **What a line says:** `<path>:<line>: <glyph> <kind> <key>`.
 
@@ -63,7 +63,7 @@ listed, as `check` does not check it.
   list: a line states what the document says.
 - The kind and key are the target as the document's fragment names it — a slug or a `[case]` node
   ID included, with a `fragment` finding under the line that names its current form. A mistyped
-  citation shows its fragment instead: `✅ #view=glossary&term=guest`.
+  citation shows its fragment instead: `✅ #q=pay`.
 
 ### `--covering NODE_ID`
 

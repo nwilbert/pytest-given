@@ -8,10 +8,15 @@ from typing import Literal
 from urllib.parse import parse_qsl
 
 from ..markdown import fold_whitespace, plain_html_text
-from ..model import Narration, NodeId, ReportData, StoryId, node_base
-from ..report import CitationIndex, Target, build_scenario_slug_index, html_link_text
+from ..model import Narration, NodeId, ReportData, StoryId, TermId, node_base
+from ..report import (
+    CitationIndex,
+    Target,
+    build_scenario_slug_index,
+    html_link_text,
+)
 
-# The markup a link text is written in: a Markdown link's, or a narrated
+# The markup a link text is written in: a Markdown link's, or a `<details>`
 # citation's HTML.
 type TitleForm = Literal['markdown', 'html']
 
@@ -20,7 +25,6 @@ def shown_title(title: Narration | str, form: TitleForm) -> str:
     """A title as a link text of `form` shows it, to compare a written one with."""
     if form == 'markdown':
         return fold_whitespace(title if isinstance(title, str) else title.text)
-    assert isinstance(title, Narration)
     return plain_html_text(html_link_text(title))
 
 
@@ -36,6 +40,8 @@ def parse_fragment(fragment: str) -> Target | None:
         return Target('tag', params['tag'])
     if keys == ['story', 'view'] and params['view'] == 'stories':
         return Target('story', params['story'])
+    if keys == ['term'] or (keys == ['term', 'view'] and params['view'] == 'glossary'):
+        return Target('term', params['term'])
     return None
 
 
@@ -63,6 +69,8 @@ class TargetResolver:
                 return target if target.key in self.index.tags else None
             case 'story':
                 return target if target.key in self.index.stories else None
+            case 'term':
+                return target if target.key in self.index.terms else None
 
     def scenarios_titled(self, title: str, form: TitleForm) -> list[NodeId]:
         return self._titles(form).get(title, [])
@@ -98,6 +106,15 @@ class TargetResolver:
                     title=link_title,
                     id_by_title=self._story_by_title,
                 )
+            case 'term':
+                return _closest(
+                    id_label='term id',
+                    key=target.key,
+                    ids=self.index.terms,
+                    title_label='term name',
+                    title=link_title,
+                    id_by_title=self._term_by_name,
+                )
 
     def _titles(self, form: TitleForm) -> dict[str, list[NodeId]]:
         if form not in self._titled:
@@ -111,6 +128,12 @@ class TargetResolver:
     @cached_property
     def _story_by_title(self) -> dict[str, StoryId]:
         return {title: story_id for story_id, (title, _) in self.index.stories.items()}
+
+    @cached_property
+    def _term_by_name(self) -> dict[str, TermId]:
+        return {
+            term.canonical: term_id for term_id, (term, _) in self.index.terms.items()
+        }
 
     def _resolve_scenario(self, key: str) -> Target | None:
         if key in self.index.scenarios:

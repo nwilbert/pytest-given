@@ -52,7 +52,7 @@ from .citation_index import (
     CitationTemplate,
     Target,
     TargetKind,
-    scenario_citation_templates,
+    citation_templates,
 )
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
@@ -74,15 +74,14 @@ _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 # Maps parameter name to its color index. The index resolves to a color via
 # `palette.param_column_colors`, which never runs out.
 type ParamColorMap = dict[str, int]
-type CitationHalves = tuple[str, str]
 
 
 class CitationData(TypedDict):
-    report_url: str
     templates: dict[str, CitationTemplate]
     scenario: list[list[str]]
-    tag: dict[str, CitationHalves]
-    story: dict[str, CitationHalves]
+    tag: dict[str, list[str]]
+    story: dict[str, list[str]]
+    term: dict[str, list[str]]
 
 
 @dataclass(frozen=True)
@@ -272,6 +271,7 @@ def _render_context(
     citation_index = CitationIndex(
         report,
         {story_id: rollup.scenarios for story_id, rollup in story_rollups.items()},
+        glossary_view.term_scenarios,
     )
     term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
     return {
@@ -412,27 +412,24 @@ def _piece_text(piece: NarrationPiece) -> str:
 
 
 def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | None:
-    """What each copy button copies, keyed as the page finds it: a scenario's
-    row by its card's position, a tag's line at every level of the tree
-    `app.js` builds, a story's by id. Only a report with a public URL carries
-    it."""
+    """What each copy button copies: the forms, and a row for each target, keyed
+    as the page finds it: a scenario's by its card's position, a tag's at every
+    level of the tree `app.js` builds, a story's and a term's by id. Only a
+    report with a public URL carries it."""
     report_url = report.metadata.report_url
     if report_url is None:
         return None
 
-    def halves(kind: TargetKind, key: str) -> CitationHalves:
-        return index.citation(Target(kind, key)).markdown_halves()
+    def row(kind: TargetKind, key: str) -> list[str]:
+        return index.citation(Target(kind, key)).template_row()
 
     return {
-        'report_url': report_url,
-        'templates': scenario_citation_templates(report_url),
+        'templates': citation_templates(report_url),
         # `index.scenarios` holds every scenario, in the report's order.
-        'scenario': [
-            index.citation(Target('scenario', cited)).scenario_row()
-            for cited in index.scenarios
-        ],
-        'tag': {tag: halves('tag', tag) for tag in index.tags},
-        'story': {story_id: halves('story', story_id) for story_id in index.stories},
+        'scenario': [row('scenario', cited) for cited in index.scenarios],
+        'tag': {tag: row('tag', tag) for tag in index.tags},
+        'story': {story_id: row('story', story_id) for story_id in index.stories},
+        'term': {term_id: row('term', term_id) for term_id in index.terms},
     }
 
 

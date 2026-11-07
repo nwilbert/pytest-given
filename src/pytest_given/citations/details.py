@@ -1,5 +1,6 @@
-"""Narrated citations in a document: a `<details>` block whose summary holds a
-scenario citation written as HTML, with the spans `citations update` rewrites.
+"""Narrated and defining citations in a document: a `<details>` block whose
+summary holds a citation written as HTML, with the spans `citations update`
+rewrites.
 """
 
 import functools
@@ -12,15 +13,17 @@ from typing import NamedTuple
 from ..markdown import LINE_BREAK, HtmlBlock, Span, TextRun, html_blocks
 from .markdown_links import (
     ATTRIBUTE_TOKEN,
+    SUMMARY_PATTERN,
     VARIATION_SELECTOR,
     Glyph,
+    WrittenSummary,
     fragment_offset,
     resolved,
 )
 
 
 @dataclass(frozen=True, kw_only=True)
-class NarratedCitation:
+class DetailsCitation:
     """`body` is the lines between the summary and the closing tag past
     `prefix`, a blank container line read as empty, joined by `\n`: a filled
     block reads `'\n' + narration + '\n'`, a freshly copied one `''`.
@@ -28,7 +31,7 @@ class NarratedCitation:
     line when the block holds its own. `markdown` is the opening tag's
     attribute value, `''` bare and None without it; `markdown_attribute` its
     span in the tag, leading whitespace included, or zero-width past
-    `<details`."""
+    `<details`. `end` is just past the `</a>`, where a summary goes."""
 
     line: int
     glyph: Glyph
@@ -40,6 +43,8 @@ class NarratedCitation:
     href_span: Span
     text: str
     text_span: Span
+    end: int
+    summary: WrittenSummary | None
     body: str
     body_span: Span
     prefix: str
@@ -67,8 +72,8 @@ class NarratedCitation:
 
 @dataclass(frozen=True, kw_only=True)
 class LooseDetails:
-    """A `<details>` block that cites into the report in no shape a narrated
-    citation takes. `offset` places its `<a>` in the source."""
+    """A `<details>` block that cites into the report in no shape a citation
+    takes. `offset` places its `<a>` in the source."""
 
     line: int
     offset: int
@@ -76,14 +81,14 @@ class LooseDetails:
     reason: str
 
 
-def scan_narrated(
+def scan_details(
     source: str, glyphs: Collection[str]
-) -> list[NarratedCitation | LooseDetails]:
+) -> list[DetailsCitation | LooseDetails]:
     """In document order. A `<details>` line inside a larger HTML block is
     read as a block of its own, so its citation is never missed."""
     patterns = _patterns(tuple(sorted(glyphs, key=len, reverse=True)))
     blocks = html_blocks(source)
-    found: list[NarratedCitation | LooseDetails] = []
+    found: list[DetailsCitation | LooseDetails] = []
     for index, block in enumerate(blocks):
         first, *buried = _pieces(block.run)
         if _OPENS.match(first.text):
@@ -119,7 +124,9 @@ _CUT_OFF = (
     "its <summary> is separated from <details> by a blank line or a list item's "
     "or quote's edge"
 )
-_NOT_THE_SHAPE = 'its summary is not the glyph, a space and the link alone'
+_NOT_THE_SHAPE = 'its summary is not the glyph, a space and the link'
+# What a citation's shape lets stand between `</a>` and `</summary>`.
+_PAST_ANCHOR = re.compile(rf'(?:\s+(?:{SUMMARY_PATTERN}))?\s*', re.IGNORECASE)
 
 
 class _Patterns(NamedTuple):
@@ -137,7 +144,9 @@ def _patterns(longest_first: tuple[str, ...]) -> _Patterns:
         rf'\s*(?P<glyph>(?:{glyph}){VARIATION_SELECTOR}?)\s+'
     )
     shape = re.compile(
-        head + r'<a href="(?P<href>[^"\n]*)">(?P<text>(?:(?!</a>).)*)</a>'
+        head
+        + r'<a href="(?P<href>[^"\n]*)">(?P<text>(?:(?!</a>).)*)(?P<anchor_close></a>)'
+        rf'(?:\s+(?P<summary>{SUMMARY_PATTERN}))?'
         # A closing tag the block holds starts its own line, where an update
         # writes the body above it.
         r'\s*</summary>(?:[ \t]*(?:\r\n?|\n)\s*(?P<close></details\s*>))?\s*\Z',
@@ -166,7 +175,7 @@ def _read(
     run: TextRun,
     patterns: _Patterns,
     holds_more: bool,
-) -> NarratedCitation | LooseDetails | None:
+) -> DetailsCitation | LooseDetails | None:
     """`run` is the block's first piece; `holds_more`, whether others follow."""
     parts = patterns.shape.match(run.text)
     if parts is None:
@@ -216,7 +225,7 @@ def _citation(
     run: TextRun,
     parts: re.Match[str],
     closing: HtmlBlock | None,
-) -> NarratedCitation:
+) -> DetailsCitation:
     if closing is None:
         line_start = block.line_starts[run.line_at(parts.start('close')) - run.line]
         body, body_span = '', (line_start, line_start)
@@ -232,7 +241,7 @@ def _citation(
         ),
         None,
     )
-    return NarratedCitation(
+    return DetailsCitation(
         line=run.line_at(parts.start('href')),
         glyph=Glyph(parts['glyph'], run.span(*parts.span('glyph'))),
         opening_tag=tag,
@@ -245,6 +254,12 @@ def _citation(
         href_span=run.span(*parts.span('href')),
         text=parts['text'],
         text_span=run.span(*parts.span('text')),
+        end=run.span(*parts.span('anchor_close'))[1],
+        summary=(
+            WrittenSummary(parts['summary'], run.span(*parts.span('summary')))
+            if parts['summary']
+            else None
+        ),
         body=body,
         body_span=body_span,
         prefix=block.prefix,
@@ -268,7 +283,7 @@ def _loose(
     run: TextRun, patterns: _Patterns, reason: str | None = None
 ) -> LooseDetails | None:
     """The run's citing summary, if it has one, as loose: for `reason`, or
-    for what keeps it from a narrated citation's shape."""
+    for what keeps it from a citation's shape."""
     text = run.text
     summary = patterns.summary_glyph.search(text)
     anchor = _ANCHOR.search(text, summary.end()) if summary else None
@@ -296,7 +311,7 @@ def _href(anchor: str) -> re.Match[str] | None:
 
 def _mistyped(text: str, anchor: re.Match[str], head: re.Pattern[str]) -> str:
     """The first part, in reading order, where a block that starts as a
-    narrated citation leaves its shape."""
+    citation leaves its shape."""
     if not head.match(text[: anchor.start()]):
         return _NOT_THE_SHAPE
     names = [attribute['name'].lower() for attribute in _attributes(anchor.group(), 2)]
@@ -310,7 +325,7 @@ def _mistyped(text: str, anchor: re.Match[str], head: re.Pattern[str]) -> str:
         return _NOT_THE_SHAPE
     summary_closes = _SUMMARY_CLOSES.search(text, anchor_closes.end())
     in_summary_end = len(text) if summary_closes is None else summary_closes.start()
-    if text[anchor_closes.end() : in_summary_end].strip():
+    if not _PAST_ANCHOR.fullmatch(text, anchor_closes.end(), in_summary_end):
         return 'text follows </a>'
     if summary_closes is None:
         return _NOT_THE_SHAPE

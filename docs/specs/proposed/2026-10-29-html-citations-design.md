@@ -198,7 +198,7 @@ entry copies an empty body for `update` to fill, as the Markdown one does. The H
 their own icon, distinct from the Markdown mark the citation entries use. Which icon is the
 builder's call.
 
-`scenario_citation_templates` gains the two HTML forms. A scenario's `scenario_row` already
+`citation_templates` gains the two HTML forms. A scenario's `template_row` already
 carries the HTML title they need. Like every template change, the menu is Playwright-verified.
 
 ## Where the code goes

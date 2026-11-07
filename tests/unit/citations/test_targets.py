@@ -8,7 +8,7 @@ import pytest
 from pytest_given.citations.targets import TargetResolver, parse_fragment
 from pytest_given.model import Scenario, Story
 from pytest_given.report import Target, report_fragment
-from tests.unit.citation_reports import report_, scenario_, story_
+from tests.unit.citation_reports import report_, scenario_, story_, term_
 
 
 def _resolver(*scenarios: Scenario, stories: tuple[Story, ...] = ()) -> TargetResolver:
@@ -35,6 +35,10 @@ def test_a_fragment_round_trips_through_parse_fragment(node_id: str) -> None:
         ('tag=spec', Target('tag', 'spec')),
         ('story=cancel&view=stories', Target('story', 'cancel')),
         ('view=stories&story=cancel', Target('story', 'cancel')),
+        ('view=glossary&term=guest', Target('term', 'guest')),
+        ('term=guest&view=glossary', Target('term', 'guest')),
+        ('term=guest', Target('term', 'guest')),
+        ('view=stories&term=guest', None),
         ('tag=a&tag=b', None),
         ('q=foo', None),
         ('view=glossary&story=cancel', None),
@@ -42,10 +46,25 @@ def test_a_fragment_round_trips_through_parse_fragment(node_id: str) -> None:
         ('', None),
     ],
 )
-def test_only_the_three_shapes_are_report_link_fragments(
+def test_only_the_report_link_shapes_are_report_link_fragments(
     fragment: str, target: Target | None
 ) -> None:
     assert parse_fragment(fragment) == target
+
+
+def test_a_term_resolves_as_it_is_and_suggests_by_id_and_name() -> None:
+    resolver = TargetResolver(report_(terms=(term_('Guest'), term_('Host'))))
+    assert resolver.resolve(Target('term', 'guest')) == Target('term', 'guest')
+    gone = Target('term', 'guests')
+    assert resolver.resolve(gone) is None
+    assert resolver.suggestions(gone, 'Hosts') == [
+        'closest by term id: guest',
+        'closest by term name: host ("Host")',
+    ]
+
+
+def test_no_term_resolves_in_a_report_without_a_glossary() -> None:
+    assert _resolver(scenario_('t.py::test_a')).resolve(Target('term', 'guest')) is None
 
 
 def test_the_current_keys_resolve_as_they_are() -> None:

@@ -9,11 +9,14 @@ from pytest_given.model import (
     narration_of,
 )
 from pytest_given.report import CitationIndex, Target
+from pytest_given.report.citation_index import citation_templates
 from pytest_given.report.html_renderer import _make_narration_filter
 from pytest_given.report.inline_markdown import render_definition
 from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
-from tests.unit.citation_reports import report_, scenario_
+from tests.unit.citation_reports import URL, filled, report_, scenario_
+
+BOOK_LINK = f'{URL}#scenario=t.py::test_book'
 
 
 def _outputs(title: Narration) -> tuple[str, str, str]:
@@ -23,7 +26,8 @@ def _outputs(title: Narration) -> tuple[str, str, str]:
     html = str(_make_narration_filter(param_color_map={}, glossary=None)(title))
     heading = render_md(report).splitlines()[2]
     citation = CitationIndex.of(report).citation(Target('scenario', 't.py::test_book'))
-    return html, heading, citation.markdown_halves()[0]
+    template = citation_templates(URL)['citation']
+    return html, heading, filled(template, citation.template_row())
 
 
 @scenario(
@@ -44,7 +48,7 @@ def test_a_title_s_emphasis_renders_the_same_in_every_output() -> None:
         )
     with then('the Markdown keeps the same markers, so a viewer renders the same'):
         assert heading == '## ✓ Books a **suite** with `late_checkout`'
-        assert citation == '✅ [Books a **suite** with `late_checkout`]('
+        assert citation == f'✅ [Books a **suite** with `late_checkout`]({BOOK_LINK})'
 
 
 @scenario(
@@ -71,7 +75,7 @@ def test_a_span_crossed_by_a_term_ref_stays_literal() -> None:
         assert html == '**Guest books**'
     with then('the Markdown escapes them, so a viewer shows them as written'):
         assert heading == '## ✓ \\*\\*«Guest» books\\*\\*'
-        assert citation == '✅ [\\*\\*Guest books\\*\\*]('
+        assert citation == f'✅ [\\*\\*Guest books\\*\\*]({BOOK_LINK})'
 
 
 @pytest.mark.parametrize(

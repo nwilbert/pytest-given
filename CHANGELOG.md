@@ -13,6 +13,20 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ## [Unreleased]
 
+### Added
+
+- `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary.
+- A term citation written as a `<details markdown="1">` block carries the term's definition, which `citations update` writes and `citations check` holds to the report.
+- A Glossary term row in the HTML report gets the copy button, which offers **Copy citation** and **Copy defining citation** when the report has a URL.
+
+### Changed
+
+- A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
+
+### Fixed
+
+- A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which `citations update` rewrites.
+
 ## [0.5.2] - 2026-11-07
 
 ### Changed

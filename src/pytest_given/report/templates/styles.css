@@ -1741,8 +1741,8 @@ span.param-highlight {
 /* === Copy menu ===
    A sheet of the card's own surface, lifted by the tooltip's shadow. Its
    button stays lit in the accent while the menu is open, so the menu reads
-   as that button's. The rule separates the link from the two citations,
-   which copy Markdown. Keyboard focus takes the accent tint, a pointer's
+   as that button's. The rule separates the link from the citations, which
+   copy Markdown. Keyboard focus takes the accent tint, a pointer's
    hover the plainer row hover, as in the sidebar. */
 .copy-menu-trigger.copy-menu-open { opacity: 1 !important; color: var(--color-accent); }
 .copy-menu {

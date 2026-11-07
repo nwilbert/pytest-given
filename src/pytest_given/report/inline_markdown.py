@@ -5,22 +5,18 @@ report concern, so this lives in `report/` and never imports from `capture/`."""
 # A run that renders no HTML never loads MarkupSafe.
 __lazy_modules__ = ['markupsafe']
 
-import re
 from collections.abc import Callable
 
 from markupsafe import escape
 
 from ..markdown import (
-    LINE_BREAK,
     CodeSpan,
     EmphasisSpan,
     InlineSpan,
     PlainSpan,
     read_spans,
 )
-
-# Re-admit an author's escaped <br> / <br/> / <br /> (any case) as a real break.
-_BR = re.compile(r'&lt;br\s*/?\s*&gt;', re.IGNORECASE)
+from .text import DEFINITION_BREAK
 
 
 def render_span(span: InlineSpan) -> str:
@@ -51,4 +47,4 @@ def _escaped(text: str) -> str:
 
 
 def _with_breaks(text: str) -> str:
-    return LINE_BREAK.sub('<br>', _BR.sub('<br>', _escaped(text)))
+    return '<br>'.join(_escaped(line) for line in DEFINITION_BREAK.split(text))

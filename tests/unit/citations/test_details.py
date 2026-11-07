@@ -1,18 +1,18 @@
 import pytest
 
-from pytest_given.citations.narrated import (
+from pytest_given.citations.details import (
+    DetailsCitation,
     LooseDetails,
-    NarratedCitation,
-    scan_narrated,
+    scan_details,
 )
 
 GLYPHS = ['✅', '❓']
 SUMMARY = '<summary>✅ <a href="r.html#scenario=t::a">Title</a></summary>'
 
 
-def _only_citation(source: str) -> NarratedCitation:
-    [found] = scan_narrated(source, GLYPHS)
-    assert isinstance(found, NarratedCitation)
+def _only_citation(source: str) -> DetailsCitation:
+    [found] = scan_details(source, GLYPHS)
+    assert isinstance(found, DetailsCitation)
     return found
 
 
@@ -21,7 +21,7 @@ def _slice(source: str, span: tuple[int, int]) -> str:
 
 
 def _loose(source: str) -> list[tuple[int, str, str]]:
-    found = scan_narrated(source, GLYPHS)
+    found = scan_details(source, GLYPHS)
     assert all(isinstance(each, LooseDetails) for each in found)
     return [
         (each.line, each.href, each.reason)
@@ -122,10 +122,10 @@ def test_an_unclosed_block_is_loose() -> None:
 
 def test_two_in_a_row_leave_the_first_unclosed() -> None:
     source = f'<details>\n{SUMMARY}\n\ntext\n\n<details>\n{SUMMARY}\n\n</details>\n'
-    first, second = scan_narrated(source, GLYPHS)
+    first, second = scan_details(source, GLYPHS)
     assert isinstance(first, LooseDetails)
     assert first.reason == 'no </details> closes it'
-    assert isinstance(second, NarratedCitation)
+    assert isinstance(second, DetailsCitation)
 
 
 BURIED = 'a blank line must separate it from the HTML above it'
@@ -133,8 +133,8 @@ BURIED = 'a blank line must separate it from the HTML above it'
 
 def test_a_details_line_inside_a_larger_html_block_is_loose() -> None:
     copied = f'<details markdown="1">\n{SUMMARY}\n\n</details>\n'
-    first, second = scan_narrated(copied + copied, GLYPHS)
-    assert isinstance(first, NarratedCitation)
+    first, second = scan_details(copied + copied, GLYPHS)
+    assert isinstance(first, DetailsCitation)
     assert first.body == ''
     assert isinstance(second, LooseDetails)
     assert (second.line, second.reason) == (6, BURIED)
@@ -142,8 +142,8 @@ def test_a_details_line_inside_a_larger_html_block_is_loose() -> None:
 
 def test_the_first_of_two_blocks_holding_their_closing_tags_is_read() -> None:
     held = f'<details markdown="1">\n{SUMMARY}\n</details>\n'
-    first, second = scan_narrated(held + held, GLYPHS)
-    assert isinstance(first, NarratedCitation)
+    first, second = scan_details(held + held, GLYPHS)
+    assert isinstance(first, DetailsCitation)
     assert isinstance(second, LooseDetails)
     assert (second.line, second.reason) == (5, BURIED)
 
@@ -175,8 +175,8 @@ def test_a_details_line_after_a_prettier_ignore_comment_is_loose() -> None:
         f'<details markdown="1">\n{SUMMARY}\n\n</details>\n'
         '<!-- prettier-ignore-end -->\n'
     )
-    first, second = scan_narrated(wrapped + wrapped, GLYPHS)
-    assert isinstance(first, NarratedCitation)
+    first, second = scan_details(wrapped + wrapped, GLYPHS)
+    assert isinstance(first, DetailsCitation)
     assert first.body == ''
     assert isinstance(second, LooseDetails)
     assert (second.line, second.reason) == (9, BURIED)
@@ -188,7 +188,7 @@ def test_an_authors_details_line_inside_a_larger_html_block_is_ignored() -> None
         '<details>\n<summary>Notes</summary>\n\n</details>\n'
         '<details>\n<summary>✅ no link</summary>\n\n</details>\n'
     )
-    assert len(scan_narrated(source, GLYPHS)) == 1
+    assert len(scan_details(source, GLYPHS)) == 1
 
 
 def test_an_anchor_with_other_attributes_is_loose() -> None:
@@ -212,11 +212,69 @@ def test_text_after_the_anchor_is_loose() -> None:
     assert _reason(unclosed) == 'text follows </a>'
 
 
+def test_a_summary_touching_the_anchor_is_text_after_it() -> None:
+    source = '<details>\n<summary>✅ <a href="u#s">T</a>(1 ✅)</summary>\n</details>\n'
+    assert _reason(source) == 'text follows </a>'
+
+
+def test_a_summary_in_another_case_leaves_the_block_to_its_other_fault() -> None:
+    source = (
+        '<details>\n<summary>✅ <a href="u#s">T</a> (NO SCENARIOS)</summary>\n'
+        '</details> more\n'
+    )
+    assert _reason(source) == 'text follows its </details>'
+
+
+@pytest.mark.parametrize(
+    ('between', 'summary'),
+    [
+        (' ', '(1 ✅)'),
+        (' ', '(1 ✅ · 2 ❌)'),
+        ('  ', '(no scenarios)'),
+        ('\n', '(1 ✅️)'),
+    ],
+)
+def test_a_summary_after_the_anchor_is_read_and_placed(
+    between: str, summary: str
+) -> None:
+    source = (
+        f'<details>\n<summary>✅ <a href="u#s">T</a>{between}{summary}</summary>\n'
+        '\n</details>\n'
+    )
+    found = _only_citation(source)
+    assert found.summary is not None
+    assert found.summary.text == summary
+    assert _slice(source, found.summary.span) == summary
+    assert source[found.end - len('</a>') : found.end] == '</a>'
+
+
+def test_a_citation_without_a_summary_ends_past_its_anchor() -> None:
+    source = f'<details>\n{SUMMARY}\n\n</details>\n'
+    found = _only_citation(source)
+    assert found.summary is None
+    assert source[found.end :].startswith('</summary>')
+
+
+@pytest.mark.parametrize('text', ['(1 passed)', '(1 ✅) more', 'more (1 ✅)', '(1 ✅'])
+def test_text_of_no_summary_shape_is_loose(text: str) -> None:
+    source = (
+        f'<details>\n<summary>✅ <a href="u#s">T</a> {text}</summary>\n\n</details>\n'
+    )
+    assert _reason(source) == 'text follows </a>'
+
+
+def test_a_mistyped_block_with_a_summary_is_named_for_its_other_fault() -> None:
+    source = (
+        '<details>\n<summary>✅ <a href="u#s">T</a> (1 ✅)</summary></details>\n\nx\n'
+    )
+    assert _reason(source) == 'its </details> is not on a line of its own'
+
+
 def test_an_authors_details_is_ignored() -> None:
     source = '<details><summary>Notes</summary>\n\nx\n\n</details>\n'
-    assert scan_narrated(source, GLYPHS) == []
+    assert scan_details(source, GLYPHS) == []
     source = '<details>\n<summary>✅ no link</summary>\n\n</details>\n'
-    assert scan_narrated(source, GLYPHS) == []
+    assert scan_details(source, GLYPHS) == []
 
 
 def test_a_list_item_prefix_is_read_off_the_body() -> None:
@@ -269,7 +327,7 @@ def test_a_destination_without_a_fragment_has_no_fragment_span() -> None:
 )
 def test_a_summary_in_no_other_shape_is_loose_for_it(summary: str) -> None:
     source = f'<details>\n{summary}\n\n</details>\n'
-    assert _reason(source) == 'its summary is not the glyph, a space and the link alone'
+    assert _reason(source) == 'its summary is not the glyph, a space and the link'
 
 
 def test_a_closing_tag_in_another_container_does_not_close_it() -> None:
@@ -278,7 +336,7 @@ def test_a_closing_tag_in_another_container_does_not_close_it() -> None:
 
 
 def test_the_markdown_attribute_is_read_among_the_others() -> None:
-    def opening(tag: str) -> NarratedCitation:
+    def opening(tag: str) -> DetailsCitation:
         return _only_citation(f'{tag}\n{SUMMARY}\n\n</details>\n')
 
     quoted = opening('<details title="see markdown here" open>')

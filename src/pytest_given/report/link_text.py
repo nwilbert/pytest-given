@@ -16,15 +16,18 @@ from .markdown_writer import literal_markdown, narration_markdown, one_line
 
 def link_text(title: Narration | str, *, in_table_row: bool = False) -> str:
     """A citation's link text: a scenario title as the Markdown report writes
-    it, a tag or story title literal."""
+    it, a tag's, story's or term's title literal."""
     if isinstance(title, str):
         return literal_markdown(one_line(title))
     return narration_markdown(title, in_table_row=in_table_row)
 
 
-def html_link_text(title: Narration) -> str:
-    """A scenario title as the HTML report's inline Markdown renders it, for a
-    narrated citation's `<summary>`: one line, everything but its spans escaped."""
+def html_link_text(title: Narration | str) -> str:
+    """A title for a `<details>` citation's `<summary>`, on one line: a scenario
+    title as the HTML report's inline Markdown renders it, everything but its
+    spans escaped, a term's literal."""
+    if isinstance(title, str):
+        return render_span(PlainSpan(text=one_line(title)))
     return ''.join(_piece_html(piece) for piece in read_narration(title))
 
 

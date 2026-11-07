@@ -1,5 +1,7 @@
 # Term Citations — Design Spec
 
+✅ [spec/term-citations](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/term-citations) (8 ✅)
+
 ## Goal
 
 Let a Markdown document cite a glossary term as it cites a tag, so that:
@@ -13,7 +15,7 @@ Let a Markdown document cite a glossary term as it cites a tag, so that:
 
 ## Background
 
-A [citation](../2026-10-07-citations-design.md) names a scenario, a tag or a story. A term has a
+A [citation](2026-10-07-citations-design.md) names a scenario, a tag or a story. A term has a
 deep link, `#view=glossary&term=<id>`, but `check` reads none: a plain one is an ordinary link that
 goes dead without a finding, and one with a glyph is `mistyped`.
 
@@ -28,8 +30,9 @@ rollup with no new notion of coverage.
 ```
 
 - **Fragment** — `view=glossary&term=<term id>`, the fragment the report's Glossary view already
-  opens, in either parameter order. A bare `#term=<id>` stays an ordinary link, as a bare
-  `#story=<id>` does.
+  opens, in either parameter order. A bare `#term=<id>` opens the same term, so it names the term
+  too, and `update` leaves it as written. A bare `#story=<id>` opens no story, so it stays an
+  ordinary link.
 - **Glyph and summary** — a tag's rollup over the scenarios the Glossary view lists for the term:
   every scenario with a term ref to it in its title or steps. `❌` if any failed, and a `failed`
   finding with it, else `🔵`, `✅`, `🟠`.
@@ -65,7 +68,7 @@ Someone staying at the hotel.
 
 A **defining citation** is a term citation written as a `<details>` block: the citation in its
 `<summary>`, the term's definition in its body. Its block follows a
-[narrated citation](../2026-10-17-narrated-citations-design.md)'s rules — the opening tag and
+[narrated citation](2026-10-17-narrated-citations-design.md)'s rules — the opening tag and
 `markdown="1"`, the blank lines, the containers it is read in, an `update` that owns the body and
 compares it character for character, a body nothing reads a link from — with these differences:
 
@@ -78,7 +81,10 @@ compares it character for character, a body nothing reads a link from — with t
   `literal_markdown`, a marker that would open a block at the line's start included, as the
   Markdown report's quoted text does. An author's `<br>` or a newline becomes `<br>`, as the Markdown
   report writes a line break in a table cell. A link or HTML tag in a definition therefore stays
-  literal text in the document, and no definition can close the block early.
+  literal text in the document, and on a CommonMark renderer no definition can close the block
+  early. Python-Markdown knows no `\<`, `\&`, `\~` or `\$` and reads tags before escapes, so on such
+  a site a definition holding one of those characters shows the backslash and one holding
+  `</details>` ends the block, as a narrated citation's step text does.
 - **Undefined term** — the expected body is empty. A fresh block is current, with no finding. A
   block with text in its body gets a `stale` finding (`stale definition`), and `update` empties it:
   the body is the citation's whatever it holds, so an author's own words go outside the block and a
@@ -102,16 +108,17 @@ The anchor link on each Glossary term row becomes the copy button a scenario car
 |---|---|
 | Copy link | always |
 | Copy citation | with a report URL |
-| Copy defining citation | with a report URL |
+| Copy defining citation | with a report URL, for a term with a definition |
 
 **Copy defining citation** copies the block with its glyph, `href`, link text and summary filled in
 and its body empty for `update` to fill, as **Copy narrated citation** does. The entry uses the
 narrated entry's icon, with its own tooltip. The citation data gains a `term` map beside `tag` and
-`story`, holding what the two forms need for each term in the glossary.
+`story`, holding each glossary term's row, and the templates a row fills gain a summary slot and a
+`defining` form.
 
 ## Interaction with HTML citations
 
-The proposed [HTML citations](2026-10-29-html-citations-design.md) design lands independently.
+The proposed [HTML citations](proposed/2026-10-29-html-citations-design.md) design lands independently.
 Whichever lands second carries the other through: an HTML term citation reads as an HTML tag
 citation, and an HTML defining citation's body is the definition through the report's inline
 Markdown rendering. Its menus gain the term row's HTML entries.
@@ -119,43 +126,48 @@ Markdown rendering. Its menus gain the term row's HTML entries.
 ## Where the code goes
 
 - `report/citation_index.py` — `TargetKind` gains `'term'`, `report_fragment` its fragment.
-  `CitationIndex` gains `terms`, built on first use as `tags` and `stories` are, and `citation`,
-  `counted` and a `definition` method answer for it. A `Citation`'s HTML link text handles a literal
-  title, escaped, which a scenario's narrated form never needed.
+  `CitationIndex` gains `terms`, built on first use as `tags` and `stories` are, from a term-to-scenarios
+  map its caller passes as it passes the story scenarios, since the HTML renderer has already walked
+  them for the Glossary view. `citation`, `counted` and a `definition` method answer for it. A
+  `Citation`'s HTML link text handles a literal title, escaped, which a scenario's narrated form never
+  needed.
 - `report/md_renderer.py` — `definition_body_md(term)`, the body as above, beside
   `narration_body_md`, reading spans with `read_spans` as `render_definition` does.
 - `report/html_renderer.py`, `templates/`, `app.js` — the `term` citation data and the term row's
   copy button; the copy menu's defining entry.
 - `citations/targets.py` — `parse_fragment`, `TargetResolver.resolve` and `suggestions` for a term;
   `shown_title` for a literal title in HTML.
-- `citations/narrated.py` — the shape reads an optional summary after `</a>`, with its span.
-- `citations/check.py` — `_NarratedCheck` checks a summary and a term's body, and stops treating a
-  scenario as the only kind that owns one. The `mistyped` message reads "names no scenario, tag,
-  story or term". The `failed` message for a term reads
+- `citations/details.py`, renamed from `narrated.py` for its wider job as `NarratedCitation` becomes
+  `DetailsCitation` — the shape reads an optional summary after `</a>`, with its span, by the pattern
+  `check.py` reads a one-line citation's with, now shared in `targets.py`. A `mistyped` reason looks
+  past a summary, so it names what is actually wrong with the block.
+- `citations/check.py` — `_DetailsCheck`, renamed from `_NarratedCheck`, checks a summary and a term's
+  body, and stops treating a scenario as the only kind that owns one. The `mistyped` message reads
+  "names no scenario, tag, story or term". The `failed` message for a term reads
   `a scenario using cited term fails: Guest`, since a term itself cannot fail.
-
-Whether `NarratedCitation` and `_NarratedCheck` are renamed for their wider job is the builder's
-call.
 
 ## Documentation
 
 - `GLOSSARY.md` — **Citation** and **Report link** name terms; a **Defining citation** row beside
   **Narrated citation**.
-- `docs/site/guide/citations.md` — the kinds table, the glyph and summary rules, the fragment table
-  and a *Defining citations* section, with a live term citation and a live defining citation of a
-  self-report term. *Keeping the check accurate* adds: use a plain report link for an everyday term,
-  whose citation changes with most new scenarios.
+- `docs/site/guide/citations.md` — the opening paragraphs, the kinds table, the glyph and summary
+  rules, the fragment table, the `--covering` paragraph and a *Defining citations* section, with a
+  live term citation and a live defining citation of the self-report's **Defining citation** term,
+  which few scenarios will ever use. *Keeping the check accurate* adds: use a plain report link for
+  an everyday term, whose citation changes with most new scenarios.
 - `docs/site/html-report.md` — the copy button on a Glossary term row.
-- The `pytest-given-citing` skill and its `references/repair.md` — the term fragment in the triage
-  row and the writing rules, the defining block, the broad-term warning, and that a renamed term is
-  repaired by hand. The reviewing skill's citation step reads a defining citation's body as the
-  meaning a document claims.
+- `README.md`, `docs/site/index.md` and `docs/site/ai-agents.md` — terms among what a document can
+  cite.
+- The `pytest-given-citing` skill and its `references/repair.md` — the description, the glyph list,
+  the term fragment in the triage row and the writing rules, the defining block, the broad-term
+  warning, and that a renamed term is repaired by hand. The reviewing skill's citation step reads a
+  defining citation's body as the meaning a document claims.
 - `docs/specs/2026-10-07-citations-design.md` loses its out-of-scope entry on citing a term, and
   `docs/specs/2026-10-16-citations-list-design.md` its two examples of a term link as not a report
   link.
 - `CHANGELOG.md`:
-  - under Added: `citations check` and `update` read `#view=glossary&term=<id>` as a citation of a
-    term, with a tag's glyph and summary;
+  - under Added: `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a
+    citation of a term, with a tag's glyph and summary;
   - under Added: a term citation written as a `<details markdown="1">` block carries the term's
     definition, which `citations update` writes and `citations check` holds to the report;
   - under Changed: a plain report link to a glossary term is now checked, so a dead one fails
@@ -174,6 +186,7 @@ call.
 - Self-report scenarios tagged `spec/term-citations`, one per rule:
   - A term citation rolls up the scenarios that reference the term.
   - A term no scenario references reads as having no scenarios.
+  - A failed scenario holding a term ref fails the citation of its term.
   - A term missing from the report is a finding, for a citation and a plain report link alike.
   - `citations update` writes a defining citation's body from the term's definition.
   - An undefined term's defining citation has an empty body, and `citations update` empties one
@@ -182,8 +195,6 @@ call.
   - `--covering` keeps a term citation that counts the scenario.
 - Playwright: the copy menu on a Glossary term row with and without a report URL; a copied defining
   citation passes `check` after `update`.
-
-When it lands, the spec cites `spec/term-citations` at its head and moves to `docs/specs/`.
 
 ## Verification
 

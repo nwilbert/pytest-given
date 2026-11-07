@@ -1,8 +1,8 @@
 # Citations
 
-A design spec, a README or any other Markdown document can link to a scenario, a tag or a story in the HTML report. pytest-given checks these links against the JSON report of a test run, so they keep pointing at something that exists, and keeps their text in line with what that run found.
+A design spec, a README or any other Markdown document can link to a scenario, a tag, a story or a glossary term in the HTML report. pytest-given checks these links against the JSON report of a test run, so they keep pointing at something that exists, and keeps their text in line with what that run found.
 
-Such a link is a **citation** when it starts with a status glyph. pytest-given owns everything in it — the glyph, the link text and, for a tag or story, a summary of its scenarios — and `pytest-given citations update` keeps all of it current.
+Such a link is a **citation** when it starts with a status glyph. pytest-given owns everything in it — the glyph, the link text and, for a tag, story or term, a summary of its scenarios — and `pytest-given citations update` keeps all of it current.
 
 ```markdown
 ✅ [A renamed test keeps its citation](https://example.org/report.html#scenario=tests/test_x.py::test_y)
@@ -13,6 +13,7 @@ Live, against this site's example reports:
 
 - 🔵 [Cancel a Booking](../examples/hotel-booking.html#view=stories&story=cancel-a-booking) (2 ✅ · 1 🔵)
 - ✅ [spec/citations](../examples/self-report.html#tag=spec/citations) (10 ✅)
+- ✅ [Defining citation](../examples/self-report.html#view=glossary&term=defining-citation) (3 ✅)
 
 A [narrated citation](#narrated-citations) also folds in its scenario's narration:
 
@@ -48,6 +49,15 @@ A [narrated citation](#narrated-citations) also folds in its scenario's narratio
 
 </details>
 
+A [defining citation](#defining-citations) folds in a term's definition:
+
+<details markdown="1">
+<summary>✅ <a href="../examples/self-report.html#view=glossary&term=defining-citation">Defining citation</a> (3 ✅)</summary>
+
+A *Citation* of a term written as a collapsible block, the citation as its summary and the term's definition as its body.
+
+</details>
+
 ## How it fits together
 
 Citations link to the HTML report you publish, but the `pytest-given citations` commands read a JSON report and run no tests. So a citation is only right if the two reports match: write both from the same run.
@@ -71,7 +81,7 @@ Citations link to the HTML report you publish, but the `pytest-given citations` 
     cp given-report/report.html docs/report.html
     ```
 
-4. **Cite** scenarios, tags and stories by [copying a citation from the report](#copying-from-the-report), or by [writing one by hand](#writing-it-by-hand).
+4. **Cite** scenarios, tags, stories and terms by [copying a citation from the report](#copying-from-the-report), or by [writing one by hand](#writing-it-by-hand).
 
 5. **Update** your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under `docs/` and the project's `README.md`:
 
@@ -95,23 +105,24 @@ The run must include every scenario a document cites, because the commands can't
 |---|---|
 | ✅ | passed |
 | ❌ | failed |
-| 🟠 | skipped — or, for a story, no scenario yet |
+| 🟠 | skipped — or, for a story or term, no scenario yet |
 | 🔵 | expected failure |
 | ❓ | not in the report |
 
-A tag or story reads `❌` if any of its scenarios failed, else `🔵` if any is an expected failure, else `✅` if any passed, else `🟠`.
+A tag, story or term reads `❌` if any of its scenarios failed, else `🔵` if any is an expected failure, else `✅` if any passed, else `🟠`.
 
-Its summary counts its scenarios per status, as in `(5 ✅ · 2 🔵)`, or reads `(no scenarios)` for a story nothing covers yet. A tag counts the scenarios below it too, as its link opens them: `spec` counts those tagged `spec/citations`. A scenario citation has no summary.
+Its summary counts its scenarios per status, as in `(5 ✅ · 2 🔵)`, or reads `(no scenarios)` for a story nothing covers yet or a term no scenario uses. A tag counts the scenarios below it too, as its link opens them: `spec` counts those tagged `spec/citations`. A term counts the scenarios the Glossary view lists for it: those with a term ref to it in their title or steps. A term ref in a story's sentence does not count. A scenario citation has no summary.
 
 ## Adding a report link
 
-pytest-given reads four kinds of link into the report:
+pytest-given reads five kinds of link into the report:
 
 | Kind | Looks like | Kept current | From the report |
 |---|---|---|---|
 | Scenario citation | `✅ [title](…#scenario=…)` | glyph and link text | **Copy citation** on its scenario card |
-| Tag or story citation | `✅ [spec/citations](…#tag=spec/citations) (10 ✅)` | glyph, link text and summary | **Copy citation** on a story header or a Tags sidebar row |
+| Tag, story or term citation | `✅ [spec/citations](…#tag=spec/citations) (10 ✅)` | glyph, link text and summary | **Copy citation** on a story header, a Tags sidebar row or a Glossary term row |
 | [Narrated citation](#narrated-citations) | a `<details>` block around a scenario citation | glyph, link text and narration | **Copy narrated citation** on its scenario card |
+| [Defining citation](#defining-citations) | a `<details>` block around a term citation | glyph, link text, summary and definition | **Copy defining citation** on its Glossary term row |
 | Plain report link | `[your words](…#scenario=…)` | its fragment | **Copy link** on the published report. On a local report, **Copy citation** and delete the glyph and any summary. |
 
 A citation states what the report found, so `pytest-given citations check` fails when it is out of date or its target fails. A plain report link states only that its target exists, so its text is yours and it can sit inside your own sentence. You can also [write any of them by hand](#writing-it-by-hand).
@@ -120,7 +131,7 @@ A citation states what the report found, so `pytest-given citations check` fails
 
 The report offers the citation entries in the table only when `given_report_url` is set, as in [step 1](#how-it-fits-together) above. To set it for one run instead, pass `--given-report-url=URL`. The URL is also stored in the JSON report, so `pytest-given report` re-renders the entries from it, and the `pytest-given citations` commands know which links point at the report.
 
-The copy button on a scenario card, story header or Tags sidebar row opens a menu with these entries. A citation links to `given_report_url`, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. **Copy link** copies the address you opened the report at. Without the setting, it is all the copy button offers.
+The copy button on a scenario card, story header, Tags sidebar row or Glossary term row opens a menu with these entries. A citation links to `given_report_url`, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. **Copy link** copies the address you opened the report at. Without the setting, it is all the copy button offers.
 
 ### Writing it by hand
 
@@ -137,6 +148,7 @@ The part after `#` names the target:
 | Scenario | `#scenario=<node ID>` — for a parametrized scenario, any case's node ID |
 | Tag | `#tag=<tag>` |
 | Story | `#view=stories&story=<story id>` |
+| Term | `#view=glossary&term=<term id>` or `#term=<term id>` |
 
 A plain report link takes the same URL, with no glyph and your own link text:
 
@@ -144,7 +156,7 @@ A plain report link takes the same URL, with no glyph and your own link text:
 Rejecting [divergent cases](https://docs.example.org/report.html#scenario=tests/test_grouping.py::test_divergent_cases) keeps the tree honest.
 ```
 
-A link into the report can outlive what it names. When the report no longer has a scenario, tag, story or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.
+A link into the report can outlive what it names. When the report no longer has a scenario, tag, story, term or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.
 
 ## Narrated citations
 
@@ -169,6 +181,29 @@ To add one, choose **Copy narrated citation** in the report's copy menu on a sce
 
 On a Python-Markdown site (MkDocs, Zensical), enable `md_in_html` and keep the block at the top level of the page, not inside a list item. GitHub renders it anywhere.
 
+## Defining citations
+
+A term citation written as a `<details>` block carries the term's definition, folded under it. A reader sees what the document means by the term, in the report's wording, and your pull request's diff shows a changed definition. A **defining citation** looks like this:
+
+```markdown
+<details markdown="1">
+<summary>🔵 <a href="https://example.org/report.html#view=glossary&term=guest">Guest</a> (5 ✅ · 2 🔵)</summary>
+
+Someone staying at the hotel.
+
+</details>
+```
+
+The block follows a [narrated citation](#narrated-citations)'s rules, with the term's summary after `</a>`, inside the `<summary>`.
+
+The body is the definition on one line, showing what the report's Glossary view shows. Its code and emphasis stay Markdown and everything else is escaped, so a link or an HTML tag in a definition stays literal text. A line break becomes `<br>`.
+
+To add one, choose **Copy defining citation** in the report's copy menu on a Glossary term row, paste it into your document, and run `pytest-given citations update`, which fills the empty body. From then on `update` rewrites the body to match the report, and `pytest-given citations check` fails when it differs.
+
+The body belongs to the citation, so write your own words outside the block. A term with no definition has no **Copy defining citation** entry. Its block's body stays empty, and `update` empties one that holds text. When the term leaves the report, the glyph becomes `❓`, the summary goes and the body stays.
+
+On a Python-Markdown site, a definition holding `<`, `&`, `~` or `$` shows the backslash that escapes it, and one holding `</details>` ends the block early.
+
 ## Updating citations
 
 Pass the documents or directories to update. The JSON report must come from [the run that wrote your HTML report](#how-it-fits-together):
@@ -180,13 +215,14 @@ pytest-given citations update docs/ README.md
 It rewrites what the report now says:
 
 - a citation's glyph, link text and summary;
+- the body of a narrated or defining citation;
 - the fragment of any report link that uses a scenario's slug or a `[case]`, to its node ID;
 - the node ID of a renamed test, when exactly one scenario still has the citation's title.
 
 It can't fix everything. These stay as citation findings for you to resolve, and the command exits 1:
 
-- **A target that is no longer in the report.** The citation's glyph becomes `❓`, its URL and text stay, and it recovers on its own once the target is back.
-- **A cited target that fails.** The document claims something that doesn't hold right now: fix the code, or change what the document says.
+- **A target that is no longer in the report.** The citation's glyph becomes `❓`, its URL and text stay, and it recovers on its own once the target is back. A term's id comes from its name, so a renamed term is one of these: edit the link's fragment to its new id.
+- **A cited target that fails.** The document claims something that doesn't hold right now: fix the code, or change what the document says. A term citation fails when any scenario using the term fails.
 - **A summary after a scenario citation**, which takes none.
 - **A tag or story written as a narrated citation**, which has no single narration.
 
@@ -213,9 +249,10 @@ These habits keep `pytest-given citations check` from failing on a document noth
 - **Run pytest from the same rootdir.** A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.
 - **Use a plain report link for a scenario whose title contains a per-run value**, such as a temporary path. Its citation's link text would be stale after every run, and so would a narrated citation's body when any step or attachment contains one.
 - **Cite a tag that belongs to one piece of work**, like `spec/<slug>`. A broad area tag's summary changes with every new scenario, so link it with a plain report link.
+- **Use a plain report link for an everyday term.** A term citation counts every scenario that mentions the term, so an everyday term's summary changes with most new scenarios, and a failure in any of them marks it `❌`.
 - **Leave the glyph and link unformatted.** In `**✅** […](…)` or `✅ *[…](…)*` pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.
 - **On a versioned docs site, link the report relatively**, as in `../examples/report.html#tag=…`, so each version of a page opens its own version's report. A copied citation links `given_report_url`, so replace its URL up to the `#` with the relative path. Pass `--report-path`, where your docs build puts the report, so the commands recognize these links and keep them relative.
-- **Keep a Markdown formatter off narrated citations.** Prettier pads table columns and a two-space list-indent rule reindents nested steps, so `check` then reports the body stale. Wrap each block in ignore comments:
+- **Keep a Markdown formatter off narrated and defining citations.** Prettier pads table columns and a two-space list-indent rule reindents nested steps, so `check` then reports the body stale. Wrap each block in ignore comments:
 
 ```markdown
 <!-- prettier-ignore-start -->
@@ -247,4 +284,4 @@ docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
 citations: every report link is current
 ```
 
-The list includes links to a tag or story whose summary counts the scenario. It also includes every link the check can't resolve, as one may cite the scenario under an old node ID. Run `citations update` first to repoint a renamed test, and the list is exact once the check is clean.
+The list includes links to a tag, story or term whose summary counts the scenario. It also includes every link the check can't resolve, as one may cite the scenario under an old node ID. Run `citations update` first to repoint a renamed test, and the list is exact once the check is clean.
