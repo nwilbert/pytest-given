@@ -702,7 +702,7 @@
 
 | case ID | placeholder | suite | error |
 |---|---|---|---|
-| plain-fixture | {room} | suite | '{room}' in the given annotation on parameter 'room' does not match any parametrize column (have: \['x'\]) |
+| plain-fixture | {room} | suite | '{room}' in the given annotation on parameter 'room' does not match any parametrize column (have: \['x'\]). A given annotation reads only parametrize columns, not fixture values. To show a fixture value, narrate it in a t-string in the test body. |
 | attribute | {room.number} | suite | only supports bare identifiers as placeholders; got 'room.number' |
 
 - **plain-fixture** — suite:

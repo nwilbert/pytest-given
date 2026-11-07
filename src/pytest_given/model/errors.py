@@ -32,15 +32,17 @@ class PytestGivenLookupError(PytestGivenError, LookupError):
 
 
 def placeholder_mismatch(
-    name: str, param_names: Sequence[str], *, where: str = ''
+    name: str, param_names: Sequence[str], *, where: str = '', fix: str = ''
 ) -> PytestGivenError:
     """The error for a `Template` placeholder naming no parametrize column.
 
     Collection and grouping both reach this condition and say the same
-    sentence. `where` names the site when the caller knows it.
+    sentence. `where` names the site when the caller knows it, and `fix` the
+    remedy when it is specific to that site.
     """
     location = f' {where}' if where else ''
+    remedy = f' {fix}' if fix else ''
     return PytestGivenError(
         f"pytest_given.Template placeholder '{{{name}}}'{location} does not "
-        f'match any parametrize column (have: {sorted(param_names)}).'
+        f'match any parametrize column (have: {sorted(param_names)}).{remedy}'
     )

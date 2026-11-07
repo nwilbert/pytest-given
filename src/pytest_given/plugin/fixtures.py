@@ -157,6 +157,11 @@ def _check_template_annotations(
                     part.name,
                     param_names,
                     where=f'in the given annotation on parameter {parameter!r}',
+                    fix=(
+                        'A given annotation reads only parametrize columns, not '
+                        'fixture values. To show a fixture value, narrate it in a '
+                        't-string in the test body.'
+                    ),
                 )
 
 
