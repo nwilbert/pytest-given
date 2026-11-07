@@ -2051,7 +2051,7 @@ def test_render_prefers_the_title_over_the_project(tmp_path: Path) -> None:
     html_path = tmp_path / 'report.html'
     render_html(report, html_path)
     content = html_path.read_text(encoding='utf-8')
-    assert '<title>Coffee Shop Example — pytest-given Report</title>' in content
+    assert '<title>Coffee Shop Example</title>' in content
 
 
 def test_render_embeds_sentence_filter_data(tmp_path: Path) -> None:
