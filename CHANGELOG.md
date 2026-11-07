@@ -34,6 +34,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Fixed
 
 - Following a term ref to the HTML report's Glossary tab scrolls to the term, clearing the tab's search and filters when they hide it.
+- A test session writing a report no longer crashes on a git remote URL that the system's locale encoding can't decode.
 - A report link whose `#status=` names only statuses the report doesn't know now shows every scenario instead of none.
 - A failure raised while rendering a step's interpolation, such as a bad format spec, no longer shows a pytest-given frame in the report's traceback.
 - A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which `citations update` rewrites.
