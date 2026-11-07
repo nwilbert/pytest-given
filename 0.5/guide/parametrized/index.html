@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A pytest plugin that generates interactive HTML reports from Given/When/Then annotated tests.">
+        <meta name="description" content="A pytest plugin that generates interactive HTML reports from Given&#x2f;When&#x2f;Then annotated tests.">
       
       
       
@@ -24,7 +24,7 @@
       
       
       <link rel="icon" href="../../assets/logo.svg">
-      <meta name="generator" content="zensical-0.0.71">
+      <meta name="generator" content="zensical-0.0.74">
     
     
       
@@ -35,7 +35,7 @@
       
         
       
-      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.e442bf79.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.4ab2de0c.min.css">
       
         
           
@@ -102,9 +102,10 @@
   <img src="../../assets/logo.svg" alt="pytest-given">
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+    <label class="md-header__button md-icon" for="__drawer">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+      <span class="md-visually-hidden">Navigation</span>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -166,9 +167,10 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <label class="md-header__button md-icon" for="__search">
           
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+          <span class="md-visually-hidden">Search</span>
         </label>
         <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
   <button type="button" class="md-search__button">
@@ -1134,6 +1136,7 @@
 <p>The group fails if any case failed. Otherwise it is an expected failure (<code>xfailed</code>) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.</p>
 <p>When you give any case a custom ID, with <code>pytest.param(..., id=...)</code> or with <code>ids=</code> on a mark or a fixture, the table starts with a <code>case ID</code> column. It shows each case's ID as pytest prints it, so <code>test_overlap[touching-edges]</code> in a failure summary points straight at its row. Cases whose ids pytest generated show those ids in the column too. Without any custom ID, the column is left out, since generated ids only repeat the values. A custom ID that only repeats them counts as generated.</p>
 <p>The columns appear in the order the narration first shows them: the scenario title, then the steps from top to bottom. Inputs narrated in a <code>given</code> come before outcomes narrated in a <code>then</code>. A parametrize argument that no step narrates stays next to the argument before it.</p>
+<p>When the exact value matters, as with a padded or an empty string, narrate it with <code>{name!r}</code>. The column then shows each value's repr, with its quotes, and the HTML report sets it in a monospace font so that its whitespace is easy to see. <code>!a</code> does the same.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">'Pricing'</span><span class="p">)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s1">'euros,expect'</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_pricing</span><span class="p">(</span><span class="n">machine</span><span class="p">,</span> <span class="n">euros</span><span class="p">,</span> <span class="n">expect</span><span class="p">):</span>
@@ -1260,10 +1263,10 @@
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.tabs.sticky","navigation.sections","toc.integrate","navigation.top","search.suggest","search.highlight","content.code.copy","content.action.edit"],"redirect":null,"search":"../../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a2388154.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d31f0ffa.min.js"></script>
       
     
   </body>
