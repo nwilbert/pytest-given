@@ -212,27 +212,18 @@ def test_a_scenario_is_listed_under_its_stories_and_the_stories_it_covers() -> N
     t'An under-anchored {pg["Sentence"].l} reads as untracked until a '
     t'{pg["Pin"].l} covers it',
 )
-@pytest.mark.parametrize(
-    ('anchored', 'pinned', 'eligible', 'untracked'),
-    [
-        (True, False, True, False),
-        (False, False, False, True),
-        (False, True, False, False),
-    ],
-)
+@pytest.mark.parametrize(('pinned', 'untracked'), [(False, True), (True, False)])
 def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
-    anchored, pinned, eligible, untracked
+    pinned, untracked
 ) -> None:
     """`untracked` is what the timeline renders as '—'."""
     with given(
-        t'a {pg["Story"].l} whose only {pg["Sentence"].l} is anchored by at '
-        t'least two distinct {pg["Term"].l.s}: {anchored}'
+        t'a {pg["Story"].l} whose only {pg["Sentence"].l} names a single {pg["Term"].l}'
     ):
-        guest = _ent('guest', 'Guest')
         parts = (
-            (guest, _activity_part('search'), _ent('room', 'Room'))
-            if anchored
-            else (guest, ClauseWord(text='browses'), ClauseWord(text='listings'))
+            _ent('guest', 'Guest'),
+            ClauseWord(text='browses'),
+            ClauseWord(text='listings'),
         )
         only = Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),))
         story = Story(id=StoryId('book'), title='Book', sentences=(only,))
@@ -261,8 +252,6 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
     with when('the story rollups are built'):
         coverage = build_story_rollups(rd, build_coverage_map(rd))
         sentence_coverage = coverage[StoryId('book')].per_sentence[SentenceId(1)]
-    with then(t'it is {pg["Coverage"].l}-eligible: {eligible}'):
-        assert sentence_coverage.eligible == eligible
     with then(t'it reads as untracked: {untracked}'):
         assert sentence_coverage.untracked == untracked
 

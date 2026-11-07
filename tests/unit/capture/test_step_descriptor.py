@@ -969,44 +969,23 @@ def test_step_descriptor_records_the_pins_of_its_handles():
     assert then('an opt-out', pins=[]).pins == ()
 
 
-def _looked_up(the_story, written):
-    if isinstance(written, list):
-        return [the_story[item] for item in written]
-    return the_story[written]
-
-
 @scenario(
     t'A {pg["Pin"].l} takes a {pg["Sentence"].l} handle from its {pg["Story"].l}, '
     t'never a bare number or name',
     tags=['validation'],
 )
-@pytest.mark.parametrize(
-    ('written', 'looked_up', 'outcome'),
-    [
-        (2, True, 'accepted'),
-        (2, False, 'refused'),
-        ('cancel', True, 'accepted'),
-        ('cancel', False, 'refused'),
-        ([1, 2], True, 'accepted'),
-        ([1, 2], False, 'refused'),
-    ],
-)
-def test_a_sentence_pins_only_once_looked_up_on_its_story(written, looked_up, outcome):
-    with given(
-        t'the sentence {written}, looked up on its {pg["Story"].l}: {looked_up}'
+@pytest.mark.parametrize('written', [2, 'cancel', [1, 2]])
+def test_a_pin_refuses_a_bare_sentence_number_or_name(written):
+    with given(t'the bare {pg["Sentence"].l} reference {written}'):
+        pins = written
+    with (
+        when_then(
+            t'a {pg["Step"].l} is declared with it as its {pg["Pin"].l}',
+            'a PytestGivenError shows the handle form',
+        ),
+        pytest.raises(PytestGivenError, match=r"the_story\['name'\]"),
     ):
-        the_story = _two_sentence_story('Bare Pins')
-        pins = _looked_up(the_story, written) if looked_up else written
-    with when(t'a {pg["Step"].l} is declared with it as its {pg["Pin"].l}'):
-        try:
-            given('x', pins=pins)
-            refusal = ''
-        except PytestGivenError as error:
-            refusal = str(error)
-    with then(t'the {pg["Pin"].l} is {outcome}'):
-        assert ('refused' if refusal else 'accepted') == outcome
-    with then('a refusal shows the handle form'):
-        assert ("the_story['name']" in refusal) == (outcome == 'refused')
+        given('x', pins=pins)
 
 
 def test_scenario_refuses_a_bare_pin_too():

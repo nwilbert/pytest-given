@@ -1201,11 +1201,8 @@ def test_step_fixture_yielding_twice_keeps_pytests_error(pytester):
     'A fixture takes only `@given`, never `@when` or `@then`',
     tags=['validation'],
 )
-@pytest.mark.parametrize(
-    ('decorator', 'outcome'),
-    [('given', 'accepted'), ('when', 'refused'), ('then', 'refused')],
-)
-def test_a_fixture_takes_only_given(pytester, decorator, outcome):
+@pytest.mark.parametrize('decorator', ['when', 'then'])
+def test_a_fixture_takes_only_given(pytester, decorator):
     """Fixtures are setup, so only @given fits them."""
     with given(t'a fixture decorated with @{decorator}'):
         suite = f"""
@@ -1226,13 +1223,11 @@ def test_a_fixture_takes_only_given(pytester, decorator, outcome):
         attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
-    with then(t'the decorator is {outcome}'):
-        assert ('accepted' if result.ret == 0 else 'refused') == outcome
-    with then('a refusal is a PytestGivenError that points at @given'):
+    with then('a PytestGivenError points at @given'):
         output = result.stdout.str()
-        assert (
-            'PytestGivenError' in output and 'only @given is allowed' in output
-        ) == (outcome == 'refused')
+        assert result.ret != 0
+        assert 'PytestGivenError' in output
+        assert 'only @given is allowed' in output
 
 
 def test_session_scoped_fixture_records_for_each_consumer(pytester, tmp_path):
@@ -3373,7 +3368,7 @@ _ANNOTATED_TEMPLATE_SUITE = """
     def room():
         return 101
 
-    @scenario('bad')
+    @scenario('Booking a room')
     @pytest.mark.parametrize('x', [1])
     def test_it(x, room: Annotated[int, given(Template('room PLACEHOLDER'))]):
         with when('it is booked'):
@@ -3386,35 +3381,43 @@ _ANNOTATED_TEMPLATE_SUITE = """
     tags=['parametrization', 'validation'],
 )
 @pytest.mark.parametrize(
-    ('placeholder', 'outcome', 'error'),
+    ('placeholder', 'error'),
     [
-        ('{x}', 'accepted', 'nothing'),
         (
             '{room}',
-            'refused',
-            "'{room}' in the given annotation on parameter 'room' does not match",
+            (
+                "'{room}' in the given annotation on parameter 'room' does not match "
+                "any parametrize column (have: ['x'])"
+            ),
         ),
-        ('{room.number}', 'refused', 'bare identifiers'),
+        (
+            '{room.number}',
+            "only supports bare identifiers as placeholders; got 'room.number'",
+        ),
     ],
-    ids=['column', 'plain-fixture', 'attribute'],
+    ids=['plain-fixture', 'attribute'],
 )
 def test_a_template_given_annotation_needs_a_bare_parametrize_column(
-    pytester, placeholder, outcome, error
+    pytester, placeholder, error
 ):
     with given(
-        t'a {pg["Parametrized scenario"].l} whose `Template` '
-        t'{pg["Given annotation"].l} on a {pg["Plain fixture"].l} holds {placeholder}'
+        t'a {pg["Parametrized scenario"].l} over `x`, with a {pg["Plain fixture"].l} '
+        t'`room` whose `Template` {pg["Given annotation"].l} holds {placeholder}'
     ):
         suite = _ANNOTATED_TEMPLATE_SUITE.replace('PLACEHOLDER', placeholder)
         pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs'):
         result = pytester.runpytest()
-    with then(t'the annotation is {outcome}'):
-        assert ('accepted' if result.ret == 0 else 'refused') == outcome
-    with then(t'a refusal errors the scenario, saying {error}'):
-        errored = result.parseoutcomes().get('errors', 0) == 1
-        assert errored == (outcome == 'refused')
-        assert outcome == 'accepted' or error in result.stdout.str()
+    with then(t'the scenario errors, saying {error}'):
+        assert result.parseoutcomes().get('errors', 0) == 1
+        assert error in result.stdout.str()
+
+
+def test_a_template_given_annotation_on_a_plain_fixture_may_hold_a_column(pytester):
+    pytester.makepyfile(_ANNOTATED_TEMPLATE_SUITE.replace('PLACEHOLDER', '{x}'))
+    result = pytester.runpytest()
+    result.assert_outcomes(passed=1)
 
 
 def test_param_without_annotated_stays_table_only(pytester, tmp_path):

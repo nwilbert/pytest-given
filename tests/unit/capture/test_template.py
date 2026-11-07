@@ -139,29 +139,21 @@ def test_template_unclosed_brace_refuses_with_a_given_error() -> None:
     tags=['parametrization', 'validation'],
 )
 @pytest.mark.parametrize(
-    ('text', 'outcome'),
-    [
-        ('count={count}', 'accepted'),
-        ('count={obj.attr}', 'refused'),
-        ('{d[key]}', 'refused'),
-        ('{x + 1}', 'refused'),
-    ],
-    ids=['bare-identifier', 'attribute', 'indexing', 'expression'],
+    'text',
+    ['count={obj.attr}', '{d[key]}', '{x + 1}'],
+    ids=['attribute', 'indexing', 'expression'],
 )
 def test_a_template_accepts_bare_identifiers_only(
     text: Annotated[str, given(Template('the placeholder {text}'))],
-    outcome: str,
 ) -> None:
-    with when('a `Template` is built from it'):
-        try:
-            Template(text)
-            refusal = ''
-        except PytestGivenError as error:
-            refusal = str(error)
-    with then(t'the placeholder is {outcome}'):
-        assert ('refused' if refusal else 'accepted') == outcome
-    with then('a refusal says bare identifiers only'):
-        assert ('bare identifiers' in refusal) == (outcome == 'refused')
+    with (
+        when_then(
+            'a `Template` is built from it',
+            'a PytestGivenError says bare identifiers only',
+        ),
+        pytest.raises(PytestGivenError, match='only supports bare identifiers'),
+    ):
+        Template(text)
 
 
 def test_parse_tstring_literal_only() -> None:

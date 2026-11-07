@@ -569,32 +569,21 @@ def test_story_rejects_duplicate_sentence_names(guest, search, room):
     t'A {pg["Sentence"].l} name must be non-empty and unpadded',
     tags=['validation'],
 )
-@pytest.mark.parametrize(
-    ('name', 'outcome'),
-    [
-        ('cancel', 'accepted'),
-        ('', 'refused'),
-        (' cancel', 'refused'),
-        ('cancel ', 'refused'),
-    ],
-)
-def test_a_sentence_name_must_be_non_empty_and_unpadded(
-    guest, search, room, name, outcome
-):
+@pytest.mark.parametrize('name', ['', ' cancel', 'cancel '])
+def test_a_sentence_name_must_be_non_empty_and_unpadded(guest, search, room, name):
     with given(t'the {pg["Sentence"].l} name {name!r}'):
         sentence_name = name
-    with when(t'a {pg["Sentence"].l} is built with that name'):
-        try:
-            sentence(guest, search, room, name=sentence_name)
-            refusal = ''
-        except PytestGivenError as error:
-            refusal = str(error)
-    with then(t'the name is {outcome}'):
-        assert ('refused' if refusal else 'accepted') == outcome
-    with then('a refusal says what a name must be'):
-        assert (
-            'a sentence name must be a non-empty str, with no leading or' in refusal
-        ) == (outcome == 'refused')
+    with (
+        when_then(
+            t'a {pg["Sentence"].l} is built with that name',
+            'a PytestGivenError says what a name must be',
+        ),
+        pytest.raises(
+            PytestGivenError,
+            match='a sentence name must be a non-empty str, with no leading or',
+        ),
+    ):
+        sentence(guest, search, room, name=sentence_name)
 
 
 # --- Task 4.5: story-id duplicate detection ---

@@ -413,38 +413,20 @@
             assert thing == 1
     ```
 
-## ✓ A fixture takes only `@given`, never `@when` or `@then` · 3 cases
+## ✓ A fixture takes only `@given`, never `@when` or `@then` · 2 cases
 `tests/integration/test_plugin.py::test_a_fixture_takes_only_given` · validation
 
 - **given** a fixture decorated with @{decorator}
     - 📎 suite — *see parameter table*
 - **when** the suite runs
-- **then** the decorator is {outcome}
-- **then** a refusal is a PytestGivenError that points at @given
+- **then** a PytestGivenError points at @given
 
-| decorator | suite | outcome |
-|---|---|---|
-| given | suite | accepted |
-| when | suite | refused |
-| then | suite | refused |
+| decorator | suite |
+|---|---|
+| when | suite |
+| then | suite |
 
-- **given, accepted** — suite:
-    ```
-    import pytest
-    from pytest_given import scenario, then, given
-
-    @pytest.fixture
-    @given("a coin is inserted")
-    def coin():
-        return 2
-
-    @scenario("uses the fixture")
-    def test_use(coin):
-        with then("the coin is 2"):
-            assert coin == 2
-    ```
-
-- **when, refused** — suite:
+- **when** — suite:
     ```
     import pytest
     from pytest_given import scenario, then, when
@@ -460,7 +442,7 @@
             assert coin == 2
     ```
 
-- **then, refused** — suite:
+- **then** — suite:
     ```
     import pytest
     from pytest_given import scenario, then, then
@@ -710,19 +692,52 @@
 - **then** the scenario errors, naming the parameter and the fix
 - **then** the HTML «report» is still written
 
-## ✓ A `Template` «given annotation» may only hold a bare parametrize column · 3 cases
+## ✓ A `Template` «given annotation» may only hold a bare parametrize column · 2 cases
 `tests/integration/test_plugin.py::test_a_template_given_annotation_needs_a_bare_parametrize_column` · parametrization, validation
 
-- **given** a «parametrized scenario» whose `Template` «given annotation» on a «plain fixture» holds {placeholder}
+- **given** a «parametrized scenario» over `x`, with a «plain fixture» `room` whose `Template` «given annotation» holds {placeholder}
+    - 📎 suite — *see parameter table*
 - **when** the suite runs
-- **then** the annotation is {outcome}
-- **then** a refusal errors the scenario, saying {error}
+- **then** the scenario errors, saying {error}
 
-| case ID | placeholder | outcome | error |
+| case ID | placeholder | suite | error |
 |---|---|---|---|
-| column | {x} | accepted | nothing |
-| plain-fixture | {room} | refused | '{room}' in the given annotation on parameter 'room' does not match |
-| attribute | {room.number} | refused | bare identifiers |
+| plain-fixture | {room} | suite | '{room}' in the given annotation on parameter 'room' does not match any parametrize column (have: \['x'\]) |
+| attribute | {room.number} | suite | only supports bare identifiers as placeholders; got 'room.number' |
+
+- **plain-fixture** — suite:
+    ```
+    from typing import Annotated
+    import pytest
+    from pytest_given import scenario, given, when, Template
+
+    @pytest.fixture
+    def room():
+        return 101
+
+    @scenario('Booking a room')
+    @pytest.mark.parametrize('x', [1])
+    def test_it(x, room: Annotated[int, given(Template('room {room}'))]):
+        with when('it is booked'):
+            pass
+    ```
+
+- **attribute** — suite:
+    ```
+    from typing import Annotated
+    import pytest
+    from pytest_given import scenario, given, when, Template
+
+    @pytest.fixture
+    def room():
+        return 101
+
+    @scenario('Booking a room')
+    @pytest.mark.parametrize('x', [1])
+    def test_it(x, room: Annotated[int, given(Template('room {room.number}'))]):
+        with when('it is booked'):
+            pass
+    ```
 
 ## ✓ A bare run writes no «report» at all
 `tests/integration/test_plugin.py::test_no_output_flags_writes_nothing`
@@ -2085,22 +2100,18 @@
 | when |
 | then |
 
-## ✓ A «pin» takes a «sentence» handle from its «story», never a bare number or name · 6 cases
-`tests/unit/capture/test_step_descriptor.py::test_a_sentence_pins_only_once_looked_up_on_its_story` · validation
+## ✓ A «pin» takes a «sentence» handle from its «story», never a bare number or name · 3 cases
+`tests/unit/capture/test_step_descriptor.py::test_a_pin_refuses_a_bare_sentence_number_or_name` · validation
 
-- **given** the sentence {written}, looked up on its «story»: {looked_up}
+- **given** the bare «sentence» reference {written}
 - **when** a «step» is declared with it as its «pin»
-- **then** the «pin» is {outcome}
-- **then** a refusal shows the handle form
+- **then** a PytestGivenError shows the handle form
 
-| written | looked_up | outcome |
-|---|---|---|
-| 2 | True | accepted |
-| 2 | False | refused |
-| cancel | True | accepted |
-| cancel | False | refused |
-| \[1, 2\] | True | accepted |
-| \[1, 2\] | False | refused |
+| written |
+|---|
+| 2 |
+| cancel |
+| \[1, 2\] |
 
 ## ✓ An «actor» handle in a «clause» becomes a «term ref»
 `tests/unit/capture/test_story.py::test_clause_dispatches_actor_to_clause_term_ref`
@@ -2297,7 +2308,7 @@
 - **when** a «story» is built from them
 - **then** a PytestGivenError names the duplicate and both numbers
 
-## ✓ A «sentence» name must be non-empty and unpadded · 4 cases
+## ✓ A «sentence» name must be non-empty and unpadded · 3 cases
 `tests/unit/capture/test_story.py::test_a_sentence_name_must_be_non_empty_and_unpadded` · validation
 
 - **given** a Guest actor
@@ -2305,15 +2316,13 @@
 - **given** a Room work object
 - **given** the «sentence» name {name}
 - **when** a «sentence» is built with that name
-- **then** the name is {outcome}
-- **then** a refusal says what a name must be
+- **then** a PytestGivenError says what a name must be
 
-| name | outcome |
-|---|---|
-| 'cancel' | accepted |
-| '' | refused |
-| ' cancel' | refused |
-| 'cancel ' | refused |
+| name |
+|---|
+| '' |
+| ' cancel' |
+| 'cancel ' |
 
 ## ✓ Two «stories» with the same id collide
 `tests/unit/capture/test_story.py::test_story_id_collision_raises_with_both_sites` · validation
@@ -2368,20 +2377,18 @@
 - **when** a parametrize value is substituted in
 - **then** the placeholder is filled with that value
 
-## ✓ A `Template` accepts bare identifiers only · 4 cases
+## ✓ A `Template` accepts bare identifiers only · 3 cases
 `tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only` · parametrization, validation
 
 - **given** the placeholder {text}
 - **when** a `Template` is built from it
-- **then** the placeholder is {outcome}
-- **then** a refusal says bare identifiers only
+- **then** a PytestGivenError says bare identifiers only
 
-| case ID | text | outcome |
-|---|---|---|
-| bare-identifier | count={count} | accepted |
-| attribute | count={obj.attr} | refused |
-| indexing | {d\[key\]} | refused |
-| expression | {x + 1} | refused |
+| case ID | text |
+|---|---|
+| attribute | count={obj.attr} |
+| indexing | {d\[key\]} |
+| expression | {x + 1} |
 
 ## ✓ A t-string interpolation records its rendered value and its expression
 `tests/unit/capture/test_template.py::test_parse_tstring_single_interpolation`
@@ -3086,20 +3093,18 @@
 | \['guest'\] | False |
 | \[\] | False |
 
-## ✓ An under-anchored «sentence» is covered only through a «pin» · 4 cases
+## ✓ An under-anchored «sentence» is covered only through a «pin» · 2 cases
 `tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
 
-- **given** a «story» whose «sentence» references the «terms» {term_ids}
-- **given** a «step» narrating those «terms», «pinning» the «sentence»: {pinned}
+- **given** a «story» whose «sentence» names a single «term»
+- **given** a «step» narrating that «term», «pinning» the «sentence»: {pinned}
 - **when** «coverage» is computed against the «story»
 - **then** the «sentence» is covered: {covered}
 
-| term_ids | pinned | covered |
-|---|---|---|
-| \['guest', 'room'\] | False | True |
-| \['guest', 'room'\] | True | True |
-| \['guest'\] | False | False |
-| \['guest'\] | True | True |
+| pinned | covered |
+|---|---|
+| False | False |
+| True | True |
 
 ## ✓ A nested «step» covers a «sentence» like a top-level one
 `tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
@@ -3669,20 +3674,18 @@
 - **then** the preset is refused
 - **then** the error points at the env var and the raw-template escape hatch
 
-## ✓ An under-anchored «sentence» reads as untracked until a «pin» covers it · 3 cases
+## ✓ An under-anchored «sentence» reads as untracked until a «pin» covers it · 2 cases
 `tests/unit/report/test_story_view.py::test_an_under_anchored_sentence_reads_as_untracked_until_pinned`
 
-- **given** a «story» whose only «sentence» is anchored by at least two distinct «terms»: {anchored}
+- **given** a «story» whose only «sentence» names a single «term»
 - **given** a «scenario» whose «step» «pins» it: {pinned}
 - **when** the story rollups are built
-- **then** it is «coverage»-eligible: {eligible}
 - **then** it reads as untracked: {untracked}
 
-| anchored | pinned | eligible | untracked |
-|---|---|---|---|
-| True | False | True | False |
-| False | False | False | True |
-| False | True | False | False |
+| pinned | untracked |
+|---|---|
+| False | True |
+| True | False |
 
 ## ✓ A «scenario» bound to two «stories» is listed under each
 `tests/unit/report/test_story_view.py::test_build_story_rollups_lists_a_scenario_under_each_bound_story`

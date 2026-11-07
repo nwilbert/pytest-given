@@ -513,42 +513,36 @@ def test_coverage_eligibility_needs_two_distinct_terms(term_ids, eligible):
 @scenario(
     t'An under-anchored {pg["Sentence"].l} is covered only through a {pg["Pin"].l}',
 )
-@pytest.mark.parametrize(
-    ('term_ids', 'pinned', 'covered'),
-    [
-        (['guest', 'room'], False, True),
-        (['guest', 'room'], True, True),
-        (['guest'], False, False),
-        (['guest'], True, True),
-    ],
-)
-def test_an_under_anchored_sentence_is_covered_only_through_a_pin(
-    term_ids, pinned, covered
-):
+@pytest.mark.parametrize(('pinned', 'covered'), [(False, False), (True, True)])
+def test_an_under_anchored_sentence_is_covered_only_through_a_pin(pinned, covered):
     """Eligibility gates narration matching only. A pin says what the
     narration cannot, so it covers an under-anchored sentence too."""
     with given(
-        t'a {pg["Story"].l} whose {pg["Sentence"].l} references the '
-        t'{pg["Term"].l.s} {term_ids}'
+        t'a {pg["Story"].l} whose {pg["Sentence"].l} names a single {pg["Term"].l}'
     ):
         story = Story(
-            id=StoryId('s'), title='S', sentences=(_sentence_naming(*term_ids),)
+            id=StoryId('s'), title='S', sentences=(_sentence_naming('guest'),)
         )
     with given(
-        t'a {pg["Step"].l} narrating those {pg["Term"].l.s}, '
+        t'a {pg["Step"].l} narrating that {pg["Term"].l}, '
         t'{pg["Pin"]("pinning")} the {pg["Sentence"].l}: {pinned}'
     ):
-        step = _step(
-            'when',
-            *(_term_ref(term_id, term_id) for term_id in term_ids),
-            pins=[1] if pinned else None,
-        )
+        step = _step('when', _term_ref('guest', 'guest'), pins=[1] if pinned else None)
     with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(
             _scenario_with_steps(step), build_story_index(story)
         )
     with then(t'the {pg["Sentence"].l} is covered: {covered}'):
         assert (SentenceId(1) in coverage) == covered
+
+
+def test_narration_alone_covers_a_sentence_with_two_distinct_terms():
+    story = Story(
+        id=StoryId('s'), title='S', sentences=(_sentence_naming('guest', 'room'),)
+    )
+    step = _step('when', _term_ref('guest', 'guest'), _term_ref('room', 'room'))
+    coverage = compute_coverage(_scenario_with_steps(step), build_story_index(story))
+    assert SentenceId(1) in coverage
 
 
 @scenario(
