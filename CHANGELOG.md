@@ -18,10 +18,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary.
 - A term citation written as a `<details markdown="1">` block carries the term's definition, which `citations update` writes and `citations check` holds to the report.
 - A Glossary term row in the HTML report gets the copy button, which offers **Copy citation** and **Copy defining citation** when the report has a URL.
+- A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
 
 ### Changed
 
 - A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
+- **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
 
 ### Fixed
 

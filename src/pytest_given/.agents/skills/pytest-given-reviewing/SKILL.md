@@ -41,6 +41,7 @@ Judge each scenario's step texts against their bodies with the rubric below. `py
 **Step text may abstract, but it must never overstate.**
 
 - **Values:** a quantity, date or amount in the text must match the body's data, even when every assertion passes. Ask for an interpolation (`{BATCH_SIZE}`) over a literal copied from a constant.
+- **Boolean phrases:** the true phrase comes first, and nothing checks that. `{pinned:does not pin it|pins it}` over `if pinned` runs green and reports the opposite, so read the body.
 - **Quantifiers:** "each", "every", "both" or "all" in a `then` or a scenario title claims every item it covers. Assertions on a sample overstate it: ask for the rest to be asserted, or for the text to be narrowed.
 - **Outcomes:** everything a `then` claims must be asserted in it, on a value the code under test produced. The lint can't tell, because the step contains an `assert`. A "never called" claim needs recorded calls asserted in the `then`, not a stub that raises, whose error the code may catch. In a parameter table, the claim must hold for every row: "the scenario errors, saying {error}" over a row that passes is false for that row. A conditional claim ("a coffee is brewed when the machine has beans") still holds on a contrast row where its condition fails, such as an empty machine that brews nothing.
 - **Strength:** an assertion must fail when its claim is false. `relpath.endswith('.py')` under "keeps its rootdir-relative source" passes on an absolute path too. Data that keeps two parts in separate fields can't show their order.
@@ -93,6 +94,8 @@ Parameter tables are part of the document too. Flag these:
 - A label column that the body turns back into data, with no attachment showing the data.
 - A case ID that misnames its row, or only repeats a column's value.
 - An outcome that varies but has no column of its own, or that the body derives from an input column.
+- A Boolean phrase pair that only restates the value (`{kept:True|False}`), or whose words don't lead back to the column's name.
+- A Boolean narrated as a trailing `: {flag}` where two phrases would read as a sentence.
 - A trivial control row: a reader would assume its outcome, and it adds a Boolean, an `accepted` or `refused` column, a filler value, or a `then` that only applies to the other rows.
 - Sibling scenarios that should be one table: the same steps with one arrangement varied, or titles that negate each other.
 

@@ -2,8 +2,8 @@
 
 `@scenario(group_parametrized=False)` says the cases have nothing honest to
 share, so each one leaves here as a scenario of its own — no parameter table,
-no shared tree. What the grouped path renders as a `{name}` token pointing at a
-column, this path renders as the case's own value.
+no shared tree. What the grouped path renders as a token pointing at a column,
+this path renders as the case's own value.
 """
 
 from dataclasses import replace
@@ -26,6 +26,7 @@ from ..model import (
     placeholder_mismatch,
     rebuilt,
 )
+from .checks import check_case_phrase_values
 
 
 def per_case_scenarios(cases: list[Scenario], param_info: ParamInfo) -> list[Scenario]:
@@ -47,6 +48,7 @@ def _substituted(scenario: Scenario, spec: ParamSpec) -> Scenario:
     """The case with every placeholder — in its name and in its steps — filled
     from its own parameters."""
     params = spec.mapping()
+    check_case_phrase_values(scenario, params)
     return replace(
         scenario,
         narration=_substituted_narration(scenario.narration, params),

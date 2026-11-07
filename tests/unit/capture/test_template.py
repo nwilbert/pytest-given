@@ -135,6 +135,30 @@ def test_template_unclosed_brace_refuses_with_a_given_error() -> None:
 
 
 @scenario(
+    t'Identical {pg["Boolean phrase"].l.s} are refused, since the {pg["Step"].l} would '
+    t'read the same in every row',
+    tags=['spec/boolean-phrases', 'validation'],
+)
+def test_template_refuses_identical_phrases_with_no_value_bound() -> None:
+    with given('a text with the same phrase on both sides of its format spec'):
+        text = 'it {flag:a|a}'
+    with (
+        when_then(
+            'a `Template` is created from it, with no value bound',
+            'a `PytestGivenError` quotes the spec',
+        ),
+        pytest.raises(PytestGivenError, match=r'a\|a'),
+    ):
+        Template(text)
+
+
+def test_template_keeps_a_phrase_spec_on_its_placeholder() -> None:
+    part = Template('it {flag:a|b}').parts[1]
+    assert isinstance(part, NarrationPlaceholder)
+    assert (part.name, part.format_spec) == ('flag', 'a|b')
+
+
+@scenario(
     'A `Template` accepts bare identifiers only',
     tags=['parametrization', 'validation'],
 )

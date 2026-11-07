@@ -7,7 +7,17 @@ from typing import cast
 
 import pytest
 
-from pytest_given import Glossary, attach, given, scenario, then, when, when_then
+from pytest_given import (
+    Glossary,
+    Template,
+    attach,
+    given,
+    scenario,
+    then,
+    when,
+    when_then,
+)
+from pytest_given.capture.template import narration_from
 from pytest_given.grouping import (
     checks,
     columns,
@@ -2972,8 +2982,8 @@ def test_a_failed_case_is_not_held_to_steps_it_does_not_share(retries: bool) -> 
             Step(phase='then', narration=Narration(text='it is hot')),
         ]
     with given(
-        t'a failed {pg["Case"].l} that loads its items, then retries instead of '
-        t'checking it is hot: {retries}'
+        t'a failed {pg["Case"].l} that loads its items, then '
+        t'{retries:retries instead of checking it is hot|stops}'
     ):
         failed = [_tstring_step('when', ' items load', 'n', '4')]
         if retries:
@@ -3234,3 +3244,345 @@ def test_detail_text_reads_a_part_that_carries_no_formatting() -> None:
     assert detail_text(key('literal', 'a machine')) == 'no formatting'
     assert detail_text(key('value', 'n', (None, ''))) == 'no formatting'
     assert detail_text(key('value', 'n', ('r', '>5'))) == '!r:>5'
+
+
+PINS = 'pins it|does not pin it'
+
+
+def _phrased_cases(
+    values: list[object],
+    steps: list[list[Step]],
+    *,
+    statuses: list[Status] | None = None,
+    title: Narration | None = None,
+) -> tuple[list[Scenario], ParamInfo]:
+    """One case per entry of `values`, bound to a `pinned` parameter."""
+    ids = [NodeId(f't.py::test_pin[{index}]') for index in range(len(values))]
+    scenarios = [
+        Scenario(
+            id=node_id,
+            narration=title or Narration(text='pin'),
+            module='m',
+            status=status,
+            steps=case_steps,
+            source=SourceLocation(relpath='tests/t.py', line=12),
+        )
+        for node_id, status, case_steps in zip(
+            ids, statuses or ['passed'] * len(values), steps, strict=True
+        )
+    ]
+    param_info: ParamInfo = {
+        node_id: ParamSpec(names=['pinned'], values=[value])
+        for node_id, value in zip(ids, values, strict=True)
+    }
+    return scenarios, param_info
+
+
+def _pin_step(rendered: str, format_spec: str = PINS) -> Step:
+    return _value_step(rendered, 'pinned', format_spec)
+
+
+def _cells(grouped: Scenario) -> list[list[object]]:
+    assert grouped.parameters is not None
+    return [list(case.values) for case in grouped.parameters.cases]
+
+
+def _column_ids(grouped: Scenario) -> list[str]:
+    assert grouped.parameters is not None
+    return [column.id for column in grouped.parameters.columns]
+
+
+def _placeholder(step: Step) -> NarrationPlaceholder:
+    part = step.narration.parts[1]
+    assert isinstance(part, NarrationPlaceholder)
+    return part
+
+
+def test_a_phrased_column_keeps_its_booleans() -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [False, True],
+            [[_pin_step('does not pin it')], [_pin_step('pins it')]],
+        )
+    )
+    assert _column_ids(grouped) == ['pinned']
+    assert _cells(grouped) == [[False], [True]]
+    assert _placeholder(grouped.steps[0]).column_id == 'pinned'
+    assert grouped.steps[0].narration.text == (
+        'the drink costs {pins it / does not pin it} euros'
+    )
+
+
+def test_a_local_holding_the_opposite_boolean_raises_rule_3() -> None:
+    with pytest.raises(PytestGivenError, match='matches a parametrize column'):
+        group_parametrized(
+            *_phrased_cases(
+                [False, True],
+                [[_pin_step('pins it')], [_pin_step('does not pin it')]],
+            )
+        )
+
+
+def test_a_boolean_local_over_a_column_of_strings_raises_rule_3() -> None:
+    with pytest.raises(PytestGivenError, match='matches a parametrize column'):
+        group_parametrized(
+            *_phrased_cases(
+                ['yes', 'no'],
+                [[_pin_step('pins it')], [_pin_step('does not pin it')]],
+            )
+        )
+
+
+@scenario(
+    t'{pg["Step"].s} that word one Boolean with different {pg["Boolean phrase"].l.s} '
+    t'share its {pg["Parameter table"].l} column',
+    tags=['spec/boolean-phrases'],
+)
+def test_slots_with_different_phrases_share_the_param_column() -> None:
+    with given(t'two {pg["Step"].l.s} wording `pinned` with different phrases'):
+        cases = _phrased_cases(
+            [False, True],
+            [
+                [_pin_step('does not pin it'), _pin_step('stays', 'moves|stays')],
+                [_pin_step('pins it'), _pin_step('moves', 'moves|stays')],
+            ],
+        )
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"].l.s}'):
+        [grouped] = group_parametrized(*cases)
+    with then('the table holds one column, with the Booleans'):
+        assert _column_ids(grouped) == ['pinned']
+        assert _cells(grouped) == [[False], [True]]
+    with then(t'both {pg["Step"].l.s} point at that column'):
+        assert [_placeholder(step).column_id for step in grouped.steps] == [
+            'pinned',
+            'pinned',
+        ]
+
+
+@pytest.mark.parametrize('conversion', [None, 'r'])
+def test_a_slot_printing_the_boolean_beside_a_phrased_one_shares_the_param_column(
+    conversion: str | None,
+) -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [False, True],
+            [
+                [
+                    _pin_step('does not pin it'),
+                    _value_step('False', 'pinned', conversion=conversion),
+                ],
+                [
+                    _pin_step('pins it'),
+                    _value_step('True', 'pinned', conversion=conversion),
+                ],
+            ],
+        )
+    )
+    assert _column_ids(grouped) == ['pinned']
+    assert _cells(grouped) == [[False], [True]]
+
+
+def test_a_formatted_slot_beside_a_phrased_one_leaves_the_column_its_booleans() -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [False, True],
+            [
+                [_pin_step('does not pin it'), _pin_step('    0', '>5')],
+                [_pin_step('pins it'), _pin_step('    1', '>5')],
+            ],
+        )
+    )
+    assert _column_ids(grouped) == ['pinned', 'derived:0']
+    assert _cells(grouped) == [[False, '    0'], [True, '    1']]
+    assert [_placeholder(step).column_id for step in grouped.steps] == [
+        'pinned',
+        'derived:0',
+    ]
+
+
+@scenario(
+    t'A varying local worded with {pg["Boolean phrase"].l.s} becomes a derived '
+    t'column of Booleans',
+    tags=['spec/boolean-phrases'],
+)
+def test_a_varying_boolean_local_becomes_a_derived_column_of_booleans() -> None:
+    with given(t'two {pg["Case"].l.s} that word a local `flag` as "on" and "off"'):
+        cases = _phrased_cases(
+            [True, False],
+            [
+                [_value_step('off', 'flag', 'on|off')],
+                [_value_step('on', 'flag', 'on|off')],
+            ],
+        )
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"].l.s}'):
+        [grouped] = group_parametrized(*cases)
+    with then('the local gets a derived column beside the parametrize one'):
+        assert _column_ids(grouped) == ['pinned', 'derived:0']
+    with then('that column holds the Boolean behind each phrase'):
+        assert _cells(grouped) == [[True, False], [False, True]]
+    with then(t'the {pg["Step"].l} shows both phrases'):
+        assert '{on / off}' in grouped.steps[0].narration.text
+
+
+@scenario(
+    t'{pg["Step"].s} that word one varying local with different '
+    t'{pg["Boolean phrase"].l.s} share its derived column',
+    tags=['spec/boolean-phrases'],
+)
+def test_slots_wording_one_varying_local_share_its_derived_column() -> None:
+    with given(t'two {pg["Step"].l.s} wording a local `flag` with different phrases'):
+        cases = _phrased_cases(
+            [True, False],
+            [
+                [
+                    _value_step('off', 'flag', 'on|off'),
+                    _value_step('dark', 'flag', 'lit|dark'),
+                ],
+                [
+                    _value_step('on', 'flag', 'on|off'),
+                    _value_step('lit', 'flag', 'lit|dark'),
+                ],
+            ],
+        )
+    with when(t'{pg["Templatize"]("templatizing")} walks the {pg["Case"].l.s}'):
+        [grouped] = group_parametrized(*cases)
+    with then('the table holds one derived column, with the Booleans'):
+        assert _column_ids(grouped) == ['pinned', 'derived:0']
+        assert _cells(grouped) == [[True, False], [False, True]]
+    with then(t'each {pg["Step"].l} still shows its own phrases'):
+        assert [step.narration.text for step in grouped.steps] == [
+            'the drink costs {on / off} euros',
+            'the drink costs {lit / dark} euros',
+        ]
+
+
+def test_a_local_that_changes_between_steps_keeps_two_derived_columns() -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [True, False],
+            [
+                [
+                    _value_step('off', 'flag', 'on|off'),
+                    _value_step('lit', 'flag', 'lit|dark'),
+                ],
+                [
+                    _value_step('on', 'flag', 'on|off'),
+                    _value_step('dark', 'flag', 'lit|dark'),
+                ],
+            ],
+        )
+    )
+    assert _column_ids(grouped) == ['pinned', 'derived:0', 'derived:1']
+    assert _cells(grouped) == [[True, False, True], [False, True, False]]
+
+
+def test_rule_2_advice_keeps_the_slots_phrases() -> None:
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(
+            *_phrased_cases(
+                [True, False],
+                [
+                    [_value_step('big', 'count > 1', 'big|small')],
+                    [_value_step('small', 'count > 1', 'big|small')],
+                ],
+            )
+        )
+    assert 'then(t"… {value:big|small} …").' in str(excinfo.value)
+
+
+def test_a_constant_boolean_local_stays_inline() -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [True, False],
+            [
+                [_value_step('on', 'flag', 'on|off')],
+                [_value_step('on', 'flag', 'on|off')],
+            ],
+        )
+    )
+    assert _column_ids(grouped) == ['pinned']
+    assert isinstance(grouped.steps[0].narration.parts[1], NarrationValue)
+    assert grouped.steps[0].narration.text == 'the drink costs on euros'
+
+
+def _template_label(template: str) -> Step:
+    return Step(phase='given', narration=narration_from(Template(template)))
+
+
+@pytest.mark.parametrize('bad_value', [None, 1])
+@pytest.mark.parametrize('position', ['title', 'label'])
+def test_rule_7_refuses_a_non_boolean_template_slot(
+    position: str, bad_value: object
+) -> None:
+    template = 'a step that {pinned:pins it|does not pin it}'
+    label = _template_label(template)
+    cases = _phrased_cases(
+        [True, bad_value],
+        [[label], [label]] if position == 'label' else [[], []],
+        title=narration_from(Template(template)) if position == 'title' else None,
+    )
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(*cases)
+    message = str(excinfo.value)
+    assert '{pinned:pins it|does not pin it}' in message
+    assert 'test_pin' in message
+    assert type(bad_value).__name__ in message
+    assert 't.py:12' in message
+
+
+def test_rule_7_refuses_a_conversion() -> None:
+    label = _template_label('a step that {pinned!r:pins it|does not pin it}')
+    with pytest.raises(PytestGivenError, match='no conversion'):
+        group_parametrized(*_phrased_cases([True, False], [[label], [label]]))
+
+
+def test_rule_7_refuses_a_term_instance() -> None:
+    guest = Glossary().actor('Guest')
+    label = _template_label('a step that {pinned:pins it|does not pin it}')
+    with pytest.raises(PytestGivenError, match='TermInstance'):
+        group_parametrized(
+            *_phrased_cases([True, guest('Alice')], [[label], [label]]),
+        )
+
+
+@pytest.mark.parametrize('status', ['failed', 'skipped'])
+def test_a_non_boolean_row_that_did_not_pass_keeps_its_plain_value(
+    status: Status,
+) -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [True, False, None],
+            [[_pin_step('pins it')], [_pin_step('does not pin it')], []],
+            statuses=['passed', 'passed', status],
+        )
+    )
+    assert _cells(grouped) == [[True], [False], [None]]
+    assert _placeholder(grouped.steps[0]).column_id == 'pinned'
+
+
+@pytest.mark.parametrize('status', ['failed', 'skipped'])
+def test_a_template_title_leaves_a_non_boolean_row_that_did_not_pass_alone(
+    status: Status,
+) -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [True, None],
+            [[], []],
+            statuses=['passed', status],
+            title=narration_from(Template('it {pinned:pins it|does not pin it}')),
+        )
+    )
+    assert _cells(grouped) == [[True], [None]]
+    assert grouped.narration.text == 'it {pins it / does not pin it}'
+
+
+def test_a_group_with_no_passed_case_keeps_a_phrased_slot_on_its_column() -> None:
+    [grouped] = group_parametrized(
+        *_phrased_cases(
+            [True, False],
+            [[_pin_step('pins it')], [_pin_step('does not pin it')]],
+            statuses=['failed', 'failed'],
+        )
+    )
+    assert _placeholder(grouped.steps[0]).column_id == 'pinned'
+    assert _cells(grouped) == [[True], [False]]

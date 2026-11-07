@@ -920,7 +920,7 @@ def test_covering_keeps_the_links_that_may_cite_the_scenario(
         document = f'{link}\n'
     with when('its links are checked, covering `test_pay`'):
         result, _ = _run(tmp_path, document, report, covering=['t.py::test_pay'])
-    with then(t'the {pg["Report link"].l} is kept: {kept}'):
+    with then(t'the {pg["Report link"].l} {kept:is kept|is dropped}'):
         assert [checked in result.listed for checked in result.links] == [kept]
 
 

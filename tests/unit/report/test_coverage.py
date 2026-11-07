@@ -283,7 +283,7 @@ def test_a_sentence_is_covered_by_one_step_never_by_several_together(
         )
     with when(t'{pg["Coverage"].l} is computed against the {pg["Story"].l}'):
         coverage = compute_coverage(scenario_, index)
-    with then(t'the {pg["Sentence"].l} is covered: {covered}'):
+    with then(t'the {pg["Sentence"].l} {covered:is covered|is not covered}'):
         assert (SentenceId(1) in coverage) == covered
 
 
@@ -506,7 +506,7 @@ def test_coverage_eligibility_needs_two_distinct_terms(term_ids, eligible):
         sentence = _sentence_naming(*term_ids)
     with when(t'its {pg["Coverage"].l} eligibility is checked'):
         checked = is_coverage_eligible(sentence)
-    with then(t'it is eligible: {eligible}'):
+    with then(t'it {eligible:is eligible|is not eligible}'):
         assert checked == eligible
 
 

@@ -35,6 +35,7 @@ Hard rules (each raises `PytestGivenError`):
 
 1. **`Template` accepts bare identifiers only:** `{name}`, `{name:spec}`, `{name!conv}`. No attribute access, no indexing, no expressions. To work around this, parametrize by the attribute, or move the step into the test body as a t-string.
 2. **Each form works only where the table puts it.** A `Template` in a test-body step is rejected: use a t-string. A t-string is rejected on a fixture or helper decorator, in `Annotated[..., given(...)]`, and in a title that interpolates a value: use a `Template` or a plain string. One title can't combine a term ref with a per-case value.
+3. **A spec with one `|` and text on both sides words a Boolean:** `{flag:true phrase|false phrase}`. Spaces around a phrase are removed, and a phrase holds no Markdown or term ref. The step shows `{true phrase / false phrase}` and the column keeps the Boolean. A phrase with an apostrophe needs a double-quoted t-string. A non-`bool` value or a conversion raises `PytestGivenError`: a t-string step or a helper's `Template` fails its test, and a `Template` in `@scenario` or `Annotated` fails the run when a case passes with that value, or for any case under `group_parametrized=False`. Identical phrases always raise. So `{when:%H|%M}` raises too: bind the text to a local and narrate that.
 
 ## Parametrized tests
 

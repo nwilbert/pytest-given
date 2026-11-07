@@ -1,7 +1,7 @@
 """The baseline walk: what every comparable case shares stays inline, and
 anything that varies becomes a column plus a pointer at it.
 
-A varying narrated value leaves a `{name}` placeholder behind, a varying
+A varying narrated value leaves a placeholder behind, a varying
 attachment payload a content-less badge. The scenario title is templatized
 separately — evaluated once at decoration time, it cannot vary across cases and
 so has nothing to be compared against.
@@ -10,6 +10,7 @@ so has nothing to be compared against.
 from dataclasses import replace
 
 from ..model import (
+    CellValue,
     Narration,
     NarrationLiteral,
     NarrationPart,
@@ -21,6 +22,7 @@ from ..model import (
     RawParamValue,
     Step,
     StepPath,
+    boolean_phrases,
     param_id,
     placeholder_mismatch,
     rebuilt,
@@ -34,8 +36,8 @@ from .columns import (
     ColumnBuilder,
     Format,
     cell_text,
+    leaves_cell_plain,
     param_cell,
-    trivial_format,
 )
 from .context import PartSite
 
@@ -129,10 +131,10 @@ def _templatize_param_value(
     its keep where two steps format one parameter differently, which no shared
     cell can serve.
     """
-    rendered = _renderings(site, builder)
-    if builder.reads_as(param_id(part.expression), rendered):
+    cells = _case_cells(site, builder)
+    if builder.reads_as(param_id(part.expression), cells):
         return _param_slot(part)
-    return _slot(part, builder.derived(part.expression, rendered))
+    return _slot(part, builder.derived(part.expression, cells))
 
 
 def _templatize_value(
@@ -140,34 +142,45 @@ def _templatize_value(
 ) -> NarrationPart:
     """An interpolation no parametrize column binds: kept as it is when every
     case renders it the same, promoted to a `derived` column when they do not."""
-    rendered = _renderings(site, builder)
-    if all(rendering == part.rendered for rendering in rendered.values()):
+    cells = _case_cells(site, builder)
+    baseline_cell = _cell_of(part)
+    if all(cell == baseline_cell for cell in cells.values()):
         return part
     check_promotable_expression(part, site.phase, builder.group)
-    return _slot(part, builder.derived(part.expression, rendered))
+    if boolean_phrases(part.format_spec) is None:
+        return _slot(part, builder.derived(part.expression, cells))
+    return _slot(part, builder.shared_derived(part.expression, cells))
 
 
-def _renderings(site: PartSite, builder: ColumnBuilder) -> dict[NodeId, str]:
-    """Each comparable case's rendering of the interpolation at `site`.
+def _case_cells(site: PartSite, builder: ColumnBuilder) -> dict[NodeId, CellValue]:
+    """Each comparable case's cell for the interpolation at `site`.
 
     Rule 6 pins every passed case to the baseline's template, so the part is
     present and is an interpolation wherever the baseline's is.
     """
-    out: dict[NodeId, str] = {}
+    out: dict[NodeId, CellValue] = {}
     for node_id, part in builder.group.parts_at(site):
         assert isinstance(part, NarrationValue), (
             'rule 6 admits only cases shaped like the baseline'
         )
-        out[node_id] = part.rendered
+        out[node_id] = _cell_of(part)
     return out
+
+
+def _cell_of(part: NarrationValue) -> CellValue:
+    """What a column holds for this interpolation: the text it rendered, or the
+    Boolean behind a phrase, which only that text still records."""
+    phrases = boolean_phrases(part.format_spec)
+    return part.rendered if phrases is None else part.rendered == phrases[0]
 
 
 def _slot(part: NarrationValue, column: ParameterColumn) -> NarrationPlaceholder:
     """A placeholder pointing at `column`, carrying the part's own formatting.
 
-    The token names the *column*, not the expression: one expression promoted
-    in two steps gives two columns, and `{price}` in both tokens would point
-    the reader at the first one twice.
+    The name is the *column's*, not the expression's: one expression promoted
+    in two steps can give two columns, and `{price}` in both tokens would point
+    the reader at the first one twice. A phrased slot's token shows its phrases
+    instead of the name.
     """
     return NarrationPlaceholder(
         name=column.name,
@@ -255,8 +268,8 @@ def _slot_renderings(
 
 
 def _slot_format(part: NarrationPlaceholder) -> Format | None:
-    """The formatting this slot renders its value with, or None when it carries
-    none.
+    """The formatting this slot needs from its cell, or None when it leaves the
+    cell plain.
 
     None is what puts `param_cell` on its unformatted path, whose plain
     coercion unwraps a glossary term instance to its display — where
@@ -264,4 +277,4 @@ def _slot_format(part: NarrationPlaceholder) -> Format | None:
     the cell it is compared with.
     """
     fmt: Format = (part.conversion, part.format_spec)
-    return None if trivial_format(fmt) else fmt
+    return None if leaves_cell_plain(fmt) else fmt

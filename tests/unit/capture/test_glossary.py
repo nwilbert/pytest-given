@@ -194,8 +194,8 @@ def test_re_registering_a_term_is_idempotent_only_with_matching_fields(
         g = Glossary()
         first = g.actor('Guest', definition='d')
     with when(
-        t'the same name is registered again, with the same definition: '
-        t'{same_definition}',
+        t'the same name is registered again, with '
+        t'{same_definition:the same definition|a different definition}',
         pins=adopt_pytest_given['build'],
     ):
         try:

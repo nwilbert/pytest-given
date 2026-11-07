@@ -16,7 +16,7 @@
 - **given** a JSON «report» that is {report_state}
 - **when** `pytest-given citations` {command} runs on the document
 - **then** it exits {exit_code}
-- **then** the document was rewritten: {rewritten}
+- **then** the document {is rewritten / is left alone}
 
 | citation | document | report_state | command | exit_code | rewritten |
 |---|---|---|---|---|---|
@@ -973,7 +973,7 @@
 - **given** a suite that would otherwise pass
 - **when** the suite runs on {workers} xdist workers with {option}
 - **then** it exits {exit_code}
-- **then** the suite ran: {ran}
+- **then** the suite {runs / does not run}
 
 | case ID | workers | option | exit_code | ran |
 |---|---|---|---|---|
@@ -1061,6 +1061,79 @@
 - **when** the suite runs with -m pytest_given
 - **then** the «scenario» and every «case» run
 - **then** the plain test is deselected
+
+## ✓ «Boolean phrases» word a Boolean in the «step», and the «parameter table» keeps the Boolean
+`tests/integration/test_plugin.py::test_a_boolean_column_reads_as_phrases_in_the_step` · spec/boolean-phrases
+
+- **given** a «parametrized scenario» narrating a Boolean with phrases
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import given, scenario
+
+        @scenario('Pinning')
+        @pytest.mark.parametrize('pinned', [False, True])
+        def test_pin(pinned):
+            with given(t'a step that {pinned:pins it|does not pin it}'):
+                assert pinned in (False, True)
+        ```
+- **when** the suite runs with --given-md
+    - 📎 report:
+        ```
+        # pytest-given — test_a_boolean_column_reads_as_phrases_in_the_step0
+
+        ## ✓ Pinning · 2 cases
+        `test_a_boolean_column_reads_as_phrases_in_the_step.py:4::test_pin`
+
+        - **given** a step that {pins it / does not pin it}
+
+        | pinned |
+        |---|
+        | False |
+        | True |
+        ```
+- **then** both «cases» pass
+- **then** the «step» shows both phrases
+- **then** the «parameter table» shows the Booleans
+
+## ✓ A «boolean phrase» over a value that is not a Boolean fails that «case», and the «report» is still written
+`tests/integration/test_plugin.py::test_a_phrase_spec_on_a_non_boolean_value_fails_the_case` · spec/boolean-phrases, validation
+
+- **given** a t-string «step» with phrases, and a «case» of `None`
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import given, scenario
+
+        @scenario('Pinning')
+        @pytest.mark.parametrize('pinned', [True, None])
+        def test_pin(pinned):
+            with given(t'a step that {pinned:pins it|does not pin it}'):
+                assert pinned in (True, None)
+        ```
+- **when** the suite runs with --given-md
+- **then** that «case» fails and the other passes
+- **then** the failure names the spec and the type of the value
+- **then** the «report» is written, with the value in that row
+
+## ✓ A `Template` «boolean phrase» over a value that is not a Boolean fails the run
+`tests/integration/test_plugin.py::test_a_template_phrase_spec_on_a_non_boolean_value_fails_the_run` · spec/boolean-phrases, validation
+
+- **given** a `Template` «scenario title» with phrases, over a passing `None`
+    - 📎 suite:
+        ```
+        import pytest
+        from pytest_given import Template, given, scenario
+
+        @scenario(Template('A step that {pinned:pins it|does not pin it}'))
+        @pytest.mark.parametrize('pinned', [True, None])
+        def test_pin(pinned):
+            with given('a step'):
+                assert pinned in (True, None)
+        ```
+- **when** the suite runs with --given-md
+- **then** the run names the slot, the test and the type of the value
+- **then** no «report» is written
 
 ## ✓ A «file glossary»'s «kindless» «terms» reach the «report» with the kinds the run infers
 `tests/integration/test_plugin_file_glossary.py::test_file_glossary_kinds_resolved_in_report`
@@ -1617,7 +1690,7 @@
 ## ✓ Duplicate rows for one «term» collapse only when identical · 2 cases
 `tests/unit/capture/test_file_glossary.py::test_duplicate_rows_collapse_only_when_identical` · validation
 
-- **given** two rows for one «term», with identical definitions: {identical}
+- **given** two rows for one «term», with {identical definitions / different definitions}
     - 📎 Glossary file — *see parameter table*
 - **when** the «file glossary» loads the file
 - **then** the rows yield {outcome}
@@ -1749,7 +1822,7 @@
 `tests/unit/capture/test_glossary.py::test_re_registering_a_term_is_idempotent_only_with_matching_fields` · validation
 
 - **given** an «actor» already registered with a definition
-- **when** the same name is registered again, with the same definition: {same_definition}
+- **when** the same name is registered again, with {the same definition / a different definition}
 - **then** the re-registration yields {outcome}
 - **then** a refusal reports the conflict with the prior registration
 
@@ -2488,6 +2561,13 @@
 - **when** a parametrize value is substituted in
 - **then** the placeholder is filled with that value
 
+## ✓ Identical «boolean phrases» are refused, since the «step» would read the same in every row
+`tests/unit/capture/test_template.py::test_template_refuses_identical_phrases_with_no_value_bound` · spec/boolean-phrases, validation
+
+- **given** a text with the same phrase on both sides of its format spec
+- **when** a `Template` is created from it, with no value bound
+- **then** a `PytestGivenError` quotes the spec
+
 ## ✓ A `Template` accepts bare identifiers only · 3 cases
 `tests/unit/capture/test_template.py::test_a_template_accepts_bare_identifiers_only` · parametrization, validation
 
@@ -2688,7 +2768,7 @@
 - **given** a «report» where `test_pay` is tagged `checkout/card` and in a «story», `test_refund` tagged `checkout/refund`
 - **given** a document holding the «report link» {link}
 - **when** its links are checked, covering `test_pay`
-- **then** the «report link» is kept: {kept}
+- **then** the «report link» {is kept / is dropped}
 
 | link | kept |
 |---|---|
@@ -3318,7 +3398,7 @@
 - **given** a «story» whose «sentence» names guest, search and room
 - **given** a «scenario» whose «steps» name {steps_naming}
 - **when** «coverage» is computed against the «story»
-- **then** the «sentence» is covered: {covered}
+- **then** the «sentence» {is covered / is not covered}
 
 | steps_naming | covered |
 |---|---|
@@ -3357,7 +3437,7 @@
 
 - **given** a «sentence» referencing the «terms» {term_ids}
 - **when** its «coverage» eligibility is checked
-- **then** it is eligible: {eligible}
+- **then** it {is eligible / is not eligible}
 
 | term_ids | eligible |
 |---|---|
@@ -3565,7 +3645,7 @@
 
 - **given** a step whose placeholder has the conversion {conversion}
 - **when** the «renderer» picks the repr columns
-- **then** the column is one of them: {repr_column}
+- **then** the column {is one of them / is not one of them}
 
 | conversion | repr_column |
 |---|---|
@@ -3952,9 +4032,9 @@
 `tests/unit/report/test_story_view.py::test_an_under_anchored_sentence_reads_as_untracked_until_pinned`
 
 - **given** a «story» whose only «sentence» names a single «term»
-- **given** a «scenario» whose «step» narrates that «term», «pinning» the «sentence»: {pinned}
+- **given** a «scenario» whose «step» narrates that «term», and {carries a / carries no} «pin» for the «sentence»
 - **when** the story rollups are built
-- **then** it reads as untracked: {untracked}
+- **then** it {reads as untracked / stays tracked}
 
 | pinned | untracked |
 |---|---|
@@ -4169,7 +4249,7 @@
 `tests/unit/test_grouping.py::test_a_failed_case_is_not_held_to_steps_it_does_not_share` · parametrization, validation
 
 - **given** a passed «case» that loads its items, then checks it is hot
-- **given** a failed «case» that loads its items, then retries instead of checking it is hot: {retries}
+- **given** a failed «case» that loads its items, then {retries instead of checking it is hot / stops}
     - 📎 failed steps — *see parameter table*
 - **when** the «cases» are «grouped»
 - **then** they make one scenario, with a row for each case
@@ -4192,6 +4272,31 @@
 - **when** the «cases» are «grouped»
 - **then** the «parameter table» holds the term displays alone
 - **then** the step still points at that column
+
+## ✓ «Steps» that word one Boolean with different «boolean phrases» share its «parameter table» column
+`tests/unit/test_grouping.py::test_slots_with_different_phrases_share_the_param_column` · spec/boolean-phrases
+
+- **given** two «steps» wording `pinned` with different phrases
+- **when** «templatizing» walks the «cases»
+- **then** the table holds one column, with the Booleans
+- **then** both «steps» point at that column
+
+## ✓ A varying local worded with «boolean phrases» becomes a derived column of Booleans
+`tests/unit/test_grouping.py::test_a_varying_boolean_local_becomes_a_derived_column_of_booleans` · spec/boolean-phrases
+
+- **given** two «cases» that word a local `flag` as "on" and "off"
+- **when** «templatizing» walks the «cases»
+- **then** the local gets a derived column beside the parametrize one
+- **then** that column holds the Boolean behind each phrase
+- **then** the «step» shows both phrases
+
+## ✓ «Steps» that word one varying local with different «boolean phrases» share its derived column
+`tests/unit/test_grouping.py::test_slots_wording_one_varying_local_share_its_derived_column` · spec/boolean-phrases
+
+- **given** two «steps» wording a local `flag` with different phrases
+- **when** «templatizing» walks the «cases»
+- **then** the table holds one derived column, with the Booleans
+- **then** each «step» still shows its own phrases
 
 ## ✓ A per-case «scenario title» ends with its «case ID» as a value
 `tests/unit/test_percase.py::test_a_plain_string_title_carries_its_case_id_as_a_value` · parametrization, versions/0.5.0

@@ -13,6 +13,7 @@ from ..model import (
     NarrationTermRef,
     NarrationValue,
     PytestGivenError,
+    boolean_phrases,
     narration_of,
     param_id,
     placeholder_value,
@@ -96,8 +97,8 @@ def narration_from(value: StepText | Narration) -> Narration:
         return narration_of(parts)
     if isinstance(value, Template):
         # Text derived from the parts, never the raw template string: a
-        # placeholder renders as its bare `{name}` token, so `'{amount:.2f}'`
-        # would otherwise leave a `text` carrying a spec that nothing displays
+        # placeholder renders as its token, so `'{amount:.2f}'` would otherwise
+        # leave a `text` carrying a spec that nothing displays
         # — and `text` is what the report's search box and a `jq` query read.
         return narration_of(value.parts)
     return Narration(text=value)
@@ -136,6 +137,9 @@ class Template:
                     f'or expressions, use a t-string in the test body '
                     f'(where the value is in scope).'
                 )
+            format_spec = spec or ''
+            # Refuses identical phrases here, before any value is bound.
+            boolean_phrases(format_spec)
             if text:
                 parts.append(NarrationLiteral(value=text))
                 text = ''
@@ -143,7 +147,7 @@ class Template:
                 NarrationPlaceholder(
                     name=name,
                     column_id=param_id(name),
-                    format_spec=spec or '',
+                    format_spec=format_spec,
                     conversion=conversion,
                 )
             )

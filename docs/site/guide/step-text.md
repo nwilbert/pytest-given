@@ -43,6 +43,30 @@ Markdown is read only in the text you write, never in a value or a term ref: a v
 
 Instead, parametrize by the attribute values directly, or move the step into the test body and use a t-string, which allows any expression.
 
+A spec can also word a Boolean, as described in [Boolean phrases](#boolean-phrases).
+
+## Boolean phrases
+
+To word a Boolean in a step, write two phrases in its format spec, separated by a `|`. The true phrase comes first:
+
+```python
+@scenario('Pinning a step')
+@pytest.mark.parametrize('pinned', [False, True])
+def test_pin(pinned):
+    with given(t'a step that {pinned:pins it|does not pin it}'):
+        ...
+```
+
+The step shows `a step that {pins it / does not pin it}`, and the parameter table keeps `True` and `False`. Hovering a row in the HTML report puts that row's phrase into the sentence. A local variable that differs between cases gets a column of its own, holding `True` and `False`, and steps wording the same values share that column. One that is the same in every case, or a test that isn't parametrized, shows its one phrase.
+
+This works in a t-string and in a `Template`. The two phrases should complete the same sentence and word what the column's name says.
+
+- **Phrases are literal.** Spaces around each phrase are removed. A phrase holds no Markdown and no term ref.
+- **An apostrophe needs double quotes.** `t'{pinned:doesn't pin it|pins it}'` is a Python syntax error, so write `t"{pinned:doesn't pin it|pins it}"`.
+- **Only a `bool` can take phrases.** Any other value, or a conversion such as `!r`, raises `PytestGivenError`. A t-string step or a `Template` on a helper fails its test. A `Template` in `@scenario(...)` or `Annotated[..., given(...)]` fails the run when a case passes with that value, or for any case under `group_parametrized=False`. See [rule 7](parametrized.md#rejected-authoring-forms).
+- **The two phrases must differ.** `{flag:a|a}` raises `PytestGivenError`.
+- **The shape is reserved.** Any spec with one `|` and text on both sides counts as phrases, so `{when:%H|%M}` on a `datetime` raises. Assign the text to a local variable (`clock = when.strftime('%H|%M')`) and use `{clock}` instead. A fill character such as `{count:|>5}` has no text before the `|`, so it still works.
+
 ## Template or t-string
 
 A t-string is evaluated right away, so its values must exist at that point. In a test body they do. On a decorator they don't: decorators run when the module is imported, before any test. That's what `Template` is for: it's filled in later, once the values are known.

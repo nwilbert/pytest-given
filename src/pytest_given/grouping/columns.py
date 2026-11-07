@@ -3,11 +3,12 @@
 `ColumnBuilder` is the single registry — column ids, disambiguated names, and
 the cell store. The rest is cell construction, which answers to one rule: a
 `param` cell has to read the way the placeholder pointing at it rendered, since
-row hover substitutes the one into the other.
+row hover substitutes the one into the other. A phrased placeholder is the
+exception: hover picks its phrase from the cell's Boolean.
 """
 
 import math
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 
 from ..capture import try_term_ref
@@ -29,6 +30,7 @@ from ..model import (
     RawParamValue,
     Scenario,
     Step,
+    boolean_phrases,
     iter_steps,
     param_id,
     render_interpolation,
@@ -40,12 +42,17 @@ from .context import Group
 # which `param_cell` renders differently from an empty spec.
 type Format = tuple[str | None, str]
 
+type _SharedDerivedKey = tuple[str, tuple[tuple[NodeId, CellValue], ...]]
 
-def trivial_format(fmt: Format) -> bool:
-    """Whether a slot carries no formatting of its own — `None` and `''`
-    alike."""
+
+def leaves_cell_plain(fmt: Format) -> bool:
+    """Whether a slot asks nothing of its cell: it carries no formatting of its
+    own, `None` and `''` alike, or a phrase spec, whose phrase hover picks from
+    the raw Boolean."""
     conversion, format_spec = fmt
-    return not conversion and not format_spec
+    return (not conversion and not format_spec) or boolean_phrases(
+        format_spec
+    ) is not None
 
 
 @dataclass
@@ -57,6 +64,9 @@ class ColumnBuilder:
     _cells: dict[ColumnId, dict[NodeId, CellValue]] = field(default_factory=dict)
     _counts: dict[ColumnKind, int] = field(default_factory=dict)
     _taken_names: set[str] = field(default_factory=set)
+    _shared_derived: dict[_SharedDerivedKey, ParameterColumn] = field(
+        default_factory=dict
+    )
 
     def table(
         self, cases: list[Scenario], narrated: list[ColumnId], custom: set[NodeId]
@@ -93,12 +103,22 @@ class ColumnBuilder:
             ],
         )
 
-    def derived(self, name: str, rendered: dict[NodeId, str]) -> ParameterColumn:
-        """A new `derived` column, filled with what each case rendered."""
+    def derived(self, name: str, cells: Mapping[NodeId, CellValue]) -> ParameterColumn:
+        """A new `derived` column, filled with each case's cell."""
         column = self.new_column('derived', name)
-        for node_id, text in rendered.items():
-            self.set_cell(column.id, node_id, text)
+        for node_id, cell in cells.items():
+            self.set_cell(column.id, node_id, cell)
         return column
+
+    def shared_derived(
+        self, name: str, cells: Mapping[NodeId, CellValue]
+    ) -> ParameterColumn:
+        """The `derived` column with this name and these cells, made on first
+        use, for slots that keep what sets them apart on the slot itself."""
+        key = (name, tuple(cells.items()))
+        if key not in self._shared_derived:
+            self._shared_derived[key] = self.derived(name, cells)
+        return self._shared_derived[key]
 
     @classmethod
     def for_params(cls, group: Group, formats: dict[str, Format]) -> ColumnBuilder:
@@ -151,18 +171,21 @@ class ColumnBuilder:
         """
         return self._cells[column_id].get(node_id)
 
-    def reads_as(self, column_id: ColumnId, rendered: dict[NodeId, str]) -> bool:
-        """Whether every case's cell in *column_id* already prints the way that
-        case rendered it — the question a slot asks before promoting.
+    def reads_as(
+        self, column_id: ColumnId, slot_cells: Mapping[NodeId, CellValue]
+    ) -> bool:
+        """Whether every case's cell in *column_id* already prints what that
+        case's slot needs — the question a slot asks before promoting.
 
-        Indexed, not `.get`: the callers pass renderings from the comparable
-        cases against a `param` column, which is filled for every case in the
-        group, so a missing cell is a broken invariant rather than a case that
-        bound nothing.
+        Indexed, not `.get`: the callers pass the comparable cases against a
+        `param` column, which is filled for every case in the group, so a
+        missing cell is a broken invariant rather than a case that bound
+        nothing.
         """
         cells = self._cells[column_id]
         return all(
-            cell_text(cells[node_id]) == text for node_id, text in rendered.items()
+            cell_text(cells[node_id]) == cell_text(cell)
+            for node_id, cell in slot_cells.items()
         )
 
     def _unique_name(self, name: str) -> str:
@@ -222,7 +245,8 @@ def param_cell_formats(
     Only a formatting every slot for that column shares is used. Two slots
     formatting one parameter differently leave no single text a shared cell
     could hold; the column keeps its plain value and each disagreeing slot gets
-    a column of its own. The trivial formatting counts as one of the two.
+    a column of its own. A slot that leaves the cell plain counts as one of the
+    two.
     """
     seen: dict[str, set[Format]] = {}
     for narration in narrations:
@@ -234,7 +258,7 @@ def param_cell_formats(
     return {
         name: next(iter(formats))
         for name, formats in seen.items()
-        if len(formats) == 1 and not trivial_format(next(iter(formats)))
+        if len(formats) == 1 and not leaves_cell_plain(next(iter(formats)))
     }
 
 

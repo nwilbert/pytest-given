@@ -23,7 +23,7 @@ coverage[]    one entry per story sentence — which scenarios cover it
 | `xfail_reason` | `null`, or the reason an xfailed scenario was expected to fail. Such a scenario keeps its steps and error too. |
 | `duration_ms` | The wall-clock time of the test. |
 | `steps[]` | The tree of steps (see below). |
-| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node ID, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`, unless it only repeats the case's values); when any case's is, the report starts the table with the case IDs. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
+| `parameters` | `null`, or `{columns: [{id, name, kind}], cases: [{id, values, status, error, custom_id}]}` for a parametrized scenario. `kind` is `param`, `derived` or `attachment`. A case's `id` is its node ID, and its `values` are in the same order as `columns`. `custom_id` is `true` when the case's id is custom (`pytest.param(..., id=...)` or `ids=`, unless it only repeats the case's values); when any case's is, the report starts the table with the case IDs. A `derived` cell is the string the case rendered, a JSON Boolean for a local worded with a Boolean phrase, or `null` for a case without a value. An `attachment` cell is a `{label, content, content_type}` object, or `null` for a case without a value. A scenario that declines grouping with `group_parametrized=False` has `parameters: null`, like any scenario that isn't parametrized. |
 | `error` | `null`, or `{message, error_tail, frames: [{path, lineno, func, code, is_internal}], causes: [{frames, error_tail, connector}]}`. `causes` holds a chained error's causes, root first, each with the sentence that leads on to the next. `is_internal` marks a frame from `pluggy`, `_pytest` or pytest-given; such frames are kept only with `--given-all-frames`. **On a parametrized scenario, `error` is always `null`**, even when it failed. Its errors are in each case's `parameters.cases[].error`, with the same shape. |
 | `source` | `{relpath, line}`: where the test function is defined. |
 | `story_ids` / `pins` | `story_ids` lists the stories `@scenario(stories=...)` matches against. `pins` lists the scenario's pins as `[{story_id, sentence_id}]`: `null` when the scenario isn't pinned, `[]` when it turned matching off. A step's `pins` works the same way. |
@@ -39,7 +39,7 @@ A step is `{phase, narration, children[], attachments[], pins, fixture_name}`. `
 - `{term_id, display, expression}`: a term ref.
 - `{name, column_id, format_spec, conversion}`: a placeholder for the column `column_id` in a grouped parametrized scenario.
 
-Match parts by their keys, not by position. A step's text is `value`, `rendered`, `display` or `{name}` of each part, joined in order.
+Match parts by their keys, not by position. A step's text is `value`, `rendered`, `display` or `{name}` of each part, joined in order. A placeholder whose `format_spec` holds Boolean phrases (`a|b`) reads `{a / b}` instead of `{name}`, and its column holds the Booleans.
 
 Term ids and story ids are slugs: the name in lowercase, with each run of non-alphanumeric characters replaced by `-` (`Late fee` becomes `late-fee`).
 

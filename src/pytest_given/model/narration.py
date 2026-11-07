@@ -21,6 +21,7 @@ from ..markdown import (
     located_spans,
     read_spans,
 )
+from .errors import PytestGivenError
 from .schema import (
     Narration,
     NarrationLiteral,
@@ -38,21 +39,45 @@ _FORMATTER = Formatter()
 
 
 def placeholder_token(part: NarrationPlaceholder) -> str:
-    """A grouped-template slot as its bare `{name}` token.
+    """A grouped-template slot as its token: `{name}`, or both phrases of a
+    phrase spec.
 
     The grouped view is schematic: it marks *which* column varies, not how any
-    one value prints, so the conversion and format spec are dropped — they are
-    already applied in the concrete per-case rows. Both renderers print the
-    slot this way, and `narration_text` derives `text` from it.
+    one value prints, so a conversion and any other format spec are dropped —
+    they are already applied in the concrete per-case rows. A phrased slot
+    shows both phrases, since one would state a single row's branch as fact.
+    Both renderers print the slot this way, and `narration_text` derives `text`
+    from it.
+
+    ` / ` rather than the spec's `|`, which Markdown would write as `\\|`.
     """
-    return '{' + part.name + '}'
+    phrases = boolean_phrases(part.format_spec)
+    return '{' + (part.name if phrases is None else ' / '.join(phrases)) + '}'
+
+
+def boolean_phrases(format_spec: str) -> tuple[str, str] | None:
+    """The true and false phrase of a phrase spec, or None for any other spec.
+
+    Decided from the spec's text alone, because a token has no value in reach.
+    """
+    phrases = [phrase.strip() for phrase in format_spec.split('|')]
+    if len(phrases) != 2 or not all(phrases):
+        return None
+    true_phrase, false_phrase = phrases
+    if true_phrase == false_phrase:
+        raise PytestGivenError(
+            f'phrase spec {format_spec!r} words True and False the same, so the '
+            f'step would say the same thing in every row. Word them differently, '
+            f'or narrate the sentence without the value.'
+        )
+    return true_phrase, false_phrase
 
 
 def narration_text(parts: Sequence[NarrationPart]) -> str:
     """The text those parts render.
 
     A placeholder stands for a value not yet known, so it renders as its own
-    `{name}` token — which is what makes this both the grouped template's text
+    token — which is what makes this both the grouped template's text
     (placeholders left standing, pointing at columns) and a substituted case's
     (no placeholders left to stand).
 
@@ -163,13 +188,32 @@ def render_interpolation(
     value: object, conversion: str | None, format_spec: str
 ) -> str:
     """One interpolation rendered the way an f-string renders it: `!conv`
-    first, then `:spec`.
+    first, then `:spec`. A phrase spec is the exception, which only a bare
+    `bool` satisfies.
 
     The single definition of that rule; grouping re-applies it to a raw
     parametrize value to decide whether a narration that names a column really
     narrates it (rule 3).
     """
-    return format(_FORMATTER.convert_field(value, conversion), format_spec)
+    phrases = boolean_phrases(format_spec)
+    if phrases is None:
+        return format(_FORMATTER.convert_field(value, conversion), format_spec)
+    got = phrase_value_mismatch(value, conversion)
+    if got is not None:
+        raise PytestGivenError(
+            f'phrase spec {format_spec!r} words a Boolean, so it takes a bool and '
+            f'no conversion, but got {got}. For text that holds a "|", bind it to '
+            f'a local and narrate that.'
+        )
+    return phrases[0] if value else phrases[1]
+
+
+def phrase_value_mismatch(value: object, conversion: str | None) -> str | None:
+    """What a phrase spec was given instead of a bare `bool`, as its refusal
+    names it, or None when it was given one."""
+    if isinstance(value, bool) and not conversion:
+        return None
+    return type(value).__name__ + (f' with !{conversion}' if conversion else '')
 
 
 def placeholder_value(part: NarrationPlaceholder, value: object) -> NarrationValue:

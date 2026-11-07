@@ -6,7 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import given, scenario, then, when
+from pytest_given import Template, given, scenario, then, when
+from pytest_given.capture.template import narration_from
+from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
     AttachmentRef,
     Clause,
@@ -25,6 +27,8 @@ from pytest_given.model import (
     ParameterCase,
     ParameterColumn,
     ParameterTable,
+    ParamInfo,
+    ParamSpec,
     Phase,
     ReportData,
     Scenario,
@@ -34,6 +38,7 @@ from pytest_given.model import (
     Story,
     StoryId,
     TermId,
+    narration_of,
     param_id,
     report_from_dict,
     report_to_dict,
@@ -60,6 +65,7 @@ from pytest_given.report.html_renderer import (
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
+from tests.unit.citation_reports import report_
 from tests.unit.report.app_data import embedded_app_data
 
 _DEFAULT_METADATA = {
@@ -1214,7 +1220,7 @@ def test_a_column_narrated_with_r_or_a_is_a_repr_column(
         )
     with when(t'the {pg["Renderer"].l} picks the repr columns'):
         columns = _repr_columns(table_scenario)
-    with then(t'the column is one of them: {repr_column}'):
+    with then(t'the column {repr_column:is one of them|is not one of them}'):
         assert (ColumnId('value') in columns) == repr_column
 
 
@@ -2125,6 +2131,101 @@ def test_citation_data_carries_a_row_per_term() -> None:
 def test_a_grouped_scenarios_base_node_id_opens_it() -> None:
     data = embedded_app_data(render_html_string(_citable_report(None), None))
     assert data['cited_scenario_ids'] == {'t.py::test_pour': 't.py::test_pour[water]'}
+
+
+class _PhrasesParser(HTMLParser):
+    """Each substitutable slot's two hover phrases, as a browser reads them."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.slots: list[tuple[str | None, str | None]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attributes = dict(attrs)
+        if tag == 'span' and 'data-subst' in attributes:
+            self.slots.append(
+                (
+                    attributes.get('data-true-phrase'),
+                    attributes.get('data-false-phrase'),
+                )
+            )
+
+
+def _slot_phrases(report: ReportData) -> list[tuple[str | None, str | None]]:
+    parser = _PhrasesParser()
+    parser.feed(render_html_string(report, source_link_template=None))
+    return parser.slots
+
+
+def _phrased_report(format_spec: str, true_text: str, false_text: str) -> ReportData:
+    def step(rendered: str) -> Step:
+        return Step(
+            phase='given',
+            narration=narration_of(
+                (
+                    NarrationLiteral(value='a step that '),
+                    NarrationValue(
+                        rendered=rendered,
+                        expression='pinned',
+                        format_spec=format_spec,
+                    ),
+                )
+            ),
+        )
+
+    ids = [NodeId('t.py::test_x[True]'), NodeId('t.py::test_x[False]')]
+    cases = [
+        Scenario(
+            id=node_id,
+            narration=Narration(text='x'),
+            module='m',
+            status='passed',
+            steps=[step(rendered)],
+        )
+        for node_id, rendered in zip(ids, [true_text, false_text], strict=True)
+    ]
+    param_info: ParamInfo = {
+        node_id: ParamSpec(names=['pinned'], values=[value])
+        for node_id, value in zip(ids, [True, False], strict=True)
+    }
+    return report_(*group_parametrized(cases, param_info), report_url=None)
+
+
+def test_a_phrased_slot_carries_both_phrases_for_row_hover() -> None:
+    report = _phrased_report('pins it|does not pin it', 'pins it', 'does not pin it')
+    assert ('pins it', 'does not pin it') in _slot_phrases(report)
+
+
+def test_a_plain_slot_carries_no_phrases() -> None:
+    report = _phrased_report('', 'True', 'False')
+    assert set(_slot_phrases(report)) == {(None, None)}
+
+
+def test_a_phrase_survives_its_attribute_escaping() -> None:
+    report = _phrased_report('"a" <b>|c & d', '"a" <b>', 'c & d')
+    assert ('"a" <b>', 'c & d') in _slot_phrases(report)
+
+
+def test_a_report_rebuilt_from_json_keeps_its_phrases() -> None:
+    report = _phrased_report('pins it|does not pin it', 'pins it', 'does not pin it')
+    rebuilt = report_from_dict(json.loads(json.dumps(report_to_dict(report))))
+    assert _slot_phrases(rebuilt) == _slot_phrases(report)
+    step = rebuilt.scenarios[0].steps[0]
+    assert step.narration.text == 'a step that {pins it / does not pin it}'
+    table = rebuilt.scenarios[0].parameters
+    assert table is not None
+    assert [case.values for case in table.cases] == [[True], [False]]
+
+
+def test_the_search_box_finds_either_phrase_in_a_title() -> None:
+    title = narration_from(Template('it {pinned:pins it|does not pin it}'))
+    report = report_(
+        Scenario(id=NodeId('t.py::test_x'), narration=title, module='m'),
+        report_url=None,
+    )
+    scenarios = _app_data(report)['scenarios']
+    assert isinstance(scenarios, list)
+    assert scenarios[0]['search_text'] == 'it {pins it / does not pin it}'
 
 
 def test_the_search_box_matches_a_title_as_it_shows() -> None:

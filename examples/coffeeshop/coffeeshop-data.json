@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-07T13:01:42.003594+00:00",
+    "timestamp": "2026-11-07T19:36:39.132725+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "1b5c74282d934f30c480d3884ca9bb432f688470",
+    "commit_sha": "2dc4b43e648acfe1b36c6982a2643003d80164e1",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -213,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 73,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -250,15 +250,15 @@
         {
           "phase": "then",
           "narration": {
-            "text": "the purchase is allowed: {expect}",
+            "text": "the purchase {is allowed / is refused}",
             "parts": [
               {
-                "value": "the purchase is allowed: "
+                "value": "the purchase "
               },
               {
                 "name": "expect",
                 "column_id": "expect",
-                "format_spec": "",
+                "format_spec": "is allowed|is refused",
                 "conversion": null
               }
             ]
@@ -1618,7 +1618,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 34,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",
@@ -1784,7 +1784,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 36,
+      "duration_ms": 35,
       "steps": [
         {
           "phase": "given",

@@ -41,6 +41,7 @@ from ..model import (
     Step,
     TermId,
     TermKind,
+    boolean_phrases,
     case_id,
     iter_steps,
     placeholder_token,
@@ -575,11 +576,23 @@ def _render_narration_piece(
             return (
                 f'<span class="param-color-{color_idx}{repr_class}" '
                 f'data-param="{safe_id}" '
-                f'data-subst="{safe_id}"'
+                f'data-subst="{safe_id}"{_phrase_attributes(part)}'
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():
             return _render_term_ref(part, glossary)
+
+
+def _phrase_attributes(part: NarrationPlaceholder) -> str:
+    """What row hover shows for a phrased slot, whose cell holds the Boolean."""
+    phrases = boolean_phrases(part.format_spec)
+    if phrases is None:
+        return ''
+    true_phrase, false_phrase = phrases
+    return (
+        f' data-true-phrase="{escape(true_phrase)}"'
+        f' data-false-phrase="{escape(false_phrase)}"'
+    )
 
 
 _TERM_KIND_CLASSES: dict[TermKind, str] = {

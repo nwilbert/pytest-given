@@ -56,7 +56,7 @@ Readers scan titles first, often without the steps: in the report's list, in Mar
           booking, refusal = book(room, nights), ''
       except BookingRefused as error:
           booking, refusal = None, str(error)
-  with then(t'the booking is accepted: {accepted}'):
+  with then(t'the booking is {accepted:accepted|refused}'):
       assert (booking is not None) == accepted
   with then('a refusal names the minimum stay'):
       assert ('minimum stay' in refusal) == (not accepted)

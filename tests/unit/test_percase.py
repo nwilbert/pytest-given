@@ -1,5 +1,7 @@
 """Unit tests for the per-case path: a scenario that declines the merge."""
 
+from dataclasses import replace
+
 import pytest
 
 from pytest_given import Glossary, Template, given, scenario, then, when
@@ -16,6 +18,7 @@ from pytest_given.model import (
     ParamSpec,
     PytestGivenError,
     Scenario,
+    SourceLocation,
     Step,
     TermId,
     narration_text,
@@ -55,6 +58,45 @@ def _opted_out_group(
         for node_id, case in zip(ids, cases, strict=True)
     }
     return scenarios, param_info
+
+
+def test_a_phrased_title_renders_each_cases_own_phrase() -> None:
+    scenarios, param_info = _opted_out_group(
+        Template('it {pinned:is pinned|is not}'),
+        values=(True, False),
+        names=('pinned',),
+    )
+    result = group_parametrized(scenarios, param_info)
+    assert [s.narration.text for s in result] == [
+        'it is pinned [True]',
+        'it is not [False]',
+    ]
+
+
+@pytest.mark.parametrize('position', ['title', 'label'])
+def test_a_phrased_template_refuses_a_non_boolean_case_by_location(
+    position: str,
+) -> None:
+    template = Template('it {pinned:is pinned|is not}')
+    label = Step(phase='given', narration=narration_from(template))
+    scenarios, param_info = _opted_out_group(
+        template if position == 'title' else 'Pinning',
+        values=(True, None),
+        names=('pinned',),
+        steps=[label] if position == 'label' else [],
+    )
+    located = [
+        replace(case, source=SourceLocation(relpath='tests/t.py', line=12))
+        for case in scenarios
+    ]
+    with pytest.raises(PytestGivenError) as excinfo:
+        group_parametrized(located, param_info)
+    message = str(excinfo.value)
+    assert '{pinned:is pinned|is not}' in message
+    assert "'x'" in message
+    assert 'case [None] binds it to NoneType' in message
+    assert 't.py:12' in message
+    assert 'bind it to a local' not in message
 
 
 def test_opted_out_group_emits_one_scenario_per_case() -> None:
@@ -221,11 +263,12 @@ def test_failed_and_skipped_cases_are_emitted_with_their_own_outcome() -> None:
     assert [s.status for s in result] == ['failed', 'skipped']
 
 
-def test_a_placeholder_naming_no_parameter_raises() -> None:
+@pytest.mark.parametrize('slot', ['{cup_zize}', '{cup_zize:small|large}'])
+def test_a_placeholder_naming_no_parameter_raises(slot: str) -> None:
     """The safety net the grouped path has too: a placeholder that matches no
     parametrize column is a typo, not a value."""
     scenarios, param_info = _opted_out_group(
-        Template('Brew {cup_zize} ml'), values=(200,), statuses=('passed',)
+        Template(f'Brew {slot} ml'), values=(200,), statuses=('passed',)
     )
 
     with pytest.raises(PytestGivenError, match='cup_zize'):

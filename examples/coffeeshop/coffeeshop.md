@@ -41,7 +41,7 @@
 
 - **given** a coffee machine with 10 coffees
 - **when** I insert \${euros}
-- **then** the purchase is allowed: {expect}
+- **then** the purchase {is allowed / is refused}
 
 | case ID | euros | expect | |
 |---|---|---|---|

@@ -50,8 +50,9 @@ class NarrationValue:
 class NarrationPlaceholder:
     """A deferred placeholder — resolved at render time from a per-case mapping.
 
-    `name` supplies the `{price}` token and the color-palette entry; `column_id`
-    identifies the parameter-table column the DOM keys on. For a `param` column
+    `name` supplies the `{price}` token, unless a phrase spec's phrases replace
+    it, and the color-palette entry; `column_id` identifies the
+    parameter-table column the DOM keys on. For a `param` column
     the two coincide; a `derived` column's id is generated (`derived:0`), so the
     field is always populated rather than falling back to `name`.
     """
@@ -411,8 +412,9 @@ class ParameterColumn:
 
 
 # One table cell. A `param` cell holds the parametrize value as captured, a
-# `derived` cell the already-rendered string, an `attachment` cell the payload
-# object — which is also how serde tells the two apart on read. `None` is a
+# `derived` cell the already-rendered string or the Boolean behind a phrase, an
+# `attachment` cell the payload object — which is also how serde tells the two
+# apart on read. `None` is a
 # real parametrize value in a `param` cell and "no value here" in a generated
 # one: the column's kind disambiguates, never the cell.
 type CellValue = ParamValue | Attachment

@@ -4,6 +4,7 @@ and read back as the title it renders."""
 import pytest
 
 from pytest_given.markdown import fold_whitespace, plain_link_text
+from pytest_given.markdown.blocks import table_cell_spans
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -16,6 +17,35 @@ from pytest_given.model import (
     param_id,
 )
 from pytest_given.report.link_text import html_link_text, link_text
+
+
+def test_a_phrased_title_stays_one_cell_in_a_table_row() -> None:
+    title = narration_of(
+        (
+            NarrationLiteral(value='it '),
+            NarrationPlaceholder(
+                name='pinned',
+                column_id=param_id('pinned'),
+                format_spec='pins it|does not pin it',
+            ),
+        )
+    )
+    written = link_text(title, in_table_row=True)
+    assert written == 'it {pins it / does not pin it}'
+    assert len(table_cell_spans(f'| [{written}](u) |')) == 1
+
+
+def test_a_line_break_in_a_phrase_stays_out_of_a_summary() -> None:
+    title = narration_of(
+        (
+            NarrationPlaceholder(
+                name='pinned',
+                column_id=param_id('pinned'),
+                format_spec='pins\nit|does not',
+            ),
+        )
+    )
+    assert html_link_text(title) == '{pins it / does not}'
 
 
 def test_a_tag_or_story_title_is_link_text_written_literally() -> None:

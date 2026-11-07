@@ -5,7 +5,7 @@
 pytest-given groups all cases of a parametrized test into one scenario with a parameter table. The report shows the steps once, taken from the first case that passed (the **baseline case**). Anything that differs between cases becomes a column in the parameter table:
 
 - a parametrize argument
-- a t-string value that differs between cases. The step shows a `{name}` placeholder that points to the column.
+- a t-string value that differs between cases. The step shows a `{name}` placeholder that points to the column, or both phrases of a [Boolean phrase](step-text.md#boolean-phrases).
 - an attachment whose content differs between cases. The step shows a badge that points to the column, instead of the content.
 
 The group fails if any case failed. Otherwise it is an expected failure (`xfailed`) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.
@@ -61,3 +61,4 @@ Some ways of writing steps would make the grouped scenario show the wrong text. 
 | 4 | A term ref that names a different term or reads differently between cases, including one that takes its text from a parametrize argument | Keep the term ref and the value apart: `given(t"{pg['Customer']} {name} places an order")` |
 | 5 | A step whose `attach` labels differ between cases | Keep the labels the same and let only the content differ; the parameter table gets a column for it |
 | 6 | Cases whose steps differ in any other way: different steps, different wording, a different t-string expression, or different pins. A case that didn't pass is compared only up to the step where it stopped or took a different path | Add `group_parametrized=False` to `@scenario` so each case becomes its own scenario. For pins that differ, pin the step to one sentence instead |
+| 7 | A `Template` in `@scenario(...)` or `Annotated[..., given(...)]` with [Boolean phrases](step-text.md#boolean-phrases), when a case that passed binds it to anything but a `bool`, or the placeholder has a conversion | Parametrize a Boolean, or drop the phrases and let the column hold the value |

@@ -1032,6 +1032,35 @@ def test_unused_interpolation_fires_on_a_grouped_placeholder(tmp_path) -> None:
     assert 'interpolates {size} but never uses it' in finding.message
 
 
+def test_unused_interpolation_reads_a_phrased_slot_by_its_bare_name(tmp_path) -> None:
+    src = _write(
+        tmp_path,
+        """\
+        def test_a(pinned):
+            with given(t'a step that {pinned:pins it|does not pin it}'):
+                cup = make_cup()
+        """,
+    )
+    step = dataclasses.replace(
+        _step('given', 'a step', _line(src, 'with given')),
+        narration=Narration(
+            text='{pins it / does not pin it}',
+            parts=(
+                NarrationPlaceholder(
+                    name='pinned',
+                    column_id='pinned',
+                    format_spec='pins it|does not pin it',
+                ),
+            ),
+        ),
+    )
+    findings = _rule_findings(
+        _ast_rules([_scenario([step])], tmp_path), 'unused-interpolation'
+    )
+    assert len(findings) == 1
+    assert 'interpolates {pinned} but never uses it' in findings[0].message
+
+
 def test_unused_interpolation_skips_a_disambiguated_column_name(tmp_path) -> None:
     """A column whose name was disambiguated (`size #2`) is not a bare
     identifier and drops out with the complex expressions. `ast.parse` alone

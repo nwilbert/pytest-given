@@ -902,19 +902,23 @@ function reportApp() {
     setHoverRow(rowEl) {
       const scope = rowEl?.closest('.scenario');
       if (!scope) return;
-      const values = {};
+      const cells = new Map();
       // `data-subst` rather than `data-param`: the highlight keys on
       // `data-param`, which attachment cells and tree badges also carry, and
       // writing textContent into a badge would destroy its inline SVG.
       rowEl.querySelectorAll('td[data-subst]').forEach(td => {
-        values[td.dataset.subst] = td.textContent.trim();
+        cells.set(td.dataset.subst, td);
       });
       scope.querySelectorAll('span[data-subst]').forEach(span => {
-        const val = values[span.dataset.subst];
-        if (val === undefined) return;
+        const cell = cells.get(span.dataset.subst);
+        if (!cell) return;
         // Stash the original {token} once so re-entry stays idempotent.
         if (span.dataset.token === undefined) span.dataset.token = span.textContent;
-        span.textContent = val;
+        // `data-boolean` rather than the cell's text: a string 'True' prints
+        // the same as the Boolean, but no phrase words it.
+        const phrase = cell.dataset.boolean === 'True' ? span.dataset.truePhrase
+          : cell.dataset.boolean === 'False' ? span.dataset.falsePhrase : undefined;
+        span.textContent = phrase ?? cell.textContent.trim();
         span.classList.add('param-substituted');
       });
     },

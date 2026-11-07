@@ -104,7 +104,7 @@ def test_the_citations_exit_code_says_whether_a_finding_remains(
         rc = main(['citations', command, str(doc), '--report', str(report)])
     with then(t'it exits {exit_code}'):
         assert rc == exit_code
-    with then(t'the document was rewritten: {rewritten}'):
+    with then(t'the document {rewritten:is rewritten|is left alone}'):
         assert (doc.read_text(encoding='utf-8') != _CITATIONS[citation]) == rewritten
 
 

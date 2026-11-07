@@ -307,7 +307,8 @@ def test_table_errors_name_the_file(
 )
 def test_duplicate_rows_collapse_only_when_identical(tmp_path, identical, outcome):
     with given(
-        t'two rows for one {pg["Term"].l}, with identical definitions: {identical}'
+        t'two rows for one {pg["Term"].l}, with '
+        t'{identical:identical definitions|different definitions}'
     ):
         second = 'First definition.' if identical else 'Second definition.'
         doc = (

@@ -105,7 +105,7 @@ def _piece_markdown(
         case CodeSpan() | EmphasisSpan():
             return _span_markdown(part, in_table_row, _literal_line)
         case NarrationPlaceholder():
-            return literal_markdown(placeholder_token(part))
+            return literal_markdown(one_line(placeholder_token(part)))
         case NarrationTermRef(display=display):
             return term_ref(literal_markdown(one_line(display)))
 

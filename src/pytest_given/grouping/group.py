@@ -17,7 +17,7 @@ from ..model import (
     node_base,
     rolled_up_status,
 )
-from .checks import check_rebound_params, check_same_template
+from .checks import check_phrase_values, check_rebound_params, check_same_template
 from .columns import ColumnBuilder, narrated_column_order, param_cell_formats
 from .context import build_group
 from .percase import per_case_scenarios
@@ -65,6 +65,7 @@ def _grouped_scenario(cases: list[Scenario], param_info: ParamInfo) -> Scenario:
     group = build_group(cases, param_info)
     check_same_template(group)
     check_rebound_params(group)
+    check_phrase_values(group)
     anchor, baseline = group.anchor, group.baseline
     # The scenario title is scanned alongside the steps — a `Template` title's
     # spec is a slot's spec, and often the only one in play.

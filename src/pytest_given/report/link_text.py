@@ -36,6 +36,6 @@ def _piece_html(piece: NarrationPiece) -> str:
         case NarrationValue(rendered=text) | NarrationTermRef(display=text):
             return render_span(PlainSpan(text=one_line(text)))
         case NarrationPlaceholder():
-            return render_span(PlainSpan(text=placeholder_token(piece)))
+            return render_span(PlainSpan(text=one_line(placeholder_token(piece))))
         case _:
             return one_line(render_span(piece))

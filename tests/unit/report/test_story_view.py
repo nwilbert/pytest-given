@@ -229,7 +229,7 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
         story = Story(id=StoryId('book'), title='Book', sentences=(only,))
     with given(
         t'a {pg["Scenario"].l} whose {pg["Step"].l} narrates that {pg["Term"].l}, '
-        t'{pg["Pin"]("pinning")} the {pg["Sentence"].l}: {pinned}'
+        t'and {pinned:carries a|carries no} {pg["Pin"].l} for the {pg["Sentence"].l}'
     ):
         scenario_ = Scenario(
             id=NodeId('test::a'),
@@ -258,7 +258,7 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
     with when('the story rollups are built'):
         coverage = build_story_rollups(rd, build_coverage_map(rd))
         sentence_coverage = coverage[StoryId('book')].per_sentence[SentenceId(1)]
-    with then(t'it reads as untracked: {untracked}'):
+    with then(t'it {untracked:reads as untracked|stays tracked}'):
         assert sentence_coverage.untracked == untracked
 
 

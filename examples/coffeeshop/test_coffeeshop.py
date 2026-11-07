@@ -83,7 +83,7 @@ def test_generator_fixture(db):
 def test_pricing(machine, euros, expect):
     with when(t'I insert ${euros}'):
         purchase_allowed = euros >= machine['price']
-    with then(t'the purchase is allowed: {expect}'):
+    with then(t'the purchase {expect:is allowed|is refused}'):
         assert purchase_allowed == expect
 
 

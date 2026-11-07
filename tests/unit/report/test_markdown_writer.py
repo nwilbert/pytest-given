@@ -11,6 +11,7 @@ from pytest_given.model import (
     NarrationTermRef,
     NarrationValue,
     TermId,
+    narration_of,
     param_id,
 )
 from pytest_given.report.html_renderer import _make_narration_filter
@@ -143,6 +144,32 @@ def test_a_narration_writes_values_placeholders_and_term_refs_literally() -> Non
     )
     written = narration_markdown(narration, term_ref=lambda display: f'«{display}»')
     assert written == 'a \\*b\\* {c} «d\\_»'
+
+
+def test_a_phrased_placeholder_writes_both_phrases_with_no_escape() -> None:
+    narration = narration_of(
+        (
+            NarrationPlaceholder(
+                name='pinned',
+                column_id=param_id('pinned'),
+                format_spec='pins it|does not pin it',
+            ),
+        )
+    )
+    assert narration_markdown(narration) == '{pins it / does not pin it}'
+
+
+def test_a_line_break_in_a_phrase_stays_on_one_line() -> None:
+    narration = narration_of(
+        (
+            NarrationPlaceholder(
+                name='pinned',
+                column_id=param_id('pinned'),
+                format_spec='pins\nit|does not',
+            ),
+        )
+    )
+    assert narration_markdown(narration) == '{pins it / does not}'
 
 
 def test_a_marker_at_a_literal_s_edge_flanks_by_the_part_beside_it() -> None:

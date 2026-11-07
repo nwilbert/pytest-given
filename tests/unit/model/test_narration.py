@@ -1,5 +1,6 @@
 """The pure rules over `Narration` parts."""
 
+from datetime import UTC, datetime
 from typing import Any, cast
 
 import pytest
@@ -11,8 +12,12 @@ from pytest_given.model import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    PytestGivenError,
     TermId,
+    boolean_phrases,
     narration_text,
+    placeholder_token,
+    render_interpolation,
     spanned_part,
 )
 
@@ -118,3 +123,98 @@ def test_spanned_part_finds_none_when_every_span_stays_in_its_text(
     parts: list[NarrationPart],
 ) -> None:
     assert spanned_part(parts) is None
+
+
+@pytest.mark.parametrize(
+    ('format_spec', 'phrases'),
+    [
+        ('pins it|does not pin it', ('pins it', 'does not pin it')),
+        ('a | b', ('a', 'b')),
+        ('', None),
+        ('.2f', None),
+        ('|>5', None),
+        ('a|', None),
+        ('a|b|c', None),
+        (' |b', None),
+        ('a| ', None),
+    ],
+)
+def test_boolean_phrases_reads_a_phrase_spec(
+    format_spec: str, phrases: tuple[str, str] | None
+) -> None:
+    assert boolean_phrases(format_spec) == phrases
+
+
+@pytest.mark.parametrize('format_spec', ['a|a', 'a | a'])
+def test_boolean_phrases_refuses_identical_phrases(format_spec: str) -> None:
+    with pytest.raises(PytestGivenError) as excinfo:
+        boolean_phrases(format_spec)
+    assert format_spec in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    ('value', 'format_spec', 'rendered'),
+    [
+        (True, 'a|b', 'a'),
+        (False, 'a|b', 'b'),
+        (True, 'a | b', 'a'),
+        (False, 'a | b', 'b'),
+        (True, '|>5', '||||1'),
+        (1.5, '.2f', '1.50'),
+    ],
+)
+def test_render_interpolation_words_a_boolean_and_formats_the_rest(
+    value: object, format_spec: str, rendered: str
+) -> None:
+    assert render_interpolation(value, None, format_spec) == rendered
+
+
+@pytest.mark.parametrize('format_spec', ['a|', 'a|b|c'])
+def test_render_interpolation_leaves_a_broken_spec_to_format(format_spec: str) -> None:
+    with pytest.raises(ValueError, match='Invalid format specifier') as excinfo:
+        render_interpolation(True, None, format_spec)
+    assert format_spec in str(excinfo.value)
+
+
+def test_render_interpolation_refuses_identical_phrases() -> None:
+    with pytest.raises(PytestGivenError, match=r'a\|a'):
+        render_interpolation(True, None, 'a|a')
+
+
+@pytest.mark.parametrize(
+    ('value', 'conversion', 'format_spec', 'type_name'),
+    [
+        (1, None, 'a|b', 'int'),
+        (None, None, 'a|b', 'NoneType'),
+        ('x', None, 'a|b', 'str'),
+        (True, 'r', 'a|b', 'bool'),
+        (datetime(2026, 1, 1, 14, 30, tzinfo=UTC), None, '%H|%M', 'datetime'),
+    ],
+)
+def test_render_interpolation_refuses_a_phrase_spec_on_anything_but_a_bare_boolean(
+    value: object, conversion: str | None, format_spec: str, type_name: str
+) -> None:
+    with pytest.raises(PytestGivenError) as excinfo:
+        render_interpolation(value, conversion, format_spec)
+    assert format_spec in str(excinfo.value)
+    assert type_name in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    ('format_spec', 'token'),
+    [
+        ('', '{pinned}'),
+        ('.2f', '{pinned}'),
+        ('|>5', '{pinned}'),
+        ('pins it|does not pin it', '{pins it / does not pin it}'),
+        ('a | b', '{a / b}'),
+    ],
+)
+def test_placeholder_token_shows_both_phrases_of_a_phrase_spec(
+    format_spec: str, token: str
+) -> None:
+    part = NarrationPlaceholder(
+        name='pinned', column_id=ColumnId('pinned'), format_spec=format_spec
+    )
+    assert placeholder_token(part) == token
+    assert narration_text([part]) == token

@@ -3970,7 +3970,7 @@ def test_a_report_or_lint_under_xdist_fails_before_the_suite_runs(
         result = pytester.runpytest('-n', str(workers), option)
     with then(t'it exits {exit_code}'):
         assert result.ret == exit_code
-    with then(t'the suite ran: {ran}'):
+    with then(t'the suite {ran:runs|does not run}'):
         assert ('passed' in result.stdout.str()) == ran
 
 
@@ -4264,3 +4264,156 @@ def test_a_scenario_only_run_writes_the_same_report(
     full = normalized(full_path)
     assert full['coverage'][0]['scenario_ids']
     assert normalized(selected_path) == full
+
+
+# --- Boolean phrases ---
+
+
+@scenario(
+    t'{pg["Boolean phrase"].s} word a Boolean in the {pg["Step"].l}, and the '
+    t'{pg["Parameter table"].l} keeps the Boolean',
+    tags=['spec/boolean-phrases'],
+)
+def test_a_boolean_column_reads_as_phrases_in_the_step(pytester, tmp_path):
+    with given(t'a {pg["Parametrized scenario"].l} narrating a Boolean with phrases'):
+        suite = """
+            import pytest
+            from pytest_given import given, scenario
+
+            @scenario('Pinning')
+            @pytest.mark.parametrize('pinned', [False, True])
+            def test_pin(pinned):
+                with given(t'a step that {pinned:pins it|does not pin it}'):
+                    assert pinned in (False, True)
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        md_path = tmp_path / 'report.md'
+    with when('the suite runs with --given-md'):
+        result = pytester.runpytest(f'--given-md={md_path}')
+        written = md_path.read_text(encoding='utf-8')
+        attach('report', written)
+    with then(t'both {pg["Case"].l.s} pass'):
+        result.assert_outcomes(passed=2)
+    with then(t'the {pg["Step"].l} shows both phrases'):
+        assert '- **given** a step that {pins it / does not pin it}' in written
+    with then(t'the {pg["Parameter table"].l} shows the Booleans'):
+        assert '| pinned |' in written
+        assert '| False |' in written
+        assert '| True |' in written
+        assert '| pins it |' not in written
+
+
+@scenario(
+    t'A {pg["Boolean phrase"].l} over a value that is not a Boolean fails that '
+    t'{pg["Case"].l}, and the {pg["Report"].l} is still written',
+    tags=['spec/boolean-phrases', 'validation'],
+)
+def test_a_phrase_spec_on_a_non_boolean_value_fails_the_case(pytester, tmp_path):
+    with given(
+        t'a t-string {pg["Step"].l} with phrases, and a {pg["Case"].l} of `None`'
+    ):
+        suite = """
+            import pytest
+            from pytest_given import given, scenario
+
+            @scenario('Pinning')
+            @pytest.mark.parametrize('pinned', [True, None])
+            def test_pin(pinned):
+                with given(t'a step that {pinned:pins it|does not pin it}'):
+                    assert pinned in (True, None)
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        md_path = tmp_path / 'report.md'
+    with when('the suite runs with --given-md'):
+        result = pytester.runpytest(f'--given-md={md_path}')
+    with then(t'that {pg["Case"].l} fails and the other passes'):
+        result.assert_outcomes(passed=1, failed=1)
+    with then('the failure names the spec and the type of the value'):
+        output = result.stdout.str()
+        assert "phrase spec 'pins it|does not pin it'" in output
+        assert 'NoneType' in output
+    with then(t'the {pg["Report"].l} is written, with the value in that row'):
+        assert '| None |' in md_path.read_text(encoding='utf-8')
+
+
+def test_a_non_boolean_row_that_skips_before_narrating_leaves_the_report_written(
+    pytester, tmp_path
+):
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import given, scenario
+
+        @scenario('Pinning')
+        @pytest.mark.parametrize('pinned', [True, None])
+        def test_pin(pinned):
+            if pinned is None:
+                pytest.skip('not applicable')
+            with given(t'a step that {pinned:pins it|does not pin it}'):
+                assert pinned
+        """
+    )
+    md_path = tmp_path / 'report.md'
+    result = pytester.runpytest(f'--given-md={md_path}')
+    result.assert_outcomes(passed=1, skipped=1)
+    assert '| None |' in md_path.read_text(encoding='utf-8')
+
+
+@scenario(
+    t'A `Template` {pg["Boolean phrase"].l} over a value that is not a Boolean fails '
+    t'the run',
+    tags=['spec/boolean-phrases', 'validation'],
+)
+def test_a_template_phrase_spec_on_a_non_boolean_value_fails_the_run(
+    pytester, tmp_path
+):
+    with given(
+        t'a `Template` {pg["Scenario title"].l} with phrases, over a passing `None`'
+    ):
+        suite = """
+            import pytest
+            from pytest_given import Template, given, scenario
+
+            @scenario(Template('A step that {pinned:pins it|does not pin it}'))
+            @pytest.mark.parametrize('pinned', [True, None])
+            def test_pin(pinned):
+                with given('a step'):
+                    assert pinned in (True, None)
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
+        md_path = tmp_path / 'report.md'
+    with when('the suite runs with --given-md'):
+        result = pytester.runpytest(f'--given-md={md_path}')
+    with then('the run names the slot, the test and the type of the value'):
+        output = result.stdout.str()
+        assert '{pinned:pins it|does not pin it}' in output
+        assert "'test_pin'" in output
+        assert 'binds it to NoneType' in output
+    with then(t'no {pg["Report"].l} is written'):
+        assert 'report not written' in output
+        assert not md_path.exists()
+
+
+def test_phrased_columns_keep_their_generated_case_ids(pytester, tmp_path):
+    result, scenario_json = _run_one_scenario(
+        pytester,
+        tmp_path,
+        """
+        @scenario('Pinning')
+        @pytest.mark.parametrize(('pinned', 'tracked'), [(False, True), (True, False)])
+        def test_pin(pinned, tracked):
+            with given(t'a step that {pinned:pins it|does not pin it}'):
+                assert pinned != tracked
+            with given(t'it {tracked:stays tracked|is untracked}'):
+                assert pinned != tracked
+        """,
+    )
+    result.assert_outcomes(passed=2)
+    cases = scenario_json['parameters']['cases']
+    assert [case['id'].rpartition('::')[2] for case in cases] == [
+        'test_pin[False-True]',
+        'test_pin[True-False]',
+    ]

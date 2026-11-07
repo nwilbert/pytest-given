@@ -1,4 +1,4 @@
-"""The six authoring forms that would make a grouped tree lie about its cases,
+"""The seven authoring forms that would make a grouped tree lie about its cases,
 and how two cases' trees are compared to find them.
 
 Each raises `PytestGivenError` rather than reporting a finding the way lint
@@ -31,9 +31,12 @@ from ..model import (
     Scenario,
     Step,
     StepPath,
+    boolean_phrases,
     case_suffix,
+    iter_narrations,
     location_suffix,
     node_base,
+    phrase_value_mismatch,
     render_interpolation,
 )
 from .columns import Format
@@ -188,11 +191,12 @@ def check_promotable_expression(
     fix = 'bind it to a local and narrate that'
     if phase == 'then':
         fix = f'parametrize an expected outcome as its own column; otherwise {fix}'
+    slot_format = _written_format(part.conversion, part.format_spec)
     raise _grouping_error(
         group,
         f'{part.expression!r} in {_test_name(group.anchor)!r} varies across '
         f'parametrize cases — {fix}: '
-        f'value = {part.expression}; {phase}(t"… {{value}} …").',
+        f'value = {part.expression}; {phase}(t"… {{value{slot_format}}} …").',
     )
 
 
@@ -226,7 +230,7 @@ def _check_case_params(scenario: Scenario, group: Group) -> None:
                 reformatted = _reformat(params[part.expression], part)
             except Exception:  # noqa: BLE001 — see _reformat's contract
                 # A value whose own `__format__`/`__str__` raises something
-                # other than the two errors `_reformat` handles is broken, not
+                # other than the errors `_reformat` handles is broken, not
                 # evidence of a rebinding. Skipping is the only safe reading:
                 # raising here would abort every sink in the session.
                 continue
@@ -253,8 +257,59 @@ def _reformat(value: RawParamValue, part: NarrationValue) -> str | None:
     to the caller, which skips the check rather than reading it as evidence."""
     try:
         return render_interpolation(value, part.conversion, part.format_spec)
-    except ValueError, TypeError:
+    except ValueError, TypeError, PytestGivenError:
         return None
+
+
+def check_phrase_values(group: Group) -> None:
+    """Rule 7: a `Template` slot with a phrase spec over anything but a bare
+    `bool`.
+
+    A `Template` in a title or an `Annotated` label renders nothing while the
+    test runs, so its value and its spec first meet here. Passed cases only: a
+    row that did not pass keeps its plain value and costs nobody the report.
+
+    Rule 6 has pinned the comparable cases to the baseline's template, so the
+    baseline's slots are every case's.
+    """
+    slots = _phrase_slots(group.baseline)
+    for case in group.comparable:
+        for slot in slots:
+            _check_phrase_value(slot, case, group.case_params[case.id])
+
+
+def check_case_phrase_values(case: Scenario, params: dict[str, RawParamValue]) -> None:
+    """Rule 7 for one case. The per-case path holds every case to it, since each
+    one's title and labels have to render."""
+    for slot in _phrase_slots(case):
+        _check_phrase_value(slot, case, params)
+
+
+def _phrase_slots(case: Scenario) -> list[NarrationPlaceholder]:
+    return [
+        part
+        for narration in iter_narrations(case)
+        for part in narration.parts
+        if isinstance(part, NarrationPlaceholder)
+        and boolean_phrases(part.format_spec) is not None
+    ]
+
+
+def _check_phrase_value(
+    part: NarrationPlaceholder, case: Scenario, params: dict[str, RawParamValue]
+) -> None:
+    if part.name not in params:
+        return
+    got = phrase_value_mismatch(params[part.name], part.conversion)
+    if got is None:
+        return
+    raise PytestGivenError(
+        f'{{{part.name}{_written_format(part.conversion, part.format_spec)}}} in '
+        f'{_test_name(case)!r} is a phrase spec, which words a Boolean, so '
+        f'it takes a bool and no conversion, but case {case_suffix(case.id)} binds '
+        f'it to {got}. Parametrize a Boolean, or drop the phrase spec and let the '
+        f'column hold the value.{location_suffix(case.source)}'
+    )
 
 
 def check_attachment_labels(
@@ -431,7 +486,11 @@ def detail_text(key: PartKey) -> str:
     if key.detail is None:
         return 'no formatting'
     conversion, format_spec = key.detail
+    return _written_format(conversion, format_spec) or 'no formatting'
+
+
+def _written_format(conversion: str | None, format_spec: str) -> str:
     return (
         f'{"!" + conversion if conversion else ""}'
         f'{":" + format_spec if format_spec else ""}'
-    ) or 'no formatting'
+    )
