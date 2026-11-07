@@ -17,6 +17,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - The HTML report is visually tidied: scrolled content now stops short of the tab rule, a step's attachments no longer crowd the step below, and a scenario's source link shares its last step's line when there is room.
 - The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills hold glossary terms and definitions to concepts instead of implementation details.
+- The bundled `pytest-given-authoring` and `pytest-given-reviewing` skills move a trivial control row out of a parameter table when it complicates the narration.
 
 ### Fixed
 
