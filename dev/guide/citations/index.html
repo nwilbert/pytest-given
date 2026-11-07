@@ -785,6 +785,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#defining-citations" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Defining citations
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#updating-citations" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -1159,8 +1170,8 @@
 
 
 <h1 id="citations">Citations<a class="headerlink" href="#citations" title="Permanent link">&para;</a></h1>
-<p>A design spec, a README or any other Markdown document can link to a scenario, a tag or a story in the HTML report. pytest-given checks these links against the JSON report of a test run, so they keep pointing at something that exists, and keeps their text in line with what that run found.</p>
-<p>Such a link is a <strong>citation</strong> when it starts with a status glyph. pytest-given owns everything in it — the glyph, the link text and, for a tag or story, a summary of its scenarios — and <code>pytest-given citations update</code> keeps all of it current.</p>
+<p>A design spec, a README or any other Markdown document can link to a scenario, a tag, a story or a glossary term in the HTML report. pytest-given checks these links against the JSON report of a test run, so they keep pointing at something that exists, and keeps their text in line with what that run found.</p>
+<p>Such a link is a <strong>citation</strong> when it starts with a status glyph. pytest-given owns everything in it — the glyph, the link text and, for a tag, story or term, a summary of its scenarios — and <code>pytest-given citations update</code> keeps all of it current.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>✅ [<span class="nt">A renamed test keeps its citation</span>](<span class="na">https://example.org/report.html#scenario=tests/test_x.py::test_y</span>)
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>🔵 [<span class="nt">Cancel a Booking</span>](<span class="na">https://example.org/report.html#view=stories&amp;story=cancel-a-booking</span>) (3 ✅ · 1 🔵)
 </code></pre></div>
@@ -1168,6 +1179,7 @@
 <ul>
 <li>🔵 <a href="../../examples/hotel-booking.html#view=stories&amp;story=cancel-a-booking">Cancel a Booking</a> (2 ✅ · 1 🔵)</li>
 <li>✅ <a href="../../examples/self-report.html#tag=spec/citations">spec/citations</a> (10 ✅)</li>
+<li>✅ <a href="../../examples/self-report.html#view=glossary&amp;term=defining-citation">Defining citation</a> (3 ✅)</li>
 </ul>
 <p>A <a href="#narrated-citations">narrated citation</a> also folds in its scenario's narration:</p>
 <details>
@@ -1203,6 +1215,11 @@
 <li><strong>then</strong> no finding remains</li>
 </ul>
 </details>
+<p>A <a href="#defining-citations">defining citation</a> folds in a term's definition:</p>
+<details>
+<summary>✅ <a href="../../examples/self-report.html#view=glossary&amp;term=defining-citation">Defining citation</a> (3 ✅)</summary>
+<p>A <em>Citation</em> of a term written as a collapsible block, the citation as its summary and the term's definition as its body.</p>
+</details>
 <h2 id="how-it-fits-together">How it fits together<a class="headerlink" href="#how-it-fits-together" title="Permanent link">&para;</a></h2>
 <p>Citations link to the HTML report you publish, but the <code>pytest-given citations</code> commands read a JSON report and run no tests. So a citation is only right if the two reports match: write both from the same run.</p>
 <ol>
@@ -1223,7 +1240,7 @@
 </code></pre></div>
 </li>
 <li>
-<p><strong>Cite</strong> scenarios, tags and stories by <a href="#copying-from-the-report">copying a citation from the report</a>, or by <a href="#writing-it-by-hand">writing one by hand</a>.</p>
+<p><strong>Cite</strong> scenarios, tags, stories and terms by <a href="#copying-from-the-report">copying a citation from the report</a>, or by <a href="#writing-it-by-hand">writing one by hand</a>.</p>
 </li>
 <li>
 <p><strong>Update</strong> your documents after the report changes. Pass the Markdown files that cite the report, or directories to search for them — here everything under <code>docs/</code> and the project's <code>README.md</code>:</p>
@@ -1257,7 +1274,7 @@
 </tr>
 <tr>
 <td>🟠</td>
-<td>skipped — or, for a story, no scenario yet</td>
+<td>skipped — or, for a story or term, no scenario yet</td>
 </tr>
 <tr>
 <td>🔵</td>
@@ -1269,10 +1286,10 @@
 </tr>
 </tbody>
 </table>
-<p>A tag or story reads <code>❌</code> if any of its scenarios failed, else <code>🔵</code> if any is an expected failure, else <code>✅</code> if any passed, else <code>🟠</code>.</p>
-<p>Its summary counts its scenarios per status, as in <code>(5 ✅ · 2 🔵)</code>, or reads <code>(no scenarios)</code> for a story nothing covers yet. A tag counts the scenarios below it too, as its link opens them: <code>spec</code> counts those tagged <code>spec/citations</code>. A scenario citation has no summary.</p>
+<p>A tag, story or term reads <code>❌</code> if any of its scenarios failed, else <code>🔵</code> if any is an expected failure, else <code>✅</code> if any passed, else <code>🟠</code>.</p>
+<p>Its summary counts its scenarios per status, as in <code>(5 ✅ · 2 🔵)</code>, or reads <code>(no scenarios)</code> for a story nothing covers yet or a term no scenario uses. A tag counts the scenarios below it too, as its link opens them: <code>spec</code> counts those tagged <code>spec/citations</code>. A term counts the scenarios the Glossary view lists for it: those with a term ref to it in their title or steps. A term ref in a story's sentence does not count. A scenario citation has no summary.</p>
 <h2 id="adding-a-report-link">Adding a report link<a class="headerlink" href="#adding-a-report-link" title="Permanent link">&para;</a></h2>
-<p>pytest-given reads four kinds of link into the report:</p>
+<p>pytest-given reads five kinds of link into the report:</p>
 <table>
 <thead>
 <tr>
@@ -1290,16 +1307,22 @@
 <td><strong>Copy citation</strong> on its scenario card</td>
 </tr>
 <tr>
-<td>Tag or story citation</td>
+<td>Tag, story or term citation</td>
 <td><code>✅ [spec/citations](…#tag=spec/citations) (10 ✅)</code></td>
 <td>glyph, link text and summary</td>
-<td><strong>Copy citation</strong> on a story header or a Tags sidebar row</td>
+<td><strong>Copy citation</strong> on a story header, a Tags sidebar row or a Glossary term row</td>
 </tr>
 <tr>
 <td><a href="#narrated-citations">Narrated citation</a></td>
 <td>a <code>&lt;details&gt;</code> block around a scenario citation</td>
 <td>glyph, link text and narration</td>
 <td><strong>Copy narrated citation</strong> on its scenario card</td>
+</tr>
+<tr>
+<td><a href="#defining-citations">Defining citation</a></td>
+<td>a <code>&lt;details&gt;</code> block around a term citation</td>
+<td>glyph, link text, summary and definition</td>
+<td><strong>Copy defining citation</strong> on its Glossary term row</td>
 </tr>
 <tr>
 <td>Plain report link</td>
@@ -1312,7 +1335,7 @@
 <p>A citation states what the report found, so <code>pytest-given citations check</code> fails when it is out of date or its target fails. A plain report link states only that its target exists, so its text is yours and it can sit inside your own sentence. You can also <a href="#writing-it-by-hand">write any of them by hand</a>.</p>
 <h3 id="copying-from-the-report">Copying from the report<a class="headerlink" href="#copying-from-the-report" title="Permanent link">&para;</a></h3>
 <p>The report offers the citation entries in the table only when <code>given_report_url</code> is set, as in <a href="#how-it-fits-together">step 1</a> above. To set it for one run instead, pass <code>--given-report-url=URL</code>. The URL is also stored in the JSON report, so <code>pytest-given report</code> re-renders the entries from it, and the <code>pytest-given citations</code> commands know which links point at the report.</p>
-<p>The copy button on a scenario card, story header or Tags sidebar row opens a menu with these entries. A citation links to <code>given_report_url</code>, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. <strong>Copy link</strong> copies the address you opened the report at. Without the setting, it is all the copy button offers.</p>
+<p>The copy button on a scenario card, story header, Tags sidebar row or Glossary term row opens a menu with these entries. A citation links to <code>given_report_url</code>, not to the address you opened the report at, so you can copy it from a local report and still get a link to the published one. <strong>Copy link</strong> copies the address you opened the report at. Without the setting, it is all the copy button offers.</p>
 <h3 id="writing-it-by-hand">Writing it by hand<a class="headerlink" href="#writing-it-by-hand" title="Permanent link">&para;</a></h3>
 <p>Write <code>?</code> as the glyph, leave the link text empty, and let <code>pytest-given citations update</code> fill in the rest:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>? [](https://docs.example.org/report.html#scenario=tests/test_x.py::test_y)
@@ -1338,12 +1361,16 @@
 <td>Story</td>
 <td><code>#view=stories&amp;story=&lt;story id&gt;</code></td>
 </tr>
+<tr>
+<td>Term</td>
+<td><code>#view=glossary&amp;term=&lt;term id&gt;</code> or <code>#term=&lt;term id&gt;</code></td>
+</tr>
 </tbody>
 </table>
 <p>A plain report link takes the same URL, with no glyph and your own link text:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Rejecting [<span class="nt">divergent cases</span>](<span class="na">https://docs.example.org/report.html#scenario=tests/test_grouping.py::test_divergent_cases</span>) keeps the tree honest.
 </code></pre></div>
-<p>A link into the report can outlive what it names. When the report no longer has a scenario, tag, story or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.</p>
+<p>A link into the report can outlive what it names. When the report no longer has a scenario, tag, story, term or other filter a link selects, it warns that the link is out of date, names what is missing, and opens without it.</p>
 <h2 id="narrated-citations">Narrated citations<a class="headerlink" href="#narrated-citations" title="Permanent link">&para;</a></h2>
 <p>A scenario citation written as a <code>&lt;details&gt;</code> block carries the scenario's narration, folded under it. A reader sees what the scenario does where it is cited, and your pull request's diff shows the behavior change. A <strong>narrated citation</strong> looks like this:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>&lt;details markdown="1"&gt;
@@ -1359,29 +1386,44 @@
 <p>The body reads as the scenario's section of the <a href="../../markdown-report/">Markdown report</a>, minus its heading, its subtitle line (source anchor, tags, skip or xfail reason) and any error block. Nested steps indent by four spaces.</p>
 <p>To add one, choose <strong>Copy narrated citation</strong> in the report's copy menu on a scenario card, paste it into your document, and run <code>pytest-given citations update</code>, which fills the empty body. From then on <code>update</code> rewrites the body to match the report, and <code>pytest-given citations check</code> fails when it differs, or when the opening tag lacks <code>markdown="1"</code>, which <code>update</code> adds, keeping any other attributes such as <code>open</code>.</p>
 <p>On a Python-Markdown site (MkDocs, Zensical), enable <code>md_in_html</code> and keep the block at the top level of the page, not inside a list item. GitHub renders it anywhere.</p>
+<h2 id="defining-citations">Defining citations<a class="headerlink" href="#defining-citations" title="Permanent link">&para;</a></h2>
+<p>A term citation written as a <code>&lt;details&gt;</code> block carries the term's definition, folded under it. A reader sees what the document means by the term, in the report's wording, and your pull request's diff shows a changed definition. A <strong>defining citation</strong> looks like this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>&lt;details markdown="1"&gt;
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>&lt;summary&gt;🔵 &lt;a href="https://example.org/report.html#view=glossary&amp;term=guest"&gt;Guest&lt;/a&gt; (5 ✅ · 2 🔵)&lt;/summary&gt;
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Someone staying at the hotel.
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>&lt;/details&gt;
+</code></pre></div>
+<p>The block follows a <a href="#narrated-citations">narrated citation</a>'s rules, with the term's summary after <code>&lt;/a&gt;</code>, inside the <code>&lt;summary&gt;</code>.</p>
+<p>The body is the definition on one line, showing what the report's Glossary view shows. Its code and emphasis stay Markdown and everything else is escaped, so a link or an HTML tag in a definition stays literal text. A line break becomes <code>&lt;br&gt;</code>.</p>
+<p>To add one, choose <strong>Copy defining citation</strong> in the report's copy menu on a Glossary term row, paste it into your document, and run <code>pytest-given citations update</code>, which fills the empty body. From then on <code>update</code> rewrites the body to match the report, and <code>pytest-given citations check</code> fails when it differs.</p>
+<p>The body belongs to the citation, so write your own words outside the block. A term with no definition has no <strong>Copy defining citation</strong> entry. Its block's body stays empty, and <code>update</code> empties one that holds text. When the term leaves the report, the glyph becomes <code>❓</code>, the summary goes and the body stays.</p>
+<p>On a Python-Markdown site, a definition holding <code>&lt;</code>, <code>&amp;</code>, <code>~</code> or <code>$</code> shows the backslash that escapes it, and one holding <code>&lt;/details&gt;</code> ends the block early.</p>
 <h2 id="updating-citations">Updating citations<a class="headerlink" href="#updating-citations" title="Permanent link">&para;</a></h2>
 <p>Pass the documents or directories to update. The JSON report must come from <a href="#how-it-fits-together">the run that wrote your HTML report</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>update<span class="w"> </span>docs/<span class="w"> </span>README.md
 </code></pre></div>
 <p>It rewrites what the report now says:</p>
 <ul>
 <li>a citation's glyph, link text and summary;</li>
+<li>the body of a narrated or defining citation;</li>
 <li>the fragment of any report link that uses a scenario's slug or a <code>[case]</code>, to its node ID;</li>
 <li>the node ID of a renamed test, when exactly one scenario still has the citation's title.</li>
 </ul>
 <p>It can't fix everything. These stay as citation findings for you to resolve, and the command exits 1:</p>
 <ul>
-<li><strong>A target that is no longer in the report.</strong> The citation's glyph becomes <code>❓</code>, its URL and text stay, and it recovers on its own once the target is back.</li>
-<li><strong>A cited target that fails.</strong> The document claims something that doesn't hold right now: fix the code, or change what the document says.</li>
+<li><strong>A target that is no longer in the report.</strong> The citation's glyph becomes <code>❓</code>, its URL and text stay, and it recovers on its own once the target is back. A term's id comes from its name, so a renamed term is one of these: edit the link's fragment to its new id.</li>
+<li><strong>A cited target that fails.</strong> The document claims something that doesn't hold right now: fix the code, or change what the document says. A term citation fails when any scenario using the term fails.</li>
 <li><strong>A summary after a scenario citation</strong>, which takes none.</li>
 <li><strong>A tag or story written as a narrated citation</strong>, which has no single narration.</li>
 </ul>
 <p>The bundled <a href="../../ai-agents/#agent-skills"><code>pytest-given-citing</code> skill</a> walks an agent through these.</p>
 <h2 id="checking-in-ci">Checking in CI<a class="headerlink" href="#checking-in-ci" title="Permanent link">&para;</a></h2>
 <p><code>pytest-given citations check</code> takes the same arguments, writes nothing, and exits 1 on any citation finding, including what <code>pytest-given citations update</code> would rewrite:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pytest<span class="w"> </span>--given-json<span class="w"> </span>--given-html
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># then publish given-report/report.html at given_report_url</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pytest<span class="w"> </span>--given-json<span class="w"> </span>--given-html
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c1"># then publish given-report/report.html at given_report_url</span>
 </code></pre></div>
 <p>Make it a required CI check. A citation records the report as of its commit, and only a required check keeps the citations on your main branch current. When no document links the report, as with a mistyped <code>given_report_url</code>, the check exits 2 instead of passing. Publish the HTML report from the run the check read, so a reader who follows a citation finds what it says.</p>
 <p>If you commit the reports instead, write the JSON and HTML report together whenever you regenerate them, and let CI run only the check against the committed JSON. <a href="../../cli/#citations">Standalone CLI</a> lists the flags and exit codes.</p>
@@ -1391,32 +1433,33 @@
 <li><strong>Run pytest from the same rootdir.</strong> A node ID is relative to pytest's rootdir, so a run from another one breaks every scenario citation at once.</li>
 <li><strong>Use a plain report link for a scenario whose title contains a per-run value</strong>, such as a temporary path. Its citation's link text would be stale after every run, and so would a narrated citation's body when any step or attachment contains one.</li>
 <li><strong>Cite a tag that belongs to one piece of work</strong>, like <code>spec/&lt;slug&gt;</code>. A broad area tag's summary changes with every new scenario, so link it with a plain report link.</li>
+<li><strong>Use a plain report link for an everyday term.</strong> A term citation counts every scenario that mentions the term, so an everyday term's summary changes with most new scenarios, and a failure in any of them marks it <code>❌</code>.</li>
 <li><strong>Leave the glyph and link unformatted.</strong> In <code>**✅** […](…)</code> or <code>✅ *[…](…)*</code> pytest-given doesn't see a citation, only a plain report link, so the glyph is never updated.</li>
 <li><strong>On a versioned docs site, link the report relatively</strong>, as in <code>../examples/report.html#tag=…</code>, so each version of a page opens its own version's report. A copied citation links <code>given_report_url</code>, so replace its URL up to the <code>#</code> with the relative path. Pass <code>--report-path</code>, where your docs build puts the report, so the commands recognize these links and keep them relative.</li>
-<li><strong>Keep a Markdown formatter off narrated citations.</strong> Prettier pads table columns and a two-space list-indent rule reindents nested steps, so <code>check</code> then reports the body stale. Wrap each block in ignore comments:</li>
+<li><strong>Keep a Markdown formatter off narrated and defining citations.</strong> Prettier pads table columns and a two-space list-indent rule reindents nested steps, so <code>check</code> then reports the body stale. Wrap each block in ignore comments:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>&lt;!-- prettier-ignore-start --&gt;
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>&lt;details markdown="1"&gt;
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>&lt;summary&gt;…&lt;/summary&gt;
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>…
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>&lt;/details&gt;
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>&lt;!-- prettier-ignore-end --&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>&lt;!-- prettier-ignore-start --&gt;
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>&lt;details markdown="1"&gt;
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>&lt;summary&gt;…&lt;/summary&gt;
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>…
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>&lt;/details&gt;
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>&lt;!-- prettier-ignore-end --&gt;
 </code></pre></div>
 <h3 id="finding-the-citations-of-a-scenario">Finding the citations of a scenario<a class="headerlink" href="#finding-the-citations-of-a-scenario" title="Permanent link">&para;</a></h3>
 <p>To list the report links that may cite a scenario, pass its node ID to <code>--covering</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span>--covering<span class="w"> </span>tests/test_checkout.py::test_pay_by_card
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pytest-given<span class="w"> </span>citations<span class="w"> </span>check<span class="w"> </span>docs/<span class="w"> </span>README.md<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span>--covering<span class="w"> </span>tests/test_checkout.py::test_pay_by_card
 </code></pre></div>
 <p>It prints each link's file, line, glyph and target:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>docs/specs/checkout.md:3: ✅ tag spec/checkout
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>citations: every report link is current
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docs/specs/checkout.md:3: ✅ tag spec/checkout
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>docs/specs/checkout.md:41: ✅ scenario tests/test_checkout.py::test_pay_by_card
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>citations: every report link is current
 </code></pre></div>
-<p>The list includes links to a tag or story whose summary counts the scenario. It also includes every link the check can't resolve, as one may cite the scenario under an old node ID. Run <code>citations update</code> first to repoint a renamed test, and the list is exact once the check is clean.</p>
+<p>The list includes links to a tag, story or term whose summary counts the scenario. It also includes every link the check can't resolve, as one may cite the scenario under an old node ID. Run <code>citations update</code> first to repoint a renamed test, and the list is exact once the check is clean.</p>
 
 
 

@@ -2336,7 +2336,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Guest<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=guest" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Guest<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=guest" data-citation-kind="term" data-citation-key="guest" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A person making a room reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2400,7 +2400,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Room<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=room" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Room<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=room" data-citation-kind="term" data-citation-key="room" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2451,7 +2451,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="confirmation" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Confirmation<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=confirmation" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Confirmation<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=confirmation" data-citation-kind="term" data-citation-key="confirmation" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">A notification acknowledging a successful reservation.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2515,7 +2515,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="book" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">book<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=book" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">book<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=book" data-citation-kind="term" data-citation-key="book" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Reserve a room for a given stay.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2579,7 +2579,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="cancellation-policy" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Cancellation Policy<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=cancellation-policy" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Cancellation Policy<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=cancellation-policy" data-citation-kind="term" data-citation-key="cancellation-policy" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">The rules governing <strong>how</strong> and <strong>when</strong> a booking may be cancelled.<br>Applies to every <code>Room</code> rate.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2623,7 +2623,7 @@ span.param-highlight {
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="overbooking" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
             <span class="entry-name">
-              <span class="term-name">Overbooking<button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;term=overbooking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button></span>
+              <span class="term-name">Overbooking<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=overbooking" data-citation-kind="term" data-citation-key="overbooking" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
               <div class="entry-def">Accepting more reservations than there are rooms available.<span class="entry-def-badge" style="display:none">Undefined</span></div>
@@ -2666,16 +2666,18 @@ span.param-highlight {
 </div>
 
 
-<!-- The menu a scenario card's, story header's or tag row's copy button opens;
-     positioned by app.js beside the button that opened it. One shared node,
-     as the tooltip is: a menu per card would repeat its markup hundreds of
-     times. The narrated citation is a scenario's alone, and the untagged
-     row, which no citation covers, has only its link. -->
+<!-- The menu a scenario card's, story header's, tag row's or term row's copy
+     button opens; positioned by app.js beside the button that opened it. One
+     shared node, as the tooltip is: a menu per card would repeat its markup
+     hundreds of times. The narrated citation is a scenario's alone, the
+     defining citation a defined term's, and the untagged row, which no citation
+     covers, has only its link. -->
 <div id="copy-menu" class="copy-menu" role="menu" aria-label="Copy" hidden>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg>Copy link</button>
   <div class="copy-menu-separator" role="separator" data-copy-citations></div>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="citation" title="Copy Markdown citation. pytest-given citations check and update keep it current."><svg width="14" height="14" aria-hidden="true"><use href="#icon-citation"/></svg>Copy citation</button>
   <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="narrated" title="Copy a Markdown block for the scenario's narration, which pytest-given citations update fills in."><svg width="14" height="14" aria-hidden="true"><use href="#icon-narrated"/></svg>Copy narrated citation</button>
+  <button type="button" class="btn-reset copy-menu-item" role="menuitem" tabindex="-1" data-copy-entry="defining" title="Copy a Markdown block for the term's definition, which pytest-given citations update fills in."><svg width="14" height="14" aria-hidden="true"><use href="#icon-narrated"/></svg>Copy defining citation</button>
 </div>
 
 
@@ -2701,7 +2703,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-07T13:01:43.823312+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"report_url\":\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html\",\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705 [Book a Room](\",\"#view=stories&story=book-a-room) (2 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-07T13:01:43.823312+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a room reservation.\",\"definition_html\":\"A person making a room reservation.\"},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a room for a given stay.\",\"definition_html\":\"Reserve a room for a given stay.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\"},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing **how** and **when** a booking may be cancelled.<br>Applies to every `Room` rate.\",\"definition_html\":\"The rules governing <strong>how<\/strong> and <strong>when<\/strong> a booking may be cancelled.<br>Applies to every <code>Room<\/code> rate.\"},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are rooms available.\",\"definition_html\":\"Accepting more reservations than there are rooms available.\"}]},\"scenarios\":[{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"module\":\"test_file_glossary_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"book\",\"room\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"guest\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"book\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"file_glossary_booking/book_available_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"file_glossary_booking/book_unavailable_room\":\"examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705\",\"view=stories&story=book-a-room\",\"Book a Room\",\" (2 \\u2705)\"]},\"term\":{\"guest\":[\"\\u2705\",\"view=glossary&term=guest\",\"Guest\",\" (2 \\u2705)\"],\"book\":[\"\\u2705\",\"view=glossary&term=book\",\"book\",\" (2 \\u2705)\"],\"room\":[\"\\u2705\",\"view=glossary&term=room\",\"Room\",\" (2 \\u2705)\"],\"confirmation\":[\"\\u2705\",\"view=glossary&term=confirmation\",\"Confirmation\",\" (2 \\u2705)\"],\"cancellation-policy\":[\"\\u2705\",\"view=glossary&term=cancellation-policy\",\"Cancellation Policy\",\" (1 \\u2705)\"],\"overbooking\":[\"\\ud83d\\udfe0\",\"view=glossary&term=overbooking\",\"Overbooking\",\" (no scenarios)\"]}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -2758,8 +2760,8 @@ function lookup(map, key, fallback) {
 
 
 function fillCitation(template, row) {
-  const [glyph, fragment, title, htmlTitle = title] = row;
-  const slots = { glyph, fragment, title, html_title: htmlTitle };
+  const [glyph, fragment, title, summary = '', htmlTitle = title] = row;
+  const slots = { glyph, fragment, title, html_title: htmlTitle, summary };
   return template.map((part, position) => (position % 2 ? slots[part] : part)).join('');
 }
 
@@ -3459,15 +3461,9 @@ function reportApp() {
     },
 
 
-
-    copyCitation(kind, key, btn) {
+    copyCitation(kind, form, key, btn) {
       const citations = window.__REPORT_DATA__.citations;
-      const halves = lookup(citations[kind], key, null);
-      if (halves) this._copyAndFlash(halves[0] + citations.report_url + halves[1], btn);
-    },
-    _copyScenarioCitation(form, key, btn) {
-      const citations = window.__REPORT_DATA__.citations;
-      const row = lookup(citations.scenario, key, null);
+      const row = lookup(citations[kind], key, null);
       if (row) this._copyAndFlash(fillCitation(citations.templates[form], row), btn);
     },
 
@@ -3482,6 +3478,7 @@ function reportApp() {
       copyMenu.querySelector('[data-copy-citations]').hidden = !cited;
       copyMenu.querySelector('[data-copy-entry="citation"]').hidden = !cited;
       copyMenu.querySelector('[data-copy-entry="narrated"]').hidden = !cited || kind !== 'scenario';
+      copyMenu.querySelector('[data-copy-entry="defining"]').hidden = !cited || kind !== 'term' || !termsById.get(key)?.definition;
       copyMenu.hidden = false;
       copyMenuTrigger = trigger;
       trigger.setAttribute('aria-expanded', 'true');
@@ -3521,8 +3518,7 @@ function reportApp() {
       this._closeCopyMenu(true);
       const { citationKind: kind, citationKey: key } = trigger.dataset;
       if (entry === 'link') this.copyAnchor(trigger);
-      else if (kind === 'scenario') this._copyScenarioCitation(entry, key, trigger);
-      else this.copyCitation(kind, key, trigger);
+      else this.copyCitation(kind, entry, key, trigger);
     },
 
 
