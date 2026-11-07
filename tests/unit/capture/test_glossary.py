@@ -25,42 +25,46 @@ from pytest_given.model import GlossaryTerm, SourceLocation, TermId
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
-@scenario(
-    t"A {pg['Term'].l}'s ID is its name as a URL-safe slug, and a name that "
-    t'leaves no slug is refused',
-    tags=['validation'],
-)
+@scenario(t"A {pg['Term'].l}'s ID is its name as a URL-safe slug")
 @pytest.mark.parametrize(
-    ('text', 'refused', 'slug'),
+    ('text', 'slug'),
     [
-        ('Guest', False, 'guest'),
-        ('Order received', False, 'order-received'),
-        ('  Work Object  ', False, 'work-object'),
-        ('do_the_thing', False, 'do-the-thing'),
-        ('Buy / sell', False, 'buy-sell'),
-        ('Guest #1', False, 'guest-1'),
-        ('café', False, 'caf'),
-        ('booking system', False, 'booking-system'),
-        ('---', True, None),
-        ('   ', True, None),
-        ('', True, None),
-        ('###', True, None),
+        ('Guest', 'guest'),
+        ('Order received', 'order-received'),
+        ('  Work Object  ', 'work-object'),
+        ('do_the_thing', 'do-the-thing'),
+        ('Buy / sell', 'buy-sell'),
+        ('Guest #1', 'guest-1'),
+        ('café', 'caf'),
+        ('booking system', 'booking-system'),
     ],
 )
 def test_term_ids_are_derived_as_url_safe_slugs(
     text: Annotated[str, given(Template('the name {text}'))],
-    refused,
     slug,
 ):
     with when(t'it is slugified into a {pg["Term"].l} id'):
-        try:
-            derived, refusal = id_derive(text), ''
-        except PytestGivenError as error:
-            derived, refusal = None, str(error)
-    with then(t'a PytestGivenError reports the derived id is empty: {refused}'):
-        assert ('derived id is empty' in refusal) == refused
+        derived = id_derive(text)
     with then(t'the id is {slug!r}'):
         assert derived == slug
+
+
+@scenario(
+    t'A {pg["Term"].l} name that leaves no slug is refused',
+    tags=['validation'],
+)
+@pytest.mark.parametrize('text', ['---', '   ', '', '###'])
+def test_a_term_name_that_leaves_no_slug_is_refused(
+    text: Annotated[str, given(Template('the name {text}'))],
+):
+    with (
+        when_then(
+            t'it is slugified into a {pg["Term"].l} id',
+            'a PytestGivenError reports the derived id is empty',
+        ),
+        pytest.raises(PytestGivenError, match='derived id is empty'),
+    ):
+        id_derive(text)
 
 
 def _term(kind, name='X'):

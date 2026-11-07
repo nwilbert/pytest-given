@@ -61,39 +61,63 @@ def _infer_term(glossary, stories):
     return _kind(inferred, 'term'), ''
 
 
+def _stories_placing(term_id, slots):
+    return [
+        _story_placing(term_id, slot, f'S{index}') for index, slot in enumerate(slots)
+    ]
+
+
 @scenario(
     t'A {pg["Kindless"].l} {pg["Term"].l} takes its kind from the '
     t'{pg["Slot"].l.s} it fills',
-    tags=['diagnostics', 'validation'],
+    tags=['diagnostics'],
 )
 @pytest.mark.parametrize(
-    ('slots', 'conflict', 'kind'),
+    ('slots', 'kind'),
     [
-        ([], False, None),
-        (['actor'], False, 'actor'),
-        (['verb'], False, 'activity'),
-        (['noun'], False, 'object'),
-        (['actor', 'noun'], False, 'actor'),
-        (['verb', 'actor'], True, None),
-        (['verb', 'noun'], True, None),
+        ([], None),
+        (['actor'], 'actor'),
+        (['verb'], 'activity'),
+        (['noun'], 'object'),
+        (['actor', 'noun'], 'actor'),
     ],
 )
-def test_a_kindless_term_takes_its_kind_from_its_slots(slots, conflict, kind):
+def test_a_kindless_term_takes_its_kind_from_its_slots(slots, kind):
     with given(
         t'a {pg["Kindless"].l} {pg["Term"].l} filling the {slots} '
         t'{pg["Slot"].l.s}, one {pg["Story"].l} each'
     ):
         glossary = Glossary(terms=[_term('term')])
-        stories = [
-            _story_placing('term', slot, f'S{index}')
-            for index, slot in enumerate(slots)
-        ]
+        stories = _stories_placing('term', slots)
     with when(t'{pg["Kind inference"].l} runs over the {pg["Story"].l.s}'):
-        inferred_kind, refusal = _infer_term(glossary, stories)
-    with then(t'a conflict naming the {pg["Term"].l} is reported: {conflict}'):
-        assert ("term 'Term' is used in incompatible positions" in refusal) == conflict
+        inferred = infer_glossary_kinds(glossary, stories)
     with then(t'the inferred kind is {kind}'):
-        assert inferred_kind == kind
+        assert _kind(inferred, 'term') == kind
+
+
+@scenario(
+    t'A {pg["Kindless"].l} {pg["Term"].l} filling incompatible '
+    t'{pg["Slot"].l.s} is refused',
+    tags=['diagnostics', 'validation'],
+)
+@pytest.mark.parametrize('slots', [['verb', 'actor'], ['verb', 'noun']])
+def test_a_kindless_term_in_incompatible_slots_is_refused(slots):
+    with given(
+        t'a {pg["Kindless"].l} {pg["Term"].l} filling the {slots} '
+        t'{pg["Slot"].l.s}, one {pg["Story"].l} each'
+    ):
+        glossary = Glossary(terms=[_term('term')])
+        stories = _stories_placing('term', slots)
+    with (
+        when_then(
+            t'{pg["Kind inference"].l} runs over the {pg["Story"].l.s}',
+            t'a PytestGivenError names the {pg["Term"].l} and the conflict',
+        ),
+        pytest.raises(
+            PytestGivenError, match="term 'Term' is used in incompatible positions"
+        ),
+    ):
+        infer_glossary_kinds(glossary, stories)
 
 
 @scenario(

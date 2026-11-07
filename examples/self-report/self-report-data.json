@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-07T11:24:18.225397+00:00",
+    "timestamp": "2026-11-07T11:34:50.322372+00:00",
     "pytest_version": "9.1.1",
     "plugin_version": "0.5.1",
-    "commit_sha": "6864fc6b2cb275144113da3c5c51f8558de06229",
+    "commit_sha": "13d4b764c8f4f9b00fd3a1ec410919813adba051",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 124,
+      "duration_ms": 120,
       "steps": [
         {
           "phase": "given",
@@ -558,7 +558,7 @@
       "module": "tests.integration.test_cli_citations",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -1006,7 +1006,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -1184,7 +1184,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 104,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -1277,7 +1277,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 64,
       "steps": [
         {
           "phase": "given",
@@ -1359,7 +1359,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -1468,7 +1468,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -1597,7 +1597,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 551,
+      "duration_ms": 549,
       "steps": [
         {
           "phase": "given",
@@ -1725,7 +1725,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -1912,7 +1912,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 92,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -2098,7 +2098,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -2165,7 +2165,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -2275,7 +2275,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 22,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -2487,7 +2487,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -2607,7 +2607,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 49,
       "steps": [
         {
           "phase": "given",
@@ -2742,7 +2742,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 95,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -2870,7 +2870,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -2997,7 +2997,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 51,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -3114,7 +3114,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 164,
+      "duration_ms": 162,
       "steps": [
         {
           "phase": "given",
@@ -3187,7 +3187,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -3359,7 +3359,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -3498,7 +3498,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -3643,7 +3643,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -3796,7 +3796,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 52,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -3941,7 +3941,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -4088,7 +4088,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 167,
+      "duration_ms": 148,
       "steps": [
         {
           "phase": "given",
@@ -4259,7 +4259,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -4389,7 +4389,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 99,
+      "duration_ms": 103,
       "steps": [
         {
           "phase": "given",
@@ -4518,7 +4518,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 110,
+      "duration_ms": 104,
       "steps": [
         {
           "phase": "given",
@@ -4780,7 +4780,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -4859,7 +4859,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 224,
+      "duration_ms": 229,
       "steps": [
         {
           "phase": "given",
@@ -5041,7 +5041,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -5131,7 +5131,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -5223,7 +5223,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 84,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -5305,7 +5305,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -5397,7 +5397,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 27,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -5482,7 +5482,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 50,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -5589,7 +5589,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 165,
+      "duration_ms": 156,
       "steps": [
         {
           "phase": "given",
@@ -5696,7 +5696,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 606,
+      "duration_ms": 559,
       "steps": [
         {
           "phase": "given",
@@ -5887,7 +5887,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 415,
+      "duration_ms": 369,
       "steps": [
         {
           "phase": "given",
@@ -5968,7 +5968,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -6082,7 +6082,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 49,
+      "duration_ms": 47,
       "steps": [
         {
           "phase": "given",
@@ -6235,7 +6235,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -6311,7 +6311,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -6460,7 +6460,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 426,
+      "duration_ms": 378,
       "steps": [
         {
           "phase": "given",
@@ -6721,7 +6721,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 33,
       "steps": [
         {
           "phase": "given",
@@ -6828,7 +6828,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -6948,7 +6948,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 26,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -7078,7 +7078,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 106,
+      "duration_ms": 113,
       "steps": [
         {
           "phase": "given",
@@ -7308,7 +7308,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 50,
       "steps": [
         {
           "phase": "given",
@@ -7420,7 +7420,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -7516,7 +7516,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 88,
+      "duration_ms": 87,
       "steps": [
         {
           "phase": "given",
@@ -7583,7 +7583,7 @@
       "module": "tests.integration.test_skills_cli",
       "tags": [],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -9083,7 +9083,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -9186,7 +9186,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -9398,7 +9398,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10603,7 +10603,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10804,9 +10804,9 @@
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest-False-guest]",
+      "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest-guest]",
       "narration": {
-        "text": "A term's ID is its name as a URL-safe slug, and a name that leaves no slug is refused",
+        "text": "A term's ID is its name as a URL-safe slug",
         "parts": [
           {
             "value": "A "
@@ -10817,7 +10817,202 @@
             "expression": "pg['Term'].l"
           },
           {
-            "value": "'s ID is its name as a URL-safe slug, and a name that leaves no slug is refused"
+            "value": "'s ID is its name as a URL-safe slug"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "the name {text}",
+            "parts": [
+              {
+                "value": "the name "
+              },
+              {
+                "name": "text",
+                "column_id": "text",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it is slugified into a term id",
+            "parts": [
+              {
+                "value": "it is slugified into a "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " id"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the id is {slug}",
+            "parts": [
+              {
+                "value": "the id is "
+              },
+              {
+                "name": "slug",
+                "column_id": "slug",
+                "format_spec": "",
+                "conversion": "r"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "text",
+            "name": "text",
+            "kind": "param"
+          },
+          {
+            "id": "slug",
+            "name": "slug",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest-guest]",
+            "values": [
+              "Guest",
+              "'guest'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Order received-order-received]",
+            "values": [
+              "Order received",
+              "'order-received'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[  Work Object  -work-object]",
+            "values": [
+              "  Work Object  ",
+              "'work-object'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[do_the_thing-do-the-thing]",
+            "values": [
+              "do_the_thing",
+              "'do-the-thing'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Buy / sell-buy-sell]",
+            "values": [
+              "Buy / sell",
+              "'buy-sell'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest #1-guest-1]",
+            "values": [
+              "Guest #1",
+              "'guest-1'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[caf\\xe9-caf]",
+            "values": [
+              "caf\u00e9",
+              "'caf'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[booking system-booking-system]",
+            "values": [
+              "booking system",
+              "'booking-system'"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_glossary.py",
+        "line": 28
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused[---]",
+      "narration": {
+        "text": "A term name that leaves no slug is refused",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " name that leaves no slug is refused"
           }
         ]
       },
@@ -10875,39 +11070,8 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a PytestGivenError reports the derived id is empty: {refused}",
-            "parts": [
-              {
-                "value": "a PytestGivenError reports the derived id is empty: "
-              },
-              {
-                "name": "refused",
-                "column_id": "refused",
-                "format_spec": "",
-                "conversion": null
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the id is {slug}",
-            "parts": [
-              {
-                "value": "the id is "
-              },
-              {
-                "name": "slug",
-                "column_id": "slug",
-                "format_spec": "",
-                "conversion": "r"
-              }
-            ]
+            "text": "a PytestGivenError reports the derived id is empty",
+            "parts": []
           },
           "children": [],
           "attachments": [],
@@ -10921,146 +11085,40 @@
             "id": "text",
             "name": "text",
             "kind": "param"
-          },
-          {
-            "id": "refused",
-            "name": "refused",
-            "kind": "param"
-          },
-          {
-            "id": "slug",
-            "name": "slug",
-            "kind": "param"
           }
         ],
         "cases": [
           {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest-False-guest]",
+            "id": "tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused[---]",
             "values": [
-              "Guest",
-              false,
-              "'guest'"
+              "---"
             ],
             "status": "passed",
             "error": null,
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Order received-False-order-received]",
+            "id": "tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused[   ]",
             "values": [
-              "Order received",
-              false,
-              "'order-received'"
+              "   "
             ],
             "status": "passed",
             "error": null,
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[  Work Object  -False-work-object]",
+            "id": "tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused[]",
             "values": [
-              "  Work Object  ",
-              false,
-              "'work-object'"
+              ""
             ],
             "status": "passed",
             "error": null,
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[do_the_thing-False-do-the-thing]",
+            "id": "tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused[###]",
             "values": [
-              "do_the_thing",
-              false,
-              "'do-the-thing'"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Buy / sell-False-buy-sell]",
-            "values": [
-              "Buy / sell",
-              false,
-              "'buy-sell'"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[Guest #1-False-guest-1]",
-            "values": [
-              "Guest #1",
-              false,
-              "'guest-1'"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[caf\\xe9-False-caf]",
-            "values": [
-              "caf\u00e9",
-              false,
-              "'caf'"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[booking system-False-booking-system]",
-            "values": [
-              "booking system",
-              false,
-              "'booking-system'"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[----True-None]",
-            "values": [
-              "---",
-              true,
-              "None"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[   -True-None]",
-            "values": [
-              "   ",
-              true,
-              "None"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[-True-None]",
-            "values": [
-              "",
-              true,
-              "None"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs[###-True-None]",
-            "values": [
-              "###",
-              true,
-              "None"
+              "###"
             ],
             "status": "passed",
             "error": null,
@@ -11073,7 +11131,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 28
+        "line": 52
       },
       "story_ids": [],
       "pins": null
@@ -11182,7 +11240,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 96
+        "line": 100
       },
       "story_ids": [],
       "pins": null
@@ -11299,7 +11357,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 122
+        "line": 126
       },
       "story_ids": [],
       "pins": null
@@ -11396,7 +11454,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 142
+        "line": 146
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -11551,7 +11609,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 177
+        "line": 181
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -11629,7 +11687,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 211
+        "line": 215
       },
       "story_ids": [],
       "pins": null
@@ -11729,7 +11787,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 235
+        "line": 239
       },
       "story_ids": [],
       "pins": null
@@ -11844,7 +11902,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 327
+        "line": 331
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -12051,7 +12109,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 379
+        "line": 383
       },
       "story_ids": [],
       "pins": null
@@ -12299,7 +12357,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 405
+        "line": 409
       },
       "story_ids": [],
       "pins": null
@@ -12402,7 +12460,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 433
+        "line": 437
       },
       "story_ids": [],
       "pins": null
@@ -12488,7 +12546,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 448
+        "line": 452
       },
       "story_ids": [],
       "pins": null
@@ -12556,13 +12614,13 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_glossary.py",
-        "line": 461
+        "line": 465
       },
       "story_ids": [],
       "pins": null
     },
     {
-      "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots0-False-None]",
+      "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots0-None]",
       "narration": {
         "text": "A kindless term takes its kind from the slots it fills",
         "parts": [
@@ -12592,6 +12650,226 @@
           },
           {
             "value": " it fills"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_kind_inference",
+      "tags": [
+        "diagnostics"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a kindless term filling the {slots} slots, one story each",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "kindless",
+                "display": "kindless",
+                "expression": "pg[\"Kindless\"].l"
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " filling the "
+              },
+              {
+                "name": "slots",
+                "column_id": "slots",
+                "format_spec": "",
+                "conversion": null
+              },
+              {
+                "value": " "
+              },
+              {
+                "term_id": "slot",
+                "display": "slots",
+                "expression": "pg[\"Slot\"].l.s"
+              },
+              {
+                "value": ", one "
+              },
+              {
+                "term_id": "story",
+                "display": "story",
+                "expression": "pg[\"Story\"].l"
+              },
+              {
+                "value": " each"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "kind inference runs over the stories",
+            "parts": [
+              {
+                "term_id": "kind-inference",
+                "display": "kind inference",
+                "expression": "pg[\"Kind inference\"].l"
+              },
+              {
+                "value": " runs over the "
+              },
+              {
+                "term_id": "story",
+                "display": "stories",
+                "expression": "pg[\"Story\"].l.s"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the inferred kind is {kind}",
+            "parts": [
+              {
+                "value": "the inferred kind is "
+              },
+              {
+                "name": "kind",
+                "column_id": "kind",
+                "format_spec": "",
+                "conversion": null
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": {
+        "columns": [
+          {
+            "id": "slots",
+            "name": "slots",
+            "kind": "param"
+          },
+          {
+            "id": "kind",
+            "name": "kind",
+            "kind": "param"
+          }
+        ],
+        "cases": [
+          {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots0-None]",
+            "values": [
+              "[]",
+              null
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots1-actor]",
+            "values": [
+              "['actor']",
+              "actor"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots2-activity]",
+            "values": [
+              "['verb']",
+              "activity"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots3-object]",
+            "values": [
+              "['noun']",
+              "object"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          },
+          {
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots4-actor]",
+            "values": [
+              "['actor', 'noun']",
+              "actor"
+            ],
+            "status": "passed",
+            "error": null,
+            "custom_id": false
+          }
+        ]
+      },
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_kind_inference.py",
+        "line": 70
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_in_incompatible_slots_is_refused[slots0]",
+      "narration": {
+        "text": "A kindless term filling incompatible slots is refused",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "kindless",
+            "display": "kindless",
+            "expression": "pg[\"Kindless\"].l"
+          },
+          {
+            "value": " "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg[\"Term\"].l"
+          },
+          {
+            "value": " filling incompatible "
+          },
+          {
+            "term_id": "slot",
+            "display": "slots",
+            "expression": "pg[\"Slot\"].l.s"
+          },
+          {
+            "value": " is refused"
           }
         ]
       },
@@ -12687,10 +12965,10 @@
         {
           "phase": "then",
           "narration": {
-            "text": "a conflict naming the term is reported: {conflict}",
+            "text": "a PytestGivenError names the term and the conflict",
             "parts": [
               {
-                "value": "a conflict naming the "
+                "value": "a PytestGivenError names the "
               },
               {
                 "term_id": "term",
@@ -12698,34 +12976,7 @@
                 "expression": "pg[\"Term\"].l"
               },
               {
-                "value": " is reported: "
-              },
-              {
-                "name": "conflict",
-                "column_id": "conflict",
-                "format_spec": "",
-                "conversion": null
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the inferred kind is {kind}",
-            "parts": [
-              {
-                "value": "the inferred kind is "
-              },
-              {
-                "name": "kind",
-                "column_id": "kind",
-                "format_spec": "",
-                "conversion": null
+                "value": " and the conflict"
               }
             ]
           },
@@ -12741,91 +12992,22 @@
             "id": "slots",
             "name": "slots",
             "kind": "param"
-          },
-          {
-            "id": "conflict",
-            "name": "conflict",
-            "kind": "param"
-          },
-          {
-            "id": "kind",
-            "name": "kind",
-            "kind": "param"
           }
         ],
         "cases": [
           {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots0-False-None]",
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_in_incompatible_slots_is_refused[slots0]",
             "values": [
-              "[]",
-              false,
-              null
+              "['verb', 'actor']"
             ],
             "status": "passed",
             "error": null,
             "custom_id": false
           },
           {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots1-False-actor]",
+            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_in_incompatible_slots_is_refused[slots1]",
             "values": [
-              "['actor']",
-              false,
-              "actor"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots2-False-activity]",
-            "values": [
-              "['verb']",
-              false,
-              "activity"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots3-False-object]",
-            "values": [
-              "['noun']",
-              false,
-              "object"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots4-False-actor]",
-            "values": [
-              "['actor', 'noun']",
-              false,
-              "actor"
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots5-True-None]",
-            "values": [
-              "['verb', 'actor']",
-              true,
-              null
-            ],
-            "status": "passed",
-            "error": null,
-            "custom_id": false
-          },
-          {
-            "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[slots6-True-None]",
-            "values": [
-              "['verb', 'noun']",
-              true,
-              null
+              "['verb', 'noun']"
             ],
             "status": "passed",
             "error": null,
@@ -12838,7 +13020,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 64
+        "line": 98
       },
       "story_ids": [],
       "pins": null
@@ -13126,7 +13308,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 99
+        "line": 123
       },
       "story_ids": [],
       "pins": null
@@ -13297,7 +13479,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 134
+        "line": 158
       },
       "story_ids": [],
       "pins": null
@@ -13426,7 +13608,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 170
+        "line": 194
       },
       "story_ids": [],
       "pins": null
@@ -13550,7 +13732,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 198
+        "line": 222
       },
       "story_ids": [],
       "pins": null
@@ -13644,7 +13826,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_kind_inference.py",
-        "line": 230
+        "line": 254
       },
       "story_ids": [],
       "pins": null
@@ -18902,7 +19084,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -20198,7 +20380,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -20425,7 +20607,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -20768,7 +20950,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21087,7 +21269,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -21225,7 +21407,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 13,
       "steps": [
         {
           "phase": "given",
@@ -21473,7 +21655,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -21615,7 +21797,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22479,7 +22661,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 24,
       "steps": [
         {
           "phase": "given",
@@ -22677,7 +22859,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -23268,7 +23450,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -27378,7 +27560,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 143,
+      "duration_ms": 145,
       "steps": [
         {
           "phase": "given",

@@ -1598,28 +1598,37 @@
 - **then** a PytestGivenError is raised
 - **then** no new «term» was created
 
-## ✓ A «term»'s ID is its name as a URL-safe slug, and a name that leaves no slug is refused · 12 cases
-`tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs` · validation
+## ✓ A «term»'s ID is its name as a URL-safe slug · 8 cases
+`tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs`
 
 - **given** the name {text}
 - **when** it is slugified into a «term» id
-- **then** a PytestGivenError reports the derived id is empty: {refused}
 - **then** the id is {slug}
 
-| text | refused | slug |
-|---|---|---|
-| Guest | False | 'guest' |
-| Order received | False | 'order-received' |
-|   Work Object   | False | 'work-object' |
-| do_the_thing | False | 'do-the-thing' |
-| Buy / sell | False | 'buy-sell' |
-| Guest #1 | False | 'guest-1' |
-| café | False | 'caf' |
-| booking system | False | 'booking-system' |
-| --- | True | None |
-|     | True | None |
-|  | True | None |
-| ### | True | None |
+| text | slug |
+|---|---|
+| Guest | 'guest' |
+| Order received | 'order-received' |
+|   Work Object   | 'work-object' |
+| do_the_thing | 'do-the-thing' |
+| Buy / sell | 'buy-sell' |
+| Guest #1 | 'guest-1' |
+| café | 'caf' |
+| booking system | 'booking-system' |
+
+## ✓ A «term» name that leaves no slug is refused · 4 cases
+`tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused` · validation
+
+- **given** the name {text}
+- **when** it is slugified into a «term» id
+- **then** a PytestGivenError reports the derived id is empty
+
+| text |
+|---|
+| --- |
+|     |
+|  |
+| ### |
 
 ## ✓ Calling an «actor» names a distinct «instance»
 `tests/unit/capture/test_glossary.py::test_actor_call_returns_instance_with_distinct_display`
@@ -1733,23 +1742,32 @@
 - **when** a near-miss name is subscripted
 - **then** a PytestGivenError is raised with a spelling hint
 
-## ✓ A «kindless» «term» takes its kind from the «slots» it fills · 7 cases
-`tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots` · diagnostics, validation
+## ✓ A «kindless» «term» takes its kind from the «slots» it fills · 5 cases
+`tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots` · diagnostics
 
 - **given** a «kindless» «term» filling the {slots} «slots», one «story» each
 - **when** «kind inference» runs over the «stories»
-- **then** a conflict naming the «term» is reported: {conflict}
 - **then** the inferred kind is {kind}
 
-| slots | conflict | kind |
-|---|---|---|
-| \[\] | False | None |
-| \['actor'\] | False | actor |
-| \['verb'\] | False | activity |
-| \['noun'\] | False | object |
-| \['actor', 'noun'\] | False | actor |
-| \['verb', 'actor'\] | True | None |
-| \['verb', 'noun'\] | True | None |
+| slots | kind |
+|---|---|
+| \[\] | None |
+| \['actor'\] | actor |
+| \['verb'\] | activity |
+| \['noun'\] | object |
+| \['actor', 'noun'\] | actor |
+
+## ✓ A «kindless» «term» filling incompatible «slots» is refused · 2 cases
+`tests/unit/capture/test_kind_inference.py::test_a_kindless_term_in_incompatible_slots_is_refused` · diagnostics, validation
+
+- **given** a «kindless» «term» filling the {slots} «slots», one «story» each
+- **when** «kind inference» runs over the «stories»
+- **then** a PytestGivenError names the «term» and the conflict
+
+| slots |
+|---|
+| \['verb', 'actor'\] |
+| \['verb', 'noun'\] |
 
 ## ✓ A declared kind must fit the «slot» its «term» fills · 9 cases
 `tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot` · diagnostics, validation
