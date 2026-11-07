@@ -874,6 +874,21 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 
 
+
+.param-table td[data-subst] { white-space: pre-wrap; }
+.param-table td.param-repr {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+
+.param-repr.param-substituted {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  white-space: pre-wrap;
+}
+
+
 .param-table .param-status { text-align: center; }
 
 .param-table tbody th.param-id {
