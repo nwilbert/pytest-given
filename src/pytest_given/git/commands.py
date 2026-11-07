@@ -111,13 +111,15 @@ def _run(args: list[str], repo: Path) -> subprocess.CompletedProcess[str] | None
     """The finished process, or None when git could not run to completion.
 
     `OSError` covers the whole exec side: a `git` that exists but is not
-    executable raises `PermissionError`, not `FileNotFoundError`.
+    executable raises `PermissionError`, not `FileNotFoundError`. Git writes
+    ref names as UTF-8 whatever the locale's codec.
     """
     try:
         return subprocess.run(
             ['git', '-C', str(repo), *args],
             capture_output=True,
-            text=True,
+            encoding='utf-8',
+            errors='replace',
             timeout=_QUERY_TIMEOUT_SECONDS,
             check=False,
         )
@@ -132,13 +134,15 @@ def _stdout(*args: str) -> str | None:
     executable raises `PermissionError`, and letting that escape would cost the
     entire report — session finish catches `OSError` and discards every sink.
     Timed out rather than left to hang, since a wedged git would hold up an
-    already-finished test session.
+    already-finished test session. Git writes a remote URL as UTF-8 whatever
+    the locale's codec.
     """
     try:
         result = subprocess.run(
             ['git', *args],
             capture_output=True,
-            text=True,
+            encoding='utf-8',
+            errors='replace',
             timeout=2,
             check=True,
         )

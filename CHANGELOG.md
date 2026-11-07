@@ -17,6 +17,10 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
 
+### Fixed
+
+- A test session writing a report no longer crashes on a git remote URL that the system's locale encoding can't decode.
+
 ## [0.6.0] - 2026-11-21
 
 ### Added
