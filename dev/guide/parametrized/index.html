@@ -1130,7 +1130,7 @@
 <p>pytest-given groups all cases of a parametrized test into one scenario with a parameter table. The report shows the steps once, taken from the first case that passed (the <strong>baseline case</strong>). Anything that differs between cases becomes a column in the parameter table:</p>
 <ul>
 <li>a parametrize argument</li>
-<li>a t-string value that differs between cases. The step shows a <code>{name}</code> placeholder that points to the column.</li>
+<li>a t-string value that differs between cases. The step shows a <code>{name}</code> placeholder that points to the column, or both phrases of a <a href="../step-text/#boolean-phrases">Boolean phrase</a>.</li>
 <li>an attachment whose content differs between cases. The step shows a badge that points to the column, instead of the content.</li>
 </ul>
 <p>The group fails if any case failed. Otherwise it is an expected failure (<code>xfailed</code>) if any case is one, skipped if every case was skipped, and passed if not. When the cases differ in status, the table gets a status column that shows which case is which.</p>
@@ -1199,6 +1199,11 @@
 <td>6</td>
 <td>Cases whose steps differ in any other way: different steps, different wording, a different t-string expression, or different pins. A case that didn't pass is compared only up to the step where it stopped or took a different path</td>
 <td>Add <code>group_parametrized=False</code> to <code>@scenario</code> so each case becomes its own scenario. For pins that differ, pin the step to one sentence instead</td>
+</tr>
+<tr>
+<td>7</td>
+<td>A <code>Template</code> in <code>@scenario(...)</code> or <code>Annotated[..., given(...)]</code> with <a href="../step-text/#boolean-phrases">Boolean phrases</a>, when a case that passed binds it to anything but a <code>bool</code>, or the placeholder has a conversion</td>
+<td>Parametrize a Boolean, or drop the phrases and let the column hold the value</td>
 </tr>
 </tbody>
 </table>

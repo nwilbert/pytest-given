@@ -1181,10 +1181,12 @@
 <li><code>citations check</code> and <code>update</code> read <code>#view=glossary&amp;term=&lt;id&gt;</code> or <code>#term=&lt;id&gt;</code> as a citation of a term, with a tag's glyph and summary.</li>
 <li>A term citation written as a <code>&lt;details markdown="1"&gt;</code> block carries the term's definition, which <code>citations update</code> writes and <code>citations check</code> holds to the report.</li>
 <li>A Glossary term row in the HTML report gets the copy button, which offers <strong>Copy citation</strong> and <strong>Copy defining citation</strong> when the report has a URL.</li>
+<li>A format spec <code>{flag:true phrase|false phrase}</code> words a Boolean in a step while the parameter table keeps the Boolean.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
+<li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
