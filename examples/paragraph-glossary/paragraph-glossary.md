@@ -1,4 +1,4 @@
-# pytest-given — Paragraph Glossary Example
+# Paragraph Glossary Example
 
 ## ✓ A Member borrows an Item for a Loan
 `examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item`

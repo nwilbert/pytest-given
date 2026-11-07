@@ -11,20 +11,16 @@ from dataclasses import replace
 from ..capture import resolved_placeholder_part
 from ..model import (
     Narration,
-    NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
-    NarrationValue,
-    NodeId,
     ParamInfo,
     ParamSpec,
     RawParamValue,
     Scenario,
     Step,
-    case_id,
-    narration_of,
     placeholder_mismatch,
     rebuilt,
+    with_case_id,
 )
 from .checks import check_case_phrase_values
 
@@ -39,7 +35,7 @@ def per_case_scenarios(cases: list[Scenario], param_info: ParamInfo) -> list[Sce
     carries.
     """
     return [
-        replace(case, narration=_suffixed(case.narration, case.id))
+        replace(case, narration=with_case_id(case.narration, case.id))
         for case in (_substituted(s, param_info[s.id]) for s in cases)
     ]
 
@@ -84,17 +80,3 @@ def _substituted_part(
     if part.name not in params:
         raise placeholder_mismatch(part.name, list(params))
     return resolved_placeholder_part(part, params[part.name])
-
-
-def _suffixed(narration: Narration, node_id: NodeId) -> Narration:
-    """The parametrize id appended as a value, so it is never read for
-    Markdown."""
-    parts = narration.parts or (NarrationLiteral(value=narration.text),)
-    return narration_of(
-        (
-            *parts,
-            NarrationLiteral(value=' ['),
-            NarrationValue(rendered=case_id(node_id), expression=''),
-            NarrationLiteral(value=']'),
-        )
-    )

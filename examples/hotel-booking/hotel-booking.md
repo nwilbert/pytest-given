@@ -1,4 +1,4 @@
-# pytest-given — Hotel Booking Example
+# Hotel Booking Example
 
 ## ✓ A search offers only the available rooms
 `examples/hotel-booking/test_hotel_booking.py::test_pick_suite`

@@ -25,6 +25,7 @@ docs/superpowers/plans/
 # Documentation site: build output and the copies docs_build stages into docs_dir
 /site/
 /docs/site/examples/
+/docs/site/deltas/
 /docs/site/assets/pytest-given-diagram-full.svg
 /docs/site/assets/fonts/source-sans-3-latin-wght-normal.woff2
 /docs/site/assets/fonts/source-code-pro-latin-wght-normal.woff2

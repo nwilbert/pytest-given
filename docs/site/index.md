@@ -46,7 +46,7 @@ pytest-given works the other way round: **engineers or their agents write normal
 
 ### Written by agents, reviewed by people
 
-Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. The diagram shows this loop, and [Working with AI agents](ai-agents.md) explains how to set it up.
+Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. For a change or a release, the [delta report](delta-report.md) lists only the scenarios and glossary terms it added, removed or changed. The diagram shows this loop, and [Working with AI agents](ai-agents.md) explains how to set it up.
 
 <figure class="pg-diagram">
   --8<-- "docs/site/assets/pytest-given-diagram.svg"
@@ -68,6 +68,7 @@ A design spec or a README can [cite](guide/citations.md) scenarios, tags, storie
 - **[Table glossary](examples/table-glossary.html){ target=_blank }**: the same, with the glossary kept in a Markdown table.
 - **[Paragraph glossary](examples/paragraph-glossary.html){ target=_blank }**: the glossary kept as `**Term**:` paragraphs, with sections and avoided words.
 - **[Self-report](examples/self-report.html){ target=_blank }**: pytest-given's own test suite.
+- **[Delta](examples/delta.html){ target=_blank }**: the scenarios and glossary terms added, removed and changed between two versions of a hotel suite.
 
 The [Examples](examples.md) page links the test code behind each report.
 

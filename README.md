@@ -27,6 +27,7 @@ Live examples:
 - **[Table glossary](https://nwilbert.github.io/pytest-given/latest/examples/table-glossary.html)**: the same, with the glossary kept in a Markdown table.
 - **[Paragraph glossary](https://nwilbert.github.io/pytest-given/latest/examples/paragraph-glossary.html)**: the glossary kept as `**Term**:` paragraphs, with sections and avoided words.
 - **[Self-report](https://nwilbert.github.io/pytest-given/latest/examples/self-report.html)**: pytest-given's own test suite.
+- **[Delta](https://nwilbert.github.io/pytest-given/latest/examples/delta.html)**: the scenarios and glossary terms added, removed and changed between two versions of a hotel suite.
 
 ## Quick start
 
@@ -90,7 +91,7 @@ pytest-given works the other way round: **engineers or their agents write normal
 
 ### Written by agents, reviewed by people
 
-Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. The diagram shows this loop, and [Working with AI agents](https://nwilbert.github.io/pytest-given/latest/ai-agents/) explains how to set it up.
+Most tests are no longer written by hand. A person describes the behavior they want, in a prompt or a spec, and an AI agent writes the tests along with the code. People review the narrated report first, and the test code behind it where it matters. For a change or a release, the [delta report](https://nwilbert.github.io/pytest-given/latest/delta-report/) lists only the scenarios and glossary terms it added, removed or changed. The diagram shows this loop, and [Working with AI agents](https://nwilbert.github.io/pytest-given/latest/ai-agents/) explains how to set it up.
 
 <p align="center">
   <picture>
@@ -114,10 +115,10 @@ A design spec or a README can [cite](https://nwilbert.github.io/pytest-given/lat
 - **[Parametrized scenarios](https://nwilbert.github.io/pytest-given/latest/guide/parametrized/)**: one narrated tree plus a parameter table per case, or one scenario per case on request.
 - **[Glossary](https://nwilbert.github.io/pytest-given/latest/guide/glossary/)**: your domain's terms, declared in code or loaded from a `GLOSSARY.md`, rendered as highlighted term refs in the narration.
 - **[Domain Storytelling](https://nwilbert.github.io/pytest-given/latest/guide/domain-storytelling/)**: Domain Stories as sequences of sentences, and per-sentence coverage in the report.
-- **Reports**: a self-contained [HTML report](https://nwilbert.github.io/pytest-given/latest/html-report/) to browse and share, and a [Markdown report](https://nwilbert.github.io/pytest-given/latest/markdown-report/) for diffs, reviews and agents.
+- **Reports**: a self-contained [HTML report](https://nwilbert.github.io/pytest-given/latest/html-report/) to browse and share, a [Markdown report](https://nwilbert.github.io/pytest-given/latest/markdown-report/) for diffs, reviews and agents, and a [delta report](https://nwilbert.github.io/pytest-given/latest/delta-report/) of what a release changed.
 - **[Narration lint](https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/)**: structural checks that a step's text is honest about its body: empty steps, a `then` that checks nothing, a missing phase.
 - **[Citations](https://nwilbert.github.io/pytest-given/latest/guide/citations/)**: links from Markdown documents to scenarios, tags, stories and glossary terms, led by their status and checked against the latest run.
-- **[Agent skills](https://nwilbert.github.io/pytest-given/latest/ai-agents/)**: bundled Agent Skills for authoring, navigating and reviewing narrated tests, installable with one command.
+- **[Agent skills](https://nwilbert.github.io/pytest-given/latest/ai-agents/)**: bundled Agent Skills for working with narrated tests, their reports, citations and deltas, installable with one command.
 
 The full reference — pytest options, source links, the standalone CLI — is on the [documentation site](https://nwilbert.github.io/pytest-given/latest/).
 

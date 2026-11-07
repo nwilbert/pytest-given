@@ -1,4 +1,4 @@
-# pytest-given — Coffee Shop Example
+# Coffee Shop Example
 
 ## ✓ Buying a coffee takes one from the machine
 `examples/coffeeshop/test_coffeeshop.py::test_buy_coffee` · checkout

@@ -5,21 +5,19 @@ package asks git the same way.
 """
 
 from .commands import (
-    Ancestry,
+    commits_between,
     detect_commit_sha,
     detect_github_repo,
-    is_ancestor,
     is_shallow,
-    resolve_revision,
-    tags_pointing_at,
+    resolve_commits,
+    tags_by_commit,
 )
 
 __all__ = [
-    'Ancestry',
+    'commits_between',
     'detect_commit_sha',
     'detect_github_repo',
-    'is_ancestor',
     'is_shallow',
-    'resolve_revision',
-    'tags_pointing_at',
+    'resolve_commits',
+    'tags_by_commit',
 ]

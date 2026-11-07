@@ -1,4 +1,4 @@
-# pytest-given — Table Glossary Example
+# Table Glossary Example
 
 ## ✓ A Guest booking an available room receives a Confirmation
 `examples/table-glossary/test_table_glossary.py::test_book_available_room`

@@ -63,7 +63,7 @@ def test_a_term_summary_counts_its_other_forms_whatever_its_kind() -> None:
     )
     summaries = {
         entry.term.id: entry.summary
-        for group in view.kind_groups
+        for group in view.grouping.groups
         for entry in group.entries
     }
     assert summaries[TermId('guest')] == ('1 other form', '1 story')
@@ -77,7 +77,7 @@ def test_kind_summaries_use_irregular_plurals() -> None:
         GlossaryTerm(id=TermId('book'), kind='activity', canonical='book')
     )
     view = build_glossary_view(ReportData(metadata=_meta(), glossary=glossary))
-    assert [kind.summary for kind in view.kinds] == [
+    assert [kind.summary for kind in view.grouping.kinds] == [
         '1 actor',
         '1 work object',
         '2 activities',
@@ -204,7 +204,9 @@ def test_a_term_reaches_the_view_with_its_section_and_avoided_words() -> None:
 def _entries(report: ReportData) -> dict[TermId, TermEntry]:
     view = build_glossary_view(report)
     return {
-        entry.term.id: entry for group in view.kind_groups for entry in group.entries
+        entry.term.id: entry
+        for group in view.grouping.groups
+        for entry in group.entries
     }
 
 

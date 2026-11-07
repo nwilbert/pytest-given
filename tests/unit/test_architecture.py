@@ -16,7 +16,15 @@ PACKAGE = 'pytest_given'
 PACKAGE_ROOT = Path(pytest_given.__file__).parent
 
 LEAVES = frozenset({'markdown', 'git'})
-LIBRARY = LEAVES | {'model', 'capture', 'lint', 'report', 'grouping', 'citations'}
+LIBRARY = LEAVES | {
+    'model',
+    'capture',
+    'lint',
+    'report',
+    'grouping',
+    'delta',
+    'citations',
+}
 # Each subpackage, and the subpackages it may import.
 ALLOWED: dict[str, frozenset[str]] = {
     'markdown': frozenset(),
@@ -26,6 +34,7 @@ ALLOWED: dict[str, frozenset[str]] = {
     'lint': LEAVES | {'model'},
     'report': LEAVES | {'model'},
     'grouping': LEAVES | {'model', 'capture'},
+    'delta': LEAVES | {'model'},
     'citations': LEAVES | {'model', 'report'},
     'plugin': LIBRARY,
     'cli': LIBRARY,

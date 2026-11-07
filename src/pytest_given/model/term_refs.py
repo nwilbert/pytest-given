@@ -3,7 +3,7 @@ each term, and as which instance or activity form. The Glossary view and the
 delta both read this index.
 """
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from typing import NewType
 
@@ -14,7 +14,6 @@ from .schema import (
     Narration,
     NarrationTermRef,
     NodeId,
-    ReportData,
     Scenario,
     Story,
     StoryId,
@@ -70,19 +69,22 @@ class TermCrossRefs:
     term_scenarios: dict[TermId, list[NodeId]]
 
 
-def build_term_crossrefs(report: ReportData) -> TermCrossRefs:
+def build_term_crossrefs(
+    scenarios: Sequence[Scenario],
+    glossary: Glossary | None,
+    stories: Sequence[Story] = (),
+) -> TermCrossRefs:
     """Per-term aggregations and the term-to-scenarios index.
 
     Scenario narrations contribute actor and work-object instances; story sentence prose
     contributes story refs, more instances, and activity surface forms. Scenario
     render order is preserved and each scenario appears at most once per term.
     """
-    glossary = report.glossary
     if glossary is None:
         return TermCrossRefs(aggregations={}, term_scenarios={})
     index = _GlossaryIndex(glossary)
     term_scenarios: dict[TermId, list[NodeId]] = {}
-    for scenario in report.scenarios:
+    for scenario in scenarios:
         seen: set[TermId] = set()
         for narration, fixture_name in _scenario_narrations(scenario):
             for part in narration.parts:
@@ -98,7 +100,7 @@ def build_term_crossrefs(report: ReportData) -> TermCrossRefs:
                 if part.term_id not in seen:
                     seen.add(part.term_id)
                     term_scenarios.setdefault(part.term_id, []).append(scenario.id)
-    for story in report.stories:
+    for story in stories:
         for ref in _story_term_refs(story):
             # Each `record_*` no-ops for a term of the wrong kind, so the walk
             # states what it saw rather than sorting it into a bucket.

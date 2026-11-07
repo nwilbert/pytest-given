@@ -30,7 +30,28 @@ mistake shipped to PyPI is permanent.
       `[Unreleased]` at the new tag, and add a line for the new version.
 - [ ] Run `uv run nox -s examples self_report`. The reports record the plugin
       version, and the release's docs publish them as its example reports.
-- [ ] Commit the bump, the changelog and the regenerated reports as one commit,
+- [ ] Keep a delta of the release's self-report, unless the release changed no
+      scenario. Follow the [delta skill](../src/pytest_given/.agents/skills/pytest-given-delta/SKILL.md)
+      for the range, the two reports and the triage that adds the rename log
+      entries. One exception to the skill: the *before* self-report comes from
+      `uv run nox -s self_report` in a worktree of the *before* commit, with
+      that commit's own environment, since the suite imports the plugin's
+      internals. The version warning is expected. The two reports are each
+      checkout's `examples/self-report/self-report-data.json`. Pass
+      `--after-label v<version>`, since the tag doesn't exist yet.
+      Write the result to `docs/deltas/<version>.json` and `.html`. The
+      `.json` is written once. The `self_report` session re-renders the `.html`
+      from it. A `schema_version` bump inside the range makes the delta
+      impossible, so such a release keeps none, and the next range starts at it.
+      Add a line to the release's `CHANGELOG.md` section that links
+      `https://nwilbert.github.io/pytest-given/latest/deltas/<version>.html`.
+- [ ] Mark the `given-renames.toml` entries added since the last release. An
+      entry without a `rev` was written in its renaming pull request, so its
+      `rev` is the full SHA of the commit that added it to `main`:
+      `git log --reverse --format=%H -S '<its old line>' -- given-renames.toml`,
+      the first line. Then end each of these entries' `rev` line with
+      `# v<version>`.
+- [ ] Commit the bump, the changelog, the delta, the rename log and the regenerated reports as one commit,
       land it on `main`, and wait for CI to go green. Releases can only be
       dispatched from `main`.
 - [ ] Actions → **Compat** → Run workflow on `main`, and wait for both jobs to

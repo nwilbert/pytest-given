@@ -1,3 +1,4 @@
+import ast
 import subprocess
 import sys
 from pathlib import Path
@@ -5,12 +6,14 @@ from pathlib import Path
 import pytest
 
 from pytest_given.git import (
+    commits_between,
     detect_commit_sha,
-    is_ancestor,
+    detect_github_repo,
     is_shallow,
-    resolve_revision,
-    tags_pointing_at,
+    resolve_commits,
+    tags_by_commit,
 )
+from pytest_given.git.commands import _COMMIT_ENV_VARS
 from tests.git_repo import GitRepo, make_git_repo, run_git
 
 
@@ -100,15 +103,41 @@ def test_detect_commit_sha_unrunnable_git_returns_none(
     assert detect_commit_sha() is None
 
 
-def test_resolve_revision(git_repo: GitRepo) -> None:
-    assert resolve_revision('v1', git_repo.path) == git_repo.first
-    assert resolve_revision('v1.9', git_repo.path) == git_repo.head
-    assert resolve_revision('nope', git_repo.path) is None
+def test_the_noxfile_unsets_every_ci_variable_a_commit_sha_is_read_from() -> None:
+    """Else, on that CI, both versions of the example delta record its commit.
+    nox runs without the package, so the noxfile keeps a copy."""
+    noxfile = Path(__file__).parents[3] / 'noxfile.py'
+    [copy] = [
+        node.value
+        for node in ast.parse(noxfile.read_text(encoding='utf-8')).body
+        if isinstance(node, ast.Assign)
+        and [ast.unparse(target) for target in node.targets] == ['_COMMIT_ENV_VARS']
+    ]
+    assert ast.literal_eval(copy) == _COMMIT_ENV_VARS
 
 
-def test_resolve_revision_peels_a_tag_to_its_commit(git_repo: GitRepo) -> None:
+def test_resolve_commits_maps_each_rev_naming_a_commit_to_its_sha(
+    git_repo: GitRepo,
+) -> None:
+    """A tag counts only when it leads to a commit."""
     run_git(git_repo.path, 'tag', '-a', 'annotated', '-m', 'm', git_repo.first)
-    assert resolve_revision('annotated', git_repo.path) == git_repo.first
+    tree = run_git(git_repo.path, 'rev-parse', 'HEAD^{tree}')
+    run_git(git_repo.path, 'tag', 'on-a-tree', tree)
+    short = git_repo.head[:12]
+    revs = ['v1', short, 'annotated', 'on-a-tree', 'nope']
+    assert resolve_commits(revs, git_repo.path) == {
+        'v1': git_repo.first,
+        short: git_repo.head,
+        'annotated': git_repo.first,
+    }
+
+
+def test_resolve_commits_resolves_no_rev_holding_a_space(git_repo: GitRepo) -> None:
+    """Each rev is a line of git's input: a newline would add another rev, and
+    a space would end this one early."""
+    revs = ['v1 v1.9', 'v1\nv1.9', 'v1']
+    assert resolve_commits(revs, git_repo.path) == {'v1': git_repo.first}
+    assert resolve_commits(['v1 v1.9'], git_repo.path) == {}
 
 
 def test_is_shallow(git_repo: GitRepo, tmp_path: Path) -> None:
@@ -120,36 +149,71 @@ def test_is_shallow(git_repo: GitRepo, tmp_path: Path) -> None:
     assert is_shallow(clone) is True
 
 
-def test_is_ancestor_answers_yes_and_no(git_repo: GitRepo) -> None:
-    assert is_ancestor('v1', git_repo.head, git_repo.path) == 'yes'
-    assert is_ancestor(git_repo.head, 'v1', git_repo.path) == 'no'
+def test_commits_between_lists_what_the_tips_reach_and_the_base_does_not(
+    git_repo: GitRepo,
+) -> None:
+    head, first = git_repo.head, git_repo.first
+    assert commits_between([head], first, git_repo.path) == frozenset({head})
+    assert commits_between([first], head, git_repo.path) == frozenset()
+    assert commits_between([head], head, git_repo.path) == frozenset()
 
 
-def test_a_commit_is_its_own_ancestor(git_repo: GitRepo) -> None:
-    assert is_ancestor(git_repo.head, git_repo.head, git_repo.path) == 'yes'
+def test_commits_between_never_reads_an_error_as_no_commits(
+    git_repo: GitRepo,
+) -> None:
+    """An empty answer would skip every rename-log entry outright."""
+    assert commits_between(['f' * 40], git_repo.head, git_repo.path) is None
 
 
-def test_is_ancestor_never_reads_an_error_as_no(git_repo: GitRepo) -> None:
-    """Exit 128 (a revision git cannot resolve) is `unknown`, not exit 1's `no`."""
-    assert is_ancestor('no-such-rev', git_repo.head, git_repo.path) == 'unknown'
+def test_tags_by_commit_highest_version_first(git_repo: GitRepo) -> None:
+    assert tags_by_commit(git_repo.path) == {
+        git_repo.head: ['v1.10', 'v1.9'],
+        git_repo.first: ['v1'],
+    }
 
 
-def test_tags_pointing_at_highest_version_first(git_repo: GitRepo) -> None:
-    assert tags_pointing_at(git_repo.head, git_repo.path) == ['v1.10', 'v1.9']
-    assert tags_pointing_at(git_repo.first, git_repo.path) == ['v1']
+def test_tags_by_commit_files_an_annotated_tag_under_its_commit(
+    git_repo: GitRepo,
+) -> None:
+    run_git(git_repo.path, 'tag', '-a', 'v0.9', '-m', 'm', git_repo.first)
+    assert tags_by_commit(git_repo.path)[git_repo.first] == ['v1', 'v0.9']
 
 
-def test_tags_pointing_at_reads_a_non_ascii_tag_as_utf8(git_repo: GitRepo) -> None:
+def test_tags_by_commit_names_a_tag_by_its_own_name_where_a_branch_shares_it(
+    git_repo: GitRepo,
+) -> None:
+    run_git(git_repo.path, 'branch', 'v1', git_repo.first)
+    assert tags_by_commit(git_repo.path)[git_repo.first] == ['v1']
+
+
+def test_tags_by_commit_put_a_release_above_its_pre_releases(
+    git_repo: GitRepo,
+) -> None:
+    tags = ['v2.0.0.dev1', 'v2.0.0a1', 'v2.0.0b2', 'v2.0.0rc1', 'v2.0.0', 'v2.0.0-rc.2']
+    for tag in tags:
+        run_git(git_repo.path, 'tag', tag, git_repo.first)
+
+    assert tags_by_commit(git_repo.path)[git_repo.first][:6] == [
+        'v2.0.0',
+        'v2.0.0-rc.2',
+        'v2.0.0rc1',
+        'v2.0.0b2',
+        'v2.0.0a1',
+        'v2.0.0.dev1',
+    ]
+
+
+def test_tags_by_commit_reads_a_non_ascii_tag_as_utf8(git_repo: GitRepo) -> None:
     """Outside UTF-8 mode, a cp1252 locale cannot decode the 0x81 in 'Á'."""
     run_git(git_repo.path, 'tag', 'v1-Á', git_repo.first)
     code = (
         'import sys; from pathlib import Path; '
-        'from pytest_given.git import tags_pointing_at; '
-        'print(ascii(tags_pointing_at(sys.argv[1], Path(sys.argv[2]))))'
+        'from pytest_given.git import tags_by_commit; '
+        'print(ascii(tags_by_commit(Path(sys.argv[1]))))'
     )
 
     printed = subprocess.run(
-        [sys.executable, '-X', 'utf8=0', '-c', code, git_repo.first, git_repo.path],
+        [sys.executable, '-X', 'utf8=0', '-c', code, git_repo.path],
         capture_output=True,
         text=True,
         check=True,
@@ -159,10 +223,10 @@ def test_tags_pointing_at_reads_a_non_ascii_tag_as_utf8(git_repo: GitRepo) -> No
 
 
 @pytest.mark.usefixtures('isolated_git_env')
-def test_tags_pointing_at_an_untagged_commit(tmp_path: Path) -> None:
+def test_tags_by_commit_leaves_an_untagged_commit_out(tmp_path: Path) -> None:
     other = make_git_repo(tmp_path / 'other')
     run_git(other.path, 'tag', '-d', 'v1')
-    assert tags_pointing_at(other.first, other.path) == []
+    assert other.first not in tags_by_commit(other.path)
 
 
 def test_the_test_repository_ignores_an_inherited_git_dir(
@@ -181,27 +245,28 @@ def test_the_test_repository_ignores_an_inherited_git_dir(
 @pytest.mark.usefixtures('isolated_git_env')
 def test_outside_a_repository(tmp_path: Path) -> None:
     assert is_shallow(tmp_path) is None
-    assert resolve_revision('HEAD', tmp_path) is None
-    assert is_ancestor('HEAD', 'HEAD', tmp_path) == 'unknown'
-    assert tags_pointing_at('HEAD', tmp_path) == []
+    assert resolve_commits(['HEAD'], tmp_path) is None
+    assert commits_between(['a' * 40], 'b' * 40, tmp_path) is None
+    assert tags_by_commit(tmp_path) == {}
 
 
 @pytest.mark.parametrize('rev', ['-x', '--all', '--upload-pack=evil'])
-def test_a_revision_that_looks_like_an_option_never_reaches_git(
+def test_a_revision_that_looks_like_an_option_never_reaches_git_s_arguments(
     monkeypatch: pytest.MonkeyPatch, git_repo: GitRepo, rev: str
 ) -> None:
+    """`resolve_commits` reads it as input, where it names nothing."""
+    real_run = subprocess.run
     calls: list[list[str]] = []
 
     def spy(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
         calls.append(cmd)
-        raise AssertionError('git must not run')
+        return real_run(cmd, **kwargs)  # type: ignore[call-overload, no-any-return]
 
     monkeypatch.setattr(subprocess, 'run', spy)
-    assert resolve_revision(rev, git_repo.path) is None
-    assert is_ancestor(rev, git_repo.head, git_repo.path) == 'unknown'
-    assert is_ancestor(git_repo.head, rev, git_repo.path) == 'unknown'
-    assert tags_pointing_at(rev, git_repo.path) == []
-    assert calls == []
+    assert resolve_commits([rev], git_repo.path) == {}
+    assert commits_between([rev], git_repo.head, git_repo.path) is None
+    assert commits_between([git_repo.head], rev, git_repo.path) is None
+    assert all(rev not in cmd for cmd in calls)
 
 
 def test_every_query_runs_in_the_repository_with_an_argument_list(
@@ -215,16 +280,38 @@ def test_every_query_runs_in_the_repository_with_an_argument_list(
         return real_run(cmd, **kwargs)  # type: ignore[call-overload, no-any-return]
 
     monkeypatch.setattr(subprocess, 'run', spy)
-    resolve_revision('v1', git_repo.path)
+    resolve_commits(['v1'], git_repo.path)
     is_shallow(git_repo.path)
-    is_ancestor('v1', git_repo.head, git_repo.path)
-    tags_pointing_at(git_repo.head, git_repo.path)
+    commits_between([git_repo.head], git_repo.first, git_repo.path)
+    tags_by_commit(git_repo.path)
     assert len(calls) == 4
     for cmd, kwargs in calls:
         assert isinstance(cmd, list)
         assert cmd[:3] == ['git', '-C', str(git_repo.path)]
         assert not kwargs.get('shell')
         assert not kwargs.get('check')
+
+
+def test_session_finish_gives_git_less_time_than_a_delta_query(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A wedged git holds up an already-finished test session."""
+    _clear_ci_vars(monkeypatch)
+    monkeypatch.delenv('GITHUB_REPOSITORY', raising=False)
+    timeouts: list[object] = []
+
+    def fake_run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        timeouts.append(kwargs['timeout'])
+        return subprocess.CompletedProcess(cmd, 1, stdout='', stderr='')
+
+    monkeypatch.setattr(subprocess, 'run', fake_run)
+    detect_commit_sha()
+    detect_github_repo()
+    session = list(timeouts)
+    timeouts.clear()
+    resolve_commits(['v1'], tmp_path)
+    assert session == [2, 2]
+    assert timeouts == [5]
 
 
 _UNANSWERABLE: list[Exception] = [
@@ -242,10 +329,10 @@ def test_a_git_that_cannot_run_answers_unknown(
         raise error
 
     monkeypatch.setattr(subprocess, 'run', fake_run)
-    assert resolve_revision('v1', tmp_path) is None
+    assert resolve_commits(['v1'], tmp_path) is None
     assert is_shallow(tmp_path) is None
-    assert is_ancestor('v1', 'v2', tmp_path) == 'unknown'
-    assert tags_pointing_at('v1', tmp_path) == []
+    assert commits_between(['a' * 40], 'b' * 40, tmp_path) is None
+    assert tags_by_commit(tmp_path) == {}
 
 
 def test_an_unrecognized_shallow_answer_is_unknown(
