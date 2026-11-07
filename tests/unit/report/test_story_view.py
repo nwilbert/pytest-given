@@ -228,7 +228,8 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
         only = Sentence(id=SentenceId(1), clauses=(Clause(parts=parts),))
         story = Story(id=StoryId('book'), title='Book', sentences=(only,))
     with given(
-        t'a {pg["Scenario"].l} whose {pg["Step"].l} {pg["Pin"].l.s} it: {pinned}'
+        t'a {pg["Scenario"].l} whose {pg["Step"].l} narrates that {pg["Term"].l}, '
+        t'{pg["Pin"]("pinning")} the {pg["Sentence"].l}: {pinned}'
     ):
         scenario_ = Scenario(
             id=NodeId('test::a'),
@@ -239,7 +240,12 @@ def test_an_under_anchored_sentence_reads_as_untracked_until_pinned(
             steps=[
                 Step(
                     phase='when',
-                    narration=Narration(text='the listing page is opened'),
+                    narration=Narration(
+                        text='Guest',
+                        parts=(
+                            NarrationTermRef(term_id=TermId('guest'), display='Guest'),
+                        ),
+                    ),
                     pins=(Pin(story_id=StoryId('book'), sentence_id=SentenceId(1)),)
                     if pinned
                     else None,

@@ -1,11 +1,10 @@
 import json
 import textwrap
 from pathlib import Path
-from typing import Annotated
 
 import pytest
 
-from pytest_given import Template, attach, given, scenario, then, when
+from pytest_given import attach, given, scenario, then, when
 from pytest_given.plugin import session
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
@@ -2800,48 +2799,46 @@ def test_a_pin_on_a_given_annotation_pins_its_step(pytester):
     ids=['none-keeps', 'empty-clears', 'list-replaces'],
 )
 def test_a_given_annotation_retells_the_step_fixture_pins(
-    pytester,
-    annotation_pins: Annotated[
-        str,
-        given(
-            Template(
-                'a given annotation with pins={annotation_pins} over a step fixture '
-                'pinning a[1]'
-            )
-        ),
-    ],
-    root_sentences,
+    pytester, annotation_pins, root_sentences
 ):
-    pytester.makepyfile(f"""
-        from typing import Annotated
-        import pytest
-        from pytest_given import Glossary, given, scenario, sentence, story
+    with given(
+        t'a {pg["Story"].l} `a`, and a {pg["Given annotation"].l} with '
+        t'pins={annotation_pins} over a {pg["Step fixture"].l} pinning a[1]'
+    ):
+        suite = f"""
+            from typing import Annotated
+            import pytest
+            from pytest_given import Glossary, given, scenario, sentence, story
 
-        g = Glossary()
-        guest = g.actor('Guest')
-        search = g.activity('search')
-        room = g.work_object('Room')
-        a = story('Book', [
-            sentence(guest, search, room),
-            sentence(guest('Alice'), search, room),
-            sentence(guest('Bob'), search, room)])
+            g = Glossary()
+            guest = g.actor('Guest')
+            search = g.activity('search')
+            room = g.work_object('Room')
+            a = story('Book', [
+                sentence(guest, search, room),
+                sentence(guest('Alice'), search, room),
+                sentence(guest('Bob'), search, room)])
 
-        @pytest.fixture
-        @given('a fixture label', pins=a[1])
-        def arranged():
-            with given('an inner step', pins=a[3]):
+            @pytest.fixture
+            @given('a fixture label', pins=a[1])
+            def arranged():
+                with given('an inner step', pins=a[3]):
+                    pass
+                return 1
+
+            @scenario('x', stories=a)
+            def test_x(
+                arranged: Annotated[
+                    int, given('a retold label', pins={annotation_pins})
+                ],
+            ):
                 pass
-            return 1
-
-        @scenario('x', stories=a)
-        def test_x(
-            arranged: Annotated[int, given('a retold label', pins={annotation_pins})],
-        ):
-            pass
-    """)
+            """
+        pytester.makepyfile(suite)
+        attach('suite', textwrap.dedent(suite).strip())
     with when('the suite runs', pins=adopt_pytest_given['graft']):
         result = pytester.runpytest('--given-json=report.json')
-    with then(t'the grafted root pins the sentences {root_sentences} of a'):
+    with then(t'the grafted root pins the sentences {root_sentences} of `a`'):
         result.assert_outcomes(passed=1)
         data = json.loads(pytester.path.joinpath('report.json').read_text())
         root = data['scenarios'][0]['steps'][0]

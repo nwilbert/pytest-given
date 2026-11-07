@@ -649,16 +649,110 @@
 ## ✓ A «given annotation» retells the «pins» of the «step fixture» label it replaces · 3 cases
 `tests/integration/test_plugin.py::test_a_given_annotation_retells_the_step_fixture_pins`
 
-- **given** a given annotation with pins={annotation_pins} over a step fixture pinning a\[1\]
+- **given** a «story» `a`, and a «given annotation» with pins={annotation_pins} over a «step fixture» pinning a\[1\]
+    - 📎 suite — *see parameter table*
 - **when** the suite runs
-- **then** the grafted root pins the sentences {root_sentences} of a
+- **then** the grafted root pins the sentences {root_sentences} of `a`
 - **then** the inner «step» keeps its own «pin», a\[3\]
 
-| case ID | annotation_pins | root_sentences |
-|---|---|---|
-| none-keeps | None | \[1\] |
-| empty-clears | \[\] | \[\] |
-| list-replaces | \[a\[2\]\] | \[2\] |
+| case ID | annotation_pins | suite | root_sentences |
+|---|---|---|---|
+| none-keeps | None | suite | \[1\] |
+| empty-clears | \[\] | suite | \[\] |
+| list-replaces | \[a\[2\]\] | suite | \[2\] |
+
+- **none-keeps** — suite:
+    ```
+    from typing import Annotated
+    import pytest
+    from pytest_given import Glossary, given, scenario, sentence, story
+
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.activity('search')
+    room = g.work_object('Room')
+    a = story('Book', [
+        sentence(guest, search, room),
+        sentence(guest('Alice'), search, room),
+        sentence(guest('Bob'), search, room)])
+
+    @pytest.fixture
+    @given('a fixture label', pins=a[1])
+    def arranged():
+        with given('an inner step', pins=a[3]):
+            pass
+        return 1
+
+    @scenario('x', stories=a)
+    def test_x(
+        arranged: Annotated[
+            int, given('a retold label', pins=None)
+        ],
+    ):
+        pass
+    ```
+
+- **empty-clears** — suite:
+    ```
+    from typing import Annotated
+    import pytest
+    from pytest_given import Glossary, given, scenario, sentence, story
+
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.activity('search')
+    room = g.work_object('Room')
+    a = story('Book', [
+        sentence(guest, search, room),
+        sentence(guest('Alice'), search, room),
+        sentence(guest('Bob'), search, room)])
+
+    @pytest.fixture
+    @given('a fixture label', pins=a[1])
+    def arranged():
+        with given('an inner step', pins=a[3]):
+            pass
+        return 1
+
+    @scenario('x', stories=a)
+    def test_x(
+        arranged: Annotated[
+            int, given('a retold label', pins=[])
+        ],
+    ):
+        pass
+    ```
+
+- **list-replaces** — suite:
+    ```
+    from typing import Annotated
+    import pytest
+    from pytest_given import Glossary, given, scenario, sentence, story
+
+    g = Glossary()
+    guest = g.actor('Guest')
+    search = g.activity('search')
+    room = g.work_object('Room')
+    a = story('Book', [
+        sentence(guest, search, room),
+        sentence(guest('Alice'), search, room),
+        sentence(guest('Bob'), search, room)])
+
+    @pytest.fixture
+    @given('a fixture label', pins=a[1])
+    def arranged():
+        with given('an inner step', pins=a[3]):
+            pass
+        return 1
+
+    @scenario('x', stories=a)
+    def test_x(
+        arranged: Annotated[
+            int, given('a retold label', pins=[a[2]])
+        ],
+    ):
+        pass
+    ```
 
 ## ✓ A plugin registered from a conftest warns instead of degrading silently
 `tests/integration/test_plugin.py::test_a_conftest_registered_plugin_warns_instead_of_degrading_silently` · validation
@@ -1742,7 +1836,7 @@
 - **when** a near-miss name is subscripted
 - **then** a PytestGivenError is raised with a spelling hint
 
-## ✓ A «kindless» «term» takes its kind from the «slots» it fills · 5 cases
+## ✓ A «kindless» «term» takes its kind from the «slots» it fills · 4 cases
 `tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots` · diagnostics
 
 - **given** a «kindless» «term» filling the {slots} «slots», one «story» each
@@ -1751,11 +1845,10 @@
 
 | slots | kind |
 |---|---|
-| \[\] | None |
-| \['actor'\] | actor |
-| \['verb'\] | activity |
-| \['noun'\] | object |
-| \['actor', 'noun'\] | actor |
+| actor | actor |
+| verb | activity |
+| noun | object |
+| actor, noun | actor |
 
 ## ✓ A «kindless» «term» filling incompatible «slots» is refused · 2 cases
 `tests/unit/capture/test_kind_inference.py::test_a_kindless_term_in_incompatible_slots_is_refused` · diagnostics, validation
@@ -1766,8 +1859,8 @@
 
 | slots |
 |---|
-| \['verb', 'actor'\] |
-| \['verb', 'noun'\] |
+| verb, actor |
+| verb, noun |
 
 ## ✓ A declared kind must fit the «slot» its «term» fills · 9 cases
 `tests/unit/capture/test_kind_inference.py::test_a_declared_kind_must_fit_its_slot` · diagnostics, validation
@@ -3111,19 +3204,6 @@
 | \['guest'\] | False |
 | \[\] | False |
 
-## ✓ An under-anchored «sentence» is covered only through a «pin» · 2 cases
-`tests/unit/report/test_coverage.py::test_an_under_anchored_sentence_is_covered_only_through_a_pin`
-
-- **given** a «story» whose «sentence» names a single «term»
-- **given** a «step» narrating that «term», «pinning» the «sentence»: {pinned}
-- **when** «coverage» is computed against the «story»
-- **then** the «sentence» is covered: {covered}
-
-| pinned | covered |
-|---|---|
-| False | False |
-| True | True |
-
 ## ✓ A nested «step» covers a «sentence» like a top-level one
 `tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
 
@@ -3696,7 +3776,7 @@
 `tests/unit/report/test_story_view.py::test_an_under_anchored_sentence_reads_as_untracked_until_pinned`
 
 - **given** a «story» whose only «sentence» names a single «term»
-- **given** a «scenario» whose «step» «pins» it: {pinned}
+- **given** a «scenario» whose «step» narrates that «term», «pinning» the «sentence»: {pinned}
 - **when** the story rollups are built
 - **then** it reads as untracked: {untracked}
 
