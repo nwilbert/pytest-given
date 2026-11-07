@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-10-24T11:47:00.805022+00:00",
-    "pytest_version": "9.1.1",
-    "plugin_version": "0.5.1",
-    "commit_sha": "c823364d0a12a3a8b797f47d3d4efc3487a16389",
+    "timestamp": "2026-11-07T13:01:42.003594+00:00",
+    "pytest_version": "9.2.0",
+    "plugin_version": "0.5.2",
+    "commit_sha": "1b5c74282d934f30c480d3884ca9bb432f688470",
     "title": "Coffee Shop Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/coffeeshop.html"
   },
@@ -213,7 +213,7 @@
         "pricing"
       ],
       "status": "xfailed",
-      "duration_ms": 81,
+      "duration_ms": 73,
       "steps": [
         {
           "phase": "given",
@@ -353,14 +353,14 @@
                 },
                 {
                   "path": "site-packages/_pytest/logging.py",
-                  "lineno": 865,
+                  "lineno": 878,
                   "func": "pytest_runtest_call",
                   "code": "    yield",
                   "is_internal": true
                 },
                 {
                   "path": "site-packages/_pytest/capture.py",
-                  "lineno": 900,
+                  "lineno": 906,
                   "func": "pytest_runtest_call",
                   "code": "    return (yield)\n            ^^^^^",
                   "is_internal": true
@@ -381,7 +381,7 @@
                 },
                 {
                   "path": "site-packages/_pytest/python.py",
-                  "lineno": 1707,
+                  "lineno": 1798,
                   "func": "runtest",
                   "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
                   "is_internal": true
@@ -402,7 +402,7 @@
                 },
                 {
                   "path": "site-packages/_pytest/python.py",
-                  "lineno": 167,
+                  "lineno": 187,
                   "func": "pytest_pyfunc_call",
                   "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
                   "is_internal": true
@@ -1618,7 +1618,7 @@
       "module": "test_coffeeshop",
       "tags": [],
       "status": "failed",
-      "duration_ms": 44,
+      "duration_ms": 34,
       "steps": [
         {
           "phase": "given",
@@ -1677,14 +1677,14 @@
           },
           {
             "path": "site-packages/_pytest/logging.py",
-            "lineno": 865,
+            "lineno": 878,
             "func": "pytest_runtest_call",
             "code": "    yield",
             "is_internal": true
           },
           {
             "path": "site-packages/_pytest/capture.py",
-            "lineno": 900,
+            "lineno": 906,
             "func": "pytest_runtest_call",
             "code": "    return (yield)\n            ^^^^^",
             "is_internal": true
@@ -1705,7 +1705,7 @@
           },
           {
             "path": "site-packages/_pytest/python.py",
-            "lineno": 1707,
+            "lineno": 1798,
             "func": "runtest",
             "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
             "is_internal": true
@@ -1726,7 +1726,7 @@
           },
           {
             "path": "site-packages/_pytest/python.py",
-            "lineno": 167,
+            "lineno": 187,
             "func": "pytest_pyfunc_call",
             "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
@@ -1784,7 +1784,7 @@
         "loyalty"
       ],
       "status": "xfailed",
-      "duration_ms": 45,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -1854,14 +1854,14 @@
           },
           {
             "path": "site-packages/_pytest/logging.py",
-            "lineno": 865,
+            "lineno": 878,
             "func": "pytest_runtest_call",
             "code": "    yield",
             "is_internal": true
           },
           {
             "path": "site-packages/_pytest/capture.py",
-            "lineno": 900,
+            "lineno": 906,
             "func": "pytest_runtest_call",
             "code": "    return (yield)\n            ^^^^^",
             "is_internal": true
@@ -1882,7 +1882,7 @@
           },
           {
             "path": "site-packages/_pytest/python.py",
-            "lineno": 1707,
+            "lineno": 1798,
             "func": "runtest",
             "code": "    self.ihook.pytest_pyfunc_call(pyfuncitem=self)",
             "is_internal": true
@@ -1903,7 +1903,7 @@
           },
           {
             "path": "site-packages/_pytest/python.py",
-            "lineno": 167,
+            "lineno": 187,
             "func": "pytest_pyfunc_call",
             "code": "    result = testfunction(**testargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^",
             "is_internal": true
