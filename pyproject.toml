@@ -61,7 +61,7 @@ coverage = ["coverage>=7.14.0"]
 test = ["pytest-xdist>=3.8.0"]
 audit = ["pip-audit>=2.10.0"]
 # only for the example:
-bdd = ["pytest-bdd>=9.0.0"]
+bdd = ["pytest-bdd>=9.0.1"]
 build = ["library-skills>=0.0.19", { include-group = "nox" }]
 docs = [
     "zensical>=0.0.61",
