@@ -197,3 +197,24 @@
   font-style: normal;
   text-align: right;
 }
+
+.md-typeset .pg-report-shot {
+  width: 100%; /* the theme's figure is fit-content */
+  margin: 1.5rem 0 2rem;
+}
+.md-typeset .pg-report-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.4rem;
+}
+.md-typeset .pg-report-shot .pg-report-shot-dark {
+  display: none;
+}
+[data-md-color-scheme="slate"] .md-typeset .pg-report-shot .pg-report-shot-light {
+  display: none;
+}
+[data-md-color-scheme="slate"] .md-typeset .pg-report-shot .pg-report-shot-dark {
+  display: block;
+}

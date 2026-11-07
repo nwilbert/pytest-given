@@ -26,6 +26,13 @@ title: Home
 
 </div>
 
+<figure class="pg-report-shot">
+  <a href="examples/hotel-booking.html#scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking" target="_blank">
+    <img class="pg-report-shot-light" src="assets/report-screenshot-light.png" width="1120" height="588" alt="The HTML report of the Hotel booking example: a sidebar of status filters and browse options beside a list of scenarios, one expanded to its Given, When and Then steps with glossary terms underlined.">
+    <img class="pg-report-shot-dark" src="assets/report-screenshot-dark.png" width="1120" height="588" alt="The HTML report of the Hotel booking example: a sidebar of status filters and browse options beside a list of scenarios, one expanded to its Given, When and Then steps with glossary terms underlined.">
+  </a>
+</figure>
+
 ## Why pytest-given?
 
 Classical BDD tools (Cucumber, behave, pytest-bdd) center on Gherkin, a natural-language DSL: stakeholders write the tests, and engineers maintain the glue code behind each step. The [BDD page](bdd.md) writes the quick start's scenario that way, for comparison.

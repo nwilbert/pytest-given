@@ -12,6 +12,15 @@ Inspired by [JGiven](https://jgiven.org/) (Java).
 
 **Documentation: <https://nwilbert.github.io/pytest-given/latest/>**
 
+<p align="center">
+  <a href="https://nwilbert.github.io/pytest-given/latest/examples/hotel-booking.html#scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/site/assets/report-screenshot-dark.png">
+      <img src="https://raw.githubusercontent.com/nwilbert/pytest-given/main/docs/site/assets/report-screenshot-light.png" alt="The HTML report of the Hotel booking example: a sidebar of status filters and browse options beside a list of scenarios, one expanded to its Given, When and Then steps with glossary terms underlined." width="840">
+    </picture>
+  </a>
+</p>
+
 Live examples:
 - **[Coffeeshop](https://nwilbert.github.io/pytest-given/latest/examples/coffeeshop.html)**: a tour of the core features.
 - **[Hotel booking](https://nwilbert.github.io/pytest-given/latest/examples/hotel-booking.html)**: a glossary and domain stories, with story coverage.
