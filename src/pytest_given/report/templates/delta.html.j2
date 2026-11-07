@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" data-theme-default="{{ theme_default }}">
+<head>
+{%- set page_title = title %}
+{% include '_head.html.j2' %}
+</head>
+{#- The report's page and component, with what a delta changes: the Change
+    filter, a row per listed scenario and a card per listed term, each shown
+    from one side, and no status, parameter or term-kind colour (`body.delta`
+    in styles.css). -#}
+<body class="delta" x-data="deltaApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
+
+<div class="main">
+
+  {%- from '_macros.html.j2' import source_link, anchor_link, icon_sprite, nav_tab, reason_box, render_error, sidebar_resizer, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, stale_link_snackbar with context -%}
+  {%- from '_delta_macros.html.j2' import change_filter, term_card, delta_sides with context -%}
+  {{ icon_sprite() }}
+
+  {#- The Glossary tab only when a term is listed; no Stories tab. -#}
+  {%- set terms = glossary_view.listed %}
+  <header class="topbar">
+    <div class="topbar-title" title="{{ title }}">{{ title }}</div>
+    {% if terms %}
+    <nav class="frame-nav" role="tablist" aria-label="Delta views">
+      {{ nav_tab('scenarios', 'Scenarios') }}
+      {{ nav_tab('glossary', 'Glossary') }}
+    </nav>
+    {% endif %}
+    <div class="topbar-meta">
+      {#- The two compared sides, each its name and its SHA or time. The
+          arrow is drawn by CSS over a zero-size " to ", so a screen reader
+          and a copy get one line. Inline throughout: a block box would break
+          that line. #}
+      <p class="delta-range">
+        {%- for side in range %}
+        {%- if not loop.first %}<span class="delta-range-to"> to </span>{% endif -%}
+        <span class="delta-range-name">{{ side.name }}</span>
+        {%- if side.detail %} <span class="delta-range-detail">{{ side.detail }}</span>{% endif %}
+        {%- endfor %}
+      </p>
+      <span class="topbar-version">pytest-given {{ plugin_version }}</span>
+      {{ theme_toggle() }}
+    </div>
+  </header>
+
+  <div id="view-scenarios" {% if terms %}role="tabpanel" aria-labelledby="tab-scenarios"{% endif %} x-show="mainView === 'scenarios'">
+  <div class="view-layout">
+  <div class="sidebar">
+    {{ search_box('search', 'Search titles and tags...') }}
+
+    {{ change_filter('shownChanges', change_counts, unchanged_count) }}
+
+    {{ status_filter() }}
+
+    {% call browse_by(browse_terms) %}
+            {#- As in the report, plus a module's change: by which sides have the
+                module at all, so a package row, which is no module, has none. #}
+            <template x-if="view === 'modules' && moduleChange(group.id)">
+              <span class="delta-module-mark" :data-change="moduleChange(group.id)" :title="'Module ' + moduleChange(group.id)"
+                    x-text="changeGlyph(moduleChange(group.id))"></span>
+            </template>
+    {%- endcall %}
+  </div>
+  {{ sidebar_resizer() }}
+  <div class="view-main">
+  {% if listed %}
+  <div class="header">
+    <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+      <div class="header-title" x-text="filteredCount + ' change' + (filteredCount !== 1 ? 's' : '')"></div>
+      <div class="header-context" x-text="filterSummary"></div>
+      {{- filter_chips() }}
+    </div>
+  </div>
+
+  <div class="scenario-list">
+  {% for item in listed %}
+  {%- set scenario = item.shown -%}
+  {%- set before = item.delta.before -%}
+  {%- set index = loop.index0 -%}
+  {%- set has_body = item.has_body -%}
+  <div class="scenario{{ ' multi-case' if scenario.parameters and scenario.parameters.cases | length > 1 else '' }}"
+       data-change="{{ item.change }}"
+       x-show="isVisible({{ index }})"
+       id="scenario-{{ index }}">
+    <div class="scenario-header{% if not has_body %} scenario-header-empty{% endif %}"{% if has_body %} @click="toggleScenario({{ index }})"{% endif %}>
+      <div style="display:flex; align-items:center;">
+        {% if has_body %}<button type="button" class="disclosure-btn" aria-controls="scenario-body-{{ index }}" :aria-expanded="!!expandedScenarios[{{ index }}]" :aria-label="(expandedScenarios[{{ index }}] ? 'Collapse' : 'Expand') + ' scenario'" @click.stop="toggleScenario({{ index }})"><span class="scenario-chevron" :class="{ 'scenario-chevron-open': expandedScenarios[{{ index }}] }"></span></button>{% else %}<span class="scenario-chevron-placeholder"></span>{% endif %}
+        <span class="delta-title">
+          <span class="delta-title-line">
+            {%- if item.change == 'removed' %}
+            <del class="scenario-title" data-side="before">{{ scenario.narration | narration('before') }}</del>
+            {%- else %}
+            <span class="scenario-title" data-side="after">{{ scenario.narration | narration('after') }}</span>
+            {%- endif %}
+            {{ anchor_link(item.fragment) }}
+          </span>
+          {%- if item.change != 'removed' and item.delta.title_changed %}
+          <span class="delta-was" data-side="before">was <del>{{ before.narration | narration('before') }}</del></span>
+          {%- endif %}
+        </span>
+      </div>
+      <span class="scenario-meta">
+        <span class="delta-change-label" data-change="{{ item.change }}">{{ item.change }}</span>
+        {%- if item.delta.paired_by == 'rename-log' %}
+        <span class="delta-badge" title="Paired by the rename log">mapped by hand</span>
+        {%- endif %}
+        {%- for tag in scenario.tags %}
+        {%- set added = tag in item.delta.tags_added %}
+        <button type="button" class="btn-reset scenario-tag{% if added %} delta-tag-added{% endif %}" data-tag="{{ tag }}"{% if added %} title="Added tag"{% endif %} :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">{% if added %}+{% endif %}{{ tag }}</button>
+        {%- endfor %}
+        {%- for tag in item.delta.tags_removed %}
+        <del class="scenario-tag delta-tag-removed" title="Removed tag">{{ tag }}</del>
+        {%- endfor %}
+        <span class="scenario-status delta-status">
+          {%- if item.change == 'removed' -%}
+          was {{ scenario.status | status_glyph }} {{ scenario.status | status_label }}
+          {%- elif item.delta.status_changed -%}
+          {{ before.status | status_glyph }} {{ before.status | status_label }} → {{ scenario.status | status_glyph }} {{ scenario.status | status_label }}
+          {%- else -%}
+          {{ scenario.status | status_glyph }} {{ scenario.status | status_label }}
+          {%- endif -%}
+        </span>
+        <span class="scenario-duration">{{ scenario.duration_ms }}ms</span>
+      </span>
+    </div>
+
+    <div class="scenario-body" id="scenario-body-{{ index }}" :class="{ expanded: expandedScenarios[{{ index }}] }">
+    <div class="scenario-body-inner">
+      {%- for row in item.reasons %}
+      {{ reason_box(row.status, row.label, row.reason, row.was) }}
+      {%- endfor %}
+      {{ delta_sides(item, index) }}
+
+      {% if scenario.error %}
+      {{ render_error(scenario.error, scenario.status) }}
+      {% endif %}
+
+      {%- if scenario.source %}
+      <div class="scenario-source">{{ source_link(scenario.source, item.side) }}</div>
+      {%- endif %}
+    </div>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+  {% else %}
+  <div class="glossary-empty">No changes</div>
+  {% endif %}
+  </div>{# end .view-main #}
+  </div>{# end .view-layout #}
+  </div>{# end #view-scenarios #}
+
+  {% if terms %}
+  {%- set grouping = glossary_view.grouping %}
+  <div id="view-glossary" role="tabpanel" aria-labelledby="tab-glossary" x-show="mainView === 'glossary'" x-cloak>
+  <div class="view-layout">
+    <div class="sidebar">
+      {{ search_box('glossarySearch', 'Search terms...') }}
+
+      {{ change_filter('shownTermChanges', glossary_view.change_counts, glossary_view.unchanged_count) }}
+
+      {% if not grouping.all_uncategorized %}
+      {{ kind_filter(grouping.kinds) }}
+      {% endif %}
+
+      {% if glossary_view.undefined_count %}
+      {{ definition_filter() }}
+      {% endif %}
+    </div>
+    {{ sidebar_resizer() }}
+
+    <div class="view-main">
+      <div class="header">
+        <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
+          <div class="header-title">Glossary</div>
+          <div class="header-context meta-list">
+            <span>{{ terms | length | plural('term') }}</span>
+            {%- for change, count in glossary_view.change_counts.items() if count %}
+            <span>{{ count }} {{ change }}</span>{% endfor %}
+          </div>
+          <button class="collapse-all-btn" @click="toggleAllTerms()">
+            <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
+            <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glossary-entries">
+      {% for group in grouping.groups %}
+      {% call kind_group(group, grouping.all_uncategorized) %}
+        {% for card in group.entries %}
+        {{ term_card(card) }}
+        {% endfor %}
+      {% endcall %}
+      {% endfor %}
+      {#- Every name, hidden, as on the report's Glossary tab: the name column
+          holds still while the filters hide the cards. -#}
+      <div class="entry-name entry-name-sizer" aria-hidden="true">{% for group in grouping.groups %}{% for card in group.entries %}<span class="term-name">{{ card.shown.canonical }}</span>{% endfor %}{% endfor %}</div>
+      </div>
+      <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
+    </div>
+  </div>
+  </div>{# end #view-glossary #}
+  {% endif %}
+
+</div>
+
+<!-- Shared hover tooltip for term refs; positioned by app.js. -->
+<div id="term-tip" role="tooltip" hidden>
+  <span class="term-tip-name"></span>
+  <span class="term-tip-def"></span>
+</div>
+
+{{ stale_link_snackbar() }}
+
+<script>
+window.__REPORT_DATA__ = {{ app_data_js }};
+{{ app_js }}
+{{ delta_js }}
+</script>
+<script>{{ alpine_js }}</script>
+</body>
+</html>

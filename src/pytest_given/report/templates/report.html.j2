@@ -1,67 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme-default="{{ theme_default }}">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{#- Resolves the theme before the stylesheet parses, so a dark report never
-    flashes light. Order: the viewer's saved choice, then the configured
-    default. All three choices are stored explicitly — an absent key, not
-    "auto", is what means "use the default", so a viewer's System beats a
-    report configured dark. Plain script, no Alpine: it runs before the bundle
-    exists. It owns the whole mechanism — storage, the choice → theme rule and
-    the follow-the-system listener — and hands app.js `window.__REPORT_THEME__`
-    with the resolved `choice` and a `set` the toggle calls. -#}
-<script>
-(function () {
-  var root = document.documentElement;
-  var key = 'pytest-given-theme';
-  var darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  var stored = null;
-  try { stored = localStorage.getItem(key); } catch (error) { /* no storage: this page only */ }
-  var theme = {
-    choice: (stored === 'light' || stored === 'dark' || stored === 'auto') ? stored : root.getAttribute('data-theme-default'),
-    set: function (choice) {
-      theme.choice = choice;
-      apply();
-      try { localStorage.setItem(key, choice); } catch (error) { /* no storage: this page only */ }
-    }
-  };
-  function apply() {
-    var dark = theme.choice === 'dark' || (theme.choice === 'auto' && darkScheme.matches);
-    root.setAttribute('data-theme', dark ? 'dark' : 'light');
-  }
-  apply();
-  darkScheme.addEventListener('change', apply);
-  window.__REPORT_THEME__ = theme;
-})();
-</script>
-<title>{{ metadata.title or metadata.project }}</title>
-<link rel="icon" type="image/svg+xml" href="{{ data_url('logo.svg') }}">
-<style>
-{#- Fontsource variable latin subsets (OFL 1.1, see THIRD-PARTY-LICENSES),
-    inlined so the report stays one file. Upright only: nothing in the report
-    is set in italic, so no face is embedded for the browser to synthesise. -#}
-@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("{{ data_url('fonts/source-sans-3-latin-wght-normal.woff2') }}") format("woff2-variations"); }
-@font-face { font-family: "Source Code Pro"; font-style: normal; font-weight: 200 900; font-display: swap; src: url("{{ data_url('fonts/source-code-pro-latin-wght-normal.woff2') }}") format("woff2-variations"); }
-{{ css }}
-{# One token and one rule per parametrize column, generated for this report's
-   column count. Like every other colour, the token is set once per theme and
-   the rule only reads it. See report/palette.py for how the ring is derived;
-   styles.css holds only the properties every column shares. The `th` half of
-   the selector is there to outrank `.param-table th`, which sets a color of
-   its own. #}
-{%- for light, dark in param_colors %}
-:root { --param-color-{{ loop.index0 }}: {{ light }}; }
-[data-theme="dark"] { --param-color-{{ loop.index0 }}: {{ dark }}; }
-.param-color-{{ loop.index0 }}, th.param-color-{{ loop.index0 }} { color: var(--param-color-{{ loop.index0 }}); }
-{%- endfor %}
-</style>
+{%- set page_title = metadata.title or metadata.project %}
+{% include '_head.html.j2' %}
 </head>
 <body x-data="reportApp()" :style="'--sidebar-w: ' + sidebarWidth + 'px'">
 
 <div class="main">
 
-  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, attachment_icon, attachment_badge, expandable_attachment, render_step, sidebar_resizer, status_badge, status_dot with context -%}
+  {%- from '_macros.html.j2' import source_link, anchor_link, copy_button, citation_title, icon, icon_sprite, render_error, reason_box, sidebar_resizer, status_badge, theme_toggle, search_box, status_filter, browse_by, filter_chips, kind_filter, definition_filter, kind_group, scenario_steps, param_table, stale_link_snackbar, nav_tab, term_disclosure with context -%}
   {{ icon_sprite() }}
 
   {#- The view divs read this too: `role="tabpanel"` only where a tablist
@@ -76,114 +23,27 @@
     {#- The class paints the active tab; `aria-selected` announces it. No roving
         tabindex: three tabs do not earn the arrow-key handling. -#}
     <nav class="frame-nav" role="tablist" aria-label="Report views">
-      <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
-              :class="{ 'nav-tab-active': mainView === 'scenarios' }"
-              :aria-selected="mainView === 'scenarios'"
-              @click="mainView = 'scenarios'">Scenarios</button>
-      {% if tab_visibility.stories %}
-      <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
-              :class="{ 'nav-tab-active': mainView === 'stories' }"
-              :aria-selected="mainView === 'stories'"
-              @click="mainView = 'stories'">Stories</button>
-      {% endif %}
-      {% if tab_visibility.glossary %}
-      <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
-              :class="{ 'nav-tab-active': mainView === 'glossary' }"
-              :aria-selected="mainView === 'glossary'"
-              @click="mainView = 'glossary'">Glossary</button>
-      {% endif %}
+      {{ nav_tab('scenarios', 'Scenarios') }}
+      {% if tab_visibility.stories %}{{ nav_tab('stories', 'Stories') }}{% endif %}
+      {% if tab_visibility.glossary %}{{ nav_tab('glossary', 'Glossary') }}{% endif %}
     </nav>
     {% endif %}
     <div class="topbar-meta">
       <span class="topbar-version">pytest {{ metadata.pytest_version }}</span>
       <span class="topbar-version">pytest-given {{ metadata.plugin_version }}</span>
       <span x-text="formattedTimestamp"></span>
-      {#- Text, not an icon: the current state has to be readable without
-          hovering. `aria-pressed` on each segment is the accessible state. -#}
-      <div class="seg-toggle" role="group" aria-label="Theme">
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'light' }" :aria-pressed="themeChoice === 'light'" @click="setTheme('light')">Light</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'dark' }" :aria-pressed="themeChoice === 'dark'" @click="setTheme('dark')">Dark</button>
-        <button type="button" class="btn-reset seg-btn" :class="{ active: themeChoice === 'auto' }" :aria-pressed="themeChoice === 'auto'" @click="setTheme('auto')">System</button>
-      </div>
+      {{ theme_toggle() }}
     </div>
   </header>
 
   <div id="view-scenarios" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-scenarios"{% endif %} x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
-    <label class="search-box">
-      <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input type="text" placeholder="Search names and tags..." x-model="search">
-      <button type="button" class="search-box-clear" @click="search = ''" x-show="search" aria-label="Clear search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </label>
+    {{ search_box('search', 'Search names and tags...') }}
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">Status</div>
-      <div class="status-pills">
-        {#- Disabled at zero: the counts are report totals, so there is
-            nothing to filter, and `_visible` ignores a status no scenario
-            has. Skipped and Expected failure hide instead, being the rare
-            ones. -#}
-        {%- for status in statuses %}
-        <button type="button" class="btn-reset status-pill" :class="{ 'active-{{ status }}': shownStatuses.{{ status }} }" :aria-pressed="shownStatuses.{{ status }}" @click="shownStatuses.{{ status }} = !shownStatuses.{{ status }}" {% if status in ('passed', 'failed') %}:disabled="counts.{{ status }} === 0"{% else %}x-show="counts.{{ status }} > 0"{% endif %}>{{ status | status_glyph }} {{ status | status_label | capitalize }} <span x-text="counts.{{ status }}"></span></button>
-        {%- endfor %}
-      </div>
-    </div>
+    {{ status_filter() }}
 
-    <div class="sidebar-section">
-      <div class="sidebar-label-row">
-        <div class="sidebar-label">Browse by</div>
-        {#- Sort applies to the group rows below, whatever axis is showing:
-            "A–Z" reads the name column, "Count" the count column. -#}
-        <div class="sort-toggle">
-          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'name' }"
-                  :aria-pressed="sortBy === 'name'" @click="sortBy = 'name'"
-                  aria-label="Sort groups by name">A&ndash;Z</button>
-          <button type="button" class="sort-btn" :class="{ 'sort-btn-active': sortBy === 'count' }"
-                  :aria-pressed="sortBy === 'count'" @click="sortBy = 'count'"
-                  aria-label="Sort groups by scenario count">Count</button>
-        </div>
-      </div>
-      <div class="seg-toggle">
-        {#- Modules leads and opens by default: it is the one axis every report
-            has, so no report opens on an empty tree. The Terms axis needs a
-            glossary to browse; without one the segment is simply absent. -#}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'modules' }" :aria-pressed="view === 'modules'" @click="view = 'modules'">Modules</button>
-        {% if tab_visibility.glossary %}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'terms' }" :aria-pressed="view === 'terms'" @click="view = 'terms'">Terms</button>
-        {% endif %}
-        <button type="button" class="btn-reset seg-btn" :class="{ active: view === 'tags' }" :aria-pressed="view === 'tags'" @click="view = 'tags'">Tags</button>
-      </div>
-      <div class="nav-tree">
-        {#- Rows key on `group.id`, not the display name: a term row shows its
-            canonical name but filters by term id, and a module row shows one
-            path segment but filters by the whole path. The row filters and the
-            chevron expands — the chevron stops propagation so it opens a
-            package without filtering by it, and selecting a package opens it
-            too (see `onGroupClick`), so the common case needs no aim. Only a
-            module package or tag prefix has children, so only those render a
-            chevron; the spacer aligns the leaves beside them and stays out
-            of an axis that does not nest at all.
-            `--nav-indent` is what makes the flat row list read as a tree.
-            The row keeps its own @click so the padding stays clickable; the
-            inner button is what the keyboard reaches, and stops propagation so
-            the two do not both fire. -#}
-        <template x-for="group in groups" :key="group.id">
-          <div class="nav-group" :class="{ 'nav-group-active': isGroupActive(group), 'nav-group-bucket': group.bucket }"
-               :style="'--nav-indent:' + (group.depth * 12) + 'px'" @click="onGroupClick(group)">
-            <button type="button" class="nav-group-toggle" x-show="group.hasChildren"
-                    :class="{ 'nav-group-toggle-open': expandedGroups[group.id] }"
-                    :aria-expanded="!!expandedGroups[group.id]"
-                    :aria-label="(expandedGroups[group.id] ? 'Collapse ' : 'Expand ') + group.name"
-                    @click.stop="toggleGroup(group.id)"></button>
-            <span class="nav-group-toggle-placeholder" x-show="!group.hasChildren && groupsNest"></span>
-            <button type="button" class="btn-reset nav-group-select"
-                    :aria-pressed="isGroupActive(group)"
-                    @click.stop="onGroupClick(group)">
-              <span class="nav-group-name" x-text="group.name"></span>
-            </button>
+    {% call browse_by(tab_visibility.glossary) %}
             {#- A tag row's copy button sits beside its name, as a story's does
                 beside its title, and opens the same menu. -#}
             {% if citations %}
@@ -199,11 +59,7 @@
                     x-show="view === 'tags'" :data-anchor="tagAnchor(group.id)"
                     @click.stop="copyAnchor($el)">{{ icon('link') }}</button>
             {% endif %}
-            <span class="nav-group-count" x-text="group.count"></span>
-          </div>
-        </template>
-      </div>
-    </div>
+    {%- endcall %}
   </div>
   {{ sidebar_resizer() }}
   <div class="view-main">
@@ -211,34 +67,7 @@
     <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
       <div class="header-title" x-text="filteredCount + ' Scenario' + (filteredCount !== 1 ? 's' : '')"></div>
       <div class="header-context" x-text="filterSummary"></div>
-      {#- One chip per active filter, each dismissable on its own. Tags and
-          terms intersect (AND) and so can stack; module is single-select. -#}
-      <span class="filter-chip" x-show="moduleFilter" x-cloak>
-        Module: <span x-text="moduleFilter"></span>
-        <button type="button" class="filter-chip-x" @click="clearModuleFilter()" aria-label="Clear module filter">×</button>
-      </span>
-      <template x-for="tag in tagFilters" :key="tag">
-        <span class="filter-chip" x-cloak>
-          Tag: <span x-text="tagLabel(tag)"></span>
-          <button type="button" class="filter-chip-x" @click="removeTagFilter(tag)" aria-label="Clear tag filter">×</button>
-        </span>
-      </template>
-      <template x-for="termId in termFilters" :key="termId">
-        <span class="filter-chip" x-cloak>
-          Term: <span x-text="termLabel(termId)"></span>
-          <button type="button" class="filter-chip-x" @click="removeTermFilter(termId)" aria-label="Clear term filter">×</button>
-        </span>
-      </template>
-      {#- The sentence label is its whole prose, so it truncates and carries
-          the full prose in a title rather than pushing the chips off the row. -#}
-      <span class="filter-chip" x-show="sentenceFilter" x-cloak>
-        <span class="filter-chip-text" x-text="sentenceLabel(sentenceFilter)" :title="sentenceLabel(sentenceFilter)"></span>
-        <button type="button" class="filter-chip-x" @click="clearSentenceFilter()" aria-label="Clear sentence filter">×</button>
-      </span>
-      <button class="collapse-all-btn" @click="toggleAllScenarios()">
-        <span x-text="anyScenariosExpanded ? 'Collapse all' : 'Expand all'"></span>
-        <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyScenariosExpanded }"></span>
-      </button>
+      {{- filter_chips(sentence=true) }}
     </div>
   </div>
 
@@ -282,110 +111,10 @@
     <div class="scenario-body-inner">
       {% if scenario.skip_reason %}{{ reason_box('skipped', 'Skipped:', scenario.skip_reason) }}{% endif %}
       {% if scenario.xfail_reason %}{{ reason_box('xfailed', 'Expected to fail:', scenario.xfail_reason) }}{% endif %}
-      <div class="steps">
-        {%- set scenario_idx = loop.index0 -%}
-        {#- A running count, not the inner loop's index: step ids key
-            `expandedSteps`, so they must stay unique across blocks. -#}
-        {%- set ns = namespace(step_idx=0) -%}
-        {%- for block in scenario.steps | phase_blocks -%}
-          <div class="phase-block" data-block="{{ loop.index0 }}">
-            <div class="phase-label">{{ block[0].phase | capitalize }}</div>
-            {%- for step in block -%}
-            <div class="phase-steps">
-              {{ render_step(step, 's' ~ scenario_idx ~ '_' ~ ns.step_idx) }}
-            </div>
-            {%- set ns.step_idx = ns.step_idx + 1 -%}
-            {%- endfor -%}
-          </div>
-        {%- endfor -%}
-      </div>
+      {{ scenario_steps(scenario, loop.index0) }}
 
       {% if scenario.parameters %}
-      {#- Only when the cases differ in status: a column of one glyph repeats
-          the header's status badge on every row. -#}
-      {%- set show_status = scenario.parameters.has_mixed_statuses -%}
-      {#- Only when some case ID is custom: generated ids restate
-          the value columns. -#}
-      {%- set show_ids = scenario.parameters.has_custom_ids -%}
-      {%- set table_width = scenario.parameters.columns | length + show_status + show_ids %}
-      {#- Each column carries its phase block, so a phase hover can outline the
-          narration and its columns together. The id and status columns share
-          one of their own: they frame the row, at its two ends. -#}
-      {%- set col_blocks = scenario | column_phase_blocks %}
-      {%- set repr_cols = scenario | repr_columns %}
-      <div class="param-table-scroll">
-      <table class="param-table">
-        <thead>
-          <tr>
-            {% if show_ids %}<th class="param-id" data-block="frame">case ID</th>{% endif %}
-            {% for col in scenario.parameters.columns %}
-            <th {% if col | param_color_class %}class="{{ col | param_color_class }}" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>{{ col.name }}</th>
-            {% endfor %}
-            {% if show_status %}<th class="param-status" data-block="frame">status</th>{% endif %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for case in scenario.parameters.cases %}
-          {%- set case_idx = loop.index0 -%}
-          <tr data-case-row class="{{ case.status ~ '-row' if case.status in ('failed', 'xfailed') else '' }}">
-            {% if show_ids %}<th scope="row" class="param-id" data-block="frame">{{ case.id | case_id }}</th>{% endif %}
-            {% for col, val in scenario.parameters.cells(case) %}
-            {% if col.kind == 'attachment' %}
-            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}>
-              {% if val %}
-              {# Keyed on the column's position, never on `col.id`: the id is report data and this lands inside an Alpine expression. #}
-              {{ attachment_badge('s' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0, col.name, val.content_type) }}
-              {% endif %}
-            </td>
-            {% else %}
-            {# `data-subst` only where the cell has something to substitute: a
-               generated column is blank for a case that recorded no value, and
-               substituting that blank would erase the step's {token} instead of
-               replacing it. A `param` cell always substitutes — `None` there is
-               a real parametrize value. #}
-            <td {% if col.id in repr_cols %}class="param-repr" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}{% if val is boolean %} data-boolean="{{ val }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
-            {% endif %}
-            {% endfor %}
-            {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}
-          </tr>
-          {% if case.error %}
-          <tr>
-            <td colspan="{{ table_width }}">
-              {{ render_error(case.error, case.status) }}
-            </td>
-          </tr>
-          {% endif %}
-          {#- A payload opens across the whole table rather than inside its
-              cell: an attachment is routinely wider than any column, and a
-              cell that holds one both squeezes the columns beside it (the
-              collapsed content still sizes the column) and clips what it
-              cannot fit. -#}
-          {% for col, val in scenario.parameters.cells(case) %}
-          {% if col.kind == 'attachment' and val %}
-          {% set cell_id = 's' ~ scenario_idx ~ '_case' ~ case_idx ~ '_col' ~ loop.index0 %}
-          <tr class="attachment-panel-row">
-            <td class="attachment-panel" colspan="{{ table_width }}">
-              <div class="attachment-expand" :class="{ expanded: expandedAttachments['{{ cell_id }}'] }">
-                <div class="attachment-expand-inner">
-                  <div class="attachment-panel-body">
-                    {#- The column name alone: the panel opens under its own
-                        row, so the case is already on screen — unlike a Markdown
-                        block, which is collected below the whole table and needs
-                        the case key to say where it belongs. What the caption is
-                        for is telling two panels open on one row apart. -#}
-                    <div class="attachment-panel-label">{{ col.name }}</div>
-                    <div class="attachment-content"><pre>{{ val.content }}</pre></div>
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-          {% endif %}
-          {% endfor %}
-          {% endfor %}
-        </tbody>
-      </table>
-      </div>
+      {{ param_table(scenario, loop.index0) }}
       {% endif %}
 
       {% if scenario.error %}
@@ -532,11 +261,7 @@
         <div class="entry kind-{{ term.kind or 'kindless' }}" id="term-{{ term.id }}" data-term-id="{{ term.id }}"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="{{ term.id }}" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="{{ term.id }}"
-                    aria-controls="term-refs-{{ term.id }}"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            {{ term_disclosure(term.id) }}
             <span class="entry-name">
               <span class="term-name">{{ term.canonical }}{{ copy_button('term', term.id, 'view=glossary&term=' ~ term.id) }}</span>
             </span>
@@ -602,7 +327,7 @@
   <div id="view-glossary" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-glossary"{% endif %}{% if glossary %} data-grouping="{{ glossary_view.default_grouping }}"{% endif %} x-show="mainView === 'glossary'" x-cloak>
   {% if glossary %}
   {% set undefined_count = glossary_view.undefined_count %}
-  {% set all_uncategorized = glossary_view.all_uncategorized %}
+  {% set all_uncategorized = glossary_view.grouping.all_uncategorized %}
   {% set sectioned = glossary_view.section_groups | length > 0 %}
   {% set switch = glossary_view.show_grouping_switch %}
   <div class="view-layout">
@@ -616,13 +341,7 @@
         </div>
       </div>
       {% endif %}
-      <label class="search-box">
-        <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="text" placeholder="Search terms..." x-model="glossarySearch">
-        <button type="button" class="search-box-clear" @click="glossarySearch = ''" x-show="glossarySearch" aria-label="Clear search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </label>
+      {{ search_box('glossarySearch', 'Search terms...') }}
 
       {% if sectioned %}
       {#- Rows select with OR: the tab shows the terms of any selected
@@ -645,30 +364,13 @@
       {% endif %}
 
       {% if not all_uncategorized %}
-      <div class="sidebar-section"{% if sectioned %} x-show="glossaryGrouping === 'kind'"{% endif %}>
-        <div class="sidebar-label">Show kinds</div>
-        {% for kind in glossary_view.kinds %}
-        <label class="kind-filter-row">
-          <input type="checkbox" x-model="glossaryKindFilter.{{ kind.key }}">
-          <span class="kind-swatch kind-{{ kind.key }}"></span>
-          <span>{{ kind.label }}</span>
-          <span class="nav-group-count">{{ kind.count }}</span>
-        </label>
-        {% endfor %}
-      </div>
+      {{ kind_filter(glossary_view.grouping.kinds, "glossaryGrouping === 'kind'" if sectioned else none) }}
       {% endif %}
 
       {# When every term is defined, the Definitions filter can only ever be a
          no-op: drop it, mirroring the kind grouping's all_uncategorized hide. #}
       {% if undefined_count %}
-      <div class="sidebar-section">
-        <div class="sidebar-label">Definitions</div>
-        <div class="seg-toggle">
-          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'all' }" :aria-pressed="glossaryDefinitionFilter === 'all'" @click="glossaryDefinitionFilter = 'all'">All</button>
-          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'defined' }" :aria-pressed="glossaryDefinitionFilter === 'defined'" @click="glossaryDefinitionFilter = 'defined'">Defined</button>
-          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryDefinitionFilter === 'undefined' }" :aria-pressed="glossaryDefinitionFilter === 'undefined'" @click="glossaryDefinitionFilter = 'undefined'">Undefined</button>
-        </div>
-      </div>
+      {{ definition_filter() }}
       {% endif %}
     </div>
     {{ sidebar_resizer() }}
@@ -678,7 +380,7 @@
         <div style="display:flex; align-items:baseline; gap:var(--space-lg);">
           <div class="header-title">Glossary</div>
           <div class="header-context meta-list">
-            <span>{{ glossary.terms | length | plural('term') }}</span>{% if not all_uncategorized %}{% for kind in glossary_view.kinds %}
+            <span>{{ glossary.terms | length | plural('term') }}</span>{% if not all_uncategorized %}{% for kind in glossary_view.grouping.kinds %}
             <span>{{ kind.summary }}</span>{% endfor %}{% endif %}
           </div>
           <button class="collapse-all-btn" @click="toggleAllTerms()">
@@ -707,16 +409,8 @@
       </div>
       {% endfor %}
       {% if not sectioned or switch %}
-      {% for group in glossary_view.kind_groups %}
-      {% set kind_label, kind_key = group.label, group.key %}
-      <div class="kind-group" x-show="glossaryGrouping !== 'section' && glossaryKindFilter.{{ kind_key }} && visibleTermCount('kind', '{{ kind_key }}') > 0">
-        {% if not all_uncategorized %}
-        <div class="kind-header">
-          <span class="kind-title kind-{{ kind_key }}">{{ kind_label }}</span>
-          <span class="kind-meta" x-text="visibleTermLabel('kind', '{{ kind_key }}')"></span>
-        </div>
-        {% endif %}
-        <div class="entry-list kind-{{ kind_key }}">
+      {% for group in glossary_view.grouping.groups %}
+      {% call kind_group(group, all_uncategorized) %}
         {% for entry in group.entries %}
         {% if sectioned %}
         {#- Filled with a clone of the Section grouping's card the first time
@@ -726,8 +420,7 @@
         {{ term_card(entry) }}
         {% endif %}
         {% endfor %}
-        </div>
-      </div>
+      {% endcall %}
       {% endfor %}
       {% endif %}
       {#- Every name, hidden: the name column sizes to the widest of them, so
@@ -765,26 +458,7 @@
 </div>
 {% endif %}
 
-<!-- Names the parts of an arriving link this report no longer has. The live
-     region stays put so the message inserted into it is announced; the
-     countdown bar's animation is the timer, so hovering or focusing the
-     snackbar pauses both. -->
-<div class="snackbar-region" role="status" aria-live="polite">
-  <template x-if="staleLink">
-    <div class="snackbar">
-      <div class="snackbar-body">
-        <p class="snackbar-title">This link is out of date</p>
-        <ul class="snackbar-list">
-          <template x-for="part in staleLink" :key="part.kind + ':' + part.value">
-            <li>No <span x-text="part.kind"></span> <code x-text="part.value"></code></li>
-          </template>
-        </ul>
-      </div>
-      <button type="button" class="snackbar-close btn-reset" aria-label="Dismiss" @click="staleLink = null"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-      <span class="snackbar-countdown" aria-hidden="true" @animationend="staleLink = null"></span>
-    </div>
-  </template>
-</div>
+{{ stale_link_snackbar() }}
 
 <script>
 window.__REPORT_DATA__ = {{ app_data_js }};

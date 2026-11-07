@@ -4,22 +4,24 @@ A run may be told to write any combination of JSON, HTML and Markdown, and
 they have to agree with each other: a render that raises must not leave this
 run's JSON beside the previous run's HTML, with nothing on either saying so.
 So rendering and writing are separate steps — `render_sinks` does everything
-that can fail and touches no file, `write_sinks` touches files and cannot fail
-on content, and `discard_stale_sinks` removes a previous run's report that
-would otherwise read as current.
+that can fail and touches no file, `write_all_or_none` touches files and
+cannot fail on content, and `discard_files` removes a previous run's report
+that would otherwise read as current.
 
 `emit_sinks` is the whole transaction and the entry point callers want: the
-sequencing *is* the guarantee, so keeping it here is what stops two callers
-from each spelling it out and drifting apart.
+sequencing *is* the guarantee, so keeping it in one place (`emit_files`, which
+the delta's sinks share) is what stops callers from each spelling it out and
+drifting apart.
 
 Pytest-free like the rest of `report/`: the caller resolves its options into a
 `SinkConfig`, which is also what lets `pytest-given report` reach the same code.
 """
 
 import json
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Protocol
 
 from ..model import (
     JsonObject,
@@ -40,6 +42,8 @@ from .theme import DEFAULT_THEME, Theme
 # each spelling their own.
 DEFAULT_JSON_PATH = Path('given-report/report-data.json')
 DEFAULT_HTML_PATH = Path('given-report/report.html')
+DEFAULT_DELTA_JSON_PATH = Path('given-report/delta-data.json')
+DEFAULT_DELTA_HTML_PATH = Path('given-report/delta.html')
 
 # What a Markdown sink path may end in — also how `pytest-given report` tells
 # a Markdown `-o` from an HTML one.
@@ -71,9 +75,9 @@ class SinkConfig:
     report_url: ReportUrl | None = None
 
     def __post_init__(self) -> None:
-        _require_suffix('JSON', self.json_path, ('.json',))
-        _require_suffix('HTML', self.html_path, ('.html', '.htm'))
-        _require_suffix('Markdown', self.md_path, MD_SUFFIXES)
+        require_suffix('JSON', self.json_path, ('.json',))
+        require_suffix('HTML', self.html_path, ('.html', '.htm'))
+        require_suffix('Markdown', self.md_path, MD_SUFFIXES)
 
     def file_paths(self) -> list[Path]:
         """The paths this run would write, in sink order. Only real files —
@@ -90,12 +94,12 @@ class SinkConfig:
         return bool(self.file_paths()) or self.md_to_stdout
 
 
-def _require_suffix(sink: str, path: Path | None, allowed: tuple[str, ...]) -> None:
+def require_suffix(sink: str, path: Path | None, allowed: tuple[str, ...]) -> None:
     """Refuse a sink path that could not be a report file.
 
     These paths come from CLIs where a bare flag takes the next argument as
     its value, so a mis-ordered `--given-html tests/test_x.py` would aim the
-    renderer at the author's own source — and `discard_stale_sinks` would then
+    renderer at the author's own source — and `discard_files` would then
     unlink it on a run that failed to render. The suffix is the cheapest thing
     that tells the two apart, and checking it turns silent data loss into a
     message before the suite runs.
@@ -113,6 +117,11 @@ class RenderedFile(NamedTuple):
     text: str
 
 
+class Rendered(Protocol):
+    @property
+    def files(self) -> Sequence[RenderedFile]: ...
+
+
 @dataclass(frozen=True)
 class RenderedSinks:
     """Every configured sink rendered to text, before any of them is written."""
@@ -124,26 +133,35 @@ class RenderedSinks:
 def emit_sinks(
     report_dict: JsonObject, config: SinkConfig, source: str | None = None
 ) -> RenderedSinks:
-    """Render and write every configured sink, or leave none of them behind.
+    """Render and write every configured sink, or leave none of them behind."""
+    return emit_files(
+        lambda: render_sinks(report_dict, config, source), config.file_paths()
+    )
+
+
+def emit_files[Files: Rendered](
+    render: Callable[[], Files], paths: list[Path]
+) -> Files:
+    """Render, then write every file, or leave none of `paths` behind.
 
     Rendering can fail on content and writing can fail on the filesystem, and
     either failure has to take the whole set with it — including the *previous*
-    run's report, which would otherwise sit there reading as current. Callers
-    get that as one call rather than as a sequence they each reassemble.
+    run's, which would otherwise sit there reading as current.
 
     The discard notes are folded into the raised message, so a caller reports
     the failure by printing it.
     """
     try:
-        rendered = render_sinks(report_dict, config, source)
-        write_sinks(rendered)
+        rendered = render()
+        # A truncated file would read as current, so none is written in place.
+        write_all_or_none(rendered.files)
     except (PytestGivenError, OSError) as error:
-        raise PytestGivenError(sink_failure(error, config)) from error
+        raise PytestGivenError(_failure_discarding(error, paths)) from error
     except BaseException:
         # A renderer bug (an undefined template name, a missing color key) or
         # a Ctrl-C is not a user error and keeps its own traceback — but it
-        # fails the same way for the stale report on disk, which must still go.
-        discard_stale_sinks(config)
+        # fails the same way for the stale files on disk, which must still go.
+        discard_files(paths)
         raise
     return rendered
 
@@ -201,33 +219,34 @@ def render_json(report_dict: JsonObject, report: ReportData) -> str:
     return json.dumps(json_dict, indent=2)
 
 
-def write_sinks(rendered: RenderedSinks) -> None:
-    # A truncated file would read as current, so none is written in place.
-    write_all_or_none(rendered.files)
-
-
 def sink_failure(error: Exception, config: SinkConfig) -> str:
     """What to report when a run produces no report: the failure, and what
     discarding the stale sinks did.
 
     `emit_sinks` covers a failure inside itself, but a report that fails to
     *build* never reaches it and leaves the same stale files behind — so the
-    plugin needs this composition too, and this is the one place it is spelled.
+    plugin needs this composition too.
     """
-    return '\n'.join([str(error), *discard_stale_sinks(config)])
+    return _failure_discarding(error, config.file_paths())
 
 
-def discard_stale_sinks(config: SinkConfig) -> list[str]:
-    """Delete the sinks this run would have written, and say what happened.
+def _failure_discarding(error: Exception, paths: Sequence[Path]) -> str:
+    return '\n'.join([str(error), *discard_files(paths)])
+
+
+def discard_files(paths: Sequence[Path]) -> list[str]:
+    """Delete each existing file, and say what happened.
 
     Writing no report leaves the *previous* run's in place, where it reads as
     current — the one outcome worse than no report at all. Only the paths this
-    run was told to write are touched. Cannot raise: the caller is already
-    handling a failure, and the usual reason a write failed (an unwritable
-    directory) is also a reason the unlink will.
+    run was told to write are passed.
+
+    Cannot raise: the caller is already handling a failure, and the usual
+    reason a write failed (an unwritable directory) is also a reason the
+    unlink will.
     """
     notes = []
-    for path in config.file_paths():
+    for path in paths:
         if not path.is_file():
             continue
         try:

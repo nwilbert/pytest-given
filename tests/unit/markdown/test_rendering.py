@@ -41,3 +41,7 @@ from pytest_given.markdown import definition_html
 )
 def test_definition_html(text: str, expected: str) -> None:
     assert definition_html(text) == expected
+
+
+def test_definition_html_reads_a_stretch_with_the_characters_around_it() -> None:
+    assert definition_html('*"x"* y', before='t') == '*&#34;x&#34;* y'

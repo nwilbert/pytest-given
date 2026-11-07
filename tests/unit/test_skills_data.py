@@ -5,6 +5,7 @@ from pathlib import Path, PurePosixPath
 import pytest
 
 from pytest_given.cli.skills import BUNDLED_SKILLS_ROOT
+from pytest_given.git.commands import _COMMIT_ENV_VARS
 
 
 def _skill_dirs() -> list[Traversable]:
@@ -26,9 +27,11 @@ def _frontmatter(skill_md: Traversable) -> dict[str, str]:
 BUNDLED_SKILLS = [
     'pytest-given-authoring',
     'pytest-given-citing',
+    'pytest-given-delta',
     'pytest-given-navigating',
     'pytest-given-reviewing',
 ]
+SKILLS_WITHOUT_REFERENCES = ['pytest-given-delta']
 
 
 def test_bundles_the_expected_skills() -> None:
@@ -40,7 +43,10 @@ def test_every_skill_has_a_skill_md(skill: str) -> None:
     assert (BUNDLED_SKILLS_ROOT / skill / 'SKILL.md').is_file()
 
 
-@pytest.mark.parametrize('skill', BUNDLED_SKILLS)
+@pytest.mark.parametrize(
+    'skill',
+    [skill for skill in BUNDLED_SKILLS if skill not in SKILLS_WITHOUT_REFERENCES],
+)
 def test_reference_guides_are_bundled(skill: str) -> None:
     assert (BUNDLED_SKILLS_ROOT / skill / 'references').is_dir()
 
@@ -113,3 +119,12 @@ def test_skill_frontmatter_names_match_directories() -> None:
         fields = _frontmatter(skill_dir / 'SKILL.md')
         assert fields['name'] == skill_dir.name
         assert fields['description'].startswith('Use when')
+
+
+def test_the_delta_skill_unsets_every_ci_variable_a_commit_sha_is_read_from() -> None:
+    """Else a CI run labels both of the skill's reports with the CI commit."""
+    text = (BUNDLED_SKILLS_ROOT / 'pytest-given-delta' / 'SKILL.md').read_text(
+        encoding='utf-8'
+    )
+    [command] = re.findall(r'env((?: -u \w+)+) ', text)
+    assert command.split(' -u ')[1:] == list(_COMMIT_ENV_VARS)

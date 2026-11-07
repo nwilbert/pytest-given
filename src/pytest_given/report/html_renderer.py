@@ -12,10 +12,10 @@ __lazy_modules__ = ['jinja2', 'markupsafe']
 import base64
 import json
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Collection
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict
+from typing import TYPE_CHECKING, Protocol, TypedDict
 
 import jinja2
 from markupsafe import Markup, escape
@@ -32,6 +32,7 @@ from ..markdown import (
 )
 from ..model import (
     AttachmentRef,
+    CellValue,
     ClausePart,
     ClauseTermRef,
     ClauseWord,
@@ -81,6 +82,9 @@ from .story_view import (
 )
 from .theme import DEFAULT_THEME, Theme
 
+if TYPE_CHECKING:
+    from ..model import Change, Side
+
 _TEMPLATES_DIR = Path(__file__).parent / 'templates'
 
 # Maps parameter name to its color index. The index resolves to a color via
@@ -116,6 +120,12 @@ def tab_visibility(report: ReportData) -> TabVisibility:
     )
 
 
+def _inline_md(text: str | None) -> Markup:
+    """Jinja filter: a definition string's inline Markdown, its bold spans
+    plain bold rather than definition refs — the delta page's."""
+    return Markup(definition_html(text or ''))
+
+
 def render_html_string(
     report: ReportData,
     source_link_template: str | None,
@@ -134,7 +144,7 @@ def render_html_string(
     """
     # Built once and handed to both: the narration filter colors placeholders
     # with it, and the template emits the matching `.param-color-N` rules.
-    param_color_map = _build_param_color_map(report.scenarios)
+    param_color_map = build_param_color_map(report.scenarios)
     env = _build_env(report, source_link_template, source_root, param_color_map)
     return env.get_template('report.html.j2').render(
         **_render_context(report, param_color_map, theme)
@@ -147,64 +157,75 @@ def _build_env(
     source_root: Path | None,
     param_color_map: ParamColorMap,
 ) -> jinja2.Environment:
-    """The Jinja environment: the template loader plus every filter and test
-    the report templates call."""
-    env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
-        autoescape=True,
-    )
+    """The Jinja environment: the shared one plus every filter the report's
+    own data feeds."""
+    env = base_env()
     # The sentence key's format lives in `story_view`; the template emits it
     # for the jump button and `app.js` looks the label up by it, so both sides
     # go through the one constructor.
     env.globals['sentence_key'] = sentence_key
+    env.filters['source_url'] = make_source_url_filter(
+        template=source_link_template,
+        project=report.metadata.project,
+        commit_sha=report.metadata.commit_sha,
+        root=source_root,
+    )
+    env.filters['narration'] = make_narration_filter(
+        param_color_map, glossary=report.glossary
+    )
+    env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
+    env.filters['definition_md'] = _make_definition_filter(
+        report.glossary or Glossary()
+    )
+    env.filters['param_color_class'] = _make_param_color_class(param_color_map)
+    return env
+
+
+def base_env() -> jinja2.Environment:
+    """The template loader and the filters and tests that read no report, which
+    the report page and the delta page share."""
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(str(_TEMPLATES_DIR)),
+        autoescape=True,
+    )
     # The status filter's pills, in order; `app.js` reads the same table from
     # its data, so a new status touches neither.
     env.globals['statuses'] = tuple(STATUS_LABEL)
     # The step-tree macro branches on this: an AttachmentRef has no content to
     # expand, only a column to point at.
     env.tests['attachment_ref'] = lambda value: isinstance(value, AttachmentRef)
-    env.filters['source_url'] = _make_source_url_filter(
-        template=source_link_template,
-        project=report.metadata.project,
-        commit_sha=report.metadata.commit_sha,
-        root=source_root,
-    )
-    env.filters['narration'] = _make_narration_filter(
-        param_color_map,
-        glossary=report.glossary,
-    )
-    env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
-    env.filters['definition_md'] = _make_definition_filter(
-        report.glossary or Glossary()
-    )
+    env.filters['inline_md'] = _inline_md
     env.filters['plural'] = plural
     env.filters['avoid_html'] = _avoid_html
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
-    env.filters['param_color_class'] = _make_param_color_class(param_color_map)
-    env.filters['phase_blocks'] = _phase_blocks
-    env.filters['column_phase_blocks'] = _column_phase_blocks
-    env.filters['repr_columns'] = _repr_columns
+    env.filters['phase_blocks'] = phase_blocks
+    env.filters['column_phase_blocks'] = column_phase_blocks
+    env.filters['repr_columns'] = repr_columns
     env.filters['case_id'] = case_id
+    env.filters['value_cell'] = _value_cell
+    # No column coloured until a page passes its colour map.
+    env.filters['param_color_class'] = _make_param_color_class(None)
     env.globals['data_url'] = _data_url
     return env
 
 
 def _make_param_color_class(
-    param_color_map: ParamColorMap,
+    param_color_map: ParamColorMap | None,
 ) -> Callable[[ParameterColumn], str]:
     """Jinja filter: a column's colour class, or empty for an attachment
-    column — the one place that decides which columns are coloured."""
+    column or without a map — the one place that decides which columns are
+    coloured."""
 
     def _class(column: ParameterColumn) -> str:
-        if column.kind == 'attachment':
+        if param_color_map is None or column.kind == 'attachment':
             return ''
         return f'param-color-{param_color_map[column.name]}'
 
     return _class
 
 
-def _phase_blocks(steps: list[Step]) -> list[list[Step]]:
+def phase_blocks(steps: list[Step]) -> list[list[Step]]:
     """Top-level steps in runs sharing a phase: one keyword each in the
     narration, and what a phase hover outlines."""
     blocks: list[list[Step]] = []
@@ -216,13 +237,13 @@ def _phase_blocks(steps: list[Step]) -> list[list[Step]]:
     return blocks
 
 
-def _column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
+def column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
     """Each parameter-table column's phase block: the one a reader first meets
     it in. A column no step narrates joins the block beside it, the one before
     or, leading the table, the first."""
     assert scenario.parameters is not None
     met_in: dict[ColumnId, int] = {}
-    for index, block in enumerate(_phase_blocks(scenario.steps)):
+    for index, block in enumerate(phase_blocks(scenario.steps)):
         for step in iter_steps(block):
             for part in step.narration.parts:
                 if isinstance(part, NarrationPlaceholder):
@@ -245,7 +266,7 @@ def _column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
 _REPR_CONVERSIONS = ('r', 'a')
 
 
-def _repr_columns(scenario: Scenario) -> set[ColumnId]:
+def repr_columns(scenario: Scenario) -> set[ColumnId]:
     """The columns a slot shows as a repr, which its author narrated that way
     because the exact value matters: a padded string, an empty one."""
     step_narrations = (step.narration for step in iter_steps(scenario.steps))
@@ -261,6 +282,37 @@ def _shows_repr(part: NarrationPlaceholder) -> bool:
     return part.conversion in _REPR_CONVERSIONS
 
 
+def _value_cell(
+    column: ParameterColumn,
+    value: CellValue,
+    block: int | None,
+    change: Change | None = None,
+    shows_repr: bool = False,
+) -> Markup:
+    """A parameter table's `<td>` for any column but an attachment one. A
+    filter, not a macro: a table has one per cell, and a macro call each cost
+    the large report's render a twentieth.
+
+    `data-subst` only where the cell has something to substitute: a generated
+    column is blank for a case that recorded no value, and substituting that
+    blank would erase the step's {token} instead of replacing it. A `param`
+    cell always substitutes, as `None` there is a real parametrize value."""
+    column_id = escape(column.id)
+    substitutes = column.kind == 'param' or value is not None
+    repr_class = 'class="param-repr" ' if shows_repr else ''
+    parts = [f'<td {repr_class}data-param="{column_id}"']
+    if block is not None:
+        parts.append(f' data-block="{block}"')
+    if substitutes:
+        parts.append(f' data-subst="{column_id}"')
+    if isinstance(value, bool):
+        parts.append(f' data-boolean="{value}"')
+    if change:
+        parts.append(f' data-change="{change}"')
+    parts.append(f'>{escape(value) if substitutes else ""}</td>')
+    return Markup(''.join(parts))
+
+
 def _render_context(
     report: ReportData, param_color_map: ParamColorMap, theme: Theme
 ) -> dict[str, object]:
@@ -271,7 +323,7 @@ def _render_context(
     coverage = build_coverage_map(report)
     scn_covers = build_scenario_sentence_index(coverage)
     sentence_labels = build_sentence_labels(report)
-    scenario_slugs = build_scenario_slug_index(report)
+    scenario_slugs = build_scenario_slug_index(report.scenarios)
     story_rollups = build_story_rollups(report, coverage)
     citation_index = CitationIndex(
         report,
@@ -303,7 +355,7 @@ def _render_context(
                 strict=True,
             )
         ),
-        'app_data_js': _script_json_parse(
+        'app_data_js': script_json_parse(
             _app_data(report)
             | {
                 'story_ids': [story.id for story in report.stories],
@@ -322,7 +374,7 @@ def _render_context(
                 },
             }
         ),
-        **_bundled_assets(),
+        **bundled_assets(),
     }
 
 
@@ -342,7 +394,7 @@ def _neutralize_script_data(text: str) -> str:
     return text.replace('</', '<\\/').replace('<!--', '\\u003C!--')
 
 
-def _script_json_parse(value: object) -> Markup:
+def script_json_parse(value: object) -> Markup:
     """Serialize `value` as a `JSON.parse(...)` call rather than a JS object
     literal: an engine reads a JSON string faster than the equivalent source,
     and this is the largest blob on the page.
@@ -372,20 +424,7 @@ def _app_data(report: ReportData) -> dict[str, object]:
         'glossary': (
             {
                 'terms': [
-                    {
-                        'id': term.id,
-                        'canonical': term.canonical,
-                        'kind': term.kind,
-                        'definition': term.definition_text,
-                        # Pre-rendered once per term, for the hover tooltip.
-                        # `definition_html` escapes the text and re-admits
-                        # only <br>/<code>/<strong>/<em>, which is what lets
-                        # app.js assign it as innerHTML.
-                        'definition_html': definition_html(term.definition_text or ''),
-                        'section_key': keys[term.id],
-                        'avoid': [avoided_word(entry) for entry in term.avoid],
-                    }
-                    for term in report.glossary.terms
+                    term_app_data(term, keys[term.id]) for term in report.glossary.terms
                 ]
             }
             if report.glossary is not None
@@ -397,14 +436,31 @@ def _app_data(report: ReportData) -> dict[str, object]:
                 'module': scenario.module,
                 'tags': scenario.tags,
                 'status': scenario.status,
-                'search_text': _shown_text(scenario.narration),
+                'search_text': shown_text(scenario.narration),
             }
             for scenario in report.scenarios
         ],
     }
 
 
-def _shown_text(narration: Narration) -> str:
+def term_app_data(
+    term: GlossaryTerm, section_key: str | None = None
+) -> dict[str, object]:
+    return {
+        'id': term.id,
+        'canonical': term.canonical,
+        'kind': term.kind,
+        'definition': term.definition_text,
+        # Pre-rendered once per term, for the hover tooltip. `definition_html`
+        # escapes the text and re-admits only <br>/<code>/<strong>/<em>, which
+        # is what lets app.js assign it as innerHTML.
+        'definition_html': definition_html(term.definition_text or ''),
+        'section_key': section_key,
+        'avoid': [avoided_word(entry) for entry in term.avoid],
+    }
+
+
+def shown_text(narration: Narration) -> str:
     """A title as the page shows it, its markers rendered away."""
     return ''.join(_piece_text(piece) for piece in read_narration(narration))
 
@@ -441,20 +497,25 @@ def _citation_data(report: ReportData, index: CitationIndex) -> CitationData | N
     }
 
 
-def _bundled_assets() -> dict[str, Markup]:
-    """The stylesheet and scripts inlined into the page — the whole reason the
-    report needs no server and no external asset. Our own two lose their
-    comments; the vendored Alpine bundle is already minified and keeps its
-    licence line."""
-    css, app_js, alpine_js = (
-        (_TEMPLATES_DIR / filename).read_text(encoding='utf-8')
-        for filename in ('styles.css', 'app.js', 'alpine.min.js')
-    )
+def bundled_assets(*extra_stylesheets: str) -> dict[str, Markup]:
+    """The stylesheets and scripts inlined into the page — the whole reason the
+    report needs no server and no external asset. The vendored Alpine bundle
+    is already minified and keeps its licence line."""
     return {
-        'css': Markup(_strip_comments(css)),
-        'app_js': Markup(_strip_comments(app_js)),
-        'alpine_js': Markup(alpine_js),
+        'css': Markup('').join(
+            bundled_script(name) for name in ('styles.css', *extra_stylesheets)
+        ),
+        'app_js': bundled_script('app.js'),
+        'alpine_js': Markup(
+            (_TEMPLATES_DIR / 'alpine.min.js').read_text(encoding='utf-8')
+        ),
     }
+
+
+def bundled_script(filename: str) -> Markup:
+    """One of our own stylesheets or scripts, without its comments."""
+    source = (_TEMPLATES_DIR / filename).read_text(encoding='utf-8')
+    return Markup(_strip_comments(source))
 
 
 _DATA_URL_MIME = {'.woff2': 'font/woff2', '.svg': 'image/svg+xml'}
@@ -488,7 +549,7 @@ def _strip_comments(source: str) -> str:
     return _COMMENT_LINE.sub('', without_blocks)
 
 
-def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
+def build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     """One color per column *name* across the report, so a parameter reads the
     same color in every scenario. Attachment columns are excluded — a badge
     needs no value color."""
@@ -506,18 +567,29 @@ def _build_param_color_map(scenarios: list[Scenario]) -> ParamColorMap:
     return color_map
 
 
-def _make_source_url_filter(
+class _SourceUrlFilter(Protocol):
+    def __call__(self, source: SourceLocation | None, /) -> str | None: ...
+
+
+class _NarrationFilter(Protocol):
+    def __call__(
+        self, narration: Narration, /, *, before: str = '', after: str = ''
+    ) -> Markup: ...
+
+
+def make_source_url_filter(
     *,
     template: str | None,
     project: str,
     commit_sha: str | None,
     root: Path | None,
-) -> Callable[[SourceLocation | None], str | None]:
+) -> _SourceUrlFilter:
     """Build a Jinja filter that resolves a SourceLocation to a URL string.
 
     Returns None when source linking is disabled or the source is absent — the
     template reads that as "render a plain `<span>`". The template itself is
-    validated and parsed once here, not per location.
+    validated and parsed once here, not per location. The `side` the shared
+    macros pass is ignored: this filter serves one side.
     """
     substitute = (
         None
@@ -535,19 +607,27 @@ def _make_source_url_filter(
     return _filter
 
 
-def _make_narration_filter(
-    param_color_map: ParamColorMap,
+def make_narration_filter(
+    param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
-) -> Callable[[Narration], Markup]:
+    *,
+    term_side: Side | None = None,
+    linked_terms: Collection[TermId] | None = None,
+) -> _NarrationFilter:
     """Jinja filter: renders a `Narration` to HTML, piece by piece.
 
-    Usage: `{{ step.narration | narration }}`.
+    Without a colour map no placeholder is coloured. `term_side` stamps each
+    term ref with the side whose glossary it was read against. Given
+    `linked_terms`, a ref to any other term has its tooltip but no link.
+    `before` and `after` flank a stretch of a longer line.
     """
 
-    def _render(narration: Narration) -> Markup:
+    def _render(narration: Narration, *, before: str = '', after: str = '') -> Markup:
         out = [
-            _render_narration_piece(piece, param_color_map, glossary)
-            for piece in read_narration(narration)
+            _render_narration_piece(
+                piece, param_color_map, glossary, term_side, linked_terms
+            )
+            for piece in read_narration(narration, before=before, after=after)
         ]
         return Markup(''.join(out))
 
@@ -556,8 +636,10 @@ def _make_narration_filter(
 
 def _render_narration_piece(
     part: NarrationPiece,
-    param_color_map: ParamColorMap,
+    param_color_map: ParamColorMap | None,
     glossary: Glossary | None,
+    term_side: Side | None,
+    linked_terms: Collection[TermId] | None,
 ) -> str:
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
@@ -566,7 +648,6 @@ def _render_narration_piece(
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
-            color_idx = param_color_map[name]
             label = placeholder_token(part)
             # `data-param` keys the hover highlight and carries the column *id*
             # — two steps can interpolate the same expression with different
@@ -579,15 +660,23 @@ def _render_narration_piece(
             # would be an injection, since Alpine compiles a directive's
             # *decoded* attribute text as JS.
             safe_id = escape(column_id)
-            repr_class = ' param-repr' if _shows_repr(part) else ''
+            classes = ' '.join(
+                (
+                    []
+                    if param_color_map is None
+                    else [f'param-color-{param_color_map[name]}']
+                )
+                + (['param-repr'] if _shows_repr(part) else [])
+            )
+            class_attribute = f'class="{classes}" ' if classes else ''
             return (
-                f'<span class="param-color-{color_idx}{repr_class}" '
+                f'<span {class_attribute}'
                 f'data-param="{safe_id}" '
                 f'data-subst="{safe_id}"{_phrase_attributes(part)}'
                 f'>{escape(label)}</span>'
             )
         case NarrationTermRef():
-            return _render_term_ref(part, glossary)
+            return _render_term_ref(part, glossary, term_side, linked_terms)
 
 
 def _phrase_attributes(part: NarrationPlaceholder) -> str:
@@ -627,25 +716,39 @@ def _unknown_term_span(display: str) -> str:
     return f'<span class="term-ref-unknown">{escape(display)}</span>'
 
 
-def _term_ref_span(term: GlossaryTerm, term_id: TermId, display: str) -> str:
+def _term_ref_span(
+    term: GlossaryTerm,
+    term_id: TermId,
+    display: str,
+    side: Side | None = None,
+    linked: bool = True,
+) -> str:
     """One term reference the glossary holds.
 
     The tooltip's name and definition are *not* written here — `app.js` looks
     them up by id in the glossary `_app_data` already ships, which is what
     keeps a term used 900 times from carrying 900 copies of its definition.
     """
-    classes = f'{_term_kind_class(term.kind)} term-ref--link has-term-tip'
+    link = ' term-ref--link' if linked else ''
+    classes = f'{_term_kind_class(term.kind)}{link} has-term-tip'
+    sided = '' if side is None else f' data-term-side="{side}"'
     return (
-        f'<span class="{classes}" data-term-id="{escape(term_id)}">'
+        f'<span class="{classes}" data-term-id="{escape(term_id)}"{sided}>'
         f'{escape(display)}</span>'
     )
 
 
-def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
+def _render_term_ref(
+    part: NarrationTermRef,
+    glossary: Glossary | None,
+    side: Side | None,
+    linked_terms: Collection[TermId] | None,
+) -> str:
     term = glossary.get(part.term_id) if glossary is not None else None
     if term is None:
         return str(escape(part.display))
-    return _term_ref_span(term, part.term_id, part.display)
+    linked = linked_terms is None or part.term_id in linked_terms
+    return _term_ref_span(term, part.term_id, part.display, side, linked)
 
 
 def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Markup]:
@@ -675,7 +778,7 @@ def _definition_piece_html(
         return definition_span_html(piece)
     if piece.term_id == term_id:
         return definition_html(definition_part_text(piece))
-    return _render_term_ref(piece, glossary)
+    return _render_term_ref(piece, glossary, None, None)
 
 
 def _make_clause_part_filter(

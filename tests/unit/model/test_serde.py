@@ -41,7 +41,7 @@ from pytest_given.model import (
 )
 from pytest_given.model.serde import (
     _clause_part_from_dict,
-    _narration_part_from_dict,
+    narration_part_from_dict,
 )
 
 
@@ -773,7 +773,7 @@ def test_clause_part_unknown_shape_raises():
 def test_narration_part_unknown_shape_raises():
     """Pre-existing behavior — covered to keep 100% after extending the branch."""
     with pytest.raises(PytestGivenError, match='Unknown narration part shape'):
-        _narration_part_from_dict({'mystery': 'x'})
+        narration_part_from_dict({'mystery': 'x'})
 
 
 def test_story_source_roundtrips() -> None:

@@ -61,7 +61,7 @@ class TargetResolver:
         }
         self._by_slug = {
             slug: cited_as[node_id]
-            for node_id, slug in build_scenario_slug_index(report).items()
+            for node_id, slug in build_scenario_slug_index(report.scenarios).items()
         }
         self._titled: dict[TitleForm, dict[str, list[NodeId]]] = {}
 

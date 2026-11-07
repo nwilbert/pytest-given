@@ -44,6 +44,9 @@
 
   --color-passed: #1a6f43;
   --color-passed-tint: #dcefe4;
+  /* A copy button's flash. Resolved here, on the root, so a page that
+     re-points the status colours below it still flashes green. */
+  --color-copied: var(--color-passed);
   --color-failed: #b3261e;
   --color-failed-tint: #fdeee4;
   --color-skipped: #9a5300;
@@ -61,6 +64,14 @@
   --term-object-ink: #0f6e64;   --term-object-line: #4ca095;
   --term-activity-ink: #5f2d9a; --term-activity-line: #906fc5;
   --term-kindless-ink: #545962; --term-kindless-line: #8c9099;
+
+  /* The delta page's changes: added green, removed red, changed amber. The
+     ink is text, the line a row's bar, the tint a marked row's ground and the
+     strong tint a marked word's. On that page status, parameter and term-kind
+     colours are off (see `body.delta`), so these mean nothing else there. */
+  --added-ink: #17693f;   --added-line: #3f9e6b;   --added-tint: #e3f3e8;   --added-tint-strong: #bfe4cb;
+  --removed-ink: #a8231c; --removed-line: #d0584f; --removed-tint: #fcebe9; --removed-tint-strong: #f5c6c1;
+  --changed-ink: #855000; --changed-line: #d49a2a; --changed-tint: #fbf1dc; --changed-tint-strong: #f2d89e;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.18);
   /* Inline code inside the tooltip, which is inverted (ink on bg). */
@@ -107,6 +118,10 @@
   --term-object-ink: #7fded0;   --term-object-line: #53a397;
   --term-activity-ink: #cbb5f7; --term-activity-line: #917dbd;
   --term-kindless-ink: #b8b2c2; --term-kindless-line: #7f798a;
+
+  --added-ink: #7ad7a0;   --added-line: #4fae7c;   --added-tint: #1f3329;   --added-tint-strong: #2d5641;
+  --removed-ink: #f4968d; --removed-line: #d8675d; --removed-tint: #3b2228; --removed-tint-strong: #66303a;
+  --changed-ink: #f0c070; --changed-line: #d1a046; --changed-tint: #372d1f; --changed-tint-strong: #5c4826;
 
   --shadow-tip: 0 4px 14px rgba(0, 0, 0, 0.6);
   --bg-tip-code: rgba(0, 0, 0, 0.12);
@@ -728,8 +743,9 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 /* One keyword and its run of steps. The gutter is a fixed track in every
    block, so the steps still align across blocks; the step track sizes to its
-   text, which is what lets the hover outline hug it. The width cap leaves room
-   for that outline, which the card's `overflow: hidden` would otherwise clip. */
+   text, which is what lets the hover outline hug it. The right margin leaves
+   room for that outline, which the card's `overflow: hidden` would otherwise
+   clip; a margin, unlike a width cap, counts in a content-sized column. */
 .phase-block {
   position: relative;
   display: grid;
@@ -738,7 +754,7 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   grid-template-columns: 3em minmax(0, auto);
   column-gap: var(--space-sm);
   width: fit-content;
-  max-width: calc(100% - var(--space-sm));
+  margin-right: var(--space-sm);
 }
 /* A gap at every phase change, so a long scenario reads as Given, When and
    Then blocks rather than one run of steps. */
@@ -759,13 +775,15 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
 }
 .step-text { color: var(--text-narration); }
 .step-expand,
-.attachment-expand {
+.attachment-expand,
+.delta-term-more {
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 200ms ease-out;
 }
 .step-expand.expanded,
-.attachment-expand.expanded { grid-template-rows: 1fr; }
+.attachment-expand.expanded,
+.delta-term-more.expanded { grid-template-rows: 1fr; }
 /* `.step-children` doubles as the overflow trap because it only adds
    horizontal padding/border, which doesn't grow the grid track's vertical
    intrinsic size. `.attachment-content` has vertical padding + margin, so it
@@ -1742,7 +1760,7 @@ span.param-highlight {
 .kind-header:hover .anchor-link,
 .header:hover .anchor-link { opacity: 0.6; }
 .anchor-link:hover { opacity: 1 !important; }
-.anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
+.anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-copied); }
 .svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 /* Revealed on keyboard focus, since a button at opacity 0 would otherwise be
    focused unseen. */

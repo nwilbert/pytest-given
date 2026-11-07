@@ -56,16 +56,16 @@ from pytest_given.report.html_renderer import (
     _TEMPLATES_DIR,
     _app_data,
     _avoid_html,
-    _build_param_color_map,
-    _column_phase_blocks,
     _make_clause_part_filter,
     _make_definition_filter,
-    _make_narration_filter,
     _neutralize_script_data,
-    _phase_blocks,
-    _repr_columns,
     _strip_comments,
+    build_param_color_map,
+    column_phase_blocks,
+    make_narration_filter,
+    phase_blocks,
     render_html_string,
+    repr_columns,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
 from tests.unit.citation_reports import report_, term_
@@ -202,13 +202,13 @@ def test_a_tooltip_definition_references_no_term() -> None:
 
 
 def test_narration_filter_renders_the_spans_of_a_plain_string() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(text='Books a **suite**\nfor *two*')
     assert render(narration) == 'Books a <strong>suite</strong>\nfor <em>two</em>'
 
 
 def test_narration_filter_renders_the_spans_of_a_literal_part() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(
         text='a `cup` costs 2',
         parts=(
@@ -220,7 +220,7 @@ def test_narration_filter_renders_the_spans_of_a_literal_part() -> None:
 
 
 def test_narration_filter_reads_no_markdown_in_a_value() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(
         text='*x*', parts=(NarrationValue(rendered='*x*', expression='name'),)
     )
@@ -230,7 +230,7 @@ def test_narration_filter_reads_no_markdown_in_a_value() -> None:
 
 
 def test_narration_filter_flanks_a_literal_s_edge_by_the_part_beside_it() -> None:
-    render = _make_narration_filter(param_color_map={}, glossary=None)
+    render = make_narration_filter(param_color_map={}, glossary=None)
     narration = Narration(
         text='a**(b)**',
         parts=(
@@ -1218,7 +1218,7 @@ def test_phase_blocks_are_the_runs_of_top_level_steps_sharing_a_phase() -> None:
         _placeholder_step('when'),
     ]
 
-    assert [[step.phase for step in block] for block in _phase_blocks(steps)] == [
+    assert [[step.phase for step in block] for block in phase_blocks(steps)] == [
         ['given', 'given'],
         ['when'],
         ['then'],
@@ -1247,7 +1247,7 @@ def test_a_column_belongs_to_the_phase_block_a_reader_first_meets_it_in() -> Non
         ['guest', 'room', 'payment', 'outcome', 'log', 'refund'],
     )
 
-    assert _column_phase_blocks(scenario) == {
+    assert column_phase_blocks(scenario) == {
         'guest': 0,
         'room': 0,
         'payment': 1,
@@ -1263,7 +1263,7 @@ def test_an_unnarrated_column_joins_the_phase_block_beside_it() -> None:
         ['unnamed', 'guest', 'also_unnamed', 'outcome'],
     )
 
-    assert _column_phase_blocks(scenario) == {
+    assert column_phase_blocks(scenario) == {
         'unnamed': 0,
         'guest': 0,
         'also_unnamed': 0,
@@ -1305,7 +1305,7 @@ def test_a_column_narrated_with_r_or_a_is_a_repr_column(
             ['value'],
         )
     with when(t'the {pg["Renderer"].l} picks the repr columns'):
-        columns = _repr_columns(table_scenario)
+        columns = repr_columns(table_scenario)
     with then(t'the column {repr_column:is one of them|is not one of them}'):
         assert (ColumnId('value') in columns) == repr_column
 
@@ -1321,13 +1321,13 @@ def test_a_repr_column_is_found_in_a_nested_step_and_in_the_title() -> None:
         narration=_placeholder_narration('titled', 'r'),
     )
 
-    assert _repr_columns(table_scenario) == {ColumnId('inner'), ColumnId('titled')}
+    assert repr_columns(table_scenario) == {ColumnId('inner'), ColumnId('titled')}
 
 
 def test_a_table_no_step_narrates_has_no_phase_blocks() -> None:
     scenario = _table_scenario([_placeholder_step('given')], ['unnamed'])
 
-    assert _column_phase_blocks(scenario) == {}
+    assert column_phase_blocks(scenario) == {}
 
 
 # ---------------------------------------------------------------------------
@@ -1345,7 +1345,7 @@ def _glossary() -> Glossary:
 
 def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
@@ -1355,7 +1355,7 @@ def test_narration_filter_renders_actor_term_ref_with_actor_class() -> None:
 
 def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Room',
         parts=(NarrationTermRef(term_id=TermId('room'), display='Room'),),
@@ -1365,7 +1365,7 @@ def test_narration_filter_renders_object_term_ref_with_object_class() -> None:
 
 def test_narration_filter_renders_activity_term_ref_with_activity_class() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='search',
         parts=(NarrationTermRef(term_id=TermId('search'), display='searches'),),
@@ -1387,7 +1387,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
             definition=Definition.literal('A person staying at the hotel.'),
         )
     )
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='Guest',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
@@ -1411,9 +1411,35 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
     assert term['definition_html'] == 'A person staying at the hotel.'
 
 
+def test_a_term_ref_carries_the_side_it_was_read_on_only_when_given_one() -> None:
+    n = Narration(
+        text='Guest',
+        parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
+    )
+    sided = make_narration_filter(
+        param_color_map={}, glossary=_glossary(), term_side='before'
+    )
+    plain = make_narration_filter(param_color_map={}, glossary=_glossary())
+    assert 'data-term-side="before"' in str(sided(n))
+    assert 'data-term-side' not in str(plain(n))
+
+
+def test_a_placeholder_takes_no_colour_without_a_colour_map() -> None:
+    n = Narration(
+        text='pays {amount}',
+        parts=(
+            NarrationLiteral(value='pays '),
+            NarrationPlaceholder(name='amount', column_id=ColumnId('amount')),
+        ),
+    )
+    out = str(make_narration_filter(param_color_map=None, glossary=None)(n))
+    assert 'data-subst="amount"' in out
+    assert 'param-color' not in out
+
+
 def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
     g = _glossary()
-    f = _make_narration_filter(param_color_map={}, glossary=g)
+    f = make_narration_filter(param_color_map={}, glossary=g)
     n = Narration(
         text='X',
         parts=(NarrationTermRef(term_id=TermId('missing'), display='X'),),
@@ -1426,7 +1452,7 @@ def test_narration_filter_handles_term_ref_with_no_glossary_match() -> None:
 def test_narration_filter_with_no_glossary_falls_back_to_plain_text() -> None:
     """When the renderer is invoked with glossary=None (e.g. no glossary
     declared), NarrationTermRef still renders as escaped text."""
-    f = _make_narration_filter(param_color_map={}, glossary=None)
+    f = make_narration_filter(param_color_map={}, glossary=None)
     n = Narration(
         text='X',
         parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
@@ -1981,7 +2007,7 @@ def test_param_color_map_skips_attachment_columns() -> None:
             cases=[],
         ),
     )
-    color_map = _build_param_color_map([scenario])
+    color_map = build_param_color_map([scenario])
     assert color_map == {'cup_size': 0}
 
 

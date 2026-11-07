@@ -1,12 +1,13 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-13T15:27:48.251774+00:00",
+    "timestamp": "2026-11-13T15:40:05.450976+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "7044f0e95c80b50436c86e090ff35f85b88da1a0",
+    "commit_sha": "0a4c7dba6cf453a508724f3a37b54012c97b3d1f",
     "title": "Markdown Glossary Example",
-    "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html"
+    "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html",
+    "schema_version": 1
   },
   "scenarios": [
     {

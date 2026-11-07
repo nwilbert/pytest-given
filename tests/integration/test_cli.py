@@ -90,9 +90,35 @@ def test_cli_without_a_json_file_reads_the_default_json_report(
     assert 'cli-test' in sinks.DEFAULT_HTML_PATH.read_text(encoding='utf-8')
 
 
-def test_cli_missing_input_file(tmp_path: Path) -> None:
-    rc = main(['report', str(tmp_path / 'nonexistent.json')])
-    assert rc == 2
+@scenario(
+    'A subcommand that cannot do its job exits 2, never 1',
+    tags=['diagnostics'],
+)
+@pytest.mark.parametrize(
+    'command_line',
+    [
+        'report missing.json',
+        'delta missing.json after.json',
+        'citations check doc.md --report missing.json',
+        'skills install --dest taken.txt',
+    ],
+)
+def test_a_subcommand_that_cannot_do_its_job_exits_2(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture,
+    command_line: str,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    with given('a directory whose only files are `doc.md` and `taken.txt`'):
+        Path('doc.md').write_text('# Doc\n', encoding='utf-8')
+        Path('taken.txt').write_text('a file\n', encoding='utf-8')
+    with when(t'pytest-given runs {command_line}'):
+        rc = main(command_line.split())
+    with then('it exits 2'):
+        assert rc == 2
+    with then('it prints an error to stderr'):
+        assert capsys.readouterr().err.startswith('Error: ')
 
 
 def test_cli_no_command(capsys) -> None:

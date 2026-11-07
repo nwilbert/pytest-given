@@ -1,4 +1,4 @@
-# pytest-given — Markdown Glossary Example
+# Markdown Glossary Example
 
 ## ✓ A Guest booking an available room receives a Confirmation
 `examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room`

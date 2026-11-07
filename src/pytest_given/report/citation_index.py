@@ -19,11 +19,11 @@ from ..model import (
     Scenario,
     StoryId,
     TermId,
-    node_base,
+    build_term_crossrefs,
     rolled_up_status,
+    scenario_identity,
 )
 from .coverage import build_coverage_map
-from .glossary_view import build_term_crossrefs
 from .glyphs import CITATION_GLYPH, CitationState
 from .link_text import html_link_text, link_text
 from .story_view import scenarios_by_story
@@ -177,7 +177,9 @@ class CitationIndex:
         return cls(
             report,
             scenarios_by_story(report, build_coverage_map(report)),
-            build_term_crossrefs(report).term_scenarios,
+            build_term_crossrefs(
+                report.scenarios, report.glossary, report.stories
+            ).term_scenarios,
         )
 
     def citation(self, target: Target) -> Citation:
@@ -228,10 +230,7 @@ def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:
     a whole, by its base node ID, as its own `id` is its first case's. A title
     is fixed at decoration, so a test function groups into one scenario."""
     return {
-        NodeId(node_base(scenario.id))
-        if scenario.parameters is not None
-        else scenario.id: scenario
-        for scenario in report.scenarios
+        NodeId(scenario_identity(scenario)): scenario for scenario in report.scenarios
     }
 
 

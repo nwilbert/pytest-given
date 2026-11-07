@@ -10,7 +10,7 @@ from .commands import (
     detect_github_repo,
     is_ancestor,
     is_shallow,
-    resolve_revision,
+    revision_exists,
     tags_pointing_at,
 )
 
@@ -20,6 +20,6 @@ __all__ = [
     'detect_github_repo',
     'is_ancestor',
     'is_shallow',
-    'resolve_revision',
+    'revision_exists',
     'tags_pointing_at',
 ]

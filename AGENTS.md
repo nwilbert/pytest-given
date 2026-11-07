@@ -19,12 +19,13 @@ uv sync --group dev
 `uv run nox` runs the default gate — `format`, `lint`, `mypy`, `coverage` (the test suite, held to 100% coverage), `citations` (the documents' citations held to the committed reports), `audit` (a `pip-audit` of the locked dependencies). **Run it (or at minimum `uv run nox -s format lint mypy coverage`) before every commit.** The sessions below are on-demand; list them all with `uv run nox -l`.
 
 - `uv run nox -s examples` regenerates the example reports under `examples/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
-- `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests (see [Writing self-report scenarios](#writing-self-report-scenarios)). Run after decorating more tests or changing decorated ones, and after renderer or template changes (its HTML is one of the site's example reports), and commit the updated outputs.
+- `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests (see [Writing self-report scenarios](#writing-self-report-scenarios)). Run after decorating more tests or changing decorated ones, and after renderer or template changes (its HTML is one of the site's example reports), and commit the updated outputs. It also re-renders the HTML of each kept release delta in `docs/deltas/` from its JSON, and a JSON it can no longer read keeps its last HTML. `docs_build` publishes those HTML files.
 - **Only commit a regenerated report when its *content* actually changed.**
   - Every regeneration rewrites `commit_sha` (to current HEAD, including the SHA-pinned source-link URLs), `timestamp`, and `duration_ms` in the JSON and HTML, so a report your change didn't really touch still shows a diff — `git checkout` those files rather than committing the noise.
   - **Read the `.md` diff first**: the Markdown carries none of those fields, so it is the behavioral delta of your change in prose. An unchanged `.md` doesn't by itself prove the JSON/HTML are noise-only (glossary and story data never surface in the Markdown, nor do anchor lines: `given_md_lines = false`). A test that only moved is noise; its SHA-pinned source link still points right.
   - Regenerate only the reports a change can affect — `examples` narrates `examples/**`, `self_report` narrates `tests/**`, and a renderer or template change affects all of them.
 - `uv run nox -s reports_current` is CI's check that a change regenerated what it should: it runs both regeneration sessions and fails if any tracked `.md` changed — a report's Markdown or a document whose citations moved. Locally it leaves the regenerated files behind, to commit or `git checkout`.
+- `examples` also builds the example delta under `examples/delta/` from its before and after sources and `given-renames.toml`. `reports_current` also compares its delta JSON, without the fields every regeneration rewrites. Read that comparison as you would a `.md` diff.
 - Both regeneration sessions also run `pytest-given citations update` — `self_report` over `docs/specs/`, both over `docs/site/` — so commit the documents they change with the report.
 - Both regeneration sessions run the narration lint (`--given-lint`; see [Narration lint](docs/site/configuration/narration-lint.md) and the [design spec](docs/specs/2026-07-05-narration-lint-design.md)). `self_report` fails on any lint error — a real gate, keep the backend suite lint-clean. `examples` tolerates exit 1 for its intentional failures, which masks the lint exit code, so read the printed "narration lint" summary there. A step the lint mis-flags goes on the `given_lint_ignore` list (stale entries fail the run); the rule catalog, ignore mechanics, and when an ignored `missing-phase` is justified are in the authoring skill's [lint.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/lint.md).
 - `uv run nox -s benchmark` generates the large-scenarios suite and renders its JSON + HTML into `benchmarks/` (outputs gitignored). Run it when a change could move report-generation cost; `benchmarks/bench.py` does size sweeps and cProfile runs directly.
@@ -42,22 +43,25 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 
 ## Architecture
 
-`src/pytest_given/` is eight library subpackages plus two entry points, with a
+`src/pytest_given/` is nine library subpackages plus two entry points, with a
 strict dependency direction (held by `tests/unit/test_architecture.py`):
 
 ```
 markdown/                  a leaf — reading Markdown (blocks, tables, inline
                            spans), writing spans back, rendering them as HTML
 git/                       a leaf — every `git` subprocess call
-model/                     schema, serde, errors, shared text rules
+model/                     schema, serde (report and delta), errors, shared text rules,
+                           term cross-references (`term_refs`)
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
+delta/                     on model/ only: pairing two reports, the rename log,
+                           word diffs; no pytest
 citations/                 on model/ + report/
-plugin/   cli/             the entry points; may import all eight, and hold
-                           nothing the eight could
+plugin/   cli/             the entry points; may import all nine, and hold
+                           nothing the nine could
 ```
 
-Every package may import `markdown/` and `git/`, which import none of them.
+Every package may import `markdown/` and `git/`, which import none of the others.
 
 What no filename tells you:
 
@@ -71,6 +75,8 @@ What no filename tells you:
   should say comes from `report`: its glyph, link text and summary from
   `CitationIndex`, since the HTML's copy buttons write the same lines, and a
   `<details>` citation's body from `citation_body_md`.
+- `delta/` pairs two reports into a `model.DeltaData`, and `report/delta/`
+  renders it with the report's own renderer helpers and templates.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
   report), `lint.run_lint` and `citations.check_citations` (every document
@@ -129,7 +135,7 @@ What is specific to this repo's self-report:
 - Relative imports inside the package throughout — `from .schema import Scenario` for siblings, `from ..model import Scenario` across subpackages (always through the subpackage root, never into its submodules). Tests use absolute imports and may reach into any internal path. The dependency direction those imports must respect is under [Architecture](#architecture).
 - Prefer `assert` over `# pragma: no cover` for invariant guards. Asserts document the invariant and fail loudly if violated; pragmas hide the line and silently bail. Reserve `# pragma: no cover` for code that genuinely cannot be exercised by a test (e.g. `if __name__ == '__main__':` script entry).
 - Bump `REPORT_SCHEMA_VERSION` (`model/schema.py`) in the same commit as any change to the report JSON's shape, an added optional field included; the fingerprint test fails otherwise. `DELTA_SCHEMA_VERSION` likewise for the delta JSON.
-- JSON reports written by older pytest-given versions are not supported: `pytest-given report` may drop or misread their fields. Don't add readers, migrations, or stale-shape errors for them.
+- JSON reports written by older pytest-given versions are not supported: `pytest-given report` may drop or misread their fields. Don't add readers or migrations for them. A plain error on a schema-version mismatch, as `pytest-given delta` raises, is fine until proper validation lands.
 - Step-down rule: callers before callees, public before private. Read each file top-down from high-level API to implementation details.
 - TDD: write tests first (except frontend changes — see [Report testing](#report-testing)).
 - Commit messages: single line, no co-author trailers, no leading file/area labels like `TODO:` or `README:` — just describe the change ("note example cleanup as todo", not "TODO: note example cleanup"). Conventional-commit-style scope prefixes like `docs:` / `examples:` / `renderer:` are fine when they add information.

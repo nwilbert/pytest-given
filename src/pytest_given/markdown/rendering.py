@@ -17,10 +17,14 @@ def span_html(span: InlineSpan) -> str:
     return _span_html(span, _escaped)
 
 
-def definition_html(text: str) -> str:
+def definition_html(text: str, *, before: str = '', after: str = '') -> str:
     """A glossary definition: its spans, and an author's `<br>` or a newline
-    as a break — except in a code span, which is how to show `<br>` as text."""
-    return ''.join(definition_span_html(span) for span in read_spans(text))
+    as a break — except in a code span, which is how to show `<br>` as text.
+    `before` and `after` flank a stretch of a longer one."""
+    return ''.join(
+        definition_span_html(span)
+        for span in read_spans(text, before=before, after=after)
+    )
 
 
 def definition_span_html(span: InlineSpan) -> str:

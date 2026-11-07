@@ -25,6 +25,7 @@ nav = [
   { "Reports" = [
     { "HTML report" = "html-report.md" },
     { "Markdown report" = "markdown-report.md" },
+    { "Delta report" = "delta-report.md" },
     { "pytest options" = "configuration/pytest-options.md" },
     { "Source links & tracebacks" = "configuration/source-links.md" },
     { "Standalone CLI" = "cli.md" },

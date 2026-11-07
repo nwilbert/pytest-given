@@ -2,12 +2,13 @@
 
 import re
 from collections import Counter
+from collections.abc import Sequence
 from itertools import chain, count
 
-from ..model import NodeId, ReportData, node_base
+from ..model import NodeId, Scenario, node_base
 
 
-def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
+def build_scenario_slug_index(scenarios: Sequence[Scenario]) -> dict[NodeId, str]:
     """Map each scenario's node ID to a short, readable slug for the URL
     fragment (`#scenario=<slug>`).
 
@@ -28,12 +29,10 @@ def build_scenario_slug_index(report: ReportData) -> dict[NodeId, str]:
     defining `test_y`) falls back to the node ID, which is unique by
     construction.
     """
-    bases = {s.id: _scenario_slug(s.id, with_tail=False) for s in report.scenarios}
+    bases = {s.id: _scenario_slug(s.id, with_tail=False) for s in scenarios}
     base_counts = Counter(bases.values())
     tails = {node_id: base_counts[base] > 1 for node_id, base in bases.items()}
-    slugs = {
-        s.id: _scenario_slug(s.id, with_tail=tails[s.id]) for s in report.scenarios
-    }
+    slugs = {s.id: _scenario_slug(s.id, with_tail=tails[s.id]) for s in scenarios}
     depth = 0
     while colliding := _colliding_ids(slugs):
         depth += 1

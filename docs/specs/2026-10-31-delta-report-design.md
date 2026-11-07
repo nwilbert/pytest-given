@@ -92,8 +92,9 @@ The delta needs both reports at its own schema version, and otherwise exits 2 na
 and pointing at the skill. An integer rather than semver, because the only question is "same shape
 or not": the project supports no older shape, so a minor version would promise compatibility
 nothing keeps. Reports from before `schema_version` existed have none, and are refused the same way.
-Only computing a delta checks the version. `pytest-given report` and `citations` read a report as
-they do today, and re-rendering a delta JSON reads it the same way.
+Only computing a delta checks the report's version. `pytest-given report` and `citations` read a
+report as they do today. Re-rendering a delta JSON checks the delta's own `schema_version` and exits
+2 on another, since an older delta that still parses can break what the renderer relies on.
 
 So a *before* report written by an older pytest-given works as long as the schema hasn't changed
 since. When it has, the skill regenerates it: check out the *before* commit in a git worktree and
@@ -101,9 +102,9 @@ run its suite under the current pytest-given.
 
 **Exit status.** `pytest-given delta` exits 0 whether or not anything changed. It exits 2, as
 `citations` does on an error, when it can't build or render the delta: a usage error, an input it
-can't read, a report where a delta JSON is expected or the reverse, a schema version mismatch, a
-`--renames` file that doesn't exist, or a malformed rename log. A working directory without
-`given-renames.toml` is no error, since a project that renamed nothing has none.
+can't read, a report where a delta JSON is expected or the reverse, a schema version mismatch (a
+report's or a delta's), a `--renames` file that doesn't exist, or a malformed rename log. A working
+directory without `given-renames.toml` is no error, since a project that renamed nothing has none.
 
 Every subcommand follows one rule: 0 when it did its job with nothing to report, 1 when it found
 something to act on (a citation finding, skills that drifted from the installed copy), and 2 when it
@@ -151,7 +152,7 @@ test later took the name `A`, the old `A` pairs with `B`, and the new `A` reads 
 ### Applying the rename log
 
 From each *before* identity, the delta follows the chain of entries in file order (`A → B`, then a
-later `B → C`), leaving out entries whose `rev` predates the range. It stops at the last identity
+later `B → C`), leaving out entries whose `rev` lies outside the range. It stops at the last identity
 along the chain that exists in *after*, and rewrites the *before* identity to it. Comparing v1 to v3
 rewrites `A` to `C`, and comparing v1 to v2 rewrites `A` to `B`.
 
@@ -170,6 +171,8 @@ whose entry keeps the identity, leaves an earlier range alone.
 - When two *before* identities would end at the same one, whether both are rewritten or one already
   has it (a merge, which the log doesn't model), no *before* identity is rewritten to it, and the
   delta warns naming the entries involved.
+- A `cases` map is held to the same rule: when two *before* cases would end at the same case ID,
+  neither is rewritten to it, and the delta warns naming both cases.
 
 ### Cases and columns
 
@@ -179,7 +182,8 @@ still unpaired:
 1. **Columns by name and kind.** A column's name is its header: a `param` column's argname, a
    `derived` column's expression or placeholder name. Its ID never pairs it, since a `derived`
    column's generated ID (`derived:0`) shifts when another derived column comes or goes.
-   `attachment` columns take no part (see [What counts as a change](#what-counts-as-a-change)).
+   An `attachment` column pairs by name too, but gaining or losing one is no change, and its cells
+   are never compared (see [What counts as a change](#what-counts-as-a-change)).
 2. **Cases by custom case ID**, and by a case ID the rename log's `cases` maps rewrote.
 3. **Cases by values.** Two unpaired cases pair when each is the only unpaired case on its side
    with those values in the `param` columns both tables share. This keeps a table paired case by
@@ -206,9 +210,10 @@ A pairing records how it was made: `rename-log`, `case-id` or `values` for a cas
 Glossary terms pair the same way, and before scenarios do. The rename log's `[[term]]` entries
 rewrite the *before* term IDs, with chains, `rev` and the stop rule as for scenarios. Terms then
 pair by term ID, unless their kinds differ. A term whose kind changed, which is rare, reads as
-removed under its old kind and added under its new one. The term refs in *before* narration are
-rewritten with the term IDs, so scenario titles and steps compare with their term refs rewritten,
-whatever the kinds. A term pairing records `rename-log` or `term-id`.
+removed under its old kind and added under its new one. A kindless term pairs with any kind, since a
+file glossary term without a kind column gains one by inference once a story uses it. The term refs
+in *before* narration are rewritten with the term IDs, so scenario titles and steps compare with
+their term refs rewritten, whatever the kinds. A term pairing records `rename-log` or `term-id`.
 
 A file glossary derives a term's ID from its canonical name, so a renamed term never pairs without
 an entry. Suggestions are what surface it.
@@ -221,7 +226,8 @@ A *suggested match* is a removed and an added item that look like one renamed it
 - a removed case and an added case of one paired scenario that differ in one `param` value
 - a removed term and an added term whose term refs take each other's place in a modified step of a
   paired scenario
-- a removed term and an added term of the same kind whose definitions are nearly the same
+- a removed term and an added term of the same kind, or one of them kindless, whose definitions are
+  nearly the same
 
 A suggestion is never applied. The delta JSON records it so an agent or a person can confirm it
 into the rename log. The similarity measures and thresholds are the builder's to choose (see
@@ -241,23 +247,23 @@ current checkout, never in a worktree of an older commit.
 [[scenario]]
 old = "examples/hotel-booking/test_hotel_booking.py::test_declined_payment"
 new = "examples/hotel-booking/test_payments.py::test_declined_payment_holds_booking"
-rev = "v0.6.0"
+rev = "1c7e4b9a2f8d6035e1a4c7b9d2f0e8a6c3b5d7f9"  # v0.6.0
 
 [[scenario]]  # renamed, and one case's generated ID changed with its value
 old = "examples/coffeeshop/test_coffeeshop.py::test_pricing"
 new = "examples/coffeeshop/test_coffeeshop.py::test_price_list"
 cases = { "1.5-True" = "2.0-True" }
-rev = "v0.6.0"
+rev = "3f2a9c1e5b7d40a8c6f2e19b4d7a0c3e8f5b6d21"  # v0.6.0
 
 [[scenario]]  # only cases changed: `new` left out means the identity stayed
 old = "examples/coffeeshop/test_coffeeshop.py::test_price_list"
 cases = { "happy-hour" = "happy-hour-weekdays" }
-rev = "v0.7.0"
+rev = "a95d3e7f1b2c4086d9e3f5a7c1b8e2d4f6a0c3e5"  # v0.7.0
 
 [[term]]
 old = "room"
 new = "suite"
-rev = "v0.6.0"
+rev = "8d41e07c2a9f4b6e1d3c5a7f9e0b2d4c6a8f1e35"  # v0.6.0
 ```
 
 - `[[scenario]]` holds a scenario's identity (see [Scenario identity](#scenario-identity)). For
@@ -268,26 +274,27 @@ rev = "v0.6.0"
 - `cases` maps old *case IDs* to new ones, relative to the entry. A case it doesn't name keeps its
   case ID under the new identity.
 - `[[term]]` holds term IDs.
-- `rev`, optional, is any git revision (a tag or a SHA) at which the rename had already happened.
-  An entry whose `rev` is an ancestor of, or equal to, the *before* report's commit is skipped: the
-  rename predates the range, so a later test that reuses the old ID isn't paired by mistake. The
-  check runs `git merge-base --is-ancestor <rev> <before SHA>` once per distinct `rev`, before
-  chains are followed. When the answer is unknown, the entry applies as if it had no `rev`, and the
-  delta warns: once for each `rev` that doesn't resolve, naming it, and once in all when no ancestry
-  answer is possible. That happens without git, without a *before* SHA, in a shallow clone, or when
-  git can't resolve the *before* SHA (see [The `git/` package](#the-git-package)).
-- There is no upper-bound check. `rev` only bounds the rename from above (it happened at or before
-  `rev`), so a `rev` that isn't an ancestor of *after* proves nothing: the rename may still lie
-  inside the range. An entry from the future is harmless anyway, since its old identity and old
-  case IDs still exist in *after*, and both chains stop at their start.
-- The skill writes the tightest lasting `rev` it can find: the earliest release tag containing the
-  commit that made the rename (`git tag --contains`), otherwise that commit's SHA when it is on the
-  default branch. When it can't find that commit, the *after* report's release tag or
-  default-branch SHA is a looser bound that still holds. The tighter the `rev`, the fewer ranges
-  consider the entry. A pull request run's SHA is never written. A branch commit vanishes in a
-  squash merge, and on GitHub a pull request run's `GITHUB_SHA` names a temporary merge commit that
-  no later clone resolves. An entry written by hand in the pull request that does the rename may
-  leave `rev` out too.
+- `rev`, optional, is the commit that made the rename. An entry without it applies to every
+  comparison. An entry whose `rev` is an ancestor of, or equal to, the *before* report's commit is
+  skipped: the rename predates the range, so a later test that reuses the old ID isn't paired by
+  mistake. An entry whose `rev` is neither the *after* report's commit nor an ancestor of it is
+  skipped too: the rename postdates the range. The checks run `git merge-base --is-ancestor` once
+  per distinct `rev` and side, before chains are followed. When an answer is unknown, the entry
+  applies as if that side had no bound, and the delta warns: once for each `rev` that doesn't
+  resolve, naming it, and once in all when no ancestry answer is possible. That happens without
+  git, without a *before* SHA, in a shallow clone, or when git can't resolve the *before* SHA (see
+  [The `git/` package](#the-git-package)). An *after* report without a SHA checks the *before*
+  side alone, with a warning.
+- `rev` accepts any git revision, but only the renaming commit makes "in the range" exact. A full
+  SHA on the default branch is that commit, and a short one can turn ambiguous as the repository
+  grows. A release tag places the rename at the release, so a delta ending before the tag skips
+  the entry. A comment after the SHA can name the release that shipped the rename.
+- The skill writes the renaming commit's full SHA on the default branch, or the *after* commit's
+  when it can't find that commit. A pull request run's SHA is never written. A branch commit
+  vanishes in a squash merge, and on GitHub a pull request run's `GITHUB_SHA` names a temporary
+  merge commit that no later clone resolves. An entry written in the renaming pull request leaves
+  `rev` out. The project's release checklist fills it in with the commit that added the entry to
+  the default branch, and names the release in a comment.
 - `rev` also makes the log prunable: an entry whose `rev` is older than the oldest *before* the
   project still compares against can never apply again and may be deleted. Pruning is manual.
 - A malformed file exits 2 naming the entry. Malformed means bad TOML, an entry missing `old`, an
@@ -314,8 +321,9 @@ they do in the JSON.
 Narration compares as it reads:
 
 - Its literal text, and its values as rendered. A value's source expression doesn't count.
-- Its placeholders by the column they point at, after column pairing. A placeholder's column ID
-  and format spec don't count. The format shows in its column's cells, which compare as rendered.
+- Its placeholders by the column they point at, after column pairing, and by their Boolean
+  phrases, which show in the step. A placeholder's column ID and any other format spec don't count.
+  That format shows in its column's cells, which compare as rendered.
 - Its term refs by term, after the rename log, and by form (bare, `.l`, `.s`, an instance or an
   inflection, with the instance's or inflection's own text).
 
@@ -348,7 +356,8 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
     "before": { /* the before report's metadata, commit_sha included, plus its label */ },
     "after": { /* the after report's metadata, plus its label */ },
     "plugin_version": "…",
-    "timestamp": "…"
+    "timestamp": "…",
+    "title": "…"   /* what --title names; null without it */
   },
   "scenarios": [
     {
@@ -388,9 +397,10 @@ them, so a renderer only has to lay them out. Its exact field names are the buil
 - Each side's module names are stored, for the same reason, so Browse by can tell an added or
   removed module from a changed one.
 - A word-level diff of a narration keeps term refs, placeholders and inline Markdown spans
-  (emphasis, code spans, links) whole: a change inside one marks the whole of it. A term ref that
-  compares equal is unchanged, even when its display changed with its term's canonical name, and
-  shows its *after* display.
+  (emphasis, code spans, links) whole: a change inside one marks the whole of it. Each run holds
+  each side's own text, an unchanged run both sides', so either side reads back whole. A term ref
+  that compares equal is unchanged, even when its display changed with its term's canonical name,
+  and each side shows its own display.
 - Both `unchanged` lists hold the pairs that matched with no change, so the counts can be checked
   and a consumer can tell "unchanged" from "absent".
 - `metadata.schema_version` counts the delta's own shape, separately from the report's, whose
@@ -417,10 +427,15 @@ the text of both sides.
 
 ### Header
 
-The *after* report's title (its project's name without one), then two tabs, Scenarios and Glossary.
+The delta's title, then two tabs, Scenarios and Glossary. The title is what `--title` names, kept in
+the delta JSON's `metadata.title`, or else the *after* report's title (its project's name without
+one). It is the browser tab's title too.
 There is no Stories tab, and the Glossary tab appears only when a term is listed. The header's right
-side shows the range in place of the run's pytest and plugin versions:
-`v0.5.0 a1b2c3d to v0.6.0 e4f5a6b`. Each side shows a version label and the short SHA. The label is
+side shows the range, then the version of pytest-given that built the delta.
+The range is the two sides joined by an arrow, each side its version label in the title's colour
+and then its short SHA, or the run's timestamp to the minute when the report carries no SHA. A
+copy of it reads `v0.5.0 a1b2c3d to v0.6.0 e4f5a6b`. Each side's run has its own pytest and plugin
+versions, so neither shows. The label is
 the git tag pointing at that SHA (the highest by version order when several do), or a `--before-label` /
 `--after-label` the caller passes. Without either, the side shows only its SHA, since
 `metadata.plugin_version` is pytest-given's version, not the project's.
@@ -466,38 +481,45 @@ the git tag pointing at that SHA (the highest by version order when several do),
   scenario's *before* node ID equals an added scenario's *after* node ID.
 - **No citation copy menu.** Citations point into the normal report, not into a delta.
 
-### A changed scenario's steps: inline
+### A changed scenario: side by side
 
-The scenario reads as it does in the normal report, with its changes marked in place:
+A changed scenario shows its two versions side by side, steps above parameter table, *before* on
+the left and *after* on the right, uncaptioned: the top bar's range names the two versions, and
+the marks say which way each change went. Both columns are as wide as the scenario's wider side,
+up to a reading width, so short steps keep the two sides close whatever the screen. A hairline
+parts the columns, down to the end of each side's own steps and table. Each column reads as its own
+scenario does in the normal report, and the column says which side a line belongs to:
 
 ```
-      Given  our guest Alice
-  ~   When   Alice checks in to the [-Deluxe Suite-][+Garden Suite+]
-  −   Then   t̶h̶e̶ ̶l̶a̶t̶e̶r̶ ̶b̶o̶o̶k̶i̶n̶g̶ ̶i̶s̶ ̶c̶a̶n̶c̶e̶l̶l̶e̶d̶
-  +   Then   the later Booking is cancelled and refunded in full
-      When   she tries to cancel the stay she has checked in to
+    Given  our guest Alice                       Given  our guest Alice
+  ~ When   Alice checks in to the             ~ When   Alice checks in to the
+           [Deluxe Suite]                               [Garden Suite]
+  − Then   the later booking is cancelled     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    + Then   the later Booking is cancelled and
+                                                    refunded in full
+    When   she tries to cancel the stay…         When   she tries to cancel the stay…
 ```
 
-- A modified step gets an amber tint and a `~` in the margin. Its removed words are struck through on
-  red, and its added words follow on green. A changed phase shows the old one struck through before
-  the new one.
-- A removed step gets a red tint, `−`, and struck-through text. An added step gets a green tint and
-  `+`.
-- Unchanged steps are plain. Term refs keep their underlines throughout.
-- Added and removed scenarios expand to their steps without marks: the row's colour already says it
-  all.
-
-A side-by-side view of steps was considered and rejected for this version: steps are prose, and
-reading the new scenario as one story with its edits marked suits stakeholders better. The delta
-JSON keeps a side-by-side step view possible.
+- Steps line up by the step alignment, one row per aligned pair, so a step and its counterpart sit
+  level however each wraps. A hatched row marks a step missing on that side, as a missing case is
+  marked in the tables.
+- A modified step is led by `~`. Its removed words are marked on the *before* side, struck through
+  on red, and its added words on the *after* side, on green. Rows are not tinted: the marked words
+  and the glyph carry the change. The strike-through takes the ink colour, so it reads on the red.
+- A removed step is led by `−` and its text is struck through. An added step is led by `+`.
+- A changed phase shows each side's own phase, the step led by `~`.
+- Unchanged steps show on both sides, plain. Term refs keep their underlines throughout, and each
+  side's term refs read from that side's glossary.
+- Nested steps line up the same way, inside their parent.
+- Added and removed scenarios show one side only, in one column from the left, without marks: the
+  row's colour already says it all.
 
 ### A changed parameter table: side by side
 
-Unlike steps, a parameter table is shown side by side, because added and removed columns break a
-merged table:
+A changed parameter table sits under the steps of its side, so each side's steps narrate the table
+beneath them:
 
 ```
- Before: v0.5.0 a1b2c3d                       After: v0.6.0 e4f5a6b
  case ID       euros expect status            case ID       euros +size expect status
  a-euro-short  1     False  ✓                 a-euro-short  1     small False  ✓
  −3̶-̶T̶r̶u̶e̶        3     True   ✓                 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -505,7 +527,7 @@ merged table:
  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░               +large-cup    4     large True   ✓
 ```
 
-- Two complete tables, each captioned with its side's label and short SHA, with a gap between them.
+- Two complete tables, one in each column under its side's steps.
 - Rows line up by case, in the *after* table's case order, a removed case placed after the case that
   preceded it on the *before* side. A hatched row marks a case missing on that side.
 - Both tables always show the case ID column and the status column, whether or not any case ID is
@@ -520,30 +542,54 @@ merged table:
 - An added column's header is marked `+` and its cells tinted green. A removed column's header is
   struck through on the *before* side. A renamed column shows its new name, with `was <old name>`
   beneath it.
-- `attachment` columns appear in each side's table, unmarked.
-- Hovering a placeholder in a step highlights its column in both tables. Hovering an *after* row
-  previews its values in the steps, as in the normal report. A *before* row previews nothing, since
-  the steps read from the *after* side.
+- `attachment` columns appear in each side's table, unmarked. Hovering one of the same name on both
+  sides highlights it in both tables.
+- Hovering a placeholder in either side's steps highlights its column in both tables, a renamed
+  column included. Hovering a row previews its values in its own side's steps, as in the normal
+  report.
+- Hovering a phase on either side outlines that phase on both sides and its columns in both
+  tables, as the normal report outlines a phase and its columns.
 - A table that only changed in case statuses still renders both sides. A table that didn't change
-  at all renders once, as in the normal report. A table that was added or removed with its
-  scenario's parametrization renders once, under its side's caption, tinted as added or removed.
+  at all renders once, across both columns, and its rows preview into both sides' steps. A table
+  that was added or removed with its scenario's parametrization renders in its side's column only,
+  tinted as added or removed.
 
 ### Glossary tab
 
 The same structure as the normal Glossary tab, grouped by kind under the kinds' headings (muted,
-see [Colour](#colour)), listing only added, changed and removed terms:
+see [Colour](#colour)), listing only added, changed and removed terms. A term card is one row, as a normal entry is: its
+name, a changed term's two definitions side by side in columns sized to the card, and its change.
+Opening it shows the rest:
+
+```
+ > Suite     A [bookable] room in the hotel.  │  A [rentable] room in the hotel.   changed  mapped by hand
+   was Room
+
+ v Suite     A [bookable] room in the hotel.  │  A [rentable] room in the hotel.   changed  mapped by hand
+   was Room  rooms                            │  suites
+             5 scenarios                      │  7 scenarios
+             Listed scenarios: A walk-in guest is offered the next free suite
+```
 
 - The left bar shows the kind of change, as on the Scenarios tab. The term's kind comes from the
   section it sits in.
 - The sidebar gets the same *Change* filter and unchanged count. Show kinds and the definitions
   filter stay.
-- A changed definition shows a word-level diff. A renamed term shows `was <old name>` and, when the
-  rename log paired it, `mapped by hand`.
-- Other forms are shown, with added ones marked `+` and removed ones struck through. Changed
-  scenario counts show as `5 → 7 scenarios`. Neither makes a term changed by itself. Story counts
-  are left out with stories.
-- A term card links only the listed scenarios that refer to it. The unchanged ones it counts but
-  doesn't link, since they aren't on the page.
+- The card's row shows the term's name, its change and, when the rename log paired it,
+  `mapped by hand`. A renamed term shows its new name, its old one under it, as a scenario with a
+  new title is.
+- Each column shows its side's definition. Opening the card shows each side's other forms and
+  scenario count under its definition.
+- A changed definition marks its removed words on the *before* side, struck through on red, and its
+  added words on the *after* side, on green, as a modified step does.
+- A removed other form is struck through on the *before* side, and an added one is marked `+` on the
+  *after* side. Other forms and scenario counts don't make a term changed by themselves. Story
+  counts are left out with stories.
+- Added and removed terms show their one side alone, in one column from the left, as an added or
+  removed scenario does. A removed term's name is struck through, as a removed scenario's title is.
+- An opened card links only the listed scenarios that refer to it, in one row under its columns, or
+  says there are none. The unchanged ones it counts but doesn't link, since they aren't on the
+  page.
 - A term whose kind changed is listed twice: removed under its old kind, added under its new one.
 
 ### Colour
@@ -565,9 +611,8 @@ To keep those meanings unambiguous:
 
 Most changes are also marked without colour, by a `+` / `−` / `~` glyph, strike-through or a text
 label. Added words and changed cells are marked by their tint alone. That is accepted: a reader who
-can't tell red from green still sees the tint, and strike-through or the table's side says which
-way the change went. Media that drop background colours, such as print or a high-contrast mode,
-lose those two marks.
+can't tell red from green still sees the tint, and the column says which way the change went.
+Media that drop background colours, such as print or a high-contrast mode, lose those two marks.
 
 ## The agent skill
 
@@ -592,10 +637,10 @@ feature's name. It covers:
   pytest-given, because the public API changed in between, no delta spans that change, and the skill
   says so rather than comparing reports of two versions.
 - Triage: every suggested match, every removed scenario with an added one in the same module, and
-  every removed term with an added one of the same kind is a rename candidate. Resolving one means
-  reading `git diff --find-renames BEFORE_SHA..AFTER_SHA` and `git log --follow` on the test file,
-  then adding a `[[scenario]]` or `[[term]]` entry for a confirmed rename and leaving a genuine
-  removal alone.
+  every removed term with an added one of the same kind, or one of them kindless, is a rename
+  candidate. Resolving one means reading `git diff --find-renames BEFORE_SHA..AFTER_SHA` and
+  `git log --follow` on the test file, then adding a `[[scenario]]` or `[[term]]` entry for a
+  confirmed rename and leaving a genuine removal alone.
 - The same for cases: a suggested case match, or a removed and an added case whose generated case
   IDs differ, becomes a `cases` entry once confirmed.
 - Writing `rev` as [the rename log](#the-rename-log) describes.
@@ -603,7 +648,7 @@ feature's name. It covers:
 - Fixing a value that differs on every run at its source, such as with a fixed clock or a stable
   `__str__`, when a step or cell reads as changed in every delta.
 
-It shares the repair technique of the citing skill's [repair guide](../../../src/pytest_given/.agents/skills/pytest-given-citing/references/repair.md)
+It shares the repair technique of the citing skill's [repair guide](../../src/pytest_given/.agents/skills/pytest-given-citing/references/repair.md)
 for renamed tests. The builder decides whether to share a reference file or restate it.
 
 ## Architecture
@@ -615,15 +660,16 @@ for renamed tests. The builder decides whether to share a reference file or rest
   `delta/` needs them and may not import `report/`.
 - **`delta/`**, a new package on `model/` and `markdown/`, computes a delta: matching, the rename
   log, step and table alignment, word-level diffs, suggestions. It needs `markdown/` for word diffs
-  that keep inline Markdown spans whole. It imports no pytest and runs no git, so it is
-  unit-testable without a session or a repository.
+  that keep inline Markdown spans whole. It imports no pytest, so it is unit-testable without a
+  session. It asks `git/` which `rev`s fall outside the range, and takes the answer as plain data
+  when it compares the reports, so the comparison needs no repository.
 - **`report/`** renders the delta HTML and writes the delta JSON through the same staged-write path
   as `emit_sinks`, so a failure leaves no half-written file. The delta page reuses the report's
   templates, CSS and `app.js` wherever it can, rather than forking them.
 - **`git/`**, a new leaf package like `markdown/`, imports none of the others, and any of them may
   import it. It holds every git call the package makes (see [The `git/` package](#the-git-package)).
 - **`cli/`** adds the `delta` subcommand and wires `delta/`, `report/` and `git/` together. It asks
-  `git/` for the `rev` ancestry answers and the tag labels, and hands them to `delta/`.
+  `git/` for the tag labels, and hands them to `delta/`.
 
 ### The `git/` package
 
@@ -637,19 +683,19 @@ The delta adds three queries:
 
 | Query | Command | What is read |
 |---|---|---|
-| Is `rev` an ancestor of the *before* SHA? | `git merge-base --is-ancestor` | the exit code only |
+| Is `rev` an ancestor of the *before* SHA, and of the *after* SHA? | `git merge-base --is-ancestor` | the exit code only |
 | Which tags point at a SHA? | `git tag --points-at <sha> --sort=-version:refname` | one ref name per line |
-| Does a revision resolve? | `git rev-parse --verify --quiet <rev>^{commit}` | the exit code and one SHA |
+| Does a revision resolve? | `git rev-parse --verify --quiet <rev>^{commit}` | the exit code only |
 
 Nothing parses prose output, so the locale and the git version's wording don't matter. What keeps
 the answers honest:
 
 - An ancestry answer has three values: yes (exit 0), no (exit 1), and unknown (any other exit, no
   `git` executable, a repository `git` refuses to read). Exit 1 and exit 128 must never be
-  confused, since reading "unknown" as "no" applies an entry that should have been skipped.
+  confused, since reading "unknown" as "no" decides an entry the answer can't decide.
 - A shallow clone (`git rev-parse --is-shallow-repository`) answers "unknown" for every ancestry
   query, since a truncated history can't show a rev as an ancestor.
-- Before the ancestry queries, `git/` checks that the *before* SHA and each `rev` resolve, so a
+- Before the ancestry queries, `delta/` checks that the *before* SHA and each `rev` resolve, so a
   warning can name the revision that doesn't.
 - A `rev` that starts with `-` is a malformed entry, so no revision from the rename log can be read
   as an option.

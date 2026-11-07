@@ -1,23 +1,34 @@
 import dataclasses
 import hashlib
+import re
 import typing
 
-from pytest_given.model import REPORT_SCHEMA_VERSION, ReportData
+from pytest_given.model import (
+    DELTA_SCHEMA_VERSION,
+    REPORT_SCHEMA_VERSION,
+    DeltaData,
+    ReportData,
+)
 
 PINNED_REPORT_SCHEMA = (
     1,
-    '730841c8f3d264d9808402c2319ef2445b7674126a1397fa4fa8a85e0774415e',
+    'cf08a776b3143aa54ab97a71355be54305122c9148c904ba30ae0d4cb6723a87',
+)
+
+PINNED_DELTA_SCHEMA = (
+    1,
+    '53b2da255b6524bceb8120197ced0ffd1028405a31bc7a48fb3628e1f6738971',
 )
 
 
 def schema_fingerprint(root: type) -> str:
     """sha256 over every dataclass reachable from `root`: class name, and per
-    serialized field its name, `typing.get_type_hints` repr, and whether it has
+    serialized field its name, unqualified type-hint repr, and whether it has
     a default. Skips `_`-prefixed and `serde_exclude` fields, as serde does.
     Each reachable `type` alias adds its expansion, as a hint names it only."""
     dataclasses_found, aliases_found = _reachable(root)
     lines = [
-        f'type {alias.__name__} = {alias.__value__!r}'
+        f'type {alias.__name__} = {_hint_text(alias.__value__)}'
         for alias in sorted(aliases_found, key=lambda alias: alias.__name__)
     ]
     for dataclass in sorted(dataclasses_found, key=lambda cls: cls.__name__):
@@ -28,7 +39,9 @@ def schema_fingerprint(root: type) -> str:
                 field.default is not dataclasses.MISSING
                 or field.default_factory is not dataclasses.MISSING
             )
-            lines.append(f'  {field.name}: {hints[field.name]!r} default={has_default}')
+            lines.append(
+                f'  {field.name}: {_hint_text(hints[field.name])} default={has_default}'
+            )
     return hashlib.sha256('\n'.join(lines).encode()).hexdigest()
 
 
@@ -36,6 +49,18 @@ def test_the_report_schema_version_moves_with_its_shape() -> None:
     assert (REPORT_SCHEMA_VERSION, schema_fingerprint(ReportData)) == (
         PINNED_REPORT_SCHEMA
     ), 'The report JSON changed shape: bump REPORT_SCHEMA_VERSION and re-pin.'
+
+
+def test_the_delta_schema_version_moves_with_its_shape() -> None:
+    assert (DELTA_SCHEMA_VERSION, schema_fingerprint(DeltaData)) == (
+        PINNED_DELTA_SCHEMA
+    ), 'The delta JSON changed shape: bump DELTA_SCHEMA_VERSION and re-pin.'
+
+
+def _hint_text(hint: object) -> str:
+    """A hint's repr with its dotted qualifiers dropped: Python 3.15 qualifies a
+    `type` alias by its module, 3.14 does not."""
+    return re.sub(r'\b(?:[A-Za-z_]\w*\.)+(?=[A-Za-z_])', '', repr(hint))
 
 
 def _serialized_fields(dataclass: type) -> list[dataclasses.Field[object]]:

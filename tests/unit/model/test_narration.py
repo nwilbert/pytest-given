@@ -17,11 +17,17 @@ from pytest_given.model import (
     PytestGivenError,
     TermId,
     boolean_phrases,
+    merged_literals,
+    narration_of,
     narration_text,
     placeholder_token,
     read_definition,
+    read_narration,
     render_interpolation,
     spanned_part,
+    texts_in_context,
+    with_case_id,
+    without_case_id,
 )
 
 
@@ -102,6 +108,24 @@ def test_spanned_part_names_the_span_and_the_part_it_holds(
     parts: list[NarrationPart], kind: str, index: int
 ) -> None:
     assert spanned_part(parts) == (kind, parts[index])
+
+
+def test_read_narration_reads_a_stretch_with_the_characters_around_it() -> None:
+    """A `*` after a letter and before punctuation opens no span."""
+    stretch = narration_of([NarrationLiteral(value='*"x"* y')])
+    assert read_narration(stretch) == [
+        EmphasisSpan(strong=False, content=(PlainSpan(text='"x"'),)),
+        PlainSpan(text=' y'),
+    ]
+    assert read_narration(stretch, before='t') == [PlainSpan(text='*"x"* y')]
+
+
+def test_texts_in_context_flanks_each_text_by_its_neighbours() -> None:
+    assert list(texts_in_context(['ab', '', 'c'], before='<', after='>')) == [
+        ('<', 'c'),
+        ('b', 'c'),
+        ('b', '>'),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -249,3 +273,25 @@ def test_read_definition_reads_a_literal_s_edge_against_the_ref_beside_it() -> N
         '**Phase****(b)**', (_PHASE_REF, NarrationLiteral(value='**(b)**'))
     )
     assert read_definition(definition) == [_PHASE_REF, PlainSpan('**(b)**')]
+
+
+def test_merged_literals_joins_each_run_of_adjacent_literals() -> None:
+    value = _value('n')
+    assert merged_literals(
+        [
+            NarrationLiteral(value='a '),
+            NarrationLiteral(value='b '),
+            value,
+            NarrationLiteral(value=' c'),
+        ]
+    ) == (NarrationLiteral(value='a b '), value, NarrationLiteral(value=' c'))
+
+
+def test_without_case_id_undoes_with_case_id_for_that_case_only() -> None:
+    title = narration_of([NarrationLiteral(value='Stay')])
+
+    suffixed = with_case_id(title, 't.py::test_stay[1-2]')
+
+    assert suffixed.text == 'Stay [1-2]'
+    assert without_case_id(suffixed, 't.py::test_stay[1-2]') == title
+    assert without_case_id(suffixed, 't.py::test_stay[3]') == suffixed

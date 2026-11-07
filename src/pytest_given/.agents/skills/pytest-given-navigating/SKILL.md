@@ -32,6 +32,8 @@ The reference has recipes by status, words, term, tag and story. Use them rather
 
 These queries find only what exists. For where an area has no scenario, the reviewing skill's [completeness.md](../pytest-given-reviewing/references/completeness.md) lists the undecorated tests and the test files without a single scenario.
 
+For what changed between two commits or releases, build a delta report with the `pytest-given-delta` skill rather than comparing two reports by hand.
+
 ## Traps
 
 - **Scenario tags are report metadata, not pytest marks.** `pytest -m <tag>` selects nothing. That is expected; the suite isn't broken. Filter tags through the JSON report, or read them in the Markdown output.

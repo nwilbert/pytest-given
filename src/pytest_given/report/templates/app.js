@@ -46,6 +46,24 @@ function deserializeStory(params) {
 
 // Own keys only: these are read from the URL fragment, and a bare `map[key]`
 // answers `#term-filter=toString` with a function off Object.prototype.
+// A filter over one field's values: what the rows hold, and which values show.
+function shownFacet(values, rows, field) {
+  const counts = Object.fromEntries(values.map(v => [v, 0]));
+  for (const row of rows) counts[row[field]] += 1;
+  const present = values.filter(v => counts[v] > 0);
+  return {
+    counts,
+    present,
+    allShown: () => Object.fromEntries(values.map(v => [v, true])),
+    only: shown => Object.fromEntries(values.map(v => [v, shown.has(v)])),
+    // In the URL only when it narrows what the rows hold.
+    writeHash(params, name, shown) {
+      const on = present.filter(v => shown[v]);
+      if (on.length !== present.length) params.set(name, on.join(','));
+    },
+  };
+}
+
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
@@ -169,11 +187,6 @@ function reportApp() {
   // than carried on every ref: a term used N times would otherwise repeat its
   // whole definition N times in the markup.
   const termsById = new Map(glossaryTerms.map((t) => [t.id, t]));
-  // What the Glossary search matches: the name and the avoided words, one per
-  // line, so a query never matches across two of them.
-  const termHaystacks = new Map(glossaryTerms.map(
-    t => [t.id, [t.canonical, ...t.avoid].join('\n').toLowerCase()],
-  ));
   // The section keys a `section=` link may select, none unless the glossary
   // is sectioned.
   const knownSections = new Set(glossaryTerms.map(t => t.section_key).filter(Boolean));
@@ -192,10 +205,8 @@ function reportApp() {
   // Every status in filter order, labelled as the Markdown report words them.
   const STATUS_LABELS = data.status_labels;
   const STATUSES = Object.keys(STATUS_LABELS);
-  const allStatusesShown = () => Object.fromEntries(STATUSES.map(s => [s, true]));
-  const statusCounts = Object.fromEntries(STATUSES.map(s => [s, 0]));
-  for (const s of data.scenarios) statusCounts[s.status] += 1;
-  const statusesPresent = STATUSES.filter(s => statusCounts[s] > 0);
+  const statusFacet = shownFacet(STATUSES, data.scenarios, 'status');
+  const { counts: statusCounts, present: statusesPresent, allShown: allStatusesShown } = statusFacet;
   const moduleSkipDepth = commonDepth(allModules);
   function termLabel(id) {
     if (id === NO_TERMS) return 'no terms';
@@ -238,6 +249,17 @@ function reportApp() {
   // that also reads it would re-trigger that effect.
   let visibleCache = null;
   let termCountCache = null;
+  // One row per Glossary card, keyed by its term: what the filters and the
+  // group counts read. The search matches the name and the avoided words, one
+  // per line, so a query never matches across two of them.
+  const termRows = glossaryTerms.map(t => ({
+    key: t.id,
+    kind: t.kind || 'kindless',
+    section: t.section_key,
+    defined: t.definition !== null && t.definition !== undefined,
+    search: [t.canonical, ...t.avoid].join('\n').toLowerCase(),
+  }));
+  const termRowsByKey = new Map(termRows.map(row => [row.key, row]));
   // The shared copy menu, and the button it is open for, or null.
   let copyMenu = null;
   let copyMenuTrigger = null;
@@ -360,15 +382,16 @@ function reportApp() {
     },
     // Whether a term's card survives the search and definition filters. The
     // section selection and the kind checkboxes hide whole groups instead.
-    termShown(id) {
-      return this._termMatches(termsById.get(id));
+    termShown(key) {
+      return this._termMatches(this._termRow(key));
     },
-    _termMatches(term) {
-      if (this.glossaryDefinitionFilter !== 'all'
-          && (this.glossaryDefinitionFilter === 'undefined')
-            !== (term.definition === null || term.definition === undefined)) return false;
+    // One rule for a card's own visibility and its group's count, which have
+    // to agree. `row` is a `termRows` row.
+    _termMatches(row) {
+      const definitions = this.glossaryDefinitionFilter;
+      if (definitions !== 'all' && (definitions === 'defined') !== row.defined) return false;
       const query = this.glossarySearch.toLowerCase();
-      return !query || termHaystacks.get(term.id).includes(query);
+      return !query || row.search.includes(query);
     },
     // Terms of one group surviving the search and definition filters, keyed
     // by grouping, then by kind or section key. The headings and their counts
@@ -382,17 +405,25 @@ function reportApp() {
     // `_visible` is, and for the same reason. Sections count in a Map: a
     // section name is free text, and could be `constructor`.
     _termCounts() {
-      const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
+      const key = this._termFilterState().join('\u0000');
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
       const counts = { kind: {}, section: new Map() };
-      for (const t of glossaryTerms) {
-        if (!this._termMatches(t)) continue;
-        const kind = t.kind || 'kindless';
-        counts.kind[kind] = (counts.kind[kind] || 0) + 1;
-        if (t.section_key) counts.section.set(t.section_key, (counts.section.get(t.section_key) || 0) + 1);
+      for (const row of this._termRows()) {
+        if (!this._termMatches(row)) continue;
+        counts.kind[row.kind] = (counts.kind[row.kind] || 0) + 1;
+        if (row.section) counts.section.set(row.section, (counts.section.get(row.section) || 0) + 1);
       }
       termCountCache = { key, value: counts };
       return counts;
+    },
+    _termRows() {
+      return termRows;
+    },
+    _termRow(key) {
+      return termRowsByKey.get(key);
+    },
+    _termFilterState() {
+      return [this.glossarySearch, this.glossaryDefinitionFilter];
     },
     visibleTermLabel(grouping, key) {
       const n = this.visibleTermCount(grouping, key);
@@ -447,19 +478,29 @@ function reportApp() {
       }
     },
     get filterSummary() {
+      // An em space: this lands in one x-text, so the gap has to be a character.
+      const parts = this._summaryParts();
+      if (parts.length) return parts.join('\u2003');
+      // Term/tag/module filters each have their own removable chip, so they
+      // are not repeated here — but they do suppress the unfiltered summary.
+      return this._chipped() ? '' : this._unfilteredSummary();
+    },
+    // The delta page breaks its count down by change instead.
+    _unfilteredSummary() {
+      return 'All Scenarios';
+    },
+    _summaryParts() {
       const parts = [];
       const shown = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shown.length !== statusesPresent.length) {
         parts.push(shown.length ? shown.map(s => STATUS_LABELS[s]).join(', ') : 'no statuses');
       }
       if (this.search) parts.push('"' + this.search + '"');
-      // Term/tag/module filters each have their own removable chip, so they
-      // are not repeated here — but they do suppress "All Scenarios".
-      // An em space: this lands in one x-text, so the gap has to be a character.
-      if (parts.length) return parts.join('\u2003');
-      const chipped = this.termFilters.length || this.tagFilters.length
+      return parts;
+    },
+    _chipped() {
+      return this.termFilters.length || this.tagFilters.length
         || this.moduleFilter || this.sentenceFilter;
-      return chipped ? '' : 'All Scenarios';
     },
     get formattedTimestamp() {
       const d = new Date(data.metadata.timestamp);
@@ -478,11 +519,7 @@ function reportApp() {
     // the cache only stops the O(n) scan repeating within one pass. The array
     // filters compare by identity — both are replaced, never mutated.
     _visible() {
-      const state = [
-        ...STATUSES.map(s => this.shownStatuses[s]),
-        this.moduleFilter, this.sentenceFilter, this.search,
-        this.tagFilters, this.termFilters,
-      ];
+      const state = this._filterState();
       if (visibleCache && visibleCache.state.every((v, i) => v === state[i])) {
         return visibleCache.value;
       }
@@ -493,6 +530,14 @@ function reportApp() {
       }
       visibleCache = { state, value };
       return value;
+    },
+    // Every value `_matchesFilters` reads: what the cache above keys on.
+    _filterState() {
+      return [
+        ...STATUSES.map(s => this.shownStatuses[s]),
+        this.moduleFilter, this.sentenceFilter, this.search,
+        this.tagFilters, this.termFilters,
+      ];
     },
     // Every axis renders as the same flat list of rows carrying their own
     // `depth`, so one template serves all three; only interior rows have
@@ -707,7 +752,7 @@ function reportApp() {
     },
     goToTerm(id) {
       // A stale `#term=` link would otherwise open an empty Glossary tab.
-      if (!Object.hasOwn(termNames, id)) return;
+      if (!this._hasTermEntry(id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
       // Navigation, not refinement: Glossary filters that hide the term give
@@ -726,11 +771,11 @@ function reportApp() {
         if (el) scrollWhenShown(3);
       });
     },
-    _termFiltered(id) {
-      const term = termsById.get(id);
-      if (!this._termMatches(term)) return true;
-      if (this.glossaryGrouping === 'section') return !this.sectionShown(term.section_key);
-      return !this.glossaryKindFilter[term.kind || 'kindless'];
+    _termFiltered(key) {
+      const row = this._termRow(key);
+      if (!this._termMatches(row)) return true;
+      if (this.glossaryGrouping === 'section') return !this.sectionShown(row.section);
+      return !this.glossaryKindFilter[row.kind];
     },
     _resetTermFilters() {
       this.glossarySearch = '';
@@ -989,7 +1034,7 @@ function reportApp() {
       rowEl.querySelectorAll('td[data-subst]').forEach(td => {
         cells.set(td.dataset.subst, td);
       });
-      scope.querySelectorAll('span[data-subst]').forEach(span => {
+      this._previewSpans(rowEl, scope).forEach(span => {
         const cell = cells.get(span.dataset.subst);
         if (!cell) return;
         // Stash the original {token} once so re-entry stays idempotent.
@@ -1001,6 +1046,11 @@ function reportApp() {
         span.textContent = phrase ?? cell.textContent.trim();
         span.classList.add('param-substituted');
       });
+    },
+    // The narration a hovered row previews into; the delta page keeps each
+    // side's table to its own side's text.
+    _previewSpans(rowEl, scope) {
+      return [...scope.querySelectorAll('span[data-subst]')];
     },
     clearHoverRow(rowEl) {
       const scope = rowEl?.closest('.scenario');
@@ -1054,7 +1104,7 @@ function reportApp() {
         const pill = event.target.closest('.term-ref--link[data-term-id]');
         if (!pill) return;
         event.stopPropagation();
-        this.goToTerm(pill.dataset.termId);
+        this.goToTerm(this._refEntry(pill));
       }, true);
       document.addEventListener('click', (event) => {
         const chip = event.target.closest('[data-sentence-id]');
@@ -1138,22 +1188,23 @@ function reportApp() {
         if (!scope) return;
         hovered = { scope, block: el.dataset.block };
         this._outlinePhase(scope, el.dataset.block);
-        const table = scope.querySelector('.param-table');
-        if (table) redraw.observe(table);
+        scope.querySelectorAll('.param-table').forEach(table => redraw.observe(table));
       });
       document.addEventListener('pointerout', (event) => {
         if (!event.relatedTarget) leave();
       });
     },
+    // Every table of the card: the delta page shows a scenario's two.
+    _outlinePhase(scope, block) {
+      const safe = CSS.escape(block);
+      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
+      scope.querySelectorAll('.param-table').forEach(table => this._outlineColumns(table, safe));
+    },
     // One box per run of adjacent columns and run of rows: the id and status
     // columns sit at opposite ends of a row. A visible row without the block's
     // cells (an error, an open payload) ends a run of rows rather than being
     // drawn through. A collapsed payload row has no height and does not.
-    _outlinePhase(scope, block) {
-      const safe = CSS.escape(block);
-      scope.querySelectorAll(`.phase-block[data-block="${safe}"]`).forEach(e => e.classList.add('phase-hover'));
-      const table = scope.querySelector('.param-table');
-      if (!table) return;
+    _outlineColumns(table, safe) {
       const wrap = table.parentElement;
       const origin = wrap.getBoundingClientRect();
       const columns = [];
@@ -1186,6 +1237,19 @@ function reportApp() {
         wrap.appendChild(outline);
       }
     },
+    // The term a ref's tooltip shows; the delta page reads some refs against
+    // its before glossary.
+    _tipTerm(pill) {
+      return termsById.get(pill.dataset.termId);
+    },
+    // A Glossary entry is a term, keyed by its id; the delta page keys its
+    // cards by change, and a ref finds its card by the side it was read on.
+    _hasTermEntry(id) {
+      return Object.hasOwn(termNames, id);
+    },
+    _refEntry(pill) {
+      return pill.dataset.termId;
+    },
     // One shared tooltip for every term ref, positioned `fixed` from the
     // ref's bounding box rather than done in CSS: term refs live inside
     // `overflow: hidden` collapsible bodies, which would clip an absolutely
@@ -1199,7 +1263,7 @@ function reportApp() {
       document.addEventListener('pointerover', (event) => {
         const pill = event.target.closest('.has-term-tip[data-term-id]');
         if (!pill) { return; }
-        const term = termsById.get(pill.dataset.termId);
+        const term = this._tipTerm(pill);
         if (!term) { return; }
         nameEl.textContent = term.canonical;
         const def = term.definition_html || '';
@@ -1257,7 +1321,7 @@ function reportApp() {
         // empty value is what `_writeHash` writes for none shown.
         this.shownStatuses = named.length && !shown.size
           ? allStatusesShown()
-          : Object.fromEntries(STATUSES.map(s => [s, shown.has(s)]));
+          : statusFacet.only(shown);
       } else {
         this.shownStatuses = allStatusesShown();
       }
@@ -1283,7 +1347,7 @@ function reportApp() {
       const targetScenario = targetSlug ? scenarioFromParam(targetSlug) : null;
       if (targetSlug && !targetScenario) stale.push({ kind: 'scenario', value: targetSlug });
       const targetTerm = params.get('term');
-      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => Object.hasOwn(termNames, id)).length;
+      const termKnown = targetTerm && keep('glossary term', [targetTerm], id => this._hasTermEntry(id)).length;
       if (termKnown) {
         this.goToTerm(targetTerm);
       } else if (targetScenario) {
@@ -1305,6 +1369,9 @@ function reportApp() {
       this.$nextTick(() => { this.staleLink = stale; });
     },
     _writeHash(mode = 'push') {
+      serializeHash(this._hashParams(), mode);
+    },
+    _hashParams() {
       const params = new URLSearchParams();
       if (this.mainView !== 'scenarios') params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
@@ -1314,13 +1381,10 @@ function reportApp() {
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
       for (const key of this.sectionFilters) params.append('section', key);
 
-      const shownInReport = statusesPresent.filter(s => this.shownStatuses[s]);
-      if (shownInReport.length !== statusesPresent.length) {
-        params.set('status', shownInReport.join(','));
-      }
+      statusFacet.writeHash(params, 'status', this.shownStatuses);
 
       if (this.search) params.set('q', this.search);
-      serializeHash(params, mode);
+      return params;
     },
   };
 }

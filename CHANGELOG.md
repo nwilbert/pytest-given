@@ -22,6 +22,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term, and the `unresolved-definition-ref` lint rule, `warn` by default, flags a bold span that names no term.
 - A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
 - `metadata.schema_version` in the JSON report, bumped with every change to the report's shape.
+- `pytest-given delta BEFORE.json AFTER.json` writes a delta report — the added, removed and changed scenarios and glossary terms between two JSON reports — with a `given-renames.toml` rename log for renamed tests and terms.
+- The `pytest-given-delta` agent skill: building a delta between two commits and recording renames in `given-renames.toml`.
 
 ### Changed
 

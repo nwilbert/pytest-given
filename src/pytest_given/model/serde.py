@@ -69,23 +69,28 @@ from .schema import (
 
 
 def report_to_dict(report: ReportData) -> JsonObject:
-    result = _asdict_filtered(report)
+    result = asdict_filtered(report)
     assert isinstance(result, dict)
     return result
 
 
-def _asdict_filtered(obj: Any) -> Any:
+def asdict_filtered(obj: Any) -> Any:
     """Recursively convert dataclasses to dicts, skipping underscore fields
     and fields marked ``metadata={'serde_exclude': True}``."""
     if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
         return {
-            f.name: _asdict_filtered(getattr(obj, f.name))
+            f.name: asdict_filtered(getattr(obj, f.name))
             for f in dataclasses.fields(obj)
             if not f.name.startswith('_') and not f.metadata.get('serde_exclude')
         }
     if isinstance(obj, (list, tuple)):
-        return [_asdict_filtered(x) for x in obj]
+        return [asdict_filtered(x) for x in obj]
     return obj
+
+
+def is_delta_dict(d: JsonObject) -> bool:
+    metadata = d.get('metadata')
+    return isinstance(metadata, dict) and metadata.get('kind') == 'delta'
 
 
 def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData:
@@ -96,25 +101,28 @@ def report_from_dict(d: dict[str, Any], source: str | None = None) -> ReportData
     where the dict came from, for the caller that read it from somewhere the
     user can point at.
     """
-    metadata = d.get('metadata')
-    if isinstance(metadata, dict) and metadata.get('kind') == 'delta':
+    if is_delta_dict(d):
         raise PytestGivenError(
             f'{source or "input"} is a delta report, not a report; '
             f'render it with `pytest-given delta {source or "<file>"}`.'
         )
     try:
         return ReportData(
-            metadata=_metadata_from_dict(d['metadata'], source),
-            scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
+            metadata=metadata_from_dict(d['metadata'], source),
+            scenarios=[scenario_from_dict(s) for s in d['scenarios']],
             stories=[_story_from_dict(s) for s in d.get('stories', [])],
-            glossary=_glossary_from_dict(d.get('glossary')),
+            glossary=glossary_from_dict(d.get('glossary')),
         )
     except (AttributeError, KeyError, TypeError) as error:
-        raise PytestGivenError(
-            f'{source + " is" if source else "input is"} not a pytest-given '
-            f'report, or was written by an incompatible version '
-            f'({type(error).__name__}: {error}).'
-        ) from error
+        raise unreadable('report', source, error) from error
+
+
+def unreadable(kind: str, source: str | None, error: Exception) -> PytestGivenError:
+    return PytestGivenError(
+        f'{source + " is" if source else "input is"} not a pytest-given '
+        f'{kind}, or was written by an incompatible version '
+        f'({type(error).__name__}: {error}).'
+    )
 
 
 type JsonValue = (
@@ -142,7 +150,7 @@ def read_report_json(json_file: Path) -> JsonObject:
     return loaded
 
 
-def _metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
+def metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
     return Metadata(
         project=d['project'],
         timestamp=d['timestamp'],
@@ -158,15 +166,15 @@ def _metadata_from_dict(d: dict[str, Any], source: str | None) -> Metadata:
     )
 
 
-def _glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
+def glossary_from_dict(d: dict[str, Any] | None) -> Glossary | None:
     if d is None:
         return None
     return Glossary(
-        terms=[_glossary_term_from_dict(t) for t in d.get('terms', [])],
+        terms=[glossary_term_from_dict(t) for t in d.get('terms', [])],
     )
 
 
-def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
+def glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
     return GlossaryTerm(
         id=TermId(d['id']),
         kind=_term_kind(d['kind']),
@@ -188,7 +196,7 @@ def _definition_from_dict(definition: dict[str, Any] | None) -> Definition | Non
 
 
 def _definition_part_from_dict(part_dict: dict[str, Any]) -> DefinitionPart:
-    part = _narration_part_from_dict(part_dict)
+    part = narration_part_from_dict(part_dict)
     if isinstance(part, NarrationLiteral | NarrationTermRef):
         return part
     raise PytestGivenError(
@@ -240,8 +248,8 @@ def _clause_part_from_dict(d: dict[str, Any]) -> ClausePart:
     )
 
 
-def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
-    status = _literal(d.get('status', 'passed'), STATUSES, 'scenario status')
+def scenario_from_dict(d: dict[str, Any]) -> Scenario:
+    status = literal(d.get('status', 'passed'), STATUSES, 'scenario status')
     return Scenario(
         id=NodeId(d['id']),
         narration=_narration_from_dict(d['narration']),
@@ -261,7 +269,7 @@ def _scenario_from_dict(d: dict[str, Any]) -> Scenario:
 
 
 def _step_from_dict(d: dict[str, Any]) -> Step:
-    phase = _literal(d['phase'], PHASES, 'step phase')
+    phase = literal(d['phase'], PHASES, 'step phase')
     return Step(
         phase=phase,
         narration=_narration_from_dict(d['narration']),
@@ -294,7 +302,7 @@ def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
     """A promoted attachment carries no `content` — only a pointer to its column."""
     if 'content' in d:
         return _attachment_from_dict(d)
-    content_type = _literal(
+    content_type = literal(
         d.get('content_type', 'text'), CONTENT_TYPES, 'attachment content type'
     )
     return AttachmentRef(
@@ -305,7 +313,7 @@ def _step_attachment_from_dict(d: dict[str, Any]) -> StepAttachment:
 
 
 def _attachment_from_dict(d: dict[str, Any]) -> Attachment:
-    content_type = _literal(
+    content_type = literal(
         d.get('content_type', 'text'), CONTENT_TYPES, 'attachment content type'
     )
     return Attachment(
@@ -352,7 +360,7 @@ def _param_table_from_dict(d: dict[str, Any] | None) -> ParameterTable | None:
     )
 
 
-def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
+def literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
     """`value` as one of `allowed`, or a `PytestGivenError` naming the field.
 
     The `Status` / `Phase` / `TermKind` / `ColumnKind` annotations are erased at
@@ -369,16 +377,16 @@ def _literal[T: str](value: object, allowed: tuple[T, ...], field: str) -> T:
 
 def _term_kind(value: object) -> TermKind | None:
     """A glossary term's kind, which is legitimately absent while deferred."""
-    return None if value is None else _literal(value, TERM_KINDS, 'glossary term kind')
+    return None if value is None else literal(value, TERM_KINDS, 'glossary term kind')
 
 
 def _param_column_from_dict(d: dict[str, Any]) -> ParameterColumn:
-    kind = _literal(d['kind'], COLUMN_KINDS, 'parameter column kind')
+    kind = literal(d['kind'], COLUMN_KINDS, 'parameter column kind')
     return ParameterColumn(id=ColumnId(d['id']), name=d['name'], kind=kind)
 
 
 def _param_case_from_dict(d: dict[str, Any]) -> ParameterCase:
-    status = _literal(d.get('status', 'passed'), STATUSES, 'parameter case status')
+    status = literal(d.get('status', 'passed'), STATUSES, 'parameter case status')
     return ParameterCase(
         id=NodeId(d['id']),
         values=[_cell_from_json(v) for v in d['values']],
@@ -408,11 +416,11 @@ def _cell_from_json(value: Any) -> CellValue:
 def _narration_from_dict(d: dict[str, Any]) -> Narration:
     return Narration(
         text=d['text'],
-        parts=tuple(_narration_part_from_dict(p) for p in d.get('parts', [])),
+        parts=tuple(narration_part_from_dict(p) for p in d.get('parts', [])),
     )
 
 
-def _narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
+def narration_part_from_dict(d: dict[str, Any]) -> NarrationPart:
     """Discriminate by unique key: `value` → Literal, `term_id` → TermRef,
     `rendered` → Value, `name` → Placeholder. Unknown shapes are a
     serialization bug; raise."""

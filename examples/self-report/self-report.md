@@ -1,4 +1,4 @@
-# pytest-given — pytest-given Self-Report
+# pytest-given Self-Report
 
 ## ✓ `pytest-given report --report-url` re-renders a saved «report» for another URL
 `tests/integration/test_cli.py::test_cli_report_url_replaces_the_saved_one` · spec/citations, versions/0.5.0
@@ -7,6 +7,21 @@
 - **when** it is re-rendered with `--report-url` set to `/1.0/`
 - **then** the command succeeds
 - **then** the copy buttons' «citations» link the `/1.0/` URL
+
+## ✓ A subcommand that cannot do its job exits 2, never 1 · 4 cases
+`tests/integration/test_cli.py::test_a_subcommand_that_cannot_do_its_job_exits_2` · diagnostics
+
+- **given** a directory whose only files are `doc.md` and `taken.txt`
+- **when** pytest-given runs {command_line}
+- **then** it exits 2
+- **then** it prints an error to stderr
+
+| command_line |
+|---|
+| report missing.json |
+| delta missing.json after.json |
+| citations check doc.md --report missing.json |
+| skills install --dest taken.txt |
 
 ## ✓ The `citations` exit code says whether a «citation finding» remains, so CI can gate on it · 5 cases
 `tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations, versions/0.5.0
@@ -122,6 +137,33 @@
 - **then** the summary counts the finding it left out
 - **then** it exits 1 for that finding
 
+## ✓ `pytest-given delta` writes a «delta report» as JSON and HTML, and exits 0 whether or not anything changed · 2 cases
+`tests/integration/test_cli_delta.py::test_delta_writes_a_delta_json_and_html_and_exits_0` · delta
+
+- **given** a before «report» with a scenario titled "Pay by card"
+- **given** an after «report» that titles it "{after_title}"
+- **when** `pytest-given delta` compares the two
+- **then** it exits 0
+- **then** the delta JSON lists {listed} changed scenarios
+- **then** the delta HTML is written beside it
+
+| after_title | listed |
+|---|---|
+| Pay by card | 0 |
+| Pay by credit card | 1 |
+
+## ✓ A «delta report» is titled by `--title`, or else by the title of the after «report» · 2 cases
+`tests/integration/test_cli_delta.py::test_the_delta_is_titled_by_title_or_else_by_the_after_report` · delta
+
+- **given** an after «report» titled "Shop"
+- **when** `pytest-given delta` compares it to a before one, with the extra arguments {extra_args}
+- **then** the delta is titled "{shown}"
+
+| extra_args | shown |
+|---|---|
+| \[\] | Shop |
+| \['--title', 'Shop changes for v2'\] | Shop changes for v2 |
+
 ## ✓ `skills install` removes what no bundled file accounts for, the directories it empties included
 `tests/integration/test_cli_skills.py::test_install_prunes_directories_emptied_by_stale_file_removal`
 
@@ -155,6 +197,13 @@
 - **then** the test passes
 - **then** the «scenario» carries its title, its «tag» and its three «steps»
 - **then** the given «step» holds a «term ref» to the term
+
+## ✓ A JSON «report» records the schema version of its shape
+`tests/integration/test_plugin.py::test_the_json_report_records_its_schema_version` · delta
+
+- **given** a suite with one «scenario»
+- **when** the suite runs with --given-json
+- **then** the «report»'s `metadata.schema_version` is this pytest-given's `REPORT_SCHEMA_VERSION`
 
 ## ✓ A chained failure reports the frames of its own error, and its cause apart
 `tests/integration/test_plugin.py::test_chained_failure_keeps_the_frames_of_its_own_error` · validation
@@ -937,7 +986,7 @@
 - **then** the «narration» is followed by the test function, decorator included, each line numbered as in the file
     - 📎 Rendered Markdown:
         ````
-        # pytest-given — test_given_md_source_shows_the_test_function0
+        # test_given_md_source_shows_the_test_function0
 
         ## ✓ Buy coffee
         `test_given_md_source_shows_the_test_function.py:4::test_buy`
@@ -1124,7 +1173,7 @@
 - **when** the suite runs with --given-md
     - 📎 report:
         ```
-        # pytest-given — test_a_boolean_column_reads_as_phrases_in_the_step0
+        # test_a_boolean_column_reads_as_phrases_in_the_step0
 
         ## ✓ Pinning · 2 cases
         `test_a_boolean_column_reads_as_phrases_in_the_step.py:4::test_pin`
@@ -3352,6 +3401,239 @@
         ```
 - **then** a `failed` «citation finding» remains, blaming a scenario using the term
 
+## ✓ A grouped scenario's «scenario identity» survives its first «case» changing
+`tests/unit/delta/test_build.py::test_a_grouped_identity_survives_its_first_case_changing` · delta
+
+- **given** a grouped scenario whose first «case» is `t[1]` before and a new `t[0]` after
+- **when** a «delta report» is built
+- **then** both sides have the «scenario identity» `t.py::t`
+- **then** the two pair by it, changed by the added case
+
+## ✓ A «per-case scenario»'s «scenario identity» is its full «node ID»
+`tests/unit/delta/test_build.py::test_a_per_case_identity_is_its_full_node_id` · delta
+
+- **given** «per-case scenarios» `t[a]` and `t[b]`, and a `t[c]` only after
+- **when** a «delta report» is built
+- **then** `t[a]` and `t[b]` are unchanged, each under its own node ID
+- **then** `t[c]` is added
+
+## ✓ A «case» pairs by its values, unless it is a «per-case scenario» · 2 cases
+`tests/unit/delta/test_build.py::test_a_per_case_scenario_never_pairs_by_values` · delta, parametrization
+
+- **given** a «case» whose custom «case ID» `happy` becomes `happy-hour`
+    - **given** `group_parametrized` is {group_parametrized}
+- **when** a «delta report» is built
+- **then** the «case» pairs by its values: {group_parametrized}
+- **then** the scenario reads as {changes}
+
+| group_parametrized | changes |
+|---|---|
+| True | changed |
+| False | removed and added |
+
+## ✓ A moved test file pairs by its unique «scenario title»
+`tests/unit/delta/test_build.py::test_a_moved_test_file_pairs_by_its_unique_title` · delta
+
+- **given** a scenario moved from `a.py` to `b.py` with its «scenario title» kept and a tag added
+- **when** a «delta report» is built
+- **then** the two pair by «scenario title»
+- **when** a second after scenario has the same «scenario title»
+- **then** nothing pairs: the old one is removed and both new ones added
+
+## ✓ «Pairing» on the rewritten «scenario identity» keeps a reused ID honest
+`tests/unit/delta/test_build.py::test_pairing_on_the_rewritten_identity_keeps_a_reused_id_honest` · delta
+
+- **given** a «rename log» entry renaming `A` to `B`
+- **given** before holds `A`, after holds `B` and a new test that took the name `A`
+- **when** a «delta report» is built
+- **then** the old `A` pairs with `B` through the rename log
+- **then** the new `A` is added
+
+## ✓ What doesn't make a scenario changed in a «delta report»
+`tests/unit/delta/test_build.py::test_what_does_not_make_a_scenario_changed` · delta
+
+- **given** a parametrized scenario, moved and renamed through the «rename log»
+- **given** its after side differs in module, source, duration, error message, fixture name, story IDs, pins, attachments and an attachment column
+- **when** a «delta report» is built
+- **then** the scenario is unchanged and nothing is listed
+
+## ✓ What makes a scenario changed in a «delta report»
+`tests/unit/delta/test_build.py::test_what_makes_a_scenario_changed` · delta
+
+- **given** six scenarios whose after sides each differ in one of title, step, tag, status, reason and parameter table
+- **when** a «delta report» is built
+- **then** each is changed, with the flag of what differs
+
+## ✓ A schema version mismatch is refused, naming both versions
+`tests/unit/delta/test_build.py::test_a_schema_version_mismatch_is_refused_naming_both_versions` · delta
+
+- **given** a before report at the current schema version and an after report without one
+- **when** the reports are checked
+- **then** the error names both versions and points at the delta skill
+
+## ✓ A «rename log» chain ends at the last «scenario identity» present in the after report
+`tests/unit/delta/test_chains.py::test_a_chain_ends_at_the_last_identity_present_in_after` · delta
+
+- **given** a «rename log» renaming A to B, and later B to C
+- **when** the before identity A is rewritten against reports that end at B or C
+- **then** A ends at C when C exists, and at B when only B does
+
+## ✓ A chain that reaches nothing in the after report rewrites nothing, silently
+`tests/unit/delta/test_chains.py::test_a_chain_that_reaches_nothing_in_after_rewrites_nothing` · delta
+
+- **given** a «rename log» renaming A to B
+- **when** the after report holds neither A nor B
+- **then** nothing is rewritten and nothing is warned about
+
+## ✓ An entry whose rev predates the range is skipped, so a reused «scenario identity» pairs with its old self
+`tests/unit/delta/test_chains.py::test_an_entry_whose_rev_predates_the_range_is_skipped` · delta
+
+- **given** a «rename log» entry renaming A to B at rev v1
+- **when** v1 predates the range and both A and B exist in the after report
+- **then** A is not rewritten
+- **when** the same entry falls inside the range
+- **then** A is rewritten to B, though the after report holds an A too
+
+## ✓ A swap goes through a name neither test has, and a plain swap is a merge
+`tests/unit/delta/test_chains.py::test_a_swap_goes_through_a_name_neither_test_has` · delta
+
+- **given** a «rename log» swapping A and B through tmp
+- **given** a «rename log» that writes the swap as A to B, then B to A
+- **when** both are applied to before and after reports holding A and B
+- **then** the routed swap rewrites A to B and B to A
+- **then** the plain swap rewrites neither, and warns once naming both entries
+
+## ✓ A cases map from a later release leaves an earlier range alone
+`tests/unit/delta/test_chains.py::test_a_cases_map_from_a_later_release_leaves_an_earlier_range_alone` · delta
+
+- **given** a «rename log» that renames test_pricing to test_price_list at v0.6.0 and renames the case happy-hour at v0.7.0
+- **when** v0.5, where the test is still test_pricing, is compared with a later one
+- **then** test_pricing is rewritten to test_price_list
+- **then** against v0.6, happy-hour keeps its ID and 1.5-True becomes 2.0-True
+- **then** against v0.7, happy-hour becomes happy-hour-weekdays
+
+## ✓ A value compares by what it renders, not its source expression
+`tests/unit/delta/test_narration.py::test_a_value_compares_by_what_it_renders` · delta
+
+- **given** a «narration» that interpolates 200 ml from the expression volume
+- **given** a plain narration that reads the same
+- **when** the two are compared
+- **then** they are equal
+
+## ✓ A placeholder compares by the column it points at
+`tests/unit/delta/test_narration.py::test_a_placeholder_compares_by_its_column` · delta
+
+- **given** a before placeholder whose column pairs with the after column `derived:1`
+- **given** an after placeholder of another name and format spec in that column
+- **when** the two are compared
+- **then** they are equal
+- **when** the before placeholder is read without the column pairing
+- **then** they differ
+
+## ✓ A placeholder with «boolean phrases» also compares by its phrases, which show in the step
+`tests/unit/delta/test_narration.py::test_a_placeholder_with_boolean_phrases_compares_by_its_phrases` · delta
+
+- **given** a placeholder with two «boolean phrases»
+- **when** the true phrase is reworded on the same column
+- **then** they differ
+- **when** only the spaces around the phrases change
+- **then** they are equal, since the step shows the same phrases
+- **when** the phrases are diffed by word
+- **then** the placeholder reads removed and added whole
+
+## ✓ A «term ref» compares by term and form, not by its display
+`tests/unit/delta/test_narration.py::test_a_term_ref_compares_by_term_and_form` · delta
+
+- **given** a before «term ref» to room, lowercased, and a «rename log» renaming room to suite
+- **when** it is compared with suite, lowercased, and with suite in its «S-form»
+- **then** the same form is equal and the other form differs
+- **when** two «instances» of guest, Alice and Bob, are compared
+- **then** they differ
+
+## ✓ A word diff keeps «term refs», placeholders and inline spans whole
+`tests/unit/delta/test_narration.py::test_a_word_diff_keeps_term_refs_placeholders_and_spans_whole` · delta
+
+- **given** the before narration `the **later** booking is cancelled`
+- **given** the after narration `the **late** {Booking} is cancelled and refunded`, with a «term ref» to booking
+- **when** the two are diffed by word
+- **then** the bold span and the «term ref» that replaced booking are each marked whole, and the added words follow the unchanged ones
+- **when** the placeholder points at another column in the after narration
+- **then** the placeholder reads removed and added whole
+
+## ✓ A «rename log» entry with neither `new` nor `cases` is refused, naming the entry
+`tests/unit/delta/test_renames.py::test_an_entry_without_new_or_cases_is_malformed` · delta
+
+- **given** a «rename log» whose second scenario entry only names `old`
+- **when** it is parsed
+- **then** the error names `[[scenario]] #2`
+
+## ✓ A reworded «step» reads as modified, an unrelated one as removed and added
+`tests/unit/delta/test_steps.py::test_a_reworded_step_reads_as_modified` · delta
+
+- **given** a before and an after «step» list of one booking story
+- **when** the two are aligned
+- **then** the reworded When and Then are modified between the two unchanged steps
+- **then** the modified Then carries the words that changed
+- **when** a Then is swapped for a wholly different one
+- **then** the old Then is removed and the new one added
+
+## ✓ A removed and an added scenario with nearly the same steps are a «suggested match», never applied
+`tests/unit/delta/test_suggestions.py::test_nearly_the_same_steps_are_a_suggested_match_never_applied` · delta
+
+- **given** a scenario removed, and one added under another name with one step reworded
+- **when** the delta is built
+- **then** it records the two as a suggested match
+- **then** the scenarios stay removed and added, never paired
+
+## ✓ An added column keeps the «parameter table» paired case by case
+`tests/unit/delta/test_table.py::test_an_added_column_keeps_the_table_paired_case_by_case` · delta, parametrization
+
+- **given** a «parameter table» of n and big, and one gaining a size column that changes every generated «case ID»
+- **when** the two are aligned
+- **then** the «pairing» of both «cases» is by their values, without a changed cell
+- **then** the size column is added and the other two pair by name
+- **then** the table changed
+
+## ✓ An inserted «case» doesn't shift the positional IDs' pairing
+`tests/unit/delta/test_table.py::test_an_inserted_case_does_not_shift_the_positional_ids_pairing` · delta, parametrization
+
+- **given** a «parameter table» of objects A and B with the positional IDs order0 and order1, and one with a new object Z in front of them
+- **when** the two are aligned
+- **then** A and B pair by their values, and Z is added
+
+## ✓ A renamed argname pairs when its values did not change
+`tests/unit/delta/test_table.py::test_a_renamed_argname_pairs_when_its_values_did_not_change` · delta, parametrization
+
+- **given** a «parameter table» with a euros column, and one naming it eur
+- **when** the two are aligned
+- **then** euros and eur pair as one column, by their values
+- **then** the table changed, though no cell did
+
+## ✓ A value changed under a generated «case ID» reads as removed and added
+`tests/unit/delta/test_table.py::test_a_value_changed_under_a_generated_case_id_reads_as_removed_and_added` · delta, parametrization
+
+- **given** a «parameter table» whose case 2-True became 3-True
+- **when** the two are aligned, with and without a rename-log rewrite
+- **then** without the rewrite one case is removed and one added
+- **then** with the rewrite they pair by the rename log, the n cell changed
+
+## ✓ A renamed «term» pairs only through a `[[term]]` entry in the «rename log»
+`tests/unit/delta/test_terms.py::test_a_renamed_term_pairs_only_through_a_term_entry` · delta
+
+- **given** a «glossary» whose guest term is called visitor in the next one, and a «rename log» with a `[[term]]` entry for guest
+- **when** the terms are aligned with and without the entry
+- **then** the entry pairs them, and the renamed term reads as changed
+- **then** without the entry the term is removed and the new one added
+- **then** a narration ref to guest is rewritten to visitor with the entry
+
+## ✓ A «term» whose kind changed is listed twice
+`tests/unit/delta/test_terms.py::test_a_term_whose_kind_changed_is_listed_twice` · delta
+
+- **given** a «term» that is an object in one «glossary» and an actor in the next
+- **when** the terms are aligned
+- **then** it is removed under its old kind and added under its new one
+- **then** narration refs to it still compare as the same term
+
 ## ✓ A «parametrized scenario» takes the status of its worst «case»: failed, then xfailed, then passed, then skipped · 6 cases
 `tests/unit/grouping/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status` · parametrization
 
@@ -3759,109 +4041,8 @@
 - **then** the «lint finding» names the word and the step
 - **then** its «severity» is warn by default
 
-## ✓ A «sentence» references its «terms», whatever surface form they take
-`tests/unit/report/test_coverage.py::test_sentence_term_refs_collects_term_ids_whatever_the_display`
-
-- **given** a «sentence» written with an «instance» and an «inflection»
-- **when** «coverage» collects the «sentence» references
-- **then** they are the «term» ids alone; words contribute nothing
-
-## ✓ A multi-clause «sentence» unions references across its «clauses»
-`tests/unit/report/test_coverage.py::test_sentence_term_refs_unions_across_multi_clause_sentence`
-
-- **given** a «sentence» with two «clauses»
-- **when** «coverage» collects the «sentence» references
-- **then** the «terms» of both clauses are present
-
-## ✓ A «sentence» whose «clauses» start at different «actors» builds and is covered
-`tests/unit/report/test_coverage.py::test_sentence_with_clauses_from_different_actors_is_covered`
-
-- **given** a «sentence» of two «clauses»: a guest signs the register, and a clerk signs the register
-- **given** a «step» naming both actors, the activity and the register
-- **when** «coverage» is computed against the «story»
-- **then** the «sentence» is covered
-
-## ✓ A «step» references its «terms», whatever surface form they take
-`tests/unit/report/test_coverage.py::test_step_term_refs_collects_term_ids_whatever_the_display`
-
-- **given** a «step» naming an «instance» and an «inflection»
-- **when** «coverage» collects the «step» references
-- **then** they are the «term» ids alone
-
-## ✓ An «instance» and its bare «term» cover each other
-`tests/unit/report/test_coverage.py::test_compute_coverage_matches_instance_and_bare_term_both_ways`
-
-- **given** a «sentence» naming a bare «actor»
-- **given** the same «sentence» naming an «instance» of that actor
-- **given** a «step» naming the «instance», and one naming the bare actor
-- **when** «coverage» is computed for each pairing
-- **then** the «instance» «step» covers the bare «sentence»
-- **then** the bare «step» covers the «instance» «sentence»
-
-## ✓ A «sentence» is covered by one «step» naming all its «terms», never by several «steps» together · 3 cases
-`tests/unit/report/test_coverage.py::test_a_sentence_is_covered_by_one_step_never_by_several_together`
-
-- **given** a «story» whose «sentence» names guest, search and room
-- **given** a «scenario» whose «steps» name {steps_naming}
-- **when** «coverage» is computed against the «story»
-- **then** the «sentence» {is covered / is not covered}
-
-| steps_naming | covered |
-|---|---|
-| \[\['guest', 'search', 'room'\]\] | True |
-| \[\['guest', 'search'\], \['room'\]\] | False |
-| \[\['guest'\], \['guest', 'search', 'room'\]\] | True |
-
-## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
-`tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_sentence_gains_a_term`
-
-- **given** a «step» naming two «term refs»
-- **given** the same «sentence» with that middle slot a bare word, then an «activity» ref
-- **when** «coverage» is computed against each «story»
-- **then** the two-ref «sentence» is covered
-- **then** the widened «sentence» is no longer covered
-
-## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 6 cases
-`tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins`
-
-- **given** a scenario with pins={scenario_pins}
-- **given** a step matching sentence 1, with pins={step_pins}
-- **when** «coverage» is computed against the «story»
-- **then** the «scenario» covers the «sentences» {covered}
-
-| case ID | scenario_pins | step_pins | covered |
-|---|---|---|---|
-| nothing-pinned | None | None | \[1\] |
-| step-pinned | None | \[2\] | \[2\] |
-| scenario-pinned | \[\] | None | \[\] |
-| both-pinned | \[\] | \[2\] | \[2\] |
-| scenario-pins-elsewhere | \[2\] | None | \[2\] |
-| scenario-and-step-pinned | \[1\] | \[2\] | \[1, 2\] |
-
-## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
-`tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms`
-
-- **given** a «sentence» referencing the «terms» {term_ids}
-- **when** its «coverage» eligibility is checked
-- **then** it {is eligible / is not eligible}
-
-| term_ids | eligible |
-|---|---|
-| \['guest', 'room'\] | True |
-| \['guest', 'guest'\] | False |
-| \['guest'\] | False |
-| \[\] | False |
-
-## ✓ A nested «step» covers a «sentence» like a top-level one
-`tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
-
-- **given** a «story» with one canonical «sentence»
-- **given** the covering «term refs» in a nested child «step»
-- **when** «coverage» is computed against the «story»
-- **then** the nested «step» still counts and the «sentence» is covered
-
 ## ✓ The «glossary» view aggregates «instances» and «activity» forms
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_collects_instances_and_forms`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_collects_instances_and_forms`
 
 - **given** a «report» whose «story» and «scenario» reference «instances» of an actor and a work object, and an «inflection»
     - 📎 Report data:
@@ -3997,53 +4178,154 @@
 - **then** the activity collects its «inflection» but not its canonical form
 
 ## ✓ «Terms» referenced by a «sentence» record the «story»
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_records_story_refs_via_sentences`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_records_story_refs_via_sentences`
 
 - **given** a «story» whose «sentence» references an actor and an activity
 - **when** the «glossary» aggregations are built
 - **then** the actor and the activity each list that «story»
 
 ## ✓ A «story» referencing a «term» twice lists it once
-`tests/unit/report/test_glossary_view.py::test_repeated_references_within_one_story_are_recorded_once`
+`tests/unit/model/test_term_refs.py::test_repeated_references_within_one_story_are_recorded_once`
 
 - **given** a «story» whose two «sentences» repeat the same «term» and the same «inflection»
 - **when** the «glossary» aggregations are built
 - **then** the «story» and the «inflection» appear once each
 
 ## ✓ A canonical reference to an actor or work object is not an «instance», whatever its case
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_canonical_ref_is_not_an_instance`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_canonical_ref_is_not_an_instance`
 
 - **given** a «story» sentence referencing an actor and a work object by canonical name, and a «step» referencing one in lowercase
 - **when** the «glossary» aggregations are built
 - **then** neither the actor nor the work object records an «instance»
 
 ## ✓ An «S-form» reference is the «term» itself, not an «instance» or an «inflection»
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself` · versions/0.5.0
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_s_form_ref_is_the_term_itself` · versions/0.5.0
 
 - **given** a «story» «sentence» referencing a work object and an activity by their «s-forms», each lowercase and capitalized
 - **when** the «glossary» aggregations are built
 - **then** the work object records no «instance» and the activity no «inflection»
 
 ## ✓ A «kindless» «term» records only its «story» ref
-`tests/unit/report/test_glossary_view.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
+`tests/unit/model/test_term_refs.py::test_build_glossary_aggregations_kindless_term_records_only_story_ref`
 
 - **given** a «kindless» «term» referenced by a «story» sentence
 - **when** the «glossary» aggregations are built
 - **then** the «term» lists the «story» but no «instance» and no «inflection»
 
 ## ✓ An «instance» seen in a fixture «step» records its fixture provenance
-`tests/unit/report/test_glossary_view.py::test_glossary_aggregations_annotates_fixture_provenance`
+`tests/unit/model/test_term_refs.py::test_glossary_aggregations_annotates_fixture_provenance`
 
 - **given** a «scenario» whose fixture-sourced «step» names an «instance»
 - **when** the «glossary» aggregations are built
 - **then** the «instance» carries the fixture name
 
 ## ✓ The «term» index maps each «term» to its «scenarios» once
-`tests/unit/report/test_glossary_view.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
+`tests/unit/model/test_term_refs.py::test_build_term_scenario_index_dedups_and_includes_scenario_narration`
 
 - **given** a «scenario» referencing one «term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «term» maps to the scenario exactly once
+
+## ✓ A «sentence» references its «terms», whatever surface form they take
+`tests/unit/report/test_coverage.py::test_sentence_term_refs_collects_term_ids_whatever_the_display`
+
+- **given** a «sentence» written with an «instance» and an «inflection»
+- **when** «coverage» collects the «sentence» references
+- **then** they are the «term» ids alone; words contribute nothing
+
+## ✓ A multi-clause «sentence» unions references across its «clauses»
+`tests/unit/report/test_coverage.py::test_sentence_term_refs_unions_across_multi_clause_sentence`
+
+- **given** a «sentence» with two «clauses»
+- **when** «coverage» collects the «sentence» references
+- **then** the «terms» of both clauses are present
+
+## ✓ A «sentence» whose «clauses» start at different «actors» builds and is covered
+`tests/unit/report/test_coverage.py::test_sentence_with_clauses_from_different_actors_is_covered`
+
+- **given** a «sentence» of two «clauses»: a guest signs the register, and a clerk signs the register
+- **given** a «step» naming both actors, the activity and the register
+- **when** «coverage» is computed against the «story»
+- **then** the «sentence» is covered
+
+## ✓ A «step» references its «terms», whatever surface form they take
+`tests/unit/report/test_coverage.py::test_step_term_refs_collects_term_ids_whatever_the_display`
+
+- **given** a «step» naming an «instance» and an «inflection»
+- **when** «coverage» collects the «step» references
+- **then** they are the «term» ids alone
+
+## ✓ An «instance» and its bare «term» cover each other
+`tests/unit/report/test_coverage.py::test_compute_coverage_matches_instance_and_bare_term_both_ways`
+
+- **given** a «sentence» naming a bare «actor»
+- **given** the same «sentence» naming an «instance» of that actor
+- **given** a «step» naming the «instance», and one naming the bare actor
+- **when** «coverage» is computed for each pairing
+- **then** the «instance» «step» covers the bare «sentence»
+- **then** the bare «step» covers the «instance» «sentence»
+
+## ✓ A «sentence» is covered by one «step» naming all its «terms», never by several «steps» together · 3 cases
+`tests/unit/report/test_coverage.py::test_a_sentence_is_covered_by_one_step_never_by_several_together`
+
+- **given** a «story» whose «sentence» names guest, search and room
+- **given** a «scenario» whose «steps» name {steps_naming}
+- **when** «coverage» is computed against the «story»
+- **then** the «sentence» {is covered / is not covered}
+
+| steps_naming | covered |
+|---|---|
+| \[\['guest', 'search', 'room'\]\] | True |
+| \[\['guest', 'search'\], \['room'\]\] | False |
+| \[\['guest'\], \['guest', 'search', 'room'\]\] | True |
+
+## ✓ Promoting a bare word to an «activity» ref drops «coverage» from a «step» that matched
+`tests/unit/report/test_coverage.py::test_compute_coverage_lost_when_sentence_gains_a_term`
+
+- **given** a «step» naming two «term refs»
+- **given** the same «sentence» with that middle slot a bare word, then an «activity» ref
+- **when** «coverage» is computed against each «story»
+- **then** the two-ref «sentence» is covered
+- **then** the widened «sentence» is no longer covered
+
+## ✓ A «pin» on a «step» or its «scenario» replaces narration matching · 6 cases
+`tests/unit/report/test_coverage.py::test_narration_matching_runs_only_where_nothing_pins`
+
+- **given** a scenario with pins={scenario_pins}
+- **given** a step matching sentence 1, with pins={step_pins}
+- **when** «coverage» is computed against the «story»
+- **then** the «scenario» covers the «sentences» {covered}
+
+| case ID | scenario_pins | step_pins | covered |
+|---|---|---|---|
+| nothing-pinned | None | None | \[1\] |
+| step-pinned | None | \[2\] | \[2\] |
+| scenario-pinned | \[\] | None | \[\] |
+| both-pinned | \[\] | \[2\] | \[2\] |
+| scenario-pins-elsewhere | \[2\] | None | \[2\] |
+| scenario-and-step-pinned | \[1\] | \[2\] | \[1, 2\] |
+
+## ✓ A «sentence» is «coverage»-eligible only with two distinct «terms» · 4 cases
+`tests/unit/report/test_coverage.py::test_coverage_eligibility_needs_two_distinct_terms`
+
+- **given** a «sentence» referencing the «terms» {term_ids}
+- **when** its «coverage» eligibility is checked
+- **then** it {is eligible / is not eligible}
+
+| term_ids | eligible |
+|---|---|
+| \['guest', 'room'\] | True |
+| \['guest', 'guest'\] | False |
+| \['guest'\] | False |
+| \[\] | False |
+
+## ✓ A nested «step» covers a «sentence» like a top-level one
+`tests/unit/report/test_coverage.py::test_compute_coverage_nested_steps_are_walked`
+
+- **given** a «story» with one canonical «sentence»
+- **given** the covering «term refs» in a nested child «step»
+- **when** «coverage» is computed against the «story»
+- **then** the nested «step» still counts and the «sentence» is covered
 
 ## ✓ The Glossary tab renders each «definition ref» as a «term ref» to the «term» it names
 `tests/unit/report/test_html_renderer.py::test_the_glossary_tab_renders_each_definition_ref_as_a_term_ref` · spec/definition-refs
@@ -4086,7 +4368,7 @@
 - **then** the heading is checked and each «step» is a phase bullet
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ Buy coffee
         `tests/t.py::test_buy` · billing, happy-path
@@ -4103,7 +4385,7 @@
 - **when** the Markdown «report» is rendered
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ line one line two
         `tests/t.py::test_x`
@@ -4121,7 +4403,7 @@
 - **then** the «term ref» renders in guillemets, the value verbatim and the placeholder in braces
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ ignored
         `tests/t.py::test_parts`
@@ -4137,7 +4419,7 @@
 - **then** the heading counts the cases and the «parameter table» lists each row
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ Pricing · 2 cases
         `tests/t.py::test_price`
@@ -4168,7 +4450,7 @@
 
 - **passed, passed, \| coin \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -4183,7 +4465,7 @@
 
 - **skipped, skipped, \| coin \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -4198,7 +4480,7 @@
 
 - **failed, failed, \| coin \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -4213,7 +4495,7 @@
 
 - **passed, skipped, \| coin \| \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -4228,7 +4510,7 @@
 
 - **passed, failed, \| coin \| \|** — Rendered Markdown:
     ```
-    # pytest-given — proj
+    # proj
 
     ## ✓ Att · 2 cases
     `tests/t.py::test_att`
@@ -4273,7 +4555,7 @@
 - **then** the heading is crossed and the error follows the steps
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✗ Sold out
         `tests/t.py::test_sold_out`
@@ -4293,7 +4575,7 @@
 - **then** the «attachment» content sits in an indented fence, not inline
     - 📎 Rendered Markdown:
         ````
-        # pytest-given — proj
+        # proj
 
         ## ✓ Multi
         `tests/t.py::test_multiline`
@@ -4314,7 +4596,7 @@
 - **then** the heading is marked skipped and the reason follows the node ID
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ○ Later · skipped
         `tests/t.py::test_skip` — reason: needs fixture data
@@ -4329,7 +4611,7 @@
 - **when** the Markdown «report» is rendered
     - 📎 Rendered Markdown:
         ```
-        # pytest-given — proj
+        # proj
 
         ## ✓ Att · 3 cases
         `tests/t.py::test_att`

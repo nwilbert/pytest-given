@@ -14,8 +14,17 @@ from typing import Literal
 
 type Ancestry = Literal['yes', 'no', 'unknown']
 
+# Session finish asks the working directory's git, and a wedged one holds up an
+# already-finished test session, so it gets less time than the delta's queries.
+_SESSION_TIMEOUT_SECONDS = 2
 _QUERY_TIMEOUT_SECONDS = 5
 _COMMIT_ENV_VARS = ('GITHUB_SHA', 'CI_COMMIT_SHA', 'BUILDKITE_COMMIT')
+# Without these, version sort puts `v1.0rc1` above `v1.0`. Listed lowest first.
+_PRE_RELEASES_FIRST = tuple(
+    arg
+    for suffix in ('.dev', 'a', 'b', 'rc', '-alpha', '-beta', '-rc')
+    for arg in ('-c', f'versionsort.suffix={suffix}')
+)
 
 _GITHUB_URL_RE = re.compile(
     r'(?:https://github\.com/|git@github\.com:)'
@@ -57,23 +66,21 @@ def detect_github_repo() -> tuple[str, str] | None:
     return (match['org'], match['repo'])
 
 
-def resolve_revision(rev: str, repo: Path) -> str | None:
-    """The commit SHA `rev` names in `repo`, or None when it doesn't resolve."""
+def revision_exists(rev: str, repo: Path) -> bool:
+    """Whether `rev` names a commit in `repo`; False when git can't answer."""
     if _looks_like_option(rev):
-        return None
-    result = _run(['rev-parse', '--verify', '--quiet', f'{rev}^{{commit}}'], repo)
-    if result is None or result.returncode != 0:
-        return None
-    return result.stdout.strip()
+        return False
+    verified = _stdout(
+        'rev-parse', '--verify', '--quiet', f'{rev}^{{commit}}', repo=repo
+    )
+    return verified is not None
 
 
 def is_shallow(repo: Path) -> bool | None:
     """Whether `repo` is a shallow clone; None when git can't answer."""
-    result = _run(['rev-parse', '--is-shallow-repository'], repo)
-    if result is None or result.returncode != 0:
-        return None
+    answer = _stdout('rev-parse', '--is-shallow-repository', repo=repo)
     # A git too old for the flag echoes it back, which is no answer.
-    return {'true': True, 'false': False}.get(result.stdout.strip())
+    return {'true': True, 'false': False}.get(answer or '')
 
 
 def is_ancestor(rev: str, sha: str, repo: Path) -> Ancestry:
@@ -96,10 +103,15 @@ def tags_pointing_at(sha: str, repo: Path) -> list[str]:
     """The tags on `sha`, highest version first; empty when git can't answer."""
     if _looks_like_option(sha):
         return []
-    result = _run(['tag', '--points-at', sha, '--sort=-version:refname'], repo)
-    if result is None or result.returncode != 0:
-        return []
-    return result.stdout.splitlines()
+    listed = _stdout(
+        *_PRE_RELEASES_FIRST,
+        'tag',
+        '--points-at',
+        sha,
+        '--sort=-version:refname',
+        repo=repo,
+    )
+    return listed.splitlines() if listed else []
 
 
 def _looks_like_option(rev: str) -> bool:
@@ -107,45 +119,38 @@ def _looks_like_option(rev: str) -> bool:
     return rev.startswith('-')
 
 
-def _run(args: list[str], repo: Path) -> subprocess.CompletedProcess[str] | None:
-    """The finished process, or None when git could not run to completion.
-
-    `OSError` covers the whole exec side: a `git` that exists but is not
-    executable raises `PermissionError`, not `FileNotFoundError`. Git writes
-    ref names as UTF-8 whatever the locale's codec.
-    """
-    try:
-        return subprocess.run(
-            ['git', '-C', str(repo), *args],
-            capture_output=True,
-            encoding='utf-8',
-            errors='replace',
-            timeout=_QUERY_TIMEOUT_SECONDS,
-            check=False,
-        )
-    except OSError, subprocess.SubprocessError:
-        return None
-
-
-def _stdout(*args: str) -> str | None:
+def _stdout(*args: str, repo: Path | None = None) -> str | None:
     """The stripped stdout of a `git` call, or None when it cannot answer.
+    Without a `repo` it asks the working directory, for session finish."""
+    timeout = _QUERY_TIMEOUT_SECONDS if repo else _SESSION_TIMEOUT_SECONDS
+    result = _run(list(args), repo, timeout)
+    if result is None or result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def _run(
+    args: list[str],
+    repo: Path | None = None,
+    timeout: float = _QUERY_TIMEOUT_SECONDS,
+) -> subprocess.CompletedProcess[str] | None:
+    """The finished process, or None when git could not run to completion.
 
     `OSError` covers the whole exec side: a `git` that exists but is not
     executable raises `PermissionError`, and letting that escape would cost the
     entire report — session finish catches `OSError` and discards every sink.
-    Timed out rather than left to hang, since a wedged git would hold up an
-    already-finished test session. Git writes a remote URL as UTF-8 whatever
+    Timed out rather than left to hang. Git writes ref names as UTF-8 whatever
     the locale's codec.
     """
+    location = [] if repo is None else ['-C', str(repo)]
     try:
-        result = subprocess.run(
-            ['git', *args],
+        return subprocess.run(
+            ['git', *location, *args],
             capture_output=True,
             encoding='utf-8',
             errors='replace',
-            timeout=2,
-            check=True,
+            timeout=timeout,
+            check=False,
         )
     except OSError, subprocess.SubprocessError:
         return None
-    return result.stdout.strip()

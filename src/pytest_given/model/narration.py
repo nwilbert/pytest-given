@@ -9,7 +9,7 @@ Only rules that need nothing but the parts. `try_term_ref` stays in
 `capture/template.py`, where the glossary handle types it matches on live.
 """
 
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from string import Formatter
 from typing import Literal, assert_never
 
@@ -30,6 +30,7 @@ from .schema import (
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    case_id,
     definition_part_text,
 )
 from .step_tree import PartIndex
@@ -102,15 +103,18 @@ def narration_text(parts: Sequence[NarrationPart]) -> str:
     return ''.join(out)
 
 
-def read_narration(narration: Narration) -> list[NarrationPiece]:
+def read_narration(
+    narration: Narration, *, before: str = '', after: str = ''
+) -> list[NarrationPiece]:
     """A title or step as every output shows it: each literal read for spans on
-    its own, so a span never crosses a term ref or a value."""
-    parts = narration.parts or (NarrationLiteral(value=narration.text),)
+    its own, so a span never crosses a term ref or a value. `before` and
+    `after` flank a stretch of a longer line, as a word diff renders one."""
     pieces: list[NarrationPiece] = []
-    edges = _edges([narration_text((part,)) for part in parts])
-    for part, (before, after) in zip(parts, edges, strict=True):
+    for part, before_char, after_char in parts_in_context(
+        narration, before=before, after=after
+    ):
         if isinstance(part, NarrationLiteral):
-            pieces.extend(read_spans(part.value, before=before, after=after))
+            pieces.extend(read_spans(part.value, before=before_char, after=after_char))
         else:
             pieces.append(part)
     return pieces
@@ -120,8 +124,10 @@ def read_definition(definition: Definition) -> list[InlineSpan | NarrationTermRe
     """A definition as the Glossary tab shows it, read as `read_narration` reads
     a step: a bold span left in a literal is one no term resolved."""
     pieces: list[InlineSpan | NarrationTermRef] = []
-    edges = _edges([definition_part_text(part) for part in definition.parts])
-    for part, (before, after) in zip(definition.parts, edges, strict=True):
+    texts = [definition_part_text(part) for part in definition.parts]
+    for part, (before, after) in zip(
+        definition.parts, texts_in_context(texts), strict=True
+    ):
         if isinstance(part, NarrationLiteral):
             pieces.extend(read_spans(part.value, before=before, after=after))
         else:
@@ -129,16 +135,29 @@ def read_definition(definition: Definition) -> list[InlineSpan | NarrationTermRe
     return pieces
 
 
-def _edges(texts: Sequence[str]) -> list[tuple[str, str]]:
-    """The character before and after each part, as `texts` spell the parts:
-    what a literal's edges read against."""
-    whole = ''.join(texts)
-    edges: list[tuple[str, str]] = []
-    end = 0
+def parts_in_context(
+    narration: Narration, *, before: str = '', after: str = ''
+) -> Iterator[tuple[NarrationPart, str, str]]:
+    """Each part with the characters just before and after it, which decide how
+    a literal's Markdown markers read."""
+    parts = narration.parts or (NarrationLiteral(value=narration.text),)
+    texts = [narration_text((part,)) for part in parts]
+    for part, (before_char, after_char) in zip(
+        parts, texts_in_context(texts, before=before, after=after), strict=True
+    ):
+        yield part, before_char, after_char
+
+
+def texts_in_context(
+    texts: Sequence[str], *, before: str = '', after: str = ''
+) -> Iterator[tuple[str, str]]:
+    """The characters just before and after each of `texts`, read as one line
+    between `before` and `after`."""
+    whole = before + ''.join(texts) + after
+    end = len(before)
     for text in texts:
         start, end = end, end + len(text)
-        edges.append((whole[max(start - 1, 0) : start], whole[end : end + 1]))
-    return edges
+        yield whole[max(start - 1, 0) : start], whole[end : end + 1]
 
 
 type SpanKind = Literal['a code span', 'bold', 'italics']
@@ -186,6 +205,42 @@ def narration_of(parts: Iterable[NarrationPart]) -> Narration:
     """
     parts = tuple(parts)
     return Narration(text=narration_text(parts), parts=parts)
+
+
+def with_case_id(narration: Narration, node_id: str) -> Narration:
+    """A per-case title: the case ID appended as a value, so it is never read
+    for Markdown."""
+    parts = narration.parts or (NarrationLiteral(value=narration.text),)
+    return narration_of((*parts, *_case_id_parts(node_id)))
+
+
+def without_case_id(narration: Narration, node_id: str) -> Narration:
+    """`with_case_id` undone, or the narration as it is when it doesn't end in
+    that case ID."""
+    suffix = _case_id_parts(node_id)
+    if narration.parts[-len(suffix) :] == suffix:
+        return narration_of(narration.parts[: -len(suffix)])
+    return narration
+
+
+def _case_id_parts(node_id: str) -> tuple[NarrationPart, ...]:
+    return (
+        NarrationLiteral(value=' ['),
+        NarrationValue(rendered=case_id(node_id), expression=''),
+        NarrationLiteral(value=']'),
+    )
+
+
+def merged_literals(parts: Iterable[NarrationPart]) -> tuple[NarrationPart, ...]:
+    """The parts with each run of adjacent literals joined into one."""
+    merged: list[NarrationPart] = []
+    for part in parts:
+        last = merged[-1] if merged else None
+        if isinstance(part, NarrationLiteral) and isinstance(last, NarrationLiteral):
+            merged[-1] = NarrationLiteral(value=last.value + part.value)
+        else:
+            merged.append(part)
+    return tuple(merged)
 
 
 def rebuilt(
