@@ -14,6 +14,8 @@ When you give any case a custom ID, with `pytest.param(..., id=...)` or with `id
 
 The columns appear in the order the narration first shows them: the scenario title, then the steps from top to bottom. Inputs narrated in a `given` come before outcomes narrated in a `then`. A parametrize argument that no step narrates stays next to the argument before it.
 
+When the exact value matters, as with a padded or an empty string, narrate it with `{name!r}`. The column then shows each value's repr, with its quotes, and the HTML report sets it in a monospace font so that its whitespace is easy to see. `!a` does the same.
+
 ```python
 @scenario('Pricing')
 @pytest.mark.parametrize('euros,expect', [(1, False), (2, True), (3, True)])

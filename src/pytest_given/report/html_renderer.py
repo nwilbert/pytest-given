@@ -180,6 +180,7 @@ def _build_env(
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
     env.filters['phase_blocks'] = _phase_blocks
     env.filters['column_phase_blocks'] = _column_phase_blocks
+    env.filters['repr_columns'] = _repr_columns
     env.filters['case_id'] = case_id
     env.globals['data_url'] = _data_url
     return env
@@ -235,6 +236,25 @@ def _column_phase_blocks(scenario: Scenario) -> dict[ColumnId, int]:
         current = met_in.get(column.id, current)
         blocks[column.id] = current
     return blocks
+
+
+_REPR_CONVERSIONS = ('r', 'a')
+
+
+def _repr_columns(scenario: Scenario) -> set[ColumnId]:
+    """The columns a slot shows as a repr, which its author narrated that way
+    because the exact value matters: a padded string, an empty one."""
+    step_narrations = (step.narration for step in iter_steps(scenario.steps))
+    return {
+        part.column_id
+        for narration in (scenario.narration, *step_narrations)
+        for part in narration.parts
+        if isinstance(part, NarrationPlaceholder) and _shows_repr(part)
+    }
+
+
+def _shows_repr(part: NarrationPlaceholder) -> bool:
+    return part.conversion in _REPR_CONVERSIONS
 
 
 def _render_context(
@@ -554,8 +574,9 @@ def _render_narration_piece(
             # would be an injection, since Alpine compiles a directive's
             # *decoded* attribute text as JS.
             safe_id = escape(column_id)
+            repr_class = ' param-repr' if _shows_repr(part) else ''
             return (
-                f'<span class="param-color-{color_idx}" '
+                f'<span class="param-color-{color_idx}{repr_class}" '
                 f'data-param="{safe_id}" '
                 f'data-subst="{safe_id}"'
                 f'>{escape(label)}</span>'

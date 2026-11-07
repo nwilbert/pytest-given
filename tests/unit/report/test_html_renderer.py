@@ -1,7 +1,10 @@
 import json
 import re
+from dataclasses import replace
 from html.parser import HTMLParser
 from pathlib import Path
+
+import pytest
 
 from pytest_given import given, scenario, then, when
 from pytest_given.model import (
@@ -52,6 +55,7 @@ from pytest_given.report.html_renderer import (
     _make_narration_filter,
     _neutralize_script_data,
     _phase_blocks,
+    _repr_columns,
     _strip_comments,
     render_html_string,
 )
@@ -1173,6 +1177,59 @@ def test_an_unnarrated_column_joins_the_phase_block_beside_it() -> None:
         'also_unnamed': 0,
         'outcome': 1,
     }
+
+
+def _placeholder_narration(column_id: str, conversion: str | None) -> Narration:
+    return Narration(
+        text=column_id,
+        parts=(
+            NarrationPlaceholder(
+                name=column_id, column_id=ColumnId(column_id), conversion=conversion
+            ),
+        ),
+    )
+
+
+@scenario(
+    t'The {pg["Renderer"].l} treats a {pg["Parameter table"].l} column '
+    t'narrated with !r or !a as a repr column',
+    tags=['parametrization'],
+)
+@pytest.mark.parametrize(
+    ('conversion', 'repr_column'),
+    [('r', True), ('a', True), ('s', False), (None, False)],
+)
+def test_a_column_narrated_with_r_or_a_is_a_repr_column(
+    conversion, repr_column
+) -> None:
+    with given(t'a step whose placeholder has the conversion {conversion!r}'):
+        table_scenario = _table_scenario(
+            [
+                Step(
+                    phase='given',
+                    narration=_placeholder_narration('value', conversion),
+                )
+            ],
+            ['value'],
+        )
+    with when(t'the {pg["Renderer"].l} picks the repr columns'):
+        columns = _repr_columns(table_scenario)
+    with then(t'the column is one of them: {repr_column}'):
+        assert (ColumnId('value') in columns) == repr_column
+
+
+def test_a_repr_column_is_found_in_a_nested_step_and_in_the_title() -> None:
+    nested = Step(
+        phase='when',
+        narration=Narration(text='outer'),
+        children=[Step(phase='when', narration=_placeholder_narration('inner', 'r'))],
+    )
+    table_scenario = replace(
+        _table_scenario([nested], ['inner', 'titled', 'plain']),
+        narration=_placeholder_narration('titled', 'r'),
+    )
+
+    assert _repr_columns(table_scenario) == {ColumnId('inner'), ColumnId('titled')}
 
 
 def test_a_table_no_step_narrates_has_no_phase_blocks() -> None:

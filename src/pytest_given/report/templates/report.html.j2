@@ -312,6 +312,7 @@
           narration and its columns together. The id and status columns share
           one of their own: they frame the row, at its two ends. -#}
       {%- set col_blocks = scenario | column_phase_blocks %}
+      {%- set repr_cols = scenario | repr_columns %}
       <div class="param-table-scroll">
       <table class="param-table">
         <thead>
@@ -342,7 +343,7 @@
                substituting that blank would erase the step's {token} instead of
                replacing it. A `param` cell always substitutes — `None` there is
                a real parametrize value. #}
-            <td data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
+            <td {% if col.id in repr_cols %}class="param-repr" {% endif %}data-param="{{ col.id }}"{% if col.id in col_blocks %} data-block="{{ col_blocks[col.id] }}"{% endif %}{% if col.kind == 'param' or val is not none %} data-subst="{{ col.id }}"{% endif %}>{% if col.kind == 'param' %}{{ val }}{% else %}{{ val if val is not none else '' }}{% endif %}</td>
             {% endif %}
             {% endfor %}
             {% if show_status %}<td class="param-status" data-block="frame">{{ status_dot(case.status) }}</td>{% endif %}

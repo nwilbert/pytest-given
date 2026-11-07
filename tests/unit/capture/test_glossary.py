@@ -40,7 +40,7 @@ from tests.ubiquitous_language import adopt_pytest_given, pg
     ],
 )
 def test_term_ids_are_derived_as_url_safe_slugs(
-    text: Annotated[str, given(Template('the name {text}'))],
+    text: Annotated[str, given(Template('the name {text!r}'))],
     slug,
 ):
     with when(t'it is slugified into a {pg["Term"].l} id'):
@@ -55,7 +55,7 @@ def test_term_ids_are_derived_as_url_safe_slugs(
 )
 @pytest.mark.parametrize('text', ['---', '   ', '', '###'])
 def test_a_term_name_that_leaves_no_slug_is_refused(
-    text: Annotated[str, given(Template('the name {text}'))],
+    text: Annotated[str, given(Template('the name {text!r}'))],
 ):
     with (
         when_then(

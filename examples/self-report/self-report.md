@@ -1701,14 +1701,14 @@
 
 | text | slug |
 |---|---|
-| Guest | 'guest' |
-| Order received | 'order-received' |
-|   Work Object   | 'work-object' |
-| do_the_thing | 'do-the-thing' |
-| Buy / sell | 'buy-sell' |
-| Guest #1 | 'guest-1' |
-| café | 'caf' |
-| booking system | 'booking-system' |
+| 'Guest' | 'guest' |
+| 'Order received' | 'order-received' |
+| '  Work Object  ' | 'work-object' |
+| 'do_the_thing' | 'do-the-thing' |
+| 'Buy / sell' | 'buy-sell' |
+| 'Guest #1' | 'guest-1' |
+| 'café' | 'caf' |
+| 'booking system' | 'booking-system' |
 
 ## ✓ A «term» name that leaves no slug is refused · 4 cases
 `tests/unit/capture/test_glossary.py::test_a_term_name_that_leaves_no_slug_is_refused` · validation
@@ -1719,10 +1719,10 @@
 
 | text |
 |---|
-| --- |
-|     |
-|  |
-| ### |
+| '---' |
+| '   ' |
+| '' |
+| '###' |
 
 ## ✓ Calling an «actor» names a distinct «instance»
 `tests/unit/capture/test_glossary.py::test_actor_call_returns_instance_with_distinct_display`
@@ -3397,6 +3397,20 @@
 - **when** the «renderer» renders the HTML page
 - **then** the grouped step shows its placeholder, keyed to the euros column
 - **then** each column header carries its own column key
+
+## ✓ The «renderer» treats a «parameter table» column narrated with !r or !a as a repr column · 4 cases
+`tests/unit/report/test_html_renderer.py::test_a_column_narrated_with_r_or_a_is_a_repr_column` · parametrization
+
+- **given** a step whose placeholder has the conversion {conversion}
+- **when** the «renderer» picks the repr columns
+- **then** the column is one of them: {repr_column}
+
+| conversion | repr_column |
+|---|---|
+| 'r' | True |
+| 'a' | True |
+| 's' | False |
+| None | False |
 
 ## ✓ A «scenario title»'s emphasis renders the same in every output
 `tests/unit/report/test_inline_markdown.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown, versions/0.5.0

@@ -840,6 +840,21 @@ body.resizing-sidebar { cursor: col-resize; user-select: none; }
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
 }
+/* A value keeps every character it holds: a padded string differs from an
+   unpadded one only by its whitespace. A cell with nothing to substitute is
+   blank, so `data-subst` selects every value cell. */
+.param-table td[data-subst] { white-space: pre-wrap; }
+.param-table td.param-repr {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+/* The value a hovered row substitutes into a step reads as its cell does; the
+   {token} it replaces stays in the step's own font. */
+.param-repr.param-substituted {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  white-space: pre-wrap;
+}
 /* No width here — a percentage width on a cell stretches an auto-width table
    to the full card. */
 .param-table .param-status { text-align: center; }
