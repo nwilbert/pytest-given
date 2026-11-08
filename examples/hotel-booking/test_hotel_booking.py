@@ -83,19 +83,23 @@ booking_system = g.actor('Booking System', 'Automated reservation back-end.')
 room = g.work_object('Room', 'A bookable hotel room.')
 booking = g.work_object('Booking', 'A reservation for one or more **rooms**.')
 payment = g.work_object('Payment', 'Money transferred for a **booking**.')
-confirmation = g.work_object('Confirmation', 'Notification of a successful booking.')
+confirmation = g.work_object(
+    'Confirmation', 'Notification of a successful **booking**.'
+)
 
 confirm = g.activity(
-    'confirm', 'Guarantee a paid booking so its rooms are held for arrival.'
+    'confirm', 'Guarantee a paid **booking** so its **rooms** are held for arrival.'
 )
 # `decline` is in the ubiquitous language but no Story sentence uses it yet —
 # it surfaces in the Glossary tab and powers the error-path scenario.
-decline = g.activity('decline', 'Refuse a payment, leaving its booking pending.')
+decline = g.activity(
+    'decline', 'Refuse a **payment**, leaving its **booking** pending.'
+)
 # Vocabulary for the second Story.
-cancel = g.activity('cancel', 'Withdraw a booking before arrival.')
+cancel = g.activity('cancel', 'Withdraw a **booking** before arrival.')
 refund = g.activity('refund', 'Return the **payment** for a cancelled **booking**.')
 rebook = g.activity(
-    'rebook', 'Restore a cancelled booking for the same rooms and dates.'
+    'rebook', 'Restore a cancelled **booking** for the same **rooms** and dates.'
 )
 
 

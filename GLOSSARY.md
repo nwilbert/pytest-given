@@ -23,13 +23,13 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 
 | Term | Meaning |
 |---|---|
-| Parametrized scenario | A **Scenario** whose test is parametrized, so it runs once per **Case**. pytest-given groups the results. |
+| Parametrized scenario | A **Scenario** whose test is parametrized, so it runs once per **Case**. pytest-given **groups** the results. |
 | Case | One row of a parametrized scenario: its node ID, its parameter values, its status and any error. |
 | Case ID | A **Case**'s pytest ID: its **Node ID**'s parametrize tail without the brackets (`touching-edges`), as the terminal prints it. *Custom* when it is more than its values' generated parts, as from `pytest.param(..., id=...)` or `ids=`. |
-| Parameter table | The per-scenario table of cases and columns. A column is a `param` (a parametrize input), a `derived` (a narrated value that varies across cases) or an `attachment` (an attachment whose payload varies). |
+| Parameter table | The per-scenario table of **cases** and columns. A column is a `param` (a parametrize input), a `derived` (a narrated value that varies across cases) or an `attachment` (an **attachment** whose payload varies). |
 | Boolean phrase | Either of the two texts that word a Boolean in a step. Written as a phrase spec, a format spec holding the true phrase, a `\|` and the false phrase: `{pinned:pins it\|does not pin it}`. The step shows both phrases, and the **Parameter table** keeps the Boolean. |
-| Group | Collapsing the cases of a parametrized scenario into one logical scenario carrying a **Parameter table**. Cases group when they share both the same name and the same **Node ID** without its parametrize tail — one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario. |
-| Templatize | Derive the grouped-template step text by comparing every comparable case: what all of them share stays inline, and anything that varies points at a parameter-table column. The baseline comes from the first passed case, and every other passed case must narrate that same template — a failed case too, over the steps it shares with the baseline. |
+| Group | Collapsing the **cases** of a **parametrized scenario** into one logical scenario carrying a **Parameter table**. Cases group when they share both the same name and the same **Node ID** without its parametrize tail — one test function; two same-named scenarios on different test functions stay separate. `@scenario(group_parametrized=False)` declines the merge, so each case lives on as its own scenario. |
+| Templatize | Derive the grouped-template step text by comparing every comparable **case**: what all of them share stays inline, and anything that varies points at a **parameter-table** column. The baseline comes from the first passed case, and every other passed case must narrate that same template — a failed case too, over the steps it shares with the baseline. |
 
 ## Fixtures and recording
 
@@ -38,14 +38,14 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Step fixture | A pytest fixture that narrates its setup as a `given` **Step**. A fixture cannot narrate `when` or `then`. |
 | Plain fixture | A pytest fixture without a pytest-given decorator. It produces no step in the report unless a **Given annotation** on the test's parameter narrates it. |
 | Given annotation | A `given(...)` in a test parameter's `Annotated[...]` type: `def test(room: Annotated[int, given('a room')])`. On a parametrize value or a **Plain fixture** it adds a childless `given` step; on a **Step fixture** it replaces the fixture's root label and its pins. Only `given` is allowed, and a `Template` in it may only hold a bare parametrize column. |
-| Fixture recording | The steps and attachments a step fixture narrates during setup. A generator fixture's teardown records nothing — it refuses steps and attachments. |
-| Graft | Attaching a fixture recording into the active scenario's step tree at the moment its host test starts. |
+| Fixture recording | The steps and attachments a **step fixture** narrates during setup. A generator fixture's teardown records nothing — it refuses steps and attachments. |
+| Graft | Attaching a **fixture recording** into the **active scenario**'s step tree at the moment its host test starts. |
 
 ## Collector state
 
 | Term | Meaning |
 |---|---|
-| Collector | What gathers a session's scenarios, fixture recordings and parameter info. |
+| Collector | What gathers a session's scenarios, **fixture recordings** and parameter info. |
 | Active scenario | The scenario currently being recorded into. |
 | Node ID | A pytest test identifier (e.g., `tests/test_x.py::test_y[a-b]`). |
 | Step stack | The chain of currently-open steps. Opening a step adds it, and leaving its block removes it. |
@@ -57,7 +57,7 @@ This glossary covers pytest-given's own bounded context. The terminology a *user
 | Report | The output artifact: a JSON data file and optional self-contained HTML and Markdown renderings derived from it. The JSON is the source of truth. |
 | Renderer | Converts a JSON report into a rendering — a self-contained HTML page or a Markdown document. |
 | Parameter coloring | Each parametrize column gets a stable highlight color; placeholders and matching values share that color wherever they appear in step text and the parameter table. |
-| Value highlight | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every case (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
+| Value highlight | A neutral highlight applied to t-string interpolation values that don't correspond to a parametrize column and are constant across every **case** (e.g., a computed expression like `price * 1.2`). One that varies becomes a `derived` column instead. |
 | Source link | A link to a file and line: a scenario's test function, or the declaration of a **Story** or **Term**. |
 | Report link | A Markdown link to a scenario, tag, story or term in the HTML **Report**. Without a glyph it is a plain one, which claims only that its target exists. |
 | Citation | A **Report link** led by its target's status glyph, citing a scenario, tag, story or term from a Markdown document: `✅ [title](<report URL>#scenario=…)`. A tag, story or term citation adds a summary after it, `(5 ✅ · 2 🔵)`. A target the **Report** lacks reads `❓`. |
@@ -86,21 +86,21 @@ Terms follow [Domain Storytelling](https://domainstorytelling.org/quick-start-gu
 | Glossary | The shared vocabulary a domain speaks in: its Ubiquitous Language. |
 | File glossary | A glossary loaded from the GFM pipe tables of a Markdown file. |
 | Deferred term | A term handed over before its kind is settled: what `g('foo')` and `g['foo']` on a code glossary return, and a **file glossary** lookup of a row with no declared kind. **Kind inference** settles it later. |
-| Term | A glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind unless kindless, and an optional definition. |
+| Term | A glossary entry: an **Actor**, **Work Object**, **Activity**, or **kindless** term. Each carries an id (slug), a canonical name, a kind unless kindless, and an optional definition. |
 | Handle | What a glossary hands back for a **term**, the same from every accessor (`g.actor(...)`, `g('foo')`, `g['Guest']`, a captured `guest = ...`). It is what steps, scenario titles and sentences interpolate, in one of four surface forms: *bare* (`room` — the canonical display), **`.l`** (`room.l` — capitalized words lowercased, acronyms kept), **`.s`** (`room.s` — the **S-form**), or *called* (`room('Deluxe Suite')` — an **instance** on an Actor or Work Object, an inflection on an **Activity**). `.l` and `.s` also apply to a called form and chain (`room.l.s` reads *rooms*). Each form renders as a **term ref**. A story hands out a *sentence handle* the same way: `book_a_room['cancel']` by name or `book_a_room[3]` by number, which `pins=` takes. |
 | S-form | A term's name with the regular English -s ending, from the `.s` handle form: the plural of an Actor or Work Object (*rooms*), the third person singular of an Activity (*books*). It adds -s to the last word, -es after s, x, z, ch or sh, and turns a consonant + y into -ies, but an acronym takes a plain -s (*APIs*); anything else, such as *people* or *checks in*, needs the called form. An S-form reference, in any case, is a reference to the term itself — not an **instance** or an **inflection**. |
 | Actor | A glossary term for a participant in the domain (e.g., *Guest*). |
 | Work Object | A glossary term for a thing acted on (e.g., *Room*, *Booking*). |
-| Activity | A glossary term for what an actor does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept inflections: calling `search('searches for')` records *searches for* as a surface form of the canonical *search*. |
+| Activity | A glossary term for what an **actor** does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept **inflections**: calling `search('searches for')` records *searches for* as a surface form of the canonical *search*. |
 | Term ref | An occurrence of a term inside narration or a clause. |
 | Definition ref | A bold span in a glossary definition that names a term of the same glossary, by its canonical name or **S-form** in any case. The report renders it as a **term ref**. |
-| Instance | A named refinement of an Actor or Work Object (e.g., `guest('Alice')` is an instance of the *Guest* actor). |
-| Inflection | A surface form of an Activity term other than its canonical name or **S-form** (e.g., *searches for* as an inflection of *search*). |
-| Story | A named flow modeled as a sequence of sentences. Stories are the unit of coverage. |
-| Sentence | What Domain Storytelling calls a sentence: an actor, an activity and its work objects, plus connective words. One row in a story, numbered by its position and optionally named, a name that stays put when rows are inserted. Usually one clause; several when the sentence has several arrows under one number. |
-| Clause part | A piece of a clause's prose: a **term ref**, or a bare clause word. A bare clause word — a node label or edge connective — carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a kindless term, which has an id and is tracked. |
-| Clause | One linear walk through a sentence's arrows, a node/edge alternation starting actor → verb → noun. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit. |
-| Slot | A position role in a clause, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions ≥ 2 are noun slots. |
+| Instance | A named refinement of an **Actor** or **Work Object** (e.g., `guest('Alice')` is an instance of the *Guest* actor). |
+| Inflection | A surface form of an **Activity** term other than its canonical name or **S-form** (e.g., *searches for* as an inflection of *search*). |
+| Story | A named flow modeled as a sequence of **sentences**. Stories are the unit of **coverage**. |
+| Sentence | What Domain Storytelling calls a sentence: an **actor**, an **activity** and its **work objects**, plus connective words. One row in a story, numbered by its position and optionally named, a name that stays put when rows are inserted. Usually one **clause**; several when the sentence has several arrows under one number. |
+| Clause part | A piece of a **clause**'s prose: a **term ref**, or a bare clause word. A bare clause word — a node label or edge connective — carries no kind or id, is never classified by inference, and never reaches the glossary. That last is what separates it from a **kindless** term, which has an id and is tracked. |
+| Clause | One linear walk through a **sentence**'s arrows, a node/edge alternation starting actor → verb → noun. A sentence with several arrow chains under one number, such as an actor handing a work object to two recipients, takes one clause per chain. Domain Storytelling names no such unit. |
+| Slot | A position role in a **clause**, from its node/edge alternation: position 0 is the actor slot, odd positions are verb slots, and even positions ≥ 2 are noun slots. |
 | Scenario↔sentence binding | The link between a scenario (or step) and story sentences. `@scenario(stories=...)` names the stories a scenario is narration-matched against; a **pin** (`pins=` on `@scenario` or on `given`/`when`/`then`) binds sentences explicitly, in any story, whether `stories=` names it or not. |
 | Pin | What a sentence's **Handle** passed to `pins=` is recorded as, the way a term handle in narration is recorded as a **term ref**: a reference to a story and a sentence number. A pin binds explicitly and replaces narration matching — a step pin for that step, a scenario pin (`@scenario(pins=...)`) for every step of the scenario, which then covers its own pins plus its steps'. `pins=[]` pins nothing but still opts out of narration matching. A pin reaches under-anchored sentences too. |
 | Coverage | The "did this scenario touch that sentence" relation. A sentence is covered when the set of terms it references is a subset of the terms a single step references — matching is per step, not against the union across steps, and on terms, not surface forms: an **instance** or **inflection** counts as its term. A **pin** covers its sentences directly instead, regardless of narration or term count. |

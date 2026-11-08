@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-08T19:49:21.336156+00:00",
+    "timestamp": "2026-11-08T20:38:16.235070+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "d92d71319fd7549683ea21843c5f6b10f306aa20",
+    "commit_sha": "7b9212b4d4f51989a6ab9ff3ee2e462117b39d42",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -176,7 +176,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 197
+        "line": 201
       },
       "story_ids": [
         "book-a-group-trip"
@@ -489,7 +489,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 219
+        "line": 223
       },
       "story_ids": [
         "book-a-group-trip"
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 36,
+      "duration_ms": 46,
       "steps": [
         {
           "phase": "given",
@@ -799,7 +799,7 @@
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 293,
+                  "lineno": 297,
                   "func": "test_payment_declined",
                   "code": "    assert response == decline_reason",
                   "is_internal": false
@@ -817,7 +817,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 258
+        "line": 262
       },
       "story_ids": [
         "book-a-group-trip"
@@ -1003,7 +1003,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 312
+        "line": 316
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1106,14 +1106,14 @@
         "frames": [
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 340,
+            "lineno": 344,
             "func": "test_rebook_cancelled_booking",
             "code": "    rebook_cancelled_booking(stay)",
             "is_internal": false
           },
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 328,
+            "lineno": 332,
             "func": "rebook_cancelled_booking",
             "code": "    raise NotImplementedError('rebooking a cancelled booking is not supported yet')",
             "is_internal": false
@@ -1126,7 +1126,7 @@
       "xfail_reason": "rebooking is not implemented yet",
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 331
+        "line": 335
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1303,7 +1303,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 351
+        "line": 355
       },
       "story_ids": [
         "cancel-a-booking",
@@ -1378,7 +1378,7 @@
         "id": "confirmation",
         "kind": "object",
         "canonical": "Confirmation",
-        "definition": "Notification of a successful booking.",
+        "definition": "Notification of a successful **booking**.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 86
@@ -1388,30 +1388,30 @@
         "id": "confirm",
         "kind": "activity",
         "canonical": "confirm",
-        "definition": "Guarantee a paid booking so its rooms are held for arrival.",
+        "definition": "Guarantee a paid **booking** so its **rooms** are held for arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 88
+          "line": 90
         }
       },
       {
         "id": "decline",
         "kind": "activity",
         "canonical": "decline",
-        "definition": "Refuse a payment, leaving its booking pending.",
+        "definition": "Refuse a **payment**, leaving its **booking** pending.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 93
+          "line": 95
         }
       },
       {
         "id": "cancel",
         "kind": "activity",
         "canonical": "cancel",
-        "definition": "Withdraw a booking before arrival.",
+        "definition": "Withdraw a **booking** before arrival.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 95
+          "line": 99
         }
       },
       {
@@ -1421,17 +1421,17 @@
         "definition": "Return the **payment** for a cancelled **booking**.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 96
+          "line": 100
         }
       },
       {
         "id": "rebook",
         "kind": "activity",
         "canonical": "rebook",
-        "definition": "Restore a cancelled booking for the same rooms and dates.",
+        "definition": "Restore a cancelled **booking** for the same **rooms** and dates.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 97
+          "line": 101
         }
       },
       {
@@ -1441,7 +1441,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 129
+          "line": 133
         }
       },
       {
@@ -1451,7 +1451,7 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 130
+          "line": 134
         }
       }
     ]
@@ -1714,7 +1714,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 102
+        "line": 106
       }
     },
     {
@@ -1825,7 +1825,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 145
+        "line": 149
       }
     }
   ],
