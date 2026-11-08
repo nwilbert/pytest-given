@@ -18,7 +18,7 @@ Pytest-free like the rest of `report/`: the caller resolves its options into a
 """
 
 import json
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import NamedTuple, Protocol
@@ -131,12 +131,27 @@ class RenderedSinks:
 
 
 def emit_sinks(
-    report_dict: JsonObject, config: SinkConfig, source: str | None = None
+    load: Callable[[], JsonObject], config: SinkConfig, source: str | None = None
 ) -> RenderedSinks:
-    """Render and write every configured sink, or leave none of them behind."""
-    return emit_files(
-        lambda: render_sinks(report_dict, config, source), config.file_paths()
-    )
+    """Load the report dict, render and write every configured sink, or leave
+    none of them behind: an input that can't be loaded fails the same way."""
+    return emit_files(lambda: render_sinks(load(), config, source), config.file_paths())
+
+
+def refuse_writing_over_an_input(
+    outputs: Mapping[str, Path | None], inputs: Sequence[Path]
+) -> None:
+    """A failed run discards its outputs, so an output that is an input would
+    delete it. `outputs` maps each sink's name to its path."""
+    for name, output in outputs.items():
+        if output is None:
+            continue
+        for input_path in inputs:
+            if output.resolve() == input_path.resolve():
+                raise PytestGivenError(
+                    f'the {name} {output.as_posix()} is the input '
+                    f'{input_path.as_posix()}; write it elsewhere'
+                )
 
 
 def emit_files[Files: Rendered](

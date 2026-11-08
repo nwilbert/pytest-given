@@ -39,6 +39,7 @@ from ..report import (
     THEME_HELP,
     DeltaSinkConfig,
     emit_delta_sinks,
+    refuse_writing_over_an_input,
     resolve_source_link_template,
     resolve_theme,
 )
@@ -172,22 +173,10 @@ def _sink_config(args: argparse.Namespace, inputs: list[Path]) -> DeltaSinkConfi
         ),
         theme=resolve_theme(args.theme, '--theme'),
     )
-    _refuse_overwriting_an_input(config, inputs)
+    refuse_writing_over_an_input(
+        {'delta JSON': config.json_path, 'delta HTML': config.html_path}, inputs
+    )
     return config
-
-
-def _refuse_overwriting_an_input(config: DeltaSinkConfig, inputs: list[Path]) -> None:
-    """A failed delta discards its outputs, so an output that is an input
-    would delete it."""
-    for sink, output in (('JSON', config.json_path), ('HTML', config.html_path)):
-        if output is None:
-            continue
-        for input_path in inputs:
-            if output.resolve() == input_path.resolve():
-                raise PytestGivenError(
-                    f'the delta {sink} {output.as_posix()} is the input '
-                    f'{input_path.as_posix()}; write it elsewhere'
-                )
 
 
 def _compare(

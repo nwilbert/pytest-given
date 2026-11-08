@@ -105,7 +105,7 @@ def test_an_unexpected_render_failure_still_discards_the_stale_report(
         sinks, 'render_sinks', lambda *_: (_ for _ in ()).throw(RuntimeError('boom'))
     )
     with pytest.raises(RuntimeError, match='boom'):
-        sinks.emit_sinks({}, SinkConfig(json_path=stale))
+        sinks.emit_sinks(dict, SinkConfig(json_path=stale))
     assert not stale.exists()
 
 
@@ -126,9 +126,7 @@ def test_an_interrupted_write_leaves_no_sink_and_no_temporary(tmp_path, monkeypa
     json_path, md_path = tmp_path / 'report.json', tmp_path / 'report.md'
     _interrupt_temporary(monkeypatch, number=2)
     with pytest.raises(KeyboardInterrupt):
-        sinks.emit_sinks(
-            _report_dict(), SinkConfig(json_path=json_path, md_path=md_path)
-        )
+        sinks.emit_sinks(_report_dict, SinkConfig(json_path=json_path, md_path=md_path))
     assert list(tmp_path.iterdir()) == []
 
 
@@ -137,7 +135,7 @@ def test_an_interrupted_write_discards_the_stale_report(tmp_path, monkeypatch):
     stale.write_text('{"stale": true}')
     _interrupt_temporary(monkeypatch, number=1)
     with pytest.raises(KeyboardInterrupt):
-        sinks.emit_sinks(_report_dict(), SinkConfig(json_path=stale))
+        sinks.emit_sinks(_report_dict, SinkConfig(json_path=stale))
     assert not stale.exists()
 
 

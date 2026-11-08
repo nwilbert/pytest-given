@@ -33,6 +33,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
 - A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
 - The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".
+- `pytest-given report` now removes the previous output when its input can't be read, as it already did when rendering failed.
 
 ### Fixed
 
@@ -41,6 +42,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A report link whose `#status=` names only statuses the report doesn't know now shows every scenario instead of none.
 - A failure raised while rendering a step's interpolation, such as a bad format spec, no longer shows a pytest-given frame in the report's traceback.
 - A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which `citations update` rewrites.
+- `pytest-given report` refuses an `-o` path that is its input file, which a failed render could delete.
 
 ## [0.5.2] - 2026-11-07
 

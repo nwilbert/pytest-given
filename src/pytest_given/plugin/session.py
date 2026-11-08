@@ -157,8 +157,9 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
         return
     try:
         built = _build_report(session, write=withheld is None)
-        if built.report_dict is not None:
-            rendered = emit_sinks(built.report_dict, given_config(config).sinks)
+        report_dict = built.report_dict
+        if report_dict is not None:
+            rendered = emit_sinks(lambda: report_dict, given_config(config).sinks)
             if rendered.md_stdout is not None:
                 session_outcome(config).md_stdout = rendered.md_stdout
     except (PytestGivenError, OSError) as error:

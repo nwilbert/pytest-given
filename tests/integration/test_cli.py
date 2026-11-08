@@ -500,6 +500,46 @@ def test_cli_render_failure_also_discards_the_stale_report(
     assert 'would read as current' in err
 
 
+@scenario(
+    t'A `pytest-given report` that cannot read its input removes the earlier '
+    t'{pg["Report"].l}',
+    tags=['diagnostics'],
+)
+@pytest.mark.parametrize('flaw', ['missing', 'not JSON'])
+def test_cli_input_that_cannot_be_read_also_discards_the_stale_report(
+    tmp_path: Path, capsys, flaw: str
+) -> None:
+    with given(t'a {pg["Report"].l} left by an earlier render'):
+        html_path = tmp_path / 'out.html'
+        html_path.write_text('previous run', encoding='utf-8')
+    with when(t'a JSON file that is {flaw} is rendered to it'):
+        json_path = tmp_path / 'data.json'
+        if flaw == 'not JSON':
+            json_path.write_text('{', encoding='utf-8')
+        rc = main(['report', str(json_path), '-o', str(html_path)])
+    with then('the command exits 2'):
+        assert rc == 2
+    with then(t'the earlier {pg["Report"].l} is removed, as it would read as current'):
+        assert not html_path.exists()
+        assert 'would read as current' in capsys.readouterr().err
+
+
+def test_cli_refuses_an_output_that_is_its_input_and_keeps_the_input(
+    tmp_path: Path, capsys
+) -> None:
+    """A failed run discards its output, so writing over the input could
+    delete it."""
+    json_path = tmp_path / 'data.html'
+    json_path.write_text('{', encoding='utf-8')
+    rc = main(['report', str(json_path), '-o', str(json_path)])
+    assert rc == 2
+    assert json_path.read_text(encoding='utf-8') == '{'
+    assert capsys.readouterr().err == (
+        f'Error: the report HTML {json_path.as_posix()} is the input '
+        f'{json_path.as_posix()}; write it elsewhere\n'
+    )
+
+
 def test_cli_refuses_an_unknown_source_link_preset_on_a_markdown_run(
     tmp_path: Path, capsys
 ) -> None:
