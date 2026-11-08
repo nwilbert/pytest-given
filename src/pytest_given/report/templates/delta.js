@@ -76,6 +76,10 @@ function deltaApp() {
     _termMatches(row) {
       return this.shownTermChanges[row.change] && base._termMatches.call(this, row);
     },
+    _resetTermFilters() {
+      base._resetTermFilters.call(this);
+      this.shownTermChanges = allChangesShown();
+    },
     // A side's table previews into its own side's text; the one table of a
     // scenario whose table didn't change, into both.
     _previewSpans(rowEl, scope) {
@@ -90,12 +94,9 @@ function deltaApp() {
       alignSides();
       scrollTablesTogether();
     },
-    _readHash() {
-      base._readHash.call(this);
-      const params = parseHash();
-      this.shownChanges = params.has('change')
-        ? changeFacet.only(new Set(params.get('change').split(',')))
-        : allChangesShown();
+    _readFacets(params, keep) {
+      base._readFacets.call(this, params, keep);
+      this.shownChanges = changeFacet.fromHash(params, 'change', keep);
     },
     _hashParams() {
       const params = base._hashParams.call(this);

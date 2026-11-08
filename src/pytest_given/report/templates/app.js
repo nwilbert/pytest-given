@@ -44,18 +44,26 @@ function deserializeStory(params) {
   return ids[0] || null;
 }
 
-// Own keys only: these are read from the URL fragment, and a bare `map[key]`
-// answers `#term-filter=toString` with a function off Object.prototype.
 // A filter over one field's values: what the rows hold, and which values show.
 function shownFacet(values, rows, field) {
   const counts = Object.fromEntries(values.map(v => [v, 0]));
   for (const row of rows) counts[row[field]] += 1;
   const present = values.filter(v => counts[v] > 0);
+  const allShown = () => Object.fromEntries(values.map(v => [v, true]));
   return {
     counts,
     present,
-    allShown: () => Object.fromEntries(values.map(v => [v, true])),
-    only: shown => Object.fromEntries(values.map(v => [v, shown.has(v)])),
+    allShown,
+    // `keep` drops and reports a value this report doesn't hold; a link whose
+    // every value is dropped shows all rather than none. An empty value is
+    // what `writeHash` writes for none shown.
+    fromHash(params, name, keep) {
+      if (!params.has(name)) return allShown();
+      const named = params.get(name).split(',').filter(Boolean);
+      const known = keep(name, named, v => values.includes(v));
+      if (named.length && !known.length) return allShown();
+      return Object.fromEntries(values.map(v => [v, known.includes(v)]));
+    },
     // In the URL only when it narrows what the rows hold.
     writeHash(params, name, shown) {
       const on = present.filter(v => shown[v]);
@@ -64,6 +72,8 @@ function shownFacet(values, rows, field) {
   };
 }
 
+// Own keys only: these are read from the URL fragment, and a bare `map[key]`
+// answers `#term-filter=toString` with a function off Object.prototype.
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
 }
@@ -1314,17 +1324,7 @@ function reportApp() {
       this.sectionFilters = keep('glossary section', params.getAll('section').filter(Boolean),
         key => knownSections.has(key));
       if (this.sectionFilters.length) this.glossaryGrouping = 'section';
-      if (params.has('status')) {
-        const named = params.get('status').split(',').filter(Boolean);
-        const shown = new Set(keep('status', named, s => STATUSES.includes(s)));
-        // A link whose every status is dropped shows all rather than none. An
-        // empty value is what `_writeHash` writes for none shown.
-        this.shownStatuses = named.length && !shown.size
-          ? allStatusesShown()
-          : statusFacet.only(shown);
-      } else {
-        this.shownStatuses = allStatusesShown();
-      }
+      this._readFacets(params, keep);
       keep('view', first('view'), v => v === deserializeView(params));
       keep('story', first('story'), s => storyIds.includes(s));
       if (params.has('q')) this.search = params.get('q');
@@ -1360,6 +1360,9 @@ function reportApp() {
         // without adding history.
         if (targetSlug || targetTerm || stale.length) this._writeHash('replace');
       });
+    },
+    _readFacets(params, keep) {
+      this.shownStatuses = statusFacet.fromHash(params, 'status', keep);
     },
     // Re-created rather than updated, so a second stale link restarts the
     // countdown, which is the snackbar's own CSS animation.

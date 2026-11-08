@@ -2119,7 +2119,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
     </nav>
     
     <div class="topbar-meta">
-      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-13 15:40</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-13 15:40</span>
+      <p class="delta-range"><span class="delta-range-name">v1</span> <span class="delta-range-detail">2026-11-13 15:41</span><span class="delta-range-to"> to </span><span class="delta-range-name">v2</span> <span class="delta-range-detail">2026-11-13 15:41</span>
       </p>
       <span class="topbar-version">pytest-given 0.5.2</span>
       <div class="seg-toggle" role="group" aria-label="Theme">
@@ -2488,7 +2488,7 @@ ins.delta-words { background: var(--added-tint-strong); text-decoration: none; }
         <span class="delta-change-label" data-change="changed">changed</span>
         <button type="button" class="btn-reset scenario-tag" data-tag="error-handling" :class="{ 'active-tag': tagFilters.includes($el.dataset.tag) }" :aria-pressed="tagFilters.includes($el.dataset.tag)" @click.stop="filterByTag($el.dataset.tag)">error-handling</button>
         <span class="scenario-status delta-status">⊗ expected failure → ✗ failed</span>
-        <span class="scenario-duration">58ms</span>
+        <span class="scenario-duration">69ms</span>
       </span>
     </div>
 
@@ -3209,17 +3209,25 @@ function deserializeStory(params) {
 }
 
 
-
-
 function shownFacet(values, rows, field) {
   const counts = Object.fromEntries(values.map(v => [v, 0]));
   for (const row of rows) counts[row[field]] += 1;
   const present = values.filter(v => counts[v] > 0);
+  const allShown = () => Object.fromEntries(values.map(v => [v, true]));
   return {
     counts,
     present,
-    allShown: () => Object.fromEntries(values.map(v => [v, true])),
-    only: shown => Object.fromEntries(values.map(v => [v, shown.has(v)])),
+    allShown,
+
+
+
+    fromHash(params, name, keep) {
+      if (!params.has(name)) return allShown();
+      const named = params.get(name).split(',').filter(Boolean);
+      const known = keep(name, named, v => values.includes(v));
+      if (named.length && !known.length) return allShown();
+      return Object.fromEntries(values.map(v => [v, known.includes(v)]));
+    },
 
     writeHash(params, name, shown) {
       const on = present.filter(v => shown[v]);
@@ -3227,6 +3235,8 @@ function shownFacet(values, rows, field) {
     },
   };
 }
+
+
 
 function lookup(map, key, fallback) {
   return Object.hasOwn(map, key) ? map[key] : fallback;
@@ -4478,17 +4488,7 @@ function reportApp() {
       this.sectionFilters = keep('glossary section', params.getAll('section').filter(Boolean),
         key => knownSections.has(key));
       if (this.sectionFilters.length) this.glossaryGrouping = 'section';
-      if (params.has('status')) {
-        const named = params.get('status').split(',').filter(Boolean);
-        const shown = new Set(keep('status', named, s => STATUSES.includes(s)));
-
-
-        this.shownStatuses = named.length && !shown.size
-          ? allStatusesShown()
-          : statusFacet.only(shown);
-      } else {
-        this.shownStatuses = allStatusesShown();
-      }
+      this._readFacets(params, keep);
       keep('view', first('view'), v => v === deserializeView(params));
       keep('story', first('story'), s => storyIds.includes(s));
       if (params.has('q')) this.search = params.get('q');
@@ -4524,6 +4524,9 @@ function reportApp() {
 
         if (targetSlug || targetTerm || stale.length) this._writeHash('replace');
       });
+    },
+    _readFacets(params, keep) {
+      this.shownStatuses = statusFacet.fromHash(params, 'status', keep);
     },
 
 
@@ -4631,6 +4634,10 @@ function deltaApp() {
     _termMatches(row) {
       return this.shownTermChanges[row.change] && base._termMatches.call(this, row);
     },
+    _resetTermFilters() {
+      base._resetTermFilters.call(this);
+      this.shownTermChanges = allChangesShown();
+    },
 
 
     _previewSpans(rowEl, scope) {
@@ -4645,12 +4652,9 @@ function deltaApp() {
       alignSides();
       scrollTablesTogether();
     },
-    _readHash() {
-      base._readHash.call(this);
-      const params = parseHash();
-      this.shownChanges = params.has('change')
-        ? changeFacet.only(new Set(params.get('change').split(',')))
-        : allChangesShown();
+    _readFacets(params, keep) {
+      base._readFacets.call(this, params, keep);
+      this.shownChanges = changeFacet.fromHash(params, 'change', keep);
     },
     _hashParams() {
       const params = base._hashParams.call(this);
