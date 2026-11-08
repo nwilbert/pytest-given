@@ -265,14 +265,16 @@ one word for emphasis (`The **decision** qualifier`), which `unresolved-definiti
   the section selection when it hides the target, as it resets the kind filter (see the definition
   refs spec).
 
-`build_glossary_view` returns both groupings. The cards render once, in the Kind grouping, as
-today. The Section grouping renders a slot per term, which borrows its card the way a Stories-view
-slot borrows a scenario card (`fillStoryCards`): the first time the Section grouping shows, each
-slot is filled with a clone of the term's card, its ids and `aria-controls` prefixed `section-`
-through the same preparation `_prepareClone` gives a scenario clone. The page thus carries each
-card once, and no id appears twice. A clone keeps the original's `data-term-id`, so expanded
-cards, keyed by term id in Alpine state, stay expanded across a switch. `goToTerm` scrolls to
-`section-term-<id>` while the Section grouping shows. The per-group visible counts, keyed by kind
+`build_glossary_view` returns both groupings. The cards render once, in the default grouping:
+the Section grouping in a sectioned glossary, the Kind grouping or the flat list otherwise, as
+today. In a sectioned glossary the Kind grouping renders a slot per term, which borrows its card
+the way a Stories-view slot borrows a scenario card (`fillStoryCards`): the first time the Kind
+grouping shows, each slot is filled with a clone of the term's card, its ids and `aria-controls`
+prefixed `kind-` through the same preparation `_prepareClone` gives a scenario clone. The page
+thus carries each card once, the default view needs no cloning on load, and no id appears twice.
+A clone keeps the original's `data-term-id`, so expanded cards, keyed by term id in Alpine state,
+stay expanded across a switch. `goToTerm` scrolls to `kind-term-<id>` while the Kind grouping of
+a sectioned glossary shows. The per-group visible counts, keyed by kind
 today, are keyed by group so that both groupings use them.
 
 ### Avoided words on the card
@@ -363,8 +365,8 @@ the old name, as a record of their time.
   section list with its counts, avoided words on `TermEntry`.
 - `report/templates/report.html.j2`, `app.js`, `styles.css` — the switch, the section list and its
   OR selection, the `section=` parameters in `_writeHash` and the hash reader, the header link
-  buttons, the Section grouping's card slots and their filling (sharing `_prepareClone` with the
-  Stories view), `goToTerm`'s target in the Section grouping, the group-keyed visible counts, the avoid line,
+  buttons, the Kind grouping's card slots in a sectioned glossary and their filling (sharing
+  `_prepareClone` with the Stories view), `goToTerm`'s target in that grouping, the group-keyed visible counts, the avoid line,
   avoided words in the search text and in `_termCounts`, `goToTerm`'s section reset.
 - `lint/base.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_term_findings`, registered in `_RUNTIME_RULES`.
