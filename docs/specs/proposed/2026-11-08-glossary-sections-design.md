@@ -7,13 +7,13 @@ Glossary tab, plus a rename they make necessary:
 
 - **Glossary sections.** A term belongs to a named group: the heading it sits under in a
   `GLOSSARY.md`, or the section a code glossary declares it through. The Glossary tab groups terms
-  by section.
+  by section and filters by them.
 - **Avoided words.** A term lists the rejected synonyms a writer should not use for it. The report
   shows them on the term's card, and a new lint rule, `avoided-term`, flags one in narration.
 - **The paragraph format.** A new `ParagraphGlossary` reads the `GLOSSARY.md` format of Matt
   Pocock's [skills](https://github.com/mattpocock/skills) (its `domain-modeling` and `teach`
-  skills), one paragraph per term, so a project that keeps its glossary that way loads it
-  unchanged.
+  skills), one paragraph per term, so a project that keeps its glossary that way loads the file
+  as it is.
 - **`FileGlossary` becomes `TableGlossary`.** With two file formats, each gets a class named for
   what it reads.
 
@@ -39,14 +39,16 @@ A customer's request for goods, placed in one checkout.
 _Avoid_: Purchase, transaction
 
 **Invoice**:
-A request for payment sent to a customer after delivery.
+A request for payment sent to a customer after delivery, for one **Order**.
 _Avoid_: Bill, payment request
 ```
 
 Terms sit under `## Language` (`## Terms` in the `teach` skill) and may be grouped under
 subheadings. Two further sections, `## Relationships` and `## Flagged ambiguities`, hold prose and
-bullets, not terms. The `_Avoid_:` line is how the format records rejected synonyms. A repo with
-several bounded contexts keeps one `GLOSSARY.md` per context, listed in a `GLOSSARY-MAP.md`.
+bullets, not terms. The `_Avoid_:` line is how the format records rejected synonyms. A definition
+names another term in bold, the markup a *definition ref* uses (see the
+[definition refs spec](2026-11-08-definition-refs-design.md), which lands first). A repo with several bounded contexts
+keeps one `GLOSSARY.md` per context, listed in a `GLOSSARY-MAP.md`.
 
 ## Non-goals
 
@@ -83,18 +85,25 @@ class GlossaryTerm:
   `Glossary` keeps no section list: sections are ordered by the first term that names each one, in
   `Glossary.terms` order, which is registration order for a code glossary and file order for a
   file glossary.
-- **`avoid`** holds the avoided words in authored order. An entry may end in a parenthesized note,
-  as in `ticket (use only when quoting external systems)`. The report shows the whole entry. The
-  lint matches only the **avoided word**: the entry's text before the note, stripped.
-- **One id space across sections.** Lookup stays by name alone (`g['Guest']`), and the same term in
-  two sections is the duplicate-term error it is today.
+- **`avoid`** holds the avoid entries in authored order, each an inline-Markdown string. An entry
+  may end in a parenthesized note, as in `ticket (use only when quoting external systems)`. The
+  report shows the whole entry. The lint matches only the **avoided word**: the entry's text before
+  the note, with its inline markup unwrapped (as a term cell is) and stripped.
+- **One id space across sections.** Lookup stays by name alone (`g['Guest']`). The same term in
+  two sections is a conflict: two rows or registrations agree only when their section and avoided
+  words agree too, so a repeat that today passes as identical raises once it names another
+  section.
 - **An avoided word may not name a term** of the same glossary, by canonical name or *S-form* in
   any case. A glossary that avoids `Booking` while defining `Booking` contradicts itself, so
-  loading raises, naming both terms. A code glossary checks at registration, against the terms
-  registered so far and, for each later term, against the avoided words already recorded.
+  loading raises, naming both terms.
+- **Several terms may avoid the same word.** *Guest* and *Clerk* can both avoid `Customer`, and the
+  lint then offers both, leaving the writer to pick the one the step means.
+- A code glossary runs the check at registration, against the terms and avoided words registered
+  so far.
 
-Both fields go into the JSON report through the reflective serializer, so `pytest-given report`
-re-renders sections and avoided words from a saved run.
+Both fields go into the JSON report through the reflective serializer, and `serde`'s
+`_glossary_term_from_dict` reads them back, so `pytest-given report` re-renders sections and
+avoided words from a saved run.
 
 ## Code glossaries
 
@@ -107,11 +116,11 @@ does. Every term it declares goes into the same glossary, with `section=name`:
 g = Glossary()
 
 booking = g.section('Booking')
-guest = booking.actor('Guest', 'A person who books a *room*.', avoid=['Customer', 'Client'])
+guest = booking.actor('Guest', 'A person who books a **room**.', avoid=['Customer', 'Client'])
 room = booking.work_object('Room', 'A bookable unit of a hotel.')
 
 payment = g.section('Payment')
-refund = payment.activity('refund', 'Return the money paid for a cancelled booking.')
+refund = payment.activity('refund', 'Return the money paid for a cancelled **booking**.')
 
 clerk = g.actor('Clerk', 'Staff at the front desk.')  # no section
 ```
@@ -131,7 +140,7 @@ tuple.
 
 A repeated registration stays idempotent only when it is *exactly* repeated, which now includes the
 section and the avoided words: declaring `Guest` in section `Booking` and again in section `Staff`
-raises.
+raises. The conflict message lists both fields beside kind, canonical and definition.
 
 ## File glossaries
 
@@ -153,7 +162,7 @@ ParagraphGlossary(path)
 
 - **Shared base.** Both subclass a private `_MarkdownFileGlossary(LookupGlossary)` in
   `capture/file_glossary.py`, which reads the file, wraps reader errors with the path, registers the
-  rows (id derivation, kind parsing, duplicate check) and runs the avoided-word check. A subclass
+  rows (id derivation, kind parsing, duplicate check) and runs the avoided-word checks. A subclass
   only supplies its reader. Both are closed vocabularies: the call form looks up and never creates,
   as `FileGlossary`'s does today.
 - **Discovery is unchanged.** It recognizes the model's `Glossary` base, which both classes extend.
@@ -168,9 +177,9 @@ A term's section is the text of the nearest heading above its table or term para
 level, read as plain text with its inline markup unwrapped (as a term cell is). Two exceptions name
 no section:
 
-- **The title.** When the file's first heading is a level-1 heading, it names the file, not a
-  section. In this repo's `GLOSSARY.md`, `# Glossary` is the title and `## Core test model` is a
-  section.
+- **The title.** A file's only level-1 heading names the file, not a section. In this repo's
+  `GLOSSARY.md`, `# Glossary` is the title and `## Core test model` is a section. A file with
+  several level-1 headings has no title, and each of them is a section.
 - **`Language` and `Terms`**, in `ParagraphGlossary` only. They hold the terms rather than group
   them.
 
@@ -195,9 +204,9 @@ Today's `FileGlossary`, renamed, plus:
 
 A **term paragraph** is a paragraph whose first line starts with a bold span followed directly by a
 colon: `**Order**:`. The bold text, unwrapped, is the term. The rest of the paragraph, up to an
-avoid line, is the definition. It may start on the first line after the colon or on the next line,
-and a definition spanning several lines keeps its line breaks, which `normalize_definition` and the
-renderer treat as in a table cell.
+avoid line, is the definition. It may start on the first line after the colon or on the next line.
+A definition spanning several lines is one Markdown paragraph, so its soft line breaks fold into
+spaces, as GitHub renders them. A `<br>` or a backslash hard break stays a break.
 
 - **The avoid line** is a line of the paragraph that starts with an italic `Avoid` and a colon
   (`_Avoid_:` or `*Avoid*:`, case-insensitive). The rest of the line is split like an avoid cell.
@@ -206,38 +215,68 @@ renderer treat as in a table cell.
   (case-insensitive) starts a stretch the reader skips, up to the next heading of the same or a
   higher level.
 - **Everything else is prose.** The title, the description under it, and any paragraph that is not
-  a term paragraph are ignored, so `**Update rule:** rename…`, whose colon sits inside the bold, is
-  not a term paragraph.
+  a term paragraph are ignored, so `**Order:** a customer's request`, whose colon sits inside the
+  bold, is not a term paragraph.
 - A file with no term paragraph raises, naming the expected form.
+
+A file in this format can still draw lint findings once loaded. Pocock's own `GLOSSARY.md` bolds
+one word for emphasis (`The **decision** qualifier`), which `unresolved-definition-ref` flags.
 
 ## The Glossary tab
 
 ### Grouping
 
+- **Sections count from two.** A glossary is *sectioned* when its terms name at least two sections.
+  **Other** doesn't count as one. A glossary with a single section, such as a table glossary under
+  one `## Terms` heading, shows no section anywhere in the tab, as if it had none. The terms keep
+  their `section` in the model and the JSON report.
 - **Section is the default grouping.** Section headers appear in section order. Terms with no
   section come last, under **Other**, which appears only when some terms have a section and some
   don't. Each card keeps its kind color.
 - **The Kind grouping** is today's view.
-- **The switch** appears only when the glossary has at least one section *and* at least one term
-  with a kind. It is a segmented control in the Glossary sidebar, labelled *Group by*, with
-  *Section* and *Kind*, styled like the definition filter.
-- **Without the switch:** a glossary with sections but no kinds groups by section. One with kinds but
-  no sections groups by kind, as today. One with neither shows the flat list, as today.
-- **Filters apply in both groupings.** The kind checkboxes, the definition filter and the search
-  hide terms inside section groups too, and a section header hides when none of its terms is
-  visible. "No terms match this filter" covers both groupings.
-- The chosen grouping is not persisted. The URL's `term=` link opens the term's card in whichever
-  grouping is showing.
+- **The switch** appears only when the glossary is sectioned *and* has at least one term with a
+  kind. It is a segmented control at the top of the Glossary sidebar, labelled *Group by*,
+  with *Section* and *Kind*, styled like the definition filter.
+- **Each grouping brings its own filter**, shown below the switch:
+  - *Kind* shows today's kind checkboxes.
+  - *Section* shows a list of the sections in section order, **Other** last when it appears, each
+    with its term count. Clicking a row selects or deselects it, and a selected row is highlighted
+    the way a selected term is under *Browse by: Terms*. With no row selected, every section shows.
+    With some selected, the tab shows the terms of any selected section.
+- **The hidden grouping's filter doesn't apply.** It keeps its state and applies again when its
+  grouping is shown.
+- **Without the switch:** a sectioned glossary with no kinds groups by section and shows the
+  section list. An unsectioned one with kinds groups by kind, as today. One with neither shows the
+  flat list, as today.
+- **The search and the definition filter apply in both groupings.** A section header hides when
+  none of its terms is visible, and "No terms match this filter" covers both groupings.
+- **The section selection is in the URL**, one `section=` parameter per selected section, as
+  `tag=` carries the tag filters. An empty value stands for **Other**, so an author's own
+  `## Other` heading doesn't collide with it. The parameters are written only while the Section
+  grouping is showing, and a link carrying them opens the Glossary in that grouping with those
+  sections selected. A name the report no longer has is dropped and named in the stale-link
+  snackbar, as for a tag. The grouping itself is not persisted, as the kind checkboxes are not.
+- **Each section header carries a link button**, the plain link icon a term row shows when the
+  report has no public URL. It copies `view=glossary&section=<name>`, with the name URL-encoded so
+  a heading such as `Q&A` survives, the link that selects that section alone. A section is no citation target, so there is no copy menu, and `citations check`
+  treats a section link in a document as an ordinary link.
+- The URL's `term=` link opens the term's card in whichever grouping is showing. `goToTerm` resets
+  the section selection when it hides the target, as it resets the kind filter (see the definition
+  refs spec).
 
-`build_glossary_view` returns both groupings, so the template renders the section groups and the
-kind groups and `app.js` shows one. The per-group visible counts, keyed by kind today, are keyed by
-group so that both groupings use them.
+`build_glossary_view` returns both groupings. The template renders each inside its own
+`<template x-if>`, so only the grouping that is showing is in the DOM: a card's `term-…` ids exist
+once, and `goToTerm`'s `getElementById` and the cards' `aria-controls` work unchanged. Expanded
+cards are keyed by term id in Alpine state, so they survive a switch. The report's HTML carries
+the cards twice, which the `benchmark` session measures. The per-group visible counts, keyed by
+kind today, are keyed by group so that both groupings use them.
 
 ### Avoided words on the card
 
 A card whose term avoids words shows them under the definition, as `Avoid: Customer, Client`, each
-entry as written, note included. The Glossary search matches avoided words, so a reader searching
-`customer` finds *Guest*. The term tooltip in narration is unchanged.
+entry as written, note included, rendered as inline Markdown with no definition refs. The Glossary
+search matches avoided words, so a reader searching `customer` finds *Guest*. The term tooltip in
+narration is unchanged.
 
 ### Term citations
 
@@ -248,24 +287,30 @@ folded in.
 
 | Rule | Default | Catches |
 |---|---|---|
-| `avoided-term` | warn | An avoided word in the plain text of a step or a scenario title. |
+| `avoided-term` | warn | An avoided word in the plain text of a step, a scenario title or a story sentence. |
 
 - **What it scans:** the plain-text pieces of each scenario's title and step narrations, per
-  grouped scenario. Term refs, values, placeholders and code spans are skipped, so a term ref never
-  trips it. Glossary definitions are not scanned, since a definition may name a rejected word on
-  purpose.
+  grouped scenario, and the words of each story sentence. Term refs, values, placeholders and code
+  spans are skipped, so a term ref never trips it. Glossary definitions are not scanned, since a
+  definition may name a rejected word on purpose.
 - **How it matches:** case-insensitive, on whole words, the avoided word as written or its
-  *S-form*. `Customer` is caught in "the customers pay" and not in "customerId".
-- **One finding per scenario and avoided word.** Subject: the scenario's node ID, so an intentional
-  use is a `given_lint_ignore` entry like any scenario-subject finding. Location: the first step
-  that uses the word, or the scenario's source for its title. Message:
+  *S-form*. `Customer` is caught in "the customers pay" and not in "customerId". A multi-word
+  avoided word matches across any run of whitespace, so `payment request` is caught when a line
+  break splits it.
+- **One finding per scenario or story and avoided word.** Subject: the scenario's node ID or the
+  story's id, so an intentional use is a `given_lint_ignore` entry like any finding on that
+  subject. An entry silences every avoided word in its scenario or story. Location: the first step
+  that uses the word, the scenario's source for its title, or the story's source. Message, naming
+  the avoided word as the glossary writes it:
 
   ```text
   step text uses 'Customer', which the glossary avoids in favour of 'Guest'
   ```
 
-  or `scenario title uses …` for a title.
-- **Catalog remedies:** use a term ref to the preferred term, or reword. If the word is right after
+  or `scenario title uses …` and `story sentence uses …`. When several terms avoid the word, the
+  message names each, in glossary order: `… in favour of 'Guest' or 'Clerk'`.
+- **Catalog remedies:** use a term ref to the preferred term (the fitting one, when the message
+  names several), or reword. If the word is right after
   all, remove it from the term's avoided words.
 - **No glossary, no findings**, as for the other term rules.
 
@@ -273,48 +318,54 @@ folded in.
 
 `GLOSSARY.md` stays in the table format and gains sections from its existing headings, so the
 self-report's Glossary tab groups by its nine sections, with the switch, since story terms carry
-kinds. Its rows change:
+kinds. Its rows change (term cells plain and refs bold, per the definition refs spec):
 
 | Term | Meaning |
 |---|---|
-| **File glossary** | A glossary loaded from a Markdown file: a `TableGlossary` from GFM pipe tables, or a `ParagraphGlossary` from *term paragraphs*. |
-| **Term paragraph** | A term in a `ParagraphGlossary`, written as one paragraph: `**Term**:`, its definition, and an optional `_Avoid_:` line, the format of Matt Pocock's skills. |
-| **Glossary section** | A named group of terms: the heading a *file glossary* term sits under, or the `g.section(...)` a code glossary declares it through. The Glossary tab groups by it. |
-| **Avoided word** | A rejected synonym a *term* lists, which the `avoided-term` lint rule flags in narration. |
-| **Term** | A glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind unless kindless, an optional definition, an optional *glossary section* and any *avoided words*. |
+| File glossary | A glossary loaded from a Markdown file: a `TableGlossary` from GFM pipe tables, or a `ParagraphGlossary` from **term paragraphs**. |
+| Term paragraph | A term in a `ParagraphGlossary`, written as one paragraph: `**Term**:`, its definition, and an optional `_Avoid_:` line, the format of Matt Pocock's skills. |
+| Glossary section | A named group of terms: the heading a **file glossary** term sits under, or the `g.section(...)` a code glossary declares it through. The Glossary tab groups and filters by it. |
+| Avoided word | A rejected synonym a **term** lists, which the `avoided-term` lint rule flags in narration. An avoid entry may add a parenthesized note, which the report shows and the lint ignores. |
+| Term | A glossary entry: an Actor, Work Object, Activity, or kindless term. Each carries an id (slug), a canonical name, a kind unless kindless, an optional definition, an optional **glossary section** and any **avoided words**. |
 
 ## The rename
 
 `FileGlossary` becomes `TableGlossary` everywhere: the class, its module's docstring, the exports,
-`tests/ubiquitous_language.py`, the tests that construct one, the file-glossary example, `noxfile.py`
-and `pyproject.toml` where they name it, AGENTS.md, the site, and the three bundled skills. The
-module stays `capture/file_glossary.py`, since it holds both classes, and the example stays
-`examples/file-glossary-booking/`, since *file glossary* still names both. Committed specs under
-`docs/specs/` keep the old name, as a record of their time.
+`tests/ubiquitous_language.py`, `tests/conftest.py`, the tests that construct one, the
+file-glossary example, `noxfile.py` and `pyproject.toml` where they name it, AGENTS.md, the site
+(`guide/glossary.md`, `guide/step-text.md`, `examples.md`, `ai-agents.md`), the three bundled
+skills, and specs still under `docs/specs/proposed/`. The module stays `capture/file_glossary.py`,
+since it holds both classes, and the example stays `examples/file-glossary-booking/`, since *file
+glossary* still names both. Implemented specs under `docs/specs/` and past CHANGELOG entries keep
+the old name, as a record of their time.
 
 ## Implementation touch points
 
 - `markdown/blocks.py` — the block walk with heading levels and paragraphs, re-exported from
   `markdown/__init__.py`.
 - `model/schema.py` — `GlossaryTerm.section` and `avoid`. A helper `avoided_word(entry)` that
-  strips the note, beside the term model, since `capture/` and `lint/` both need it.
+  strips the note and unwraps the markup, beside the term model, since `capture/` and `lint/` both
+  need it.
+- `model/serde.py` — `_glossary_term_from_dict` reads both fields.
 - `capture/glossary.py` — `Glossary.section`, `GlossarySection`, the `avoid` parameter, the exact-
-  repeat check extended to both fields, the avoided-word-names-a-term check.
+  repeat check and its message extended to both fields, the two avoided-word checks.
 - `capture/markdown_glossary.py` — sections and `avoid_column` in the table reader, and the
   paragraph reader.
 - `capture/file_glossary.py` — `_MarkdownFileGlossary`, `TableGlossary` with `avoid_column`,
   `ParagraphGlossary`, and the wrong-class hints.
 - `__init__.py` and `capture/__init__.py` — export `TableGlossary`, `ParagraphGlossary` and
   `GlossarySection`, no longer `FileGlossary`.
-- `report/glossary_view.py` — section groups beside kind groups, the switch's visibility, avoided
-  words on `TermEntry`.
-- `report/templates/report.html.j2`, `app.js`, `styles.css` — the switch, section groups, the
-  group-keyed visible counts, the avoid line, avoided words in the search text.
+- `report/glossary_view.py` — section groups beside kind groups, the switch's visibility, the
+  section list with its counts, avoided words on `TermEntry`.
+- `report/templates/report.html.j2`, `app.js`, `styles.css` — the switch, the section list and its
+  OR selection, the `section=` parameters in `_writeHash` and the hash reader, the header link
+  buttons, the two groupings under `x-if`, the group-keyed visible counts, the avoid line,
+  avoided words in the search text and in `_termCounts`, `goToTerm`'s section reset.
 - `lint/base.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_term_findings`, registered in `_RUNTIME_RULES`.
 - Docs: `docs/site/guide/glossary.md` (the *File glossary* section covers both classes, sections in
-  code and in files, `avoid`), `docs/site/html-report.md` (the grouping switch),
-  `docs/site/configuration/narration-lint.md` (the rule table).
+  code and in files, `avoid`), `docs/site/html-report.md` (the grouping switch and the section
+  list), `docs/site/configuration/narration-lint.md` (the rule table).
 - Authoring skill: `references/api.md` (`section`, `avoid`, both file glossary classes),
   `references/glossaries.md` (sections, avoided words, the paragraph format), `references/lint.md`
   (the catalog row). Reviewing skill `references/hygiene.md`: a term with well-known synonyms the
@@ -334,28 +385,37 @@ module stays `capture/file_glossary.py`, since it holds both classes, and the ex
   - Under Added, one entry each: glossary sections, avoided words, `ParagraphGlossary`, and the
     `avoided-term` lint rule.
 - Regenerate `examples/` and `examples/self-report/`. Playwright-verify the Glossary tab in both
-  groupings: the switch, filters and search in each, a `term=` link, the avoid line, a report with
-  sections only and one with kinds only (no switch).
+  groupings: the switch, the section list (one, several and no sections selected), a copied
+  section link opened in a new tab, a `section=` link naming a removed section, back and forward
+  across selections, the kind
+  checkboxes, the search and the definition filter in each, a `term=` link to a term outside the
+  selected sections, a card left expanded across a switch, the avoid line, and a report with
+  sections only, one with kinds only and one with a single section (no switch in each).
 
 ## Test coverage
 
 - Block walk units: heading levels and text, paragraphs in order, tables in between.
-- Section units, both classes: the nearest heading, the title exception, `Language` and `Terms`
-  in `ParagraphGlossary`, a term above every heading, two headings with the same text.
+- Section units, both classes: the nearest heading, the title exception, a file with two level-1
+  headings, `Language` and `Terms` in `ParagraphGlossary`, a term above every heading, two headings
+  with the same text.
 - `TableGlossary` units: `avoid_column` by name and index, commas inside parentheses, a missing
-  avoid column raising, the hint on a file of term paragraphs.
-- `ParagraphGlossary` units: definition on the first line and on the next, a multi-line
-  definition, the avoid line in both italic forms, skipped sections ending at the next heading of
-  their level, a bold-with-colon-inside paragraph ignored, no term paragraph raising, the hint on a
-  file of tables.
+  avoid column raising, the hint on a file of term paragraphs, an exact repeat in another section
+  raising.
+- `ParagraphGlossary` units: definition on the first line and on the next, a multi-line definition
+  folded into one line, a `<br>` kept, the avoid line in both italic forms, a term with parentheses
+  in its name (`**RPE (Rate of Perceived Exertion)**:`), subheadings beside `## Terms` rather than
+  under it, skipped sections ending at the next heading of their level and spanning a deeper one, a
+  bold-with-colon-inside paragraph ignored, no term paragraph raising, the hint on a file of tables.
 - Code glossary units: a section's terms carry it, `g.section` twice merges, an empty name raises,
-  an inexact repeat across sections or avoided words raises, an avoided word naming a term raises in
-  both registration orders.
+  an inexact repeat across sections or avoided words raises, an avoided word naming a term raises
+  in both registration orders.
+- Avoided-word units: the note stripped, markup unwrapped.
 - `build_glossary_view` units on the data contract: section order, the Other group's presence, the
-  switch's visibility for each combination of sections and kinds.
+  section list's counts, a single section shown as none, the switch's visibility for each
+  combination of sectioned and kinds.
 - Rule units: an avoided word in plain text (finding), in a term ref (clean), in a code span
   (clean), its S-form (finding), inside a longer word (clean), a note ignored, one finding per
-  scenario and word, a scenario title.
+  scenario and word, a scenario title, a story sentence, a word two terms avoid (both named).
 - Integration: the finding prints under `--given-lint`, an ignore entry suppresses it, discovery
   finds a `ParagraphGlossary` in a conftest, and a saved JSON report re-renders with sections and
   avoided words.
