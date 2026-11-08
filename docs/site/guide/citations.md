@@ -54,7 +54,7 @@ A [defining citation](#defining-citations) folds in a term's definition:
 <details markdown="1">
 <summary>✅ <a href="../examples/self-report.html#view=glossary&term=defining-citation">Defining citation</a> (3 ✅)</summary>
 
-A *Citation* of a term written as a collapsible block, the citation as its summary and the term's definition as its body.
+A **Citation** of a term written as a collapsible block, the citation as its summary and the term's definition as its body.
 
 </details>
 

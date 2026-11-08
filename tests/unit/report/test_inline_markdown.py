@@ -1,6 +1,7 @@
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
+from pytest_given.markdown import EmphasisSpan, InlineSpan, PlainSpan
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -116,6 +117,18 @@ def test_a_span_crossed_by_a_term_ref_stays_literal() -> None:
 )
 def test_render_definition(text: str, expected: str) -> None:
     assert render_definition(text) == expected
+
+
+def test_render_definition_renders_a_span_as_render_ref_returns_it() -> None:
+    """A `None` keeps the span as it renders without one."""
+
+    def render_ref(span: InlineSpan) -> str | None:
+        return '[ref]' if span == EmphasisSpan(True, (PlainSpan('Phase'),)) else None
+
+    rendered = render_definition(
+        'In one **Phase** or **unknown**.<br>See *it*.', render_ref=render_ref
+    )
+    assert rendered == 'In one [ref] or <strong>unknown</strong>.<br>See <em>it</em>.'
 
 
 @pytest.mark.parametrize(

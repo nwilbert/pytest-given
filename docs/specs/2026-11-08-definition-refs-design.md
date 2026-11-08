@@ -1,5 +1,7 @@
 # Definition Refs — Design Spec
 
+✅ [spec/definition-refs](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/definition-refs) (2 ✅)
+
 ## Goal
 
 Let a glossary definition reference other terms, so a reader of the Glossary tab can follow the
@@ -23,7 +25,7 @@ definition has to find its row by hand.
 Bold is the reference markup because it is what the `GLOSSARY.md` format of Matt Pocock's
 [skills](https://github.com/mattpocock/skills) uses (`A single tracked unit of work inside an
 **Issue tracker**`), which `ParagraphGlossary` reads (see the
-[glossary sections spec](2026-11-08-glossary-sections-design.md)). One rule then covers every
+[glossary sections spec](proposed/2026-11-08-glossary-sections-design.md)). One rule then covers every
 glossary, and italics stay free for emphasis and example words. The convention this design
 introduces: **in a definition, a bold span is a reference.**
 
@@ -73,8 +75,10 @@ the rule lives on the model:
 - `Glossary.resolve_ref(text: str) -> GlossaryTerm | None` — the term a bold span's text names, per
   the matching rules above. Its S-form index is kept current by the constructor and `register`,
   the way `_by_id` is.
-- `definition_bold_spans(definition: str) -> Iterator[str]` — the text of each bold span a
-  definition holds that could be a ref (holding no code span), read with `markdown.read_spans`.
+- `definition_ref_text(span: InlineSpan) -> str | None` — a bold span's text if it could be a
+  ref (holding no code span).
+- `definition_bold_spans(definition: str) -> Iterator[str]` — that text for each span of a
+  definition, read with `markdown.read_spans`.
 
 ## Rendering
 
@@ -83,9 +87,9 @@ the rule lives on the model:
   carries the kind class, `term-ref--link`, `has-term-tip` and `data-term-id`, so hovering shows
   the referenced term's definition.
 - **Clicking a definition ref** opens the referenced term's card. The capture-phase click handler
-  in `app.js` skips every `[data-term-id]` inside a `.entry`, because the card's own header
-  carries one. It lets a `.term-ref--link` inside `.entry-def` through to `goToTerm`, and stops
-  propagation, so the card it sits in doesn't also expand or collapse. `goToTerm` already clears
+  in `app.js` navigates from a `.term-ref--link` only, not from any `[data-term-id]`: the card's
+  header and controls carry the term's id for Alpine. It stops propagation, so the card a
+  definition ref sits in doesn't also expand or collapse. `goToTerm` already clears
   the Glossary filters that hide its target, so a reader who searched for `step` and clicks
   **Phase** lands on its card.
 - **Term tooltip: unchanged.** The tooltip's `definition_html`, pre-rendered per term in
@@ -94,12 +98,13 @@ the rule lives on the model:
   `innerHTML` on the invariant that it holds only attribute-free tags.
 - **Not a ref.** An unresolved bold span and a self-reference render as `<strong>`, as today.
 
-`render_definition` takes an optional glossary, the id of the term whose definition it renders,
-and a callback that renders one resolved ref, so `inline_markdown.py` stays free of the term-ref
-markup, which lives in `html_renderer.py`. Without them, as for the tooltip, it renders every bold
-span as `<strong>`. The Glossary tab's filter is made per render over the report's glossary, as
-the `narration` filter is, and applied to the term rather than its definition text
-(`term | definition_md`), so it knows which ref is a self-reference.
+`render_definition` takes an optional callback, `render_ref`, which gets each span and returns
+the HTML it renders as instead, or None. The callback asks `definition_ref_text` whether the span
+could be a ref, so the renderer and the lint share one rule. Resolution and the term-ref markup
+then live in `html_renderer.py`, and `inline_markdown.py` stays free of both. Without the callback, as for the tooltip, it renders every bold span as `<strong>`. The
+Glossary tab's filter is made per render over the report's glossary, as the `narration` filter
+is, and applied to the term rather than its definition text (`term | definition_md`), so it knows
+which ref is a self-reference.
 
 ## The `unresolved-definition-ref` lint rule
 
@@ -146,14 +151,14 @@ the `narration` filter is, and applied to the term rather than its definition te
 
 ## Implementation touch points
 
-- `model/schema.py` — `Glossary.resolve_ref` and its S-form index; `definition_bold_spans` beside
-  it, re-exported from `model/__init__.py`.
-- `report/inline_markdown.py` — `render_definition` takes the optional glossary, owning term id
-  and ref callback.
-- `report/html_renderer.py` — `_inline_md` becomes a `definition_md` filter made per render, which
-  passes the report's glossary, the term's id and a callback over `_term_ref_span`.
-  `report.html.j2` applies it to the term. `_app_data`'s `definition_html` passes none of them.
-- `report/templates/app.js` — the click handler's `.entry` exemption.
+- `model/schema.py` — `Glossary.resolve_ref` and its S-form index; `definition_ref_text` and
+  `definition_bold_spans` beside it, re-exported from `model/__init__.py`.
+- `report/inline_markdown.py` — `render_definition` takes the optional `render_ref` callback.
+- `report/html_renderer.py` — `_inline_md` becomes a `definition_md` filter made per render, whose
+  callback resolves a span over the report's glossary, skips the term itself, and renders the rest
+  with `_term_ref_span`. `report.html.j2` applies it to the term. `_app_data`'s `definition_html`
+  passes no callback.
+- `report/templates/app.js` — the click handler's narrower selector.
 - `lint/base.py` — `UNRESOLVED_DEFINITION_REF`, default `warn`.
 - `lint/runtime_rules.py` — `_unresolved_definition_ref_findings`, registered in `_RUNTIME_RULES`.
 - `docs/site/guide/glossary.md` — the definition paragraph states the convention.

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-07T13:01:43.073414+00:00",
+    "timestamp": "2026-11-08T19:49:21.336156+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "1b5c74282d934f30c480d3884ca9bb432f688470",
+    "commit_sha": "d92d71319fd7549683ea21843c5f6b10f306aa20",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 37,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -1358,7 +1358,7 @@
         "id": "booking",
         "kind": "object",
         "canonical": "Booking",
-        "definition": "A reservation for one or more rooms.",
+        "definition": "A reservation for one or more **rooms**.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 84
@@ -1368,7 +1368,7 @@
         "id": "payment",
         "kind": "object",
         "canonical": "Payment",
-        "definition": "Money transferred for a booking.",
+        "definition": "Money transferred for a **booking**.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 85
@@ -1418,7 +1418,7 @@
         "id": "refund",
         "kind": "activity",
         "canonical": "refund",
-        "definition": "Return the payment for a cancelled booking.",
+        "definition": "Return the **payment** for a cancelled **booking**.",
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 96

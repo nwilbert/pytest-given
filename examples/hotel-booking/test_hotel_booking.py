@@ -81,8 +81,8 @@ guest = g.actor('Guest', 'Individual traveler in the group.')
 booking_system = g.actor('Booking System', 'Automated reservation back-end.')
 
 room = g.work_object('Room', 'A bookable hotel room.')
-booking = g.work_object('Booking', 'A reservation for one or more rooms.')
-payment = g.work_object('Payment', 'Money transferred for a booking.')
+booking = g.work_object('Booking', 'A reservation for one or more **rooms**.')
+payment = g.work_object('Payment', 'Money transferred for a **booking**.')
 confirmation = g.work_object('Confirmation', 'Notification of a successful booking.')
 
 confirm = g.activity(
@@ -93,7 +93,7 @@ confirm = g.activity(
 decline = g.activity('decline', 'Refuse a payment, leaving its booking pending.')
 # Vocabulary for the second Story.
 cancel = g.activity('cancel', 'Withdraw a booking before arrival.')
-refund = g.activity('refund', 'Return the payment for a cancelled booking.')
+refund = g.activity('refund', 'Return the **payment** for a cancelled **booking**.')
 rebook = g.activity(
     'rebook', 'Restore a cancelled booking for the same rooms and dates.'
 )

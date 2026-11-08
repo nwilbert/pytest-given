@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_given import Template, given, scenario, then, when
+from pytest_given import Template, attach, given, scenario, then, when
 from pytest_given.capture.template import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
@@ -55,8 +55,8 @@ from pytest_given.report.html_renderer import (
     _app_data,
     _build_param_color_map,
     _column_phase_blocks,
-    _inline_md,
     _make_clause_part_filter,
+    _make_definition_filter,
     _make_narration_filter,
     _neutralize_script_data,
     _phase_blocks,
@@ -65,7 +65,7 @@ from pytest_given.report.html_renderer import (
     render_html_string,
 )
 from tests.ubiquitous_language import adopt_pytest_given, pg
-from tests.unit.citation_reports import report_
+from tests.unit.citation_reports import report_, term_
 from tests.unit.report.app_data import embedded_app_data
 
 _DEFAULT_METADATA = {
@@ -109,13 +109,90 @@ def _narration(text: str, parts: list | None = None) -> dict:
     return {'text': text, 'parts': parts or []}
 
 
-def test_inline_md_filter_blank_is_empty() -> None:
-    assert _inline_md(None) == ''
-    assert _inline_md('') == ''
+class _TermRefs(HTMLParser):
+    """Each element carrying a term id, as `(term id, its text)`."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.refs: list[tuple[str, str]] = []
+        self._open: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self._open = dict(attrs).get('data-term-id')
+
+    def handle_data(self, data: str) -> None:
+        if self._open is not None:
+            self.refs.append((self._open, data))
+            self._open = None
 
 
-def test_inline_md_filter_renders_markdown() -> None:
-    assert _inline_md('**x** and `y`') == '<strong>x</strong> and <code>y</code>'
+def _term_refs(html: str) -> list[tuple[str, str]]:
+    parser = _TermRefs()
+    parser.feed(html)
+    return parser.refs
+
+
+def _referenced_ids(html: str) -> list[str]:
+    return [term_id for term_id, _ in _term_refs(html)]
+
+
+_STEP = term_(
+    'Step',
+    'A unit in one **Phase**. **Steps** nest, may carry **attachments** and '
+    'name a **sentence handle**, *phase* or **`.l`**.',
+)
+_DEFINITION_GLOSSARY = Glossary(terms=[_STEP, term_('Phase'), term_('Attachment')])
+
+
+def test_definition_filter_renders_an_undefined_term_empty() -> None:
+    render = _make_definition_filter(_DEFINITION_GLOSSARY)
+    assert render(term_('Phase')) == ''
+
+
+def test_definition_filter_references_the_terms_its_bold_spans_name() -> None:
+    """A self-reference, an unresolved bold span, an italic and a bold code
+    span reference nothing."""
+    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(_STEP))
+    assert _referenced_ids(rendered) == ['phase', 'attachment']
+
+
+@scenario(
+    t'A {pg["Definition ref"].l} names its {pg["Term"].l} by canonical name or '
+    t'{pg["S-form"]}, in any case',
+    tags=['spec/definition-refs'],
+)
+def test_a_definition_ref_names_its_term_by_canonical_name_or_s_form() -> None:
+    with given(
+        t'a {pg["Glossary"].l} whose Step definition bolds "phase" and "Attachments"'
+    ):
+        step = term_('Step', 'A unit in one **phase**, carrying **Attachments**.')
+        glossary = Glossary(terms=[step, term_('Phase'), term_('Attachment')])
+    with when('the Glossary tab renders the definition'):
+        rendered = str(_make_definition_filter(glossary)(step))
+        attach('definition', rendered)
+    with then(
+        t'each bold span is a {pg["Term ref"].l} to the {pg["Term"].l} it names, '
+        t'in the words its author wrote'
+    ):
+        assert _term_refs(rendered) == [
+            ('phase', 'phase'),
+            ('attachment', 'Attachments'),
+        ]
+
+
+def test_definition_filter_without_a_glossary_references_nothing() -> None:
+    rendered = str(_make_definition_filter(None)(_STEP))
+    assert _referenced_ids(rendered) == []
+
+
+def test_a_tooltip_definition_references_no_term() -> None:
+    """The tooltip closes before the pointer reaches it, so a link in it
+    could never be followed."""
+    data = _app_data(report_(terms=tuple(_DEFINITION_GLOSSARY.terms)))
+    assert data['glossary'] is not None
+    [step, *_] = data['glossary']['terms']
+    assert '<strong>Phase</strong>' in step['definition_html']
+    assert _referenced_ids(step['definition_html']) == []
 
 
 def test_narration_filter_renders_the_spans_of_a_plain_string() -> None:

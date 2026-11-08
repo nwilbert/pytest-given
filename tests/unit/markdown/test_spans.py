@@ -8,6 +8,7 @@ from pytest_given.markdown import (
     InlineSpan,
     PlainSpan,
     read_spans,
+    span_text,
 )
 
 
@@ -132,3 +133,14 @@ def test_read_spans_takes_linear_time_over_unclosed_markers(text: str) -> None:
     start = time.perf_counter()
     read_spans(text)
     assert time.perf_counter() - start < 1
+
+
+def test_span_text_unwraps_the_markers() -> None:
+    assert [span_text(span) for span in read_spans('a **b `c`** *d* `e`')] == [
+        'a ',
+        'b c',
+        ' ',
+        'd',
+        ' ',
+        'e',
+    ]

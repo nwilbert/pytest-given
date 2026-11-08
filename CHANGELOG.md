@@ -19,6 +19,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A term citation written as a `<details markdown="1">` block carries the term's definition, which `citations update` writes and `citations check` holds to the report.
 - A Glossary term row in the HTML report gets the copy button, which offers **Copy citation** and **Copy defining citation** when the report has a URL.
 - A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
+- A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term.
+- The `unresolved-definition-ref` lint rule, `warn` by default, flags a bold span in a glossary definition that names no term.
 
 ### Changed
 

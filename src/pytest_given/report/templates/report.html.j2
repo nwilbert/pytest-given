@@ -611,7 +611,7 @@
               <span class="term-name">{{ term.canonical }}{{ copy_button('term', term.id, 'view=glossary&term=' ~ term.id) }}</span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">{{ term.definition | inline_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
+              <div class="entry-def">{{ term | definition_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
               <div class="entry-summary meta-list">{% for part in entry.summary %}<span>{{ part }}</span>{% endfor %}</div>
             </div>
           </div>

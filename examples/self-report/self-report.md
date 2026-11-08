@@ -3353,6 +3353,14 @@
 - **when** the runtime «lint rules» run over that story
 - **then** dead-term flags none of its terms
 
+## ✓ «Narration lint» flags a bold span in a «term»'s definition that names no «term»
+`tests/unit/lint/test_runtime_rules.py::test_unresolved_definition_ref_flags_a_bold_span_naming_no_term` · spec/definition-refs
+
+- **given** a «glossary» whose Handle definition bolds a «term» and a word naming none
+- **when** the runtime «lint rules» run
+- **then** one «lint finding» names the bold word, not the «term»
+- **then** its «severity» is warn by default
+
 ## ✓ A «sentence» references its «terms», whatever surface form they take
 `tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display`
 
@@ -3631,6 +3639,17 @@
 - **given** a «scenario» referencing one «term» in two steps and another in its name
 - **when** the term-scenario index is built
 - **then** each «term» maps to the scenario exactly once
+
+## ✓ A «definition ref» names its «term» by canonical name or «S-form», in any case
+`tests/unit/report/test_html_renderer.py::test_a_definition_ref_names_its_term_by_canonical_name_or_s_form` · spec/definition-refs
+
+- **given** a «glossary» whose Step definition bolds "phase" and "Attachments"
+- **when** the Glossary tab renders the definition
+    - 📎 definition:
+        ```
+        A unit in one <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="phase">phase</span>, carrying <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="attachment">Attachments</span>.
+        ```
+- **then** each bold span is a «term ref» to the «term» it names, in the words its author wrote
 
 ## ✓ «Parameter coloring» ties each placeholder to its column header
 `tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration` · parametrization

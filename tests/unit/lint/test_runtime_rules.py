@@ -341,3 +341,75 @@ def test_dead_term_passes_term_referenced_only_by_a_second_clause() -> None:
 
 def test_dead_term_needs_a_glossary() -> None:
     assert _dead_term_findings(None) == []
+
+
+# --- Runtime rule: unresolved-definition-ref ---
+
+
+def _defining(name, definition):
+    return GlossaryTerm(
+        id=id_derive(name),
+        kind=None,
+        canonical=name,
+        definition=definition,
+        source=SourceLocation(relpath='GLOSSARY.md', line=3),
+    )
+
+
+def _definition_ref_findings(*terms):
+    findings = _runtime(glossary=Glossary(terms=list(terms)))
+    return _rule_findings(findings, 'unresolved-definition-ref')
+
+
+@scenario(
+    t"{pg['Narration lint']} flags a bold span in a {pg['Term'].l}'s definition "
+    t'that names no {pg["Term"].l}',
+    tags=['spec/definition-refs'],
+)
+def test_unresolved_definition_ref_flags_a_bold_span_naming_no_term() -> None:
+    with given(
+        t'a {pg["Glossary"].l} whose Handle definition bolds a {pg["Term"].l} '
+        t'and a word naming none'
+    ):
+        handle = _defining('Handle', 'Names a **Term**, or a **sentence handle**.')
+        glossary = (handle, _defining('Term', None))
+    with when(t'the runtime {pg["Lint rule"].l.s} run'):
+        findings = _definition_ref_findings(*glossary)
+    with then(
+        t'one {pg["Lint finding"].l} names the bold word, not the {pg["Term"].l}'
+    ):
+        [finding] = findings
+        assert finding.subject == 'handle'
+        assert finding.location == handle.source
+        assert finding.message == (
+            "definition of 'Handle' bolds 'sentence handle', "
+            'which names no glossary term'
+        )
+    with then(t'its {pg["Severity"].l} is warn by default'):
+        assert DEFAULTS[finding.rule] == 'warn'
+
+
+def test_unresolved_definition_ref_passes_an_s_form_in_another_case() -> None:
+    step = _defining('Step', 'In one **phases**.')
+    assert _definition_ref_findings(step, _defining('Phase', None)) == []
+
+
+def test_unresolved_definition_ref_ignores_italics_and_bold_code_spans() -> None:
+    step = _defining('Step', 'Spelled *nested* or **`.l`**.')
+    assert _definition_ref_findings(step) == []
+
+
+def test_unresolved_definition_ref_passes_a_self_reference() -> None:
+    assert _definition_ref_findings(_defining('Step', '**Steps** nest.')) == []
+
+
+def test_unresolved_definition_ref_flags_one_text_once_per_definition() -> None:
+    findings = _definition_ref_findings(
+        _defining('Step', '**bare** or **bare**.'),
+        _defining('Phase', 'A **bare** word.'),
+    )
+    assert [finding.subject for finding in findings] == ['step', 'phase']
+
+
+def test_unresolved_definition_ref_passes_without_a_glossary() -> None:
+    assert _rule_findings(_runtime(), 'unresolved-definition-ref') == []

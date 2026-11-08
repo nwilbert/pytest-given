@@ -21,7 +21,9 @@ g = FileGlossary('GLOSSARY.md', term_column='Term', definition_column='Meaning',
 
 The kind column takes `actor`, `work object` (or `object`), or `activity`.
 
-A term or kind cell may be emphasized: `**Guest**` reads `Guest`. A definition renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
+Write term and kind cells plain: `| Guest |`. A definition renders `**bold**`, `*italic*` and `` `code` ``, and a `<br>` or newline as a line break; `__bold__` shows as written.
+
+**In a definition, a bold span is a definition ref.** Bold another term's canonical name or S-form, in any case (`A **Booking** for one **room**`), and the report renders it as a term ref. Use italics for emphasis and a code span or quotes for an example word: a bold span that names no term is an `unresolved-definition-ref` lint finding.
 
 **A code-defined `Glossary`** declares terms where the tests live:
 

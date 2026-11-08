@@ -20,7 +20,7 @@ from typing import TypedDict
 import jinja2
 from markupsafe import Markup, escape
 
-from ..markdown import CodeSpan, EmphasisSpan, PlainSpan
+from ..markdown import CodeSpan, EmphasisSpan, InlineSpan, PlainSpan, span_text
 from ..model import (
     AttachmentRef,
     ClausePart,
@@ -43,6 +43,7 @@ from ..model import (
     TermKind,
     boolean_phrases,
     case_id,
+    definition_ref_text,
     iter_steps,
     placeholder_token,
     plural,
@@ -105,16 +106,6 @@ def tab_visibility(report: ReportData) -> TabVisibility:
     )
 
 
-def _inline_md(text: str | None) -> Markup:
-    """Jinja filter: render a term definition's inline Markdown to safe HTML.
-
-    The `not text` guard matters: `markupsafe.escape(None)` renders the literal
-    string 'None', and `term.definition` is None for undefined terms."""
-    if not text:
-        return Markup('')
-    return Markup(render_definition(text))
-
-
 def render_html_string(
     report: ReportData,
     source_link_template: str | None,
@@ -173,7 +164,7 @@ def _build_env(
         glossary=report.glossary,
     )
     env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
-    env.filters['inline_md'] = _inline_md
+    env.filters['definition_md'] = _make_definition_filter(report.glossary)
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
@@ -399,15 +390,10 @@ def _shown_text(narration: Narration) -> str:
 
 def _piece_text(piece: NarrationPiece) -> str:
     match piece:
-        case (
-            PlainSpan(text=text)
-            | CodeSpan(text=text)
-            | NarrationValue(rendered=text)
-            | NarrationTermRef(display=text)
-        ):
+        case PlainSpan() | CodeSpan() | EmphasisSpan():
+            return span_text(piece)
+        case NarrationValue(rendered=text) | NarrationTermRef(display=text):
             return text
-        case EmphasisSpan(content=content):
-            return ''.join(span.text for span in content)
         case NarrationPlaceholder():
             return placeholder_token(piece)
 
@@ -639,6 +625,36 @@ def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
     if term is None:
         return str(escape(part.display))
     return _term_ref_span(term, part.term_id, part.display)
+
+
+def _make_definition_filter(
+    glossary: Glossary | None,
+) -> Callable[[GlossaryTerm], Markup]:
+    """Jinja filter: a term's definition, each definition ref a term ref.
+
+    Usage: `{{ term | definition_md }}` — the term, not its definition, so a
+    reference to the term itself stays plain bold: a link to the card the
+    reader is on goes nowhere."""
+
+    def _render(term: GlossaryTerm) -> Markup:
+        # `markupsafe.escape(None)` would render the literal string 'None'.
+        if not term.definition:
+            return Markup('')
+        if glossary is None:
+            return Markup(render_definition(term.definition))
+
+        def _ref(span: InlineSpan) -> str | None:
+            text = definition_ref_text(span)
+            if text is None:
+                return None
+            target = glossary.resolve_ref(text)
+            if target is None or target is term:
+                return None
+            return _term_ref_span(target, target.id, text)
+
+        return Markup(render_definition(term.definition, render_ref=_ref))
+
+    return _render
 
 
 def _make_clause_part_filter(

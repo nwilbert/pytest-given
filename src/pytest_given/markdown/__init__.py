@@ -33,6 +33,7 @@ from .spans import (
     PlainSpan,
     located_spans,
     read_spans,
+    span_text,
 )
 
 __all__ = [
@@ -56,6 +57,7 @@ __all__ = [
     'plain_html_text',
     'plain_link_text',
     'read_spans',
+    'span_text',
     'table_cell_spans',
     'tables',
     'text_runs',

@@ -18,10 +18,10 @@ from pytest_given import Glossary
 g = Glossary()
 guest = g('Guest', definition='Person booking accommodation.')
 room = g('Room', definition='A bookable hotel room.')
-book = g('book', definition='Reserve a room for a stay.')
+book = g('book', definition='Reserve a **room** for a stay.')
 ```
 
-A definition can use [bold, italic, code and line breaks](step-text.md#formatting).
+A definition can use [bold, italic, code and line breaks](step-text.md#formatting). Bold marks a reference to another term: in the report, `**room**` shows the Room term's definition on hover and opens its entry in the Glossary tab when clicked. A bold word matches a term's name or its plural in any case, so `**Rooms**` works too. Use italics for emphasis, because the lint flags a bold word that names no term ([`unresolved-definition-ref`](../configuration/narration-lint.md)).
 
 Each call returns a **handle**. If the term already exists, `g(...)` returns its handle. To only look up a term, use `g['Guest']`, which raises an error if the term doesn't exist.
 

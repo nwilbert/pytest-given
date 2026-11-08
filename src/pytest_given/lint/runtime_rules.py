@@ -14,11 +14,19 @@ from ..model import (
     Scenario,
     Story,
     TermId,
+    definition_bold_spans,
     derived_id,
     iter_narrations,
     iter_steps,
 )
-from .base import DEAD_TERM, MISSING_PHASE, TAG_SHADOWS_TERM, RawLintFinding, RuleId
+from .base import (
+    DEAD_TERM,
+    MISSING_PHASE,
+    TAG_SHADOWS_TERM,
+    UNRESOLVED_DEFINITION_REF,
+    RawLintFinding,
+    RuleId,
+)
 
 
 def run_runtime_rules(
@@ -166,12 +174,36 @@ def _dead_term_findings(context: _Context) -> list[RawLintFinding]:
     ]
 
 
+def _unresolved_definition_ref_findings(context: _Context) -> list[RawLintFinding]:
+    """Rule `unresolved-definition-ref`: a bold span in a glossary definition
+    names no term — a definition ref left stale by a rename, or bold used for
+    emphasis. One finding per term and bold text."""
+    if context.glossary is None:
+        return []
+    glossary = context.glossary
+    return [
+        RawLintFinding(
+            rule=UNRESOLVED_DEFINITION_REF,
+            subject=term.id,
+            location=term.source,
+            message=(
+                f'definition of {term.canonical!r} bolds {text!r}, '
+                f'which names no glossary term'
+            ),
+        )
+        for term in glossary.terms
+        for text in dict.fromkeys(definition_bold_spans(term.definition or ''))
+        if glossary.resolve_ref(text) is None
+    ]
+
+
 # Keyed by rule id so `run_runtime_rules` skips a disabled rule entirely —
 # `dead-term`, off by default, walks every narration part and every clause.
 _RUNTIME_RULES: dict[RuleId, Callable[[_Context], list[RawLintFinding]]] = {
     MISSING_PHASE: _missing_phase_findings,
     TAG_SHADOWS_TERM: _tag_shadows_term_findings,
     DEAD_TERM: _dead_term_findings,
+    UNRESOLVED_DEFINITION_REF: _unresolved_definition_ref_findings,
 }
 
 RUNTIME_RULE_IDS = frozenset(_RUNTIME_RULES)

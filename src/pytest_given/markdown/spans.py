@@ -34,6 +34,15 @@ def read_spans(text: str, *, before: str = '', after: str = '') -> list[InlineSp
     return [span for span, _ in located_spans(text, before=before, after=after)]
 
 
+def span_text(span: InlineSpan) -> str:
+    """The text a span shows, its markers unwrapped."""
+    match span:
+        case PlainSpan(text=text) | CodeSpan(text=text):
+            return text
+        case EmphasisSpan(content=content):
+            return ''.join(span_text(part) for part in content)
+
+
 def located_spans(
     text: str, *, before: str = '', after: str = ''
 ) -> Iterator[tuple[InlineSpan, range]]:

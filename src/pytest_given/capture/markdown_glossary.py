@@ -7,14 +7,7 @@ as empty. Column selection accepts a header name (case-insensitive) or a
 
 from dataclasses import dataclass
 
-from ..markdown import (
-    CodeSpan,
-    EmphasisSpan,
-    InlineSpan,
-    PlainSpan,
-    read_spans,
-    tables,
-)
+from ..markdown import read_spans, span_text, tables
 from ..model import PytestGivenError
 
 type ColumnSpec = int | str
@@ -77,15 +70,7 @@ def _strip_emphasis(cell: str) -> str:
     """The cell's text with the reader's spans unwrapped. Applied to term and
     kind cells so a glossary written with emphasized term names renders clean
     pills."""
-    return ''.join(_span_text(span) for span in read_spans(cell)).strip()
-
-
-def _span_text(span: InlineSpan) -> str:
-    match span:
-        case PlainSpan(text=text) | CodeSpan(text=text):
-            return text
-        case EmphasisSpan(content=content):
-            return ''.join(_span_text(part) for part in content)
+    return ''.join(span_text(span) for span in read_spans(cell)).strip()
 
 
 def _addresses_another_table(specs: tuple[ColumnSpec, ...], header: list[str]) -> bool:

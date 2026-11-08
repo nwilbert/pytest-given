@@ -441,6 +441,42 @@ def test_dead_term_opt_in_flags_unreferenced_term(pytester):
     )
 
 
+BOLDING_GLOSSARY_CONFTEST = """
+from pytest_given import Glossary
+
+g = Glossary()
+guest = g.actor('Guest', 'Books a **Room** for a **stay**.')
+room = g.work_object('Room')
+"""
+
+
+def test_unresolved_definition_ref_prints_under_the_lint(pytester):
+    pytester.makeconftest(BOLDING_GLOSSARY_CONFTEST)
+    result = _run(pytester, TAGGED_SUITE, '--given-lint')
+    result.stdout.fnmatch_lines(
+        [
+            (
+                "*WARN*unresolved-definition-ref*guest*definition of 'Guest' "
+                "bolds 'stay', which names no glossary term*"
+            )
+        ]
+    )
+    assert "bolds 'Room'" not in result.stdout.str()
+
+
+def test_unresolved_definition_ref_is_ignored_by_term_id(pytester):
+    pytester.makeconftest(BOLDING_GLOSSARY_CONFTEST)
+    result = _run(
+        pytester,
+        TAGGED_SUITE,
+        '--given-lint',
+        '-o',
+        'given_lint_ignore=unresolved-definition-ref: gue*',
+    )
+    assert 'unresolved-definition-ref' not in result.stdout.str()
+    assert 'stale-ignore' not in result.stdout.str()
+
+
 def test_removed_phase_check_cli_flag_is_unrecognized(pytester):
     result = _run(pytester, TWO_PHASE, '--given-phase-check=warn')
     assert result.ret == pytest.ExitCode.USAGE_ERROR

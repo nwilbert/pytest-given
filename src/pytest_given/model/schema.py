@@ -7,12 +7,14 @@ one exception is a field marked `serde_exclude`, which stays in memory and out
 of the JSON; `Step.source` is the only one.
 """
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import Literal, NewType
 
+from ..markdown import EmphasisSpan, InlineSpan, PlainSpan, read_spans, span_text
 from .report_url import ReportUrl
+from .text import derived_id, s_form
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -235,9 +237,16 @@ class Glossary:
     _by_id: dict[TermId, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
+    # Keyed by the derived id of a term's S-form; first registered wins.
+    _by_s_form: dict[str, GlossaryTerm] = field(
+        init=False, repr=False, compare=False, default_factory=dict
+    )
 
     def __post_init__(self) -> None:
-        self._by_id = {term.id: term for term in self.terms}
+        self._by_id = {}
+        self._by_s_form = {}
+        for term in self.terms:
+            self._index(term)
 
     def get(self, key: TermId) -> GlossaryTerm | None:
         return self._by_id.get(key)
@@ -245,7 +254,39 @@ class Glossary:
     def register(self, term: GlossaryTerm) -> None:
         assert self.get(term.id) is None, f'term id {term.id!r} already registered'
         self.terms.append(term)
+        self._index(term)
+
+    def resolve_ref(self, text: str) -> GlossaryTerm | None:
+        """The term a definition's bold span names: by derived id, of the
+        canonical name or the S-form, the canonical name winning a collision."""
+        slug = derived_id(text)
+        if slug is None:
+            return None
+        return self._by_id.get(TermId(slug)) or self._by_s_form.get(slug)
+
+    def _index(self, term: GlossaryTerm) -> None:
         self._by_id[term.id] = term
+        s_form_id = derived_id(s_form(term.canonical))
+        if s_form_id is not None:
+            self._by_s_form.setdefault(s_form_id, term)
+
+
+def definition_bold_spans(definition: str) -> Iterator[str]:
+    """The text of each bold span in `definition` that could be a definition ref."""
+    for span in read_spans(definition):
+        text = definition_ref_text(span)
+        if text is not None:
+            yield text
+
+
+def definition_ref_text(span: InlineSpan) -> str | None:
+    """A bold span's text if it could be a definition ref: one holding a code
+    span formats an identifier instead."""
+    if not isinstance(span, EmphasisSpan) or not span.strong:
+        return None
+    if not all(isinstance(part, PlainSpan) for part in span.content):
+        return None
+    return span_text(span)
 
 
 # Step phase
