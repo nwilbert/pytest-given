@@ -655,8 +655,18 @@ function reportApp() {
       this.expandedTerms[id] = true;
       this.$nextTick(() => {
         const el = document.getElementById('term-' + id);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!el) return;
+        const scroll = () => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (el.getClientRects().length) return scroll();
+        // Navigation, not refinement: Glossary filters that hide the term give way.
+        this._resetTermFilters();
+        this.$nextTick(scroll);
       });
+    },
+    _resetTermFilters() {
+      this.glossarySearch = '';
+      this.glossaryDefinitionFilter = 'all';
+      this.glossaryKindFilter = { actor: true, object: true, activity: true, kindless: true };
     },
     filterScenariosByTerm(id) {
       // Navigation, not refinement: the term arrives on its own rather than
@@ -1165,9 +1175,13 @@ function reportApp() {
       this.sentenceFilter = keep('story sentence', first('sentence-filter'),
         key => Object.hasOwn(sentenceLabels, key))[0] ?? null;
       if (params.has('status')) {
-        const shown = new Set(keep('status', params.get('status').split(',').filter(Boolean),
-          s => STATUSES.includes(s)));
-        this.shownStatuses = Object.fromEntries(STATUSES.map(s => [s, shown.has(s)]));
+        const named = params.get('status').split(',').filter(Boolean);
+        const shown = new Set(keep('status', named, s => STATUSES.includes(s)));
+        // A link whose every status is dropped shows all rather than none. An
+        // empty value is what `_writeHash` writes for none shown.
+        this.shownStatuses = named.length && !shown.size
+          ? allStatusesShown()
+          : Object.fromEntries(STATUSES.map(s => [s, shown.has(s)]));
       } else {
         this.shownStatuses = allStatusesShown();
       }
