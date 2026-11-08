@@ -227,12 +227,12 @@ one word for emphasis (`The **decision** qualifier`), which `unresolved-definiti
 ### Grouping
 
 - **Sections count from two.** A glossary is *sectioned* when its terms name at least two sections.
-  **Other** doesn't count as one. A glossary with a single section, such as a table glossary under
-  one `## Terms` heading, shows no section anywhere in the tab, as if it had none. The terms keep
-  their `section` in the model and the JSON report.
+  Terms with no section don't count as one. A glossary with a single section, such as a table
+  glossary under one `## Terms` heading, shows no section anywhere in the tab, as if it had none.
+  The terms keep their `section` in the model and the JSON report.
 - **Section is the default grouping.** Section headers appear in section order. Terms with no
-  section come last, under **Other**, which appears only when some terms have a section and some
-  don't. Each card keeps its kind color.
+  section join the section named **Other** (in any case), which comes last. When no section has
+  that name, **Other** appears only for terms with no section. Each card keeps its kind color.
 - **The Kind grouping** is today's view.
 - **The switch** appears only when the glossary is sectioned *and* has at least one term with a
   kind. It is a segmented control at the top of the Glossary sidebar, labelled *Group by*,
@@ -251,25 +251,29 @@ one word for emphasis (`The **decision** qualifier`), which `unresolved-definiti
 - **The search and the definition filter apply in both groupings.** A section header hides when
   none of its terms is visible, and "No terms match this filter" covers both groupings.
 - **The section selection is in the URL**, one `section=` parameter per selected section, as
-  `tag=` carries the tag filters. An empty value stands for **Other**, so an author's own
-  `## Other` heading doesn't collide with it. The parameters are written only while the Section
+  `tag=` carries the tag filters. `section=Other` selects **Other**, terms with no section
+  included. The parameters are written only while the Section
   grouping is showing, and a link carrying them opens the Glossary in that grouping with those
   sections selected. A name the report no longer has is dropped and named in the stale-link
   snackbar, as for a tag. The grouping itself is not persisted, as the kind checkboxes are not.
 - **Each section header carries a link button**, the plain link icon a term row shows when the
   report has no public URL. It copies `view=glossary&section=<name>`, with the name URL-encoded so
-  a heading such as `Q&A` survives, the link that selects that section alone. A section is no citation target, so there is no copy menu, and `citations check`
-  treats a section link in a document as an ordinary link.
+  a heading such as `Q&A` survives, the link that selects that section alone. A section is no
+  citation target, so there is no copy menu, and `citations check` treats a section link in a
+  document as an ordinary link.
 - The URL's `term=` link opens the term's card in whichever grouping is showing. `goToTerm` resets
   the section selection when it hides the target, as it resets the kind filter (see the definition
   refs spec).
 
-`build_glossary_view` returns both groupings. The template renders each inside its own
-`<template x-if>`, so only the grouping that is showing is in the DOM: a card's `term-…` ids exist
-once, and `goToTerm`'s `getElementById` and the cards' `aria-controls` work unchanged. Expanded
-cards are keyed by term id in Alpine state, so they survive a switch. The report's HTML carries
-the cards twice, which the `benchmark` session measures. The per-group visible counts, keyed by
-kind today, are keyed by group so that both groupings use them.
+`build_glossary_view` returns both groupings. The cards render once, in the Kind grouping, as
+today. The Section grouping renders a slot per term, which borrows its card the way a Stories-view
+slot borrows a scenario card (`fillStoryCards`): the first time the Section grouping shows, each
+slot is filled with a clone of the term's card, its ids and `aria-controls` prefixed `section-`
+through the same preparation `_prepareClone` gives a scenario clone. The page thus carries each
+card once, and no id appears twice. A clone keeps the original's `data-term-id`, so expanded
+cards, keyed by term id in Alpine state, stay expanded across a switch. `goToTerm` scrolls to
+`section-term-<id>` while the Section grouping shows. The per-group visible counts, keyed by kind
+today, are keyed by group so that both groupings use them.
 
 ### Avoided words on the card
 
@@ -359,7 +363,8 @@ the old name, as a record of their time.
   section list with its counts, avoided words on `TermEntry`.
 - `report/templates/report.html.j2`, `app.js`, `styles.css` — the switch, the section list and its
   OR selection, the `section=` parameters in `_writeHash` and the hash reader, the header link
-  buttons, the two groupings under `x-if`, the group-keyed visible counts, the avoid line,
+  buttons, the Section grouping's card slots and their filling (sharing `_prepareClone` with the
+  Stories view), `goToTerm`'s target in the Section grouping, the group-keyed visible counts, the avoid line,
   avoided words in the search text and in `_termCounts`, `goToTerm`'s section reset.
 - `lint/base.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_term_findings`, registered in `_RUNTIME_RULES`.
@@ -411,7 +416,8 @@ the old name, as a record of their time.
   in both registration orders.
 - Avoided-word units: the note stripped, markup unwrapped.
 - `build_glossary_view` units on the data contract: section order, the Other group's presence, the
-  section list's counts, a single section shown as none, the switch's visibility for each
+  section list's counts, an authored **Other** section merged with the terms that have none, a
+  single section shown as none, the switch's visibility for each
   combination of sectioned and kinds.
 - Rule units: an avoided word in plain text (finding), in a term ref (clean), in a code span
   (clean), its S-form (finding), inside a longer word (clean), a note ignored, one finding per
