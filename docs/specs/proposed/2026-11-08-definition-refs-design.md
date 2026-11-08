@@ -82,23 +82,24 @@ the rule lives on the model:
   `display` is the span's text as authored, so a ref keeps its inflection (`Attachments`). It
   carries the kind class, `term-ref--link`, `has-term-tip` and `data-term-id`, so hovering shows
   the referenced term's definition.
-- **Clicking a definition ref** opens the referenced term's card. Two things in `app.js` stand in
-  the way today:
-  - The capture-phase click handler skips every `[data-term-id]` inside a `.entry`, because the
-    card's own header carries one. It lets a `.term-ref--link` inside `.entry-def` through to
-    `goToTerm`, and stops propagation, so the card it sits in doesn't also expand or collapse.
-  - `goToTerm` scrolls to a card the Glossary search, kind filter or definition filter may hide. A
-    reader who searched for `step` and clicks *Phase* would see nothing happen. `goToTerm` resets
-    whichever of the three hides the target.
-- **Term tooltip: unchanged.** `definition_html` renders a definition ref as `<strong>`. The
-  tooltip closes when the pointer leaves the word that opened it, so a link inside it can't be
-  reached, and `app.js` assigns it as `innerHTML` on the invariant that it holds only
-  attribute-free tags.
+- **Clicking a definition ref** opens the referenced term's card. The capture-phase click handler
+  in `app.js` skips every `[data-term-id]` inside a `.entry`, because the card's own header
+  carries one. It lets a `.term-ref--link` inside `.entry-def` through to `goToTerm`, and stops
+  propagation, so the card it sits in doesn't also expand or collapse. `goToTerm` already clears
+  the Glossary filters that hide its target, so a reader who searched for `step` and clicks
+  **Phase** lands on its card.
+- **Term tooltip: unchanged.** The tooltip's `definition_html`, pre-rendered per term in
+  `_app_data`, renders a definition ref as `<strong>`. The tooltip closes when the pointer leaves
+  the word that opened it, so a link inside it can't be reached, and `app.js` assigns it as
+  `innerHTML` on the invariant that it holds only attribute-free tags.
 - **Not a ref.** An unresolved bold span and a self-reference render as `<strong>`, as today.
 
-`render_definition` takes an optional glossary and a callback that renders one resolved ref, so
-`inline_markdown.py` stays free of the term-ref markup, which lives in `html_renderer.py`. Without
-them, as for the tooltip, it renders every bold span as `<strong>`.
+`render_definition` takes an optional glossary, the id of the term whose definition it renders,
+and a callback that renders one resolved ref, so `inline_markdown.py` stays free of the term-ref
+markup, which lives in `html_renderer.py`. Without them, as for the tooltip, it renders every bold
+span as `<strong>`. The Glossary tab's filter is made per render over the report's glossary, as
+the `narration` filter is, and applied to the term rather than its definition text
+(`term | definition_md`), so it knows which ref is a self-reference.
 
 ## The `unresolved-definition-ref` lint rule
 
@@ -147,20 +148,22 @@ them, as for the tooltip, it renders every bold span as `<strong>`.
 
 - `model/schema.py` — `Glossary.resolve_ref` and its S-form index; `definition_bold_spans` beside
   it, re-exported from `model/__init__.py`.
-- `report/inline_markdown.py` — `render_definition` takes the optional glossary and ref callback.
-- `report/html_renderer.py` — the `_inline_md` filter passes the report's glossary and a callback
-  over `_term_ref_span`. `definition_html` passes neither.
-- `report/templates/app.js` — the click handler's `.entry` exemption and `goToTerm`'s filter
-  reset.
+- `report/inline_markdown.py` — `render_definition` takes the optional glossary, owning term id
+  and ref callback.
+- `report/html_renderer.py` — `_inline_md` becomes a `definition_md` filter made per render, which
+  passes the report's glossary, the term's id and a callback over `_term_ref_span`.
+  `report.html.j2` applies it to the term. `_app_data`'s `definition_html` passes none of them.
+- `report/templates/app.js` — the click handler's `.entry` exemption.
 - `lint/base.py` — `UNRESOLVED_DEFINITION_REF`, default `warn`.
 - `lint/runtime_rules.py` — `_unresolved_definition_ref_findings`, registered in `_RUNTIME_RULES`.
-- `docs/site/guide/glossary.md` — the definition paragraph states the convention, and the file
-  glossary section writes term cells plain. `docs/site/configuration/narration-lint.md` — the
-  rule table.
+- `docs/site/guide/glossary.md` — the definition paragraph states the convention.
+  `docs/site/configuration/narration-lint.md` — the rule table.
 - Authoring skill `references/glossaries.md` — the convention, beside the line on formatting a
-  definition, and plain term cells. `references/lint.md` — the catalog row with its remedies.
-  Reviewing skill `references/hygiene.md` — a definition that names another term without bold is
-  a finding, the gap the lint can't see. Regenerate the `.claude/skills/` mirror with
+  definition, and plain term cells in place of the line that allows emphasized ones.
+  `references/lint.md` — the catalog row with its remedies. Reviewing skill
+  `references/hygiene.md` — a definition whose meaning rests on another term, with that term's
+  first mention not bold, is a finding, the gap the lint can't see. Passing mentions of common
+  terms such as *term* or *glossary* are not. Regenerate the `.claude/skills/` mirror with
   `uv run pytest-given skills install`.
 - Examples: no example glossary references a term today. The hotel-booking glossary declared in
   code and `examples/file-glossary-booking/`'s `GLOSSARY.md` each gain a few refs, so both glossary
