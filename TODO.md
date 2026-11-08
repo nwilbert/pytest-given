@@ -2,12 +2,12 @@
 
 ## Now
 
+- [ ] sectioned/heading-scoped glossaries — one table per section on input, grouped sections in the HTML Glossary view (see `docs/specs/2026-06-18-file-backed-glossary-design.md` forward notes).
+- [ ] Support the glossary format of https://github.com/mattpocock/skills
+
 ## Next
 
-- [ ] Enable term descriptions referencing other terms (in MD glossaries maybe via *italics*; resolve any conflict with the inline Markdown definitions already render, where `*italic*` is plain italics)
-- [ ] sectioned/heading-scoped glossaries — one table per section on input, grouped sections in the HTML Glossary view (see `docs/specs/2026-06-18-file-backed-glossary-design.md` forward notes).
 - [ ] pytest-xdist support for reports and lint under `-n --dist loadfile` / `loadscope`, which keep a test function's cases on one worker (other `--dist` modes stay refused). Each worker groups its own scenarios, since `ParamSpec.values` are live Python objects, and ships them (with `Step.source`, which serde excludes), its stories and glossary to the controller via `workeroutput`. The controller merges them in collection order, then lints and writes the sinks.
-- [ ] Support the glossary format of https://github.com/mattpocock/skills
 
 ## Later
 
