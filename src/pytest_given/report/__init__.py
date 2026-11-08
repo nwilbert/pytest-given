@@ -32,6 +32,7 @@ from .sinks import (
     RenderedSinks,
     SinkConfig,
     emit_sinks,
+    refuse_writing_over_an_input,
     require_glossary_terms,
     sink_failure,
 )
@@ -67,6 +68,7 @@ __all__ = [
     'emit_sinks',
     'html_link_text',
     'link_text',
+    'refuse_writing_over_an_input',
     'report_fragment',
     'require_glossary_terms',
     'resolve_source_link_template',

@@ -23,6 +23,19 @@
 | citations check doc.md --report missing.json |
 | skills install --dest taken.txt |
 
+## ✓ A `pytest-given report` that cannot read its input removes the earlier «report» · 2 cases
+`tests/integration/test_cli.py::test_cli_input_that_cannot_be_read_also_discards_the_stale_report` · diagnostics
+
+- **given** a «report» left by an earlier render
+- **when** a JSON file that is {flaw} is rendered to it
+- **then** the command exits 2
+- **then** the earlier «report» is removed, as it would read as current
+
+| flaw |
+|---|
+| missing |
+| not JSON |
+
 ## ✓ `pytest-given report --glossary-only` renders only the «glossary»
 `tests/integration/test_cli.py::test_cli_glossary_only_renders_just_the_glossary`
 

@@ -22,10 +22,12 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Changed
 
 - The HTML report's browser tab and the Markdown report's heading show only the report's title, without "pytest-given".
+- `pytest-given report` now removes the previous output when its input can't be read, as it already did when rendering failed.
 
 ### Fixed
 
 - A test session writing a report no longer crashes on a git remote URL that the system's locale encoding can't decode.
+- `pytest-given report` refuses an `-o` path that is its input file, which a failed render could delete.
 
 ## [0.6.0] - 2026-11-21
 

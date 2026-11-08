@@ -78,3 +78,5 @@ Every subcommand uses the same codes, so a script can branch on the code alone:
 - `2` means the command could not do its job. A file could not be read or written, or a flag value was refused. The message goes to stderr.
 
 `report`, `delta` and a plain `skills install` never exit 1, since none reports findings.
+
+When `report` or `delta` exits 2, it leaves no output behind that could pass for current.

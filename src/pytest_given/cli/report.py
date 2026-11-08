@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from ..model import (
+    JsonObject,
     PytestGivenError,
     ReportUrl,
     read_report_json,
@@ -20,6 +21,7 @@ from ..report import (
     THEME_HELP,
     SinkConfig,
     emit_sinks,
+    refuse_writing_over_an_input,
     require_glossary_terms,
     resolve_source_link_template,
     resolve_theme,
@@ -100,10 +102,10 @@ def run_report(args: argparse.Namespace) -> int:
     """Render a saved JSON report to HTML or Markdown.
 
     Goes through `emit_sinks` rather than calling a renderer directly, so this
-    entry point gets exactly the guarantee the plugin has: a render or write
-    that fails leaves no half-written report behind, and takes the stale
-    previous one with it. Input and output problems are reported as CLI errors
-    rather than tracebacks.
+    entry point gets exactly the guarantee the plugin has: a run that fails,
+    reading its input included, leaves no half-written report behind, and
+    takes the stale previous one with it. Input and output problems are
+    reported as CLI errors rather than tracebacks.
     """
     json_file: Path = args.json_file
     try:
@@ -116,10 +118,20 @@ def run_report(args: argparse.Namespace) -> int:
             resolve_report_url(args.report_url, '--report-url'),
             args.glossary_only,
         )
-        report_dict = read_report_json(json_file)
-        if args.glossary_only:
-            require_glossary_terms(report_from_dict(report_dict, json_file.as_posix()))
-        rendered = emit_sinks(report_dict, config, json_file.as_posix())
+        refuse_writing_over_an_input(
+            {'report HTML': config.html_path, 'report Markdown': config.md_path},
+            [json_file],
+        )
+        report_dict = (
+            _refuse_a_report_without_glossary_terms(json_file)
+            if args.glossary_only
+            else None
+        )
+        rendered = emit_sinks(
+            lambda: read_report_json(json_file) if report_dict is None else report_dict,
+            config,
+            json_file.as_posix(),
+        )
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2
@@ -128,6 +140,19 @@ def run_report(args: argparse.Namespace) -> int:
     for rendered_file in rendered.files:
         print(f'Report generated: {rendered_file.path}')
     return 0
+
+
+def _refuse_a_report_without_glossary_terms(json_file: Path) -> JsonObject | None:
+    """The report dict read, for `emit_sinks` to render. A refusal keeps the
+    previous report, so it comes before `emit_sinks`. An unreadable input is no
+    refusal: `emit_sinks` reads it again, fails and discards."""
+    try:
+        report_dict = read_report_json(json_file)
+        report = report_from_dict(report_dict, json_file.as_posix())
+    except PytestGivenError, OSError:
+        return None
+    require_glossary_terms(report)
+    return report_dict
 
 
 def _sink_config(
