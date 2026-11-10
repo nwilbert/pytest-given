@@ -47,7 +47,7 @@ Terms sit under `## Language` (`## Terms` in the `teach` skill) and may be group
 subheadings. Two further sections, `## Relationships` and `## Flagged ambiguities`, hold prose and
 bullets, not terms. The `_Avoid_:` line is how the format records rejected synonyms. A definition
 names another term in bold, the markup a *definition ref* uses (see the
-[definition refs spec](../2026-11-08-definition-refs-design.md), which lands first). A repo with
+[definition refs spec](2026-11-08-definition-refs-design.md), which lands first). A repo with
 several bounded contexts keeps one `GLOSSARY.md` per context, listed in a `GLOSSARY-MAP.md`.
 
 ## Non-goals
@@ -75,7 +75,7 @@ class GlossaryTerm:
     id: TermId
     kind: TermKind | None
     canonical: str
-    definition: str | None = None
+    definition: Definition | None = None
     source: SourceLocation | None = None
     section: str | None = None
     avoid: tuple[str, ...] = ()
@@ -284,8 +284,8 @@ so that both groupings use them.
 ### Avoided words on the card
 
 A card whose term avoids words shows them under the definition, as `Avoid: Customer, Client`, each
-entry as written, note included, rendered by `definition_html` without a glossary, so with no
-definition refs. The Glossary
+entry as written, note included, rendered by `definition_html`. An entry is a string, not a
+stored definition, so its bold renders as plain bold, never as a definition ref. The Glossary
 search matches avoided words, so a reader searching `customer` finds *Guest*. The term tooltip in
 narration is unchanged.
 
@@ -374,8 +374,7 @@ the old name, as a record of their time.
   `_prepareClone` with the Stories view), `goToTerm`'s target in that grouping, the group-keyed
   visible counts, the avoid line, avoided words in the search text and in `_termCounts`, the
   section selection in `_resetTermFilters`.
-- `report/html_renderer.py` — the avoid line rendered through `definition_html` without a
-  glossary.
+- `report/html_renderer.py` — the avoid line rendered through `definition_html`.
 - `lint/catalog.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_term_findings`, registered in `_RUNTIME_RULES`.
 - Docs: `docs/site/guide/glossary.md` (the *File glossary* section covers both classes, sections in
