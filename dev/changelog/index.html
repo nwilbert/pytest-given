@@ -1182,6 +1182,8 @@
 <li>A term citation written as a <code>&lt;details markdown="1"&gt;</code> block carries the term's definition, which <code>citations update</code> writes and <code>citations check</code> holds to the report.</li>
 <li>A Glossary term row in the HTML report gets the copy button, which offers <strong>Copy citation</strong> and <strong>Copy defining citation</strong> when the report has a URL.</li>
 <li>A format spec <code>{flag:true phrase|false phrase}</code> words a Boolean in a step while the parameter table keeps the Boolean.</li>
+<li>A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term.</li>
+<li>The <code>unresolved-definition-ref</code> lint rule, <code>warn</code> by default, flags a bold span in a glossary definition that names no term.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
