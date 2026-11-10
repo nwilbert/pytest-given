@@ -77,8 +77,13 @@ the rule lives on the model:
 
 - `Glossary.resolve_ref(text: str) -> GlossaryTerm | None` — the term a bold span's text names, per
   the matching rules above. Its name index is kept current by the constructor and `register`,
-  the way `_by_id` is. The Glossary tab's test for a term ref reading as the term's own name uses
-  the same `name_key` and `s_form_keys` from `model/text.py`.
+  the way `_by_id` is.
+
+The rest sits in `model/text.py`, beside `s_form`:
+
+- `name_key(text: str) -> str` and `name_keys(name: str) -> set[str]` — the comparison above, and
+  every key that spells a name. The Glossary tab's test for a term ref reading as the term's own
+  name uses the same two.
 - `definition_ref_text(span: InlineSpan) -> str | None` — a bold span's text if it could be a
   ref (holding no code span).
 - `definition_bold_spans(definition: str) -> Iterator[str]` — that text for each span of a
@@ -155,8 +160,9 @@ which ref is a self-reference.
 
 ## Implementation touch points
 
-- `model/schema.py` — `Glossary.resolve_ref` and its name index; `definition_ref_text` and
-  `definition_bold_spans` beside it, re-exported from `model/__init__.py`.
+- `model/schema.py` — `Glossary.resolve_ref` and its name index.
+- `model/text.py` — `name_key`, `name_keys`, `definition_ref_text` and `definition_bold_spans`,
+  re-exported from `model/__init__.py`.
 - `report/inline_markdown.py` — `render_definition` takes the optional `render_ref` callback.
 - `report/html_renderer.py` — `_inline_md` becomes a `definition_md` filter made per render, whose
   callback resolves a span over the report's glossary, skips the term itself, and renders the rest
@@ -187,15 +193,15 @@ which ref is a self-reference.
 ## Test coverage
 
 - `Glossary.resolve_ref` units: canonical name in each case; S-form; both S-forms of an all-caps
-  name; a multi-word term; no match, punctuation around the name included; an S-form that collides with another term's canonical name; a term registered after the first
-  lookup.
+  name; a multi-word term; no match, punctuation around the name included; an S-form that
+  collides with another term's canonical name; a term registered after the first lookup.
 - `definition_bold_spans` units: italic skipped; a bold span holding a code span skipped; a
   possessive after the span.
 - Renderer units on the data contract: which term ids a rendered definition references, and that a
-  self-reference and an unresolved bold span reference none.
-- Rule units: a resolving bold span (clean), an unresolved one (finding), an italic (clean), a
-  self-reference (clean), a bold span holding a code span (clean), two definitions with the same
-  unresolved text (one finding each).
+  self-reference, a copy of the term included, and an unresolved bold span reference none.
+- Rule units: a resolving bold span (clean), an unresolved one (finding), two definitions with the
+  same unresolved text (one finding each). The units above cover which spans count and what
+  resolves.
 - Integration: the finding prints under `--given-lint`, and an ignore entry suppresses it.
 - Self-report, tagged `spec/definition-refs`: one scenario for the matching rule (case and S-form),
   one for the lint rule.

@@ -122,13 +122,18 @@ def _case(node_id, phases, *, status='passed'):
     return _phases_scenario(node_id, phases, status=status)
 
 
-def _glossary(*names):
-    return Glossary(
-        terms=[
-            GlossaryTerm(id=id_derive(name), kind=None, canonical=name)
-            for name in names
-        ]
+def _term(name, definition=None):
+    return GlossaryTerm(
+        id=id_derive(name),
+        kind=None,
+        canonical=name,
+        definition=definition,
+        source=SourceLocation(relpath='GLOSSARY.md', line=3),
     )
+
+
+def _glossary(*names):
+    return Glossary(terms=[_term(name) for name in names])
 
 
 @scenario(
@@ -346,16 +351,6 @@ def test_dead_term_needs_a_glossary() -> None:
 # --- Runtime rule: unresolved-definition-ref ---
 
 
-def _defining(name, definition):
-    return GlossaryTerm(
-        id=id_derive(name),
-        kind=None,
-        canonical=name,
-        definition=definition,
-        source=SourceLocation(relpath='GLOSSARY.md', line=3),
-    )
-
-
 def _definition_ref_findings(*terms):
     findings = _runtime(glossary=Glossary(terms=list(terms)))
     return _rule_findings(findings, 'unresolved-definition-ref')
@@ -371,8 +366,8 @@ def test_unresolved_definition_ref_flags_a_bold_span_naming_no_term() -> None:
         t'a {pg["Glossary"].l} whose Handle definition bolds a {pg["Term"].l} '
         t'and a word naming none'
     ):
-        handle = _defining('Handle', 'Names a **Term**, or a **sentence handle**.')
-        glossary = (handle, _defining('Term', None))
+        handle = _term('Handle', 'Names a **Term**, or a **sentence handle**.')
+        glossary = (handle, _term('Term'))
     with when(t'the runtime {pg["Lint rule"].l.s} run'):
         findings = _definition_ref_findings(*glossary)
     with then(
@@ -389,24 +384,10 @@ def test_unresolved_definition_ref_flags_a_bold_span_naming_no_term() -> None:
         assert DEFAULTS[finding.rule] == 'warn'
 
 
-def test_unresolved_definition_ref_passes_an_s_form_in_another_case() -> None:
-    step = _defining('Step', 'In one **phases**.')
-    assert _definition_ref_findings(step, _defining('Phase', None)) == []
-
-
-def test_unresolved_definition_ref_ignores_italics_and_bold_code_spans() -> None:
-    step = _defining('Step', 'Spelled *nested* or **`.l`**.')
-    assert _definition_ref_findings(step) == []
-
-
-def test_unresolved_definition_ref_passes_a_self_reference() -> None:
-    assert _definition_ref_findings(_defining('Step', '**Steps** nest.')) == []
-
-
 def test_unresolved_definition_ref_flags_one_text_once_per_definition() -> None:
     findings = _definition_ref_findings(
-        _defining('Step', '**bare** or **bare**.'),
-        _defining('Phase', 'A **bare** word.'),
+        _term('Step', '**bare** or **bare**.'),
+        _term('Phase', 'A **bare** word.'),
     )
     assert [finding.subject for finding in findings] == ['step', 'phase']
 

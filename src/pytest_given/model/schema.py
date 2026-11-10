@@ -7,14 +7,13 @@ one exception is a field marked `serde_exclude`, which stays in memory and out
 of the JSON; `Step.source` is the only one.
 """
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import Literal, NewType
 
-from ..markdown import EmphasisSpan, InlineSpan, PlainSpan, read_spans, span_text
 from .report_url import ReportUrl
-from .text import name_key, s_form_keys
+from .text import name_key, name_keys
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -237,8 +236,6 @@ class Glossary:
     _by_id: dict[TermId, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
-    # Keyed by `name_key`: a canonical name overrides an S-form, and among
-    # S-forms the first registered wins.
     _by_name: dict[str, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
@@ -265,26 +262,8 @@ class Glossary:
     def _index(self, term: GlossaryTerm) -> None:
         self._by_id[term.id] = term
         self._by_name[name_key(term.canonical)] = term
-        for key in s_form_keys(term.canonical):
+        for key in name_keys(term.canonical):
             self._by_name.setdefault(key, term)
-
-
-def definition_bold_spans(definition: str) -> Iterator[str]:
-    """The text of each bold span in `definition` that could be a definition ref."""
-    for span in read_spans(definition):
-        text = definition_ref_text(span)
-        if text is not None:
-            yield text
-
-
-def definition_ref_text(span: InlineSpan) -> str | None:
-    """A bold span's text if it could be a definition ref: one holding a code
-    span formats an identifier instead."""
-    if not isinstance(span, EmphasisSpan) or not span.strong:
-        return None
-    if not all(isinstance(part, PlainSpan) for part in span.content):
-        return None
-    return span_text(span)
 
 
 # Step phase

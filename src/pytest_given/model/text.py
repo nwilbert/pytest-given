@@ -2,15 +2,18 @@
 
 `s_form` is shared so that what a handle's `.s` spells, the report recognizes
 as the same term; `plural` so the lint summary and the report count alike;
-`name_key` and `s_form_keys` so a definition ref and the Glossary tab agree on
-what spells a term's own name.
+`name_keys` so a definition ref and the Glossary tab agree on what spells a
+term's own name; `definition_ref_text` so the report links the bold spans the
+lint checks.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
 """
 
 import re
+from collections.abc import Iterator
 
+from ..markdown import EmphasisSpan, InlineSpan, PlainSpan, read_spans, span_text
 from .errors import PytestGivenError
 
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
@@ -55,10 +58,29 @@ def name_key(text: str) -> str:
     return _NAME_SEPARATORS.sub(' ', text.lower()).strip()
 
 
-def s_form_keys(name: str) -> set[str]:
-    """The `name_key`s of `name`'s S-form: two for an all-caps name, whose
-    lowercase takes -es or -ies where it does not (`SMSs`, `smses`)."""
-    return {name_key(s_form(name)), name_key(s_form(name.lower()))}
+def name_keys(name: str) -> set[str]:
+    """The `name_key`s that spell `name`: itself and its S-form, which an
+    all-caps name has two of, since only its lowercase takes -es or -ies
+    (`SMSs`, `smses`)."""
+    return {name_key(name), name_key(s_form(name)), name_key(s_form(name.lower()))}
+
+
+def definition_bold_spans(definition: str) -> Iterator[str]:
+    """The text of each bold span in `definition` that could be a definition ref."""
+    for span in read_spans(definition):
+        text = definition_ref_text(span)
+        if text is not None:
+            yield text
+
+
+def definition_ref_text(span: InlineSpan) -> str | None:
+    """A bold span's text if it could be a definition ref: one holding a code
+    span formats an identifier instead."""
+    if not isinstance(span, EmphasisSpan) or not span.strong:
+        return None
+    if not all(isinstance(part, PlainSpan) for part in span.content):
+        return None
+    return span_text(span)
 
 
 def s_form(text: str) -> str:

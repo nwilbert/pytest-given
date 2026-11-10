@@ -82,8 +82,6 @@ from .schema import (
     TracebackFrame,
     case_id,
     case_suffix,
-    definition_bold_spans,
-    definition_ref_text,
     location_suffix,
     node_base,
     param_id,
@@ -98,12 +96,14 @@ from .steps import (
     walk_steps,
 )
 from .text import (
+    definition_bold_spans,
+    definition_ref_text,
     derived_id,
     id_derive,
     name_key,
+    name_keys,
     plural,
     s_form,
-    s_form_keys,
 )
 
 __all__ = [
@@ -176,6 +176,7 @@ __all__ = [
     'iter_steps',
     'location_suffix',
     'name_key',
+    'name_keys',
     'narration_of',
     'narration_text',
     'node_base',
@@ -194,7 +195,6 @@ __all__ = [
     'resolve_report_url',
     'rolled_up_status',
     's_form',
-    's_form_keys',
     'snapshot_param_value',
     'spanned_part',
     'walk_steps',

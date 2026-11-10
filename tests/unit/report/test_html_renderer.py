@@ -151,8 +151,8 @@ def test_definition_filter_renders_an_undefined_term_empty() -> None:
 
 def test_definition_filter_references_the_terms_its_bold_spans_name() -> None:
     """A self-reference, an unresolved bold span, an italic and a bold code
-    span reference nothing."""
-    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(_STEP))
+    span reference nothing, and a copy of the term is the term itself."""
+    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(replace(_STEP)))
     assert _referenced_ids(rendered) == ['phase', 'attachment']
 
 
@@ -178,11 +178,6 @@ def test_a_definition_ref_names_its_term_by_canonical_name_or_s_form() -> None:
             ('phase', 'phase'),
             ('attachment', 'Attachments'),
         ]
-
-
-def test_definition_filter_knows_a_copy_of_the_term_for_the_term_itself() -> None:
-    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(replace(_STEP)))
-    assert _referenced_ids(rendered) == ['phase', 'attachment']
 
 
 def test_a_tooltip_definition_references_no_term() -> None:

@@ -37,10 +37,9 @@ from pytest_given.model import (
     TracebackFrame,
     case_id,
     case_suffix,
-    definition_bold_spans,
-    derived_id,
     node_base,
 )
+from tests.unit.citation_reports import term_
 
 
 def _n(text: str) -> Narration:
@@ -556,17 +555,11 @@ def test_a_table_has_custom_ids_when_any_case_has_one(
 # --- Definition refs ---
 
 
-def _term(canonical: str) -> GlossaryTerm:
-    return GlossaryTerm(
-        id=TermId(derived_id(canonical) or ''), kind='object', canonical=canonical
-    )
-
-
 @pytest.mark.parametrize('text', ['Phase', 'phase', 'PHASE', 'Phases', 'phases'])
 def test_resolve_ref_matches_the_canonical_name_or_s_form_in_any_case(
     text: str,
 ) -> None:
-    phase = _term('Phase')
+    phase = term_('Phase')
     assert Glossary(terms=[phase]).resolve_ref(text) is phase
 
 
@@ -574,13 +567,13 @@ def test_resolve_ref_matches_the_canonical_name_or_s_form_in_any_case(
 def test_resolve_ref_matches_a_multi_word_term_across_whitespace_or_hyphens(
     text: str,
 ) -> None:
-    term_ref = _term('Term ref')
+    term_ref = term_('Term ref')
     assert Glossary(terms=[term_ref]).resolve_ref(text) is term_ref
 
 
 @pytest.mark.parametrize('text', ['SMS', 'SMSs', 'SMSes', 'smses'])
 def test_resolve_ref_matches_either_s_form_of_an_all_caps_name(text: str) -> None:
-    sms = _term('SMS')
+    sms = term_('SMS')
     assert Glossary(terms=[sms]).resolve_ref(text) is sms
 
 
@@ -597,35 +590,21 @@ def test_resolve_ref_matches_either_s_form_of_an_all_caps_name(text: str) -> Non
     ],
 )
 def test_resolve_ref_returns_none_for_text_naming_no_term(text: str) -> None:
-    glossary = Glossary(terms=[_term('Handle'), _term('Phase'), _term('Term ref')])
+    glossary = Glossary(terms=[term_('Handle'), term_('Phase'), term_('Term ref')])
     assert glossary.resolve_ref(text) is None
 
 
 def test_resolve_ref_prefers_a_canonical_name_over_another_term_s_s_form() -> None:
     """`Tags` is both the S-form of `Tag` and a term of its own."""
-    tag, tags = _term('Tag'), _term('Tags')
+    tag, tags = term_('Tag'), term_('Tags')
     for glossary in (Glossary(terms=[tag, tags]), Glossary(terms=[tags, tag])):
         assert glossary.resolve_ref('tags') is tags
         assert glossary.resolve_ref('tag') is tag
 
 
 def test_resolve_ref_finds_a_term_registered_after_the_first_lookup() -> None:
-    glossary = Glossary(terms=[_term('Phase')])
+    glossary = Glossary(terms=[term_('Phase')])
     assert glossary.resolve_ref('steps') is None
-    step = _term('Step')
+    step = term_('Step')
     glossary.register(step)
     assert glossary.resolve_ref('steps') is step
-
-
-def test_definition_bold_spans_reads_only_bold() -> None:
-    definition = 'A unit in one **Phase**, which *nests* and may carry **Attachments**.'
-    assert list(definition_bold_spans(definition)) == ['Phase', 'Attachments']
-
-
-def test_definition_bold_spans_skips_a_bold_span_holding_a_code_span() -> None:
-    definition = 'Spelled **`.l`** or **`.s` form**, by a **Handle**.'
-    assert list(definition_bold_spans(definition)) == ['Handle']
-
-
-def test_definition_bold_spans_reads_a_possessive_outside_the_span() -> None:
-    assert list(definition_bold_spans("A **Case**'s row.")) == ['Case']

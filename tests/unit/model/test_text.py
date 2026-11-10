@@ -2,12 +2,13 @@ import pytest
 
 from pytest_given.model import (
     PytestGivenError,
+    definition_bold_spans,
     derived_id,
     id_derive,
     name_key,
+    name_keys,
     plural,
     s_form,
-    s_form_keys,
 )
 
 
@@ -70,13 +71,24 @@ def test_name_key_folds_case_whitespace_and_hyphens_but_keeps_punctuation() -> N
 @pytest.mark.parametrize(
     ('name', 'keys'),
     [
-        ('Room', {'rooms'}),
-        ('Policy', {'policies'}),
-        ('Term ref', {'term refs'}),
-        ('SMS', {'smss', 'smses'}),
+        ('Room', {'room', 'rooms'}),
+        ('Policy', {'policy', 'policies'}),
+        ('Term ref', {'term ref', 'term refs'}),
+        ('SMS', {'sms', 'smss', 'smses'}),
     ],
 )
-def test_s_form_keys_spell_the_s_form_of_the_name_and_of_its_lowercase(
+def test_name_keys_spell_the_name_and_the_s_form_of_it_and_of_its_lowercase(
     name: str, keys: set[str]
 ) -> None:
-    assert s_form_keys(name) == keys
+    assert name_keys(name) == keys
+
+
+def test_definition_bold_spans_reads_bold_holding_no_code_span() -> None:
+    definition = (
+        'In one **Phase**, which *nests*, by a **`.l`** or **`.s` form** **Handle**.'
+    )
+    assert list(definition_bold_spans(definition)) == ['Phase', 'Handle']
+
+
+def test_definition_bold_spans_reads_a_possessive_outside_the_span() -> None:
+    assert list(definition_bold_spans("A **Case**'s row.")) == ['Case']

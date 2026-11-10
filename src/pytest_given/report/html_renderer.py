@@ -637,10 +637,6 @@ def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Mark
     reader is on goes nowhere."""
 
     def _render(term: GlossaryTerm) -> Markup:
-        # `markupsafe.escape(None)` would render the literal string 'None'.
-        if not term.definition:
-            return Markup('')
-
         def _ref(span: InlineSpan) -> str | None:
             text = definition_ref_text(span)
             if text is None:
@@ -650,7 +646,7 @@ def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Mark
                 return None
             return _term_ref_span(target, target.id, text)
 
-        return Markup(render_definition(term.definition, render_ref=_ref))
+        return Markup(render_definition(term.definition or '', render_ref=_ref))
 
     return _render
 
