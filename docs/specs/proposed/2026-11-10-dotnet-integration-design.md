@@ -43,6 +43,8 @@ capture holds before `group_parametrized` runs, and everything downstream is sha
 - VSTest. The integration requires Microsoft.Testing.Platform (MTP), which the .NET 10 SDK's
   `dotnet test` runs natively and which xUnit v3, TUnit and MSTest all host.
 - Gherkin feature files.
+- Java and Kotlin. [Out of scope: Java and Kotlin](#out-of-scope-java-and-kotlin) records what an
+  integration would build on.
 
 **Anti-goals**
 
@@ -748,3 +750,59 @@ says no.
   repository would suit a .NET contributor better, at the cost of the contract living across two.
 - **TUnit before MSTest.** TUnit is the more modern target and the cheaper adapter. MSTest has the
   larger enterprise base. The order in [Phases](#phases) assumes the first matters more.
+
+## Out of scope: Java and Kotlin
+
+The capture file and `ingest` hold nothing specific to C#, so a JVM integration would reuse both
+unchanged and add a spelling per language to the `Dialect` table. It is not part of this design.
+This section records what it would build on.
+
+**The JVM layer, shared by Java and Kotlin.**
+
+- JUnit Jupiter (5 and 6) is the first target. `@Scenario` is meta-annotated with `@ExtendWith`,
+  so the annotation alone registers the extension. `InvocationInterceptor` hands over a
+  parameterized case's arguments.
+- A JUnit Platform `TestExecutionListener`, registered through `ServiceLoader`, takes the MTP
+  extension's part: outcomes and session finish. It sees every engine on the platform, Kotest and
+  Spock included, under Maven Surefire and Gradle alike.
+- `ExtensionContext.getUniqueId()` is the id the listener reports, and the listener's
+  `TestExecutionResult` carries the real `Throwable`. Spikes 1 and 2 have no JVM counterpart.
+- `ParameterResolver` is the counterpart of a shared fixture with `[GivenFixture]`. Per-test setup
+  records from `@BeforeEach` methods and the constructor, since Jupiter builds an instance per test
+  by default.
+- `StackTraceElement` is structured, so tracebacks need no text parsing.
+- Gradle and Maven plugins take the place of the MSBuild properties.
+
+**Java.**
+
+- A scenario reads `@Scenario(value = "…", tags = {"checkout"})`. Annotation arguments are
+  constants and annotations cannot be generic, so a pin reads
+  `@Pin(story = CheckoutStory.class, sentence = "place")`.
+- Steps are try-with-resources blocks: `try (var _ = when("I buy a coffee")) { … }`, with the
+  unnamed `_` from Java 22. Java has no `using` declaration, so `GIVEN001` has nothing to catch.
+- Java has no string interpolation. String Templates were previewed in JDK 21 and 22 and withdrawn
+  in JDK 23. Step text therefore takes the template grammar of attribute strings, filled by the
+  arguments in order: `when("I pay {euros} €", euros)`. This is Python's `Template` authoring form.
+- Nothing fills a source path or an expression text at the call. An annotation processor using
+  javac's Compiler Tree API can index scenario source locations and parameter names, check each
+  placeholder against its argument expression, and run the static lint rules. Its findings show at
+  build, not as the author types.
+
+**Kotlin.**
+
+- An `inline` step function with a trailing lambda and a `callsInPlace(block, EXACTLY_ONCE)`
+  contract replaces both step shapes: `val receipt = given("a printed receipt") { Receipt.of(order) }`.
+  A `val` declared before the step may be assigned inside it, and a `suspend` test may suspend
+  inside it. `when` is a keyword, so that step needs another name.
+- String templates compile to concatenation. A compiler plugin can rewrite a template passed to a
+  step function into the parts `StepText` records, with each hole's source text and the call's file
+  and line, as Kotlin's power-assert plugin does for `assert`. Step functions take a plain `String`
+  publicly, so code compiles without the plugin.
+- Templates have no format-spec slot. Format strings and Boolean phrases become calls the plugin
+  recognizes inside a hole: `"the coffee ${served.phrase("is served", "is refused")}"`.
+- The compiler plugin API is unstable, so the plugin needs a release per Kotlin version. Without
+  the plugin, Kotlin uses Java's template form.
+- `operator fun get` and `operator fun invoke` give glossary handles Python's spellings:
+  `Pg["Guest"]` and `Pg.X("other")`. KSP or a Gradle task generates the handles.
+- A coroutine can resume on another thread, so the open steps travel in a `ThreadContextElement`
+  rather than a bare `ThreadLocal`.
