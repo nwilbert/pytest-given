@@ -164,7 +164,9 @@ def _build_env(
         glossary=report.glossary,
     )
     env.filters['clause_part'] = _make_clause_part_filter(report.glossary)
-    env.filters['definition_md'] = _make_definition_filter(report.glossary)
+    env.filters['definition_md'] = _make_definition_filter(
+        report.glossary or Glossary()
+    )
     env.filters['plural'] = plural
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
@@ -627,9 +629,7 @@ def _render_term_ref(part: NarrationTermRef, glossary: Glossary | None) -> str:
     return _term_ref_span(term, part.term_id, part.display)
 
 
-def _make_definition_filter(
-    glossary: Glossary | None,
-) -> Callable[[GlossaryTerm], Markup]:
+def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Markup]:
     """Jinja filter: a term's definition, each definition ref a term ref.
 
     Usage: `{{ term | definition_md }}` — the term, not its definition, so a
@@ -640,15 +640,13 @@ def _make_definition_filter(
         # `markupsafe.escape(None)` would render the literal string 'None'.
         if not term.definition:
             return Markup('')
-        if glossary is None:
-            return Markup(render_definition(term.definition))
 
         def _ref(span: InlineSpan) -> str | None:
             text = definition_ref_text(span)
             if text is None:
                 return None
             target = glossary.resolve_ref(text)
-            if target is None or target is term:
+            if target is None or target.id == term.id:
                 return None
             return _term_ref_span(target, target.id, text)
 

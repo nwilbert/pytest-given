@@ -14,7 +14,7 @@ from typing import Literal, NewType
 
 from ..markdown import EmphasisSpan, InlineSpan, PlainSpan, read_spans, span_text
 from .report_url import ReportUrl
-from .text import derived_id, s_form
+from .text import name_key, s_form_keys
 
 # A parameter-table column's identity — what the DOM keys on and what a
 # placeholder or attachment badge points at. Distinct from the column's display
@@ -237,14 +237,15 @@ class Glossary:
     _by_id: dict[TermId, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
-    # Keyed by the derived id of a term's S-form; first registered wins.
-    _by_s_form: dict[str, GlossaryTerm] = field(
+    # Keyed by `name_key`: a canonical name overrides an S-form, and among
+    # S-forms the first registered wins.
+    _by_name: dict[str, GlossaryTerm] = field(
         init=False, repr=False, compare=False, default_factory=dict
     )
 
     def __post_init__(self) -> None:
         self._by_id = {}
-        self._by_s_form = {}
+        self._by_name = {}
         for term in self.terms:
             self._index(term)
 
@@ -257,18 +258,15 @@ class Glossary:
         self._index(term)
 
     def resolve_ref(self, text: str) -> GlossaryTerm | None:
-        """The term a definition's bold span names: by derived id, of the
-        canonical name or the S-form, the canonical name winning a collision."""
-        slug = derived_id(text)
-        if slug is None:
-            return None
-        return self._by_id.get(TermId(slug)) or self._by_s_form.get(slug)
+        """The term a definition's bold span names: its canonical name or
+        S-form in any case, the canonical name winning a collision."""
+        return self._by_name.get(name_key(text))
 
     def _index(self, term: GlossaryTerm) -> None:
         self._by_id[term.id] = term
-        s_form_id = derived_id(s_form(term.canonical))
-        if s_form_id is not None:
-            self._by_s_form.setdefault(s_form_id, term)
+        self._by_name[name_key(term.canonical)] = term
+        for key in s_form_keys(term.canonical):
+            self._by_name.setdefault(key, term)
 
 
 def definition_bold_spans(definition: str) -> Iterator[str]:

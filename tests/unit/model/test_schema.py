@@ -570,15 +570,34 @@ def test_resolve_ref_matches_the_canonical_name_or_s_form_in_any_case(
     assert Glossary(terms=[phase]).resolve_ref(text) is phase
 
 
-@pytest.mark.parametrize('text', ['term ref', 'Term refs', 'term-ref'])
-def test_resolve_ref_matches_a_multi_word_term_by_derived_id(text: str) -> None:
+@pytest.mark.parametrize('text', ['term ref', 'Term refs', 'TERM\n  REF', 'term-ref'])
+def test_resolve_ref_matches_a_multi_word_term_across_whitespace_or_hyphens(
+    text: str,
+) -> None:
     term_ref = _term('Term ref')
     assert Glossary(terms=[term_ref]).resolve_ref(text) is term_ref
 
 
-@pytest.mark.parametrize('text', ['sentence handle', 'Phased', '', '***'])
+@pytest.mark.parametrize('text', ['SMS', 'SMSs', 'SMSes', 'smses'])
+def test_resolve_ref_matches_either_s_form_of_an_all_caps_name(text: str) -> None:
+    sms = _term('SMS')
+    assert Glossary(terms=[sms]).resolve_ref(text) is sms
+
+
+@pytest.mark.parametrize(
+    'text',
+    [
+        'sentence handle',
+        'Phased',
+        'Phase:',
+        '(Phase)',
+        'Phase (rate)',
+        '',
+        '***',
+    ],
+)
 def test_resolve_ref_returns_none_for_text_naming_no_term(text: str) -> None:
-    glossary = Glossary(terms=[_term('Handle'), _term('Phase')])
+    glossary = Glossary(terms=[_term('Handle'), _term('Phase'), _term('Term ref')])
     assert glossary.resolve_ref(text) is None
 
 

@@ -45,13 +45,16 @@ links appear where the report renders definitions.
 A **definition ref** is a bold span (`**...**`, not `*...*`) in a glossary definition whose whole
 text names a term of the same glossary:
 
-- **The match is by derived id.** The span's text, put through `derived_id`, equals a term's id or
-  the derived id of the term's S-form. Case is folded, so `**phase**` and `**Phase**` both name
-  `Phase`, and `**term refs**` names `term ref`. A term's id is its name's derived id, and no two
-  terms share one, so the match is never ambiguous between canonical names. When one term's S-form
-  equals another term's canonical name, the canonical name wins.
-- **The whole span, nothing less.** `**sentence handle**` doesn't name `Handle`. A possessive
-  works as written, since the `'s` in `**Case**'s` sits outside the span.
+- **The match is by name, in any case.** The span's text equals a term's canonical name or its
+  S-form, compared lowercased with each run of whitespace and hyphens folded to one space. So
+  `**phase**` and `**Phase**` both name `Phase`, `**term refs**` names `term ref`, and
+  `**parameter-table**` in a compound modifier names `Parameter table`. An all-caps name has two
+  S-forms, since only a lowercase ending takes -es or -ies: `**SMSs**` and `**smses**` both name
+  `SMS`. No two terms share a lowercased name, so the match is never ambiguous between canonical
+  names. When one term's S-form equals another term's canonical name, the canonical name wins.
+- **The whole span, nothing more or less.** `**sentence handle**` doesn't name `Handle`, and
+  `**Note:**` doesn't name `Note`. A possessive works as written, since the `'s` in `**Case**'s`
+  sits outside the span.
 - **A bold span holding a code span is no ref**, and is not flagged: it formats an identifier.
 - **A term's own name in its own definition** resolves, so it is not flagged, but renders as plain
   bold: a link to the card the reader is on goes nowhere.
@@ -73,8 +76,9 @@ the refs from it. A term citation folds a definition into a document as written,
 the rule lives on the model:
 
 - `Glossary.resolve_ref(text: str) -> GlossaryTerm | None` — the term a bold span's text names, per
-  the matching rules above. Its S-form index is kept current by the constructor and `register`,
-  the way `_by_id` is.
+  the matching rules above. Its name index is kept current by the constructor and `register`,
+  the way `_by_id` is. The Glossary tab's test for a term ref reading as the term's own name uses
+  the same `name_key` and `s_form_keys` from `model/text.py`.
 - `definition_ref_text(span: InlineSpan) -> str | None` — a bold span's text if it could be a
   ref (holding no code span).
 - `definition_bold_spans(definition: str) -> Iterator[str]` — that text for each span of a
@@ -151,7 +155,7 @@ which ref is a self-reference.
 
 ## Implementation touch points
 
-- `model/schema.py` — `Glossary.resolve_ref` and its S-form index; `definition_ref_text` and
+- `model/schema.py` — `Glossary.resolve_ref` and its name index; `definition_ref_text` and
   `definition_bold_spans` beside it, re-exported from `model/__init__.py`.
 - `report/inline_markdown.py` — `render_definition` takes the optional `render_ref` callback.
 - `report/html_renderer.py` — `_inline_md` becomes a `definition_md` filter made per render, whose
@@ -182,8 +186,8 @@ which ref is a self-reference.
 
 ## Test coverage
 
-- `Glossary.resolve_ref` units: canonical name in each case; S-form; a multi-word term; no match;
-  an S-form that collides with another term's canonical name; a term registered after the first
+- `Glossary.resolve_ref` units: canonical name in each case; S-form; both S-forms of an all-caps
+  name; a multi-word term; no match, punctuation around the name included; an S-form that collides with another term's canonical name; a term registered after the first
   lookup.
 - `definition_bold_spans` units: italic skipped; a bold span holding a code span skipped; a
   possessive after the span.

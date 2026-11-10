@@ -1,7 +1,9 @@
 """Text rules two packages that cannot import each other have to agree on.
 
 `s_form` is shared so that what a handle's `.s` spells, the report recognizes
-as the same term; `plural` so the lint summary and the report count alike.
+as the same term; `plural` so the lint summary and the report count alike;
+`name_key` and `s_form_keys` so a definition ref and the Glossary tab agree on
+what spells a term's own name.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
@@ -14,6 +16,7 @@ from .errors import PytestGivenError
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
 _SIBILANT_ENDINGS = ('s', 'x', 'z', 'ch', 'sh')
 _CONSONANT_Y = re.compile(r'[b-df-hj-np-tv-z]y$')
+_NAME_SEPARATORS = re.compile(r'[\s-]+')
 
 
 def derived_id(name: str) -> str | None:
@@ -44,6 +47,18 @@ def plural(count: int, singular: str) -> str:
     if count == 1:
         return f'{count} {singular}'
     return f'{count} {s_form(singular)}'
+
+
+def name_key(text: str) -> str:
+    """`text` as names compare: lowercased, each run of whitespace and hyphens
+    one space, so `parameter-table` in a compound modifier names `Parameter table`."""
+    return _NAME_SEPARATORS.sub(' ', text.lower()).strip()
+
+
+def s_form_keys(name: str) -> set[str]:
+    """The `name_key`s of `name`'s S-form: two for an all-caps name, whose
+    lowercase takes -es or -ies where it does not (`SMSs`, `smses`)."""
+    return {name_key(s_form(name)), name_key(s_form(name.lower()))}
 
 
 def s_form(text: str) -> str:

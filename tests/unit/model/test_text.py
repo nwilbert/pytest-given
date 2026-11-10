@@ -4,8 +4,10 @@ from pytest_given.model import (
     PytestGivenError,
     derived_id,
     id_derive,
+    name_key,
     plural,
     s_form,
+    s_form_keys,
 )
 
 
@@ -58,3 +60,23 @@ def test_plural_agrees_the_noun_with_its_count() -> None:
         '1 story',
         '2 stories',
     ]
+
+
+def test_name_key_folds_case_whitespace_and_hyphens_but_keeps_punctuation() -> None:
+    assert name_key(' Term\n  REF ') == 'term ref'
+    assert name_key('Check-in:') == 'check in:'
+
+
+@pytest.mark.parametrize(
+    ('name', 'keys'),
+    [
+        ('Room', {'rooms'}),
+        ('Policy', {'policies'}),
+        ('Term ref', {'term refs'}),
+        ('SMS', {'smss', 'smses'}),
+    ],
+)
+def test_s_form_keys_spell_the_s_form_of_the_name_and_of_its_lowercase(
+    name: str, keys: set[str]
+) -> None:
+    assert s_form_keys(name) == keys

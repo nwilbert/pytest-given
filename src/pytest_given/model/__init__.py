@@ -100,8 +100,10 @@ from .steps import (
 from .text import (
     derived_id,
     id_derive,
+    name_key,
     plural,
     s_form,
+    s_form_keys,
 )
 
 __all__ = [
@@ -173,6 +175,7 @@ __all__ = [
     'iter_narrations',
     'iter_steps',
     'location_suffix',
+    'name_key',
     'narration_of',
     'narration_text',
     'node_base',
@@ -191,6 +194,7 @@ __all__ = [
     'resolve_report_url',
     'rolled_up_status',
     's_form',
+    's_form_keys',
     'snapshot_param_value',
     'spanned_part',
     'walk_steps',

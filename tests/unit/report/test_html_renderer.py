@@ -180,9 +180,9 @@ def test_a_definition_ref_names_its_term_by_canonical_name_or_s_form() -> None:
         ]
 
 
-def test_definition_filter_without_a_glossary_references_nothing() -> None:
-    rendered = str(_make_definition_filter(None)(_STEP))
-    assert _referenced_ids(rendered) == []
+def test_definition_filter_knows_a_copy_of_the_term_for_the_term_itself() -> None:
+    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(replace(_STEP)))
+    assert _referenced_ids(rendered) == ['phase', 'attachment']
 
 
 def test_a_tooltip_definition_references_no_term() -> None:

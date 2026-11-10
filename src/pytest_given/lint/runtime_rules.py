@@ -49,7 +49,7 @@ def run_runtime_rules(
 @dataclass(frozen=True)
 class _Context:
     """What every runtime rule reads. `glossary` is None when the run has no
-    glossary at all, which the two term rules treat as nothing to say."""
+    glossary at all, which the term rules treat as nothing to say."""
 
     grouped: list[Scenario]
     glossary: Glossary | None

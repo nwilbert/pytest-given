@@ -20,8 +20,9 @@ from ..model import (
     TermId,
     TermKind,
     iter_steps,
+    name_key,
     plural,
-    s_form,
+    s_form_keys,
 )
 
 
@@ -298,11 +299,8 @@ def _is_own_name(display: str, term: GlossaryTerm) -> bool:
     """Whether a reference reads as the term's canonical name or its S-form, in
     any case — `Guest`, `guest.l` and `guest.l.s` alike — and so names the
     concept itself rather than an instance or an inflection of it."""
-    return display.lower() in (
-        term.canonical.lower(),
-        s_form(term.canonical).lower(),
-        s_form(term.canonical.lower()),
-    )
+    key = name_key(display)
+    return key == name_key(term.canonical) or key in s_form_keys(term.canonical)
 
 
 class _GlossaryIndex:
