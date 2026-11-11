@@ -1114,7 +1114,7 @@
 </ul>
 <p>Two ways to get them into your repo, where Claude Code (and other harnesses following the same format) auto-discover them:</p>
 <ul>
-<li><strong><code>pytest-given skills install</code></strong> copies them into <code>.claude/skills/</code>. The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and <code>--check</code> exits 1 on drift, for a CI guard. Use <code>--dest</code> for a non-default skills directory.</li>
+<li><strong><code>pytest-given skills install</code></strong> copies them into <code>.claude/skills/</code>. The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and <code>--check</code> exits 1 on drift, for a CI guard. Either form exits 2 when it cannot read or write the skills directory. Use <code>--dest</code> for a non-default skills directory.</li>
 <li><strong><code>uvx library-skills install --claude</code></strong> — <a href="https://library-skills.io">library-skills</a> scans your project's dependencies for bundled skills and links them into <code>.agents/skills/</code> (and, with <code>--claude</code>, <code>.claude/skills/</code>), so one command covers pytest-given and every other library that ships skills. Symlinks track upgrades automatically; on Windows without developer mode add <code>--copy</code>.</li>
 </ul>
 

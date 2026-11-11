@@ -1189,12 +1189,14 @@
 <ul>
 <li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
 <li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
+<li><strong>Breaking.</strong> <code>pytest-given report</code> and <code>pytest-given skills install</code> now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which <code>citations update</code> rewrites.</li>
 <li>Following a term ref to the HTML report's Glossary tab clears the tab's search and filters when they hide the term, instead of landing on a hidden entry.</li>
 <li>A report link whose <code>#status=</code> names only statuses the report doesn't know now shows every scenario instead of none.</li>
+<li>A failure raised while rendering a step's interpolation, such as a bad format spec, no longer shows a pytest-given frame in the report's traceback.</li>
 </ul>
 <h2 id="052-2026-11-07"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.1...v0.5.2">0.5.2</a> - 2026-11-07<a class="headerlink" href="#052-2026-11-07" title="Permanent link">&para;</a></h2>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
