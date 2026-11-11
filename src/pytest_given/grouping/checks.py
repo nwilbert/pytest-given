@@ -39,8 +39,7 @@ from ..model import (
     phrase_value_mismatch,
     render_interpolation,
 )
-from .columns import Format
-from .context import Group, PartSite
+from .context import Format, Group, PartSite
 
 
 def check_same_template(group: Group) -> None:

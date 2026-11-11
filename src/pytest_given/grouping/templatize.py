@@ -34,12 +34,11 @@ from .checks import (
 )
 from .columns import (
     ColumnBuilder,
-    Format,
     cell_text,
     leaves_cell_plain,
     param_cell,
 )
-from .context import PartSite
+from .context import Format, PartSite
 
 
 def templatize_steps(

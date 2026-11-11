@@ -35,12 +35,7 @@ from ..model import (
     param_id,
     render_interpolation,
 )
-from .context import Group
-
-# A slot's rendering details as the author wrote them: `(conversion,
-# format_spec)`. `None` for the pair as a whole means "no formatting at all",
-# which `param_cell` renders differently from an empty spec.
-type Format = tuple[str | None, str]
+from .context import Format, Group
 
 type _SharedDerivedKey = tuple[str, tuple[tuple[NodeId, CellValue], ...]]
 

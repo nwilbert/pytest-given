@@ -22,6 +22,11 @@ from ..model import (
     walk_steps,
 )
 
+# A slot's rendering details as the author wrote them: `(conversion,
+# format_spec)`. `None` for the pair as a whole means "no formatting at all",
+# which `columns.param_cell` renders differently from an empty spec.
+type Format = tuple[str | None, str]
+
 
 @dataclass(frozen=True, kw_only=True)
 class PartSite:
