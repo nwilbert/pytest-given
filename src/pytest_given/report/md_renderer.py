@@ -54,6 +54,18 @@ def render_md(
     return '\n\n'.join(blocks) + '\n'
 
 
+def citation_body_md(cited: Scenario | GlossaryTerm) -> str:
+    """What a `<details>` citation of a scenario or term holds between its
+    summary and closing tag, blank lines framing it so its Markdown renders:
+    empty when there is nothing to show."""
+    text = (
+        narration_body_md(cited)
+        if isinstance(cited, Scenario)
+        else definition_body_md(cited)
+    )
+    return f'\n{text}\n' if text else ''
+
+
 def narration_body_md(scenario: Scenario) -> str:
     """The steps and, for a grouped scenario, the parameter table: the
     narration without heading, subtitle or any error block."""

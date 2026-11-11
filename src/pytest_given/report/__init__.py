@@ -16,6 +16,7 @@ from .citation_index import (
 )
 from .console import write_console_as_utf8
 from .link_text import html_link_text, link_text
+from .md_renderer import citation_body_md
 from .sinks import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
@@ -55,6 +56,7 @@ __all__ = [
     'Target',
     'Theme',
     'build_scenario_slug_index',
+    'citation_body_md',
     'detect_commit_sha',
     'emit_sinks',
     'html_link_text',

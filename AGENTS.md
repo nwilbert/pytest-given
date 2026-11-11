@@ -65,9 +65,10 @@ What no filename tells you:
   a bare `pytest` failing on one is the point, not a side effect.
 - `capture/` imports pytest nowhere, so all of it is unit-testable without a
   session; a stray step warns with `model.PytestGivenWarning`, not pytest's.
-- `citations/` reads and edits the user's Markdown documents; what a citation
-  should say is `report`'s `CitationIndex`, since the HTML's copy buttons write
-  the same lines.
+- `citations/` reads and edits the user's Markdown documents. What a citation
+  should say comes from `report`: its glyph, link text and summary from
+  `CitationIndex`, since the HTML's copy buttons write the same lines, and a
+  `<details>` citation's body from `citation_body_md`.
 - Each package exposes the *whole* job, not its parts: `report.emit_sinks`
   (render → write → discard-on-failure, so a failure leaves no half-written
   report), `lint.run_lint` and `citations.check_citations` (every document

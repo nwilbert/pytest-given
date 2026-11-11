@@ -29,7 +29,7 @@ from pytest_given.report.citation_index import (
     citation_templates,
     report_fragment,
 )
-from pytest_given.report.md_renderer import narration_body_md
+from pytest_given.report.md_renderer import citation_body_md, narration_body_md
 from tests.unit.citation_reports import (
     URL,
     filled,
@@ -269,14 +269,14 @@ def test_a_details_template_escapes_the_url_as_an_attribute(form: str) -> None:
 def test_a_scenarios_body_is_its_markdown_narration_framed_by_blank_lines() -> None:
     grouped = scenario_('t.py::test_pour[water]', grouped=True)
     index = _index(grouped)
-    assert index.body(Target('scenario', 't.py::test_pour')) == (
+    assert citation_body_md(index.cited(Target('scenario', 't.py::test_pour'))) == (
         f'\n{narration_body_md(grouped)}\n'
     )
 
 
 def test_a_scenario_without_steps_has_an_empty_body() -> None:
     index = _index(scenario_('t.py::test_pay'))
-    assert index.body(Target('scenario', 't.py::test_pay')) == ''
+    assert citation_body_md(index.cited(Target('scenario', 't.py::test_pay'))) == ''
 
 
 # --- Term citations ---
@@ -388,5 +388,8 @@ def test_a_defining_citation_is_the_block_with_its_summary_and_an_empty_body() -
 
 def test_a_terms_body_is_its_definition_framed_by_blank_lines() -> None:
     index = CitationIndex.of(report_(terms=(GUEST, term_('Host'))))
-    assert index.body(Target('term', 'guest')) == '\nSomeone staying at the hotel.\n'
-    assert index.body(Target('term', 'host')) == ''
+    assert (
+        citation_body_md(index.cited(Target('term', 'guest')))
+        == '\nSomeone staying at the hotel.\n'
+    )
+    assert citation_body_md(index.cited(Target('term', 'host'))) == ''

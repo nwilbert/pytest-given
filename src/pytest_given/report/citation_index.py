@@ -25,7 +25,6 @@ from ..model import (
 from .coverage import build_coverage_map
 from .glossary_view import build_term_crossrefs
 from .link_text import html_link_text, link_text
-from .md_renderer import definition_body_md, narration_body_md
 from .story_view import scenarios_by_story
 from .text import CITATION_GLYPH, CitationState
 
@@ -202,18 +201,6 @@ class CitationIndex:
                 term, using = self.terms[TermId(target.key)]
                 return _rollup(term.canonical, fragment, using)
 
-    def body(self, target: Target) -> str:
-        """What a `<details>` citation of a resolved scenario or term holds
-        between its summary and closing tag, blank lines framing it so its
-        Markdown renders: empty when there is nothing to show."""
-        assert target.kind in ('scenario', 'term')
-        text = (
-            narration_body_md(self.scenarios[NodeId(target.key)])
-            if target.kind == 'scenario'
-            else definition_body_md(self.terms[TermId(target.key)][0])
-        )
-        return f'\n{text}\n' if text else ''
-
     def counted(self, target: Target) -> list[Scenario]:
         """The scenarios a resolved `target` names: a scenario itself, or those
         a tag's, story's or term's summary counts."""
@@ -226,6 +213,14 @@ class CitationIndex:
                 return self.stories[StoryId(target.key)][1]
             case 'term':
                 return self.terms[TermId(target.key)][1]
+
+    def cited(self, target: Target) -> Scenario | GlossaryTerm:
+        """The scenario or term a resolved `target` names, which a `<details>`
+        citation's body shows."""
+        assert target.kind in ('scenario', 'term')
+        if target.kind == 'scenario':
+            return self.scenarios[NodeId(target.key)]
+        return self.terms[TermId(target.key)][0]
 
 
 def _citable_scenarios(report: ReportData) -> dict[NodeId, Scenario]:

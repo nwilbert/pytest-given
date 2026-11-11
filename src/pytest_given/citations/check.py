@@ -27,6 +27,7 @@ from ..report import (
     STATUS_GLYPH,
     Citation,
     Target,
+    citation_body_md,
     link_text,
     report_fragment,
     write_all_or_none,
@@ -669,7 +670,7 @@ class _DetailsCheck(_LinkCheck[DetailsCitation]):
         """Compared past its container prefixes, line breaks normalized;
         written back with the document's line break."""
         written = self.link.body
-        expected = self.resolver.index.body(target)
+        expected = citation_body_md(self.resolver.index.cited(target))
         if written == expected:
             return
         written_line, expected_line = next(
