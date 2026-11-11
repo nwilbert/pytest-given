@@ -32,6 +32,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which `citations update` rewrites.
 - Following a term ref to the HTML report's Glossary tab clears the tab's search and filters when they hide the term, instead of landing on a hidden entry.
 - A report link whose `#status=` names only statuses the report doesn't know now shows every scenario instead of none.
+- A failure raised while rendering a step's interpolation, such as a bad format spec, no longer shows a pytest-given frame in the report's traceback.
 
 ## [0.5.2] - 2026-11-07
 

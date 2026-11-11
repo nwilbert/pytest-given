@@ -2,8 +2,9 @@ from pathlib import Path
 
 import pytest
 
+import pytest_given
 from pytest_given.capture.source import restore_rootdir, set_rootdir
-from pytest_given.capture.traceback import parse_short_repr
+from pytest_given.capture.traceback import _INTERNAL_SUFFIXES, parse_short_repr
 
 
 def test_parses_multi_frame_short_repr() -> None:
@@ -143,6 +144,7 @@ def test_pytest_given_annotated_reader_frame_classified_internal() -> None:
         'capture/markdown_glossary',
         'capture/story',
         'capture/template',
+        'model/narration',
         'model/text',
     ],
 )
@@ -156,6 +158,15 @@ def test_pytest_given_refusal_frame_classified_internal(module: str) -> None:
     )
     frames, _ = parse_short_repr(text)
     assert frames[0].is_internal is True
+
+
+def test_every_hidden_module_of_ours_exists() -> None:
+    """A suffix naming no file hides nothing, and would put a renamed module's
+    frames back into the user's traceback."""
+    source_root = Path(pytest_given.__file__).parent.parent
+    ours = [suffix for suffix in _INTERNAL_SUFFIXES if '/pytest_given/' in suffix]
+    assert ours
+    assert [suffix for suffix in ours if not (source_root / suffix[1:]).is_file()] == []
 
 
 def test_third_party_library_not_internal() -> None:

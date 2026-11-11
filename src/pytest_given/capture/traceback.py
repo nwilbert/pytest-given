@@ -18,7 +18,18 @@ innermost frame is our `raise` rather than the line that made the mistake.
 import re
 from dataclasses import dataclass, field
 
+from .. import model
 from ..model import TracebackFrame
+from . import (
+    collector,
+    file_glossary,
+    glossary,
+    markdown_glossary,
+    scenario,
+    steps,
+    story,
+    template,
+)
 from .source import to_relpath
 
 # `\S` anchors the path, so an indented source line inside a frame body
@@ -33,21 +44,24 @@ _INTERNAL_SUBSTRINGS = (
     '/site-packages/_pytest/',
     '/site-packages/pluggy/',
 )
-# Derived from the modules themselves, so moving or renaming one is a name
+# Derived from the modules themselves, so moving or renaming one is an import
 # error here rather than a suffix that silently stops matching and puts our
-# own frames back into every user traceback.
+# own frames back into every user traceback. A `model` module is named, since
+# a sibling package is imported only through its root; a test holds each name
+# to a module that exists.
+_INTERNAL_MODEL_MODULES = ('narration', 'text')
 _INTERNAL_SUFFIXES = tuple(
     f'/{module.replace(".", "/")}.py'
     for module in (
-        'pytest_given.capture.collector',
-        'pytest_given.capture.file_glossary',
-        'pytest_given.capture.glossary',
-        'pytest_given.capture.markdown_glossary',
-        'pytest_given.capture.scenario',
-        'pytest_given.capture.steps',
-        'pytest_given.capture.story',
-        'pytest_given.capture.template',
-        'pytest_given.model.text',
+        collector.__name__,
+        file_glossary.__name__,
+        glossary.__name__,
+        markdown_glossary.__name__,
+        scenario.__name__,
+        steps.__name__,
+        story.__name__,
+        template.__name__,
+        *(f'{model.__name__}.{name}' for name in _INTERNAL_MODEL_MODULES),
     )
 )
 
