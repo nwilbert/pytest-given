@@ -20,7 +20,15 @@ from typing import TypedDict
 import jinja2
 from markupsafe import Markup, escape
 
-from ..markdown import CodeSpan, EmphasisSpan, InlineSpan, PlainSpan, span_text
+from ..markdown import (
+    CodeSpan,
+    EmphasisSpan,
+    InlineSpan,
+    PlainSpan,
+    definition_html,
+    span_html,
+    span_text,
+)
 from ..model import (
     AttachmentRef,
     ClausePart,
@@ -59,7 +67,6 @@ from .citation_index import (
 from .coverage import build_coverage_map
 from .glossary_view import build_glossary_view
 from .glyphs import STATUS_GLYPH, STATUS_LABEL
-from .inline_markdown import render_definition, render_span
 from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
 from .source_link import compile_source_link
@@ -361,10 +368,10 @@ def _app_data(report: ReportData) -> dict[str, object]:
                         'kind': term.kind,
                         'definition': term.definition,
                         # Pre-rendered once per term, for the hover tooltip.
-                        # `render_definition` escapes the text and re-admits
+                        # `definition_html` escapes the text and re-admits
                         # only <br>/<code>/<strong>/<em>, which is what lets
                         # app.js assign it as innerHTML.
-                        'definition_html': render_definition(term.definition or ''),
+                        'definition_html': definition_html(term.definition or ''),
                     }
                     for term in report.glossary.terms
                 ]
@@ -543,7 +550,7 @@ def _render_narration_piece(
     """Render one `NarrationPiece` to an HTML fragment."""
     match part:
         case PlainSpan() | CodeSpan() | EmphasisSpan():
-            return render_span(part)
+            return span_html(part)
         case NarrationValue(rendered=rendered):
             return f'<span class="value-highlight">{escape(rendered)}</span>'
         case NarrationPlaceholder(name=name, column_id=column_id):
@@ -646,7 +653,7 @@ def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Mark
                 return None
             return _term_ref_span(target, target.id, text)
 
-        return Markup(render_definition(term.definition or '', render_ref=_ref))
+        return Markup(definition_html(term.definition or '', render_ref=_ref))
 
     return _render
 

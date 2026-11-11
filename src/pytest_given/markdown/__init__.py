@@ -1,8 +1,9 @@
-"""Reading Markdown: a document's block structure and tables, placed in its
-source, and the inline subset titles, steps and definitions are written in.
+"""Reading Markdown — a document's block structure and tables, placed in its
+source, and the inline subset titles, steps and definitions are written in —
+and writing that subset back as Markdown or rendering it as HTML.
 
 The leaf below `model/`: it imports nothing else from the package, so every
-package reads Markdown by the same rules.
+package reads and writes Markdown by the same rules.
 """
 
 from .blocks import (
@@ -20,13 +21,14 @@ from .blocks import (
 )
 from .plain_text import (
     ASCII_PUNCTUATION,
-    DEFINITION_BREAK,
     LINE_BREAK,
     code_span_at,
     fold_whitespace,
+    one_line,
     plain_html_text,
     plain_link_text,
 )
+from .rendering import definition_html, span_html
 from .spans import (
     CodeSpan,
     EmphasisSpan,
@@ -36,10 +38,15 @@ from .spans import (
     read_spans,
     span_text,
 )
+from .writing import (
+    code_span_markdown,
+    definition_markdown,
+    literal_markdown,
+    span_markdown,
+)
 
 __all__ = [
     'ASCII_PUNCTUATION',
-    'DEFINITION_BREAK',
     'LINE_BREAK',
     'CodeSpan',
     'EmphasisSpan',
@@ -53,12 +60,19 @@ __all__ = [
     'TableRow',
     'TextRun',
     'code_span_at',
+    'code_span_markdown',
+    'definition_html',
+    'definition_markdown',
     'fold_whitespace',
     'html_blocks',
+    'literal_markdown',
     'located_spans',
+    'one_line',
     'plain_html_text',
     'plain_link_text',
     'read_spans',
+    'span_html',
+    'span_markdown',
     'span_text',
     'table_cell_spans',
     'tables',

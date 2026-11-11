@@ -1,7 +1,6 @@
 import pytest
 
 from pytest_given import attach, given, scenario, then, when
-from pytest_given.markdown import EmphasisSpan, InlineSpan, PlainSpan
 from pytest_given.model import (
     Narration,
     NarrationLiteral,
@@ -12,7 +11,6 @@ from pytest_given.model import (
 from pytest_given.report import CitationIndex, Target
 from pytest_given.report.citation_index import citation_templates
 from pytest_given.report.html_renderer import _make_narration_filter
-from pytest_given.report.inline_markdown import render_definition
 from pytest_given.report.md_renderer import render_md
 from tests.ubiquitous_language import pg
 from tests.unit.citation_reports import URL, filled, report_, scenario_
@@ -77,58 +75,6 @@ def test_a_span_crossed_by_a_term_ref_stays_literal() -> None:
     with then('the Markdown escapes them, so a viewer shows them as written'):
         assert heading == '## ✓ \\*\\*«Guest» books\\*\\*'
         assert citation == f'✅ [\\*\\*Guest books\\*\\*]({BOOK_LINK})'
-
-
-@pytest.mark.parametrize(
-    ('text', 'expected'),
-    [
-        ('plain', 'plain'),
-        ('', ''),
-        ('**bold**', '<strong>bold</strong>'),
-        ('*italic*', '<em>italic</em>'),
-        ('`code`', '<code>code</code>'),
-        (
-            'a **b** and *c* and `d`',
-            'a <strong>b</strong> and <em>c</em> and <code>d</code>',
-        ),
-        ('**`.l`**', '<strong><code>.l</code></strong>'),
-        # code span wins over emphasis inside it
-        ('`a*b*c`', '<code>a*b*c</code>'),
-        # unpaired, spaced or underscore markers stay literal
-        ('a * b', 'a * b'),
-        ('2 * 3 * 4', '2 * 3 * 4'),
-        ('__bold__', '__bold__'),
-        ('lone ` tick', 'lone ` tick'),
-        # HTML is escaped; only <br> is re-admitted
-        ('1 < 2 & 3', '1 &lt; 2 &amp; 3'),
-        ('<script>x</script>', '&lt;script&gt;x&lt;/script&gt;'),
-        ('code with `<`', 'code with <code>&lt;</code>'),
-        ('`<br>` shows', '<code>&lt;br&gt;</code> shows'),
-        # hard breaks: literal <br> forms and real newlines
-        ('a<br>b', 'a<br>b'),
-        ('a<br/>b', 'a<br>b'),
-        ('a<br />b', 'a<br>b'),
-        ('a<BR>b', 'a<br>b'),
-        ('a\nb', 'a<br>b'),
-        ('a\r\nb', 'a<br>b'),
-        ('**x**<br>`y`', '<strong>x</strong><br><code>y</code>'),
-        ('**a<br>b**', '<strong>a<br>b</strong>'),
-    ],
-)
-def test_render_definition(text: str, expected: str) -> None:
-    assert render_definition(text) == expected
-
-
-def test_render_definition_renders_a_span_as_render_ref_returns_it() -> None:
-    """A `None` keeps the span as it renders without one."""
-
-    def render_ref(span: InlineSpan) -> str | None:
-        return '[ref]' if span == EmphasisSpan(True, (PlainSpan('Phase'),)) else None
-
-    rendered = render_definition(
-        'In one **Phase** or **unknown**.<br>See *it*.', render_ref=render_ref
-    )
-    assert rendered == 'In one [ref] or <strong>unknown</strong>.<br>See <em>it</em>.'
 
 
 @pytest.mark.parametrize(

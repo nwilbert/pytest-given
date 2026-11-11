@@ -1,6 +1,6 @@
 """A citation's link text, written so it renders as the title it stands for."""
 
-from ..markdown import PlainSpan
+from ..markdown import PlainSpan, literal_markdown, one_line, span_html
 from ..model import (
     Narration,
     NarrationPiece,
@@ -10,8 +10,7 @@ from ..model import (
     placeholder_token,
     read_narration,
 )
-from .inline_markdown import render_span
-from .markdown_writer import literal_markdown, narration_markdown, one_line
+from .md_narration import narration_markdown
 
 
 def link_text(title: Narration | str, *, in_table_row: bool = False) -> str:
@@ -27,15 +26,15 @@ def html_link_text(title: Narration | str) -> str:
     title as the HTML report's inline Markdown renders it, everything but its
     spans escaped, a term's literal."""
     if isinstance(title, str):
-        return render_span(PlainSpan(text=one_line(title)))
+        return span_html(PlainSpan(text=one_line(title)))
     return ''.join(_piece_html(piece) for piece in read_narration(title))
 
 
 def _piece_html(piece: NarrationPiece) -> str:
     match piece:
         case NarrationValue(rendered=text) | NarrationTermRef(display=text):
-            return render_span(PlainSpan(text=one_line(text)))
+            return span_html(PlainSpan(text=one_line(text)))
         case NarrationPlaceholder():
-            return render_span(PlainSpan(text=one_line(placeholder_token(piece))))
+            return span_html(PlainSpan(text=one_line(placeholder_token(piece))))
         case _:
-            return one_line(render_span(piece))
+            return one_line(span_html(piece))

@@ -5,7 +5,12 @@ from collections import Counter
 from collections.abc import Mapping
 from pathlib import Path
 
-from ..markdown import LINE_BREAK
+from ..markdown import (
+    LINE_BREAK,
+    code_span_markdown,
+    definition_markdown,
+    literal_markdown,
+)
 from ..model import (
     Attachment,
     AttachmentRef,
@@ -27,12 +32,7 @@ from ..model import (
 )
 from .function_source import FunctionSource, SourceExcerpt
 from .glyphs import STATUS_GLYPH, STATUS_LABEL
-from .markdown_writer import (
-    code_span_markdown,
-    definition_markdown,
-    literal_markdown,
-    narration_markdown,
-)
+from .md_narration import narration_markdown
 
 
 def render_md(

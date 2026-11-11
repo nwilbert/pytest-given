@@ -1,6 +1,5 @@
-"""The reader's inline Markdown spans as safe HTML: in scenario titles and step
-text, and in glossary definitions, which also break lines. Rendering is a
-report concern, so this lives in `report/` and never imports from `capture/`."""
+"""The inline subset's spans as safe HTML: in scenario titles and step text,
+and in glossary definitions, which also break lines."""
 
 # A run that renders no HTML never loads MarkupSafe.
 __lazy_modules__ = ['markupsafe']
@@ -9,17 +8,11 @@ from collections.abc import Callable
 
 from markupsafe import escape
 
-from ..markdown import (
-    DEFINITION_BREAK,
-    CodeSpan,
-    EmphasisSpan,
-    InlineSpan,
-    PlainSpan,
-    read_spans,
-)
+from .plain_text import DEFINITION_BREAK
+from .spans import CodeSpan, EmphasisSpan, InlineSpan, PlainSpan, read_spans
 
 
-def render_span(span: InlineSpan) -> str:
+def span_html(span: InlineSpan) -> str:
     """A span of a title or step, which never breaks a line."""
     return _span_html(span, _escaped)
 
@@ -27,7 +20,7 @@ def render_span(span: InlineSpan) -> str:
 type RefRenderer = Callable[[InlineSpan], str | None]
 
 
-def render_definition(text: str, *, render_ref: RefRenderer | None = None) -> str:
+def definition_html(text: str, *, render_ref: RefRenderer | None = None) -> str:
     """A glossary definition: its spans, and an author's `<br>` or a newline
     as a break — except in a code span, which is how to show `<br>` as text.
 

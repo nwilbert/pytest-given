@@ -8,8 +8,8 @@ import re
 # A line ending in any of CommonMark's spellings.
 LINE_BREAK = re.compile(r'\r\n|\r|\n')
 
-# What breaks a line in a glossary definition's plain text: an author's `<br>`,
-# `<br/>` or `<br />` in any case, or a newline.
+# What breaks a line in a glossary definition's plain text, in both reports:
+# an author's `<br>`, `<br/>` or `<br />` in any case, or a newline.
 DEFINITION_BREAK = re.compile(rf'<br\s*/?\s*>|{LINE_BREAK.pattern}', re.IGNORECASE)
 
 _HTML_TAG = re.compile(r'</?[A-Za-z][^>]*>')
@@ -49,6 +49,10 @@ def plain_html_text(written: str) -> str:
 
 def fold_whitespace(text: str) -> str:
     return ' '.join(text.split())
+
+
+def one_line(text: str) -> str:
+    return LINE_BREAK.sub(' ', text)
 
 
 def code_span_at(text: str, start: int) -> tuple[int, bool]:

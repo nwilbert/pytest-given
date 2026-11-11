@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-11T20:36:01.574591+00:00",
+    "timestamp": "2026-11-11T20:37:53.769860+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "09914ef3278e3ee04343859d81c6fb6119fe54ce",
+    "commit_sha": "d75427810d567e24430cf30f5e3cef931fdd7dfe",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 144,
+      "duration_ms": 152,
       "steps": [
         {
           "phase": "given",
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 25,
       "steps": [
         {
           "phase": "given",
@@ -558,7 +558,7 @@
       "module": "tests.integration.test_cli_citations",
       "tags": [],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -836,7 +836,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -973,7 +973,7 @@
       "module": "tests.integration.test_cli_skills",
       "tags": [],
       "status": "passed",
-      "duration_ms": 23,
+      "duration_ms": 20,
       "steps": [
         {
           "phase": "given",
@@ -1084,7 +1084,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 77,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -1262,7 +1262,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 133,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
@@ -1355,7 +1355,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 88,
+      "duration_ms": 89,
       "steps": [
         {
           "phase": "given",
@@ -1437,7 +1437,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 67,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -1546,7 +1546,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -1675,7 +1675,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 571,
+      "duration_ms": 573,
       "steps": [
         {
           "phase": "given",
@@ -1803,7 +1803,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 73,
       "steps": [
         {
           "phase": "given",
@@ -1990,7 +1990,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 130,
+      "duration_ms": 151,
       "steps": [
         {
           "phase": "given",
@@ -2176,7 +2176,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 47,
+      "duration_ms": 61,
       "steps": [
         {
           "phase": "given",
@@ -2243,7 +2243,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -2353,7 +2353,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -2495,7 +2495,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 17,
+      "duration_ms": 19,
       "steps": [
         {
           "phase": "given",
@@ -2565,7 +2565,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -2685,7 +2685,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 74,
+      "duration_ms": 123,
       "steps": [
         {
           "phase": "given",
@@ -2820,7 +2820,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 112,
+      "duration_ms": 200,
       "steps": [
         {
           "phase": "given",
@@ -2948,7 +2948,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 99,
+      "duration_ms": 127,
       "steps": [
         {
           "phase": "given",
@@ -3075,7 +3075,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 74,
+      "duration_ms": 96,
       "steps": [
         {
           "phase": "given",
@@ -3192,7 +3192,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 212,
+      "duration_ms": 235,
       "steps": [
         {
           "phase": "given",
@@ -3265,7 +3265,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -3437,7 +3437,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 73,
       "steps": [
         {
           "phase": "given",
@@ -3576,7 +3576,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 67,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -3721,7 +3721,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 71,
       "steps": [
         {
           "phase": "given",
@@ -3874,7 +3874,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -4019,7 +4019,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 76,
       "steps": [
         {
           "phase": "given",
@@ -4166,7 +4166,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 210,
+      "duration_ms": 251,
       "steps": [
         {
           "phase": "given",
@@ -4387,7 +4387,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 69,
+      "duration_ms": 74,
       "steps": [
         {
           "phase": "given",
@@ -4517,7 +4517,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 129,
+      "duration_ms": 136,
       "steps": [
         {
           "phase": "given",
@@ -4646,7 +4646,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 147,
+      "duration_ms": 168,
       "steps": [
         {
           "phase": "given",
@@ -4814,7 +4814,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -4908,7 +4908,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -4987,7 +4987,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 318,
+      "duration_ms": 328,
       "steps": [
         {
           "phase": "given",
@@ -5169,7 +5169,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -5351,7 +5351,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 113,
+      "duration_ms": 121,
       "steps": [
         {
           "phase": "given",
@@ -5433,7 +5433,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 19,
+      "duration_ms": 18,
       "steps": [
         {
           "phase": "given",
@@ -5525,7 +5525,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 43,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -5610,7 +5610,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 70,
       "steps": [
         {
           "phase": "given",
@@ -5717,7 +5717,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 208,
+      "duration_ms": 217,
       "steps": [
         {
           "phase": "given",
@@ -5824,7 +5824,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 868,
+      "duration_ms": 905,
       "steps": [
         {
           "phase": "given",
@@ -6015,7 +6015,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 547,
+      "duration_ms": 566,
       "steps": [
         {
           "phase": "given",
@@ -6096,7 +6096,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -6210,7 +6210,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 68,
       "steps": [
         {
           "phase": "given",
@@ -6363,7 +6363,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 39,
+      "duration_ms": 43,
       "steps": [
         {
           "phase": "given",
@@ -6579,7 +6579,7 @@
         "spec/boolean-phrases"
       ],
       "status": "passed",
-      "duration_ms": 64,
+      "duration_ms": 72,
       "steps": [
         {
           "phase": "given",
@@ -6748,7 +6748,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 83,
+      "duration_ms": 81,
       "steps": [
         {
           "phase": "given",
@@ -6891,7 +6891,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -7024,7 +7024,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 553,
+      "duration_ms": 590,
       "steps": [
         {
           "phase": "given",
@@ -7183,7 +7183,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -7285,7 +7285,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 45,
       "steps": [
         {
           "phase": "given",
@@ -7392,7 +7392,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 41,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -7512,7 +7512,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 42,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -7642,7 +7642,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 169,
+      "duration_ms": 175,
       "steps": [
         {
           "phase": "given",
@@ -7872,7 +7872,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 84,
       "steps": [
         {
           "phase": "given",
@@ -7984,7 +7984,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -8080,7 +8080,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 118,
+      "duration_ms": 127,
       "steps": [
         {
           "phase": "given",
@@ -9976,7 +9976,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -10256,7 +10256,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -10805,7 +10805,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -13533,7 +13533,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -17092,7 +17092,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -19560,7 +19560,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -20935,7 +20935,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -21035,7 +21035,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21162,7 +21162,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -21335,7 +21335,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -21505,7 +21505,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -21636,7 +21636,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -21962,7 +21962,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 14,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -22210,7 +22210,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -22352,7 +22352,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22500,7 +22500,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22711,7 +22711,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 12,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -22926,7 +22926,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -23079,7 +23079,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -23216,7 +23216,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -23414,7 +23414,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 15,
       "steps": [
         {
           "phase": "given",
@@ -23764,7 +23764,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -23932,7 +23932,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 8,
       "steps": [
         {
           "phase": "given",
@@ -24225,7 +24225,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -24389,7 +24389,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 7,
       "steps": [
         {
           "phase": "given",
@@ -24542,7 +24542,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -24678,7 +24678,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -28314,7 +28314,7 @@
         "spec/boolean-phrases"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -28442,7 +28442,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -28985,7 +28985,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -29187,7 +29187,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -29309,7 +29309,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 2,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -30736,7 +30736,7 @@
       "module": "tests.unit.report.test_coverage",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -33153,7 +33153,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 163,
+      "duration_ms": 179,
       "steps": [
         {
           "phase": "given",
@@ -33419,251 +33419,6 @@
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
         "line": 1271
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/report/test_inline_markdown.py::test_a_title_s_emphasis_renders_the_same_in_every_output",
-      "narration": {
-        "text": "A scenario title's emphasis renders the same in every output",
-        "parts": [
-          {
-            "value": "A "
-          },
-          {
-            "term_id": "scenario-title",
-            "display": "scenario title",
-            "expression": "pg['Scenario title'].l"
-          },
-          {
-            "value": "'s emphasis renders the same in every output"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_inline_markdown",
-      "tags": [
-        "spec/inline-markdown",
-        "versions/0.5.0"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a scenario title with a bold word and a code span",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario-title",
-                "display": "scenario title",
-                "expression": "pg[\"Scenario title\"].l"
-              },
-              {
-                "value": " with a bold word and a code span"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the HTML, the Markdown report and a citation show it",
-            "parts": [
-              {
-                "value": "the HTML, the Markdown "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " and a "
-              },
-              {
-                "term_id": "citation",
-                "display": "citation",
-                "expression": "pg[\"Citation\"].l"
-              },
-              {
-                "value": " show it"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "outputs",
-              "content": "Books a <strong>suite</strong> with <code>late_checkout</code>\n## \u2713 Books a **suite** with `late_checkout`\n\u2705 [Books a **suite** with `late_checkout`](https://example.org/report.html#scenario=t.py::test_book)",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the HTML renders the word bold and the code as code",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Markdown keeps the same markers, so a viewer renders the same",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_inline_markdown.py",
-        "line": 34
-      },
-      "story_ids": [],
-      "pins": null
-    },
-    {
-      "id": "tests/unit/report/test_inline_markdown.py::test_a_span_crossed_by_a_term_ref_stays_literal",
-      "narration": {
-        "text": "A span crossed by a term ref stays literal in every output",
-        "parts": [
-          {
-            "value": "A span crossed by a "
-          },
-          {
-            "term_id": "term-ref",
-            "display": "term ref",
-            "expression": "pg[\"Term ref\"].l"
-          },
-          {
-            "value": " stays literal in every output"
-          }
-        ]
-      },
-      "module": "tests.unit.report.test_inline_markdown",
-      "tags": [
-        "spec/inline-markdown",
-        "versions/0.5.0"
-      ],
-      "status": "passed",
-      "duration_ms": 0,
-      "steps": [
-        {
-          "phase": "given",
-          "narration": {
-            "text": "a scenario title whose `**` markers enclose a term ref",
-            "parts": [
-              {
-                "value": "a "
-              },
-              {
-                "term_id": "scenario-title",
-                "display": "scenario title",
-                "expression": "pg[\"Scenario title\"].l"
-              },
-              {
-                "value": " whose `**` markers enclose a "
-              },
-              {
-                "term_id": "term-ref",
-                "display": "term ref",
-                "expression": "pg[\"Term ref\"].l"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "when",
-          "narration": {
-            "text": "the HTML, the Markdown report and a citation show it",
-            "parts": [
-              {
-                "value": "the HTML, the Markdown "
-              },
-              {
-                "term_id": "report",
-                "display": "report",
-                "expression": "pg[\"Report\"].l"
-              },
-              {
-                "value": " and a "
-              },
-              {
-                "term_id": "citation",
-                "display": "citation",
-                "expression": "pg[\"Citation\"].l"
-              },
-              {
-                "value": " show it"
-              }
-            ]
-          },
-          "children": [],
-          "attachments": [
-            {
-              "label": "outputs",
-              "content": "**Guest books**\n## \u2713 \\*\\*\u00abGuest\u00bb books\\*\\*\n\u2705 [\\*\\*Guest books\\*\\*](https://example.org/report.html#scenario=t.py::test_book)",
-              "content_type": "text"
-            }
-          ],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the HTML shows both markers as written",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        },
-        {
-          "phase": "then",
-          "narration": {
-            "text": "the Markdown escapes them, so a viewer shows them as written",
-            "parts": []
-          },
-          "children": [],
-          "attachments": [],
-          "pins": null,
-          "fixture_name": null
-        }
-      ],
-      "parameters": null,
-      "error": null,
-      "skip_reason": null,
-      "xfail_reason": null,
-      "source": {
-        "relpath": "tests/unit/report/test_inline_markdown.py",
-        "line": 55
       },
       "story_ids": [],
       "pins": null
@@ -34779,7 +34534,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -34891,7 +34646,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -34986,7 +34741,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -35218,7 +34973,7 @@
       "module": "tests.unit.report.test_source_link",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -35866,7 +35621,7 @@
       "module": "tests.unit.report.test_story_view",
       "tags": [],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -36096,6 +35851,251 @@
       "source": {
         "relpath": "tests/unit/report/test_story_view.py",
         "line": 370
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/report/test_title_spans.py::test_a_title_s_emphasis_renders_the_same_in_every_output",
+      "narration": {
+        "text": "A scenario title's emphasis renders the same in every output",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "scenario-title",
+            "display": "scenario title",
+            "expression": "pg['Scenario title'].l"
+          },
+          {
+            "value": "'s emphasis renders the same in every output"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_title_spans",
+      "tags": [
+        "spec/inline-markdown",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario title with a bold word and a code span",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario-title",
+                "display": "scenario title",
+                "expression": "pg[\"Scenario title\"].l"
+              },
+              {
+                "value": " with a bold word and a code span"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the HTML, the Markdown report and a citation show it",
+            "parts": [
+              {
+                "value": "the HTML, the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " and a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " show it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "outputs",
+              "content": "Books a <strong>suite</strong> with <code>late_checkout</code>\n## \u2713 Books a **suite** with `late_checkout`\n\u2705 [Books a **suite** with `late_checkout`](https://example.org/report.html#scenario=t.py::test_book)",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the HTML renders the word bold and the code as code",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Markdown keeps the same markers, so a viewer renders the same",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_title_spans.py",
+        "line": 32
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/report/test_title_spans.py::test_a_span_crossed_by_a_term_ref_stays_literal",
+      "narration": {
+        "text": "A span crossed by a term ref stays literal in every output",
+        "parts": [
+          {
+            "value": "A span crossed by a "
+          },
+          {
+            "term_id": "term-ref",
+            "display": "term ref",
+            "expression": "pg[\"Term ref\"].l"
+          },
+          {
+            "value": " stays literal in every output"
+          }
+        ]
+      },
+      "module": "tests.unit.report.test_title_spans",
+      "tags": [
+        "spec/inline-markdown",
+        "versions/0.5.0"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario title whose `**` markers enclose a term ref",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario-title",
+                "display": "scenario title",
+                "expression": "pg[\"Scenario title\"].l"
+              },
+              {
+                "value": " whose `**` markers enclose a "
+              },
+              {
+                "term_id": "term-ref",
+                "display": "term ref",
+                "expression": "pg[\"Term ref\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the HTML, the Markdown report and a citation show it",
+            "parts": [
+              {
+                "value": "the HTML, the Markdown "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " and a "
+              },
+              {
+                "term_id": "citation",
+                "display": "citation",
+                "expression": "pg[\"Citation\"].l"
+              },
+              {
+                "value": " show it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "outputs",
+              "content": "**Guest books**\n## \u2713 \\*\\*\u00abGuest\u00bb books\\*\\*\n\u2705 [\\*\\*Guest books\\*\\*](https://example.org/report.html#scenario=t.py::test_book)",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the HTML shows both markers as written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Markdown escapes them, so a viewer shows them as written",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/report/test_title_spans.py",
+        "line": 53
       },
       "story_ids": [],
       "pins": null

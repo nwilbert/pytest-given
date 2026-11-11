@@ -12,6 +12,7 @@ from markdown_it import MarkdownIt
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.citations import CitationsResult, check_citations, markdown_documents
 from pytest_given.citations import check as check_module
+from pytest_given.markdown import definition_html
 from pytest_given.model import (
     GlossaryTerm,
     Narration,
@@ -30,7 +31,6 @@ from pytest_given.report.citation_index import (
     CitationIndex,
     citation_templates,
 )
-from pytest_given.report.inline_markdown import render_definition
 from tests.ubiquitous_language import pg
 from tests.unit.citation_reports import (
     URL,
@@ -1819,7 +1819,7 @@ def test_a_defining_citations_body_shows_the_definition_as_the_report_does(
     ):
         body = written.splitlines()[3]
         rendered = MarkdownIt('commonmark', {'html': True}).renderInline(body)
-        assert rendered == render_definition(definition)
+        assert rendered == definition_html(definition)
     with then('the updated document is current'):
         result, _ = _run(tmp_path, written, report)
         assert result.findings == []

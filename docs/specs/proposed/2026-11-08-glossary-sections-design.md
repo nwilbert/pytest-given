@@ -284,7 +284,7 @@ so that both groupings use them.
 ### Avoided words on the card
 
 A card whose term avoids words shows them under the definition, as `Avoid: Customer, Client`, each
-entry as written, note included, rendered by `render_definition` without a glossary, so with no
+entry as written, note included, rendered by `definition_html` without a glossary, so with no
 definition refs. The Glossary
 search matches avoided words, so a reader searching `customer` finds *Guest*. The term tooltip in
 narration is unchanged.
@@ -374,7 +374,7 @@ the old name, as a record of their time.
   `_prepareClone` with the Stories view), `goToTerm`'s target in that grouping, the group-keyed
   visible counts, the avoid line, avoided words in the search text and in `_termCounts`, the
   section selection in `_resetTermFilters`.
-- `report/html_renderer.py` — the avoid line rendered through `render_definition` without a
+- `report/html_renderer.py` — the avoid line rendered through `definition_html` without a
   glossary.
 - `lint/catalog.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_term_findings`, registered in `_RUNTIME_RULES`.

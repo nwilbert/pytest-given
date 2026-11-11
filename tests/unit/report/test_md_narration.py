@@ -1,6 +1,3 @@
-"""The Markdown writer: text written so a Markdown viewer shows what the HTML
-report shows."""
-
 import pytest
 from markdown_it import MarkdownIt
 
@@ -15,38 +12,9 @@ from pytest_given.model import (
     param_id,
 )
 from pytest_given.report.html_renderer import _make_narration_filter
-from pytest_given.report.markdown_writer import (
-    code_span_markdown,
-    literal_markdown,
-    narration_markdown,
-)
+from pytest_given.report.md_narration import narration_markdown
 
 _MARKDOWN = MarkdownIt('commonmark').enable(['table', 'strikethrough'])
-
-
-@pytest.mark.parametrize(
-    ('text', 'written'),
-    [
-        ('a [b] c', 'a \\[b\\] c'),
-        ('[text](url)', '\\[text\\](url)'),
-        ('2 * 3', '2 \\* 3'),
-        ('**x**', '\\*\\*x\\*\\*'),
-        ('~~gone~~', '\\~\\~gone\\~\\~'),
-        ('<title> tag', '\\<title> tag'),
-        ('a<br>b', 'a\\<br>b'),
-        ('&amp;', '\\&amp;'),
-        ('a | b', 'a \\| b'),
-        ('$x$', '\\$x\\$'),
-        ('back\\slash', 'back\\\\slash'),
-        ('_lead and trail_', '\\_lead and trail\\_'),
-        ('__init__', '\\_\\_init\\_\\_'),
-        ('snake_case and 2_3', 'snake_case and 2_3'),
-        ('a `--given-md` flag', 'a \\`--given-md\\` flag'),
-        ('two\nlines', 'two\nlines'),
-    ],
-)
-def test_literal_markdown_escapes_every_inline_marker(text: str, written: str) -> None:
-    assert literal_markdown(text) == written
 
 
 @pytest.mark.parametrize(
@@ -72,15 +40,6 @@ def test_a_pipe_in_a_code_span_is_escaped_only_in_a_table_row() -> None:
     narration = Narration(text='the `a|b` form')
     assert narration_markdown(narration) == 'the `a|b` form'
     assert narration_markdown(narration, in_table_row=True) == 'the `a\\|b` form'
-
-
-@pytest.mark.parametrize(
-    ('content', 'written'),
-    [('a|b', '`a|b`'), (' x ', '`  x  `'), ('  ', '`  `')],
-)
-def test_a_code_span_shows_its_content_as_written(content: str, written: str) -> None:
-    assert code_span_markdown(content) == written
-    assert _MARKDOWN.renderInline(written) == f'<code>{content}</code>'
 
 
 @pytest.mark.parametrize(
@@ -230,8 +189,3 @@ def test_an_underscore_between_a_value_and_a_literal_is_intraword() -> None:
         ),
     )
     assert narration_markdown(narration) == 'foo_suffix and T\\_x'
-
-
-def test_literal_markdown_reads_an_edge_underscore_against_its_neighbours() -> None:
-    assert literal_markdown('_b_', before='a', after='c') == '_b_'
-    assert literal_markdown('_b_', before='.', after=' ') == '\\_b\\_'

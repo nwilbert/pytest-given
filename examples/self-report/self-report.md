@@ -3923,34 +3923,6 @@
 | 's' | False |
 | None | False |
 
-## ✓ A «scenario title»'s emphasis renders the same in every output
-`tests/unit/report/test_inline_markdown.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown, versions/0.5.0
-
-- **given** a «scenario title» with a bold word and a code span
-- **when** the HTML, the Markdown «report» and a «citation» show it
-    - 📎 outputs:
-        ```
-        Books a <strong>suite</strong> with <code>late_checkout</code>
-        ## ✓ Books a **suite** with `late_checkout`
-        ✅ [Books a **suite** with `late_checkout`](https://example.org/report.html#scenario=t.py::test_book)
-        ```
-- **then** the HTML renders the word bold and the code as code
-- **then** the Markdown keeps the same markers, so a viewer renders the same
-
-## ✓ A span crossed by a «term ref» stays literal in every output
-`tests/unit/report/test_inline_markdown.py::test_a_span_crossed_by_a_term_ref_stays_literal` · spec/inline-markdown, versions/0.5.0
-
-- **given** a «scenario title» whose `**` markers enclose a «term ref»
-- **when** the HTML, the Markdown «report» and a «citation» show it
-    - 📎 outputs:
-        ```
-        **Guest books**
-        ## ✓ \*\*«Guest» books\*\*
-        ✅ [\*\*Guest books\*\*](https://example.org/report.html#scenario=t.py::test_book)
-        ```
-- **then** the HTML shows both markers as written
-- **then** the Markdown escapes them, so a viewer shows them as written
-
 ## ✓ A passed «scenario» renders as a checked heading with «step» bullets
 `tests/unit/report/test_md_renderer.py::test_passed_scenario_heading_and_steps`
 
@@ -4324,3 +4296,31 @@
 - **given** a «story» with a two-«clause» «sentence»
 - **when** the «sentence» labels are built
 - **then** the label gives the number, then reads as prose under a story-scoped key, with the «clause» texts joined
+
+## ✓ A «scenario title»'s emphasis renders the same in every output
+`tests/unit/report/test_title_spans.py::test_a_title_s_emphasis_renders_the_same_in_every_output` · spec/inline-markdown, versions/0.5.0
+
+- **given** a «scenario title» with a bold word and a code span
+- **when** the HTML, the Markdown «report» and a «citation» show it
+    - 📎 outputs:
+        ```
+        Books a <strong>suite</strong> with <code>late_checkout</code>
+        ## ✓ Books a **suite** with `late_checkout`
+        ✅ [Books a **suite** with `late_checkout`](https://example.org/report.html#scenario=t.py::test_book)
+        ```
+- **then** the HTML renders the word bold and the code as code
+- **then** the Markdown keeps the same markers, so a viewer renders the same
+
+## ✓ A span crossed by a «term ref» stays literal in every output
+`tests/unit/report/test_title_spans.py::test_a_span_crossed_by_a_term_ref_stays_literal` · spec/inline-markdown, versions/0.5.0
+
+- **given** a «scenario title» whose `**` markers enclose a «term ref»
+- **when** the HTML, the Markdown «report» and a «citation» show it
+    - 📎 outputs:
+        ```
+        **Guest books**
+        ## ✓ \*\*«Guest» books\*\*
+        ✅ [\*\*Guest books\*\*](https://example.org/report.html#scenario=t.py::test_book)
+        ```
+- **then** the HTML shows both markers as written
+- **then** the Markdown escapes them, so a viewer shows them as written

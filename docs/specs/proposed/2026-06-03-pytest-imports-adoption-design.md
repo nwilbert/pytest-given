@@ -109,7 +109,7 @@ def test_no_private_imports(imports):
 
 The four rules above are all internal-facing — they say which *first-party* modules may import which. Nothing here covers which **third-party** packages a subpackage may import, and there is at least one such rule worth enforcing: `report/`, `lint/`, `grouping/` and `model/` do not import `pytest`. That is what lets them be exercised without a pytest session, and what forces `plugin.py` to resolve options into plain shapes (`SinkConfig`, plain module objects) before calling in — but it is convention only today.
 
-When implementing this spec, add that rule, and sweep the other external dependencies for the same question rather than stopping at `pytest`: `jinja2` and `markupsafe` are confined to `report/` (in fact to `html_renderer.py` and `inline_markdown.py`), and `model/` currently imports no third-party package at all. Whether `must_not_import('pytest')` works against a package outside the source roots needs checking — every target helper used above (`descendants`, `internal`, `project`) is internal-facing.
+When implementing this spec, add that rule, and sweep the other external dependencies for the same question rather than stopping at `pytest`: `jinja2` is confined to `report/html_renderer.py`, and `markupsafe` to it and `markdown/rendering.py`, and `model/` currently imports no third-party package at all. Whether `must_not_import('pytest')` works against a package outside the source roots needs checking — every target helper used above (`descendants`, `internal`, `project`) is internal-facing.
 
 ## `plugin.py` / `__init__.py` import-style change
 

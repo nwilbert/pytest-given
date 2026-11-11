@@ -46,7 +46,8 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 strict dependency direction (held by `tests/unit/test_architecture.py`):
 
 ```
-markdown/                  the leaf — reading Markdown: blocks, tables, inline spans
+markdown/                  the leaf — reading Markdown (blocks, tables, inline
+                           spans), writing spans back, rendering them as HTML
 model/                     schema, serde, errors, shared text rules
 capture/  lint/  report/   each on model/ only, never on each other
 grouping/                  on model/ + capture/
