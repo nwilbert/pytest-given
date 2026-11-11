@@ -43,7 +43,7 @@ Releases go to PyPI via a manually dispatched [Release workflow](.github/workflo
 ## Architecture
 
 `src/pytest_given/` is seven library subpackages plus two entry points, with a
-strict dependency direction (convention, not lint-enforced):
+strict dependency direction (held by `tests/unit/test_architecture.py`):
 
 ```
 markdown/                  the leaf — reading Markdown: blocks, tables, inline spans
