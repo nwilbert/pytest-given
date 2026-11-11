@@ -25,6 +25,6 @@ Four [Agent Skills](https://agentskills.io) ship in the wheel, under `pytest_giv
 
 Two ways to get them into your repo, where Claude Code (and other harnesses following the same format) auto-discover them:
 
-- **`pytest-given skills install`** copies them into `.claude/skills/`. The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` exits 1 on drift, for a CI guard. Use `--dest` for a non-default skills directory.
+- **`pytest-given skills install`** copies them into `.claude/skills/`. The files are library-owned — reinstalling after an upgrade overwrites them (keep your own conventions in your project's instructions file), and `--check` exits 1 on drift, for a CI guard. Either form exits 2 when it cannot read or write the skills directory. Use `--dest` for a non-default skills directory.
 - **`uvx library-skills install --claude`** — [library-skills](https://library-skills.io) scans your project's dependencies for bundled skills and links them into `.agents/skills/` (and, with `--claude`, `.claude/skills/`), so one command covers pytest-given and every other library that ships skills. Symlinks track upgrades automatically; on Windows without developer mode add `--copy`.
 

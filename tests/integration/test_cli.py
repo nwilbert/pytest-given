@@ -75,7 +75,7 @@ def test_cli_report_url_replaces_the_saved_one(tmp_path: Path) -> None:
 def test_cli_refuses_a_report_url_no_citation_can_link(tmp_path: Path, capsys) -> None:
     json_path = tmp_path / 'data.json'
     json_path.write_text(json.dumps(_minimal_report()))
-    assert main(['report', str(json_path), '--report-url', 'docs/report.html']) == 1
+    assert main(['report', str(json_path), '--report-url', 'docs/report.html']) == 2
     assert '--report-url must be an absolute http(s) URL' in capsys.readouterr().err
 
 
@@ -91,7 +91,7 @@ def test_cli_without_a_json_file_reads_the_default_json_report(
 
 def test_cli_missing_input_file(tmp_path: Path) -> None:
     rc = main(['report', str(tmp_path / 'nonexistent.json')])
-    assert rc == 1
+    assert rc == 2
 
 
 def test_cli_no_command(capsys) -> None:
@@ -300,7 +300,7 @@ def test_cli_reports_malformed_json_without_a_traceback(tmp_path: Path, capsys) 
     json_path = tmp_path / 'data.json'
     json_path.write_text('{"metadata": ', encoding='utf-8')
     rc = main(['report', str(json_path)])
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert 'Error' in err
     assert 'Traceback' not in err
@@ -315,7 +315,7 @@ def test_cli_reports_a_non_utf8_file_without_a_traceback(
     json_path = tmp_path / 'data.json'
     json_path.write_bytes(b'\xff\xfe\x00not utf-8')
     rc = main(['report', str(json_path)])
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert 'Error' in err
     assert 'Traceback' not in err
@@ -342,7 +342,7 @@ def test_cli_reports_a_stale_report_without_a_traceback(tmp_path: Path, capsys) 
     json_path = tmp_path / 'data.json'
     json_path.write_text(json.dumps(data), encoding='utf-8')
     rc = main(['report', str(json_path)])
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert 'Error' in err
     assert 'Traceback' not in err
@@ -371,7 +371,7 @@ def test_cli_reports_a_report_of_the_wrong_shape_without_a_traceback(
     json_path = tmp_path / 'data.json'
     json_path.write_text(json.dumps(payload), encoding='utf-8')
     rc = main(['report', str(json_path), '-o', str(tmp_path / 'o.html')])
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert 'not a pytest-given report' in err
     assert 'Traceback' not in err
@@ -392,7 +392,7 @@ def test_cli_reports_an_unknown_source_link_preset_without_a_traceback(
             'no-such-editor',
         ]
     )
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert 'Error' in err
     assert 'Traceback' not in err
@@ -414,7 +414,7 @@ def test_cli_write_failure_discards_the_stale_report(
 
     monkeypatch.setattr(Path, 'write_text', refuse)
     rc = main(['report', str(json_path), '-o', str(html_path)])
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert 'read-only file system' in err
     assert 'would read as current' in err
@@ -436,7 +436,7 @@ def test_cli_render_failure_also_discards_the_stale_report(
 
     monkeypatch.setattr(sinks, 'render_html_string', refuse)
     rc = main(['report', str(json_path), '-o', str(html_path)])
-    assert rc == 1
+    assert rc == 2
     assert not html_path.exists()
     err = capsys.readouterr().err
     assert 'template exploded' in err
@@ -460,7 +460,7 @@ def test_cli_refuses_an_unknown_source_link_preset_on_a_markdown_run(
             'no-such-editor',
         ]
     )
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert '--source-link' in err
     assert 'Traceback' not in err
@@ -499,7 +499,7 @@ def test_cli_refuses_an_unknown_theme_with_the_plugin_wording(
     rc = main(
         ['report', str(json_path), '-o', str(tmp_path / 'o.html'), '--theme', 'Dark']
     )
-    assert rc == 1
+    assert rc == 2
     err = capsys.readouterr().err
     assert "Unknown --theme value 'Dark'" in err
     assert 'Traceback' not in err

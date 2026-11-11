@@ -44,7 +44,7 @@ def _run_skills_install(args: argparse.Namespace) -> int:
         return _report_drift(dest) if args.check else _install_skills(dest)
     except OSError as error:
         print(f'Error: {error}', file=sys.stderr)
-        return 1
+        return 2
 
 
 def _install_skills(dest: Path) -> int:

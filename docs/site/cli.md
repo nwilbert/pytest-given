@@ -23,6 +23,8 @@ Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md
 
 With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no `<!-- pytest-given:md:start -->` markers; the plugin only adds them to separate the report from pytest's own output.
 
+`pytest-given report` exits 2 when it cannot read the JSON file, or cannot render or write the report. It also exits 2 when an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL.
+
 ## Citations
 
 `pytest-given citations check` verifies every link into the report in a set of Markdown files against a JSON report, and `citations update` rewrites the [citations](guide/citations.md) among them to match it:
