@@ -376,7 +376,7 @@ the old name, as a record of their time.
   section selection in `_resetTermFilters`.
 - `report/html_renderer.py` — the avoid line rendered through `render_definition` without a
   glossary.
-- `lint/base.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
+- `lint/catalog.py` — `AVOIDED_TERM`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_term_findings`, registered in `_RUNTIME_RULES`.
 - Docs: `docs/site/guide/glossary.md` (the *File glossary* section covers both classes, sections in
   code and in files, `avoid`), `docs/site/html-report.md` (the grouping switch and the section

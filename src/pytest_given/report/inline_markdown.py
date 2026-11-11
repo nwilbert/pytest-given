@@ -10,13 +10,13 @@ from collections.abc import Callable
 from markupsafe import escape
 
 from ..markdown import (
+    DEFINITION_BREAK,
     CodeSpan,
     EmphasisSpan,
     InlineSpan,
     PlainSpan,
     read_spans,
 )
-from .text import DEFINITION_BREAK
 
 
 def render_span(span: InlineSpan) -> str:

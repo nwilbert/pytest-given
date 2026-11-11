@@ -1,7 +1,7 @@
 """Unit tests for the lint findings' terminal presentation (`lint/summary.py`)."""
 
 from pytest_given.lint import LintFinding, error_count, summary_rows, summary_title
-from pytest_given.lint.base import RuleId, Severity
+from pytest_given.lint.catalog import RuleId, Severity
 from pytest_given.model import SourceLocation
 
 

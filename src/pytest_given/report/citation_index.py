@@ -24,9 +24,9 @@ from ..model import (
 )
 from .coverage import build_coverage_map
 from .glossary_view import build_term_crossrefs
+from .glyphs import CITATION_GLYPH, CitationState
 from .link_text import html_link_text, link_text
 from .story_view import scenarios_by_story
-from .text import CITATION_GLYPH, CitationState
 
 type TargetKind = Literal['scenario', 'tag', 'story', 'term']
 

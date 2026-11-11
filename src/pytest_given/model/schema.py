@@ -1,7 +1,7 @@
 """The report schema: what is serialized into the JSON report.
 
-The runtime-only carriers capture and grouping pass between themselves live in
-`runtime.py`, so what reaches a consumer is answerable from this file alone —
+The parametrize carriers capture and grouping pass between themselves live in
+`raw_params.py`, so what reaches a consumer is answerable from this file alone —
 which matters because the serializer is reflective over these dataclasses. The
 one exception is a field marked `serde_exclude`, which stays in memory and out
 of the JSON; `Step.source` is the only one.

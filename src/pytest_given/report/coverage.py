@@ -59,14 +59,14 @@ def build_story_index(story: Story) -> StoryIndex:
     """Index *story* for matching.
 
     Under-anchored sentences (fewer than 2 distinct term refs) are excluded
-    from *narration* matching — the ``A_refs ⊆ S`` rule would let one term, or
-    none, be covered by almost any step. A pin says what the narration cannot,
-    so it reaches them too.
+    from *narration* matching: a step matches a sentence when it names every
+    term the sentence does, so almost any step would match one term or none. A
+    pin says what the narration cannot, so it reaches them too.
     """
     refs_by_sentence = {
         sentence.id: refs
         for sentence in story.sentences
-        if _is_anchored(refs := a_refs(sentence))
+        if _is_anchored(refs := sentence_term_refs(sentence))
     }
     sentences_by_term: dict[TermId, set[SentenceId]] = {}
     for sentence_id, refs in refs_by_sentence.items():
@@ -80,9 +80,9 @@ def build_story_index(story: Story) -> StoryIndex:
     )
 
 
-def a_refs(sentence: Sentence) -> set[TermId]:
-    """The term ids the A_refs ⊆ S rule matches a sentence on, across all
-    its clauses. Words contribute nothing; an instance or inflection counts as
+def sentence_term_refs(sentence: Sentence) -> set[TermId]:
+    """The term ids a step has to name to match a sentence, across all its
+    clauses. Words contribute nothing; an instance or inflection counts as
     its term, so `guest('Alice')` and `guest` are the same ref."""
     return {
         part.term_id
@@ -97,7 +97,7 @@ def is_coverage_eligible(sentence: Sentence) -> bool:
     least two distinct glossary term refs. Under-anchored sentences (0 or 1
     distinct term) are excluded from it, and render 'not coverage-tracked'
     unless a pin covers them anyway."""
-    return _is_anchored(a_refs(sentence))
+    return _is_anchored(sentence_term_refs(sentence))
 
 
 def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[SentenceId]:
@@ -120,7 +120,7 @@ def compute_coverage(scenario: Scenario, index: StoryIndex) -> set[SentenceId]:
     return covered
 
 
-def s_for_step(step: Step) -> set[TermId]:
+def step_term_refs(step: Step) -> set[TermId]:
     """The term ids a step's narration term refs contribute, whatever their
     surface form.
 
@@ -149,7 +149,7 @@ def _pinned_ids(pins: tuple[Pin, ...], index: StoryIndex) -> set[SentenceId]:
 def _matched_ids(step: Step, index: StoryIndex) -> set[SentenceId]:
     """The indexed story's sentences a step's narration matches: those whose
     every term ref the step names."""
-    step_refs = s_for_step(step)
+    step_refs = step_term_refs(step)
     candidates: set[SentenceId] = set()
     for term_id in step_refs:
         candidates |= index.sentences_by_term.get(term_id, set())

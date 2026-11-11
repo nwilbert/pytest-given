@@ -18,7 +18,7 @@ from ..model import (
     StepPath,
     walk_steps,
 )
-from .base import (
+from .catalog import (
     ACTION_IN_THEN,
     CHECK_OUTSIDE_THEN,
     CONDITIONAL_CHECK,

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ..model import Glossary, Scenario, Story
 from .ast_rules import AST_RULE_IDS, run_ast_rules
-from .base import DEFAULTS, LintFinding, RuleId
+from .catalog import DEFAULTS, LintFinding, RuleId
 from .config import LintConfig, apply_config
 from .runtime_rules import RUNTIME_RULE_IDS, run_runtime_rules
 

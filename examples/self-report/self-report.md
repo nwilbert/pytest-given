@@ -122,6 +122,15 @@
 - **then** the summary counts the finding it left out
 - **then** it exits 1 for that finding
 
+## ✓ `skills install` removes what no bundled file accounts for, the directories it empties included
+`tests/integration/test_cli_skills.py::test_install_prunes_directories_emptied_by_stale_file_removal`
+
+- **given** installed skills holding a stale file two directories deep
+- **when** skills install runs again
+- **then** it succeeds
+- **then** the stale file and both directories it emptied are gone
+- **then** a bundled file beside them stays in place
+
 ## ✓ A «scenario» reaches the «report» with its «tags» and «term refs»
 `tests/integration/test_plugin.py::test_a_scenario_reaches_the_report_with_its_tags_and_term_refs`
 
@@ -1383,15 +1392,6 @@
 - **when** the suite runs with an HTML report
 - **then** the failure is summarized as the lint's, rather than raised as a traceback or titled as a report that was not written
 - **then** the report that was already written is still there
-
-## ✓ `skills install` removes what no bundled file accounts for, the directories it empties included
-`tests/integration/test_skills_cli.py::test_install_prunes_directories_emptied_by_stale_file_removal`
-
-- **given** installed skills holding a stale file two directories deep
-- **when** skills install runs again
-- **then** it succeeds
-- **then** the stale file and both directories it emptied are gone
-- **then** a bundled file beside them stays in place
 
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py::test_start_and_finish_scenario`
@@ -3362,14 +3362,14 @@
 - **then** its «severity» is warn by default
 
 ## ✓ A «sentence» references its «terms», whatever surface form they take
-`tests/unit/report/test_coverage.py::test_a_refs_collects_term_ids_whatever_the_display`
+`tests/unit/report/test_coverage.py::test_sentence_term_refs_collects_term_ids_whatever_the_display`
 
 - **given** a «sentence» written with an «instance» and an «inflection»
 - **when** «coverage» collects the «sentence» references
 - **then** they are the «term» ids alone; words contribute nothing
 
 ## ✓ A multi-clause «sentence» unions references across its «clauses»
-`tests/unit/report/test_coverage.py::test_a_refs_unions_across_multi_clause_sentence`
+`tests/unit/report/test_coverage.py::test_sentence_term_refs_unions_across_multi_clause_sentence`
 
 - **given** a «sentence» with two «clauses»
 - **when** «coverage» collects the «sentence» references
@@ -3384,7 +3384,7 @@
 - **then** the «sentence» is covered
 
 ## ✓ A «step» references its «terms», whatever surface form they take
-`tests/unit/report/test_coverage.py::test_s_for_step_collects_term_ids_whatever_the_display`
+`tests/unit/report/test_coverage.py::test_step_term_refs_collects_term_ids_whatever_the_display`
 
 - **given** a «step» naming an «instance» and an «inflection»
 - **when** «coverage» collects the «step» references

@@ -26,13 +26,13 @@ from ..model import (
     plural,
 )
 from .function_source import FunctionSource, SourceExcerpt
+from .glyphs import STATUS_GLYPH, STATUS_LABEL
 from .markdown_writer import (
     code_span_markdown,
     definition_markdown,
     literal_markdown,
     narration_markdown,
 )
-from .text import STATUS_GLYPH, STATUS_LABEL
 
 
 def render_md(

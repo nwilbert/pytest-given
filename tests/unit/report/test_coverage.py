@@ -30,11 +30,11 @@ from pytest_given.model import (
     TermId,
 )
 from pytest_given.report.coverage import (
-    a_refs,
     build_story_index,
     compute_coverage,
     is_coverage_eligible,
-    s_for_step,
+    sentence_term_refs,
+    step_term_refs,
 )
 from tests.ubiquitous_language import pg
 
@@ -55,7 +55,7 @@ def _clause(*parts):
     t'A {pg["Sentence"].l} references its {pg["Term"].l.s}, whatever surface '
     t'form they take',
 )
-def test_a_refs_collects_term_ids_whatever_the_display():
+def test_sentence_term_refs_collects_term_ids_whatever_the_display():
     with given(
         t'a {pg["Sentence"].l} written with an {pg["Instance"].l} and an '
         t'{pg["Inflection"].l}'
@@ -72,7 +72,7 @@ def test_a_refs_collects_term_ids_whatever_the_display():
             ),
         )
     with when(t'{pg["Coverage"].l} collects the {pg["Sentence"].l} references'):
-        refs = a_refs(a)
+        refs = sentence_term_refs(a)
     with then(t'they are the {pg["Term"].l} ids alone; words contribute nothing'):
         assert refs == {TermId('guest'), TermId('search'), TermId('room')}
 
@@ -81,7 +81,7 @@ def test_a_refs_collects_term_ids_whatever_the_display():
     t'A multi-clause {pg["Sentence"].l} unions references across its '
     t'{pg["Clause"].l.s}',
 )
-def test_a_refs_unions_across_multi_clause_sentence():
+def test_sentence_term_refs_unions_across_multi_clause_sentence():
     with given(t'a {pg["Sentence"].l} with two {pg["Clause"].l.s}'):
         a = Sentence(
             id=SentenceId(1),
@@ -99,7 +99,7 @@ def test_a_refs_unions_across_multi_clause_sentence():
             ),
         )
     with when(t'{pg["Coverage"].l} collects the {pg["Sentence"].l} references'):
-        refs = a_refs(a)
+        refs = sentence_term_refs(a)
     with then(t'the {pg["Term"].l.s} of both clauses are present'):
         assert TermId('room') in refs
         assert TermId('booking') in refs
@@ -165,7 +165,7 @@ def _term_ref(tid, display):
     t'A {pg["Step"].l} references its {pg["Term"].l.s}, whatever surface form '
     t'they take',
 )
-def test_s_for_step_collects_term_ids_whatever_the_display():
+def test_step_term_refs_collects_term_ids_whatever_the_display():
     with given(
         t'a {pg["Step"].l} naming an {pg["Instance"].l} and an {pg["Inflection"].l}'
     ):
@@ -173,7 +173,7 @@ def test_s_for_step_collects_term_ids_whatever_the_display():
             'when', _term_ref('guest', 'Alice'), _term_ref('search', 'searches for')
         )
     with when(t'{pg["Coverage"].l} collects the {pg["Step"].l} references'):
-        refs = s_for_step(step)
+        refs = step_term_refs(step)
     with then(t'they are the {pg["Term"].l} ids alone'):
         assert refs == {TermId('guest'), TermId('search')}
 

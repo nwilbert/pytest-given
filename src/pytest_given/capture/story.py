@@ -35,7 +35,7 @@ class _GlossaryCarrier:
     """The live `Glossary` objects a story-tree node's subtree references.
 
     `clause()` / `sentence()` / `story()` carry them at construction so
-    `discovery.resolve_glossary` can pick the suite's glossary off the
+    `glossary_resolution.resolve_glossary` can pick the suite's glossary off the
     stories it is handed.
 
     A capture-side mixin rather than a field on the schema: the report model

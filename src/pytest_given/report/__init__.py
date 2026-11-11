@@ -15,6 +15,7 @@ from .citation_index import (
     report_fragment,
 )
 from .console import write_console_as_utf8
+from .glyphs import CITATION_GLYPH, STATUS_GLYPH
 from .link_text import html_link_text, link_text
 from .md_renderer import citation_body_md
 from .sinks import (
@@ -34,7 +35,6 @@ from .source_link import (
     resolve_source_link_template,
 )
 from .staged_write import write_all_or_none
-from .text import CITATION_GLYPH, STATUS_GLYPH
 from .theme import DEFAULT_THEME, THEME_HELP, Theme, resolve_theme
 
 __all__ = [

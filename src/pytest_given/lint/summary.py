@@ -6,7 +6,7 @@ can (see its docstring). Everything here renders the sequence it is handed.
 """
 
 from ..model import location_suffix, plural
-from .base import LintFinding
+from .catalog import LintFinding
 
 
 def error_count(findings: list[LintFinding]) -> int:

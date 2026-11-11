@@ -15,9 +15,9 @@ from .collector import (
     get_active_collector,
     set_active_collector,
 )
-from .discovery import resolve_glossary
 from .file_glossary import FileGlossary
 from .glossary import Glossary
+from .glossary_resolution import resolve_glossary
 from .kind_inference import infer_glossary_kinds
 from .process_state import (
     begin_capture_session,

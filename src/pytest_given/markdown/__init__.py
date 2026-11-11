@@ -20,6 +20,7 @@ from .blocks import (
 )
 from .plain_text import (
     ASCII_PUNCTUATION,
+    DEFINITION_BREAK,
     LINE_BREAK,
     code_span_at,
     fold_whitespace,
@@ -38,6 +39,7 @@ from .spans import (
 
 __all__ = [
     'ASCII_PUNCTUATION',
+    'DEFINITION_BREAK',
     'LINE_BREAK',
     'CodeSpan',
     'EmphasisSpan',

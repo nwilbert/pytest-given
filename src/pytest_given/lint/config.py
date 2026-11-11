@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from fnmatch import fnmatchcase
 
 from ..model import PytestGivenError
-from .base import (
+from .catalog import (
     DEFAULTS,
     LEVELS,
     STALE_IGNORE,

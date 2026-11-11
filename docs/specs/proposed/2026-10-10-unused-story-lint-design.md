@@ -54,7 +54,7 @@ rule needs; `build_coverage_map` stays the report's entry point over `ReportData
 
 - `model/coverage.py` (moved from `report/coverage.py`), re-exported from `model/__init__.py`;
   `report/html_renderer.py` and `report/story_view.py` import it from `model`.
-- `lint/base.py` — `UNUSED_STORY`, default `warn`.
+- `lint/catalog.py` — `UNUSED_STORY`, default `warn`.
 - `lint/runtime_rules.py` — `_unused_story_findings`, registered in `_RUNTIME_RULES`.
 - Authoring skill `references/lint.md` — the catalog row; `references/stories.md` — the
   "Binding scenarios to a story" rule points at it, with the remedies.

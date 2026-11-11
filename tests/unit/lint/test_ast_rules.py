@@ -11,7 +11,7 @@ import pytest
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.lint import DEFAULTS
 from pytest_given.lint.ast_rules import run_ast_rules
-from pytest_given.lint.base import RawLintFinding, RuleId
+from pytest_given.lint.catalog import RawLintFinding, RuleId
 from pytest_given.model import (
     Narration,
     NarrationPlaceholder,

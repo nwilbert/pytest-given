@@ -19,7 +19,7 @@ from ..model import (
     iter_narrations,
     iter_steps,
 )
-from .base import (
+from .catalog import (
     DEAD_TERM,
     MISSING_PHASE,
     TAG_SHADOWS_TERM,

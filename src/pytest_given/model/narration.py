@@ -30,7 +30,7 @@ from .schema import (
     NarrationTermRef,
     NarrationValue,
 )
-from .steps import PartIndex
+from .step_tree import PartIndex
 
 type InterpolatedPart = NarrationValue | NarrationPlaceholder | NarrationTermRef
 type NarrationPiece = InlineSpan | InterpolatedPart

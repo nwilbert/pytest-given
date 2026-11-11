@@ -1,14 +1,8 @@
-"""Wording helpers the renderers and view builders share."""
+"""How a status and a citation's state are marked, wherever either is shown."""
 
-import re
 from typing import Literal
 
-from ..markdown import LINE_BREAK
 from ..model import Status
-
-# What breaks a line in a glossary definition's plain text: an author's `<br>`,
-# `<br/>` or `<br />` in any case, or a newline.
-DEFINITION_BREAK = re.compile(rf'<br\s*/?\s*>|{LINE_BREAK.pattern}', re.IGNORECASE)
 
 # How a status is marked, wherever it is shown.
 STATUS_GLYPH: dict[Status, str] = {

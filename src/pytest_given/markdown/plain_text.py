@@ -8,6 +8,10 @@ import re
 # A line ending in any of CommonMark's spellings.
 LINE_BREAK = re.compile(r'\r\n|\r|\n')
 
+# What breaks a line in a glossary definition's plain text: an author's `<br>`,
+# `<br/>` or `<br />` in any case, or a newline.
+DEFINITION_BREAK = re.compile(rf'<br\s*/?\s*>|{LINE_BREAK.pattern}', re.IGNORECASE)
+
 _HTML_TAG = re.compile(r'</?[A-Za-z][^>]*>')
 
 # What a backslash escapes in CommonMark.

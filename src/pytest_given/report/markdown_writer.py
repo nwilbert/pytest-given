@@ -5,6 +5,7 @@ import re
 from collections.abc import Callable
 
 from ..markdown import (
+    DEFINITION_BREAK,
     LINE_BREAK,
     CodeSpan,
     EmphasisSpan,
@@ -21,7 +22,6 @@ from ..model import (
     placeholder_token,
     read_narration,
 )
-from .text import DEFINITION_BREAK
 
 # What CommonMark or GFM give inline meaning: a link, emphasis,
 # strikethrough, a code span, raw HTML, an entity, a table cell, GitHub math —
