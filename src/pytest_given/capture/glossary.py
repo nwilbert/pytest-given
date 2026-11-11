@@ -1,4 +1,4 @@
-"""User-facing Glossary API: id derivation, value classes, registration."""
+"""User-facing Glossary API: lookup by name, term handles, registration."""
 
 import difflib
 import re

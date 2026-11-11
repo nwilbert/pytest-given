@@ -1,3 +1,8 @@
+"""Console setup both entry points run before they print a report's glyphs.
+
+Here because `plugin/` and `cli/` share nothing but the subpackages.
+"""
+
 import io
 import sys
 

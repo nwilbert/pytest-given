@@ -1,7 +1,7 @@
-"""The leaf: the report schema, its serde, and the text rules packages that
-cannot import each other still have to agree on.
+"""The report schema, its serde, and the text rules packages that cannot
+import each other still have to agree on.
 
-Imports nothing else in the package — `capture`, `lint`, `report`, `grouping`
+Imports only `markdown`, the leaf — `capture`, `lint`, `report`, `grouping`
 and `citations` all depend on this, so anything landing here is reachable from
 every one of them.
 """
