@@ -151,7 +151,7 @@ def _save_while_analyzing(monkeypatch: pytest.MonkeyPatch, document: Path) -> No
         text: str,
         resolver: check_module.TargetResolver,
         location: check_module._ReportLocation,
-    ) -> tuple[list[check_module.ReportLink], list[check_module._Edit]]:
+    ) -> tuple[list[check_module.ReportLink], list[check_module.Edit]]:
         analyzed = analyze(path, text, resolver, location)
         if path == document:
             path.write_bytes(path.read_bytes() + b'a concurrent edit\n')

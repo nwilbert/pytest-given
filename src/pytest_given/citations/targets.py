@@ -45,6 +45,12 @@ def parse_fragment(fragment: str) -> Target | None:
     return None
 
 
+def target_label(target: Target) -> str:
+    if target.key:
+        return f'{target.kind} {target.key}'
+    return f'a {target.kind} with an empty name'
+
+
 class TargetResolver:
     """What the report holds under the name a link gives a target."""
 
