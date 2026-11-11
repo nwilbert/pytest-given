@@ -3213,6 +3213,256 @@
         ```
 - **then** a `failed` «citation finding» remains, blaming a scenario using the term
 
+## ✓ A «parametrized scenario» takes the status of its worst «case»: failed, then xfailed, then passed, then skipped · 6 cases
+`tests/unit/grouping/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status` · parametrization
+
+- **given** «Cases» of one «parametrized scenario» that ended {statuses}, each xfailed one for the reason "planned"
+- **when** the «grouping» pass collapses them
+- **then** the «scenario» is {status}
+- **then** its xfail reason is {reason}
+
+| statuses | status | reason |
+|---|---|---|
+| passed, failed, skipped | failed | None |
+| xfailed, failed | failed | None |
+| passed, xfailed | xfailed | planned |
+| skipped, xfailed | xfailed | planned |
+| skipped, passed | passed | None |
+| skipped, skipped | skipped | None |
+
+## ✓ A «parametrized scenario» carries a skip or xfail reason only when its «cases» all give it · 4 cases
+`tests/unit/grouping/test_grouping.py::test_a_group_carries_a_reason_only_its_cases_share` · parametrization
+
+- **given** two {status} «cases», one saying {first} and one saying {second}
+- **when** the «cases» are «grouped»
+- **then** the «parametrized scenario» is {status}, with the reason {shared}
+
+| case ID | status | first | second | shared |
+|---|---|---|---|---|
+| skipped-different | skipped | needs a database | needs a service | None |
+| skipped-shared | skipped | needs a database | needs a database | needs a database |
+| xfailed-different | xfailed | flaky | slow | None |
+| xfailed-shared | xfailed | flaky | flaky | flaky |
+
+## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
+`tests/unit/grouping/test_grouping.py::test_group_parametrized_keeps_source_order` · parametrization
+
+- **given** a plain «scenario» between two parametrized ones
+- **when** the «grouping» pass runs
+- **then** the «report» lists them in the order the file declares
+
+## ✓ Same-named «parametrized scenarios» on different test functions stay apart
+`tests/unit/grouping/test_grouping.py::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
+
+- **given** two test functions whose «cases» share one name
+- **when** the «grouping» pass runs
+- **then** each function keeps its own «scenario» and «parameter table»
+
+## ✓ The grouped tree comes from the first passed «case»
+`tests/unit/grouping/test_grouping.py::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
+
+- **given** a skipped first «case» and a second one that ran
+- **when** the «cases» are «grouped»
+- **then** the tree is the one the passed «case» recorded
+
+## ✓ A plain-str «narration» that varies across «cases» is refused
+`tests/unit/grouping/test_grouping.py::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
+
+- **given** two «cases» whose text differs but records no parts
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the test, the missing parts and the t-string fix
+- **then** it names the «case» whose values were baked in, and the per-case opt-out
+
+## ✓ A narrated value that varies becomes a derived «parameter table» column
+`tests/unit/grouping/test_grouping.py::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
+
+- **given** two «cases» narrating a value that differs
+- **when** «templatizing» walks the «cases»
+- **then** the value becomes a derived column beside the parametrize one
+- **then** the «step» keeps a placeholder pointing at that column
+- **then** the placeholder keeps the format spec and conversion it narrated
+
+## ✓ A narrated value that is the same in every «case» stays inline as a «value highlight»
+`tests/unit/grouping/test_grouping.py::test_a_constant_interpolation_stays_inline_and_makes_no_column` · parametrization
+
+- **given** two «cases» narrating the same value
+- **when** «templatizing» walks the «cases»
+- **then** the «parameter table» gains no column for it
+- **then** the «step» keeps the value inline, as a «value highlight»
+
+## ✓ A varying interpolation that is not a bare name is refused
+`tests/unit/grouping/test_grouping.py::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
+
+- **given** two «cases» narrating a computed expression
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error quotes the expression and shows the bind-a-local fix
+
+## ✓ A varying expression in a then is refused with the fix of an expected-outcome column
+`tests/unit/grouping/test_grouping.py::test_rule_two_in_a_then_offers_an_expected_outcome_column` · diagnostics, parametrization, validation, versions/0.5.0
+
+- **given** two «cases» whose then narrates an outcome derived from an input
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error first suggests parametrizing the expected outcome
+
+## ✓ A «parameter table» cell reads the way the «scenario title» formats it
+`tests/unit/grouping/test_grouping.py::test_a_scenario_title_format_spec_reaches_its_cell` · parametrization
+
+- **given** a Template scenario title formatting its parameter
+- **when** the «cases» are «grouped»
+- **then** the cells carry the formatting the title declared
+
+## ✓ A «scenario title» formatting a parameter unlike a «step» gets its own column
+`tests/unit/grouping/test_grouping.py::test_a_scenario_title_disagreeing_with_a_step_gets_its_own_column` · parametrization
+
+- **given** a title formatting the parameter and a step reading it plainly
+- **when** the «cases» are «grouped»
+- **then** the title points at a column holding what it renders
+- **then** the title renders the disambiguated token, text and parts agreeing
+
+## ✓ A «step» formatting a parameter unlike the «scenario title» gets its own column
+`tests/unit/grouping/test_grouping.py::test_a_step_slot_disagreeing_with_the_title_gets_its_own_column` · parametrization
+
+- **given** a step formatting the parameter and a title reading it plainly
+- **when** the «cases» are «grouped»
+- **then** the step points at a column holding what it renders
+- **then** the step renders the disambiguated token, text and parts agreeing
+
+## ✓ A «step» whose narrated value differs from its parameter column is refused
+`tests/unit/grouping/test_grouping.py::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
+
+- **given** two «cases» narrating a value their column lacks
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the column and what the case actually narrated
+
+## ✓ A «term ref» whose display differs between «cases» is refused
+`tests/unit/grouping/test_grouping.py::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
+
+- **given** two «cases» whose «term ref» reads differently
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the «term ref» and the split-it-out fix
+
+## ✓ A «term ref» whose display varies is refused even when a parametrize value binds it
+`tests/unit/grouping/test_grouping.py::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
+
+- **given** two «cases» whose «term ref» is the parameter itself
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error points at the per-case «scenario» opt-out
+
+## ✓ A «parameter table» orders its columns the way the «narration» first shows them
+`tests/unit/grouping/test_grouping.py::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
+
+- **given** two «cases» whose given attaches a varying log and whose later step narrates the parameter
+- **when** «templatizing» walks the «cases»
+- **then** the given's «attachment» column comes first
+- **then** each «case» row follows the same order
+
+## ✓ An «attachment» whose payload varies becomes an «attachment» column
+`tests/unit/grouping/test_grouping.py::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
+
+- **given** two «cases» attaching a label with differing payloads
+- **when** «templatizing» walks the «cases»
+- **then** the payload moves into an «attachment» column
+- **then** the «step» keeps a content-less badge pointing at it
+
+## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
+`tests/unit/grouping/test_grouping.py::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
+
+- **given** an «attachment» label only one «case» attaches
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the label, the case, and asks for a constant one
+
+## ✓ A «parameter table» cell holds the text the «step» pointing at it narrated
+`tests/unit/grouping/test_grouping.py::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
+
+- **given** two «cases» narrating a parameter with a format spec
+- **when** «grouping» builds the «parameter table»
+- **then** each cell carries the formatted text, under one column
+- **then** the step keeps its placeholder, which that cell substitutes into
+
+## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
+`tests/unit/grouping/test_grouping.py::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
+
+- **given** two «cases» whose «step» trees differ
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the divergence and the opt-out that answers it
+
+## ✓ A failed «case» must narrate the «steps» it shares with the passed ones the same way
+`tests/unit/grouping/test_grouping.py::test_a_failed_case_with_recorded_steps_must_narrate_the_baseline` · parametrization, validation
+
+- **given** two «cases» whose «step» texts differ
+- **when** the «cases» are «grouped»
+- **then** the grouping is refused
+- **then** the error names the failed case and its difference from the baseline
+
+## ✓ A failed «case» that stops early or takes another path still «groups» · 2 cases
+`tests/unit/grouping/test_grouping.py::test_a_failed_case_is_not_held_to_steps_it_does_not_share` · parametrization, validation
+
+- **given** a passed «case» that loads its items, then checks it is hot
+- **given** a failed «case» that loads its items, then {retries instead of checking it is hot / stops}
+    - 📎 failed steps — *see parameter table*
+- **when** the «cases» are «grouped»
+- **then** they make one scenario, with a row for each case
+
+| case ID | retries | failed steps |
+|---|---|---|
+| stops-early | False | `when 4 items load` |
+| parts-from-the-baseline | True | failed steps |
+
+- **parts-from-the-baseline** — failed steps:
+    ```
+    when 4 items load
+    when it retries
+    ```
+
+## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
+`tests/unit/grouping/test_grouping.py::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
+
+- **given** a step narrating a parameter bound to a glossary term instance
+- **when** the «cases» are «grouped»
+- **then** the «parameter table» holds the term displays alone
+- **then** the step still points at that column
+
+## ✓ «Steps» that word one Boolean with different «boolean phrases» share its «parameter table» column
+`tests/unit/grouping/test_grouping.py::test_slots_with_different_phrases_share_the_param_column` · spec/boolean-phrases
+
+- **given** two «steps» wording `pinned` with different phrases
+- **when** «templatizing» walks the «cases»
+- **then** the table holds one column, with the Booleans
+- **then** both «steps» point at that column
+
+## ✓ A varying local worded with «boolean phrases» becomes a derived column of Booleans
+`tests/unit/grouping/test_grouping.py::test_a_varying_boolean_local_becomes_a_derived_column_of_booleans` · spec/boolean-phrases
+
+- **given** two «cases» that word a local `flag` as "on" and "off"
+- **when** «templatizing» walks the «cases»
+- **then** the local gets a derived column beside the parametrize one
+- **then** that column holds the Boolean behind each phrase
+- **then** the «step» shows both phrases
+
+## ✓ «Steps» that word one varying local with different «boolean phrases» share its derived column
+`tests/unit/grouping/test_grouping.py::test_slots_wording_one_varying_local_share_its_derived_column` · spec/boolean-phrases
+
+- **given** two «steps» wording a local `flag` with different phrases
+- **when** «templatizing» walks the «cases»
+- **then** the table holds one derived column, with the Booleans
+- **then** each «step» still shows its own phrases
+
+## ✓ A per-case «scenario title» ends with its «case ID» as a value
+`tests/unit/grouping/test_percase.py::test_a_plain_string_title_carries_its_case_id_as_a_value` · parametrization, versions/0.5.0
+
+- **given** a «parametrized scenario» titled "Split" that declines the «grouping», with the case ID a*b*c
+- **when** its «case» becomes a «scenario» of its own
+- **then** the title reads "Split \[a*b*c\]"
+- **then** the case ID is a value part, and its asterisks are not read as emphasis
+
 ## ✓ «Narration lint» flags a «step» whose body does nothing
 `tests/unit/lint/test_ast_rules.py::test_empty_step_fires_on_pass_only_body`
 
@@ -4074,253 +4324,3 @@
 - **given** a «story» with a two-«clause» «sentence»
 - **when** the «sentence» labels are built
 - **then** the label gives the number, then reads as prose under a story-scoped key, with the «clause» texts joined
-
-## ✓ A «parametrized scenario» takes the status of its worst «case»: failed, then xfailed, then passed, then skipped · 6 cases
-`tests/unit/test_grouping.py::test_a_parametrized_scenario_takes_its_worst_cases_status` · parametrization
-
-- **given** «Cases» of one «parametrized scenario» that ended {statuses}, each xfailed one for the reason "planned"
-- **when** the «grouping» pass collapses them
-- **then** the «scenario» is {status}
-- **then** its xfail reason is {reason}
-
-| statuses | status | reason |
-|---|---|---|
-| passed, failed, skipped | failed | None |
-| xfailed, failed | failed | None |
-| passed, xfailed | xfailed | planned |
-| skipped, xfailed | xfailed | planned |
-| skipped, passed | passed | None |
-| skipped, skipped | skipped | None |
-
-## ✓ A «parametrized scenario» carries a skip or xfail reason only when its «cases» all give it · 4 cases
-`tests/unit/test_grouping.py::test_a_group_carries_a_reason_only_its_cases_share` · parametrization
-
-- **given** two {status} «cases», one saying {first} and one saying {second}
-- **when** the «cases» are «grouped»
-- **then** the «parametrized scenario» is {status}, with the reason {shared}
-
-| case ID | status | first | second | shared |
-|---|---|---|---|---|
-| skipped-different | skipped | needs a database | needs a service | None |
-| skipped-shared | skipped | needs a database | needs a database | needs a database |
-| xfailed-different | xfailed | flaky | slow | None |
-| xfailed-shared | xfailed | flaky | flaky | flaky |
-
-## ✓ A «parametrized scenario» keeps its place among the «scenarios» around it
-`tests/unit/test_grouping.py::test_group_parametrized_keeps_source_order` · parametrization
-
-- **given** a plain «scenario» between two parametrized ones
-- **when** the «grouping» pass runs
-- **then** the «report» lists them in the order the file declares
-
-## ✓ Same-named «parametrized scenarios» on different test functions stay apart
-`tests/unit/test_grouping.py::test_group_parametrized_distinct_functions_same_name_do_not_group` · parametrization
-
-- **given** two test functions whose «cases» share one name
-- **when** the «grouping» pass runs
-- **then** each function keeps its own «scenario» and «parameter table»
-
-## ✓ The grouped tree comes from the first passed «case»
-`tests/unit/test_grouping.py::test_baseline_is_the_first_passed_case_not_the_first_case` · parametrization
-
-- **given** a skipped first «case» and a second one that ran
-- **when** the «cases» are «grouped»
-- **then** the tree is the one the passed «case» recorded
-
-## ✓ A plain-str «narration» that varies across «cases» is refused
-`tests/unit/test_grouping.py::test_a_varying_str_narration_raises_rule_one` · parametrization, validation
-
-- **given** two «cases» whose text differs but records no parts
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error names the test, the missing parts and the t-string fix
-- **then** it names the «case» whose values were baked in, and the per-case opt-out
-
-## ✓ A narrated value that varies becomes a derived «parameter table» column
-`tests/unit/test_grouping.py::test_a_varying_bare_name_interpolation_becomes_a_derived_column` · parametrization
-
-- **given** two «cases» narrating a value that differs
-- **when** «templatizing» walks the «cases»
-- **then** the value becomes a derived column beside the parametrize one
-- **then** the «step» keeps a placeholder pointing at that column
-- **then** the placeholder keeps the format spec and conversion it narrated
-
-## ✓ A narrated value that is the same in every «case» stays inline as a «value highlight»
-`tests/unit/test_grouping.py::test_a_constant_interpolation_stays_inline_and_makes_no_column` · parametrization
-
-- **given** two «cases» narrating the same value
-- **when** «templatizing» walks the «cases»
-- **then** the «parameter table» gains no column for it
-- **then** the «step» keeps the value inline, as a «value highlight»
-
-## ✓ A varying interpolation that is not a bare name is refused
-`tests/unit/test_grouping.py::test_a_varying_compound_interpolation_raises_rule_two` · diagnostics, parametrization, validation
-
-- **given** two «cases» narrating a computed expression
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error quotes the expression and shows the bind-a-local fix
-
-## ✓ A varying expression in a then is refused with the fix of an expected-outcome column
-`tests/unit/test_grouping.py::test_rule_two_in_a_then_offers_an_expected_outcome_column` · diagnostics, parametrization, validation, versions/0.5.0
-
-- **given** two «cases» whose then narrates an outcome derived from an input
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error first suggests parametrizing the expected outcome
-
-## ✓ A «parameter table» cell reads the way the «scenario title» formats it
-`tests/unit/test_grouping.py::test_a_scenario_title_format_spec_reaches_its_cell` · parametrization
-
-- **given** a Template scenario title formatting its parameter
-- **when** the «cases» are «grouped»
-- **then** the cells carry the formatting the title declared
-
-## ✓ A «scenario title» formatting a parameter unlike a «step» gets its own column
-`tests/unit/test_grouping.py::test_a_scenario_title_disagreeing_with_a_step_gets_its_own_column` · parametrization
-
-- **given** a title formatting the parameter and a step reading it plainly
-- **when** the «cases» are «grouped»
-- **then** the title points at a column holding what it renders
-- **then** the title renders the disambiguated token, text and parts agreeing
-
-## ✓ A «step» formatting a parameter unlike the «scenario title» gets its own column
-`tests/unit/test_grouping.py::test_a_step_slot_disagreeing_with_the_title_gets_its_own_column` · parametrization
-
-- **given** a step formatting the parameter and a title reading it plainly
-- **when** the «cases» are «grouped»
-- **then** the step points at a column holding what it renders
-- **then** the step renders the disambiguated token, text and parts agreeing
-
-## ✓ A «step» whose narrated value differs from its parameter column is refused
-`tests/unit/test_grouping.py::test_a_rebound_parametrize_name_raises_rule_three` · parametrization, validation
-
-- **given** two «cases» narrating a value their column lacks
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error names the column and what the case actually narrated
-
-## ✓ A «term ref» whose display differs between «cases» is refused
-`tests/unit/test_grouping.py::test_a_varying_term_ref_display_raises_rule_four` · parametrization, validation
-
-- **given** two «cases» whose «term ref» reads differently
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error names the «term ref» and the split-it-out fix
-
-## ✓ A «term ref» whose display varies is refused even when a parametrize value binds it
-`tests/unit/test_grouping.py::test_a_param_bound_term_ref_that_varies_raises_rule_four` · parametrization, validation
-
-- **given** two «cases» whose «term ref» is the parameter itself
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error points at the per-case «scenario» opt-out
-
-## ✓ A «parameter table» orders its columns the way the «narration» first shows them
-`tests/unit/test_grouping.py::test_a_parameter_table_orders_its_columns_by_first_narration` · parametrization
-
-- **given** two «cases» whose given attaches a varying log and whose later step narrates the parameter
-- **when** «templatizing» walks the «cases»
-- **then** the given's «attachment» column comes first
-- **then** each «case» row follows the same order
-
-## ✓ An «attachment» whose payload varies becomes an «attachment» column
-`tests/unit/test_grouping.py::test_a_varying_attachment_becomes_a_column_and_leaves_a_content_less_badge` · parametrization
-
-- **given** two «cases» attaching a label with differing payloads
-- **when** «templatizing» walks the «cases»
-- **then** the payload moves into an «attachment» column
-- **then** the «step» keeps a content-less badge pointing at it
-
-## ✓ A «step» whose set of «attachment» labels differs between «cases» is refused
-`tests/unit/test_grouping.py::test_a_label_present_in_one_case_only_raises_rule_five` · parametrization, validation
-
-- **given** an «attachment» label only one «case» attaches
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error names the label, the case, and asks for a constant one
-
-## ✓ A «parameter table» cell holds the text the «step» pointing at it narrated
-`tests/unit/test_grouping.py::test_a_formatted_param_cell_holds_the_text_the_step_narrated` · parametrization
-
-- **given** two «cases» narrating a parameter with a format spec
-- **when** «grouping» builds the «parameter table»
-- **then** each cell carries the formatted text, under one column
-- **then** the step keeps its placeholder, which that cell substitutes into
-
-## ✓ «Cases» that narrate different «steps» are refused rather than «grouped»
-`tests/unit/test_grouping.py::test_divergent_step_structure_refuses_the_merge` · parametrization, validation
-
-- **given** two «cases» whose «step» trees differ
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error names the divergence and the opt-out that answers it
-
-## ✓ A failed «case» must narrate the «steps» it shares with the passed ones the same way
-`tests/unit/test_grouping.py::test_a_failed_case_with_recorded_steps_must_narrate_the_baseline` · parametrization, validation
-
-- **given** two «cases» whose «step» texts differ
-- **when** the «cases» are «grouped»
-- **then** the grouping is refused
-- **then** the error names the failed case and its difference from the baseline
-
-## ✓ A failed «case» that stops early or takes another path still «groups» · 2 cases
-`tests/unit/test_grouping.py::test_a_failed_case_is_not_held_to_steps_it_does_not_share` · parametrization, validation
-
-- **given** a passed «case» that loads its items, then checks it is hot
-- **given** a failed «case» that loads its items, then {retries instead of checking it is hot / stops}
-    - 📎 failed steps — *see parameter table*
-- **when** the «cases» are «grouped»
-- **then** they make one scenario, with a row for each case
-
-| case ID | retries | failed steps |
-|---|---|---|
-| stops-early | False | `when 4 items load` |
-| parts-from-the-baseline | True | failed steps |
-
-- **parts-from-the-baseline** — failed steps:
-    ```
-    when 4 items load
-    when it retries
-    ```
-
-## ✓ A «step» narrating a glossary term parameter keeps pointing at its «parameter table» column
-`tests/unit/test_grouping.py::test_a_step_slot_over_a_term_instance_keeps_pointing_at_its_cell` · parametrization
-
-- **given** a step narrating a parameter bound to a glossary term instance
-- **when** the «cases» are «grouped»
-- **then** the «parameter table» holds the term displays alone
-- **then** the step still points at that column
-
-## ✓ «Steps» that word one Boolean with different «boolean phrases» share its «parameter table» column
-`tests/unit/test_grouping.py::test_slots_with_different_phrases_share_the_param_column` · spec/boolean-phrases
-
-- **given** two «steps» wording `pinned` with different phrases
-- **when** «templatizing» walks the «cases»
-- **then** the table holds one column, with the Booleans
-- **then** both «steps» point at that column
-
-## ✓ A varying local worded with «boolean phrases» becomes a derived column of Booleans
-`tests/unit/test_grouping.py::test_a_varying_boolean_local_becomes_a_derived_column_of_booleans` · spec/boolean-phrases
-
-- **given** two «cases» that word a local `flag` as "on" and "off"
-- **when** «templatizing» walks the «cases»
-- **then** the local gets a derived column beside the parametrize one
-- **then** that column holds the Boolean behind each phrase
-- **then** the «step» shows both phrases
-
-## ✓ «Steps» that word one varying local with different «boolean phrases» share its derived column
-`tests/unit/test_grouping.py::test_slots_wording_one_varying_local_share_its_derived_column` · spec/boolean-phrases
-
-- **given** two «steps» wording a local `flag` with different phrases
-- **when** «templatizing» walks the «cases»
-- **then** the table holds one derived column, with the Booleans
-- **then** each «step» still shows its own phrases
-
-## ✓ A per-case «scenario title» ends with its «case ID» as a value
-`tests/unit/test_percase.py::test_a_plain_string_title_carries_its_case_id_as_a_value` · parametrization, versions/0.5.0
-
-- **given** a «parametrized scenario» titled "Split" that declines the «grouping», with the case ID a*b*c
-- **when** its «case» becomes a «scenario» of its own
-- **then** the title reads "Split \[a*b*c\]"
-- **then** the case ID is a value part, and its asterisks are not read as emphasis
