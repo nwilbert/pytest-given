@@ -1189,6 +1189,7 @@
 <ul>
 <li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
 <li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
+<li><strong>Breaking.</strong> A glossary term's <code>definition</code> in the JSON report is now an object, which holds the string it used to be in <code>text</code> and its definition refs in <code>parts</code>. A script reading <code>.definition</code> must read <code>.definition.text</code>.</li>
 <li><strong>Breaking.</strong> <code>pytest-given report</code> and <code>pytest-given skills install</code> now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
