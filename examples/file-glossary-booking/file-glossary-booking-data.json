@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-10T17:08:39.521196+00:00",
+    "timestamp": "2026-11-12T18:54:56.362658+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "a42c0c18c5e3dd32c22db0aeb077dbbf54eb9b85",
+    "commit_sha": "bec336b5707b0621c5f7cc4029e3e282e3abe36e",
     "title": "File Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html"
   },
@@ -257,7 +257,22 @@
         "id": "guest",
         "kind": "actor",
         "canonical": "Guest",
-        "definition": "A person making a **room** reservation.",
+        "definition": {
+          "text": "A person making a **room** reservation.",
+          "parts": [
+            {
+              "value": "A person making a "
+            },
+            {
+              "term_id": "room",
+              "display": "room",
+              "expression": ""
+            },
+            {
+              "value": " reservation."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 7
@@ -267,7 +282,22 @@
         "id": "book",
         "kind": "activity",
         "canonical": "book",
-        "definition": "Reserve a **Room** for a given stay.",
+        "definition": {
+          "text": "Reserve a **Room** for a given stay.",
+          "parts": [
+            {
+              "value": "Reserve a "
+            },
+            {
+              "term_id": "room",
+              "display": "Room",
+              "expression": ""
+            },
+            {
+              "value": " for a given stay."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 8
@@ -277,7 +307,14 @@
         "id": "room",
         "kind": "object",
         "canonical": "Room",
-        "definition": "A bookable hotel room.",
+        "definition": {
+          "text": "A bookable hotel room.",
+          "parts": [
+            {
+              "value": "A bookable hotel room."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 9
@@ -287,7 +324,14 @@
         "id": "confirmation",
         "kind": "object",
         "canonical": "Confirmation",
-        "definition": "A notification acknowledging a successful reservation.",
+        "definition": {
+          "text": "A notification acknowledging a successful reservation.",
+          "parts": [
+            {
+              "value": "A notification acknowledging a successful reservation."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 10
@@ -297,7 +341,22 @@
         "id": "cancellation-policy",
         "kind": null,
         "canonical": "Cancellation Policy",
-        "definition": "The rules governing *how* and *when* a booking may be cancelled.<br>Applies to every **Room** rate, such as `flexible` or `non-refundable`.",
+        "definition": {
+          "text": "The rules governing *how* and *when* a booking may be cancelled.<br>Applies to every **Room** rate, such as `flexible` or `non-refundable`.",
+          "parts": [
+            {
+              "value": "The rules governing *how* and *when* a booking may be cancelled.<br>Applies to every "
+            },
+            {
+              "term_id": "room",
+              "display": "Room",
+              "expression": ""
+            },
+            {
+              "value": " rate, such as `flexible` or `non-refundable`."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 11
@@ -307,7 +366,22 @@
         "id": "overbooking",
         "kind": null,
         "canonical": "Overbooking",
-        "definition": "Accepting more reservations than there are **rooms** available.",
+        "definition": {
+          "text": "Accepting more reservations than there are **rooms** available.",
+          "parts": [
+            {
+              "value": "Accepting more reservations than there are "
+            },
+            {
+              "term_id": "room",
+              "display": "rooms",
+              "expression": ""
+            },
+            {
+              "value": " available."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
           "line": 12

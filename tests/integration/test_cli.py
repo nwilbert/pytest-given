@@ -10,6 +10,7 @@ from pytest_given.cli import main
 from pytest_given.report import sinks
 from tests.ubiquitous_language import pg
 from tests.unit.report.app_data import embedded_app_data
+from tests.unit.report.term_refs import term_refs
 
 
 def test_cli_generates_html(tmp_path: Path) -> None:
@@ -281,6 +282,36 @@ def test_cli_md_creates_missing_parent_dirs(tmp_path) -> None:
     rc = main(['report', str(json_path), '--format', 'md', '-o', str(out)])
     assert rc == 0
     assert out.read_text(encoding='utf-8').startswith('# pytest-given — cli')
+
+
+def test_cli_renders_the_definition_refs_a_saved_report_stores(tmp_path: Path) -> None:
+    """It reads the stored parts: `suite` names no term, so resolving the
+    text again would link nothing."""
+    report = _minimal_report()
+    term = {'kind': 'object', 'definition': None}
+    report['glossary'] = {
+        'terms': [
+            {
+                **term,
+                'id': 'guest',
+                'canonical': 'Guest',
+                'definition': {
+                    'text': 'Books a **suite**.',
+                    'parts': [
+                        {'value': 'Books a '},
+                        {'term_id': 'room', 'display': 'suite', 'expression': ''},
+                        {'value': '.'},
+                    ],
+                },
+            },
+            {**term, 'id': 'room', 'canonical': 'Room'},
+        ]
+    }
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(report))
+    html_path = tmp_path / 'out.html'
+    assert main(['report', str(json_path), '-o', str(html_path)]) == 0
+    assert ('room', 'suite') in term_refs(html_path.read_text(encoding='utf-8'))
 
 
 def _minimal_report() -> dict:

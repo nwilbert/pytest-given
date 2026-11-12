@@ -156,13 +156,50 @@ class SourceLocation:
     line: int
 
 
+type DefinitionPart = NarrationLiteral | NarrationTermRef
+
+
+def definition_part_text(part: DefinitionPart) -> str:
+    """A part as its definition's `text` spells it: a ref in bold."""
+    match part:
+        case NarrationLiteral(value=value):
+            return value
+        case NarrationTermRef(display=display):
+            return f'**{display}**'
+
+
+@dataclass(frozen=True)
+class Definition:
+    """A glossary definition as authored, and its definition refs resolved:
+    the bold spans naming a term are term ref parts, the rest literals.
+
+    Not a `Narration`, whose `text` spells a ref as its bare `display`.
+    """
+
+    text: str
+    parts: tuple[DefinitionPart, ...]
+
+    def __post_init__(self) -> None:
+        joined = ''.join(definition_part_text(part) for part in self.parts)
+        assert joined == self.text, f'parts spell {joined!r}, not {self.text!r}'
+
+    @classmethod
+    def literal(cls, text: str) -> Definition:
+        """`text` with no ref resolved, as every definition is declared."""
+        return cls(text, (NarrationLiteral(value=text),))
+
+
 @dataclass(frozen=True, kw_only=True)
 class GlossaryTerm:
     id: TermId
     kind: TermKind | None
     canonical: str
-    definition: str | None = None
+    definition: Definition | None = None
     source: SourceLocation | None = None
+
+    @property
+    def definition_text(self) -> str | None:
+        return None if self.definition is None else self.definition.text
 
 
 @dataclass(frozen=True, kw_only=True)

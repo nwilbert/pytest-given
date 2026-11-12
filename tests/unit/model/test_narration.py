@@ -5,8 +5,10 @@ from typing import Any, cast
 
 import pytest
 
+from pytest_given.markdown import EmphasisSpan, PlainSpan
 from pytest_given.model import (
     ColumnId,
+    Definition,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
@@ -17,6 +19,7 @@ from pytest_given.model import (
     boolean_phrases,
     narration_text,
     placeholder_token,
+    read_definition,
     render_interpolation,
     spanned_part,
 )
@@ -218,3 +221,31 @@ def test_placeholder_token_shows_both_phrases_of_a_phrase_spec(
     )
     assert placeholder_token(part) == token
     assert narration_text([part]) == token
+
+
+_PHASE_REF = NarrationTermRef(term_id=TermId('phase'), display='Phase')
+
+
+def test_read_definition_passes_a_ref_through_and_reads_the_literals() -> None:
+    definition = Definition(
+        'In one **Phase**, *nested*.',
+        (
+            NarrationLiteral(value='In one '),
+            _PHASE_REF,
+            NarrationLiteral(value=', *nested*.'),
+        ),
+    )
+    assert read_definition(definition) == [
+        PlainSpan('In one '),
+        _PHASE_REF,
+        PlainSpan(', '),
+        EmphasisSpan(False, (PlainSpan('nested'),)),
+        PlainSpan('.'),
+    ]
+
+
+def test_read_definition_reads_a_literal_s_edge_against_the_ref_beside_it() -> None:
+    definition = Definition(
+        '**Phase****(b)**', (_PHASE_REF, NarrationLiteral(value='**(b)**'))
+    )
+    assert read_definition(definition) == [_PHASE_REF, PlainSpan('**(b)**')]

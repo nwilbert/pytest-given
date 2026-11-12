@@ -17,8 +17,7 @@ from .collector import (
 )
 from .file_glossary import FileGlossary
 from .glossary import Glossary
-from .glossary_resolution import resolve_glossary
-from .kind_inference import infer_glossary_kinds
+from .glossary_resolution import session_glossary
 from .process_state import (
     begin_capture_session,
     capture_snapshot,
@@ -68,17 +67,16 @@ __all__ = [
     'clause',
     'get_active_collector',
     'given',
-    'infer_glossary_kinds',
     'is_internal_path',
     'item_source',
     'parse_short_repr',
     'registered_stories',
-    'resolve_glossary',
     'resolved_placeholder_part',
     'restore_capture_state',
     'scenario',
     'scenario_marker',
     'sentence',
+    'session_glossary',
     'set_active_collector',
     'step_descriptor',
     'story',

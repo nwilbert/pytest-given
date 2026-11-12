@@ -1,6 +1,7 @@
 """Reports to cite, built from the model for the citation tests."""
 
 from pytest_given.model import (
+    Definition,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -72,7 +73,7 @@ def term_(name: str, definition: str | None = None) -> GlossaryTerm:
         id=TermId(name.lower()),
         kind='actor',
         canonical=name,
-        definition=definition,
+        definition=None if definition is None else Definition.literal(definition),
     )
 
 

@@ -26,6 +26,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
 - **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
+- **Breaking.** A glossary term's `definition` in the JSON report is now an object, which holds the string it used to be in `text` and its definition refs in `parts`. A script reading `.definition` must read `.definition.text`.
 - **Breaking.** `pytest-given report` and `pytest-given skills install` now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.
 
 ### Fixed

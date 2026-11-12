@@ -34,6 +34,8 @@ from .schema import (
     ClauseTermRef,
     ClauseWord,
     ColumnId,
+    Definition,
+    DefinitionPart,
     ErrorCause,
     ErrorInfo,
     Glossary,
@@ -162,8 +164,27 @@ def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
         id=TermId(d['id']),
         kind=_term_kind(d['kind']),
         canonical=d['canonical'],
-        definition=d.get('definition'),
+        definition=_definition_from_dict(d.get('definition')),
         source=_source_from_dict(d.get('source')),
+    )
+
+
+def _definition_from_dict(definition: dict[str, Any] | None) -> Definition | None:
+    if definition is None:
+        return None
+    return Definition(
+        definition['text'],
+        tuple(_definition_part_from_dict(part) for part in definition['parts']),
+    )
+
+
+def _definition_part_from_dict(part_dict: dict[str, Any]) -> DefinitionPart:
+    part = _narration_part_from_dict(part_dict)
+    if isinstance(part, NarrationLiteral | NarrationTermRef):
+        return part
+    raise PytestGivenError(
+        f'invalid definition part (keys: {sorted(part_dict)!r}) in JSON report; '
+        'expected a literal or a term ref.'
     )
 
 

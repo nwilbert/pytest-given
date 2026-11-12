@@ -2237,6 +2237,56 @@ def test_glossary_term_source_captured_in_json(pytester, tmp_path):
         assert src['line'] >= 1
 
 
+@scenario(
+    t'The {pg["Report"].l} stores a definition as written, each '
+    t'{pg["Definition ref"].l} a {pg["Term ref"].l} part',
+    tags=['spec/definition-refs'],
+)
+def test_the_report_stores_a_definition_as_written_with_its_refs_as_parts(
+    pytester, tmp_path
+):
+    with given(
+        t'a {pg["Glossary"].l} declared in code whose Guest definition bolds Room, '
+        t'a {pg["Term"].l} declared after it'
+    ):
+        conftest = """
+            from pytest_given import Glossary
+
+            g = Glossary()
+            guest = g.actor('Guest', 'Books a **Room** for a stay.')
+            room = g.work_object('Room')
+            """
+        pytester.makeconftest(conftest)
+        attach('conftest', textwrap.dedent(conftest).strip())
+        pytester.makepyfile(
+            """
+            from conftest import guest
+            from pytest_given import scenario, when
+
+            @scenario(t'A {guest} books')
+            def test_a():
+                with when('x'):
+                    pass
+            """
+        )
+        json_path = tmp_path / 'report.json'
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest(f'--given-json={json_path}')
+        result.assert_outcomes(passed=1)
+        [guest, _] = json.loads(json_path.read_text())['glossary']['terms']
+        attach('definition', guest['definition'])
+    with then("the definition's text is as written, bold included"):
+        assert guest['definition']['text'] == 'Books a **Room** for a stay.'
+    with then(
+        t'its parts hold the {pg["Definition ref"].l} as a {pg["Term ref"].l} to Room'
+    ):
+        assert guest['definition']['parts'] == [
+            {'value': 'Books a '},
+            {'term_id': 'room', 'display': 'Room', 'expression': ''},
+            {'value': ' for a stay.'},
+        ]
+
+
 def test_glossary_term_source_captured_when_declared_in_conftest(pytester, tmp_path):
     """Glossary terms registered at the top level of conftest.py — a common
     shared-fixture pattern — must capture source even though conftest is

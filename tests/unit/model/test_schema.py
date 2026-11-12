@@ -11,6 +11,7 @@ from pytest_given.model import (
     ClausePart,
     ClauseTermRef,
     ClauseWord,
+    Definition,
     ErrorInfo,
     Glossary,
     GlossaryTerm,
@@ -263,12 +264,15 @@ def test_glossary_term_is_frozen_and_kw_only() -> None:
         id=TermId('guest'),
         kind='actor',
         canonical='Guest',
-        definition='Person booking accommodation.',
+        definition=Definition.literal('Person booking accommodation.'),
     )
     assert term.id == 'guest'
     assert term.kind == 'actor'
     assert term.canonical == 'Guest'
-    assert term.definition == 'Person booking accommodation.'
+    assert term.definition == Definition(
+        'Person booking accommodation.',
+        (NarrationLiteral(value='Person booking accommodation.'),),
+    )
     with pytest.raises(dataclasses.FrozenInstanceError):
         term.kind = 'activity'  # type: ignore[misc]
 
@@ -276,6 +280,18 @@ def test_glossary_term_is_frozen_and_kw_only() -> None:
 def test_glossary_term_definition_defaults_none() -> None:
     term = GlossaryTerm(id=TermId('x'), kind='activity', canonical='x')
     assert term.definition is None
+
+
+_ROOM_REF = NarrationTermRef(term_id=TermId('room'), display='Room')
+
+
+def test_a_definition_s_parts_join_to_its_text_each_ref_in_bold() -> None:
+    Definition(
+        'Reserve a **Room**.',
+        (NarrationLiteral(value='Reserve a '), _ROOM_REF, NarrationLiteral(value='.')),
+    )
+    with pytest.raises(AssertionError):
+        Definition('Reserve a Room.', (NarrationLiteral(value='Reserve a '), _ROOM_REF))
 
 
 # --- Task 1.2: Sentence-part variants + ClausePart union ---

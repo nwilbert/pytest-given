@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-08T20:38:16.235070+00:00",
+    "timestamp": "2026-11-12T18:54:55.599090+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "7b9212b4d4f51989a6ab9ff3ee2e462117b39d42",
+    "commit_sha": "bec336b5707b0621c5f7cc4029e3e282e3abe36e",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 46,
+      "duration_ms": 41,
       "steps": [
         {
           "phase": "given",
@@ -795,7 +795,7 @@
             ],
             "status": "failed",
             "error": {
-              "message": "assert 'unsupported payment method' == 'partial balance'\n  \n  - partial balance\n  + unsupported payment method",
+              "message": "assert 'unsupported payment method' == 'partial balance'\n  \n  \u001b[0m\u001b[91m- partial balance\u001b[39;49;00m\u001b[90m\u001b[39;49;00m\n  \u001b[92m+ unsupported payment method\u001b[39;49;00m\u001b[90m\u001b[39;49;00m",
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
@@ -805,7 +805,7 @@
                   "is_internal": false
                 }
               ],
-              "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     - partial balance\nE     + unsupported payment method",
+              "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     \u001b[0m\u001b[91m- partial balance\u001b[39;49;00m\u001b[90m\u001b[39;49;00m\nE     \u001b[92m+ unsupported payment method\u001b[39;49;00m\u001b[90m\u001b[39;49;00m",
               "causes": []
             },
             "custom_id": false
@@ -1318,7 +1318,14 @@
         "id": "organizer",
         "kind": "actor",
         "canonical": "Organizer",
-        "definition": "Person booking accommodation on behalf of a group.",
+        "definition": {
+          "text": "Person booking accommodation on behalf of a group.",
+          "parts": [
+            {
+              "value": "Person booking accommodation on behalf of a group."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 79
@@ -1328,7 +1335,14 @@
         "id": "guest",
         "kind": "actor",
         "canonical": "Guest",
-        "definition": "Individual traveler in the group.",
+        "definition": {
+          "text": "Individual traveler in the group.",
+          "parts": [
+            {
+              "value": "Individual traveler in the group."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 80
@@ -1338,7 +1352,14 @@
         "id": "booking-system",
         "kind": "actor",
         "canonical": "Booking System",
-        "definition": "Automated reservation back-end.",
+        "definition": {
+          "text": "Automated reservation back-end.",
+          "parts": [
+            {
+              "value": "Automated reservation back-end."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 81
@@ -1348,7 +1369,14 @@
         "id": "room",
         "kind": "object",
         "canonical": "Room",
-        "definition": "A bookable hotel room.",
+        "definition": {
+          "text": "A bookable hotel room.",
+          "parts": [
+            {
+              "value": "A bookable hotel room."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 83
@@ -1358,7 +1386,22 @@
         "id": "booking",
         "kind": "object",
         "canonical": "Booking",
-        "definition": "A reservation for one or more **rooms**.",
+        "definition": {
+          "text": "A reservation for one or more **rooms**.",
+          "parts": [
+            {
+              "value": "A reservation for one or more "
+            },
+            {
+              "term_id": "room",
+              "display": "rooms",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 84
@@ -1368,7 +1411,22 @@
         "id": "payment",
         "kind": "object",
         "canonical": "Payment",
-        "definition": "Money transferred for a **booking**.",
+        "definition": {
+          "text": "Money transferred for a **booking**.",
+          "parts": [
+            {
+              "value": "Money transferred for a "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 85
@@ -1378,7 +1436,22 @@
         "id": "confirmation",
         "kind": "object",
         "canonical": "Confirmation",
-        "definition": "Notification of a successful **booking**.",
+        "definition": {
+          "text": "Notification of a successful **booking**.",
+          "parts": [
+            {
+              "value": "Notification of a successful "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 86
@@ -1388,7 +1461,30 @@
         "id": "confirm",
         "kind": "activity",
         "canonical": "confirm",
-        "definition": "Guarantee a paid **booking** so its **rooms** are held for arrival.",
+        "definition": {
+          "text": "Guarantee a paid **booking** so its **rooms** are held for arrival.",
+          "parts": [
+            {
+              "value": "Guarantee a paid "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": " so its "
+            },
+            {
+              "term_id": "room",
+              "display": "rooms",
+              "expression": ""
+            },
+            {
+              "value": " are held for arrival."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 90
@@ -1398,7 +1494,30 @@
         "id": "decline",
         "kind": "activity",
         "canonical": "decline",
-        "definition": "Refuse a **payment**, leaving its **booking** pending.",
+        "definition": {
+          "text": "Refuse a **payment**, leaving its **booking** pending.",
+          "parts": [
+            {
+              "value": "Refuse a "
+            },
+            {
+              "term_id": "payment",
+              "display": "payment",
+              "expression": ""
+            },
+            {
+              "value": ", leaving its "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": " pending."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 95
@@ -1408,7 +1527,22 @@
         "id": "cancel",
         "kind": "activity",
         "canonical": "cancel",
-        "definition": "Withdraw a **booking** before arrival.",
+        "definition": {
+          "text": "Withdraw a **booking** before arrival.",
+          "parts": [
+            {
+              "value": "Withdraw a "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": " before arrival."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 99
@@ -1418,7 +1552,30 @@
         "id": "refund",
         "kind": "activity",
         "canonical": "refund",
-        "definition": "Return the **payment** for a cancelled **booking**.",
+        "definition": {
+          "text": "Return the **payment** for a cancelled **booking**.",
+          "parts": [
+            {
+              "value": "Return the "
+            },
+            {
+              "term_id": "payment",
+              "display": "payment",
+              "expression": ""
+            },
+            {
+              "value": " for a cancelled "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 100
@@ -1428,7 +1585,30 @@
         "id": "rebook",
         "kind": "activity",
         "canonical": "rebook",
-        "definition": "Restore a cancelled **booking** for the same **rooms** and dates.",
+        "definition": {
+          "text": "Restore a cancelled **booking** for the same **rooms** and dates.",
+          "parts": [
+            {
+              "value": "Restore a cancelled "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": " for the same "
+            },
+            {
+              "term_id": "room",
+              "display": "rooms",
+              "expression": ""
+            },
+            {
+              "value": " and dates."
+            }
+          ]
+        },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
           "line": 101

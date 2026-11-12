@@ -16,10 +16,9 @@ import pytest
 from ..capture import (
     begin_capture_session,
     capture_snapshot,
-    infer_glossary_kinds,
     registered_stories,
-    resolve_glossary,
     restore_capture_state,
+    session_glossary,
 )
 from ..grouping import group_parametrized
 from ..lint import LintFinding, error_count, run_lint, summary_rows, summary_title
@@ -222,16 +221,14 @@ def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
     stories = registered_stories()
     _warn_of_undeclared_stories(scenarios, stories)
     # Registered plugins include class instances; only modules can declare a
-    # conftest glossary, so the filter is the caller's and `resolve_glossary`
+    # conftest glossary, so the filter is the caller's and `session_glossary`
     # keeps a precise signature.
     conftests = [
         plugin
         for plugin in config.pluginmanager.get_plugins()
         if isinstance(plugin, ModuleType)
     ]
-    glossary = resolve_glossary(stories, conftests)
-    if glossary is not None:
-        glossary = infer_glossary_kinds(glossary, stories)
+    glossary = session_glossary(stories, conftests)
     report_dict = None
     if write and given.sinks.writes_anything():
         report = ReportData(

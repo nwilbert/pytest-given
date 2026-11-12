@@ -26,6 +26,7 @@ from ..markdown import (
     InlineSpan,
     PlainSpan,
     definition_html,
+    definition_span_html,
     span_html,
     span_text,
 )
@@ -51,10 +52,11 @@ from ..model import (
     TermKind,
     boolean_phrases,
     case_id,
-    definition_ref_text,
+    definition_part_text,
     iter_steps,
     placeholder_token,
     plural,
+    read_definition,
     read_narration,
 )
 from .citation_index import (
@@ -366,12 +368,12 @@ def _app_data(report: ReportData) -> dict[str, object]:
                         'id': term.id,
                         'canonical': term.canonical,
                         'kind': term.kind,
-                        'definition': term.definition,
+                        'definition': term.definition_text,
                         # Pre-rendered once per term, for the hover tooltip.
                         # `definition_html` escapes the text and re-admits
                         # only <br>/<code>/<strong>/<em>, which is what lets
                         # app.js assign it as innerHTML.
-                        'definition_html': definition_html(term.definition or ''),
+                        'definition_html': definition_html(term.definition_text or ''),
                     }
                     for term in report.glossary.terms
                 ]
@@ -644,18 +646,26 @@ def _make_definition_filter(glossary: Glossary) -> Callable[[GlossaryTerm], Mark
     reader is on goes nowhere."""
 
     def _render(term: GlossaryTerm) -> Markup:
-        def _ref(span: InlineSpan) -> str | None:
-            text = definition_ref_text(span)
-            if text is None:
-                return None
-            target = glossary.resolve_ref(text)
-            if target is None or target.id == term.id:
-                return None
-            return _term_ref_span(target, target.id, text)
-
-        return Markup(definition_html(term.definition or '', render_ref=_ref))
+        if term.definition is None:
+            return Markup('')
+        return Markup(
+            ''.join(
+                _definition_piece_html(piece, term.id, glossary)
+                for piece in read_definition(term.definition)
+            )
+        )
 
     return _render
+
+
+def _definition_piece_html(
+    piece: InlineSpan | NarrationTermRef, term_id: TermId, glossary: Glossary
+) -> str:
+    if not isinstance(piece, NarrationTermRef):
+        return definition_span_html(piece)
+    if piece.term_id == term_id:
+        return definition_html(definition_part_text(piece))
+    return _render_term_ref(piece, glossary)
 
 
 def _make_clause_part_filter(

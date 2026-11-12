@@ -49,7 +49,10 @@ def _write_report(
                             'id': 'guest',
                             'kind': 'actor',
                             'canonical': 'Guest',
-                            'definition': 'Someone staying.',
+                            'definition': {
+                                'text': 'Someone staying.',
+                                'parts': [{'value': 'Someone staying.'}],
+                            },
                         }
                     ]
                 },

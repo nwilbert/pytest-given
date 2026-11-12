@@ -92,7 +92,7 @@ Terms follow [Domain Storytelling](https://domainstorytelling.org/quick-start-gu
 | Actor | A glossary term for a participant in the domain (e.g., *Guest*). |
 | Work Object | A glossary term for a thing acted on (e.g., *Room*, *Booking*). |
 | Activity | A glossary term for what an **actor** does (e.g., *book*, *confirm*), which Domain Storytelling draws as an arrow labelled with a verb. Activities accept **inflections**: calling `search('searches for')` records *searches for* as a surface form of the canonical *search*. |
-| Term ref | An occurrence of a term inside narration or a clause. |
+| Term ref | An occurrence of a term inside narration, a clause or a definition. |
 | Definition ref | A bold span in a glossary definition that names a term of the same glossary, by its canonical name or **S-form** in any case. The report renders it as a **term ref**. |
 | Instance | A named refinement of an **Actor** or **Work Object** (e.g., `guest('Alice')` is an instance of the *Guest* actor). |
 | Inflection | A surface form of an **Activity** term other than its canonical name or **S-form** (e.g., *searches for* as an inflection of *search*). |

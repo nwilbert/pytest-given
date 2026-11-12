@@ -8,11 +8,12 @@ from pytest_given import Glossary
 from pytest_given.capture import (
     FileGlossary,
     clause,
-    resolve_glossary,
     sentence,
+    session_glossary,
     story,
 )
-from pytest_given.model import PytestGivenError
+from pytest_given.capture.glossary_resolution import resolve_glossary
+from pytest_given.model import NarrationTermRef, PytestGivenError, TermId
 
 
 class _FakeConftest:
@@ -117,3 +118,23 @@ def test_a_story_referencing_no_glossary_falls_back_to_the_conftest_scan() -> No
     g = Glossary()
     g.actor('Guest')
     assert resolve_glossary([bare], [_FakeConftest('/x/conftest.py', g=g)]) is g
+
+
+@pytest.mark.usefixtures('isolated_story_registry')
+def test_the_session_glossary_has_its_kinds_inferred_and_its_refs_resolved() -> None:
+    g = Glossary()
+    guest = g('Guest', 'Books a **Room**.')
+    room = g.work_object('Room')
+    told = story('Booking', [sentence(guest, g.activity('book'), room)])
+    resolved = session_glossary([told], [])
+    assert resolved is not None
+    [guest_term, *_] = resolved.terms
+    assert guest_term.kind == 'actor'
+    assert guest_term.definition is not None
+    assert NarrationTermRef(term_id=TermId('room'), display='Room') in (
+        guest_term.definition.parts
+    )
+
+
+def test_no_glossary_is_no_session_glossary() -> None:
+    assert session_glossary([], []) is None

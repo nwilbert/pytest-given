@@ -17,20 +17,15 @@ def span_html(span: InlineSpan) -> str:
     return _span_html(span, _escaped)
 
 
-type RefRenderer = Callable[[InlineSpan], str | None]
-
-
-def definition_html(text: str, *, render_ref: RefRenderer | None = None) -> str:
+def definition_html(text: str) -> str:
     """A glossary definition: its spans, and an author's `<br>` or a newline
-    as a break — except in a code span, which is how to show `<br>` as text.
-
-    `render_ref` returns the HTML a span renders as instead, or None."""
-    return ''.join(_definition_span_html(span, render_ref) for span in read_spans(text))
+    as a break — except in a code span, which is how to show `<br>` as text."""
+    return ''.join(definition_span_html(span) for span in read_spans(text))
 
 
-def _definition_span_html(span: InlineSpan, render_ref: RefRenderer | None) -> str:
-    ref = render_ref(span) if render_ref is not None else None
-    return ref if ref is not None else _span_html(span, _with_breaks)
+def definition_span_html(span: InlineSpan) -> str:
+    """A span of a glossary definition, which may break a line."""
+    return _span_html(span, _with_breaks)
 
 
 def _span_html(span: InlineSpan, plain: Callable[[str], str]) -> str:

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from pytest_given import Template, attach, given, scenario, then, when
+from pytest_given.capture.definition_refs import resolve_definition_refs
 from pytest_given.capture.template import narration_from
 from pytest_given.grouping import group_parametrized
 from pytest_given.model import (
@@ -15,6 +16,7 @@ from pytest_given.model import (
     ClauseTermRef,
     ClauseWord,
     ColumnId,
+    Definition,
     Glossary,
     GlossaryTerm,
     Metadata,
@@ -67,6 +69,7 @@ from pytest_given.report.html_renderer import (
 from tests.ubiquitous_language import adopt_pytest_given, pg
 from tests.unit.citation_reports import report_, term_
 from tests.unit.report.app_data import embedded_app_data
+from tests.unit.report.term_refs import referenced_ids, term_refs
 
 _DEFAULT_METADATA = {
     'project': 'p',
@@ -109,39 +112,20 @@ def _narration(text: str, parts: list | None = None) -> dict:
     return {'text': text, 'parts': parts or []}
 
 
-class _TermRefs(HTMLParser):
-    """Each element carrying a term id, as `(term id, its text)`."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.refs: list[tuple[str, str]] = []
-        self._open: str | None = None
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        self._open = dict(attrs).get('data-term-id')
-
-    def handle_data(self, data: str) -> None:
-        if self._open is not None:
-            self.refs.append((self._open, data))
-            self._open = None
-
-
-def _term_refs(html: str) -> list[tuple[str, str]]:
-    parser = _TermRefs()
-    parser.feed(html)
-    return parser.refs
-
-
-def _referenced_ids(html: str) -> list[str]:
-    return [term_id for term_id, _ in _term_refs(html)]
-
-
-_STEP = term_(
-    'Step',
-    'A unit in one **Phase**. **Steps** nest, may carry **attachments** and '
-    'name a **sentence handle**, *phase* or **`.l`**.',
+_DEFINITION_GLOSSARY = resolve_definition_refs(
+    Glossary(
+        terms=[
+            term_(
+                'Step',
+                'A unit in one **Phase**. **Steps** nest, may carry **attachments** '
+                'and name a **sentence handle**, *phase* or **`.l`**.',
+            ),
+            term_('Phase'),
+            term_('Attachment'),
+        ]
+    )
 )
-_DEFINITION_GLOSSARY = Glossary(terms=[_STEP, term_('Phase'), term_('Attachment')])
+_STEP = _DEFINITION_GLOSSARY.terms[0]
 
 
 def test_definition_filter_renders_an_undefined_term_empty() -> None:
@@ -149,35 +133,61 @@ def test_definition_filter_renders_an_undefined_term_empty() -> None:
     assert render(term_('Phase')) == ''
 
 
-def test_definition_filter_references_the_terms_its_bold_spans_name() -> None:
-    """A self-reference, an unresolved bold span, an italic and a bold code
-    span reference nothing, and a copy of the term is the term itself."""
-    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(replace(_STEP)))
-    assert _referenced_ids(rendered) == ['phase', 'attachment']
-
-
 @scenario(
-    t'A {pg["Definition ref"].l} names its {pg["Term"].l} by canonical name or '
-    t'{pg["S-form"]}, in any case',
+    t'The Glossary tab renders each {pg["Definition ref"].l} as a '
+    t'{pg["Term ref"].l} to the {pg["Term"].l} it names',
     tags=['spec/definition-refs'],
 )
-def test_a_definition_ref_names_its_term_by_canonical_name_or_s_form() -> None:
+def test_the_glossary_tab_renders_each_definition_ref_as_a_term_ref() -> None:
     with given(
-        t'a {pg["Glossary"].l} whose Step definition bolds "phase" and "Attachments"'
+        t'a {pg["Glossary"].l} whose Step definition bolds Phase, attachments, '
+        t'Steps itself and a word naming no {pg["Term"].l}'
     ):
-        step = term_('Step', 'A unit in one **phase**, carrying **Attachments**.')
-        glossary = Glossary(terms=[step, term_('Phase'), term_('Attachment')])
-    with when('the Glossary tab renders the definition'):
-        rendered = str(_make_definition_filter(glossary)(step))
+        glossary, step = _DEFINITION_GLOSSARY, _STEP
+    with when('the Glossary tab renders the Step definition'):
+        # A copy of the term, as a report rebuilt from JSON holds, is the term.
+        rendered = str(_make_definition_filter(glossary)(replace(step)))
         attach('definition', rendered)
     with then(
-        t'each bold span is a {pg["Term ref"].l} to the {pg["Term"].l} it names, '
-        t'in the words its author wrote'
+        t'Phase and attachments are {pg["Term ref"].l.s}, in the words its author '
+        t'wrote, and neither Steps nor the other bold word links anywhere'
     ):
-        assert _term_refs(rendered) == [
-            ('phase', 'phase'),
-            ('attachment', 'Attachments'),
+        assert term_refs(rendered) == [
+            ('phase', 'Phase'),
+            ('attachment', 'attachments'),
         ]
+
+
+def test_definition_filter_renders_a_ref_to_a_term_the_glossary_lacks_as_text() -> None:
+    step = replace(
+        _STEP,
+        definition=Definition(
+            'In one **Phase**.',
+            (
+                NarrationLiteral(value='In one '),
+                NarrationTermRef(term_id=TermId('phase'), display='Phase'),
+                NarrationLiteral(value='.'),
+            ),
+        ),
+    )
+    rendered = str(_make_definition_filter(Glossary(terms=[step]))(step))
+    assert rendered == 'In one Phase.'
+
+
+def test_definition_filter_reads_a_literal_s_edge_against_the_ref_beside_it() -> None:
+    step = replace(
+        _STEP,
+        definition=Definition(
+            '**Phase****(b)**',
+            (
+                NarrationTermRef(term_id=TermId('phase'), display='Phase'),
+                NarrationLiteral(value='**(b)**'),
+            ),
+        ),
+    )
+    rendered = str(_make_definition_filter(_DEFINITION_GLOSSARY)(step))
+    assert referenced_ids(rendered) == ['phase']
+    assert rendered.endswith('**(b)**')
 
 
 def test_a_tooltip_definition_references_no_term() -> None:
@@ -187,7 +197,7 @@ def test_a_tooltip_definition_references_no_term() -> None:
     assert data['glossary'] is not None
     [step, *_] = data['glossary']['terms']
     assert '<strong>Phase</strong>' in step['definition_html']
-    assert _referenced_ids(step['definition_html']) == []
+    assert referenced_ids(step['definition_html']) == []
 
 
 def test_narration_filter_renders_the_spans_of_a_plain_string() -> None:
@@ -846,7 +856,10 @@ def test_render_includes_terms_browse_segment(tmp_path: Path) -> None:
                 'id': 'guest',
                 'kind': 'actor',
                 'canonical': 'Guest',
-                'definition': 'A person staying over.',
+                'definition': {
+                    'text': 'A person staying over.',
+                    'parts': [{'value': 'A person staying over.'}],
+                },
                 'source': None,
             }
         ],
@@ -1370,7 +1383,7 @@ def test_a_term_ref_points_at_its_term_rather_than_repeating_it() -> None:
             id=TermId('guest'),
             kind='actor',
             canonical='Guest',
-            definition='A person staying at the hotel.',
+            definition=Definition.literal('A person staying at the hotel.'),
         )
     )
     f = _make_narration_filter(param_color_map={}, glossary=g)
@@ -1481,19 +1494,19 @@ def test_render_with_story_computes_coverage_maps(tmp_path: Path) -> None:
                     'id': 'guest',
                     'kind': 'actor',
                     'canonical': 'Guest',
-                    'definition': '',
+                    'definition': None,
                 },
                 {
                     'id': 'search',
                     'kind': 'activity',
                     'canonical': 'search',
-                    'definition': '',
+                    'definition': None,
                 },
                 {
                     'id': 'room',
                     'kind': 'object',
                     'canonical': 'Room',
-                    'definition': '',
+                    'definition': None,
                 },
             ]
         },
@@ -1589,7 +1602,7 @@ def test_render_emits_term_scenario_index_global(tmp_path: Path) -> None:
                     'id': 'guest',
                     'kind': 'actor',
                     'canonical': 'Guest',
-                    'definition': '',
+                    'definition': None,
                     'source': None,
                 },
             ],
@@ -1919,7 +1932,10 @@ def test_report_data_never_lands_in_an_alpine_expression(tmp_path: Path) -> None
                         'id': f'term{_BREAKOUT}',
                         'kind': 'actor',
                         'canonical': 'A Term',
-                        'definition': 'a definition',
+                        'definition': {
+                            'text': 'a definition',
+                            'parts': [{'value': 'a definition'}],
+                        },
                     }
                 ]
             },

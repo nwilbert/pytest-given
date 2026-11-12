@@ -23,12 +23,14 @@ from ..markdown import (
 )
 from .errors import PytestGivenError
 from .schema import (
+    Definition,
     Narration,
     NarrationLiteral,
     NarrationPart,
     NarrationPlaceholder,
     NarrationTermRef,
     NarrationValue,
+    definition_part_text,
 )
 from .step_tree import PartIndex
 
@@ -104,18 +106,39 @@ def read_narration(narration: Narration) -> list[NarrationPiece]:
     """A title or step as every output shows it: each literal read for spans on
     its own, so a span never crosses a term ref or a value."""
     parts = narration.parts or (NarrationLiteral(value=narration.text),)
-    texts = [narration_text((part,)) for part in parts]
-    whole = ''.join(texts)
     pieces: list[NarrationPiece] = []
-    end = 0
-    for part, text in zip(parts, texts, strict=True):
-        start, end = end, end + len(text)
+    edges = _edges([narration_text((part,)) for part in parts])
+    for part, (before, after) in zip(parts, edges, strict=True):
         if isinstance(part, NarrationLiteral):
-            before, after = whole[max(start - 1, 0) : start], whole[end : end + 1]
             pieces.extend(read_spans(part.value, before=before, after=after))
         else:
             pieces.append(part)
     return pieces
+
+
+def read_definition(definition: Definition) -> list[InlineSpan | NarrationTermRef]:
+    """A definition as the Glossary tab shows it, read as `read_narration` reads
+    a step: a bold span left in a literal is one no term resolved."""
+    pieces: list[InlineSpan | NarrationTermRef] = []
+    edges = _edges([definition_part_text(part) for part in definition.parts])
+    for part, (before, after) in zip(definition.parts, edges, strict=True):
+        if isinstance(part, NarrationLiteral):
+            pieces.extend(read_spans(part.value, before=before, after=after))
+        else:
+            pieces.append(part)
+    return pieces
+
+
+def _edges(texts: Sequence[str]) -> list[tuple[str, str]]:
+    """The character before and after each part, as `texts` spell the parts:
+    what a literal's edges read against."""
+    whole = ''.join(texts)
+    edges: list[tuple[str, str]] = []
+    end = 0
+    for text in texts:
+        start, end = end, end + len(text)
+        edges.append((whole[max(start - 1, 0) : start], whole[end : end + 1]))
+    return edges
 
 
 type SpanKind = Literal['a code span', 'bold', 'italics']

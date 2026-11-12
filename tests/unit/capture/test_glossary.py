@@ -21,7 +21,7 @@ from pytest_given.capture.glossary import (
     TermInstance,
     id_derive,
 )
-from pytest_given.model import GlossaryTerm, SourceLocation, TermId
+from pytest_given.model import Definition, GlossaryTerm, SourceLocation, TermId
 from tests.ubiquitous_language import adopt_pytest_given, pg
 
 
@@ -160,7 +160,7 @@ def test_glossary_actor_registers_and_returns_handle():
         assert a.declared_kind == 'actor'
         assert a.id == 'guest'
         assert a.canonical == 'Guest'
-        assert a.term.definition == 'Person booking accommodation.'
+        assert a.term.definition == Definition.literal('Person booking accommodation.')
         assert g.get(TermId('guest')).kind == 'actor'
 
 
@@ -313,6 +313,15 @@ def test_glossary_re_registration_matching_fields_ok_when_source_differs(monkeyp
     assert a1.term.source == src1  # first-registration wins
 
 
+def test_a_conflict_prints_each_definition_as_written():
+    g = Glossary()
+    g.actor('Guest', 'd')
+    with pytest.raises(
+        PytestGivenError, match=r"definition='d'; new: .* definition='two'\)"
+    ):
+        g.actor('Guest', 'two')
+
+
 def test_blank_definition_normalizes_to_none():
     g = Glossary()
     actor = g.actor('Guest', '   ')
@@ -322,7 +331,7 @@ def test_blank_definition_normalizes_to_none():
 def test_real_definition_is_kept():
     g = Glossary()
     verb = g.activity('book', 'Reserve a room.')
-    assert verb.term.definition == 'Reserve a room.'
+    assert verb.term.definition == Definition.literal('Reserve a room.')
 
 
 # --- Task 3: g(name) declare-or-get and g[name] get-only ---
@@ -355,7 +364,9 @@ def test_call_is_idempotent():
 def test_call_accepts_definition():
     g = Glossary()
     handle = g('redeems', 'Exchange points for a benefit.')
-    assert handle.term.definition == 'Exchange points for a benefit.'
+    assert handle.term.definition == Definition.literal(
+        'Exchange points for a benefit.'
+    )
 
 
 def test_call_returns_deferred_handle():

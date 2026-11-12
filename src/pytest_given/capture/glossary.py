@@ -7,9 +7,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from ..model import (
-    Glossary as BaseGlossary,
-)
-from ..model import (
+    Definition,
     GlossaryTerm,
     PytestGivenError,
     PytestGivenLookupError,
@@ -18,6 +16,9 @@ from ..model import (
     TermKind,
     id_derive,
     s_form,
+)
+from ..model import (
+    Glossary as BaseGlossary,
 )
 from .source import capture_caller_source
 
@@ -84,13 +85,14 @@ class Glossary(LookupGlossary):
         return self._declare(None, name, definition)
 
 
-def normalize_definition(definition: str | None) -> str | None:
-    """Collapse an empty or whitespace-only definition to None so 'undefined'
-    has exactly one representation."""
+def normalize_definition(definition: str | None) -> Definition | None:
+    """A definition as declared, its refs left for `resolve_definition_refs`.
+    An empty or whitespace-only one is None, so 'undefined' has exactly one
+    representation."""
     if definition is None:
         return None
     stripped = definition.strip()
-    return stripped or None
+    return Definition.literal(stripped) if stripped else None
 
 
 class TermHandleBase(ABC):
@@ -269,8 +271,8 @@ def _register_kind(
         lambda existing: (
             f'term {name!r} (id {new.id!r}) conflicts with prior registration '
             f'(existing: kind={existing.kind!r}, canonical={existing.canonical!r}, '
-            f'definition={existing.definition!r}; new: kind={new.kind!r}, '
-            f'canonical={new.canonical!r}, definition={new.definition!r}).'
+            f'definition={existing.definition_text!r}; new: kind={new.kind!r}, '
+            f'canonical={new.canonical!r}, definition={new.definition_text!r}).'
         ),
     )
 

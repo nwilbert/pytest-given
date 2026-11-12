@@ -45,7 +45,7 @@ Term ids and story ids are slugs: the name in lowercase, with each run of non-al
 
 ## Glossary term
 
-A term is `{id, kind, canonical, definition, source}`. `kind` is `actor`, `activity` or `object`, or `null` for a kindless term.
+A term is `{id, kind, canonical, definition, source}`. `kind` is `actor`, `activity` or `object`, or `null` for a kindless term. `definition` is `null` for an undefined term, or `{text, parts}`. `text` is the definition as written, Markdown included. `parts` split it into `{value}` literals and, for each definition ref (a bold span naming a term), a `{term_id, display, expression}` term ref whose `display` is the bold text.
 
 ## Story
 
@@ -101,7 +101,11 @@ jq -r '.coverage[] | select(.story_id == "lend-and-return-a-book" and .sentence_
        | .scenario_ids[]' report.json
 
 # Every term with its definition
-jq -r '.glossary.terms[] | .canonical + ": " + .definition' report.json
+jq -r '.glossary.terms[] | select(.definition) | .canonical + ": " + .definition.text' report.json
+
+# The terms one term's definition names
+jq -r '.glossary.terms[] | select(.id == "booking") | .definition.parts[]
+       | select(.term_id) | .term_id' report.json
 
 # Every derived/attachment column a parametrized scenario grew
 jq -r '.scenarios[] | select(.parameters)

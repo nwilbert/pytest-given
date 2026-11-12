@@ -75,7 +75,9 @@ def narration_body_md(scenario: Scenario) -> str:
 def definition_body_md(term: GlossaryTerm) -> str:
     """The one line a defining citation's body holds, empty for an undefined
     term: nothing in a definition can open a block or close the citation's."""
-    return _block_marker_escaped(definition_markdown((term.definition or '').strip()))
+    return _block_marker_escaped(
+        definition_markdown((term.definition_text or '').strip())
+    )
 
 
 def _scenario_md(

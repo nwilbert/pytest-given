@@ -1,6 +1,6 @@
 # Definition Refs — Design Spec
 
-✅ [spec/definition-refs](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/definition-refs) (2 ✅)
+✅ [spec/definition-refs](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/definition-refs) (4 ✅)
 
 ## Goal
 
@@ -25,7 +25,7 @@ in a definition has to find its row by hand.
 Bold is the reference markup because it is what the `GLOSSARY.md` format of Matt Pocock's
 [skills](https://github.com/mattpocock/skills) uses (`A single tracked unit of work inside an
 **Issue tracker**`), which `ParagraphGlossary` reads (see the
-[glossary sections spec](2026-11-08-glossary-sections-design.md)). One rule then covers every
+[glossary sections spec](proposed/2026-11-08-glossary-sections-design.md)). One rule then covers every
 glossary, and italics stay free for emphasis and example words. The convention this design
 introduces: **in a definition, a bold span is a reference.**
 
@@ -102,6 +102,7 @@ In the model, `GlossaryTerm.definition` is a `Definition | None`:
 - `Definition(text: str, parts: tuple[DefinitionPart, ...])`. Its `__post_init__` asserts that
   the parts' text joins to `text`.
 - `type DefinitionPart = NarrationLiteral | NarrationTermRef`.
+- `GlossaryTerm.definition_text` — the definition's `text`, or None for an undefined term.
 
 It is a type of its own, not a `Narration`. A narration's `text` joins its parts with each ref as
 its `display`, while a definition's `text` keeps the bold around each ref.
@@ -113,7 +114,8 @@ a term declared after it, in the same module or in another. So declaring a term 
 A definition read from `GLOSSARY.md` or passed to `g.work_object` starts out as one literal part.
 
 - **`resolve_definition_refs(glossary: Glossary) -> Glossary`**, in `capture/`, runs at session
-  finish right after `infer_glossary_kinds`, over the complete glossary. It returns the glossary
+  finish right after `infer_glossary_kinds`, over the complete glossary. Both run inside
+  `session_glossary`, the one call through which the plugin gets the suite's glossary. It returns the glossary
   with every definition's refs resolved. It reads each definition's spans, with the characters
   each one covers, with `markdown.located_spans`, asks `definition_ref_text` whether a span could be a ref, and asks
   `Glossary.resolve_ref` which term the span names.
@@ -132,18 +134,19 @@ The rest sits in `model/text.py`, beside `s_form`:
   name uses the same two.
 - `definition_ref_text(span: InlineSpan) -> str | None` — a bold span's text if it could be a
   ref (holding no code span).
-- `definition_bold_spans(text: str, *, before: str = '', after: str = '') -> Iterator[str]` — that
-  text for each span of a literal part, read with `markdown.read_spans`. `before` and `after` are
-  the text of the parts on either side.
+
+`read_definition(definition: Definition) -> list[InlineSpan | NarrationTermRef]`, in
+`model/narration.py` beside `read_narration`, reads a definition the way `read_narration` reads a
+step: each literal part read for spans against the edges of the parts beside it, and each ref part
+passed through. The lint and the renderer both read a definition with it.
 
 ## Rendering
 
 - **Glossary tab.** A ref part renders through `_render_term_ref`, as a step's term ref does:
   its target looked up by `term_id`, and its `display` as plain text if the glossary holds no such
   term. It carries the kind class, `term-ref--link`, `has-term-tip` and `data-term-id`, so hovering
-  shows the referenced term's definition. A literal part renders through `definition_html`, with
-  the text of the parts on either side as context, so a span's edges read as they do in the whole
-  definition.
+  shows the referenced term's definition. Each span of a literal part renders through
+  `markdown.definition_span_html`.
 - **Clicking a definition ref** opens the referenced term's card. The capture-phase click handler
   in `app.js` navigates from a `.term-ref--link` only, not from any `[data-term-id]`: the card's
   header and controls carry the term's id for Alpine. It stops propagation, so the card a
@@ -161,8 +164,8 @@ The rest sits in `model/text.py`, beside `s_form`:
 
 The Glossary tab's filter is made per render over the report's glossary, as the `narration` filter
 is, and applied to the term rather than its definition (`term | definition_md`), so it knows which
-ref is a self-reference. `markdown/` knows nothing of refs: `definition_html` renders one literal
-stretch, and the filter joins the parts.
+ref is a self-reference. `markdown/` knows nothing of refs: it renders the spans, and the filter
+joins them with the refs.
 
 ## The `unresolved-definition-ref` lint rule
 
@@ -170,10 +173,8 @@ stretch, and the filter joins the parts.
 |---|---|---|
 | `unresolved-definition-ref` | warn | A bold span in a glossary definition that names no term. |
 
-- **Read from the stored parts.** A bold span left in a literal part is unresolved:
-  `definition_bold_spans` over each literal part, with the text of the parts on either side as
-  context.
-  The rule needs no lookup of its own.
+- **Read from the stored parts.** A bold span `read_definition` reads from a literal part, which
+  `definition_ref_text` says could be a ref, is unresolved. The rule needs no lookup of its own.
 - **One finding per term and bold text.** Subject: the term's id, as for `dead-term`, so a
   deliberate bold span is an ordinary `given_lint_ignore` entry
   (`unresolved-definition-ref: <term-id glob>`). Location: the term's source. Message:
@@ -213,28 +214,31 @@ stretch, and the filter joins the parts.
 
 ## Implementation touch points
 
-- `model/schema.py` — `Definition`, `DefinitionPart`, `GlossaryTerm.definition: Definition | None`,
-  and `Glossary.resolve_ref` with its name index.
+- `model/schema.py` — `Definition`, `DefinitionPart`, `GlossaryTerm.definition: Definition | None`
+  with its `definition_text`, and `Glossary.resolve_ref` with its name index.
 - `model/serde.py` — a definition's parts are read with `_narration_part_from_dict`, and a part
   other than a literal or a term ref is refused as a malformed report.
-- `model/text.py` — `name_key`, `name_keys`, `definition_ref_text` and `definition_bold_spans`,
-  re-exported from `model/__init__.py`.
-- `capture/` — `resolve_definition_refs` beside `infer_glossary_kinds`. In `glossary.py`,
+- `model/text.py` — `name_key`, `name_keys` and `definition_ref_text`. `model/narration.py` —
+  `read_definition`, sharing `read_narration`'s edge rule. Both re-exported from
+  `model/__init__.py`.
+- `capture/` — `resolve_definition_refs` beside `infer_glossary_kinds`, and `session_glossary`,
+  which finds the glossary with `resolve_glossary` and runs both. The package exports
+  `session_glossary` in place of the three. In `glossary.py`,
   `normalize_definition` returns a definition of one literal part, for both glossary kinds, and the
   term conflict error prints the definitions' `text`.
-- `plugin/session.py` — runs `resolve_definition_refs` right after `infer_glossary_kinds`.
-- `markdown/rendering.py` — `definition_html` takes `before` and `after`, the text around a
-  stretch, in place of `render_ref`.
-- `report/html_renderer.py` — the `definition_md` filter renders a term's parts: a ref with
-  `_render_term_ref`, a self-reference and a literal with `definition_html`. `report.html.j2`
-  applies it to the term. `_app_data` embeds `definition.text` and renders `definition_html` from
+- `plugin/session.py` — gets the glossary from `session_glossary`.
+- `markdown/rendering.py` — `definition_span_html` renders one span of a definition, and
+  `definition_html` loses `render_ref`.
+- `report/html_renderer.py` — the `definition_md` filter renders what `read_definition` reads: a
+  ref with `_render_term_ref`, a self-reference as plain bold and a span with
+  `definition_span_html`. `report.html.j2` applies it to the term. `_app_data` embeds `definition.text` and renders `definition_html` from
   it.
 - `report/md_renderer.py`, `report/glossary_view.py` and the term citations read
   `definition.text`.
 - `report/templates/app.js` — the click handler's narrower selector.
 - `lint/catalog.py` — `UNRESOLVED_DEFINITION_REF`, default `warn`.
 - `lint/runtime_rules.py` — `_unresolved_definition_ref_findings`, registered in `_RUNTIME_RULES`,
-  reading the literal parts.
+  reading the definition with `read_definition`.
 - `docs/site/guide/glossary.md` — the definition paragraph states the convention.
   `docs/site/configuration/narration-lint.md` — the rule table.
 - Authoring skill `references/glossaries.md` — the convention, beside the line on formatting a
@@ -259,21 +263,21 @@ stretch, and the filter joins the parts.
 - `Glossary.resolve_ref` units: canonical name in each case; S-form; both S-forms of an all-caps
   name; a multi-word term; no match, punctuation around the name included; an S-form that
   collides with another term's canonical name; a term registered after the first lookup.
-- `definition_bold_spans` units: italic skipped; a bold span holding a code span skipped; a
-  possessive after the span; a span's edge read against the neighbouring text.
+- `read_definition` units: a ref passed through and the literals read for spans; a literal's edge
+  read against the ref beside it.
 - `resolve_definition_refs` units: a ref becomes a term ref part whose `display` is the span's
   text; an unresolved bold span and a bold code span stay in literal parts; a self-reference is
-  stored as a ref; a ref to a term registered after the referencing term resolves; joining the
-  parts, each ref as `**display**`, gives `text`.
+  stored as a ref; a ref to a term registered after the referencing term resolves; a ref at
+  either end of a definition resolves.
 - Serde: a definition with ref parts round-trips, an undefined term's stays `null`, and a value
   part in a definition is refused.
 - Renderer units on the data contract: which term ids a definition rendered from its parts
   references, and that a self-reference, an unresolved bold span and a ref to a term the glossary
   lacks reference none.
 - Rule units: a resolved ref (clean), a bold span left in a literal part (finding), two definitions
-  with the same unresolved text (one finding each). The units above cover which spans count and
-  what resolves.
+  with the same unresolved text (one finding each), italic and a bold span holding a code span
+  (never flagged), a possessive after the span (its text flagged whole).
 - Integration: the finding prints under `--given-lint`, and an ignore entry suppresses it.
   `pytest-given report` renders the refs of a saved JSON report.
 - Self-report, tagged `spec/definition-refs`: one scenario for the matching rule (case and S-form),
-  one for the stored parts, one for the lint rule.
+  one for the stored parts, one for the Glossary tab rendering a ref, one for the lint rule.

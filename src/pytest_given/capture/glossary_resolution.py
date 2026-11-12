@@ -11,7 +11,20 @@ from pathlib import Path
 from types import ModuleType
 
 from ..model import Glossary, PytestGivenError, Story
+from .definition_refs import resolve_definition_refs
+from .kind_inference import infer_glossary_kinds
 from .story import carried_glossaries, union_glossaries
+
+
+def session_glossary(
+    stories: list[Story], modules: Iterable[ModuleType]
+) -> Glossary | None:
+    """The suite's glossary as the report carries it: found, its kinds
+    inferred, its definition refs resolved."""
+    glossary = resolve_glossary(stories, modules)
+    if glossary is None:
+        return None
+    return resolve_definition_refs(infer_glossary_kinds(glossary, stories))
 
 
 def resolve_glossary(

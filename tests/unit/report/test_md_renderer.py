@@ -8,6 +8,7 @@ from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Attachment,
     AttachmentRef,
+    Definition,
     ErrorInfo,
     GlossaryTerm,
     Metadata,
@@ -1384,5 +1385,10 @@ def test_a_source_line_holding_a_unicode_line_separator_stays_one_line() -> None
 def test_a_definition_body_shows_what_the_glossary_view_shows(
     definition: str | None, body: str
 ) -> None:
-    term = GlossaryTerm(id=TermId('t'), kind=None, canonical='T', definition=definition)
+    term = GlossaryTerm(
+        id=TermId('t'),
+        kind=None,
+        canonical='T',
+        definition=None if definition is None else Definition.literal(definition),
+    )
     assert definition_body_md(term) == body

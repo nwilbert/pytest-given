@@ -47,7 +47,7 @@ Terms sit under `## Language` (`## Terms` in the `teach` skill) and may be group
 subheadings. Two further sections, `## Relationships` and `## Flagged ambiguities`, hold prose and
 bullets, not terms. The `_Avoid_:` line is how the format records rejected synonyms. A definition
 names another term in bold, the markup a *definition ref* uses (see the
-[definition refs spec](2026-11-08-definition-refs-design.md), which lands first). A repo with
+[definition refs spec](../2026-11-08-definition-refs-design.md), which lands first). A repo with
 several bounded contexts keeps one `GLOSSARY.md` per context, listed in a `GLOSSARY-MAP.md`.
 
 ## Non-goals

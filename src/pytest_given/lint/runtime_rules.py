@@ -1,12 +1,13 @@
 """Runtime-surface rules: pure inspection of the recorded report model, no
 source access needed."""
 
-from collections.abc import Callable, Container
+from collections.abc import Callable, Container, Iterator
 from dataclasses import dataclass, field
 
 from ..model import (
     PHASES,
     ClauseTermRef,
+    Definition,
     Glossary,
     GlossaryTerm,
     NarrationTermRef,
@@ -14,10 +15,11 @@ from ..model import (
     Scenario,
     Story,
     TermId,
-    definition_bold_spans,
+    definition_ref_text,
     derived_id,
     iter_narrations,
     iter_steps,
+    read_definition,
 )
 from .catalog import (
     DEAD_TERM,
@@ -180,7 +182,6 @@ def _unresolved_definition_ref_findings(context: _Context) -> list[RawLintFindin
     emphasis. One finding per term and bold text."""
     if context.glossary is None:
         return []
-    glossary = context.glossary
     return [
         RawLintFinding(
             rule=UNRESOLVED_DEFINITION_REF,
@@ -191,10 +192,21 @@ def _unresolved_definition_ref_findings(context: _Context) -> list[RawLintFindin
                 f'which names no glossary term'
             ),
         )
-        for term in glossary.terms
-        for text in dict.fromkeys(definition_bold_spans(term.definition or ''))
-        if glossary.resolve_ref(text) is None
+        for term in context.glossary.terms
+        for text in dict.fromkeys(_unresolved_bold_spans(term.definition))
     ]
+
+
+def _unresolved_bold_spans(definition: Definition | None) -> Iterator[str]:
+    """The text of each bold span the resolution left in a literal part."""
+    if definition is None:
+        return
+    for piece in read_definition(definition):
+        if isinstance(piece, NarrationTermRef):
+            continue
+        text = definition_ref_text(piece)
+        if text is not None:
+            yield text
 
 
 # Keyed by rule id so `run_runtime_rules` skips a disabled rule entirely —

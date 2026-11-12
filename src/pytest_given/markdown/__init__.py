@@ -28,7 +28,7 @@ from .plain_text import (
     plain_html_text,
     plain_link_text,
 )
-from .rendering import definition_html, span_html
+from .rendering import definition_html, definition_span_html, span_html
 from .spans import (
     CodeSpan,
     EmphasisSpan,
@@ -63,6 +63,7 @@ __all__ = [
     'code_span_markdown',
     'definition_html',
     'definition_markdown',
+    'definition_span_html',
     'fold_whitespace',
     'html_blocks',
     'literal_markdown',

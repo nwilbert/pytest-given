@@ -3,17 +3,16 @@
 `s_form` is shared so that what a handle's `.s` spells, the report recognizes
 as the same term; `plural` so the lint summary and the report count alike;
 `name_keys` so a definition ref and the Glossary tab agree on what spells a
-term's own name; `definition_ref_text` so the report links the bold spans the
-lint checks.
+term's own name; `definition_ref_text` so capture resolves and the lint flags
+the same bold spans.
 
 `id_derive` returns a bare `str`, not a `TermId`: story ids, term ids and
 coverage instance ids all derive the same way.
 """
 
 import re
-from collections.abc import Iterator
 
-from ..markdown import EmphasisSpan, InlineSpan, PlainSpan, read_spans, span_text
+from ..markdown import EmphasisSpan, InlineSpan, PlainSpan, span_text
 from .errors import PytestGivenError
 
 _NON_ALNUM = re.compile(r'[^a-z0-9]+')
@@ -63,14 +62,6 @@ def name_keys(name: str) -> set[str]:
     all-caps name has two of, since only its lowercase takes -es or -ies
     (`SMSs`, `smses`)."""
     return {name_key(name), name_key(s_form(name)), name_key(s_form(name.lower()))}
-
-
-def definition_bold_spans(definition: str) -> Iterator[str]:
-    """The text of each bold span in `definition` that could be a definition ref."""
-    for span in read_spans(definition):
-        text = definition_ref_text(span)
-        if text is not None:
-            yield text
 
 
 def definition_ref_text(span: InlineSpan) -> str | None:

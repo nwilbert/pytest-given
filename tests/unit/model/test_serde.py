@@ -6,6 +6,7 @@ from pytest_given.model import (
     Clause,
     ClauseTermRef,
     ClauseWord,
+    Definition,
     ErrorCause,
     ErrorInfo,
     Glossary,
@@ -805,6 +806,49 @@ def test_none_definition_round_trips():
     assert restored.glossary.terms[0].definition is None
 
 
+def test_a_definition_with_ref_parts_round_trips():
+    definition = Definition(
+        'Reserve a **Room**.',
+        (
+            NarrationLiteral(value='Reserve a '),
+            NarrationTermRef(term_id=TermId('room'), display='Room'),
+            NarrationLiteral(value='.'),
+        ),
+    )
+    term = GlossaryTerm(
+        id=TermId('book'), kind='activity', canonical='book', definition=definition
+    )
+    report = ReportData(metadata=_meta(), glossary=Glossary(terms=[term]))
+    as_dict = report_to_dict(report)
+    assert as_dict['glossary']['terms'][0]['definition']['parts'][1] == {  # type: ignore[call-overload, index]
+        'term_id': 'room',
+        'display': 'Room',
+        'expression': '',
+    }
+    restored = report_from_dict(as_dict)
+    assert restored.glossary is not None
+    assert restored.glossary.terms[0].definition == definition
+
+
+def test_a_value_part_in_a_definition_is_refused():
+    as_dict = report_to_dict(ReportData(metadata=_meta(), glossary=Glossary()))
+    as_dict['glossary'] = {
+        'terms': [
+            {
+                'id': 'book',
+                'kind': None,
+                'canonical': 'book',
+                'definition': {
+                    'text': 'x',
+                    'parts': [{'rendered': 'x', 'expression': 'x'}],
+                },
+            }
+        ]
+    }
+    with pytest.raises(PytestGivenError, match='definition part'):
+        report_from_dict(as_dict)
+
+
 def test_glossary_term_source_roundtrips() -> None:
     g = Glossary(
         terms=[
@@ -920,7 +964,7 @@ def _every_field_populated() -> ReportData:
         id=TermId('guest'),
         kind='actor',
         canonical='Guest',
-        definition='someone who books',
+        definition=Definition.literal('someone who books'),
         source=SourceLocation(relpath='g.py', line=3),
     )
     story = Story(

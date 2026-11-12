@@ -1,6 +1,6 @@
 import pytest
 
-from pytest_given.markdown import EmphasisSpan, InlineSpan, PlainSpan, definition_html
+from pytest_given.markdown import definition_html
 
 
 @pytest.mark.parametrize(
@@ -41,15 +41,3 @@ from pytest_given.markdown import EmphasisSpan, InlineSpan, PlainSpan, definitio
 )
 def test_definition_html(text: str, expected: str) -> None:
     assert definition_html(text) == expected
-
-
-def test_definition_html_renders_a_span_as_render_ref_returns_it() -> None:
-    """A `None` keeps the span as it renders without one."""
-
-    def render_ref(span: InlineSpan) -> str | None:
-        return '[ref]' if span == EmphasisSpan(True, (PlainSpan('Phase'),)) else None
-
-    rendered = definition_html(
-        'In one **Phase** or **unknown**.<br>See *it*.', render_ref=render_ref
-    )
-    assert rendered == 'In one [ref] or <strong>unknown</strong>.<br>See <em>it</em>.'

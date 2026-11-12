@@ -3,12 +3,14 @@
 import dataclasses
 
 from pytest_given import given, scenario, then, when
+from pytest_given.capture.definition_refs import resolve_definition_refs
 from pytest_given.lint import DEFAULTS
 from pytest_given.lint.catalog import RuleId
-from pytest_given.lint.runtime_rules import run_runtime_rules
+from pytest_given.lint.runtime_rules import _unresolved_bold_spans, run_runtime_rules
 from pytest_given.model import (
     Clause,
     ClauseTermRef,
+    Definition,
     Glossary,
     GlossaryTerm,
     Narration,
@@ -127,7 +129,7 @@ def _term(name, definition=None):
         id=id_derive(name),
         kind=None,
         canonical=name,
-        definition=definition,
+        definition=None if definition is None else Definition.literal(definition),
         source=SourceLocation(relpath='GLOSSARY.md', line=3),
     )
 
@@ -352,8 +354,8 @@ def test_dead_term_needs_a_glossary() -> None:
 
 
 def _definition_ref_findings(*terms):
-    findings = _runtime(glossary=Glossary(terms=list(terms)))
-    return _rule_findings(findings, 'unresolved-definition-ref')
+    glossary = resolve_definition_refs(Glossary(terms=list(terms)))
+    return _rule_findings(_runtime(glossary=glossary), 'unresolved-definition-ref')
 
 
 @scenario(
@@ -390,6 +392,27 @@ def test_unresolved_definition_ref_flags_one_text_once_per_definition() -> None:
         _term('Phase', 'A **bare** word.'),
     )
     assert [finding.subject for finding in findings] == ['step', 'phase']
+
+
+def test_unresolved_definition_ref_passes_a_resolved_ref() -> None:
+    assert (
+        _definition_ref_findings(_term('Step', 'In one **Phase**.'), _term('Phase'))
+        == []
+    )
+
+
+def test_unresolved_definition_ref_flags_a_bold_span_left_in_a_literal_part() -> None:
+    """The rule reads the stored parts and resolves no name of its own."""
+    glossary = Glossary(terms=[_term('Step', 'In one **Phase**.'), _term('Phase')])
+    findings = _rule_findings(_runtime(glossary=glossary), 'unresolved-definition-ref')
+    assert [finding.subject for finding in findings] == ['step']
+
+
+def test_unresolved_definition_ref_reads_bold_holding_no_code_span() -> None:
+    definition = Definition.literal(
+        "In one **Phase**, which *nests*, by a **`.l`** or **`.s` form** **Case**'s."
+    )
+    assert list(_unresolved_bold_spans(definition)) == ['Phase', 'Case']
 
 
 def test_unresolved_definition_ref_passes_without_a_glossary() -> None:

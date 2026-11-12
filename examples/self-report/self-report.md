@@ -488,6 +488,41 @@
 - **then** pytest counts the test xfailed
 - **then** the «report» marks the «scenario» xfailed with its reason, its steps and the error that broke it
 
+## ✓ The «report» stores a definition as written, each «definition ref» a «term ref» part
+`tests/integration/test_plugin.py::test_the_report_stores_a_definition_as_written_with_its_refs_as_parts` · spec/definition-refs
+
+- **given** a «glossary» declared in code whose Guest definition bolds Room, a «term» declared after it
+    - 📎 conftest:
+        ```
+        from pytest_given import Glossary
+
+        g = Glossary()
+        guest = g.actor('Guest', 'Books a **Room** for a stay.')
+        room = g.work_object('Room')
+        ```
+- **when** the suite runs with --given-json
+    - 📎 definition:
+        ```
+        {
+          "text": "Books a **Room** for a stay.",
+          "parts": [
+            {
+              "value": "Books a "
+            },
+            {
+              "term_id": "room",
+              "display": "Room",
+              "expression": ""
+            },
+            {
+              "value": " for a stay."
+            }
+          ]
+        }
+        ```
+- **then** the definition's text is as written, bold included
+- **then** its parts hold the «definition ref» as a «term ref» to Room
+
 ## ✓ An editor «source link» opens the file under the rootdir, wherever pytest runs from
 `tests/integration/test_plugin.py::test_editor_source_link_resolves_against_the_rootdir`
 
@@ -1476,6 +1511,13 @@
 - **given** a collector with no «active scenario»
 - **when** a leaf «graft» runs
 - **then** the invariant is asserted rather than silently dropping the step
+
+## ✓ A «definition ref» names its «term» by canonical name or «S-form», in any case
+`tests/unit/capture/test_definition_refs.py::test_a_definition_ref_names_its_term_by_canonical_name_or_s_form` · spec/definition-refs
+
+- **given** a «glossary» whose Step definition bolds "phase" and "Attachments"
+- **when** its «definition refs» resolve at session finish
+- **then** each bold span is a «term ref» to the «term» it names, in the words its author wrote
 
 ## ✓ A «file glossary» looks «terms» up case-insensitively
 `tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive`
@@ -3890,16 +3932,16 @@
 - **when** the term-scenario index is built
 - **then** each «term» maps to the scenario exactly once
 
-## ✓ A «definition ref» names its «term» by canonical name or «S-form», in any case
-`tests/unit/report/test_html_renderer.py::test_a_definition_ref_names_its_term_by_canonical_name_or_s_form` · spec/definition-refs
+## ✓ The Glossary tab renders each «definition ref» as a «term ref» to the «term» it names
+`tests/unit/report/test_html_renderer.py::test_the_glossary_tab_renders_each_definition_ref_as_a_term_ref` · spec/definition-refs
 
-- **given** a «glossary» whose Step definition bolds "phase" and "Attachments"
-- **when** the Glossary tab renders the definition
+- **given** a «glossary» whose Step definition bolds Phase, attachments, Steps itself and a word naming no «term»
+- **when** the Glossary tab renders the Step definition
     - 📎 definition:
         ```
-        A unit in one <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="phase">phase</span>, carrying <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="attachment">Attachments</span>.
+        A unit in one <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="phase">Phase</span>. <strong>Steps</strong> nest, may carry <span class="term-ref-actor term-ref--link has-term-tip" data-term-id="attachment">attachments</span> and name a <strong>sentence handle</strong>, <em>phase</em> or <strong><code>.l</code></strong>.
         ```
-- **then** each bold span is a «term ref» to the «term» it names, in the words its author wrote
+- **then** Phase and attachments are «term refs», in the words its author wrote, and neither Steps nor the other bold word links anywhere
 
 ## ✓ «Parameter coloring» ties each placeholder to its column header
 `tests/unit/report/test_html_renderer.py::test_render_parametrized_step_with_structured_narration` · parametrization
