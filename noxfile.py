@@ -36,7 +36,6 @@ nox.options.sessions = [
     'format',
     'lint',
     'mypy',
-    'test',
     'coverage',
     'citations',
     'audit',
@@ -136,8 +135,6 @@ def coverage(session: nox.Session) -> None:
         'pytest_given',
         '-m',
         'pytest',
-        'tests/unit',
-        'tests/integration',
     )
     try:
         session.run('coverage', 'report', '--fail-under', '100', '--show-missing')

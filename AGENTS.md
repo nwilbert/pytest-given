@@ -16,7 +16,7 @@ uv sync --group dev
 
 ## Quality gates
 
-`uv run nox` runs the default gate — `format`, `lint`, `mypy`, `test`, `coverage` (a 100% target), `citations` (the documents' citations held to the committed reports), `audit` (a `pip-audit` of the locked dependencies). **Run it (or at minimum `uv run nox -s format lint mypy test`) before every commit.** The sessions below are on-demand; list them all with `uv run nox -l`.
+`uv run nox` runs the default gate — `format`, `lint`, `mypy`, `coverage` (the test suite, held to 100% coverage), `citations` (the documents' citations held to the committed reports), `audit` (a `pip-audit` of the locked dependencies). **Run it (or at minimum `uv run nox -s format lint mypy coverage`) before every commit.** The sessions below are on-demand; list them all with `uv run nox -l`.
 
 - `uv run nox -s examples` regenerates the example reports under `examples/`. Run after changes to the renderer, templates, plugin output schema, or any example test file, and commit the updated outputs.
 - `uv run nox -s self_report` regenerates `examples/self-report/` — pytest-given applied to its own backend tests (see [Writing self-report scenarios](#writing-self-report-scenarios)). Run after decorating more tests or changing decorated ones, and after renderer or template changes (its HTML is one of the site's example reports), and commit the updated outputs.

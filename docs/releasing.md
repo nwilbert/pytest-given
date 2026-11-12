@@ -117,7 +117,7 @@ Docs workflow with the version and alias to publish; it runs the same
 
 | job | runs | notes |
 | --- | --- | --- |
-| `verify` | `nox -s lint mypy test coverage audit` | Re-run rather than trusted from CI, because dispatch can target any ref. |
+| `verify` | `nox -s lint mypy coverage audit` | Re-run rather than trusted from CI, because dispatch can target any ref. |
 | `build` | guards, then `nox -s build` | Uploads `dist/` as a workflow artifact. |
 | `publish` | `pypa/gh-action-pypi-publish` | Environment-scoped, `id-token: write`. |
 | `github-release` | `gh release create` | Creates the `v<version>` tag and the GitHub Release. Skipped for rehearsals. |

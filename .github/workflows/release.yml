@@ -30,7 +30,6 @@ jobs:
       - run: uv tool install --python 3.14 nox
       - run: nox -s lint
       - run: nox -s mypy
-      - run: nox -s test
       - run: nox -s coverage
       - run: nox -s audit
 
