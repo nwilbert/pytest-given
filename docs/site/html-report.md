@@ -27,14 +27,14 @@ In a [parametrized scenario](guide/parametrized.md), hover a column of the param
 
 The Stories view shows each story as a timeline of its sentences, with the scenarios that cover each one. See [Coverage in the report](guide/domain-storytelling.md#coverage-in-the-report).
 
-The Glossary view lists the terms, with a search and a filter for undefined terms. The search also matches a term's [avoided words](guide/glossary.md#avoided-words), which its card shows under the definition, as in `Avoid: Customer, Client`. Expand a term to see the stories and scenarios that use it, and select *Show N scenarios using this term* to filter the Scenarios view by it.
+The Glossary view lists the terms, with a search and a filter for undefined terms. The search also matches a term's [avoided words](guide/glossary.md#avoided-words). Expand a term to see its avoided words, as `Avoid: Customer, Client`, and the stories and scenarios that use it. Select *Show N scenarios using this term* to filter the Scenarios view by it.
 
-The view groups the terms in one of two ways:
+The view groups the terms by section or by kind:
 
-- **By section**, for a glossary with [glossary sections](guide/glossary.md#glossary-sections). The sections come in the order the glossary first names each one. A section named **Other**, in any case, comes last, and the terms with no section join it. The sidebar lists the sections with their term counts. Click a section to show only its terms, and click more to show the terms of any of them. With none selected, every section shows.
+- **By section**, for a glossary with [glossary sections](guide/glossary.md#glossary-sections). The sections come in the order the glossary first names each one. A section named **Other**, in any case, comes last, and the terms with no section join it. When no section has that name, the terms with no section form an **Other** group of their own. The sidebar lists the sections with their term counts. Click a section to show only its terms, and click more to show the terms of any of them. With none selected, every section shows.
 - **By kind**, for a glossary whose terms have kinds. The sidebar has a checkbox per kind to show or hide its terms.
 
-A glossary with sections opens grouped by section. When its terms also have kinds, a *Group by* switch at the top of the sidebar changes between *Section* and *Kind*, and switching to *Kind* clears the section selection. A glossary with neither sections nor kinds lists its terms without groups.
+A glossary with sections opens grouped by section. When at least one of its terms has a kind, a *Group by* switch at the top of the sidebar changes between *Section* and *Kind*, and switching to *Kind* clears the section selection. A glossary with neither sections nor kinds lists its terms without groups.
 
 A glossary counts as having sections only when its terms name at least two. A glossary under a single heading shows no sections.
 

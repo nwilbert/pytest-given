@@ -1525,6 +1525,13 @@ span.param-highlight {
   color: var(--kind-ink);
 }
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+/* A section names no kind, so its header takes the text ink; its cards keep
+   their own kind marks. */
+.section-title { color: var(--text-primary); }
+
+/* The Group by switch leads the sidebar, above the search. */
+.sidebar > .glossary-grouping:first-child { margin-top: 0; padding-top: 0; }
+.glossary-grouping + .search-box { margin-top: var(--space-lg); }
 
 /* === Term names === */
 /* No underline: in the catalog every name is a term, and the kind header
@@ -1557,6 +1564,9 @@ span.param-highlight {
   grid-template-columns: subgrid;
 }
 .kind-header { grid-column: 1 / -1; }
+/* A Kind-grouping slot holding a borrowed card: out of the grid, so the card
+   lands in the subgrid as the original does. */
+.entry-slot { display: contents; }
 /* The kind mark: a scenario row's status bar, in the kind's underline color. */
 .entry { position: relative; }
 .entry::before {
@@ -1638,6 +1648,11 @@ span.param-highlight {
   color: var(--text-muted);
   font-weight: 500;
   white-space: nowrap;
+}
+/* Rejected synonyms recede to the weight of the chips beside them. */
+.refs-avoid {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 .refs-none {
   font-size: var(--font-size-sm);
@@ -1724,6 +1739,7 @@ span.param-highlight {
 .anchor-link svg { display: block; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
+.kind-header:hover .anchor-link,
 .header:hover .anchor-link { opacity: 0.6; }
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }

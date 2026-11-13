@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-12T19:28:50.857228+00:00",
+    "timestamp": "2026-11-13T08:03:24.298897+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "bec336b5707b0621c5f7cc4029e3e282e3abe36e",
+    "commit_sha": "c9b923838bdb49885d12bf1dd5416ae89f40a22a",
     "title": "pytest-given Self-Report",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/self-report.html"
   },
@@ -33,7 +33,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 124,
+      "duration_ms": 119,
       "steps": [
         {
           "phase": "given",
@@ -139,7 +139,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 31,
+      "duration_ms": 17,
       "steps": [
         {
           "phase": "given",
@@ -432,7 +432,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -690,7 +690,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 5,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -973,7 +973,7 @@
       "module": "tests.integration.test_cli_skills",
       "tags": [],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -1084,7 +1084,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 67,
+      "duration_ms": 59,
       "steps": [
         {
           "phase": "given",
@@ -1262,7 +1262,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 108,
+      "duration_ms": 102,
       "steps": [
         {
           "phase": "given",
@@ -1355,7 +1355,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 68,
+      "duration_ms": 65,
       "steps": [
         {
           "phase": "given",
@@ -1437,7 +1437,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 54,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -1546,7 +1546,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -1675,7 +1675,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 556,
+      "duration_ms": 555,
       "steps": [
         {
           "phase": "given",
@@ -1803,7 +1803,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 60,
       "steps": [
         {
           "phase": "given",
@@ -1990,7 +1990,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 123,
+      "duration_ms": 105,
       "steps": [
         {
           "phase": "given",
@@ -2176,7 +2176,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 44,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -2243,7 +2243,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 36,
       "steps": [
         {
           "phase": "given",
@@ -2353,7 +2353,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 28,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -2495,7 +2495,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 15,
+      "duration_ms": 12,
       "steps": [
         {
           "phase": "given",
@@ -2565,7 +2565,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 32,
       "steps": [
         {
           "phase": "given",
@@ -2820,7 +2820,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 85,
+      "duration_ms": 79,
       "steps": [
         {
           "phase": "given",
@@ -2948,7 +2948,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 78,
+      "duration_ms": 66,
       "steps": [
         {
           "phase": "given",
@@ -3075,7 +3075,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3210,7 +3210,7 @@
         "spec/definition-refs"
       ],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -3341,7 +3341,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 169,
+      "duration_ms": 164,
       "steps": [
         {
           "phase": "given",
@@ -3414,7 +3414,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -3725,7 +3725,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -3870,7 +3870,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -4023,7 +4023,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 53,
       "steps": [
         {
           "phase": "given",
@@ -4168,7 +4168,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 57,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -4315,7 +4315,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 169,
+      "duration_ms": 161,
       "steps": [
         {
           "phase": "given",
@@ -4536,7 +4536,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 66,
+      "duration_ms": 55,
       "steps": [
         {
           "phase": "given",
@@ -4666,7 +4666,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 103,
+      "duration_ms": 99,
       "steps": [
         {
           "phase": "given",
@@ -4795,7 +4795,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 128,
+      "duration_ms": 105,
       "steps": [
         {
           "phase": "given",
@@ -4963,7 +4963,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 28,
       "steps": [
         {
           "phase": "given",
@@ -5057,7 +5057,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 45,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -5136,7 +5136,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 237,
+      "duration_ms": 236,
       "steps": [
         {
           "phase": "given",
@@ -5318,7 +5318,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 75,
       "steps": [
         {
           "phase": "given",
@@ -5408,7 +5408,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 76,
+      "duration_ms": 48,
       "steps": [
         {
           "phase": "given",
@@ -5500,7 +5500,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 89,
+      "duration_ms": 91,
       "steps": [
         {
           "phase": "given",
@@ -5582,7 +5582,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 13,
+      "duration_ms": 14,
       "steps": [
         {
           "phase": "given",
@@ -5674,7 +5674,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 36,
+      "duration_ms": 39,
       "steps": [
         {
           "phase": "given",
@@ -5759,7 +5759,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 60,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -5866,7 +5866,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 162,
+      "duration_ms": 163,
       "steps": [
         {
           "phase": "given",
@@ -5973,7 +5973,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 630,
+      "duration_ms": 621,
       "steps": [
         {
           "phase": "given",
@@ -6164,7 +6164,7 @@
       "module": "tests.integration.test_plugin",
       "tags": [],
       "status": "passed",
-      "duration_ms": 419,
+      "duration_ms": 408,
       "steps": [
         {
           "phase": "given",
@@ -6359,7 +6359,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 58,
+      "duration_ms": 51,
       "steps": [
         {
           "phase": "given",
@@ -6512,7 +6512,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -6588,7 +6588,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 35,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -6728,7 +6728,7 @@
         "spec/boolean-phrases"
       ],
       "status": "passed",
-      "duration_ms": 56,
+      "duration_ms": 52,
       "steps": [
         {
           "phase": "given",
@@ -6897,7 +6897,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 71,
+      "duration_ms": 57,
       "steps": [
         {
           "phase": "given",
@@ -7040,7 +7040,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 34,
+      "duration_ms": 31,
       "steps": [
         {
           "phase": "given",
@@ -7173,7 +7173,7 @@
       "module": "tests.integration.test_plugin_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 434,
+      "duration_ms": 422,
       "steps": [
         {
           "phase": "given",
@@ -7309,7 +7309,231 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/integration/test_plugin_file_glossary.py",
-        "line": 35
+        "line": 39
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/integration/test_plugin_file_glossary.py::test_saved_json_rerenders_sections_and_avoid",
+      "narration": {
+        "text": "A saved report re-renders with each term's glossary section and avoided words",
+        "parts": [
+          {
+            "value": "A saved "
+          },
+          {
+            "term_id": "report",
+            "display": "report",
+            "expression": "pg['Report'].l"
+          },
+          {
+            "value": " re-renders with each "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg['Term'].l"
+          },
+          {
+            "value": "'s "
+          },
+          {
+            "term_id": "glossary-section",
+            "display": "glossary section",
+            "expression": "pg[\"Glossary section\"].l"
+          },
+          {
+            "value": " and "
+          },
+          {
+            "term_id": "avoided-word",
+            "display": "avoided words",
+            "expression": "pg[\"Avoided word\"].l.s"
+          }
+        ]
+      },
+      "module": "tests.integration.test_plugin_file_glossary",
+      "tags": [
+        "spec/glossary-sections"
+      ],
+      "status": "passed",
+      "duration_ms": 458,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a suite whose code glossary sorts terms into two glossary sections and gives one avoided words",
+            "parts": [
+              {
+                "value": "a suite whose code "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].l"
+              },
+              {
+                "value": " sorts "
+              },
+              {
+                "term_id": "term",
+                "display": "terms",
+                "expression": "pg[\"Term\"].l.s"
+              },
+              {
+                "value": " into two "
+              },
+              {
+                "term_id": "glossary-section",
+                "display": "glossary sections",
+                "expression": "pg[\"Glossary section\"].l.s"
+              },
+              {
+                "value": " and gives one "
+              },
+              {
+                "term_id": "avoided-word",
+                "display": "avoided words",
+                "expression": "pg[\"Avoided word\"].l.s"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "conftest.py",
+              "content": "from pytest_given import Glossary\n\ng = Glossary()\npeople = g.section('People')\nplaces = g.section('Places')\nguest = people.actor('Guest', avoid=['Customer (too broad)', '**Client**'])\nroom = places.work_object('Room')",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "it runs with --given-json and the report is re-rendered",
+            "parts": [
+              {
+                "value": "it runs with --given-json and the "
+              },
+              {
+                "term_id": "report",
+                "display": "report",
+                "expression": "pg[\"Report\"].l"
+              },
+              {
+                "value": " is re-rendered"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the run passes and the re-render succeeds",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the glossary view groups the terms by glossary section",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].l"
+              },
+              {
+                "value": " view groups the "
+              },
+              {
+                "term_id": "term",
+                "display": "terms",
+                "expression": "pg[\"Term\"].l.s"
+              },
+              {
+                "value": " by "
+              },
+              {
+                "term_id": "glossary-section",
+                "display": "glossary section",
+                "expression": "pg[\"Glossary section\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the avoided words survive, note included",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "avoided-word",
+                "display": "avoided words",
+                "expression": "pg[\"Avoided word\"].l.s"
+              },
+              {
+                "value": " survive, note included"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the page data carries each avoided word as a plain word",
+            "parts": [
+              {
+                "value": "the page data carries each "
+              },
+              {
+                "term_id": "avoided-word",
+                "display": "avoided word",
+                "expression": "pg[\"Avoided word\"].l"
+              },
+              {
+                "value": " as a plain word"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/integration/test_plugin_file_glossary.py",
+        "line": 132
       },
       "story_ids": [],
       "pins": null
@@ -7541,7 +7765,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 33,
+      "duration_ms": 30,
       "steps": [
         {
           "phase": "given",
@@ -7661,7 +7885,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 29,
       "steps": [
         {
           "phase": "given",
@@ -7791,7 +8015,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 121,
+      "duration_ms": 119,
       "steps": [
         {
           "phase": "given",
@@ -8021,7 +8245,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 61,
+      "duration_ms": 54,
       "steps": [
         {
           "phase": "given",
@@ -8133,7 +8357,7 @@
       "module": "tests.integration.test_plugin_lint",
       "tags": [],
       "status": "passed",
-      "duration_ms": 30,
+      "duration_ms": 26,
       "steps": [
         {
           "phase": "given",
@@ -9762,7 +9986,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10068,7 +10292,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10255,7 +10479,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 0,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10362,7 +10586,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10449,7 +10673,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10535,7 +10759,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10628,7 +10852,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10799,7 +11023,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -10900,7 +11124,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -11084,7 +11308,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -11256,7 +11480,7 @@
       "module": "tests.unit.capture.test_file_glossary",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -11480,7 +11704,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 1,
+      "duration_ms": 0,
       "steps": [
         {
           "phase": "given",
@@ -11564,6 +11788,282 @@
       "source": {
         "relpath": "tests/unit/capture/test_file_glossary.py",
         "line": 368
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/capture/test_file_glossary.py::test_section_from_nearest_heading",
+      "narration": {
+        "text": "A file glossary reads each term's glossary section from the heading above it",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "file-glossary",
+            "display": "file glossary",
+            "expression": "pg['File glossary'].l"
+          },
+          {
+            "value": " reads each "
+          },
+          {
+            "term_id": "term",
+            "display": "term",
+            "expression": "pg['Term'].l"
+          },
+          {
+            "value": "'s "
+          },
+          {
+            "term_id": "glossary-section",
+            "display": "glossary section",
+            "expression": "pg[\"Glossary section\"].l"
+          },
+          {
+            "value": " from the heading above it"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_file_glossary",
+      "tags": [
+        "spec/glossary-sections"
+      ],
+      "status": "passed",
+      "duration_ms": 7,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Markdown glossary with a table under each of two headings",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Glossary\n\n## Booking\n\n| Term | Meaning |\n|---|---|\n| Guest | A person. |\n\n## Stay\n\n| Term | Meaning |\n|---|---|\n| Room | A bookable room. |\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a file glossary loads it",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "file-glossary",
+                "display": "file glossary",
+                "expression": "pg[\"File glossary\"].l"
+              },
+              {
+                "value": " loads it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each term names the heading above its table",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " names the heading above its table"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_file_glossary.py",
+        "line": 410
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/capture/test_file_glossary.py::test_paragraph_glossary_reads_term_paragraphs",
+      "narration": {
+        "text": "A file glossary reads term paragraphs",
+        "parts": [
+          {
+            "value": "A "
+          },
+          {
+            "term_id": "file-glossary",
+            "display": "file glossary",
+            "expression": "pg[\"File glossary\"].l"
+          },
+          {
+            "value": " reads "
+          },
+          {
+            "term_id": "term-paragraph",
+            "display": "term paragraphs",
+            "expression": "pg[\"Term paragraph\"].l.s"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_file_glossary",
+      "tags": [
+        "spec/glossary-sections"
+      ],
+      "status": "passed",
+      "duration_ms": 1,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Markdown glossary of term paragraphs under `## Language`",
+            "parts": [
+              {
+                "value": "a Markdown glossary of "
+              },
+              {
+                "term_id": "term-paragraph",
+                "display": "term paragraphs",
+                "expression": "pg[\"Term paragraph\"].l.s"
+              },
+              {
+                "value": " under `## Language`"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [
+            {
+              "label": "Glossary file",
+              "content": "# Ordering\n\nReceives and tracks customer orders.\n\n## Language\n\n**Order**:\nA customer's request for goods, placed in one checkout.\n_Avoid_: Purchase, transaction\n\n**Invoice**:\nA request for payment sent to a customer after delivery, for one **Order**.\n_Avoid_: Bill, payment request\n",
+              "content_type": "text"
+            }
+          ],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a `ParagraphGlossary` loads it",
+            "parts": [
+              {
+                "value": "a `ParagraphGlossary` loads it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "each term takes its definition from the lines under its bold name",
+            "parts": [
+              {
+                "value": "each "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " takes its definition from the lines under its bold name"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the `_Avoid_:` line lists the words the term avoids",
+            "parts": [
+              {
+                "value": "the `_Avoid_:` line lists the words the "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " avoids"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "`## Language` holds the terms rather than naming a glossary section",
+            "parts": [
+              {
+                "value": "`## Language` holds the "
+              },
+              {
+                "term_id": "term",
+                "display": "terms",
+                "expression": "pg[\"Term\"].l.s"
+              },
+              {
+                "value": " rather than naming a "
+              },
+              {
+                "term_id": "glossary-section",
+                "display": "glossary section",
+                "expression": "pg[\"Glossary section\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_file_glossary.py",
+        "line": 497
       },
       "story_ids": [],
       "pins": null
@@ -13385,6 +13885,141 @@
       "pins": null
     },
     {
+      "id": "tests/unit/capture/test_glossary.py::test_section_terms_carry_it",
+      "narration": {
+        "text": "A code glossary groups terms into glossary sections",
+        "parts": [
+          {
+            "value": "A code "
+          },
+          {
+            "term_id": "glossary",
+            "display": "glossary",
+            "expression": "pg[\"Glossary\"].l"
+          },
+          {
+            "value": " groups "
+          },
+          {
+            "term_id": "term",
+            "display": "terms",
+            "expression": "pg[\"Term\"].l.s"
+          },
+          {
+            "value": " into "
+          },
+          {
+            "term_id": "glossary-section",
+            "display": "glossary sections",
+            "expression": "pg[\"Glossary section\"].l.s"
+          }
+        ]
+      },
+      "module": "tests.unit.capture.test_glossary",
+      "tags": [
+        "spec/glossary-sections"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a glossary with a \"Booking\" section",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].l"
+              },
+              {
+                "value": " with a \"Booking\" section"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "a term is declared through the section and another outside it",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " is declared through the section and another outside it"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "only the first term carries the glossary section",
+            "parts": [
+              {
+                "value": "only the first "
+              },
+              {
+                "term_id": "term",
+                "display": "term",
+                "expression": "pg[\"Term\"].l"
+              },
+              {
+                "value": " carries the "
+              },
+              {
+                "term_id": "glossary-section",
+                "display": "glossary section",
+                "expression": "pg[\"Glossary section\"].l"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the declared term records the line of the call in this file",
+            "parts": []
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/capture/test_glossary.py",
+        "line": 501
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
       "id": "tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots[actor-actor]",
       "narration": {
         "text": "A kindless term takes its kind from the slots it fills",
@@ -14676,7 +15311,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 26
+        "line": 36
       },
       "story_ids": [],
       "pins": null
@@ -14750,7 +15385,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 43
+        "line": 57
       },
       "story_ids": [],
       "pins": null
@@ -14812,7 +15447,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 61
+        "line": 79
       },
       "story_ids": [],
       "pins": null
@@ -14874,7 +15509,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 76
+        "line": 98
       },
       "story_ids": [],
       "pins": null
@@ -15068,7 +15703,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 99
+        "line": 125
       },
       "story_ids": [],
       "pins": null
@@ -15274,7 +15909,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 162
+        "line": 189
       },
       "story_ids": [],
       "pins": null
@@ -15488,7 +16123,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 189
+        "line": 220
       },
       "story_ids": [],
       "pins": null
@@ -15550,7 +16185,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/capture/test_markdown_glossary.py",
-        "line": 219
+        "line": 250
       },
       "story_ids": [],
       "pins": null
@@ -19839,7 +20474,7 @@
         "validation"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -21103,7 +21738,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21214,7 +21849,7 @@
       "module": "tests.unit.citations.test_check",
       "tags": [],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21314,7 +21949,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -21441,7 +22076,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -21614,7 +22249,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21784,7 +22419,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -21915,7 +22550,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -22103,7 +22738,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22241,7 +22876,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 29,
+      "duration_ms": 9,
       "steps": [
         {
           "phase": "given",
@@ -22489,7 +23124,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -22631,7 +23266,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -22779,7 +23414,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -22990,7 +23625,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -23205,7 +23840,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 9,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -23358,7 +23993,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -23495,7 +24130,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 40,
+      "duration_ms": 16,
       "steps": [
         {
           "phase": "given",
@@ -23693,7 +24328,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 18,
+      "duration_ms": 6,
       "steps": [
         {
           "phase": "given",
@@ -23878,7 +24513,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 8,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -24043,7 +24678,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -24211,7 +24846,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -24363,7 +24998,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 7,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -24504,7 +25139,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 5,
       "steps": [
         {
           "phase": "given",
@@ -24668,7 +25303,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 6,
+      "duration_ms": 4,
       "steps": [
         {
           "phase": "given",
@@ -24821,7 +25456,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -24957,7 +25592,7 @@
         "spec/term-citations"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 2,
       "steps": [
         {
           "phase": "given",
@@ -28845,7 +29480,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -28998,7 +29633,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -29122,7 +29757,7 @@
         "versions/0.5.0"
       ],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -29264,7 +29899,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 11,
+      "duration_ms": 3,
       "steps": [
         {
           "phase": "given",
@@ -29466,7 +30101,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 4,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -29588,7 +30223,7 @@
       "module": "tests.unit.lint.test_ast_rules",
       "tags": [],
       "status": "passed",
-      "duration_ms": 3,
+      "duration_ms": 1,
       "steps": [
         {
           "phase": "given",
@@ -29829,7 +30464,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 65
+        "line": 67
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -29991,7 +30626,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 141
+        "line": 143
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -30161,7 +30796,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 245
+        "line": 247
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -30297,7 +30932,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 316
+        "line": 318
       },
       "story_ids": [],
       "pins": null
@@ -30449,7 +31084,167 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/lint/test_runtime_rules.py",
-        "line": 361
+        "line": 363
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "tests/unit/lint/test_runtime_rules.py::test_plain_text_finding",
+      "narration": {
+        "text": "The narration lint flags an avoided word in step text",
+        "parts": [
+          {
+            "value": "The "
+          },
+          {
+            "term_id": "narration-lint",
+            "display": "narration lint",
+            "expression": "pg[\"Narration lint\"].l"
+          },
+          {
+            "value": " flags an "
+          },
+          {
+            "term_id": "avoided-word",
+            "display": "avoided word",
+            "expression": "pg[\"Avoided word\"].l"
+          },
+          {
+            "value": " in step text"
+          }
+        ]
+      },
+      "module": "tests.unit.lint.test_runtime_rules",
+      "tags": [
+        "spec/glossary-sections"
+      ],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a glossary where Guest avoids Customer",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "glossary",
+                "display": "glossary",
+                "expression": "pg[\"Glossary\"].l"
+              },
+              {
+                "value": " where Guest avoids Customer"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a scenario whose step text says Customer",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "scenario",
+                "display": "scenario",
+                "expression": "pg[\"Scenario\"].l"
+              },
+              {
+                "value": " whose step text says Customer"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the runtime lint rules run",
+            "parts": [
+              {
+                "value": "the runtime "
+              },
+              {
+                "term_id": "lint-rule",
+                "display": "lint rules",
+                "expression": "pg[\"Lint rule\"].l.s"
+              },
+              {
+                "value": " run"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the lint finding names the word and the step",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "lint-finding",
+                "display": "lint finding",
+                "expression": "pg[\"Lint finding\"].l"
+              },
+              {
+                "value": " names the word and the step"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "its severity is warn by default",
+            "parts": [
+              {
+                "value": "its "
+              },
+              {
+                "term_id": "severity",
+                "display": "severity",
+                "expression": "pg[\"Severity\"].l"
+              },
+              {
+                "value": " is warn by default"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "tests/unit/lint/test_runtime_rules.py",
+        "line": 467
       },
       "story_ids": [],
       "pins": null
@@ -32288,7 +33083,7 @@
           "attachments": [
             {
               "label": "Report data",
-              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null,\n    \"report_url\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"pins\": null,\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"xfail_reason\": null,\n      \"source\": null,\n      \"story_ids\": [\n        \"book\"\n      ],\n      \"pins\": null\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"activity\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"sentences\": [\n        {\n          \"id\": 1,\n          \"clauses\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ],\n          \"name\": null\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
+              "content": "{\n  \"metadata\": {\n    \"project\": \"p\",\n    \"timestamp\": \"t\",\n    \"pytest_version\": \"8\",\n    \"plugin_version\": \"0\",\n    \"commit_sha\": null,\n    \"title\": null,\n    \"report_url\": null\n  },\n  \"scenarios\": [\n    {\n      \"id\": \"t\",\n      \"narration\": {\n        \"text\": \"s\",\n        \"parts\": []\n      },\n      \"module\": \"m\",\n      \"tags\": [],\n      \"status\": \"passed\",\n      \"duration_ms\": 0,\n      \"steps\": [\n        {\n          \"phase\": \"when\",\n          \"narration\": {\n            \"text\": \"x\",\n            \"parts\": [\n              {\n                \"term_id\": \"guest\",\n                \"display\": \"Alice\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"search\",\n                \"display\": \"searches\",\n                \"expression\": \"\"\n              },\n              {\n                \"term_id\": \"room\",\n                \"display\": \"Deluxe Suite\",\n                \"expression\": \"\"\n              }\n            ]\n          },\n          \"children\": [],\n          \"attachments\": [],\n          \"pins\": null,\n          \"fixture_name\": null\n        }\n      ],\n      \"parameters\": null,\n      \"error\": null,\n      \"skip_reason\": null,\n      \"xfail_reason\": null,\n      \"source\": null,\n      \"story_ids\": [\n        \"book\"\n      ],\n      \"pins\": null\n    }\n  ],\n  \"glossary\": {\n    \"terms\": [\n      {\n        \"id\": \"guest\",\n        \"kind\": \"actor\",\n        \"canonical\": \"Guest\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      },\n      {\n        \"id\": \"room\",\n        \"kind\": \"object\",\n        \"canonical\": \"Room\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      },\n      {\n        \"id\": \"search\",\n        \"kind\": \"activity\",\n        \"canonical\": \"search\",\n        \"definition\": null,\n        \"source\": null,\n        \"section\": null,\n        \"avoid\": []\n      }\n    ]\n  },\n  \"stories\": [\n    {\n      \"id\": \"book\",\n      \"title\": \"Book\",\n      \"sentences\": [\n        {\n          \"id\": 1,\n          \"clauses\": [\n            {\n              \"parts\": [\n                {\n                  \"term_id\": \"guest\",\n                  \"display\": \"Alice\"\n                },\n                {\n                  \"term_id\": \"search\",\n                  \"display\": \"searches for\"\n                },\n                {\n                  \"term_id\": \"room\",\n                  \"display\": \"Deluxe Suite\"\n                }\n              ]\n            }\n          ],\n          \"name\": null\n        }\n      ],\n      \"source\": null\n    }\n  ]\n}",
               "content_type": "json"
             }
           ],
@@ -32368,7 +33163,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 91
+        "line": 99
       },
       "story_ids": [],
       "pins": null
@@ -32487,7 +33282,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 193
+        "line": 201
       },
       "story_ids": [],
       "pins": null
@@ -32628,7 +33423,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 223
+        "line": 231
       },
       "story_ids": [],
       "pins": null
@@ -32737,7 +33532,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 278
+        "line": 286
       },
       "story_ids": [],
       "pins": null
@@ -32885,7 +33680,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 324
+        "line": 332
       },
       "story_ids": [],
       "pins": null
@@ -33042,7 +33837,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 411
+        "line": 419
       },
       "story_ids": [],
       "pins": null
@@ -33167,7 +33962,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 444
+        "line": 452
       },
       "story_ids": [],
       "pins": null
@@ -33283,7 +34078,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_glossary_view.py",
-        "line": 533
+        "line": 541
       },
       "story_ids": [],
       "pins": null
@@ -33404,7 +34199,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 136
+        "line": 137
       },
       "story_ids": [],
       "pins": null
@@ -33429,7 +34224,7 @@
         "parametrization"
       ],
       "status": "passed",
-      "duration_ms": 138,
+      "duration_ms": 137,
       "steps": [
         {
           "phase": "given",
@@ -33527,7 +34322,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 353
+        "line": 354
       },
       "story_ids": [
         "adopt-pytest-given"
@@ -33694,7 +34489,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "tests/unit/report/test_html_renderer.py",
-        "line": 1284
+        "line": 1285
       },
       "story_ids": [],
       "pins": null
@@ -36394,7 +37189,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 13
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "scenario-title",
@@ -36427,7 +37224,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 14
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "step",
@@ -36484,7 +37283,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 15
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "narration",
@@ -36509,7 +37310,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 16
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "phase",
@@ -36526,7 +37329,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 17
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "when-then",
@@ -36543,7 +37348,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 18
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "tag",
@@ -36560,7 +37367,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 19
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "attachment",
@@ -36577,7 +37386,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 20
-        }
+        },
+        "section": "Core test model",
+        "avoid": []
       },
       {
         "id": "parametrized-scenario",
@@ -36618,7 +37429,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 26
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "case",
@@ -36635,7 +37448,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 27
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "case-id",
@@ -36668,7 +37483,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 28
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "parameter-table",
@@ -36701,7 +37518,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 29
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "boolean-phrase",
@@ -36726,7 +37545,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 30
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "group",
@@ -36775,7 +37596,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 31
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "templatize",
@@ -36808,7 +37631,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 32
-        }
+        },
+        "section": "Parametrization",
+        "avoid": []
       },
       {
         "id": "step-fixture",
@@ -36833,7 +37658,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 38
-        }
+        },
+        "section": "Fixtures and recording",
+        "avoid": []
       },
       {
         "id": "plain-fixture",
@@ -36858,7 +37685,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 39
-        }
+        },
+        "section": "Fixtures and recording",
+        "avoid": []
       },
       {
         "id": "given-annotation",
@@ -36891,7 +37720,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 40
-        }
+        },
+        "section": "Fixtures and recording",
+        "avoid": []
       },
       {
         "id": "fixture-recording",
@@ -36916,7 +37747,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 41
-        }
+        },
+        "section": "Fixtures and recording",
+        "avoid": []
       },
       {
         "id": "graft",
@@ -36949,7 +37782,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 42
-        }
+        },
+        "section": "Fixtures and recording",
+        "avoid": []
       },
       {
         "id": "collector",
@@ -36974,7 +37809,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 48
-        }
+        },
+        "section": "Collector state",
+        "avoid": []
       },
       {
         "id": "active-scenario",
@@ -36991,7 +37828,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 49
-        }
+        },
+        "section": "Collector state",
+        "avoid": []
       },
       {
         "id": "node-id",
@@ -37008,7 +37847,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 50
-        }
+        },
+        "section": "Collector state",
+        "avoid": []
       },
       {
         "id": "step-stack",
@@ -37025,7 +37866,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 51
-        }
+        },
+        "section": "Collector state",
+        "avoid": []
       },
       {
         "id": "report",
@@ -37042,7 +37885,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 57
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "renderer",
@@ -37059,7 +37904,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 58
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "parameter-coloring",
@@ -37076,7 +37923,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 59
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "value-highlight",
@@ -37101,7 +37950,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 60
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "source-link",
@@ -37134,7 +37985,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 61
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "report-link",
@@ -37159,7 +38012,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 62
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "citation",
@@ -37192,7 +38047,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 63
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "narrated-citation",
@@ -37217,7 +38074,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 64
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "defining-citation",
@@ -37242,7 +38101,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 65
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "citation-finding",
@@ -37267,7 +38128,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 66
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "theme",
@@ -37284,7 +38147,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 67
-        }
+        },
+        "section": "Report",
+        "avoid": []
       },
       {
         "id": "narration-lint",
@@ -37317,7 +38182,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 73
-        }
+        },
+        "section": "Narration lint",
+        "avoid": []
       },
       {
         "id": "lint-rule",
@@ -37342,7 +38209,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 74
-        }
+        },
+        "section": "Narration lint",
+        "avoid": []
       },
       {
         "id": "lint-finding",
@@ -37383,7 +38252,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 75
-        }
+        },
+        "section": "Narration lint",
+        "avoid": []
       },
       {
         "id": "severity",
@@ -37408,7 +38279,9 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 76
-        }
+        },
+        "section": "Narration lint",
+        "avoid": []
       },
       {
         "id": "glossary",
@@ -37425,24 +38298,109 @@
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 86
-        }
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "file-glossary",
         "kind": null,
         "canonical": "File glossary",
         "definition": {
-          "text": "A glossary loaded from the GFM pipe tables of a Markdown file.",
+          "text": "A glossary loaded from a Markdown file: a `TableGlossary` from GFM pipe tables, or a `ParagraphGlossary` from **term paragraphs**.",
           "parts": [
             {
-              "value": "A glossary loaded from the GFM pipe tables of a Markdown file."
+              "value": "A glossary loaded from a Markdown file: a `TableGlossary` from GFM pipe tables, or a `ParagraphGlossary` from "
+            },
+            {
+              "term_id": "term-paragraph",
+              "display": "term paragraphs",
+              "expression": ""
+            },
+            {
+              "value": "."
             }
           ]
         },
         "source": {
           "relpath": "GLOSSARY.md",
           "line": 87
-        }
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
+      },
+      {
+        "id": "term-paragraph",
+        "kind": null,
+        "canonical": "Term paragraph",
+        "definition": {
+          "text": "A term in a `ParagraphGlossary`, written as one paragraph: `**Term**:`, its definition, and an optional `_Avoid_:` line, the format of Matt Pocock's skills.",
+          "parts": [
+            {
+              "value": "A term in a `ParagraphGlossary`, written as one paragraph: `**Term**:`, its definition, and an optional `_Avoid_:` line, the format of Matt Pocock's skills."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 88
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
+      },
+      {
+        "id": "glossary-section",
+        "kind": null,
+        "canonical": "Glossary section",
+        "definition": {
+          "text": "A named group of terms: the heading a **file glossary** term sits under, or the `g.section(...)` a code glossary declares it through. The Glossary tab groups and filters by it.",
+          "parts": [
+            {
+              "value": "A named group of terms: the heading a "
+            },
+            {
+              "term_id": "file-glossary",
+              "display": "file glossary",
+              "expression": ""
+            },
+            {
+              "value": " term sits under, or the `g.section(...)` a code glossary declares it through. The Glossary tab groups and filters by it."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 89
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
+      },
+      {
+        "id": "avoided-word",
+        "kind": null,
+        "canonical": "Avoided word",
+        "definition": {
+          "text": "A rejected synonym a **term** lists, which the `avoided-word` lint rule flags in narration. An avoid entry may add a parenthesized note, which the report shows and the lint ignores.",
+          "parts": [
+            {
+              "value": "A rejected synonym a "
+            },
+            {
+              "term_id": "term",
+              "display": "term",
+              "expression": ""
+            },
+            {
+              "value": " lists, which the `avoided-word` lint rule flags in narration. An avoid entry may add a parenthesized note, which the report shows and the lint ignores."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "GLOSSARY.md",
+          "line": 90
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "deferred-term",
@@ -37474,15 +38432,17 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 88
-        }
+          "line": 91
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "term",
         "kind": null,
         "canonical": "Term",
         "definition": {
-          "text": "A glossary entry: an **Actor**, **Work Object**, **Activity**, or **kindless** term. Each carries an id (slug), a canonical name, a kind unless kindless, and an optional definition.",
+          "text": "A glossary entry: an **Actor**, **Work Object**, **Activity**, or **kindless** term. Each carries an id (slug), a canonical name, a kind unless kindless, an optional definition, an optional **glossary section** and any **avoided words**.",
           "parts": [
             {
               "value": "A glossary entry: an "
@@ -37517,14 +38477,32 @@
               "expression": ""
             },
             {
-              "value": " term. Each carries an id (slug), a canonical name, a kind unless kindless, and an optional definition."
+              "value": " term. Each carries an id (slug), a canonical name, a kind unless kindless, an optional definition, an optional "
+            },
+            {
+              "term_id": "glossary-section",
+              "display": "glossary section",
+              "expression": ""
+            },
+            {
+              "value": " and any "
+            },
+            {
+              "term_id": "avoided-word",
+              "display": "avoided words",
+              "expression": ""
+            },
+            {
+              "value": "."
             }
           ]
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 89
-        }
+          "line": 92
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "handle",
@@ -37580,8 +38558,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 90
-        }
+          "line": 93
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "s-form",
@@ -37613,8 +38593,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 91
-        }
+          "line": 94
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "actor",
@@ -37630,8 +38612,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 92
-        }
+          "line": 95
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "work-object",
@@ -37647,8 +38631,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 93
-        }
+          "line": 96
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "activity",
@@ -37680,8 +38666,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 94
-        }
+          "line": 97
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "term-ref",
@@ -37697,8 +38685,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 95
-        }
+          "line": 98
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "definition-ref",
@@ -37730,8 +38720,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 96
-        }
+          "line": 99
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "instance",
@@ -37763,8 +38755,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 97
-        }
+          "line": 100
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "inflection",
@@ -37796,8 +38790,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 98
-        }
+          "line": 101
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "story",
@@ -37829,8 +38825,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 99
-        }
+          "line": 102
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "sentence",
@@ -37878,8 +38876,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 100
-        }
+          "line": 103
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "clause-part",
@@ -37919,8 +38919,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 101
-        }
+          "line": 104
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "clause",
@@ -37944,8 +38946,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 102
-        }
+          "line": 105
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "slot",
@@ -37969,8 +38973,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 103
-        }
+          "line": 106
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "scenario-sentence-binding",
@@ -37994,8 +39000,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 104
-        }
+          "line": 107
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "pin",
@@ -38027,8 +39035,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 105
-        }
+          "line": 108
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "coverage",
@@ -38068,8 +39078,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 106
-        }
+          "line": 109
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "kind-inference",
@@ -38101,8 +39113,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 107
-        }
+          "line": 110
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "kindless",
@@ -38134,8 +39148,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 108
-        }
+          "line": 111
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "undefined",
@@ -38159,8 +39175,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 109
-        }
+          "line": 112
+        },
+        "section": "Domain Storytelling",
+        "avoid": []
       },
       {
         "id": "developer",
@@ -38192,8 +39210,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 117
-        }
+          "line": 120
+        },
+        "section": "Collaboration",
+        "avoid": []
       },
       {
         "id": "domain-expert",
@@ -38209,8 +39229,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 118
-        }
+          "line": 121
+        },
+        "section": "Collaboration",
+        "avoid": []
       },
       {
         "id": "agent",
@@ -38234,8 +39256,10 @@
         },
         "source": {
           "relpath": "GLOSSARY.md",
-          "line": 119
-        }
+          "line": 122
+        },
+        "section": "Collaboration",
+        "avoid": []
       }
     ]
   },

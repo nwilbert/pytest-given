@@ -523,10 +523,99 @@
   </div>
   {% endif %}
   </div>
-  <div id="view-glossary" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-glossary"{% endif %} x-show="mainView === 'glossary'" x-cloak>
+  {#- One term's card. Rendered once, in the default grouping: the Kind
+      grouping of a sectioned glossary borrows it (see `fillKindCards`). -#}
+  {%- macro term_card(entry) -%}
+        {% set term = entry.term %}
+        {% set agg = entry.aggregation %}
+        {% set scn_ids = entry.scenario_ids %}
+        <div class="entry kind-{{ term.kind or 'kindless' }}" id="term-{{ term.id }}" data-term-id="{{ term.id }}"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="{{ term.id }}" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="{{ term.id }}"
+                    aria-controls="term-refs-{{ term.id }}"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">{{ term.canonical }}{{ copy_button('term', term.id, 'view=glossary&term=' ~ term.id) }}</span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">{{ term | definition_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
+              <div class="entry-summary meta-list">{% for part in entry.summary %}<span>{{ part }}</span>{% endfor %}</div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-{{ term.id }}" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                {% if term.avoid %}
+                <div class="refs-line">
+                  <span class="refs-label">Avoid:</span>
+                  <span class="refs-avoid">{{ term | avoid_html }}</span>
+                </div>
+                {% endif %}
+                {% if agg.stories %}
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  {% for sid in agg.stories %}
+                  <a class="use-chip" href="#" data-story-id="{{ sid }}" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">{{ sid }}</a>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if entry.show_instances %}
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  {% for inst in agg.instances %}
+                  <span class="use-chip use-chip--static">{{ inst.display }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if entry.show_forms %}
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  {% for form in agg.forms %}
+                  <span class="use-chip use-chip--static">{{ form }}</span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if scn_ids %}
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="{{ term.id }}"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show {{ scn_ids | length | plural('scenario') }} using this term
+                  </a>
+                </div>
+                {% else %}
+                {#- Also what keeps an otherwise empty entry open: the source
+                    link alone is out of flow, so the panel would clip it. -#}
+                <div class="refs-line refs-none">No scenario uses this term.</div>
+                {% endif %}
+                {% if term.source %}
+                <div class="scenario-source">{{ source_link(term.source) }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+  {%- endmacro -%}
+  {#- `data-grouping` is the grouping the tab opens in, read once by `reportApp`. -#}
+  <div id="view-glossary" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-glossary"{% endif %}{% if glossary %} data-grouping="{{ glossary_view.default_grouping }}"{% endif %} x-show="mainView === 'glossary'" x-cloak>
   {% if glossary %}
+  {% set undefined_count = glossary_view.undefined_count %}
+  {% set all_uncategorized = glossary_view.all_uncategorized %}
+  {% set sectioned = glossary_view.section_groups | length > 0 %}
+  {% set switch = glossary_view.show_grouping_switch %}
   <div class="view-layout">
     <div class="sidebar">
+      {% if switch %}
+      <div class="sidebar-section glossary-grouping">
+        <div class="sidebar-label">Group by</div>
+        <div class="seg-toggle" role="group" aria-label="Group by">
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryGrouping === 'section' }" :aria-pressed="glossaryGrouping === 'section'" @click="setGlossaryGrouping('section')">Section</button>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryGrouping === 'kind' }" :aria-pressed="glossaryGrouping === 'kind'" @click="setGlossaryGrouping('kind')">Kind</button>
+        </div>
+      </div>
+      {% endif %}
       <label class="search-box">
         <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input type="text" placeholder="Search terms..." x-model="glossarySearch">
@@ -535,10 +624,28 @@
         </button>
       </label>
 
-      {% set undefined_count = glossary_view.undefined_count %}
-      {% set all_uncategorized = glossary_view.all_uncategorized %}
+      {% if sectioned %}
+      {#- Rows select with OR: the tab shows the terms of any selected
+          section. Keys travel as data-section, never inside an expression. -#}
+      <div class="sidebar-section" x-show="glossaryGrouping === 'section'">
+        <div class="sidebar-label">Sections</div>
+        {% for section in glossary_view.section_groups %}
+        <div class="nav-group" data-section="{{ section.key }}"
+             :class="{ 'nav-group-active': sectionFilters.includes($el.dataset.section) }"
+             @click="toggleSectionFilter($el.dataset.section)">
+          <button type="button" class="btn-reset nav-group-select" data-section="{{ section.key }}"
+                  :aria-pressed="sectionFilters.includes($el.dataset.section)"
+                  @click.stop="toggleSectionFilter($el.dataset.section)">
+            <span class="nav-group-name">{{ section.label }}</span>
+          </button>
+          <span class="nav-group-count">{{ section.entries | length }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       {% if not all_uncategorized %}
-      <div class="sidebar-section">
+      <div class="sidebar-section"{% if sectioned %} x-show="glossaryGrouping === 'kind'"{% endif %}>
         <div class="sidebar-label">Show kinds</div>
         {% for kind in glossary_view.kinds %}
         <label class="kind-filter-row">
@@ -582,89 +689,47 @@
       </div>
 
       <div class="glossary-entries">
-      {% for group in glossary_view.kind_groups %}
-      {% set kind_label, kind_key = group.label, group.key %}
-      <div class="kind-group" x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
-        {% if not all_uncategorized %}
+      {% for group in glossary_view.section_groups %}
+      <div class="kind-group" data-section="{{ group.key }}"
+           x-show="glossaryGrouping === 'section' && sectionShown($el.dataset.section) && visibleTermCount('section', $el.dataset.section) > 0">
         <div class="kind-header">
-          <span class="kind-title kind-{{ kind_key }}">{{ kind_label }}</span>
-          <span class="kind-meta" x-text="visibleTermLabel('{{ kind_key }}')"></span>
+          <span class="kind-title section-title">{{ group.label }}</span>
+          {#- A section is no citation target, so the button copies a link
+              and opens no menu, with or without a report URL. -#}
+          {{ anchor_link('view=glossary&section=' ~ (group.key | urlencode)) }}
+          <span class="kind-meta" data-section="{{ group.key }}" x-text="visibleTermLabel('section', $el.dataset.section)"></span>
         </div>
-        {% endif %}
-        <div class="entry-list kind-{{ kind_key }}">
+        <div class="entry-list">
         {% for entry in group.entries %}
-        {% set term = entry.term %}
-        {% set agg = entry.aggregation %}
-        {% set scn_ids = entry.scenario_ids %}
-        {% set show_instances = entry.show_instances %}
-        {% set show_forms = entry.show_forms %}
-        <div class="entry" id="term-{{ term.id }}"
-             data-search="{{ term.canonical | lower }}"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === {{ 'true' if term.definition is none else 'false' }}) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="{{ term.id }}" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="{{ term.id }}"
-                    aria-controls="term-refs-{{ term.id }}"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">{{ term.canonical }}{{ copy_button('term', term.id, 'view=glossary&term=' ~ term.id) }}</span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">{{ term | definition_md }}<span class="entry-def-badge" {% if term.definition %}style="display:none"{% endif %}>Undefined</span></div>
-              <div class="entry-summary meta-list">{% for part in entry.summary %}<span>{{ part }}</span>{% endfor %}</div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-{{ term.id }}" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                {% if agg.stories %}
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  {% for sid in agg.stories %}
-                  <a class="use-chip" href="#" data-story-id="{{ sid }}" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">{{ sid }}</a>
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {% if show_instances %}
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  {% for inst in agg.instances %}
-                  <span class="use-chip use-chip--static">{{ inst.display }}</span>
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {% if show_forms %}
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  {% for form in agg.forms %}
-                  <span class="use-chip use-chip--static">{{ form }}</span>
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {% if scn_ids %}
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="{{ term.id }}"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show {{ scn_ids | length | plural('scenario') }} using this term
-                  </a>
-                </div>
-                {% else %}
-                {#- Also what keeps an otherwise empty entry open: the source
-                    link alone is out of flow, so the panel would clip it. -#}
-                <div class="refs-line refs-none">No scenario uses this term.</div>
-                {% endif %}
-                {% if term.source %}
-                <div class="scenario-source">{{ source_link(term.source) }}</div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
+        {{ term_card(entry) }}
         {% endfor %}
         </div>
       </div>
       {% endfor %}
+      {% if not sectioned or switch %}
+      {% for group in glossary_view.kind_groups %}
+      {% set kind_label, kind_key = group.label, group.key %}
+      <div class="kind-group" x-show="glossaryGrouping !== 'section' && glossaryKindFilter.{{ kind_key }} && visibleTermCount('kind', '{{ kind_key }}') > 0">
+        {% if not all_uncategorized %}
+        <div class="kind-header">
+          <span class="kind-title kind-{{ kind_key }}">{{ kind_label }}</span>
+          <span class="kind-meta" x-text="visibleTermLabel('kind', '{{ kind_key }}')"></span>
+        </div>
+        {% endif %}
+        <div class="entry-list kind-{{ kind_key }}">
+        {% for entry in group.entries %}
+        {% if sectioned %}
+        {#- Filled with a clone of the Section grouping's card the first time
+            this grouping shows. -#}
+        <div class="entry-slot" data-term-clone-of="{{ entry.term.id }}"></div>
+        {% else %}
+        {{ term_card(entry) }}
+        {% endif %}
+        {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
       {#- Every name, hidden: the name column sizes to the widest of them, so
           it holds still while search and the filters hide the entries. -#}
       <div class="entry-name entry-name-sizer" aria-hidden="true">{% for term in glossary.terms %}<span class="term-name">{{ term.canonical }}</span>{% endfor %}</div>

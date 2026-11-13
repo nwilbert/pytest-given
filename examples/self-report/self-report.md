@@ -1210,6 +1210,26 @@
 - **then** the scenario passes
 - **then** each «term» in the «report» takes the kind of its «slot»: actor, activity, object
 
+## ✓ A saved «report» re-renders with each «term»'s «glossary section» and «avoided words»
+`tests/integration/test_plugin_file_glossary.py::test_saved_json_rerenders_sections_and_avoid` · spec/glossary-sections
+
+- **given** a suite whose code «glossary» sorts «terms» into two «glossary sections» and gives one «avoided words»
+    - 📎 conftest.py:
+        ```
+        from pytest_given import Glossary
+
+        g = Glossary()
+        people = g.section('People')
+        places = g.section('Places')
+        guest = people.actor('Guest', avoid=['Customer (too broad)', '**Client**'])
+        room = places.work_object('Room')
+        ```
+- **when** it runs with --given-json and the «report» is re-rendered
+- **then** the run passes and the re-render succeeds
+- **then** the «glossary» view groups the «terms» by «glossary section»
+- **then** the «avoided words» survive, note included
+- **then** the page data carries each «avoided word» as a plain word
+
 ## ✓ «Narration lint» is off unless it is asked for
 `tests/integration/test_plugin_lint.py::test_disabled_by_default_records_no_sources_and_reports_nothing`
 
@@ -1807,6 +1827,54 @@
 - **then** a PytestGivenError is raised
 - **then** no new «term» was created
 
+## ✓ A «file glossary» reads each «term»'s «glossary section» from the heading above it
+`tests/unit/capture/test_file_glossary.py::test_section_from_nearest_heading` · spec/glossary-sections
+
+- **given** a Markdown glossary with a table under each of two headings
+    - 📎 Glossary file:
+        ```
+        # Glossary
+
+        ## Booking
+
+        | Term | Meaning |
+        |---|---|
+        | Guest | A person. |
+
+        ## Stay
+
+        | Term | Meaning |
+        |---|---|
+        | Room | A bookable room. |
+        ```
+- **when** a «file glossary» loads it
+- **then** each «term» names the heading above its table
+
+## ✓ A «file glossary» reads «term paragraphs»
+`tests/unit/capture/test_file_glossary.py::test_paragraph_glossary_reads_term_paragraphs` · spec/glossary-sections
+
+- **given** a Markdown glossary of «term paragraphs» under `## Language`
+    - 📎 Glossary file:
+        ```
+        # Ordering
+
+        Receives and tracks customer orders.
+
+        ## Language
+
+        **Order**:
+        A customer's request for goods, placed in one checkout.
+        _Avoid_: Purchase, transaction
+
+        **Invoice**:
+        A request for payment sent to a customer after delivery, for one **Order**.
+        _Avoid_: Bill, payment request
+        ```
+- **when** a `ParagraphGlossary` loads it
+- **then** each «term» takes its definition from the lines under its bold name
+- **then** the `_Avoid_:` line lists the words the «term» avoids
+- **then** `## Language` holds the «terms» rather than naming a «glossary section»
+
 ## ✓ A «term»'s ID is its name as a URL-safe slug · 8 cases
 `tests/unit/capture/test_glossary.py::test_term_ids_are_derived_as_url_safe_slugs`
 
@@ -1950,6 +2018,14 @@
 - **given** a glossary with one declared «term»
 - **when** a near-miss name is subscripted
 - **then** a PytestGivenError is raised with a spelling hint
+
+## ✓ A code «glossary» groups «terms» into «glossary sections»
+`tests/unit/capture/test_glossary.py::test_section_terms_carry_it` · spec/glossary-sections
+
+- **given** a «glossary» with a "Booking" section
+- **when** a «term» is declared through the section and another outside it
+- **then** only the first «term» carries the «glossary section»
+- **then** the declared term records the line of the call in this file
 
 ## ✓ A «kindless» «term» takes its kind from the «slots» it fills · 4 cases
 `tests/unit/capture/test_kind_inference.py::test_a_kindless_term_takes_its_kind_from_its_slots` · diagnostics
@@ -3653,6 +3729,15 @@
 - **then** one «lint finding» names the bold word, not the «term»
 - **then** its «severity» is warn by default
 
+## ✓ The «narration lint» flags an «avoided word» in step text
+`tests/unit/lint/test_runtime_rules.py::test_plain_text_finding` · spec/glossary-sections
+
+- **given** a «glossary» where Guest avoids Customer
+- **given** a «scenario» whose step text says Customer
+- **when** the runtime «lint rules» run
+- **then** the «lint finding» names the word and the step
+- **then** its «severity» is warn by default
+
 ## ✓ A «sentence» references its «terms», whatever surface form they take
 `tests/unit/report/test_coverage.py::test_sentence_term_refs_collects_term_ids_whatever_the_display`
 
@@ -3828,21 +3913,27 @@
                 "kind": "actor",
                 "canonical": "Guest",
                 "definition": null,
-                "source": null
+                "source": null,
+                "section": null,
+                "avoid": []
               },
               {
                 "id": "room",
                 "kind": "object",
                 "canonical": "Room",
                 "definition": null,
-                "source": null
+                "source": null,
+                "section": null,
+                "avoid": []
               },
               {
                 "id": "search",
                 "kind": "activity",
                 "canonical": "search",
                 "definition": null,
-                "source": null
+                "source": null,
+                "section": null,
+                "avoid": []
               }
             ]
           },

@@ -169,6 +169,15 @@ function reportApp() {
   // than carried on every ref: a term used N times would otherwise repeat its
   // whole definition N times in the markup.
   const termsById = new Map(glossaryTerms.map((t) => [t.id, t]));
+  // What the Glossary search matches: the name and the avoided words, one per
+  // line, so a query never matches across two of them.
+  const termHaystacks = new Map(glossaryTerms.map(
+    t => [t.id, [t.canonical, ...t.avoid].join('\n').toLowerCase()],
+  ));
+  // The section keys a `section=` link may select, none unless the glossary
+  // is sectioned.
+  const knownSections = new Set(glossaryTerms.map(t => t.section_key).filter(Boolean));
+  const sectioned = knownSections.size > 0;
   const termScenarios = data.term_scenarios || {};
   // termScenarios is term -> scenarios; the sidebar needs the inverse.
   const scenarioTerms = {};
@@ -253,6 +262,11 @@ function reportApp() {
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
+    // 'section', 'kind' or 'flat': the grouping the tab opens in, as the
+    // template renders it. Not in the hash, as the kind checkboxes are not.
+    glossaryGrouping: document.getElementById('view-glossary').dataset.grouping || 'kind',
+    // Section keys, OR-ed. Only ever non-empty in the Section grouping.
+    sectionFilters: [],
     expandedTerms: {},
     shownStatuses: allStatusesShown(),
     expandedGroups: {},
@@ -344,38 +358,81 @@ function reportApp() {
       if (!this.anySentencesHighlighted) return true;
       return coveredIds.some(id => this.highlightedSentences[id]);
     },
-    // Terms of one kind surviving the search and definition filters. The
-    // headings and their counts are Jinja-rendered report totals, so without
-    // this a search matching nothing leaves them standing over an empty page.
-    visibleTermCount(kind) {
-      return this._termCounts()[kind] || 0;
+    // Whether a term's card survives the search and definition filters. The
+    // section selection and the kind checkboxes hide whole groups instead.
+    termShown(id) {
+      return this._termMatches(termsById.get(id));
     },
-    // One pass per filter change, not the twelve the four kind sections ask
-    // for. Cached as `_visible` is, and for the same reason.
+    _termMatches(term) {
+      if (this.glossaryDefinitionFilter !== 'all'
+          && (this.glossaryDefinitionFilter === 'undefined')
+            !== (term.definition === null || term.definition === undefined)) return false;
+      const query = this.glossarySearch.toLowerCase();
+      return !query || termHaystacks.get(term.id).includes(query);
+    },
+    // Terms of one group surviving the search and definition filters, keyed
+    // by grouping, then by kind or section key. The headings and their counts
+    // are Jinja-rendered report totals, so without this a search matching
+    // nothing leaves them standing over an empty page.
+    visibleTermCount(grouping, key) {
+      const counts = this._termCounts();
+      return (grouping === 'section' ? counts.section.get(key) : counts.kind[key]) || 0;
+    },
+    // One pass per filter change, not one per group heading. Cached as
+    // `_visible` is, and for the same reason. Sections count in a Map: a
+    // section name is free text, and could be `constructor`.
     _termCounts() {
       const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
-      const q = this.glossarySearch.toLowerCase();
-      const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
-      const counts = {};
+      const counts = { kind: {}, section: new Map() };
       for (const t of glossaryTerms) {
-        if (this.glossaryDefinitionFilter !== 'all'
-            && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
-        if (q && !t.canonical.toLowerCase().includes(q)) continue;
+        if (!this._termMatches(t)) continue;
         const kind = t.kind || 'kindless';
-        counts[kind] = (counts[kind] || 0) + 1;
+        counts.kind[kind] = (counts.kind[kind] || 0) + 1;
+        if (t.section_key) counts.section.set(t.section_key, (counts.section.get(t.section_key) || 0) + 1);
       }
       termCountCache = { key, value: counts };
       return counts;
     },
-    visibleTermLabel(kind) {
-      const n = this.visibleTermCount(kind);
+    visibleTermLabel(grouping, key) {
+      const n = this.visibleTermCount(grouping, key);
       return n + (n === 1 ? ' term' : ' terms');
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
+      if (this.glossaryGrouping === 'section') {
+        return [...counts.section.keys()].some(key => this.sectionShown(key));
+      }
       return ['actor', 'object', 'activity', 'kindless']
-        .some(k => this.glossaryKindFilter[k] && counts[k] > 0);
+        .some(k => this.glossaryKindFilter[k] && counts.kind[k] > 0);
+    },
+    sectionShown(key) {
+      return !this.sectionFilters.length || this.sectionFilters.includes(key);
+    },
+    toggleSectionFilter(key) {
+      this.sectionFilters = this.sectionFilters.includes(key)
+        ? this.sectionFilters.filter(other => other !== key)
+        : [...this.sectionFilters, key];
+    },
+    // The URL carries the selection but not the grouping, so the Kind
+    // grouping clears it for the two to agree. Its watcher adds the history
+    // entry, and only when there was a selection to clear.
+    setGlossaryGrouping(grouping) {
+      this.glossaryGrouping = grouping;
+      if (grouping === 'kind' && this.sectionFilters.length) this.sectionFilters = [];
+    },
+    // The Kind grouping of a sectioned glossary borrows its cards from the
+    // Section grouping, as a Stories-view slot borrows a scenario card. A
+    // clone keeps `data-term-id`, so a card expanded in one grouping stays
+    // expanded in the other.
+    fillKindCards() {
+      if (this.glossaryGrouping !== 'kind') return;
+      for (const slot of document.querySelectorAll('#view-glossary [data-term-clone-of]:not([data-filled])')) {
+        const card = document.getElementById('term-' + slot.dataset.termCloneOf).cloneNode(true);
+        this._prepareClone(card, 'kind-');
+        slot.append(card);
+        slot.dataset.filled = '';
+      }
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -653,20 +710,33 @@ function reportApp() {
       if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
+      // Navigation, not refinement: Glossary filters that hide the term give
+      // way. Read off the state, not the card, which a hidden tab hides too.
+      if (this._termFiltered(id)) this._resetTermFilters();
       this.$nextTick(() => {
-        const el = document.getElementById('term-' + id);
-        if (!el) return;
-        const scroll = () => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (el.getClientRects().length) return scroll();
-        // Navigation, not refinement: Glossary filters that hide the term give way.
-        this._resetTermFilters();
-        this.$nextTick(scroll);
+        // The Kind grouping of a sectioned glossary shows the cards' clones.
+        const prefix = sectioned && this.glossaryGrouping === 'kind' ? 'kind-' : '';
+        const el = document.getElementById(prefix + 'term-' + id);
+        // x-show reveals an element in an animation frame, not on the tick,
+        // so the scroll waits up to a few frames for the card to show.
+        const scrollWhenShown = (frames) => {
+          if (el.getClientRects().length) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          else if (frames) requestAnimationFrame(() => scrollWhenShown(frames - 1));
+        };
+        if (el) scrollWhenShown(3);
       });
+    },
+    _termFiltered(id) {
+      const term = termsById.get(id);
+      if (!this._termMatches(term)) return true;
+      if (this.glossaryGrouping === 'section') return !this.sectionShown(term.section_key);
+      return !this.glossaryKindFilter[term.kind || 'kindless'];
     },
     _resetTermFilters() {
       this.glossarySearch = '';
       this.glossaryDefinitionFilter = 'all';
       this.glossaryKindFilter = { actor: true, object: true, activity: true, kindless: true };
+      this.sectionFilters = [];
     },
     filterScenariosByTerm(id) {
       // Navigation, not refinement: the term arrives on its own rather than
@@ -961,7 +1031,7 @@ function reportApp() {
       // spam); discrete navigations and filters push a back-able one. All
       // writes are suppressed while state is being applied FROM the hash.
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses', 'sectionFilters'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       ['mainView', 'selectedStory'].forEach(key => {
@@ -973,6 +1043,7 @@ function reportApp() {
       // Once Alpine has walked the page, so the cards cloned are initialized
       // ones and a `#view=stories` link lands with its story filled.
       this.$nextTick(() => this.fillStoryCards());
+      this.$watch('glossaryGrouping', () => this.fillKindCards());
       // hashchange: manual URL edits / pasted links. popstate: back/forward.
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
@@ -1174,6 +1245,11 @@ function reportApp() {
         id => id === NO_TERMS || Object.hasOwn(termNames, id));
       this.sentenceFilter = keep('story sentence', first('sentence-filter'),
         key => Object.hasOwn(sentenceLabels, key))[0] ?? null;
+      // A selection shows only in the Section grouping, so a link carrying one
+      // switches to it. Without one, the grouping stays as it is.
+      this.sectionFilters = keep('glossary section', params.getAll('section').filter(Boolean),
+        key => knownSections.has(key));
+      if (this.sectionFilters.length) this.glossaryGrouping = 'section';
       if (params.has('status')) {
         const named = params.get('status').split(',').filter(Boolean);
         const shown = new Set(keep('status', named, s => STATUSES.includes(s)));
@@ -1236,6 +1312,7 @@ function reportApp() {
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       for (const termId of this.termFilters) params.append('term-filter', termId);
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
+      for (const key of this.sectionFilters) params.append('section', key);
 
       const shownInReport = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shownInReport.length !== statusesPresent.length) {

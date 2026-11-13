@@ -170,7 +170,7 @@ An **avoided word** is a synonym of a term that the team has decided not to use.
 guest = g.actor('Guest', definition='Person booking accommodation.', avoid=['Customer', 'Client'])
 ```
 
-A `TableGlossary` reads them from its `avoid_column`, a `ParagraphGlossary` from a term's avoid line. The term's card in the Glossary tab shows them under the definition, and the Glossary search finds the term by them. The [`avoided-word`](../configuration/narration-lint.md) lint rule flags an avoided word used in a step, a scenario title or a story sentence.
+A `TableGlossary` reads them from its `avoid_column`, a `ParagraphGlossary` from a term's avoid line. The term's card in the Glossary tab shows them when expanded, and the Glossary search finds the term by them. The [`avoided-word`](../configuration/narration-lint.md) lint rule flags an avoided word used in a step, a scenario title or a story sentence.
 
 - **An entry may end with a note** in parentheses, as in `Reservation (in partner APIs only)`. The card shows the whole entry, and the lint matches only the text before the note. An entry that is only a note raises an error.
 - **An entry shows its [formatting](step-text.md#formatting)** on the card, but a bold word in it links no term.
