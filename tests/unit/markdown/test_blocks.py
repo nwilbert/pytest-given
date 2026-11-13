@@ -4,7 +4,16 @@ the source."""
 import pytest
 from markdown_it import MarkdownIt
 
-from pytest_given.markdown import html_blocks, table_cell_spans, tables, text_runs
+from pytest_given.markdown import (
+    Heading,
+    Paragraph,
+    Table,
+    document_blocks,
+    html_blocks,
+    table_cell_spans,
+    tables,
+    text_runs,
+)
 
 
 @pytest.mark.parametrize(
@@ -187,3 +196,49 @@ def test_text_runs_and_tables_skip_html_blocks() -> None:
     source = '<details>\n\ntext\n\n| a |\n|---|\n| 1 |\n\n</details>\n'
     assert [run.text for run in text_runs(source)] == ['text', ' a ', ' 1 ']
     assert len(tables(source)) == 1
+
+
+def test_document_blocks_heading_levels() -> None:
+    blocks = [
+        found.block for found in document_blocks('# A\n\n### B ###\n\nSetext\n---\n')
+    ]
+    assert [block.level for block in blocks if isinstance(block, Heading)] == [1, 3, 2]
+    assert [block.text for block in blocks if isinstance(block, Heading)] == [
+        'A',
+        'B',
+        'Setext',
+    ]
+
+
+def test_document_blocks_setext_heading_lines_joined() -> None:
+    [found] = document_blocks('Front\ndesk\n===\n')
+    assert isinstance(found.block, Heading)
+    assert found.block.text == 'Front desk'
+
+
+def test_document_blocks_order_with_tables() -> None:
+    source = '# H\n\npara\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\nlast\n'
+    assert [type(found.block) for found in document_blocks(source)] == [
+        Heading,
+        Paragraph,
+        Table,
+        Paragraph,
+    ]
+
+
+def test_document_blocks_nested_not_top_level() -> None:
+    source = '- ## H\n  para\n\n> para\n> | a | b |\n> |---|---|\n'
+    found = document_blocks(source)
+    assert found
+    assert [block.top_level for block in found] == [False] * len(found)
+
+
+def test_document_blocks_top_level_after_container() -> None:
+    found = document_blocks('> quoted\n\nplain\n')
+    assert [block.top_level for block in found] == [False, True]
+
+
+def test_document_blocks_paragraph_run_lines() -> None:
+    (found,) = document_blocks('one\ntwo\n')
+    assert isinstance(found.block, Paragraph)
+    assert found.block.run.text == 'one\ntwo'

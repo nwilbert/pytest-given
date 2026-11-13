@@ -139,13 +139,40 @@ class Table:
     rows: tuple[TableRow, ...]
 
 
+@dataclass(frozen=True)
+class Heading:
+    # 1-6: setext `=` is 1, `-` is 2.
+    level: int
+    # Closing ATX hashes already gone.
+    text: str
+    run: TextRun
+
+
+@dataclass(frozen=True)
+class Paragraph:
+    run: TextRun
+
+
+@dataclass(frozen=True)
+class DocumentBlock:
+    block: Heading | Paragraph | Table
+    # False inside any list item or blockquote.
+    top_level: bool
+
+
+def document_blocks(source: str) -> list[DocumentBlock]:
+    """The headings, paragraphs and tables of a document, in document order."""
+    return [block for block in _blocks(source) if isinstance(block, DocumentBlock)]
+
+
 def text_runs(source: str) -> Iterator[TextRun]:
     """Every paragraph's, heading's and table cell's text, in document order.
     Code and HTML blocks hold none."""
-    for block in _blocks(source):
-        if isinstance(block, TextRun):
-            yield block
-        elif isinstance(block, Table):
+    for found in document_blocks(source):
+        block = found.block
+        if isinstance(block, Heading | Paragraph):
+            yield block.run
+        else:
             for row in (block.header, *block.rows):
                 for cell in row.cells:
                     # A cell holds one line, and a one-line run's spans never
@@ -161,7 +188,11 @@ def html_blocks(source: str) -> list[HtmlBlock]:
 
 def tables(source: str) -> list[Table]:
     """The GFM pipe tables a renderer shows."""
-    return [block for block in _blocks(source) if isinstance(block, Table)]
+    return [
+        found.block
+        for found in document_blocks(source)
+        if isinstance(found.block, Table)
+    ]
 
 
 def table_cell_spans(row: str) -> list[Span]:
@@ -202,11 +233,11 @@ class SourceLine:
 
 # The citation readers each walk the document they read.
 @functools.lru_cache(maxsize=1)
-def _blocks(source: str) -> tuple[TextRun | Table | HtmlBlock, ...]:
+def _blocks(source: str) -> tuple[DocumentBlock | HtmlBlock, ...]:
     return tuple(_walk(source))
 
 
-def _walk(source: str) -> Iterator[TextRun | Table | HtmlBlock]:
+def _walk(source: str) -> Iterator[DocumentBlock | HtmlBlock]:
     lines = _source_lines(source)
     tokens = _block_parser().parse(source)
     rows: list[TableRow] = []
@@ -236,13 +267,34 @@ def _walk(source: str) -> Iterator[TextRun | Table | HtmlBlock]:
                 rows.append(TableRow(token.map[0] + 1, _cells(row, width)))
             case 'table_close':
                 header, *body = rows
-                yield Table(header, tuple(body))
+                yield DocumentBlock(
+                    Table(header, tuple(body)), _top_level(tokens, containers)
+                )
                 rows = []
             case 'inline' if tokens[index - 1].type in (
                 'paragraph_open',
                 'heading_open',
             ):
-                yield _prose_run(token, tokens[index - 1], lines)
+                opener = tokens[index - 1]
+                run = _prose_run(token, opener, lines)
+                prose = (
+                    Heading(int(opener.tag[1:]), _one_line(token.content), run)
+                    if opener.type == 'heading_open'
+                    else Paragraph(run)
+                )
+                yield DocumentBlock(prose, _top_level(tokens, containers))
+
+
+def _one_line(content: str) -> str:
+    # A setext heading may span lines, which read as one, as in a paragraph.
+    return ' '.join(line.strip() for line in content.splitlines())
+
+
+def _top_level(tokens: list[Token], containers: list[int]) -> bool:
+    return not any(
+        tokens[opener].type in ('list_item_open', 'blockquote_open')
+        for opener in containers
+    )
 
 
 def _cells(row: SourceLine, width: int | None) -> tuple[TableCell, ...]:
