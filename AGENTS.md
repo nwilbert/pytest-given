@@ -110,14 +110,14 @@ Before merging changes to narrated tests, run the `pytest-given-reviewing` skill
 
 What is specific to this repo's self-report:
 
-- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `FileGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions); regeneration and lint gating under [Quality gates](#quality-gates).
+- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `TableGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions); regeneration and lint gating under [Quality gates](#quality-gates).
 - **New or changed user-facing behavior needs a scenario, not just a test** — otherwise the behavior is invisible in the report. Decorate the test that best *states* the rule, one per rule, not per branch; the edge cases around it stay plain. Two gaps to check for: a rule the [CHANGELOG](CHANGELOG.md) announces that no scenario names, and a [GLOSSARY.md](GLOSSARY.md) row *asserting* behavior (`Templatize`, `Parameter table`) that no scenario demonstrates.
 
 ## Conventions
 
 - Use the canonical vocabulary from [GLOSSARY.md](GLOSSARY.md) in prose as well as code — docs, skill references, and specs say the official term (`term ref`, not a paraphrase like "narrated term"). Naming and rename mechanics live in the skill's [references/glossaries.md](src/pytest_given/.agents/skills/pytest-given-authoring/references/glossaries.md); here, a rename lands in one commit (glossary row, `pg\[` references, implementation naming) plus a regenerated `uv run nox -s self_report`. Adding a term is safe, but still regenerate.
 - **Docstrings only for what the code cannot say** — a non-obvious invariant, a constraint that makes the shape necessary, a trap for the next reader — and a line or two at most. No signature restatement, no implementation narration, no `X is the only caller of Y` cross-references (they rot fastest; the reader can grep). Prefer a precise name to a sentence explaining a vague one. When you change a module, delete the sentences that have stopped being true rather than repairing them.
-- Internal code annotates a glossary as the base `model.Glossary`, never `pytest_given.Glossary` (the `capture` subclass users register terms on): a report rebuilt from JSON and a `FileGlossary` both carry no such subclass.
+- Internal code annotates a glossary as the base `model.Glossary`, never `pytest_given.Glossary` (the `capture` subclass users register terms on): a report rebuilt from JSON and a file glossary both carry no such subclass.
 - Avoid `Any` — use precise types, generics, `TYPE_CHECKING` imports, or `ContextVar[T]` over untyped `threading.local`.
 - Use `NewType` for domain-specific IDs (e.g., `NodeId`) and PEP 695 `type` statements for aliases. Avoid raw complex types like `dict[str, tuple[list[str], list[Any]]]` — introduce named types instead.
 - Every package `src/` imports is a declared dependency in `pyproject.toml`, even one another dependency already brings in.

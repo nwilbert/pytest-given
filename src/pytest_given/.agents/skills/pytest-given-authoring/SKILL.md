@@ -41,7 +41,7 @@ Each kind of artifact works on its own; using scenarios only is a perfectly good
 
 - **Existing codebase:** start with scenarios. Decorate the tests that assert behavior, and let glossary terms emerge from their narration.
 - **New project:** consider starting with stories. Write the results of Domain Storytelling sessions with stakeholders as `story(...)` code before any scenarios exist. That establishes the domain understanding and vocabulary up front.
-- **Glossary:** adopt an existing `GLOSSARY.md` with `FileGlossary`, or collect terms from scenarios and stories as you go.
+- **Glossary:** adopt an existing `GLOSSARY.md` with `TableGlossary` (tables) or `ParagraphGlossary` (`**Term**:` paragraphs), or collect terms from scenarios and stories as you go.
 
 ## Verify before committing
 

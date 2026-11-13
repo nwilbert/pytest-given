@@ -40,22 +40,7 @@ A term ref has four forms. Use the simplest one that fits your sentence:
 
 ## File glossary
 
-Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a `GLOSSARY.md`. Load the file with `FileGlossary`:
-
-```python
-from pathlib import Path
-from pytest_given import FileGlossary
-
-g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
-```
-
-The file needs at least one Markdown table (a GFM pipe table). pytest-given reads the tables a GFM renderer shows, including one in a blockquote or a list but not one in a code or HTML block, and a cell missing from a row reads as empty. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, or `kind_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
-
-```python
-g = FileGlossary('GLOSSARY.md', term_column='Term', definition_column='Meaning', kind_column='Kind')
-```
-
-A term or kind cell may be formatted: `**Guest**` reads as `Guest`. The definition keeps its [formatting](step-text.md#formatting).
+Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a `GLOSSARY.md`. pytest-given reads two formats: terms in tables with `TableGlossary`, and term paragraphs with `ParagraphGlossary`. Loading a file with the wrong class raises an error that names the other one.
 
 Look up a term by name with `g['Guest']` (case-insensitive). The result is a handle like any other:
 
@@ -64,7 +49,70 @@ with when(t'{g["Guest"]} {g["book"].s} a {g["Room"]}'):
     ...
 ```
 
-A file glossary is a **closed vocabulary**: you add new terms only as rows in the file. Both `g['foo']` and `g('foo')` only look up a term, and raise an error if it doesn't exist.
+A file glossary is a **closed vocabulary**: you add new terms only in the file. Both `g['foo']` and `g('foo')` only look up a term, and raise an error if it doesn't exist.
+
+### Tables
+
+`TableGlossary` reads the Markdown tables of a file:
+
+```python
+from pathlib import Path
+from pytest_given import TableGlossary
+
+g = TableGlossary(Path(__file__).parent / 'GLOSSARY.md')
+```
+
+The file needs at least one Markdown table (a GFM pipe table). pytest-given reads the tables a GFM renderer shows, including one in a blockquote or a list but not one in a code or HTML block, and a cell missing from a row reads as empty. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass `term_column`, `definition_column`, `kind_column` or `avoid_column`. Each takes a column number (starting at 0) or a header name (case-insensitive):
+
+```python
+g = TableGlossary(
+    'GLOSSARY.md',
+    term_column='Term',
+    definition_column='Meaning',
+    kind_column='Kind',
+    avoid_column='Avoid',
+)
+```
+
+A term or kind cell may be formatted: `**Guest**` reads as `Guest`. The definition keeps its [formatting](step-text.md#formatting). An avoid cell lists the term's [avoided words](#avoided-words), separated by commas. A comma inside parentheses doesn't separate them.
+
+### Term paragraphs
+
+`ParagraphGlossary` reads the `GLOSSARY.md` format of Matt Pocock's [skills](https://github.com/mattpocock/skills), where each term is a paragraph of its own, a **term paragraph**:
+
+```markdown
+# Ordering
+
+Receives and tracks customer orders.
+
+## Language
+
+**Order**:
+A customer's request for goods, placed in one checkout.
+_Avoid_: Purchase, transaction
+
+**Invoice**:
+A request for payment sent to a customer after delivery, for one **Order**.
+_Avoid_: Bill, payment request
+
+## Relationships
+
+- An **Order** produces one **Invoice**.
+```
+
+```python
+from pathlib import Path
+from pytest_given import ParagraphGlossary
+
+g = ParagraphGlossary(Path(__file__).parent / 'GLOSSARY.md')
+```
+
+- **A term paragraph starts with a term line:** a line that opens with the term's name in bold, followed directly by a colon, as in `**Order**:`. In `**Order:**` the colon sits inside the bold, so the line is no term line. The term paragraph ends at the next term line or at the end of the paragraph, so two terms with no blank line between them are still two terms.
+- **The definition** is the rest of the term paragraph. It starts on the term line after the colon or on the next line. Its line breaks become spaces, as GitHub shows them. A `<br>`, or a backslash or two spaces at the end of a line, is a line break.
+- **An avoid line** starts with `_Avoid_:` or `*Avoid*:` and lists the term's [avoided words](#avoided-words), separated by commas. A list too long for one line can wrap onto the term paragraph's next lines.
+- **Everything else is prose**, which pytest-given ignores: the title, the description under it, any text before a paragraph's first term line, lists and blockquotes. A heading reading `Relationships` or `Flagged ambiguities` starts a part that is ignored too, up to the next heading of the same or a higher level.
+
+The format has no place for a kind, so a term in it gets its kind from [kind inference](domain-storytelling.md#kind-inference) or stays kindless.
 
 ## Kinds
 
@@ -76,9 +124,9 @@ room = g.work_object('Room', definition='A bookable hotel room.')
 book = g.activity('book', definition='Reserve a room for a stay.')
 ```
 
-In a file glossary, the kinds come from the column you pass as `kind_column`.
+In a `TableGlossary`, the kinds come from the column you pass as `kind_column`.
 
-If you don't declare a kind, pytest-given [infers it](domain-storytelling.md#kind-inference) from the story sentences that use the term. A term that gets no kind either way is **kindless**. The report shows it in a neutral color and lists it under **Uncategorized** in the Glossary tab.
+If you don't declare a kind, pytest-given [infers it](domain-storytelling.md#kind-inference) from the story sentences that use the term. A term that gets no kind either way is **kindless**. The report shows it in a neutral color and lists it under **Uncategorized** when the Glossary tab groups terms by kind.
 
 ## Undefined terms
 
@@ -86,12 +134,56 @@ A term without a `definition=` is **undefined**. The Glossary tab marks it with 
 
 Every declared term appears in the report, whether a test uses it or not.
 
+## Glossary sections
+
+A **glossary section** is a named group of terms. The Glossary tab of the [HTML report](../html-report.md#stories-and-glossary) groups terms by section and filters by them.
+
+In code, declare terms through `g.section(name)`. A section has the glossary's `actor`, `work_object`, `activity` and call form, and puts each term it declares into the glossary with that section:
+
+```python
+booking = g.section('Booking')
+guest = booking.actor('Guest', definition='Person booking accommodation.')
+room = booking.work_object('Room', definition='A bookable hotel room.')
+
+payment = g.section('Payment')
+refund = payment.activity('refund', definition='Return the money a **guest** paid for a cancelled stay.')
+
+clerk = g.actor('Clerk', definition='Staff at the front desk.')  # no section
+```
+
+Look up a term on the glossary, whatever its section: `g['Guest']`. Calling `g.section('Booking')` again, in the same module or another, adds to the same section. Section names are compared as written, so `Booking` and `booking` are two sections.
+
+In a file glossary, a term's section is the nearest heading above its table or term paragraph, at any level, with its formatting removed. A heading inside a list or a blockquote doesn't count. Two kinds of heading name no section:
+
+- **The title:** a file's only level-1 heading. A file with several level-1 headings has no title, and each of them names a section.
+- **`Language` and `Terms`** in a `ParagraphGlossary`, in any case. They hold the terms rather than group them.
+
+A term above every qualifying heading has no section. Two headings with the same text name one section.
+
+A term belongs to one section. Declaring a term again in another section raises an error, and so does the same term in two sections of a file, even in two identical rows.
+
+## Avoided words
+
+An **avoided word** is a synonym of a term that the team has decided not to use. List a term's avoided words with `avoid=`, on the glossary or on a section:
+
+```python
+guest = g.actor('Guest', definition='Person booking accommodation.', avoid=['Customer', 'Client'])
+```
+
+A `TableGlossary` reads them from its `avoid_column`, a `ParagraphGlossary` from a term's avoid line. The term's card in the Glossary tab shows them under the definition, and the Glossary search finds the term by them. The [`avoided-word`](../configuration/narration-lint.md) lint rule flags an avoided word used in a step, a scenario title or a story sentence.
+
+- **An entry may end with a note** in parentheses, as in `Reservation (in partner APIs only)`. The card shows the whole entry, and the lint matches only the text before the note. An entry that is only a note raises an error.
+- **An entry shows its [formatting](step-text.md#formatting)** on the card, but a bold word in it links no term.
+- **An entry is dropped** when its avoided word repeats an earlier entry's of the same term, in any case and with a hyphen or a space between its words, even if the notes differ.
+- **An avoided word may not name a term** of the same glossary, by its name or its [S-form](#term-refs), in any case. A glossary that avoids `Booking` while it defines `Booking` or `Bookings` raises an error.
+- **Several terms may avoid the same word.** The lint then names each of them, and you pick the one the step means.
+
 ## Discovery
 
 pytest-given finds your glossary in one of two ways:
 
 1. Through a story: each `story(...)` remembers the glossary its terms come from.
-2. Otherwise, by looking for a `Glossary` or `FileGlossary` object among the names defined in your `conftest.py` files.
+2. Otherwise, by looking for a `Glossary`, `TableGlossary` or `ParagraphGlossary` object among the names defined in your `conftest.py` files.
 
 So if you use a glossary without stories, import the glossary object itself into a `conftest.py`:
 
@@ -106,4 +198,4 @@ A test suite can have only one glossary. If your stories reach two different glo
 
 ## Examples
 
-The hotel-booking and file-glossary-booking [examples](../examples.md) show a glossary in use.
+The hotel-booking, file-glossary-booking and paragraph-glossary [examples](../examples.md) show a glossary in use. All three have glossary sections and avoided words.

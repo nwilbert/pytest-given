@@ -14,6 +14,8 @@ A **narrated citation** is a scenario citation written as a `<details>` block, i
 
 A **plain report link** has no glyph: it keeps its own wording and claims only that its target exists.
 
+A glossary section link (`#view=glossary&section=…`) is neither: the citations commands don't check it, and a glyph before it is a mistyped citation.
+
 `pytest-given citations check DOCS…` verifies every report link. `citations update` (same arguments) fixes what the first triage row lists, and exits 1 while other citation findings remain. Both commands:
 
 - **read the JSON report of a run of every scenario:** `pytest -m pytest_given --given-json`, without xdist's `-n`. They read `given-report/report-data.json` unless `--report PATH` names another. A target the run left out counts as gone.

@@ -45,7 +45,7 @@ Term ids and story ids are slugs: the name in lowercase, with each run of non-al
 
 ## Glossary term
 
-A term is `{id, kind, canonical, definition, source}`. `kind` is `actor`, `activity` or `object`, or `null` for a kindless term. `definition` is `null` for an undefined term, or `{text, parts}`. `text` is the definition as written, Markdown included. `parts` split it into `{value}` literals and, for each definition ref (a bold span naming a term), a `{term_id, display, expression}` term ref whose `display` is the bold text.
+A term is `{id, kind, canonical, definition, source, section, avoid}`. `kind` is `actor`, `activity` or `object`, or `null` for a kindless term. `definition` is `null` for an undefined term, or `{text, parts}`. `text` is the definition as written, Markdown included. `parts` split it into `{value}` literals and, for each definition ref (a bold span naming a term), a `{term_id, display, expression}` term ref whose `display` is the bold text. `section` is the term's glossary section, or `null`. `avoid` lists its avoided words as written, each with any parenthesized note.
 
 ## Story
 

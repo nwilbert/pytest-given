@@ -8,7 +8,7 @@ What the agent itself gets out of it:
 
 - **Context economy.** `pytest --given-md` renders a run's narration as [Markdown](markdown-report.md) to stdout — a fraction of the tokens of the test code it summarizes, useful for orienting in an unfamiliar suite or handing a run summary to a human. Combine with pytest's own selection (`-k`, `--lf`, node IDs).
 - **Structured queries.** `--given-json` + `jq` filter scenarios by tag, status, or glossary term.
-- **A controlled vocabulary.** A [`Glossary`](guide/glossary.md) — or a `FileGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
+- **A controlled vocabulary.** A [`Glossary`](guide/glossary.md) — or a `TableGlossary` or `ParagraphGlossary` over the `GLOSSARY.md` you already keep — gives the agent a stable set of domain terms to narrate with, keeping naming consistent across sessions.
 - **Specs that stay true.** A design spec the agent writes can [cite](guide/citations.md) the scenarios that implement it. `pytest-given citations check` fails CI when one of them stops passing or disappears, so the spec doesn't drift from the code the way separate documentation does.
 - **Early, typed errors.** Misusing a step-text form (a t-string on a decorator, a `Template` in a test body) raises `PytestGivenError` immediately with a clear message — cheap for an agent to learn from.
 

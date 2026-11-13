@@ -4,8 +4,9 @@ Everything is a top-level export of `pytest_given`:
 
 ```python
 from pytest_given import (
-    FileGlossary, Glossary, PytestGivenError, PytestGivenWarning, Template,
-    attach, clause, given, scenario, sentence, story, then, when, when_then,
+    Glossary, GlossarySection, ParagraphGlossary, PytestGivenError,
+    PytestGivenWarning, TableGlossary, Template, attach, clause, given,
+    scenario, sentence, story, then, when, when_then,
 )
 ```
 
@@ -46,9 +47,11 @@ Hard rules (each raises `PytestGivenError`):
 
 ## Glossary
 
-- `Glossary()` offers `g.actor(name, definition=…)`, `g.work_object(…)`, `g.activity(…)` and `g('foo')` (kindless). `FileGlossary(path, *, term_column=0, definition_column=1, kind_column=None)` loads a Markdown file. `g['Guest']` looks a term up, case-insensitive.
+- `Glossary()` offers `g.actor(name, definition=…, *, avoid=())`, `g.work_object(…)`, `g.activity(…)` and `g('foo')` (kindless). `avoid=` lists the term's avoided words. `g.section(name)` returns a `GlossarySection` with the same four declarations, each putting its term in that glossary section.
+- `TableGlossary(path, *, term_column=0, definition_column=1, kind_column=None, avoid_column=None)` loads the pipe tables of a Markdown file. `ParagraphGlossary(path)` loads its term paragraphs (`**Term**:`).
+- `g['Guest']` looks a term up, case-insensitive, whatever its section.
 
-Handle forms, discovery, kinds and the one-glossary-per-suite rule are in [glossaries.md](glossaries.md).
+Handle forms, discovery, kinds, sections, avoided words and the one-glossary-per-suite rule are in [glossaries.md](glossaries.md).
 
 ## Stories
 

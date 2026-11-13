@@ -15,14 +15,15 @@ You can write step text in several forms. Which form to use depends on where the
 
 ## Formatting
 
-Scenario titles, step text and glossary definitions can use a little Markdown. Everything else shows exactly as written, in the HTML report, the Markdown report and citations alike.
+Scenario titles, step text, glossary definitions and avoided words can use a little Markdown. Everything else shows exactly as written, in the HTML report, the Markdown report and citations alike.
 
 | Text | Bold, italic, code | Newline | `<br>` | Where it shows |
 |---|---|---|---|---|
 | Scenario title | rendered | space | literal | HTML, Markdown, citations |
 | Step text | rendered | space | literal | HTML, Markdown, narrated citations |
 | Glossary term definition | rendered | line break | line break | HTML: Glossary tab, term ref tooltip |
-| `FileGlossary` term and kind cells | removed: `**Guest**` reads as `Guest` | | literal | wherever the term shows |
+| Avoided word | rendered | line break | line break | HTML: Glossary tab |
+| File glossary term names, kind cells and section headings | removed: `**Guest**` reads as `Guest` | | literal | wherever the term or section shows |
 | Everything else | literal | | literal | |
 
 *Rendered* means `**bold**` shows as bold, `*italic*` as italic and `` `code` `` as code. *Literal* means the characters show as written in every output, the Markdown report included. *Everything else* is the report title, term names and term refs, interpolated values, case IDs, story titles and clauses, tags, skip and xfail reasons, parameter column names and values, attachments and error messages.
