@@ -31,7 +31,7 @@ A sentence reads left to right: actor, activity, work object. Connecting words l
 
 Each part can be a glossary handle or a plain string. Use plain strings for generic verbs like *searches for*. Only words with a specific meaning in your domain need a glossary entry.
 
-Handles from a [file glossary](glossary.md#file-glossary) work the same way: `sentence(g['Guest'], g['book'].s, g['Room'])`.
+Handles from a [Markdown glossary](glossary.md#markdown-glossary) work the same way: `sentence(g['Guest'], g['book'].s, g['Room'])`.
 
 To be matched against your tests, a sentence needs at least two different glossary terms. The report marks a sentence with fewer as "not coverage-tracked". You can still cover it with a [pin](#pins).
 
@@ -60,7 +60,7 @@ If a term has no declared [kind](glossary.md#kinds), pytest-given infers it from
 
 If a term's kind is declared, pytest-given checks the kind against the term's position when the sentence is created. A term in the wrong position raises `PytestGivenError`, naming the term and its kind.
 
-If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a `kind_column` to your file glossary) to fix it.
+If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a `kind_column` to your Markdown glossary) to fix it.
 
 ## Linking scenarios to stories
 

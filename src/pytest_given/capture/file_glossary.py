@@ -1,4 +1,4 @@
-"""File glossaries: a Markdown file read into a Glossary, accessed by name."""
+"""Markdown glossaries: a Markdown file read into a Glossary, accessed by name."""
 
 from collections.abc import Callable
 from functools import partial
@@ -106,7 +106,7 @@ class _MarkdownFileGlossary(LookupGlossary):
         return mapped
 
     def __call__(self, name: str) -> TermHandle:
-        # A file glossary is a closed vocabulary: the call form looks up only,
+        # A Markdown glossary is a closed vocabulary: the call form looks up only,
         # never creates. Unknown names raise (same as the subscript).
         return self[name]
 

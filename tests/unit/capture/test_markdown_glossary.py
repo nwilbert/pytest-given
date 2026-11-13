@@ -36,7 +36,7 @@ def simple_doc():
     t'A pipe table parses into {pg["Term"].l} and definition rows',
 )
 def test_parses_default_columns(simple_doc):
-    with when(t'the parser reads it into rows for a {pg["File glossary"].l}'):
+    with when(t'the parser reads it into rows for a {pg["Markdown glossary"].l}'):
         rows = parse_glossary_tables(
             simple_doc,
             term_column=0,
@@ -122,7 +122,7 @@ _UNREADABLE_DOCUMENTS = {
 
 
 @scenario(
-    t'A {pg["File glossary"].l} table the parser cannot read is refused, saying '
+    t'A {pg["Markdown glossary"].l} table the parser cannot read is refused, saying '
     t'what is wrong',
     tags=['diagnostics', 'validation'],
 )
@@ -186,7 +186,8 @@ _GFM_DOCUMENTS = {
 
 
 @scenario(
-    t'A {pg["File glossary"].l} reads the tables a GFM renderer shows, and no others',
+    t'A {pg["Markdown glossary"].l} reads the tables a GFM renderer shows, '
+    t'and no others',
     tags=['versions/0.5.0'],
 )
 @pytest.mark.parametrize(

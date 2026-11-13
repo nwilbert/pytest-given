@@ -401,7 +401,7 @@ _EXAMPLES = (
     _Example(
         'examples/file-glossary-booking/test_file_glossary_booking.py',
         'file-glossary-booking',
-        'File Glossary Example',
+        'Markdown Glossary Example',
     ),
     _Example(
         'examples/paragraph-glossary/test_paragraph_glossary.py',

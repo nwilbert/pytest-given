@@ -15,7 +15,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
-- Glossary sections: `Glossary.section(name)` and a file glossary's headings group terms, and the Glossary tab groups and filters by them.
+- Glossary sections: `Glossary.section(name)` and a Markdown glossary's headings group terms, and the Glossary tab groups and filters by them.
 - `ParagraphGlossary` loads a `GLOSSARY.md` written as `**Term**:` paragraphs with optional `_Avoid_:` lines.
 - Avoided words: `avoid=` on a term declaration, a `TableGlossary`'s `avoid_column` and a `ParagraphGlossary`'s `_Avoid_:` line list a term's rejected synonyms, which the term's card shows and the `avoided-word` lint rule, `warn` by default, flags in a step, a scenario title or a story sentence.
 - Term citations: `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary, a `<details markdown="1">` one carrying the term's definition, and a Glossary term row in the HTML report gets the copy button with **Copy citation** and **Copy defining citation**.
@@ -24,7 +24,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Changed
 
-- **Breaking.** `FileGlossary` is renamed `TableGlossary`, and a term repeated under two headings of a file glossary now raises, identical rows included. Rename the import and the constructor call, and keep one row of a repeated term.
+- **Breaking.** `FileGlossary` is renamed `TableGlossary`, and a term repeated under two headings of a Markdown glossary now raises, identical rows included. Rename the import and the constructor call, and keep one row of a repeated term.
 - **Breaking.** `pytest-given report` and `pytest-given skills install` now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.
 - **Breaking.** A glossary term's `definition` in the JSON report is now an object, which holds the string it used to be in `text` and its definition refs in `parts`. A script reading `.definition` must read `.definition.text`.
 - **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.

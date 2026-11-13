@@ -199,8 +199,8 @@ function reportApp() {
   const moduleSkipDepth = commonDepth(allModules);
   function termLabel(id) {
     if (id === NO_TERMS) return 'no terms';
-    // Term ids are slugs ('file-glossary'); the report speaks canonical
-    // names ('File glossary'). Falls back to the id for an unknown term.
+    // Term ids are slugs ('markdown-glossary'); the report speaks canonical
+    // names ('Markdown glossary'). Falls back to the id for an unknown term.
     return lookup(termNames, id, id);
   }
   function tagLabel(tag) {

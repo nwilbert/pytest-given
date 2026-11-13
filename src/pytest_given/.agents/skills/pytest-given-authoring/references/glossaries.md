@@ -4,7 +4,7 @@ A glossary declares the ubiquitous language your tests speak: actors, work objec
 
 ## Two ways to declare a glossary
 
-**A file glossary over a Markdown file is the recommended default.** Humans and agents read the same `GLOSSARY.md`, and the tests load it directly. `TableGlossary` reads its GFM pipe tables:
+**A Markdown glossary over a Markdown file is the recommended default.** Humans and agents read the same `GLOSSARY.md`, and the tests load it directly. `TableGlossary` reads its GFM pipe tables:
 
 ```python
 from pathlib import Path
@@ -69,12 +69,12 @@ Every handle offers the same four forms, whether you captured it (`guest = g.act
 
 ## Naming terms
 
-- **Term names are natural language, not class names.** Name the concept the way a person would say it (`File glossary`, `Clause part`). A one-word term may match its class name only when the class name is already the natural word. A multi-word CamelCase name never is.
+- **Term names are natural language, not class names.** Name the concept the way a person would say it (`Markdown glossary`, `Clause part`). A one-word term may match its class name only when the class name is already the natural word. A multi-word CamelCase name never is.
 - **Renaming or removing a term is a code change, not just a doc edit.** A term's slug is its lookup key: the name in lowercase, with each run of non-alphanumeric characters replaced by `-`. So `Term ref` and `TermRef` are *different* keys, and a rename breaks every `g['Old name']` reference. Search for the old name, update the references, and re-render the reports. A citation of the term names the old slug too, so `citations check` reports it missing until you edit its fragment. Rename the implementation too: if the code keeps the old name, you create exactly the language drift the vocabulary rule forbids (see [scenarios.md](scenarios.md)). Adding a term is always safe.
 
 ## Sections and avoided words
 
-- **A glossary section groups terms.** In a file glossary, a term's section is the nearest heading above its table or term paragraph. The file's only level-1 heading is its title and names no section, nor does a `Language` or `Terms` heading in a `ParagraphGlossary`. In code, declare terms through `g.section('Booking')`, which offers the glossary's four declarations. A term in two sections raises. The report shows sections only when the terms name at least two.
+- **A glossary section groups terms.** In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph. The file's only level-1 heading is its title and names no section, nor does a `Language` or `Terms` heading in a `ParagraphGlossary`. In code, declare terms through `g.section('Booking')`, which offers the glossary's four declarations. A term in two sections raises. The report shows sections only when the terms name at least two.
 - **List the synonyms that titles and steps use in place of a term as avoided words:** `avoid=['Customer']` in code, an avoid column, or an `_Avoid_:` line. The `avoided-word` lint rule then flags them. A parenthesized note after the word (`Reservation (in partner APIs only)`) shows in the report, and the lint ignores it. An avoided word that spells a term of the same glossary, or its S-form, raises.
 
 ## Kinds
@@ -84,7 +84,7 @@ Each term is an actor, an activity or a work object. A term gets its kind in one
 1. **Explicitly:** `g.actor(...)`, `g.activity(...)` or `g.work_object(...)`, or a `kind_column` in the glossary file.
 2. **Inferred from stories:** a term with no declared kind takes its kind from its positions in clauses. Position 0 makes it an actor, odd positions (the verb slots) an activity, and even positions from 2 on a work object. A term seen both as an actor and in a noun slot becomes an actor, because an actor can receive a hand-off. A term seen in a verb slot *and* in any other slot raises an error; add a kind column to settle it. A term used only in steps stays kindless (grey).
    **A declared kind is never overridden:** putting a term in a slot its kind doesn't allow raises an error at `sentence(...)`. `kind_column` is opt-in: a column headed "Kind" is ignored unless you pass `kind_column=`.
-3. **Deliberately deferred:** `g('foo')` declares a term the team hasn't classified yet. It goes into the *Uncategorized* kind group and shows an *Undefined* badge until someone writes a definition. Treat this as a place to sort terms later, not a place to leave them. This works only for code-defined glossaries. A file glossary is a **closed vocabulary**: `g('foo')` and `g['foo']` both only look up, and raise on an unknown name. To add vocabulary, add it to the file.
+3. **Deliberately deferred:** `g('foo')` declares a term the team hasn't classified yet. It goes into the *Uncategorized* kind group and shows an *Undefined* badge until someone writes a definition. Treat this as a place to sort terms later, not a place to leave them. This works only for code-defined glossaries. A Markdown glossary is a **closed vocabulary**: `g('foo')` and `g['foo']` both only look up, and raise on an unknown name. To add vocabulary, add it to the file.
 
 ## Keeping the glossary honest
 

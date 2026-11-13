@@ -23,7 +23,7 @@ Scenario titles, step text, glossary definitions and avoided words can use a lit
 | Step text | rendered | space | literal | HTML, Markdown, narrated citations |
 | Glossary term definition | rendered | line break | line break | HTML: Glossary tab, term ref tooltip |
 | Avoided word | rendered | line break | line break | HTML: Glossary tab |
-| File glossary term names, kind cells and section headings | removed: `**Guest**` reads as `Guest` | | literal | wherever the term or section shows |
+| Markdown glossary term names, kind cells and section headings | removed: `**Guest**` reads as `Guest` | | literal | wherever the term or section shows |
 | Everything else | literal | | literal | |
 
 *Rendered* means `**bold**` shows as bold, `*italic*` as italic and `` `code` `` as code. *Literal* means the characters show as written in every output, the Markdown report included. *Everything else* is the report title, term names and term refs, interpolated values, case IDs, story titles and clauses, tags, skip and xfail reasons, parameter column names and values, attachments and error messages.

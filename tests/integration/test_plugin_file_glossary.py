@@ -37,12 +37,12 @@ def test_guest_searches():
 
 
 @scenario(
-    t"A {pg['File glossary'].l}'s {pg['Kindless'].l} {pg['Term'].l.s} reach the "
+    t"A {pg['Markdown glossary'].l}'s {pg['Kindless'].l} {pg['Term'].l.s} reach the "
     t'{pg["Report"].l} with the kinds the run infers',
 )
 def test_file_glossary_kinds_resolved_in_report(pytester):
     with given(
-        t'a {pg["File glossary"].l} of {pg["Kindless"].l} {pg["Term"].l.s} and a '
+        t'a {pg["Markdown glossary"].l} of {pg["Kindless"].l} {pg["Term"].l.s} and a '
         t'{pg["Story"].l} whose {pg["Sentence"].l} uses them'
     ):
         pytester.makefile('.md', GLOSSARY=GLOSSARY_MD)

@@ -397,12 +397,12 @@ def file_glossary(tmp_path: Path) -> TableGlossary:
 
 
 @scenario(
-    t'A {pg["File glossary"].l} handle works in a t-string {pg["Step"].l}',
+    t'A {pg["Markdown glossary"].l} handle works in a t-string {pg["Step"].l}',
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
     file_glossary: TableGlossary,
 ) -> None:
-    with given(t'a {pg["Deferred term"].l} from a {pg["File glossary"].l}'):
+    with given(t'a {pg["Deferred term"].l} from a {pg["Markdown glossary"].l}'):
         guest = file_glossary['Guest']
     with when('it is interpolated into a t-string step'):
         parts = parse_tstring(t'a {guest} arrives')

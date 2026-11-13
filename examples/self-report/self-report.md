@@ -1179,10 +1179,10 @@
 - **then** the run names the slot, the test and the type of the value
 - **then** no «report» is written
 
-## ✓ A «file glossary»'s «kindless» «terms» reach the «report» with the kinds the run infers
+## ✓ A «markdown glossary»'s «kindless» «terms» reach the «report» with the kinds the run infers
 `tests/integration/test_plugin_file_glossary.py::test_file_glossary_kinds_resolved_in_report`
 
-- **given** a «file glossary» of «kindless» «terms» and a «story» whose «sentence» uses them
+- **given** a «markdown glossary» of «kindless» «terms» and a «story» whose «sentence» uses them
     - 📎 GLOSSARY.md:
         ```
         # Glossary
@@ -1539,10 +1539,10 @@
 - **when** its «definition refs» resolve at session finish
 - **then** each bold span is a «term ref» to the «term» it names, in the words its author wrote
 
-## ✓ A «file glossary» looks «terms» up case-insensitively
+## ✓ A «markdown glossary» looks «terms» up case-insensitively
 `tests/unit/capture/test_file_glossary.py::test_lookup_is_case_insensitive`
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1559,7 +1559,7 @@
 ## ✓ Repeated lookups return the same handle
 `tests/unit/capture/test_file_glossary.py::test_handles_are_memoized`
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1587,13 +1587,13 @@
         | Room   | A bookable room. |
         | search | Look up options. |
         ```
-- **when** a «file glossary» loads it
+- **when** a «markdown glossary» loads it
 - **then** each «term» is «kindless» until «kind inference» runs
 
-## ✓ A misspelt name looked up in a «file glossary» gets a spelling hint
+## ✓ A misspelt name looked up in a «markdown glossary» gets a spelling hint
 `tests/unit/capture/test_file_glossary.py::test_unknown_name_raises_with_suggestion` · diagnostics, validation
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1610,7 +1610,7 @@
 ## ✓ Handles are usable inline in a «sentence»
 `tests/unit/capture/test_file_glossary.py::test_usable_inline_in_sentence`
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1627,7 +1627,7 @@
 ## ✓ Calling a handle overrides its display
 `tests/unit/capture/test_file_glossary.py::test_call_overrides_display`
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1653,7 +1653,7 @@
         | Room | y | Work Object |
         | book | z | Activity |
         ```
-- **when** the «file glossary» reads the Kind column
+- **when** the «markdown glossary» reads the Kind column
 - **then** kinds come straight from the file, not «kind inference»
 
 ## ✓ A kind column can be selected by integer index
@@ -1667,7 +1667,7 @@
         | Guest | x | Actor |
         | Room | y | Work Object |
         ```
-- **when** the «file glossary» selects the kind column by index
+- **when** the «markdown glossary» selects the kind column by index
 - **then** the kinds are read from that column
 
 ## ✓ A `work_object` kind cell maps to the «work object» kind
@@ -1680,7 +1680,7 @@
         |---|---|---|
         | Room | y | work_object |
         ```
-- **when** the «file glossary» parses the kind
+- **when** the «markdown glossary» parses the kind
 - **then** it normalizes to the «work object» kind
 
 ## ✓ An unrecognized kind value is rejected
@@ -1693,14 +1693,14 @@
         |---|---|---|
         | Guest | x | Wizard |
         ```
-- **when** the «file glossary» loads the file
+- **when** the «markdown glossary» loads the file
 - **then** a PytestGivenError names the unrecognized kind
 
 ## ✓ A missing «glossary» file is refused as not found
 `tests/unit/capture/test_file_glossary.py::test_missing_file_raises` · validation
 
 - **given** a path to a file that does not exist
-- **when** a «file glossary» is opened on that path
+- **when** a «markdown glossary» is opened on that path
 - **then** a PytestGivenError reports the file is not found
 
 ## ✓ A «term» cell with no alphanumeric characters is rejected
@@ -1713,16 +1713,16 @@
         |---|---|
         | @#$ | some definition |
         ```
-- **when** the «file glossary» loads the file
+- **when** the «markdown glossary» loads the file
 - **then** a PytestGivenError is raised with file:line context
 
-## ✓ A «file glossary» error about its tables names the file · 3 cases
+## ✓ A «markdown glossary» error about its tables names the file · 3 cases
 `tests/unit/capture/test_file_glossary.py::test_table_errors_name_the_file` · diagnostics, validation
 
 - **given** a glossary file with {problem}
 - **given** that file on disk as bad.md
     - 📎 Glossary file — *see parameter table*
-- **when** a «file glossary» loads it
+- **when** a «markdown glossary» loads it
 - **then** a PytestGivenError names the file before the problem: {message}
 
 | problem | Glossary file | message |
@@ -1754,7 +1754,7 @@
 
 - **given** two rows for one «term», with {identical definitions / different definitions}
     - 📎 Glossary file — *see parameter table*
-- **when** the «file glossary» loads the file
+- **when** the «markdown glossary» loads the file
 - **then** the rows yield {outcome}
 - **then** a refusal points at the second row as the conflict
 
@@ -1789,13 +1789,13 @@
         |---|---|
         | Guest |   |
         ```
-- **when** the «file glossary» parses it
+- **when** the «markdown glossary» parses it
 - **then** the «term» definition is None, i.e. «undefined»
 
-## ✓ Calling a «file glossary» looks up a known «term»
+## ✓ Calling a «markdown glossary» looks up a known «term»
 `tests/unit/capture/test_file_glossary.py::test_file_glossary_call_known_name_returns_handle`
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1809,10 +1809,10 @@
 - **when** a known «term» is looked up by call
 - **then** a «deferred term» is returned
 
-## ✓ A «file glossary» is a closed vocabulary
+## ✓ A «markdown glossary» is a closed vocabulary
 `tests/unit/capture/test_file_glossary.py::test_file_glossary_call_unknown_name_raises` · validation
 
-- **given** a «file glossary» loaded from a Markdown file
+- **given** a «markdown glossary» loaded from a Markdown file
     - 📎 Glossary file:
         ```
         # Glossary
@@ -1827,7 +1827,7 @@
 - **then** a PytestGivenError is raised
 - **then** no new «term» was created
 
-## ✓ A «file glossary» reads each «term»'s «glossary section» from the heading above it
+## ✓ A «markdown glossary» reads each «term»'s «glossary section» from the heading above it
 `tests/unit/capture/test_file_glossary.py::test_section_from_nearest_heading` · spec/glossary-sections
 
 - **given** a Markdown glossary with a table under each of two headings
@@ -1847,10 +1847,10 @@
         |---|---|
         | Room | A bookable room. |
         ```
-- **when** a «file glossary» loads it
+- **when** a «markdown glossary» loads it
 - **then** each «term» names the heading above its table
 
-## ✓ A «term» repeated under two headings of a «file glossary» raises, identical rows included
+## ✓ A «term» repeated under two headings of a «markdown glossary» raises, identical rows included
 `tests/unit/capture/test_file_glossary.py::test_exact_repeat_in_other_section_raises` · spec/glossary-sections
 
 - **given** a Markdown glossary with the same row under two headings
@@ -1868,10 +1868,10 @@
         |---|---|
         | Guest | A person. |
         ```
-- **when** a «file glossary» loads it
+- **when** a «markdown glossary» loads it
 - **then** a PytestGivenError names the line of the second row
 
-## ✓ A «file glossary» reads «term paragraphs»
+## ✓ A «markdown glossary» reads «term paragraphs»
 `tests/unit/capture/test_file_glossary.py::test_paragraph_glossary_reads_term_paragraphs` · spec/glossary-sections
 
 - **given** a Markdown glossary of «term paragraphs» under `## Language`
@@ -2139,7 +2139,7 @@
         | Guest | A person booking. |
         | Room  | A bookable room. |
         ```
-- **when** the parser reads it into rows for a «file glossary»
+- **when** the parser reads it into rows for a «markdown glossary»
 - **then** each row carries a «term», definition and source line
 
 ## ✓ Multiple tables in one file are merged
@@ -2190,7 +2190,7 @@
 - **when** the parser splits the row
 - **then** the escaped pipe survives as a literal pipe
 
-## ✓ A «file glossary» table the parser cannot read is refused, saying what is wrong · 3 cases
+## ✓ A «markdown glossary» table the parser cannot read is refused, saying what is wrong · 3 cases
 `tests/unit/capture/test_markdown_glossary.py::test_an_unreadable_glossary_table_is_refused` · diagnostics, validation
 
 - **given** a Markdown document with {document}
@@ -2232,7 +2232,7 @@
     | Room  | A bookable room. |
     ```
 
-## ✓ A «file glossary» reads the tables a GFM renderer shows, and no others · 6 cases
+## ✓ A «markdown glossary» reads the tables a GFM renderer shows, and no others · 6 cases
 `tests/unit/capture/test_markdown_glossary.py::test_a_glossary_reads_the_tables_a_gfm_renderer_shows` · versions/0.5.0
 
 - **given** a Markdown document with {document}
@@ -2661,10 +2661,10 @@
 - **when** they form a five-node «clause» (actor verb object verb object)
 - **then** every slot is a «term ref», with no bare words
 
-## ✓ A «file glossary»'s declared kind is checked when a «clause» is built
+## ✓ A «markdown glossary»'s declared kind is checked when a «clause» is built
 `tests/unit/capture/test_story.py::test_file_glossary_declared_kind_in_wrong_slot_raises` · validation
 
-- **given** a «file glossary» declaring Room a work object
+- **given** a «markdown glossary» declaring Room a work object
 - **when** Room is placed in the verb «slot»
 - **then** a PytestGivenError names the term and its declared kind
 
@@ -2758,10 +2758,10 @@
 - **when** the t-string is parsed
 - **then** a PytestGivenError says a «term ref» takes no format spec
 
-## ✓ A «file glossary» handle works in a t-string «step»
+## ✓ A «markdown glossary» handle works in a t-string «step»
 `tests/unit/capture/test_template.py::test_tstring_with_file_term_handle_emits_term_ref`
 
-- **given** a «deferred term» from a «file glossary»
+- **given** a «deferred term» from a «markdown glossary»
 - **when** it is interpolated into a t-string step
 - **then** the step carries a single «term ref»
 

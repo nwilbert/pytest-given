@@ -1188,20 +1188,20 @@ def test_unused_interpolation_skips_term_refs(tmp_path) -> None:
         tmp_path,
         """\
         def test_a():
-            with given(t'a {pg["File glossary"].l} on disk'):
+            with given(t'a {pg["Markdown glossary"].l} on disk'):
                 y = 1
         """,
     )
-    step = _step('given', 'a File glossary on disk', _line(src, 'with given'))
+    step = _step('given', 'a Markdown glossary on disk', _line(src, 'with given'))
     step = dataclasses.replace(
         step,
         narration=Narration(
-            text='a File glossary on disk',
+            text='a Markdown glossary on disk',
             parts=(
                 NarrationTermRef(
-                    term_id=TermId('file-glossary'),
-                    display='File glossary',
-                    expression='pg["File glossary"]',
+                    term_id=TermId('markdown-glossary'),
+                    display='Markdown glossary',
+                    expression='pg["Markdown glossary"]',
                 ),
             ),
         ),

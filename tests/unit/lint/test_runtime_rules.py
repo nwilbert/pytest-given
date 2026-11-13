@@ -151,14 +151,18 @@ def _glossary(*names):
 )
 def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
     with given(t'a {pg["Glossary"].l} defining one {pg["Term"].l}'):
-        glossary = _glossary('File glossary')
+        glossary = _glossary('Markdown glossary')
     with given(t'two scenarios carrying that word as a {pg["Tag"].l}'):
         scenarios = [
             _phases_scenario(
-                'test_x.py::test_a', ['given', 'when', 'then'], tags=['File Glossary']
+                'test_x.py::test_a',
+                ['given', 'when', 'then'],
+                tags=['Markdown Glossary'],
             ),
             _phases_scenario(
-                'test_x.py::test_b', ['given', 'when', 'then'], tags=['File Glossary']
+                'test_x.py::test_b',
+                ['given', 'when', 'then'],
+                tags=['Markdown Glossary'],
             ),
         ]
     with when(
@@ -173,9 +177,9 @@ def test_tag_shadows_term_fires_once_per_unique_tag() -> None:
     ):
         [finding] = findings
         assert DEFAULTS[finding.rule] == 'warn'
-        assert finding.subject == 'file-glossary'
+        assert finding.subject == 'markdown-glossary'
         assert finding.message == (
-            "tag 'File Glossary' duplicates glossary term 'File glossary' "
+            "tag 'Markdown Glossary' duplicates glossary term 'Markdown glossary' "
             '(2 scenarios, e.g. test_x.py::test_a)'
         )
 
@@ -214,7 +218,7 @@ def test_tag_shadows_term_counts_a_scenario_once_across_spellings() -> None:
 
 
 def test_tag_shadows_term_passes_orthogonal_tags() -> None:
-    glossary = _glossary('File glossary')
+    glossary = _glossary('Markdown glossary')
     scenarios = [
         _phases_scenario(
             'test_x.py::test_a', ['given', 'when', 'then'], tags=['happy-path']
@@ -227,7 +231,7 @@ def test_tag_shadows_term_passes_orthogonal_tags() -> None:
 def test_tag_shadows_term_needs_a_glossary() -> None:
     scenarios = [
         _phases_scenario(
-            'test_x.py::test_a', ['given', 'when', 'then'], tags=['file-glossary']
+            'test_x.py::test_a', ['given', 'when', 'then'], tags=['markdown-glossary']
         ),
     ]
     assert _runtime(grouped=scenarios, glossary=None) == []

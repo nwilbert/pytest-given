@@ -725,12 +725,12 @@ def test_top_level_imports():
 
 
 @scenario(
-    t"A {pg['File glossary'].l}'s declared kind is checked when a "
+    t"A {pg['Markdown glossary'].l}'s declared kind is checked when a "
     t'{pg["Clause"].l} is built',
     tags=['validation'],
 )
 def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):
-    with given(t'a {pg["File glossary"].l} declaring Room a work object'):
+    with given(t'a {pg["Markdown glossary"].l} declaring Room a work object'):
         glossary_file = tmp_path / 'GLOSSARY.md'
         glossary_file.write_text(
             '| Term | Meaning | Kind |\n'

@@ -4,7 +4,7 @@
 
 ## Goal
 
-Three additions to the glossary, designed together because they share the file glossaries and the
+Three additions to the glossary, designed together because they share the Markdown glossaries and the
 Glossary tab, plus a rename they make necessary:
 
 - **Glossary sections.** A term belongs to a named group: the heading it sits under in a
@@ -56,7 +56,7 @@ several bounded contexts keeps one `GLOSSARY.md` per context, listed in a `GLOSS
 
 - **`## Relationships` and `## Flagged ambiguities`.** `ParagraphGlossary` skips both. Neither
   reaches the report.
-- **Several glossaries per suite.** A file glossary reads one file, and a suite has one glossary,
+- **Several glossaries per suite.** A Markdown glossary reads one file, and a suite has one glossary,
   as today. `GLOSSARY-MAP.md` is not read. A repo with several contexts gives each its own suite
   and its own report.
 - **Nested sections.** A section is one heading, never a path of headings.
@@ -86,7 +86,7 @@ class GlossaryTerm:
 - **`section`** is the section's name as written, or `None` for a term outside every section.
   `Glossary` keeps no section list: sections are ordered by the first term that names each one, in
   `Glossary.terms` order, which is registration order for a code glossary and file order for a
-  file glossary.
+  Markdown glossary.
 - **`avoid`** holds the avoid entries in authored order, each an inline-Markdown string. An entry
   may end in a parenthesized note, as in `ticket (use only when quoting external systems)`. The
   report shows the whole entry. The lint matches only the **avoided word**: the entry's text before
@@ -148,9 +148,9 @@ A repeated registration stays idempotent only when it is *exactly* repeated, whi
 section and the avoided words: declaring `Guest` in section `Booking` and again in section `Staff`
 raises. The conflict message lists both fields beside kind, canonical and definition.
 
-## File glossaries
+## Markdown glossaries
 
-A **file glossary** is a glossary loaded from a Markdown file, in one of two formats, each with its
+A **Markdown glossary** is a glossary loaded from a Markdown file, in one of two formats, each with its
 own class:
 
 ```python
@@ -355,14 +355,14 @@ folded in.
 
 `GLOSSARY.md` stays in the table format and gains sections from its existing headings, so the
 self-report's Glossary tab groups by its eight sections, with the switch, since story terms carry
-kinds. In its *Domain Storytelling* section the *File glossary* and *Term* rows change, and three
+kinds. In its *Domain Storytelling* section the *Markdown glossary* and *Term* rows change, and three
 rows join them:
 
 | Term | Meaning |
 |---|---|
-| File glossary | A glossary loaded from a Markdown file: a `TableGlossary` from GFM pipe tables, or a `ParagraphGlossary` from **term paragraphs**. |
+| Markdown glossary | A glossary loaded from a Markdown file: a `TableGlossary` from GFM pipe tables, or a `ParagraphGlossary` from **term paragraphs**. |
 | Term paragraph | A term in a `ParagraphGlossary`, written as one paragraph: `**Term**:`, its definition, and an optional `_Avoid_:` line, the format of Matt Pocock's skills. |
-| Glossary section | A named group of terms: the heading a **file glossary** term sits under, or the `g.section(...)` a code glossary declares it through. The Glossary tab groups and filters by it. |
+| Glossary section | A named group of terms: the heading a **Markdown glossary** term sits under, or the `g.section(...)` a code glossary declares it through. The Glossary tab groups and filters by it. |
 | Avoided word | A rejected synonym a **term** lists, which the `avoided-word` lint rule flags in narration. An avoid entry may add a parenthesized note, which the report shows and the lint ignores. |
 | Term | A glossary entry: an **Actor**, **Work Object**, **Activity**, or **kindless** term. Each carries an id (slug), a canonical name, a kind unless kindless, an optional definition, an optional **glossary section** and any **avoided words**. |
 
@@ -405,13 +405,13 @@ the old name, as a record of their time.
 - `report/html_renderer.py` — the avoid line rendered through `definition_html`.
 - `lint/catalog.py` — `AVOIDED_WORD`, default `warn`. `lint/runtime_rules.py` —
   `_avoided_word_findings`, registered in `_RUNTIME_RULES`.
-- Docs: `docs/site/guide/glossary.md` (the *File glossary* section covers both classes, sections in
+- Docs: `docs/site/guide/glossary.md` (the *Markdown glossary* section covers both classes, sections in
   code and in files, `avoid`), `docs/site/html-report.md` (the grouping switch and the section
   list), `docs/site/configuration/narration-lint.md` (the rule table),
   `docs/site/guide/step-text.md` (the Formatting table: a section heading and a paragraph term name
   lose their markup as a term cell does, and an avoid entry renders its bold, italic and code on
   the term's card).
-- Authoring skill: `references/api.md` (`section`, `avoid`, both file glossary classes),
+- Authoring skill: `references/api.md` (`section`, `avoid`, both Markdown glossary classes),
   `references/glossaries.md` (sections, avoided words, the paragraph format), `references/lint.md`
   (the catalog row). Reviewing skill `references/hygiene.md`: a term with well-known synonyms the
   narration drifts into, and no avoided words, is a finding. Navigating skill: a term's `section`
@@ -483,6 +483,6 @@ the old name, as a record of their time.
 - Integration: the finding prints under `--given-lint`, an ignore entry suppresses it, discovery
   finds a `ParagraphGlossary` in a conftest, and a saved JSON report re-renders with sections and
   avoided words.
-- Self-report, tagged `spec/glossary-sections`: one scenario each for a file glossary's sections,
+- Self-report, tagged `spec/glossary-sections`: one scenario each for a Markdown glossary's sections,
   a code glossary's sections, the paragraph format, avoided words reaching the report, and the
   `avoided-word` rule.

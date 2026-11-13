@@ -24,7 +24,7 @@ Inspired by [JGiven](https://jgiven.org/) (Java).
 Live examples:
 - **[Coffeeshop](https://nwilbert.github.io/pytest-given/latest/examples/coffeeshop.html)**: a tour of the core features.
 - **[Hotel booking](https://nwilbert.github.io/pytest-given/latest/examples/hotel-booking.html)**: a glossary and domain stories, with story coverage.
-- **[File glossary](https://nwilbert.github.io/pytest-given/latest/examples/file-glossary-booking.html)**: the same, with the glossary kept in a Markdown file.
+- **[Markdown glossary](https://nwilbert.github.io/pytest-given/latest/examples/file-glossary-booking.html)**: the same, with the glossary kept in a Markdown file.
 - **[Paragraph glossary](https://nwilbert.github.io/pytest-given/latest/examples/paragraph-glossary.html)**: the glossary kept as `**Term**:` paragraphs, with sections and avoided words.
 - **[Self-report](https://nwilbert.github.io/pytest-given/latest/examples/self-report.html)**: pytest-given's own test suite.
 

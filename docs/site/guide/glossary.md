@@ -38,7 +38,7 @@ A term ref has four forms. Use the simplest one that fits your sentence:
 
 `.l` and `.s` chain and also apply to the called form: `{room.l.s}` reads *rooms*, `{room('suite').s}` reads *suites*. All forms work on every handle, including handles you look up by name.
 
-## File glossary
+## Markdown glossary
 
 Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a `GLOSSARY.md`. pytest-given reads two formats: terms in tables with `TableGlossary`, and term paragraphs with `ParagraphGlossary`. Loading a file with the wrong class raises an error that names the other one.
 
@@ -49,7 +49,7 @@ with when(t'{g["Guest"]} {g["book"].s} a {g["Room"]}'):
     ...
 ```
 
-A file glossary is a **closed vocabulary**: you add new terms only in the file. Both `g['foo']` and `g('foo')` only look up a term, and raise an error if it doesn't exist.
+A Markdown glossary is a **closed vocabulary**: you add new terms only in the file. Both `g['foo']` and `g('foo')` only look up a term, and raise an error if it doesn't exist.
 
 ### Tables
 
@@ -153,7 +153,7 @@ clerk = g.actor('Clerk', definition='Staff at the front desk.')  # no section
 
 Look up a term on the glossary, whatever its section: `g['Guest']`. Calling `g.section('Booking')` again, in the same module or another, adds to the same section. Section names are compared as written, so `Booking` and `booking` are two sections.
 
-In a file glossary, a term's section is the nearest heading above its table or term paragraph, at any level, with its formatting removed. A heading inside a list or a blockquote doesn't count. Two kinds of heading name no section:
+In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph, at any level, with its formatting removed. A heading inside a list or a blockquote doesn't count. Two kinds of heading name no section:
 
 - **The title:** a file's only level-1 heading. A file with several level-1 headings has no title, and each of them names a section.
 - **`Language` and `Terms`** in a `ParagraphGlossary`, in any case. They hold the terms rather than group them.
