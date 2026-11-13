@@ -16,31 +16,26 @@ form `## [x.y.z] - YYYY-MM-DD`.
 ### Added
 
 - Glossary sections: `Glossary.section(name)` and a file glossary's headings group terms, and the Glossary tab groups and filters by them.
-- Avoided words: `avoid=` on a term declaration, a `TableGlossary`'s `avoid_column` and a `ParagraphGlossary`'s `_Avoid_:` line list a term's rejected synonyms, shown on the term's card.
-- The `avoided-word` lint rule, `warn` by default, flags a term's avoided word in a step, a scenario title or a story sentence.
 - `ParagraphGlossary` loads a `GLOSSARY.md` written as `**Term**:` paragraphs with optional `_Avoid_:` lines.
-- `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary.
-- A term citation written as a `<details markdown="1">` block carries the term's definition, which `citations update` writes and `citations check` holds to the report.
-- A Glossary term row in the HTML report gets the copy button, which offers **Copy citation** and **Copy defining citation** when the report has a URL.
+- Avoided words: `avoid=` on a term declaration, a `TableGlossary`'s `avoid_column` and a `ParagraphGlossary`'s `_Avoid_:` line list a term's rejected synonyms, which the term's card shows and the `avoided-word` lint rule, `warn` by default, flags in a step, a scenario title or a story sentence.
+- Term citations: `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary, a `<details markdown="1">` one carrying the term's definition, and a Glossary term row in the HTML report gets the copy button with **Copy citation** and **Copy defining citation**.
+- A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term, and the `unresolved-definition-ref` lint rule, `warn` by default, flags a bold span that names no term.
 - A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
-- A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term.
-- The `unresolved-definition-ref` lint rule, `warn` by default, flags a bold span in a glossary definition that names no term.
 
 ### Changed
 
-- A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
-- **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
-- **Breaking.** A glossary term's `definition` in the JSON report is now an object, which holds the string it used to be in `text` and its definition refs in `parts`. A script reading `.definition` must read `.definition.text`.
+- **Breaking.** `FileGlossary` is renamed `TableGlossary`, and a term repeated under two headings of a file glossary now raises, identical rows included. Rename the import and the constructor call, and keep one row of a repeated term.
 - **Breaking.** `pytest-given report` and `pytest-given skills install` now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.
-- **Breaking.** `FileGlossary` is renamed `TableGlossary`, so rename the import and the constructor call.
-- **Breaking.** A term repeated under two headings of a file glossary now raises, identical rows included, so keep one of them.
+- **Breaking.** A glossary term's `definition` in the JSON report is now an object, which holds the string it used to be in `text` and its definition refs in `parts`. A script reading `.definition` must read `.definition.text`.
+- **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
+- A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
 
 ### Fixed
 
-- A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which `citations update` rewrites.
 - Following a term ref to the HTML report's Glossary tab scrolls to the term, clearing the tab's search and filters when they hide it.
 - A report link whose `#status=` names only statuses the report doesn't know now shows every scenario instead of none.
 - A failure raised while rendering a step's interpolation, such as a bad format spec, no longer shows a pytest-given frame in the report's traceback.
+- A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which `citations update` rewrites.
 
 ## [0.5.2] - 2026-11-07
 
