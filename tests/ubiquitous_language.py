@@ -1,7 +1,7 @@
 """The ubiquitous language of pytest-given's own bounded context.
 
 The project's own ``GLOSSARY.md`` is the ubiquitous language of pytest-given's
-bounded context. Loading it as a :class:`FileGlossary` lets the backend tests
+bounded context. Loading it as a :class:`TableGlossary` lets the backend tests
 narrate their behavior in that vocabulary, so ``pytest --given-html`` renders a
 living, filterable behavioral spec of the plugin itself.
 
@@ -22,11 +22,11 @@ and *Group*, existing terms whose meaning is the verb. The ``_t`` suffix
 
 from pathlib import Path
 
-from pytest_given import FileGlossary, sentence, story
+from pytest_given import TableGlossary, sentence, story
 
 _GLOSSARY_PATH = Path(__file__).resolve().parent.parent / 'GLOSSARY.md'
 
-pg = FileGlossary(_GLOSSARY_PATH)
+pg = TableGlossary(_GLOSSARY_PATH)
 
 developer = pg['Developer']
 domain_expert = pg['Domain Expert']

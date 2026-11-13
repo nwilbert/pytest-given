@@ -6,7 +6,7 @@ from typing import Annotated, Any, cast
 import pytest
 
 from pytest_given import Glossary, given, scenario, then, when, when_then
-from pytest_given.capture.file_glossary import FileGlossary
+from pytest_given.capture.file_glossary import TableGlossary
 from pytest_given.capture.template import (
     Template,
     narration_from,
@@ -390,17 +390,17 @@ _FILE_GLOSSARY_MD = (
 
 
 @pytest.fixture
-def file_glossary(tmp_path: Path) -> FileGlossary:
+def file_glossary(tmp_path: Path) -> TableGlossary:
     path = tmp_path / 'G.md'
     path.write_text(_FILE_GLOSSARY_MD, encoding='utf-8')
-    return FileGlossary(path)
+    return TableGlossary(path)
 
 
 @scenario(
     t'A {pg["File glossary"].l} handle works in a t-string {pg["Step"].l}',
 )
 def test_tstring_with_file_term_handle_emits_term_ref(
-    file_glossary: FileGlossary,
+    file_glossary: TableGlossary,
 ) -> None:
     with given(t'a {pg["Deferred term"].l} from a {pg["File glossary"].l}'):
         guest = file_glossary['Guest']
@@ -414,7 +414,7 @@ def test_tstring_with_file_term_handle_emits_term_ref(
 
 
 def test_tstring_with_file_term_instance_emits_term_ref_with_override_display(
-    file_glossary: FileGlossary,
+    file_glossary: TableGlossary,
 ) -> None:
     guest = file_glossary['Guest']
     parts = parse_tstring(t'{guest("Alice")} books a room')

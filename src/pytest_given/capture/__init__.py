@@ -2,7 +2,7 @@
 
 Two audiences share this namespace. The authoring surface — `given` / `when` /
 `then` / `when_then` / `attach`, `@scenario`, `story` / `sentence` / `clause`,
-`Glossary` / `FileGlossary` / `Template` — is re-exported from the package
+`Glossary` / `TableGlossary` / `Template` — is re-exported from the package
 root and is what a test author writes. Everything else is the seam `plugin/`
 drives it through, public only because a sibling subpackage may import solely
 from a subpackage root. `__all__` stays sorted rather than grouped, so this
@@ -15,7 +15,7 @@ from .collector import (
     get_active_collector,
     set_active_collector,
 )
-from .file_glossary import FileGlossary
+from .file_glossary import TableGlossary
 from .glossary import Glossary, GlossarySection
 from .glossary_resolution import session_glossary
 from .process_state import (
@@ -54,12 +54,12 @@ from .traceback import is_internal_path, parse_short_repr
 
 __all__ = [
     'Collector',
-    'FileGlossary',
     'FixtureRecording',
     'Glossary',
     'GlossarySection',
     'ScenarioDecorator',
     'StepDescriptor',
+    'TableGlossary',
     'Template',
     'annotated_given_descriptors',
     'attach',

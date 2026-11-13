@@ -1,9 +1,9 @@
 """pytest-given: Generate interactive HTML reports from GWT tests."""
 
 from .capture import (
-    FileGlossary,
     Glossary,
     GlossarySection,
+    TableGlossary,
     Template,
     attach,
     clause,
@@ -18,11 +18,11 @@ from .capture import (
 from .model import PytestGivenError, PytestGivenWarning
 
 __all__ = [
-    'FileGlossary',
     'Glossary',
     'GlossarySection',
     'PytestGivenError',
     'PytestGivenWarning',
+    'TableGlossary',
     'Template',
     'attach',
     'clause',

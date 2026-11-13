@@ -6,7 +6,7 @@ import pytest
 
 from pytest_given import Glossary
 from pytest_given.capture import (
-    FileGlossary,
+    TableGlossary,
     clause,
     sentence,
     session_glossary,
@@ -68,7 +68,7 @@ def test_a_file_glossary_on_a_conftest_is_discovered(tmp_path: Path) -> None:
         '| Term | Meaning |\n|---|---|\n| Guest | A person booking. |\n',
         encoding='utf-8',
     )
-    file_glossary = FileGlossary(md_path)
+    file_glossary = TableGlossary(md_path)
     modules = [_FakeConftest('/x/conftest.py', g=file_glossary)]
     assert resolve_glossary([], modules) is file_glossary
 

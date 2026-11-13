@@ -92,7 +92,7 @@ packages = ["src/pytest_given"]
 # untracked local directories, so this is an allowlist rather than a list of
 # exclusions. `pyproject.toml`, the readme, and the license files are always
 # included. GLOSSARY.md is load-bearing: tests/conftest.py loads it as a
-# FileGlossary. The narration-lint docs page is listed for the same reason:
+# TableGlossary. The narration-lint docs page is listed for the same reason:
 # tests/unit/lint/test_config.py checks its rule table against the lint
 # catalog. `examples/` is deliberately out — 2.6 MB of pre-rendered reports
 # that no test reads (the eight `examples/` mentions under tests/ are all

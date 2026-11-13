@@ -3,9 +3,9 @@ from pathlib import Path
 import pytest
 
 from pytest_given import (
-    FileGlossary,
     Glossary,
     PytestGivenError,
+    TableGlossary,
     given,
     scenario,
     then,
@@ -739,7 +739,7 @@ def test_file_glossary_declared_kind_in_wrong_slot_raises(tmp_path):
             '| Room | A place | object |\n',
             encoding='utf-8',
         )
-        fg = FileGlossary(glossary_file, kind_column='Kind')
+        fg = TableGlossary(glossary_file, kind_column='Kind')
     with (
         when_then(
             t'Room is placed in the verb {pg["Slot"].l}',
@@ -826,6 +826,6 @@ def test_misplaced_instances_name_their_canonical_term(g, tmp_path):
         '| Term | Meaning | Kind |\n|---|---|---|\n| Room | A place | object |\n',
         encoding='utf-8',
     )
-    fg = FileGlossary(glossary_file, kind_column='Kind')
+    fg = TableGlossary(glossary_file, kind_column='Kind')
     with pytest.raises(PytestGivenError, match=r"'Room' is declared a work object"):
         clause(fg['Room'], fg['Room']('Suite'), fg['Room'])

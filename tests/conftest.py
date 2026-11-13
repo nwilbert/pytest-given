@@ -1,4 +1,4 @@
-# Expose the pytest-given FileGlossary at conftest module level so the plugin
+# Expose the pytest-given TableGlossary at conftest module level so the plugin
 # discovers it and renders the Glossary tab for the self-documenting scenarios.
 import pytest
 

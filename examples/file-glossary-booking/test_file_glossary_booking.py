@@ -1,6 +1,6 @@
 """File-backed glossary booking example.
 
-Demonstrates FileGlossary loading a Markdown glossary file, using the resulting
+Demonstrates TableGlossary loading a Markdown glossary file, using the resulting
 handles in story sentences and t-string steps, and how term kinds are inferred
 from clause-slot positions at session finish.
 
@@ -21,7 +21,7 @@ Key behaviours shown:
 from pathlib import Path
 
 from pytest_given import (
-    FileGlossary,
+    TableGlossary,
     given,
     scenario,
     sentence,
@@ -32,7 +32,7 @@ from pytest_given import (
 
 # Load the glossary from the Markdown file alongside this module.
 # Module-level declaration registers it with the plugin for kind inference.
-g = FileGlossary(Path(__file__).parent / 'GLOSSARY.md')
+g = TableGlossary(Path(__file__).parent / 'GLOSSARY.md')
 
 # Story: Guest → book (slot 1, activity) → Room (slot 2, object).
 # The first sentence is deliberately under-anchored — only one glossary term

@@ -3,7 +3,16 @@ import re
 import pytest
 
 from pytest_given import attach, given, scenario, then, when, when_then
-from pytest_given.capture.markdown_glossary import GlossaryRow, parse_glossary_tables
+from pytest_given.capture.markdown_glossary import (
+    GlossaryRow,
+    has_tables,
+    has_term_lines,
+    heading_section,
+    parse_glossary_tables,
+    split_avoid,
+    title_level,
+)
+from pytest_given.markdown import document_blocks
 from pytest_given.model import PytestGivenError
 from tests.ubiquitous_language import pg
 
@@ -29,7 +38,11 @@ def simple_doc():
 def test_parses_default_columns(simple_doc):
     with when(t'the parser reads it into rows for a {pg["File glossary"].l}'):
         rows = parse_glossary_tables(
-            simple_doc, term_column=0, definition_column=1, kind_column=None
+            simple_doc,
+            term_column=0,
+            definition_column=1,
+            kind_column=None,
+            avoid_column=None,
         )
     with then(t'each row carries a {pg["Term"].l}, definition and source line'):
         assert rows == [
@@ -52,7 +65,11 @@ def test_merges_multiple_tables():
         attach('Markdown document', text)
     with when('the parser reads the whole document'):
         rows = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
+            text,
+            term_column=0,
+            definition_column=1,
+            kind_column=None,
+            avoid_column=None,
         )
     with then(t'every table contributes its {pg["Term"].l} rows'):
         assert [row.term for row in rows] == ['Guest', 'Room', 'Search']
@@ -67,7 +84,11 @@ def test_column_by_header_name_case_insensitive():
         attach('Markdown document', text)
     with when('the parser selects columns by header name'):
         rows = parse_glossary_tables(
-            text, term_column='word', definition_column='note', kind_column='role'
+            text,
+            term_column='word',
+            definition_column='note',
+            kind_column='role',
+            avoid_column=None,
         )
     with then('the named columns are matched case-insensitively'):
         assert rows == [GlossaryRow(term='Guest', definition='x', kind='Actor', line=3)]
@@ -82,7 +103,11 @@ def test_escaped_pipe_in_cell():
         attach('Markdown document', text)
     with when('the parser splits the row'):
         rows = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
+            text,
+            term_column=0,
+            definition_column=1,
+            kind_column=None,
+            avoid_column=None,
         )
     with then('the escaped pipe survives as a literal pipe'):
         assert rows == [
@@ -122,6 +147,7 @@ def test_an_unreadable_glossary_table_is_refused(document, columns, message):
             'term_column': 0,
             'definition_column': 1,
             'kind_column': None,
+            'avoid_column': None,
             **columns,
         }
     with (
@@ -180,7 +206,11 @@ def test_a_glossary_reads_the_tables_a_gfm_renderer_shows(document, rows):
         attach('Markdown document', text)
     with when('the parser reads the document'):
         read = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
+            text,
+            term_column=0,
+            definition_column=1,
+            kind_column=None,
+            avoid_column=None,
         )
     with then(t'it reads the term and definition rows {rows}'):
         assert [(row.term, row.definition) for row in read] == rows
@@ -210,7 +240,7 @@ def test_a_term_or_kind_cell_is_read_as_its_plain_text(column, cell, plain):
         text = f'| Term | Meaning | Kind |\n|---|---|---|\n| {term} | x | {kind} |\n'
     with when('the parser reads the row'):
         [row] = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=2
+            text, term_column=0, definition_column=1, kind_column=2, avoid_column=None
         )
     with then(t'the {column} is {plain}'):
         assert (row.term if column == 'term' else row.kind) == plain
@@ -228,7 +258,11 @@ def test_leaves_definition_markdown_intact():
         attach('Markdown document', text)
     with when('the parser reads the row'):
         rows = parse_glossary_tables(
-            text, term_column=0, definition_column=1, kind_column=None
+            text,
+            term_column=0,
+            definition_column=1,
+            kind_column=None,
+            avoid_column=None,
         )
     with then('the definition keeps its markup for the tooltip'):
         assert rows[0].definition == 'A test decorated with `@scenario(...)`.'
@@ -237,7 +271,7 @@ def test_leaves_definition_markdown_intact():
 def test_nested_emphasis_unwraps_all_the_way():
     text = '| Term | Meaning |\n|---|---|\n| **`Scenario`** | nested. |\n'
     rows = parse_glossary_tables(
-        text, term_column=0, definition_column=1, kind_column=None
+        text, term_column=0, definition_column=1, kind_column=None, avoid_column=None
     )
     assert rows[0].term == 'Scenario'
 
@@ -256,10 +290,144 @@ def test_a_named_spec_skips_a_table_it_cannot_address() -> None:
         '| --flag | off |\n'
     )
     rows = parse_glossary_tables(
-        doc, term_column='Term', definition_column='Description', kind_column=None
+        doc,
+        term_column='Term',
+        definition_column='Description',
+        kind_column=None,
+        avoid_column=None,
     )
     assert [(r.term, r.definition) for r in rows] == [('Guest', 'someone')]
     with pytest.raises(PytestGivenError, match='Nope'):
         parse_glossary_tables(
-            doc, term_column='Term', definition_column='Nope', kind_column=None
+            doc,
+            term_column='Term',
+            definition_column='Nope',
+            kind_column=None,
+            avoid_column=None,
         )
+
+
+def _read(text, **overrides):
+    options = {
+        'term_column': 0,
+        'definition_column': 1,
+        'kind_column': None,
+        'avoid_column': None,
+    } | overrides
+    return parse_glossary_tables(text, **options)
+
+
+_AVOID_TABLE = (
+    '| Term | Meaning | Avoid |\n|---|---|---|\n'
+    '| Guest | A person. | Customer, Client |\n'
+)
+
+
+@pytest.mark.parametrize('avoid_column', ['avoid', 2])
+def test_avoid_column_by_name_and_index(avoid_column):
+    rows = _read(_AVOID_TABLE, avoid_column=avoid_column)
+    assert rows[0].avoid == ('Customer', 'Client')
+
+
+def test_no_avoid_column_leaves_avoid_empty():
+    assert _read(_AVOID_TABLE)[0].avoid == ()
+
+
+def test_split_avoid_commas_in_parentheses():
+    assert split_avoid('Bill, payment request (a, b), ') == [
+        'Bill',
+        'payment request (a, b)',
+    ]
+
+
+def test_missing_avoid_column_raises():
+    with pytest.raises(PytestGivenError, match="column 'Avoid' not found"):
+        _read(
+            '| Term | Meaning |\n|---|---|\n| Guest | x |\n',
+            avoid_column='Avoid',
+            term_column='Term',
+        )
+
+
+def test_avoid_column_counts_for_addresses_another_table():
+    text = (
+        '| Avoid | Note |\n|---|---|\n| a | b |\n\n'
+        '| Term | Meaning | Avoid |\n|---|---|---|\n| Guest | x | Client |\n'
+    )
+    with pytest.raises(PytestGivenError, match="column 'Term' not found"):
+        _read(
+            text, term_column='Term', definition_column='Meaning', avoid_column='Avoid'
+        )
+
+
+def _sections(text, **overrides):
+    return [(row.term, row.section) for row in _read(text, **overrides)]
+
+
+def _row_table(*terms):
+    return '| Term | Meaning |\n|---|---|\n' + ''.join(f'| {t} | d |\n' for t in terms)
+
+
+def test_section_from_nearest_heading_at_any_level():
+    text = '## Core\n\n' + _row_table('Guest') + '\n#### Deep\n\n' + _row_table('Room')
+    assert _sections(text) == [('Guest', 'Core'), ('Room', 'Deep')]
+
+
+def test_title_heading_names_no_section():
+    text = '# Glossary\n\n' + _row_table('Guest') + '\n## Core\n\n' + _row_table('Room')
+    assert _sections(text) == [('Guest', None), ('Room', 'Core')]
+
+
+def test_two_level_one_headings_are_sections():
+    text = '# One\n\n' + _row_table('Guest') + '\n# Two\n\n' + _row_table('Room')
+    assert _sections(text) == [('Guest', 'One'), ('Room', 'Two')]
+
+
+def test_term_above_every_heading_has_no_section():
+    text = _row_table('Guest') + '\n## Core\n\n' + _row_table('Room')
+    assert _sections(text) == [('Guest', None), ('Room', 'Core')]
+
+
+def test_same_heading_text_one_section():
+    text = '## Core\n\n' + _row_table('Guest') + '\n## Core\n\n' + _row_table('Room')
+    assert {section for _, section in _sections(text)} == {'Core'}
+
+
+def test_heading_in_blockquote_ignored():
+    text = (
+        '## Core\n\n> ## Quoted\n>\n'
+        '> | Term | Meaning |\n> |---|---|\n> | Guest | d |\n'
+    )
+    assert _sections(text) == [('Guest', 'Core')]
+
+
+def test_heading_markup_and_closing_hashes():
+    text = '## The *core* model ##\n\n' + _row_table('Guest')
+    assert _sections(text) == [('Guest', 'The core model')]
+
+
+def test_empty_heading_names_no_section():
+    text = '## Core\n\n##\n\n' + _row_table('Guest')
+    assert _sections(text) == [('Guest', None)]
+
+
+def test_heading_section_holders_name_no_section():
+    blocks = document_blocks('## Terms\n')
+    heading = blocks[0].block
+    assert (
+        heading_section(heading, title_level=None, holders=frozenset({'terms'})) is None
+    )
+    assert heading_section(heading, title_level=None, holders=frozenset()) == 'Terms'
+
+
+def test_title_level_needs_exactly_one_top_level_level_one_heading():
+    assert title_level(document_blocks('# A\n\n## B\n')) == 1
+    assert title_level(document_blocks('# A\n\n# B\n')) is None
+    assert title_level(document_blocks('## B\n\n> # Q\n')) is None
+
+
+def test_has_tables_and_term_lines():
+    assert has_tables(SIMPLE)
+    assert not has_tables('# x\n')
+    assert has_term_lines('**Order**: a request\n')
+    assert not has_term_lines('**Order:** a request\n')

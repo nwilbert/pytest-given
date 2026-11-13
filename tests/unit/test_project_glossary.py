@@ -1,4 +1,4 @@
-"""The project's own GLOSSARY.md, whose tables a `FileGlossary` reads the way
+"""The project's own GLOSSARY.md, whose tables a `TableGlossary` reads the way
 GFM does: a row wider than its header lost its tail to an unescaped `|`."""
 
 from pathlib import Path

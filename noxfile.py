@@ -694,7 +694,7 @@ def docs_deploy(session: nox.Session) -> None:
 def self_report(session: nox.Session) -> None:
     """Regenerate the self-documentation report from pytest-given's own backend
     tests. The @scenario-decorated unit tests narrate the plugin's behavior in
-    the vocabulary of GLOSSARY.md (loaded as a FileGlossary in tests/conftest.py).
+    the vocabulary of GLOSSARY.md (loaded as a TableGlossary in tests/conftest.py).
     """
     _sync(session, 'test', include_project=True)
     _regenerate_self_report(session)

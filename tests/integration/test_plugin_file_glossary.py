@@ -13,9 +13,9 @@ GLOSSARY_MD = """# Glossary
 """
 
 CONFTEST = """
-from pytest_given import FileGlossary
+from pytest_given import TableGlossary
 
-g = FileGlossary('GLOSSARY.md')
+g = TableGlossary('GLOSSARY.md')
 """
 
 TEST_FILE = """
