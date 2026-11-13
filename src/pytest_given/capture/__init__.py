@@ -16,7 +16,7 @@ from .collector import (
     set_active_collector,
 )
 from .file_glossary import FileGlossary
-from .glossary import Glossary
+from .glossary import Glossary, GlossarySection
 from .glossary_resolution import session_glossary
 from .process_state import (
     begin_capture_session,
@@ -57,6 +57,7 @@ __all__ = [
     'FileGlossary',
     'FixtureRecording',
     'Glossary',
+    'GlossarySection',
     'ScenarioDecorator',
     'StepDescriptor',
     'Template',

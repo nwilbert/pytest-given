@@ -3,8 +3,9 @@
 import difflib
 import re
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
+from functools import cache
 
 from ..model import (
     Definition,
@@ -14,7 +15,10 @@ from ..model import (
     SourceLocation,
     TermId,
     TermKind,
+    avoided_word,
     id_derive,
+    name_key,
+    name_keys,
     s_form,
 )
 from ..model import (
@@ -52,37 +56,90 @@ class LookupGlossary(BaseGlossary):
         return handle
 
 
-class Glossary(LookupGlossary):
+class _TermDeclarations(ABC):
+    """The four ways to declare a term, shared by a glossary and its sections."""
+
+    def actor(
+        self, name: str, definition: str | None = None, *, avoid: Sequence[str] = ()
+    ) -> TermHandle:
+        """Register an actor — a participant in the domain."""
+        return self._declare('actor', name, definition, avoid)
+
+    def work_object(
+        self, name: str, definition: str | None = None, *, avoid: Sequence[str] = ()
+    ) -> TermHandle:
+        """Register a work object — a thing acted on."""
+        return self._declare('object', name, definition, avoid)
+
+    def activity(
+        self, name: str, definition: str | None = None, *, avoid: Sequence[str] = ()
+    ) -> TermHandle:
+        """Register an activity — what an actor does."""
+        return self._declare('activity', name, definition, avoid)
+
+    def __call__(
+        self, name: str, definition: str | None = None, *, avoid: Sequence[str] = ()
+    ) -> TermHandle:
+        """Register a term whose kind inference will settle later."""
+        return self._declare(None, name, definition, avoid)
+
+    @abstractmethod
+    def _declare(
+        self,
+        kind: TermKind | None,
+        name: str,
+        definition: str | None,
+        avoid: Sequence[str],
+    ) -> TermHandle: ...
+
+
+class Glossary(LookupGlossary, _TermDeclarations):
     """The user-facing glossary: the model's storage plus the registration API.
 
-    Every registration below is idempotent for an *exactly* repeated one — kind,
-    canonical and definition all equal — and raises on anything else, a
-    definition supplied only the first time included. Re-reading a term declared
-    elsewhere is `g[name]`, which never registers.
+    Every registration is idempotent for an *exactly* repeated one — kind,
+    canonical, definition, section and avoid entries all equal — and raises on
+    anything else, a definition supplied only the first time included.
+    Re-reading a term declared elsewhere is `g[name]`, which never registers.
     """
 
+    def section(self, name: str) -> GlossarySection:
+        """A group of terms declared into this glossary under the heading
+        `name`. Two sections of one name declare into the same group."""
+        stripped = name.strip()
+        if not stripped:
+            raise PytestGivenError('a glossary section needs a name.')
+        return GlossarySection(_glossary=self, name=stripped)
+
     def _declare(
-        self, kind: TermKind | None, name: str, definition: str | None
+        self,
+        kind: TermKind | None,
+        name: str,
+        definition: str | None,
+        avoid: Sequence[str],
+        section: str | None = None,
     ) -> TermHandle:
-        """Register `name` under `kind` and hand back its handle."""
-        term = _register_kind(self, kind, name, definition, capture_caller_source())
+        term = _register_kind(
+            self, kind, name, definition, section, avoid, capture_caller_source()
+        )
         return TermHandle(_term=term, _glossary=self)
 
-    def actor(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register an actor — a participant in the domain."""
-        return self._declare('actor', name, definition)
 
-    def work_object(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register a work object — a thing acted on."""
-        return self._declare('object', name, definition)
+@dataclass(frozen=True)
+class GlossarySection(_TermDeclarations):
+    """Declares terms into its glossary under one section name. It has no
+    lookup: `g[name]` reads a term back whatever its section."""
 
-    def activity(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register an activity — what an actor does."""
-        return self._declare('activity', name, definition)
+    _glossary: Glossary
+    name: str
 
-    def __call__(self, name: str, definition: str | None = None) -> TermHandle:
-        """Register a term whose kind inference will settle later."""
-        return self._declare(None, name, definition)
+    def _declare(
+        self,
+        kind: TermKind | None,
+        name: str,
+        definition: str | None,
+        avoid: Sequence[str],
+    ) -> TermHandle:
+        return self._glossary._declare(kind, name, definition, avoid, self.name)
 
 
 def normalize_definition(definition: str | None) -> Definition | None:
@@ -234,13 +291,64 @@ def _lowercase_words(text: str) -> str:
 
 
 def terms_match(existing: GlossaryTerm, candidate: GlossaryTerm) -> bool:
-    """Whether two terms are the same registration: kind, canonical and
-    definition agree. `source` is intentionally excluded."""
+    """Whether two terms are the same registration: kind, canonical,
+    definition, section and avoid entries agree. `source` is intentionally
+    excluded."""
     return (
         existing.kind == candidate.kind
         and existing.canonical == candidate.canonical
         and existing.definition == candidate.definition
+        and existing.section == candidate.section
+        and existing.avoid == candidate.avoid
     )
+
+
+def unique_avoid(entries: Iterable[str]) -> tuple[str, ...]:
+    """The entries in order, dropping one whose avoided word repeats an
+    earlier one's as names compare."""
+    kept: dict[str, str] = {}
+    for entry in entries:
+        word = avoided_word(entry)
+        if not word:
+            raise PytestGivenError(f'avoid entry {entry!r} has no avoided word.')
+        kept.setdefault(name_key(word), entry)
+    return tuple(kept.values())
+
+
+def check_avoided_words(glossary: BaseGlossary, term: GlossaryTerm) -> None:
+    """Raise when an avoided word of `term` names a term of the glossary,
+    `term` included, or an avoided word of a registered term names `term`.
+    Two registered terms were checked against each other on registering."""
+    registered = [other for other in glossary.terms if other.id != term.id]
+    for entry in term.avoid:
+        for named in [term, *registered]:
+            if _avoided_word_keys(entry) & _name_keys(named.canonical):
+                raise _avoided_word_error(entry, term, named)
+    for avoiding in registered:
+        for entry in avoiding.avoid:
+            if _avoided_word_keys(entry) & _name_keys(term.canonical):
+                raise _avoided_word_error(entry, avoiding, term)
+
+
+def _avoided_word_error(
+    entry: str, avoiding: GlossaryTerm, named: GlossaryTerm
+) -> PytestGivenError:
+    return PytestGivenError(
+        f'avoided word {avoided_word(entry)!r} of term {avoiding.canonical!r} '
+        f'names term {named.canonical!r}.'
+    )
+
+
+# Cached because every registration checks its term against all registered
+# ones, so a glossary of n terms would re-derive each word's keys n times.
+@cache
+def _avoided_word_keys(entry: str) -> frozenset[str]:
+    return _name_keys(avoided_word(entry))
+
+
+@cache
+def _name_keys(name: str) -> frozenset[str]:
+    return frozenset(name_keys(name))
 
 
 def _register_kind(
@@ -248,22 +356,32 @@ def _register_kind(
     kind: TermKind | None,
     name: str,
     definition: str | None,
+    section: str | None,
+    avoid: Sequence[str],
     source: SourceLocation | None = None,
 ) -> GlossaryTerm:
     """Idempotent registration. Returns the canonical term (existing or new).
 
-    `source` is the call site of the user-facing method (`g.actor` /
-    `g.work_object` / `g.activity`), captured there and threaded through.
-    First-registration wins: re-registration with matching (kind, canonical,
-    definition) returns the existing term unchanged, preserving its original
-    `source`.
+    `source` is the call site of the user-facing method, captured there and
+    threaded through. First-registration wins: re-registration with matching
+    `terms_match` fields returns the existing term unchanged, preserving its
+    original `source`.
     """
+    if isinstance(avoid, str):
+        raise PytestGivenError(
+            f'term {name!r} takes its avoided words as a list, as avoid=[{avoid!r}].'
+        )
+    entries = [entry.strip() for entry in avoid]
+    if not all(entries):
+        raise PytestGivenError(f'term {name!r} has an empty avoid entry.')
     new = GlossaryTerm(
         id=TermId(id_derive(name)),
         kind=kind,
         canonical=name,
         definition=normalize_definition(definition),
         source=source,
+        section=section,
+        avoid=unique_avoid(entries),
     )
     return register_or_conflict(
         glossary,
@@ -271,8 +389,11 @@ def _register_kind(
         lambda existing: (
             f'term {name!r} (id {new.id!r}) conflicts with prior registration '
             f'(existing: kind={existing.kind!r}, canonical={existing.canonical!r}, '
-            f'definition={existing.definition_text!r}; new: kind={new.kind!r}, '
-            f'canonical={new.canonical!r}, definition={new.definition_text!r}).'
+            f'definition={existing.definition_text!r}, '
+            f'section={existing.section!r}, avoid={existing.avoid!r}; '
+            f'new: kind={new.kind!r}, canonical={new.canonical!r}, '
+            f'definition={new.definition_text!r}, '
+            f'section={new.section!r}, avoid={new.avoid!r}).'
         ),
     )
 
@@ -286,12 +407,14 @@ def register_or_conflict(
 
     First-registration wins, and `terms_match` decides what "equal" means.
     Shared by both glossaries so they agree on what counts as a
-    re-registration; only the message differs.
+    re-registration and on which avoided words are refused; only the conflict
+    message differs.
     """
     existing = glossary.get(term.id)
     if existing is not None:
         if terms_match(existing, term):
             return existing
         raise PytestGivenError(conflict_message(existing))
+    check_avoided_words(glossary, term)
     glossary.register(term)
     return term

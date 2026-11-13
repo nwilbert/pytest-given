@@ -15,6 +15,8 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
+- `Glossary.section(name)` groups the terms it declares into a glossary section, as a file glossary's headings do, and the Glossary tab groups and filters by it.
+- `avoid=` on a term declaration lists rejected synonyms, as a file glossary's avoid entries do, shown on the term's card.
 - `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary.
 - A term citation written as a `<details markdown="1">` block carries the term's definition, which `citations update` writes and `citations check` holds to the report.
 - A Glossary term row in the HTML report gets the copy button, which offers **Copy citation** and **Copy defining citation** when the report has a URL.

@@ -317,7 +317,7 @@ def test_a_conflict_prints_each_definition_as_written():
     g = Glossary()
     g.actor('Guest', 'd')
     with pytest.raises(
-        PytestGivenError, match=r"definition='d'; new: .* definition='two'\)"
+        PytestGivenError, match=r"definition='d', .*; new: .* definition='two', "
     ):
         g.actor('Guest', 'two')
 
@@ -496,3 +496,168 @@ def test_subscript_miss_is_a_lookup_error():
     `glossary[name]`, catching only `LookupError`."""
     with pytest.raises(LookupError):
         Glossary()['description']
+
+
+@scenario(
+    t'A code {pg["Glossary"].l} groups {pg["Term"].l.s} into '
+    t'{pg["Glossary section"].l.s}',
+    tags=['spec/glossary-sections'],
+)
+def test_section_terms_carry_it():
+    source_mod.set_rootdir(Path(__file__).resolve().parents[3])
+    try:
+        with given(t'a {pg["Glossary"].l} with a "Booking" section'):
+            g = Glossary()
+            booking = g.section('Booking')
+        with when(
+            t'a {pg["Term"].l} is declared through the section and another outside it'
+        ):
+            guest = booking.actor('Guest')
+            clerk = g.actor('Clerk')
+        with then(
+            t'only the first {pg["Term"].l} carries the {pg["Glossary section"].l}'
+        ):
+            assert guest.term.section == 'Booking'
+            assert clerk.term.section is None
+        with then('the declared term records the line of the call in this file'):
+            assert guest.term.source is not None
+            assert guest.term.source.relpath.endswith('test_glossary.py')
+            assert (
+                'booking.actor'
+                in Path(__file__)
+                .read_text(encoding='utf-8')
+                .splitlines()[guest.term.source.line - 1]
+            )
+    finally:
+        source_mod.restore_rootdir(None)
+
+
+def test_section_twice_merges():
+    g = Glossary()
+    first = g.section('Booking').actor('Guest')
+    second = g.section('Booking').work_object('Room')
+    assert first.term.section == second.term.section == 'Booking'
+
+
+def test_section_name_stripped():
+    assert Glossary().section(' Booking ').actor('Guest').term.section == 'Booking'
+
+
+@pytest.mark.parametrize('name', ['', '   '])
+def test_section_empty_name_raises(name):
+    with pytest.raises(PytestGivenError, match='section needs a name'):
+        Glossary().section(name)
+
+
+def test_section_names_case_sensitive():
+    g = Glossary()
+    upper = g.section('Booking').actor('Guest')
+    lower = g.section('booking').actor('Clerk')
+    assert (upper.term.section, lower.term.section) == ('Booking', 'booking')
+
+
+def test_section_call_form_and_activity_register_with_section():
+    section = Glossary().section('Booking')
+    assert section('redeems').term.section == 'Booking'
+    assert section.activity('book').term.section == 'Booking'
+
+
+def test_repeat_in_other_section_raises():
+    g = Glossary()
+    g.section('Booking').actor('Guest')
+    with pytest.raises(PytestGivenError, match=r"section='Booking'.*section='Staff'"):
+        g.section('Staff').actor('Guest')
+
+
+def test_repeat_with_other_avoid_raises():
+    g = Glossary()
+    g.actor('Guest', avoid=['Customer'])
+    with pytest.raises(PytestGivenError, match=r"avoid=\('Customer',\).*avoid=\(\)"):
+        g.actor('Guest')
+
+
+def test_exact_repeat_with_section_and_avoid_is_idempotent():
+    g = Glossary()
+    first = g.section('Booking').actor('Guest', 'd', avoid=['Customer'])
+    again = g.section('Booking').actor('Guest', 'd', avoid=['Customer'])
+    assert again.term is first.term
+
+
+def test_avoid_entry_note_alone_raises():
+    with pytest.raises(PytestGivenError, match='no avoided word'):
+        Glossary().actor('Guest', avoid=['(legacy)'])
+
+
+def test_avoid_entries_stripped_and_empty_raises():
+    g = Glossary()
+    assert g.actor('Guest', avoid=['  Customer ']).term.avoid == ('Customer',)
+    with pytest.raises(PytestGivenError, match='empty avoid entry'):
+        g.actor('Clerk', avoid=['Staffer', '  '])
+
+
+@pytest.mark.parametrize('repeat', ['customer', 'CUSTOMER (old)'])
+def test_avoid_repeat_dropped(repeat):
+    term = Glossary().actor('Guest', avoid=['Customer', repeat]).term
+    assert term.avoid == ('Customer',)
+
+
+def test_avoid_repeat_with_hyphen_or_space_dropped():
+    term = Glossary().actor('Clerk', avoid=['front desk', 'Front-Desk']).term
+    assert term.avoid == ('front desk',)
+
+
+@pytest.mark.parametrize('avoiding_first', [True, False])
+@pytest.mark.parametrize(
+    ('avoid', 'named'),
+    [('Bookings', 'Booking'), ('Booking', 'Bookings'), ('booking (old)', 'Booking')],
+)
+def test_avoided_word_naming_term_raises(avoiding_first, avoid, named):
+    g = Glossary()
+    declare_avoiding = lambda: g.actor('Guest', avoid=[avoid])  # noqa: E731
+    declare_named = lambda: g.work_object(named)  # noqa: E731
+    first, second = (
+        (declare_avoiding, declare_named)
+        if avoiding_first
+        else (declare_named, declare_avoiding)
+    )
+    first()
+    with pytest.raises(PytestGivenError) as raised:
+        second()
+    message = str(raised.value)
+    assert repr(avoid.split(' (')[0]) in message
+    assert "'Guest'" in message
+    assert repr(named) in message
+
+
+def test_term_may_not_avoid_its_own_name():
+    with pytest.raises(PytestGivenError, match="avoided word 'guest'"):
+        Glossary().actor('Guest', avoid=['guest'])
+
+
+def test_avoided_words_checked_only_in_pairs_with_the_new_term():
+    clashing = [
+        GlossaryTerm(
+            id=TermId('guest'), kind='actor', canonical='Guest', avoid=('Clerk',)
+        ),
+        GlossaryTerm(id=TermId('clerk'), kind='actor', canonical='Clerk'),
+    ]
+    g = Glossary(terms=clashing)
+    assert g.actor('Room', avoid=['Chamber']).term.avoid == ('Chamber',)
+
+
+def test_avoid_as_bare_string_raises():
+    with pytest.raises(PytestGivenError, match=r"avoid=\['Customer'\]"):
+        Glossary().actor('Guest', avoid='Customer')
+
+
+def test_two_terms_may_avoid_one_word():
+    g = Glossary()
+    g.actor('Guest', avoid=['Customer'])
+    g.actor('Clerk', avoid=['Customer'])
+    assert [term.avoid for term in g.terms] == [('Customer',), ('Customer',)]
+
+
+def test_section_lookup_through_glossary():
+    g = Glossary()
+    declared = g.section('Booking').actor('Guest')
+    assert g['Guest'] == declared

@@ -3,6 +3,7 @@
 from .capture import (
     FileGlossary,
     Glossary,
+    GlossarySection,
     Template,
     attach,
     clause,
@@ -19,6 +20,7 @@ from .model import PytestGivenError, PytestGivenWarning
 __all__ = [
     'FileGlossary',
     'Glossary',
+    'GlossarySection',
     'PytestGivenError',
     'PytestGivenWarning',
     'Template',
