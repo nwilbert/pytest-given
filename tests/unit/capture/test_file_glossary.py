@@ -533,9 +533,15 @@ def test_paragraph_glossary_reads_term_paragraphs(tmp_path):
         t'each {pg["Term"].l} takes its definition from the lines under its bold name'
     ):
         order = glossary['Order'].term
+        invoice = glossary['Invoice'].term
         assert order.definition is not None
         assert order.definition.text == (
             "A customer's request for goods, placed in one checkout."
+        )
+        assert invoice.definition is not None
+        assert invoice.definition.text == (
+            'A request for payment sent to a customer after delivery, '
+            'for one **Order**.'
         )
     with then(t'the `_Avoid_:` line lists the words the {pg["Term"].l} avoids'):
         assert order.avoid == ('Purchase', 'transaction')

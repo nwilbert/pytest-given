@@ -25,7 +25,7 @@ in a definition has to find its row by hand.
 Bold is the reference markup because it is what the `GLOSSARY.md` format of Matt Pocock's
 [skills](https://github.com/mattpocock/skills) uses (`A single tracked unit of work inside an
 **Issue tracker**`), which `ParagraphGlossary` reads (see the
-[glossary sections spec](proposed/2026-11-08-glossary-sections-design.md)). One rule then covers every
+[glossary sections spec](2026-11-08-glossary-sections-design.md)). One rule then covers every
 glossary, and italics stay free for emphasis and example words. The convention this design
 introduces: **in a definition, a bold span is a reference.**
 

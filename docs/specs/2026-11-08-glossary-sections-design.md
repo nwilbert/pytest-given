@@ -1,5 +1,7 @@
 # Glossary Sections, Avoided Words and Paragraph Glossaries — Design Spec
 
+✅ [spec/glossary-sections](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/glossary-sections) (6 ✅)
+
 ## Goal
 
 Three additions to the glossary, designed together because they share the file glossaries and the
@@ -47,7 +49,7 @@ Terms sit under `## Language` (`## Terms` in the `teach` skill) and may be group
 subheadings. Two further sections, `## Relationships` and `## Flagged ambiguities`, hold prose and
 bullets, not terms. The `_Avoid_:` line is how the format records rejected synonyms. A definition
 names another term in bold, the markup a *definition ref* uses (see the
-[definition refs spec](../2026-11-08-definition-refs-design.md)). A repo with
+[definition refs spec](2026-11-08-definition-refs-design.md)). A repo with
 several bounded contexts keeps one `GLOSSARY.md` per context, listed in a `GLOSSARY-MAP.md`.
 
 ## Non-goals
@@ -90,7 +92,7 @@ class GlossaryTerm:
   report shows the whole entry. The lint matches only the **avoided word**: the entry's text before
   the note, with its inline markup unwrapped (as a term cell is) and stripped. An entry with no
   avoided word, such as a note alone, raises. An entry whose avoided word repeats an earlier one of
-  the same term, in any case, is dropped.
+  the same term, as names compare (`name_key`), is dropped.
 - **One id space across sections.** Lookup stays by name alone (`g['Guest']`). The same term in
   two sections is a conflict: two rows or registrations agree only when their section and avoided
   words agree too, so a repeat that today passes as identical raises once it names another
@@ -222,8 +224,8 @@ definition spanning several lines folds its soft line breaks into spaces, as Git
 is stored as `<br>`, since the report renders only that and a newline as breaks.
 
 - **The avoid line** is a line of the term paragraph that starts with an italic `Avoid` and a colon
-  (`_Avoid_:` or `*Avoid*:`, case-insensitive). The rest of the line is split like an avoid cell.
-  The term paragraph's lines after it are ignored.
+  (`_Avoid_:` or `*Avoid*:`, case-insensitive). The rest of the term paragraph, its line breaks
+  read as spaces, is split like an avoid cell, so a wrapped list runs on.
 - **Skipped sections.** A heading reading `Relationships` or `Flagged ambiguities`
   (case-insensitive) starts a stretch the reader skips, up to the next heading of the same or a
   higher level.
@@ -304,7 +306,7 @@ so that both groupings use them.
 
 ### Avoided words on the card
 
-A card whose term avoids words shows them under the definition, as `Avoid: Customer, Client`, each
+A card whose term avoids words shows them in its expanded panel, as `Avoid: Customer, Client`, each
 entry as written, note included, rendered by `definition_html`. An entry is a string, not a
 stored definition, so its bold renders as plain bold, never as a definition ref. The Glossary
 search matches avoided words, so a reader searching `customer` finds *Guest*. The term tooltip in
@@ -325,12 +327,12 @@ folded in.
   grouped scenario, and the bare clause words of each story sentence. Bold and italic text is
   scanned without its markers. Bare clause words that follow one another in a clause are read as
   one text, joined by a space. Term refs, values, placeholders and code spans are skipped, so a
-  term ref never trips it. Glossary definitions are not scanned, since a definition may name a
+  term ref never trips it, except that both phrases of a Boolean phrase spec are scanned. Glossary definitions are not scanned, since a definition may name a
   rejected word on purpose.
 - **How it matches:** case-insensitive, on whole words, the avoided word as written or its
   *S-form*. `Customer` is caught in "the customers pay" and not in "customerId". A multi-word
-  avoided word matches across any run of whitespace, so `payment request` is caught when a line
-  break splits it.
+  avoided word matches across any run of whitespace and hyphens, so `payment request` is caught
+  when a line break splits it, and `check-in desk` in "check in desk".
 - **One finding per scenario or story and avoided word**, for the word's first use, the title read
   before the steps. Subject: the scenario's node ID or the story's id, so an intentional use is a
   `given_lint_ignore` entry like any finding on that subject. An entry silences every avoided word

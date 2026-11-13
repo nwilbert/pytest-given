@@ -1850,6 +1850,27 @@
 - **when** a «file glossary» loads it
 - **then** each «term» names the heading above its table
 
+## ✓ A «term» repeated under two headings of a «file glossary» raises, identical rows included
+`tests/unit/capture/test_file_glossary.py::test_exact_repeat_in_other_section_raises` · spec/glossary-sections
+
+- **given** a Markdown glossary with the same row under two headings
+    - 📎 Glossary file:
+        ```
+        ## Booking
+
+        | Term | Meaning |
+        |---|---|
+        | Guest | A person. |
+
+        ## Stay
+
+        | Term | Meaning |
+        |---|---|
+        | Guest | A person. |
+        ```
+- **when** a «file glossary» loads it
+- **then** a PytestGivenError names the line of the second row
+
 ## ✓ A «file glossary» reads «term paragraphs»
 `tests/unit/capture/test_file_glossary.py::test_paragraph_glossary_reads_term_paragraphs` · spec/glossary-sections
 
