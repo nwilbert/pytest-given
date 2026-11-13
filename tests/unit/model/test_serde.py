@@ -1165,3 +1165,23 @@ def test_a_stored_report_url_a_citation_cannot_link_is_refused(stored: str) -> N
         PytestGivenError, match=r'metadata\.report_url in reports/x\.json must be'
     ):
         report_from_dict(data, 'reports/x.json')
+
+
+def test_glossary_term_section_and_avoid_round_trip() -> None:
+    g = Glossary()
+    g.register(
+        GlossaryTerm(
+            id=TermId('guest'),
+            kind='actor',
+            canonical='Guest',
+            section='Booking',
+            avoid=('Customer', 'Client (old)'),
+        )
+    )
+    g.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    restored = _round_trip(ReportData(metadata=_meta(), glossary=g))
+    assert restored.glossary is not None
+    guest = restored.glossary.get(TermId('guest'))
+    assert (guest.section, guest.avoid) == ('Booking', ('Customer', 'Client (old)'))
+    room = restored.glossary.get(TermId('room'))
+    assert (room.section, room.avoid) == (None, ())

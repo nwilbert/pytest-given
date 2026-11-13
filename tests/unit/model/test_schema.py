@@ -36,6 +36,7 @@ from pytest_given.model import (
     StoryId,
     TermId,
     TracebackFrame,
+    avoided_word,
     case_id,
     case_suffix,
     node_base,
@@ -624,3 +625,30 @@ def test_resolve_ref_finds_a_term_registered_after_the_first_lookup() -> None:
     step = term_('Step')
     glossary.register(step)
     assert glossary.resolve_ref('steps') is step
+
+
+def test_avoided_word_strips_note() -> None:
+    assert avoided_word('ticket (use only when quoting external systems)') == 'ticket'
+
+
+def test_avoided_word_unwraps_markup() -> None:
+    assert avoided_word('**Bill**') == 'Bill'
+    assert avoided_word('`pay-request` (legacy)') == 'pay-request'
+
+
+def test_avoided_word_keeps_inner_parentheses() -> None:
+    assert avoided_word('check (in) (legacy)') == 'check (in)'
+    assert avoided_word('plain') == 'plain'
+    assert avoided_word('odd) (note)') == 'odd)'
+
+
+def test_avoided_word_note_alone_is_empty() -> None:
+    assert avoided_word('(internal only)') == ''
+
+
+def test_avoided_word_unbalanced_note_is_kept_as_word() -> None:
+    assert avoided_word('word (unclosed') == 'word (unclosed'
+
+
+def test_avoided_word_unmatched_closing_parenthesis_is_kept() -> None:
+    assert avoided_word('a)') == 'a)'

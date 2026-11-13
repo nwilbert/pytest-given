@@ -166,6 +166,8 @@ def _glossary_term_from_dict(d: dict[str, Any]) -> GlossaryTerm:
         canonical=d['canonical'],
         definition=_definition_from_dict(d.get('definition')),
         source=_source_from_dict(d.get('source')),
+        section=d.get('section'),
+        avoid=tuple(d.get('avoid', ())),
     )
 
 

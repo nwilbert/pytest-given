@@ -41,6 +41,7 @@ from .spans import (
     located_spans,
     read_spans,
     span_text,
+    unwrapped_text,
 )
 from .writing import (
     code_span_markdown,
@@ -86,4 +87,5 @@ __all__ = [
     'table_cell_spans',
     'tables',
     'text_runs',
+    'unwrapped_text',
 ]

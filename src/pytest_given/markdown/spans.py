@@ -34,13 +34,20 @@ def read_spans(text: str, *, before: str = '', after: str = '') -> list[InlineSp
     return [span for span, _ in located_spans(text, before=before, after=after)]
 
 
-def span_text(span: InlineSpan) -> str:
+def unwrapped_text(text: str, *, code: bool = True) -> str:
+    """`text` with its markers unwrapped, its code spans dropped unless `code`."""
+    return ''.join(span_text(span, code=code) for span in read_spans(text))
+
+
+def span_text(span: InlineSpan, *, code: bool = True) -> str:
     """The text a span shows, its markers unwrapped."""
     match span:
-        case PlainSpan(text=text) | CodeSpan(text=text):
+        case PlainSpan(text=text):
             return text
+        case CodeSpan(text=text):
+            return text if code else ''
         case EmphasisSpan(content=content):
-            return ''.join(span_text(part) for part in content)
+            return ''.join(span_text(part, code=code) for part in content)
 
 
 def located_spans(

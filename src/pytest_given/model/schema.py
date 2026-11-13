@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import PurePosixPath
 from typing import Literal, NewType
 
+from ..markdown import unwrapped_text
 from .report_url import ReportUrl
 from .text import name_key, name_keys
 
@@ -196,6 +197,8 @@ class GlossaryTerm:
     canonical: str
     definition: Definition | None = None
     source: SourceLocation | None = None
+    section: str | None = None
+    avoid: tuple[str, ...] = ()
 
     @property
     def definition_text(self) -> str | None:
@@ -554,3 +557,17 @@ class ReportData:
     scenarios: list[Scenario] = field(default_factory=list)
     glossary: Glossary | None = None
     stories: list[Story] = field(default_factory=list)
+
+
+def avoided_word(entry: str) -> str:
+    """The text of an avoid entry the lint matches: before its trailing
+    parenthesized note, markup unwrapped. Empty for a note alone."""
+    text = entry.strip()
+    if text.endswith(')'):
+        depth = 0
+        for index in range(len(text) - 1, -1, -1):
+            depth += {')': 1, '(': -1}.get(text[index], 0)
+            if depth == 0:
+                text = text[:index]
+                break
+    return unwrapped_text(text).strip()
