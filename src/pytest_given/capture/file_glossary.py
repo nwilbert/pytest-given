@@ -1,8 +1,10 @@
 """File glossaries: a Markdown file read into a Glossary, accessed by name."""
 
-from abc import abstractmethod
+from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 
+from ..markdown import tables
 from ..model import (
     GlossaryTerm,
     PytestGivenError,
@@ -20,8 +22,8 @@ from .glossary import (
 from .markdown_glossary import (
     ColumnSpec,
     GlossaryRow,
-    has_tables,
     has_term_lines,
+    parse_glossary_paragraphs,
     parse_glossary_tables,
 )
 from .source import file_source
@@ -40,10 +42,16 @@ class _MarkdownFileGlossary(LookupGlossary):
     g['Guest'].
 
     A `Glossary` rather than a wrapper around one, since every consumer of a
-    glossary wants the storage. A subclass supplies the reader.
+    glossary wants the storage. A subclass supplies the reader, and the hint
+    added to a reader's error when the file looks like the other format's.
     """
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(
+        self,
+        path: str | Path,
+        read: Callable[[str], list[GlossaryRow]],
+        hint: Callable[[str], str | None],
+    ) -> None:
         super().__init__()
         self._path = Path(path)
         try:
@@ -55,21 +63,13 @@ class _MarkdownFileGlossary(LookupGlossary):
                 f'cannot read glossary file {self._path}: {exc}'
             ) from exc
         try:
-            rows = self._read(text)
+            rows = read(text)
         except PytestGivenError as exc:
-            hint = self._hint(text)
-            suffix = f' ({hint})' if hint else ''
+            hint_text = hint(text)
+            suffix = f' {hint_text}' if hint_text else ''
             raise PytestGivenError(f'{self._path}: {exc}{suffix}') from exc
         for row in rows:
             self._add_row(row)
-
-    @abstractmethod
-    def _read(self, text: str) -> list[GlossaryRow]: ...
-
-    @abstractmethod
-    def _hint(self, text: str) -> str | None:
-        """What to add to a reader's error when the file looks like the other
-        format's."""
 
     def _add_row(self, row: GlossaryRow) -> None:
         try:
@@ -123,20 +123,30 @@ class TableGlossary(_MarkdownFileGlossary):
         kind_column: ColumnSpec | None = None,
         avoid_column: ColumnSpec | None = None,
     ) -> None:
-        self._columns = (term_column, definition_column, kind_column, avoid_column)
-        super().__init__(path)
-
-    def _read(self, text: str) -> list[GlossaryRow]:
-        term_column, definition_column, kind_column, avoid_column = self._columns
-        return parse_glossary_tables(
-            text,
+        read = partial(
+            parse_glossary_tables,
             term_column=term_column,
             definition_column=definition_column,
             kind_column=kind_column,
             avoid_column=avoid_column,
         )
+        super().__init__(path, read, _paragraphs_hint)
 
-    def _hint(self, text: str) -> str | None:
-        if not has_tables(text) and has_term_lines(text):
-            return 'for `**Term**:` paragraphs, use `ParagraphGlossary`'
-        return None
+
+class ParagraphGlossary(_MarkdownFileGlossary):
+    """A glossary read from the term paragraphs of a Markdown file."""
+
+    def __init__(self, path: str | Path) -> None:
+        super().__init__(path, parse_glossary_paragraphs, _tables_hint)
+
+
+def _paragraphs_hint(text: str) -> str | None:
+    if not tables(text) and has_term_lines(text):
+        return 'For `**Term**:` paragraphs, use `ParagraphGlossary`.'
+    return None
+
+
+def _tables_hint(text: str) -> str | None:
+    if tables(text):
+        return 'For a glossary in tables, use `TableGlossary`.'
+    return None

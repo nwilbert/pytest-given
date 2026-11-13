@@ -2,11 +2,11 @@
 
 Two audiences share this namespace. The authoring surface — `given` / `when` /
 `then` / `when_then` / `attach`, `@scenario`, `story` / `sentence` / `clause`,
-`Glossary` / `TableGlossary` / `Template` — is re-exported from the package
-root and is what a test author writes. Everything else is the seam `plugin/`
-drives it through, public only because a sibling subpackage may import solely
-from a subpackage root. `__all__` stays sorted rather than grouped, so this
-note is where the two are told apart.
+`Glossary` / `TableGlossary` / `ParagraphGlossary` / `Template` — is re-exported
+from the package root and is what a test author writes. Everything else is the
+seam `plugin/` drives it through, public only because a sibling subpackage may
+import solely from a subpackage root. `__all__` stays sorted rather than
+grouped, so this note is where the two are told apart.
 """
 
 from .collector import (
@@ -15,7 +15,7 @@ from .collector import (
     get_active_collector,
     set_active_collector,
 )
-from .file_glossary import TableGlossary
+from .file_glossary import ParagraphGlossary, TableGlossary
 from .glossary import Glossary, GlossarySection
 from .glossary_resolution import session_glossary
 from .process_state import (
@@ -57,6 +57,7 @@ __all__ = [
     'FixtureRecording',
     'Glossary',
     'GlossarySection',
+    'ParagraphGlossary',
     'ScenarioDecorator',
     'StepDescriptor',
     'TableGlossary',

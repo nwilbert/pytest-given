@@ -1,29 +1,39 @@
-"""The GFM pipe tables in a Markdown document, read into glossary rows.
+"""A Markdown document read into glossary rows, from its GFM pipe tables or
+from its term paragraphs.
 
 A table counts where a renderer shows one, and a cell a row leaves out reads
 as empty. Column selection accepts a header name (case-insensitive) or a
 0-based index. A row's section is the nearest top-level heading above its
-table.
+table or term line.
 """
 
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
+from itertools import pairwise
 
 from ..markdown import (
     DocumentBlock,
     Heading,
     Paragraph,
     Table,
+    TextRun,
     document_blocks,
-    read_spans,
-    span_text,
+    unwrapped_text,
 )
 from ..model import PytestGivenError
 
 type ColumnSpec = int | str
 
-# A line starting with a bold span closed right before a colon.
-_TERM_LINE = re.compile(r'^\*\*[^*\n].*?\*\*:', re.MULTILINE)
+# A line starting with a bold span closed right before a colon. The bold holds
+# no `*`, so `**Order:** see **Invoice**:` is no term line.
+_TERM_LINE = re.compile(r'^\*\*([^*\n]+)\*\*:', re.MULTILINE)
+_AVOID_LINE = re.compile(r'^[_*]avoid[_*]\s*:', re.IGNORECASE)
+# A backslash that no backslash before it escapes, or two spaces.
+_HARD_BREAK = re.compile(r'(?:(?<!\\)(?:\\\\)*\\| {2,})$')
+_ENDS_IN_BR = re.compile(r'<br\s*/?\s*>$', re.IGNORECASE)
+_TERM_HOLDERS = frozenset({'language', 'terms'})
+_SKIPPED_SECTIONS = frozenset({'relationships', 'flagged ambiguities'})
 
 
 @dataclass(frozen=True)
@@ -102,6 +112,32 @@ def parse_glossary_tables(
     return rows
 
 
+def parse_glossary_paragraphs(text: str) -> list[GlossaryRow]:
+    rows: list[GlossaryRow] = []
+    blocks = document_blocks(text)
+    title = title_level(blocks)
+    section: str | None = None
+    skip_level: int | None = None
+    for found in blocks:
+        block = found.block
+        if not found.top_level:
+            continue
+        if isinstance(block, Heading):
+            if skip_level is not None and block.level > skip_level:
+                continue
+            skipped = _strip_emphasis(block.text).lower() in _SKIPPED_SECTIONS
+            skip_level = block.level if skipped else None
+            section = heading_section(block, title_level=title, holders=_TERM_HOLDERS)
+        elif isinstance(block, Paragraph) and skip_level is None:
+            rows.extend(_term_rows(block.run, section))
+    if not rows:
+        raise PytestGivenError(
+            'found no `**Term**:` line in the glossary file (a term line starts '
+            'with the term in bold followed directly by a colon).'
+        )
+    return rows
+
+
 def split_avoid(text: str) -> list[str]:
     """The text split on commas outside parentheses, entries stripped and
     empty ones dropped."""
@@ -146,10 +182,6 @@ def title_level(blocks: list[DocumentBlock]) -> int | None:
     return 1 if len(top_titles) == 1 else None
 
 
-def has_tables(text: str) -> bool:
-    return any(isinstance(found.block, Table) for found in document_blocks(text))
-
-
 def has_term_lines(text: str) -> bool:
     return any(
         found.top_level
@@ -159,9 +191,64 @@ def has_term_lines(text: str) -> bool:
     )
 
 
+def _term_rows(run: TextRun, section: str | None) -> Iterator[GlossaryRow]:
+    """A paragraph's terms, each running from its term line to the next."""
+    starts = [
+        index for index, line in enumerate(run.lines) if _TERM_LINE.match(line.content)
+    ]
+    for start, end in pairwise([*starts, len(run.lines)]):
+        lines = [line.content for line in run.lines[start:end]]
+        term_line = _TERM_LINE.match(lines[0])
+        assert term_line is not None
+        lines[0] = lines[0][term_line.end() :]
+        avoid: list[str] = []
+        for index in range(1, len(lines)):
+            avoid_line = _AVOID_LINE.match(lines[index])
+            if avoid_line is not None:
+                # The paragraph's line breaks read as spaces, so a wrapped list
+                # runs on to the term's last line.
+                rest = [lines[index][avoid_line.end() :], *lines[index + 1 :]]
+                avoid = split_avoid(' '.join(line.strip() for line in rest))
+                del lines[index:]
+                break
+        yield GlossaryRow(
+            term=_strip_emphasis(term_line.group(1)),
+            definition=_fold(
+                lines, ends_paragraph=start + len(lines) == len(run.lines)
+            ),
+            kind=None,
+            line=run.line + start,
+            section=section,
+            avoid=tuple(avoid),
+        )
+
+
+def _fold(lines: list[str], *, ends_paragraph: bool) -> str:
+    """Definition lines as one line: a soft break read as a space, a hard
+    break stored as `<br>`. A paragraph's last line breaks nothing, so a
+    backslash ending it is text."""
+    folded = ''
+    separator = ''
+    for index, line in enumerate(lines):
+        breaks = index < len(lines) - 1 or not ends_paragraph
+        hard = breaks and _HARD_BREAK.search(line) is not None
+        content = (line.removesuffix('\\') if hard else line).strip()
+        if not content:
+            if hard and folded:
+                separator = separator.removesuffix(' ') + '<br>'
+            continue
+        folded += separator + content
+        if hard:
+            separator = '<br>'
+        elif _ENDS_IN_BR.search(content):
+            separator = ''
+        else:
+            separator = ' '
+    return folded
+
+
 def _strip_emphasis(cell: str) -> str:
-    """The cell's text with the reader's spans unwrapped."""
-    return ''.join(span_text(span) for span in read_spans(cell)).strip()
+    return unwrapped_text(cell).strip()
 
 
 def _addresses_another_table(specs: tuple[ColumnSpec, ...], header: list[str]) -> bool:

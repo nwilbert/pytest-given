@@ -58,3 +58,46 @@ def test_file_glossary_kinds_resolved_in_report(pytester):
         data = json.loads(json_path.read_text(encoding='utf-8'))
         kinds = {term['id']: term['kind'] for term in data['glossary']['terms']}
         assert kinds == {'guest': 'actor', 'search': 'activity', 'room': 'object'}
+
+
+PARAGRAPH_GLOSSARY_MD = """# Ordering
+
+## Checkout
+
+**Order**:
+A customer's request for goods, placed in one checkout.
+_Avoid_: Purchase, transaction
+"""
+
+PARAGRAPH_CONFTEST = """
+from pytest_given import ParagraphGlossary
+
+g = ParagraphGlossary('GLOSSARY.md')
+"""
+
+PARAGRAPH_TEST_FILE = """
+from pytest_given import scenario, when
+from conftest import g
+
+
+@scenario('An order is placed')
+def test_order_placed():
+    with when(t'an {g["Order"]} is placed'):
+        pass
+"""
+
+
+def test_paragraph_glossary_discovered_in_conftest(pytester):
+    pytester.makefile('.md', GLOSSARY=PARAGRAPH_GLOSSARY_MD)
+    pytester.makeconftest(PARAGRAPH_CONFTEST)
+    pytester.makepyfile(test_file=PARAGRAPH_TEST_FILE)
+    json_path = pytester.path / 'report-data.json'
+    result = pytester.runpytest_subprocess('--given-json', str(json_path))
+    result.assert_outcomes(passed=1)
+    data = json.loads(json_path.read_text(encoding='utf-8'))
+    [term] = data['glossary']['terms']
+    assert (term['canonical'], term['section'], term['avoid']) == (
+        'Order',
+        'Checkout',
+        ['Purchase', 'transaction'],
+    )

@@ -5,9 +5,9 @@ import pytest
 from pytest_given import attach, given, scenario, then, when, when_then
 from pytest_given.capture.markdown_glossary import (
     GlossaryRow,
-    has_tables,
     has_term_lines,
     heading_section,
+    parse_glossary_paragraphs,
     parse_glossary_tables,
     split_avoid,
     title_level,
@@ -426,8 +426,214 @@ def test_title_level_needs_exactly_one_top_level_level_one_heading():
     assert title_level(document_blocks('## B\n\n> # Q\n')) is None
 
 
-def test_has_tables_and_term_lines():
-    assert has_tables(SIMPLE)
-    assert not has_tables('# x\n')
+def test_has_term_lines():
     assert has_term_lines('**Order**: a request\n')
     assert not has_term_lines('**Order:** a request\n')
+
+
+ORDERING = """# Ordering
+
+Receives and tracks customer orders.
+
+## Language
+
+**Order**:
+A customer's request for goods, placed in one checkout.
+_Avoid_: Purchase, transaction
+
+**Invoice**:
+A request for payment sent to a customer after delivery, for one **Order**.
+_Avoid_: Bill, payment request
+"""
+
+
+def _terms(text):
+    return {row.term: row for row in parse_glossary_paragraphs(text)}
+
+
+def _definitions(text):
+    return {row.term: row.definition for row in parse_glossary_paragraphs(text)}
+
+
+def test_definition_on_next_line():
+    assert parse_glossary_paragraphs(ORDERING) == [
+        GlossaryRow(
+            term='Order',
+            definition="A customer's request for goods, placed in one checkout.",
+            kind=None,
+            line=7,
+            section=None,
+            avoid=('Purchase', 'transaction'),
+        ),
+        GlossaryRow(
+            term='Invoice',
+            definition='A request for payment sent to a customer after delivery, '
+            'for one **Order**.',
+            kind=None,
+            line=11,
+            section=None,
+            avoid=('Bill', 'payment request'),
+        ),
+    ]
+
+
+def test_definition_on_term_line():
+    assert _definitions('**Order**: A request for goods.\n') == {
+        'Order': 'A request for goods.'
+    }
+
+
+def test_term_without_definition():
+    assert _definitions('**Order**:\n\n**Invoice**:\n_Avoid_: Bill\n') == {
+        'Order': '',
+        'Invoice': '',
+    }
+
+
+def test_multiline_definition_folded():
+    text = '**Order**: A request\nfor goods,\n   placed in one checkout.\n'
+    assert _definitions(text) == {
+        'Order': 'A request for goods, placed in one checkout.'
+    }
+
+
+def test_br_kept():
+    text = '**Order**: One line<br>\nanother<br/>and a third.\n'
+    assert _definitions(text) == {'Order': 'One line<br>another<br/>and a third.'}
+
+
+def test_backslash_and_two_space_hard_breaks_stored_as_br():
+    text = '**Order**: One\\\ntwo  \nthree\\\n_Avoid_: Bill\n'
+    assert _definitions(text) == {'Order': 'One<br>two<br>three'}
+
+
+def test_escaped_backslash_pair_is_text():
+    text = '**Order**: One\\\\\ntwo\n'
+    assert _definitions(text) == {'Order': 'One\\\\ two'}
+
+
+def test_backslash_only_line_adds_a_break():
+    text = '**Order**: One\\\n\\\ntwo\n'
+    assert _definitions(text) == {'Order': 'One<br><br>two'}
+
+
+def test_backslash_on_a_paragraph_last_line_is_text():
+    assert _definitions('**Order**: One\ntwo\\\n') == {'Order': 'One two\\'}
+
+
+@pytest.mark.parametrize('marker', ['_Avoid_', '*Avoid*', '_AVOID_', '*avoid*'])
+def test_avoid_line_both_italic_forms(marker):
+    row = _terms(f'**Order**: A request.\n{marker}: Purchase, transaction\n')['Order']
+    assert (row.definition, row.avoid) == ('A request.', ('Purchase', 'transaction'))
+
+
+def test_avoid_note_with_comma_and_bold():
+    text = '**Order**: A request.\n_Avoid_: Bill (for an **Invoice**, legacy), sale\n'
+    assert _terms(text)['Order'].avoid == ('Bill (for an **Invoice**, legacy)', 'sale')
+
+
+def test_avoid_list_wraps_onto_following_lines():
+    text = '**Order**: A request.\n_Avoid_: Bill,\n  purchase (legacy),\nsale\n'
+    row = _terms(text)['Order']
+    assert (row.definition, row.avoid) == (
+        'A request.',
+        ('Bill', 'purchase (legacy)', 'sale'),
+    )
+
+
+def test_two_terms_without_blank_line():
+    text = (
+        '**Order**: A request.\n_Avoid_: Bill\n'
+        '**Invoice**:\nA payment request.\n'
+        '**Refund**: Money back.\n'
+    )
+    rows = parse_glossary_paragraphs(text)
+    assert [(row.term, row.definition, row.line) for row in rows] == [
+        ('Order', 'A request.', 1),
+        ('Invoice', 'A payment request.', 3),
+        ('Refund', 'Money back.', 5),
+    ]
+
+
+def test_prose_before_first_term_line_ignored():
+    text = 'Some prose about orders\nthat wraps.\n**Order**: A request.\n'
+    rows = parse_glossary_paragraphs(text)
+    assert [(row.term, row.definition, row.line) for row in rows] == [
+        ('Order', 'A request.', 3)
+    ]
+
+
+def test_term_line_in_list_item_ignored():
+    text = '- **Order**: in a list\n\n> **Quote**: in a blockquote\n\n**Real**: yes\n'
+    assert list(_terms(text)) == ['Real']
+
+
+def test_term_with_parentheses_in_name():
+    text = '**RPE (Rate of Perceived Exertion)**: How hard a set felt.\n'
+    assert _definitions(text) == {
+        'RPE (Rate of Perceived Exertion)': 'How hard a set felt.'
+    }
+
+
+def test_term_name_markup_unwrapped():
+    assert list(_terms('**`Order`**: A request.\n')) == ['Order']
+
+
+def test_bold_with_colon_inside_ignored():
+    text = (
+        "**Order:** a customer's request\n\n"
+        '**Bill:** see **Invoice**: not a term line\n\n'
+        '**Real**: yes\n'
+    )
+    assert list(_terms(text)) == ['Real']
+
+
+def _paragraph_sections(text):
+    return [(row.term, row.section) for row in parse_glossary_paragraphs(text)]
+
+
+@pytest.mark.parametrize('holder', ['Language', 'Terms', 'TERMS', 'language'])
+def test_language_and_terms_hold_not_group(holder):
+    text = f'# Ordering\n\n## {holder}\n\n**Order**: A request.\n'
+    assert _paragraph_sections(text) == [('Order', None)]
+
+
+def test_subheadings_beside_terms_heading():
+    text = (
+        '# Ordering\n\n## Terms\n\n**Order**: A request.\n\n'
+        '### Billing\n\n**Invoice**: A bill.\n\n'
+        '## Shipping\n\n**Parcel**: A box.\n'
+    )
+    assert _paragraph_sections(text) == [
+        ('Order', None),
+        ('Invoice', 'Billing'),
+        ('Parcel', 'Shipping'),
+    ]
+
+
+def test_skipped_section_ends_at_same_level_and_spans_deeper():
+    text = (
+        '## Language\n\n**Order**: A request.\n\n'
+        '## Relationships\n\n**Order**: has many **Invoice**s.\n\n'
+        '### Deeper\n\n**Ghost**: skipped too.\n\n'
+        '## Billing\n\n**Invoice**: A bill.\n\n'
+        '### *Flagged ambiguities*\n\n**Account**: skipped.\n\n'
+        '## Shipping\n\n**Parcel**: A box.\n'
+    )
+    assert _paragraph_sections(text) == [
+        ('Order', None),
+        ('Invoice', 'Billing'),
+        ('Parcel', 'Shipping'),
+    ]
+
+
+def test_crlf_file_reads_like_lf():
+    text = ORDERING + '\n**Refund**: Money\\\nback  \nto the guest.\n'
+    assert parse_glossary_paragraphs(
+        text.replace('\n', '\r\n')
+    ) == parse_glossary_paragraphs(text)
+
+
+def test_no_term_line_raises():
+    with pytest.raises(PytestGivenError, match=r'found no `\*\*Term\*\*:` line'):
+        parse_glossary_paragraphs('# Ordering\n\n**Order:** a request\n')

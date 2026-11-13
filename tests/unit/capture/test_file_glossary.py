@@ -4,7 +4,7 @@ from typing import Annotated
 import pytest
 
 from pytest_given import Template, attach, given, scenario, then, when, when_then
-from pytest_given.capture.file_glossary import TableGlossary
+from pytest_given.capture.file_glossary import ParagraphGlossary, TableGlossary
 from pytest_given.capture.glossary import TermHandle
 from pytest_given.capture.story import sentence
 from pytest_given.model import ClauseTermRef, Glossary, PytestGivenError, TermId
@@ -487,7 +487,10 @@ def test_exact_repeat_in_other_section_raises(tmp_path):
 
 def test_hint_on_term_paragraph_file(tmp_path):
     path = _write(tmp_path, '**Order**: a request\n')
-    with pytest.raises(PytestGivenError, match=r'use `ParagraphGlossary`\)$'):
+    with pytest.raises(
+        PytestGivenError,
+        match=r'\. For `\*\*Term\*\*:` paragraphs, use `ParagraphGlossary`\.$',
+    ):
         TableGlossary(path)
 
 
@@ -496,3 +499,89 @@ def test_no_hint_without_term_lines(tmp_path):
     with pytest.raises(PytestGivenError) as raised:
         TableGlossary(path)
     assert 'ParagraphGlossary' not in str(raised.value)
+
+
+ORDERING = """# Ordering
+
+Receives and tracks customer orders.
+
+## Language
+
+**Order**:
+A customer's request for goods, placed in one checkout.
+_Avoid_: Purchase, transaction
+
+**Invoice**:
+A request for payment sent to a customer after delivery, for one **Order**.
+_Avoid_: Bill, payment request
+"""
+
+
+@scenario(
+    t'A {pg["File glossary"].l} reads {pg["Term paragraph"].l.s}',
+    tags=['spec/glossary-sections'],
+)
+def test_paragraph_glossary_reads_term_paragraphs(tmp_path):
+    with given(
+        t'a Markdown glossary of {pg["Term paragraph"].l.s} under `## Language`'
+    ):
+        attach('Glossary file', ORDERING)
+        path = _write(tmp_path, ORDERING)
+    with when(t'a `ParagraphGlossary` loads it'):
+        glossary = ParagraphGlossary(path)
+    with then(
+        t'each {pg["Term"].l} takes its definition from the lines under its bold name'
+    ):
+        order = glossary['Order'].term
+        assert order.definition is not None
+        assert order.definition.text == (
+            "A customer's request for goods, placed in one checkout."
+        )
+    with then(t'the `_Avoid_:` line lists the words the {pg["Term"].l} avoids'):
+        assert order.avoid == ('Purchase', 'transaction')
+    with then(
+        t'`## Language` holds the {pg["Term"].l.s} rather than naming a '
+        t'{pg["Glossary section"].l}'
+    ):
+        assert order.section is None
+
+
+def test_paragraph_glossary_crlf_file_reads_like_lf(tmp_path):
+    lf = ParagraphGlossary(_write(tmp_path, ORDERING))
+    crlf_path = tmp_path / 'crlf.md'
+    crlf_path.write_bytes(ORDERING.replace('\n', '\r\n').encode('utf-8'))
+    crlf = ParagraphGlossary(crlf_path)
+    assert [(term.canonical, term.definition, term.avoid) for term in crlf.terms] == [
+        (term.canonical, term.definition, term.avoid) for term in lf.terms
+    ]
+
+
+def test_paragraph_glossary_no_term_line_raises_with_path(tmp_path):
+    path = _write(tmp_path, '# Ordering\n\nNo terms here.\n')
+    with pytest.raises(
+        PytestGivenError, match=r'g\.md: found no `\*\*Term\*\*:`'
+    ) as raised:
+        ParagraphGlossary(path)
+    assert 'TableGlossary' not in str(raised.value)
+
+
+def test_hint_on_table_file(tmp_path):
+    path = _write(tmp_path, '| Term | Meaning |\n|---|---|\n| Order | x |\n')
+    with pytest.raises(
+        PytestGivenError,
+        match=r'\. For a glossary in tables, use `TableGlossary`\.$',
+    ):
+        ParagraphGlossary(path)
+
+
+def test_paragraph_glossary_row_error_names_its_line(tmp_path):
+    path = _write(tmp_path, '**Order**: A request.\n_Avoid_: (a note)\n')
+    with pytest.raises(PytestGivenError, match=r'g\.md:1: avoid entry'):
+        ParagraphGlossary(path)
+
+
+def test_paragraph_glossary_terms_are_kindless_and_closed(tmp_path):
+    glossary = ParagraphGlossary(_write(tmp_path, ORDERING))
+    assert {term.kind for term in glossary.terms} == {None}
+    with pytest.raises(PytestGivenError, match='no glossary term'):
+        glossary('Unknown')
