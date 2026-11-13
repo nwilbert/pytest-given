@@ -50,6 +50,7 @@ from ..model import (
     Step,
     TermId,
     TermKind,
+    avoided_word,
     boolean_phrases,
     case_id,
     definition_part_text,
@@ -67,7 +68,7 @@ from .citation_index import (
     citation_templates,
 )
 from .coverage import build_coverage_map
-from .glossary_view import build_glossary_view
+from .glossary_view import build_glossary_view, section_keys
 from .glyphs import STATUS_GLYPH, STATUS_LABEL
 from .palette import param_column_colors
 from .slugs import build_scenario_slug_index
@@ -177,6 +178,7 @@ def _build_env(
         report.glossary or Glossary()
     )
     env.filters['plural'] = plural
+    env.filters['avoid_html'] = _avoid_html
     env.filters['status_glyph'] = lambda status: STATUS_GLYPH.get(status, '')
     env.filters['status_label'] = lambda status: STATUS_LABEL.get(status, status)
     env.filters['param_color_class'] = _make_param_color_class(param_color_map)
@@ -353,11 +355,17 @@ def _script_json_parse(value: object) -> Markup:
     return Markup('JSON.parse(' + _neutralize_script_data(payload) + ')')
 
 
+def _avoid_html(term: GlossaryTerm) -> Markup:
+    """A term's avoid entries as written, each rendered by `definition_html`."""
+    return Markup(', '.join(definition_html(entry) for entry in term.avoid))
+
+
 def _app_data(report: ReportData) -> dict[str, object]:
     """The projection of the report that `app.js` seeds its state from.
 
     Not the whole report: everything the page displays is already rendered into
     the markup, and a second copy would dominate a large report's size."""
+    keys = section_keys(report.glossary.terms) if report.glossary else {}
     return {
         'metadata': {'timestamp': report.metadata.timestamp},
         'status_labels': STATUS_LABEL,
@@ -374,6 +382,8 @@ def _app_data(report: ReportData) -> dict[str, object]:
                         # only <br>/<code>/<strong>/<em>, which is what lets
                         # app.js assign it as innerHTML.
                         'definition_html': definition_html(term.definition_text or ''),
+                        'section_key': keys[term.id],
+                        'avoid': [avoided_word(entry) for entry in term.avoid],
                     }
                     for term in report.glossary.terms
                 ]

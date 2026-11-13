@@ -1,5 +1,7 @@
 """Unit tests for the Glossary-view rollups (`report/glossary_view.py`)."""
 
+import pytest
+
 from pytest_given import attach, given, scenario, then, when
 from pytest_given.model import (
     Clause,
@@ -21,7 +23,11 @@ from pytest_given.model import (
     TermId,
     report_to_dict,
 )
-from pytest_given.report.glossary_view import build_glossary_view, build_term_crossrefs
+from pytest_given.report.glossary_view import (
+    OTHER_SECTION,
+    build_glossary_view,
+    build_term_crossrefs,
+)
 from tests.ubiquitous_language import pg
 
 
@@ -63,7 +69,9 @@ def test_a_term_summary_counts_its_other_forms_whatever_its_kind() -> None:
         ReportData(metadata=_meta(), stories=[story], glossary=_g())
     )
     summaries = {
-        entry.term.id: entry.summary for group in view.groups for entry in group.entries
+        entry.term.id: entry.summary
+        for group in view.kind_groups
+        for entry in group.entries
     }
     assert summaries[TermId('guest')] == ('1 other form', '1 story')
     assert summaries[TermId('search')] == ('1 other form', '1 story')
@@ -569,3 +577,120 @@ def test_build_term_scenario_index_dedups_and_includes_scenario_narration() -> N
     with then(t'each {pg["Term"].l} maps to the scenario exactly once'):
         assert index[TermId('guest')] == [NodeId('test::a')]  # dedup across steps
         assert index[TermId('room')] == [NodeId('test::a')]  # narration counts
+
+
+def _sectioned(*sections: str | None, kind: bool = True) -> ReportData:
+    glossary = Glossary(
+        terms=[
+            GlossaryTerm(
+                id=TermId(f't{index}'),
+                kind='actor' if kind else None,
+                canonical=f'Term {index}',
+                section=section,
+            )
+            for index, section in enumerate(sections)
+        ]
+    )
+    return ReportData(metadata=_meta(), glossary=glossary)
+
+
+def test_section_order_by_first_term() -> None:
+    view = build_glossary_view(_sectioned('Stay', 'Booking', 'Stay', 'Payment'))
+    assert [group.label for group in view.section_groups] == [
+        'Stay',
+        'Booking',
+        'Payment',
+    ]
+    assert [len(group.entries) for group in view.section_groups] == [2, 1, 1]
+
+
+def test_other_group_for_sectionless_terms() -> None:
+    view = build_glossary_view(_sectioned(None, 'Stay', 'Booking'))
+    assert [(group.label, group.key) for group in view.section_groups] == [
+        ('Stay', 'Stay'),
+        ('Booking', 'Booking'),
+        ('Other', OTHER_SECTION),
+    ]
+
+
+def test_section_counts() -> None:
+    view = build_glossary_view(_sectioned('Stay', 'Booking', 'Stay', None))
+    assert [(group.label, len(group.entries)) for group in view.section_groups] == [
+        ('Stay', 2),
+        ('Booking', 1),
+        ('Other', 1),
+    ]
+
+
+def test_authored_other_merges_and_comes_last() -> None:
+    view = build_glossary_view(_sectioned('Misc other', 'other', None, 'Stay'))
+    assert [(group.label, group.key) for group in view.section_groups] == [
+        ('Misc other', 'Misc other'),
+        ('Stay', 'Stay'),
+        ('other', OTHER_SECTION),
+    ]
+    assert len(view.section_groups[-1].entries) == 2
+
+
+def test_authored_other_last_without_sectionless_terms() -> None:
+    view = build_glossary_view(_sectioned('Other', 'Stay'))
+    assert [group.key for group in view.section_groups] == ['Stay', OTHER_SECTION]
+
+
+def test_other_spellings_merge_counted_once() -> None:
+    view = build_glossary_view(_sectioned('Other', 'other', 'Booking'))
+    assert view.default_grouping == 'section'
+    assert [(group.label, len(group.entries)) for group in view.section_groups] == [
+        ('Booking', 1),
+        ('Other', 2),
+    ]
+
+
+def test_single_section_shown_as_none() -> None:
+    view = build_glossary_view(_sectioned('Terms', 'Terms', None))
+    assert view.section_groups == []
+    assert view.default_grouping == 'kind'
+
+
+@pytest.mark.parametrize(
+    ('sectioned', 'kinds', 'switch', 'grouping'),
+    [
+        (True, True, True, 'section'),
+        (True, False, False, 'section'),
+        (False, True, False, 'kind'),
+        (False, False, False, 'flat'),
+    ],
+)
+def test_switch_visibility(
+    sectioned: bool, kinds: bool, switch: bool, grouping: str
+) -> None:
+    sections = ('Stay', 'Booking') if sectioned else (None, None)
+    view = build_glossary_view(_sectioned(*sections, kind=kinds))
+    assert (view.show_grouping_switch, view.default_grouping) == (switch, grouping)
+
+
+def test_a_term_reaches_the_view_with_its_section_and_avoided_words() -> None:
+    report = ReportData(
+        metadata=_meta(),
+        glossary=Glossary(
+            terms=[
+                GlossaryTerm(
+                    id=TermId('guest'),
+                    kind='actor',
+                    canonical='Guest',
+                    section='People',
+                    avoid=('Customer (too broad)', '**Client**'),
+                ),
+                GlossaryTerm(
+                    id=TermId('room'),
+                    kind='object',
+                    canonical='Room',
+                    section='Places',
+                ),
+            ]
+        ),
+    )
+    view = build_glossary_view(report)
+    assert [group.label for group in view.section_groups] == ['People', 'Places']
+    [entry] = view.section_groups[0].entries
+    assert entry.term.avoid == ('Customer (too broad)', '**Client**')

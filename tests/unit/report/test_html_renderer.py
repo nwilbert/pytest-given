@@ -55,6 +55,7 @@ from pytest_given.report.html_renderer import (
     _COMMENT_LINE,
     _TEMPLATES_DIR,
     _app_data,
+    _avoid_html,
     _build_param_color_map,
     _column_phase_blocks,
     _make_clause_part_filter,
@@ -2337,3 +2338,33 @@ def test_the_search_box_matches_a_title_as_it_shows() -> None:
     scenarios = _app_data(report)['scenarios']
     assert isinstance(scenarios, list)
     assert scenarios[0]['search_text'] == 'a paid pay for Guest in {room}'
+
+
+def test_app_data_carries_each_terms_section_key_and_plain_avoided_words() -> None:
+    sectioned = (
+        replace(term_('Guest'), section='People', avoid=('Customer (too broad)',)),
+        replace(term_('Room'), section='other', avoid=('**Unit**', 'Flat')),
+        replace(term_('Bill')),
+    )
+    data = _app_data(report_(terms=sectioned))
+    assert data['glossary'] is not None
+    terms = {term['id']: term for term in data['glossary']['terms']}
+    assert terms['guest']['section_key'] == 'People'
+    assert terms['guest']['avoid'] == ['Customer']
+    assert terms['room']['section_key'] == 'Other'
+    assert terms['room']['avoid'] == ['Unit', 'Flat']
+    assert terms['bill']['section_key'] == 'Other'
+    assert terms['bill']['avoid'] == []
+
+
+def test_app_data_has_no_section_key_in_an_unsectioned_glossary() -> None:
+    data = _app_data(report_(terms=(replace(term_('Guest'), section='Terms'),)))
+    assert data['glossary'] is not None
+    assert [term['section_key'] for term in data['glossary']['terms']] == [None]
+
+
+def test_the_avoid_filter_renders_each_entry_as_written_joined_by_commas() -> None:
+    term = replace(term_('Guest'), avoid=('**Customer** (too broad)', 'a <b>'))
+    assert str(_avoid_html(term)) == (
+        '<strong>Customer</strong> (too broad), a &lt;b&gt;'
+    )

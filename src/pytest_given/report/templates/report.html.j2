@@ -582,7 +582,7 @@
       </div>
 
       <div class="glossary-entries">
-      {% for group in glossary_view.groups %}
+      {% for group in glossary_view.kind_groups %}
       {% set kind_label, kind_key = group.label, group.key %}
       <div class="kind-group" x-show="glossaryKindFilter.{{ kind_key }} && visibleTermCount('{{ kind_key }}') > 0">
         {% if not all_uncategorized %}

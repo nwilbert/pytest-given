@@ -25,6 +25,9 @@ from ..model import (
     plural,
 )
 
+OTHER_SECTION = 'Other'
+"""The URL key of the Other group, whatever spelling its header shows."""
+
 
 @dataclass
 class TermOccurrence:
@@ -84,19 +87,35 @@ class KindGroup:
 
 
 @dataclass(frozen=True)
+class SectionGroup:
+    """The Glossary view's terms under one section heading."""
+
+    label: str
+    key: str
+    entries: list[TermEntry]
+
+
+type Grouping = Literal['section', 'kind', 'flat']
+
+
+@dataclass(frozen=True)
 class GlossaryView:
     """Everything the Glossary tab renders, computed here rather than in Jinja.
 
     `all_uncategorized` says the kind grouping carries no information — every
     term is kindless — so the template drops the filter section and the
-    'Uncategorized' heading and shows a flat list.
+    'Uncategorized' heading and shows a flat list. `section_groups` is empty
+    unless the glossary is sectioned.
     """
 
-    groups: list[KindGroup]
+    kind_groups: list[KindGroup]
+    section_groups: list[SectionGroup]
     kinds: list[KindTally]
     term_scenarios: dict[TermId, list[NodeId]]
     undefined_count: int
     all_uncategorized: bool
+    default_grouping: Grouping
+    show_grouping_switch: bool
 
 
 class _KindRow(NamedTuple):
@@ -142,27 +161,77 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
     for term in terms:
         by_kind[term.kind or 'kindless'].append(term)
     counts = {key: len(group) for key, group in by_kind.items()}
+    # One entry per term, which both groupings list.
+    entries = {term.id: _term_entry(term, crossrefs) for term in terms}
     groups = [
         KindGroup(
             label=row.label,
             key=row.key,
-            entries=[
-                _term_entry(term, row.key, crossrefs) for term in by_kind[row.key]
-            ],
+            entries=[entries[term.id] for term in by_kind[row.key]],
         )
         for row in _KIND_GROUPS
         if by_kind[row.key]
     ]
+    all_uncategorized = bool(
+        counts['kindless']
+        and not (counts['actor'] or counts['object'] or counts['activity'])
+    )
+    section_groups = _section_groups(terms, entries)
+    sectioned = bool(section_groups)
     return GlossaryView(
-        groups=groups,
+        kind_groups=groups,
+        section_groups=section_groups,
         kinds=_kind_tallies(counts),
         term_scenarios=crossrefs.term_scenarios,
         undefined_count=sum(1 for term in terms if term.definition is None),
-        all_uncategorized=bool(
-            counts['kindless']
-            and not (counts['actor'] or counts['object'] or counts['activity'])
+        all_uncategorized=all_uncategorized,
+        default_grouping=(
+            'section' if sectioned else 'flat' if all_uncategorized else 'kind'
         ),
+        show_grouping_switch=sectioned and not all_uncategorized,
     )
+
+
+def section_keys(terms: list[GlossaryTerm]) -> dict[TermId, str | None]:
+    """Each term's section group key, `None` throughout an unsectioned glossary.
+
+    A term with no section of a sectioned glossary is in the Other group.
+    """
+    authored = {_section_key(term.section) for term in terms if term.section}
+    if len(authored) < 2:
+        return {term.id: None for term in terms}
+    return {
+        term.id: _section_key(term.section) if term.section else OTHER_SECTION
+        for term in terms
+    }
+
+
+def _section_key(section: str) -> str:
+    return OTHER_SECTION if section.casefold() == OTHER_SECTION.casefold() else section
+
+
+def _section_groups(
+    terms: list[GlossaryTerm], entries: dict[TermId, TermEntry]
+) -> list[SectionGroup]:
+    keys = section_keys(terms)
+    labels: dict[str, str] = {}
+    members: dict[str, list[GlossaryTerm]] = {}
+    for term in terms:
+        key = keys[term.id]
+        if key is None:
+            return []
+        # The first authored spelling labels a group; sectionless terms add none.
+        if term.section:
+            labels.setdefault(key, term.section)
+        members.setdefault(key, []).append(term)
+    return [
+        SectionGroup(
+            label=labels.get(key, key),
+            key=key,
+            entries=[entries[term.id] for term in members[key]],
+        )
+        for key in sorted(members, key=lambda key: key == OTHER_SECTION)
+    ]
 
 
 def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
@@ -188,9 +257,8 @@ def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
     ]
 
 
-def _term_entry(
-    term: GlossaryTerm, kind_key: KindKey, crossrefs: TermCrossRefs
-) -> TermEntry:
+def _term_entry(term: GlossaryTerm, crossrefs: TermCrossRefs) -> TermEntry:
+    kind_key = term.kind or 'kindless'
     aggregation = crossrefs.aggregations.get(term.id, GlossaryAggregation())
     scenario_ids = crossrefs.term_scenarios.get(term.id, [])
     show_instances = kind_key in _INSTANCE_KINDS and bool(aggregation.instances)
