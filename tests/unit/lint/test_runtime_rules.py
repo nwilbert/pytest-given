@@ -2,6 +2,8 @@
 
 import dataclasses
 
+import pytest
+
 from pytest_given import given, scenario, then, when
 from pytest_given.capture.definition_refs import resolve_definition_refs
 from pytest_given.lint import DEFAULTS
@@ -10,11 +12,16 @@ from pytest_given.lint.runtime_rules import _unresolved_bold_spans, run_runtime_
 from pytest_given.model import (
     Clause,
     ClauseTermRef,
+    ClauseWord,
+    ColumnId,
     Definition,
     Glossary,
     GlossaryTerm,
     Narration,
+    NarrationLiteral,
+    NarrationPlaceholder,
     NarrationTermRef,
+    NarrationValue,
     NodeId,
     Scenario,
     Sentence,
@@ -417,3 +424,253 @@ def test_unresolved_definition_ref_reads_bold_holding_no_code_span() -> None:
 
 def test_unresolved_definition_ref_passes_without_a_glossary() -> None:
     assert _rule_findings(_runtime(), 'unresolved-definition-ref') == []
+
+
+# --- avoided-word ---
+
+
+def _avoiding(name, *avoid):
+    return dataclasses.replace(_term(name), avoid=tuple(avoid))
+
+
+def _avoid_glossary(*avoid, term='Guest'):
+    return Glossary(terms=[_avoiding(term, *avoid)])
+
+
+def _worded_scenario(*step_texts, title='Booking', narrations=()):
+    steps = [_step('given', text, 10 + index) for index, text in enumerate(step_texts)]
+    steps += [
+        Step(
+            phase='given',
+            narration=narration,
+            source=SourceLocation(relpath='test_x.py', line=40),
+        )
+        for narration in narrations
+    ]
+    return dataclasses.replace(
+        _phases_scenario('test_x.py::test_a', ['given', 'when', 'then']),
+        narration=Narration(text=title),
+        steps=steps,
+    )
+
+
+def _avoided_findings(glossary, scenario=None, stories=()):
+    findings = _runtime(
+        grouped=[] if scenario is None else [scenario],
+        glossary=glossary,
+        stories=stories,
+    )
+    return _rule_findings(findings, 'avoided-word')
+
+
+def _step_message(word, preferred="'Guest'"):
+    return (
+        f'step text uses {word!r}, which the glossary avoids in favour of {preferred}'
+    )
+
+
+@scenario(
+    t'The {pg["Narration lint"].l} flags an {pg["Avoided word"].l} in step text',
+    tags=['spec/glossary-sections'],
+)
+def test_plain_text_finding() -> None:
+    with given(t'a {pg["Glossary"].l} where Guest avoids Customer'):
+        glossary = _avoid_glossary('Customer')
+    with given(t'a {pg["Scenario"].l} whose step text says Customer'):
+        booking = _worded_scenario('the Customer books a room')
+    with when(t'the runtime {pg["Lint rule"].l.s} run'):
+        [finding] = _avoided_findings(glossary, booking)
+    with then(t'the {pg["Lint finding"].l} names the word and the step'):
+        assert finding.subject == 'test_x.py::test_a'
+        assert finding.location == SourceLocation(relpath='test_x.py', line=10)
+        assert finding.message == _step_message('Customer')
+    with then(t'its {pg["Severity"].l} is warn by default'):
+        assert DEFAULTS[finding.rule] == 'warn'
+
+
+def test_other_case_finding() -> None:
+    glossary = _avoid_glossary('Customer')
+    [finding] = _avoided_findings(glossary, _worded_scenario('a CUSTOMER books'))
+    assert finding.message == _step_message('Customer')
+
+
+def test_bold_finding() -> None:
+    glossary = _avoid_glossary('Customer')
+    booking = _worded_scenario('a **Customer** books')
+    assert len(_avoided_findings(glossary, booking)) == 1
+    assert len(_avoided_findings(glossary, _worded_scenario('an *e-Customer*'))) == 1
+
+
+def test_term_ref_clean() -> None:
+    glossary = _avoid_glossary('Customer', term='Customer')
+    ref = NarrationTermRef(term_id=id_derive('Customer'), display='Customer')
+    narration = Narration(
+        text='the Customer pays',
+        parts=(NarrationLiteral(value='the '), ref, NarrationLiteral(value=' pays')),
+    )
+    booking = _worded_scenario(narrations=[narration])
+    assert _avoided_findings(glossary, booking) == []
+
+
+@pytest.mark.parametrize(
+    'part',
+    [
+        NarrationValue(
+            rendered='still open',
+            expression='paid',
+            format_spec='paid by the Customer|still open',
+        ),
+        NarrationPlaceholder(
+            name='paid',
+            column_id=ColumnId('paid'),
+            format_spec='paid by the Customer|still open',
+        ),
+    ],
+)
+def test_boolean_phrase_finding(part) -> None:
+    glossary = _avoid_glossary('Customer')
+    narration = Narration(
+        text='the booking is still open',
+        parts=(NarrationLiteral(value='the booking is '), part),
+    )
+    [finding] = _avoided_findings(glossary, _worded_scenario(narrations=[narration]))
+    assert finding.message == _step_message('Customer')
+
+
+def test_value_clean() -> None:
+    glossary = _avoid_glossary('Customer')
+    value = NarrationValue(rendered='Customer', expression='name')
+    narration = Narration(text='Customer', parts=(value,))
+    assert _avoided_findings(glossary, _worded_scenario(narrations=[narration])) == []
+
+
+def test_code_span_clean() -> None:
+    glossary = _avoid_glossary('Customer')
+    assert _avoided_findings(glossary, _worded_scenario('the `Customer` row')) == []
+
+
+def test_s_form_finding() -> None:
+    glossary = _avoid_glossary('Customer')
+    booking = _worded_scenario('the customers pay')
+    assert len(_avoided_findings(glossary, booking)) == 1
+
+
+@pytest.mark.parametrize('words', ['two SMSs are sent', 'two SMSes are sent'])
+def test_acronym_s_forms_finding(words) -> None:
+    glossary = _avoid_glossary('SMS')
+    [finding] = _avoided_findings(glossary, _worded_scenario(words))
+    assert finding.message == _step_message('SMS')
+
+
+def test_inside_longer_word_clean() -> None:
+    glossary = _avoid_glossary('Customer')
+    assert _avoided_findings(glossary, _worded_scenario('the customerId is set')) == []
+
+
+def test_multiword_split_by_line_break() -> None:
+    glossary = _avoid_glossary('payment request')
+    booking = _worded_scenario('a payment\n   request arrives')
+    [finding] = _avoided_findings(glossary, booking)
+    assert finding.message == _step_message('payment request')
+
+
+def test_note_ignored() -> None:
+    glossary = _avoid_glossary('Customer (a person who buys)')
+    assert _avoided_findings(glossary, _worded_scenario('a person who buys')) == []
+    [finding] = _avoided_findings(glossary, _worded_scenario('a Customer'))
+    assert finding.message == _step_message('Customer')
+
+
+def test_one_finding_per_scenario_and_word() -> None:
+    glossary = _avoid_glossary('Customer', 'Patron')
+    booking = _worded_scenario('a Customer', 'the Customer again', 'a Patron')
+    findings = _avoided_findings(glossary, booking)
+    assert [finding.message for finding in findings] == [
+        _step_message('Customer'),
+        _step_message('Patron'),
+    ]
+
+
+def test_scenario_title_finding() -> None:
+    glossary = _avoid_glossary('Customer')
+    booking = _worded_scenario('plain', title='A Customer books')
+    [finding] = _avoided_findings(glossary, booking)
+    assert finding.location == booking.source
+    assert finding.message == (
+        "scenario title uses 'Customer', which the glossary avoids in favour of 'Guest'"
+    )
+
+
+def test_title_and_step_one_finding_on_title() -> None:
+    glossary = _avoid_glossary('Customer')
+    booking = _worded_scenario('a Customer', title='A Customer books')
+    [finding] = _avoided_findings(glossary, booking)
+    assert finding.message.startswith('scenario title uses')
+    assert finding.location == booking.source
+
+
+def _story(*clauses):
+    return Story(
+        id=StoryId('booking'),
+        title='Booking',
+        sentences=(Sentence(id=SentenceId(0), clauses=clauses),),
+        source=SourceLocation(relpath='stories.py', line=4),
+    )
+
+
+def test_story_sentence_finding() -> None:
+    glossary = _avoid_glossary('Customer')
+    ref = ClauseTermRef(term_id=id_derive('Guest'), display='Guest')
+    story = _story(Clause(parts=(ref, ClauseWord(text='is a Customer'))))
+    [finding] = _avoided_findings(glossary, stories=[story])
+    assert finding.subject == 'booking'
+    assert finding.location == SourceLocation(relpath='stories.py', line=4)
+    assert finding.message == (
+        "story sentence uses 'Customer', which the glossary avoids in favour of 'Guest'"
+    )
+
+
+def test_bare_clause_words_joined() -> None:
+    glossary = _avoid_glossary('payment request')
+    story = _story(
+        Clause(parts=(ClauseWord(text='payment'), ClauseWord(text='request')))
+    )
+    assert len(_avoided_findings(glossary, stories=[story])) == 1
+
+
+def test_bare_clause_words_split_by_a_term_ref_clean() -> None:
+    glossary = _avoid_glossary('payment request')
+    ref = ClauseTermRef(term_id=id_derive('Guest'), display='Guest')
+    story = _story(
+        Clause(parts=(ClauseWord(text='payment'), ref, ClauseWord(text='request')))
+    )
+    assert _avoided_findings(glossary, stories=[story]) == []
+
+
+def test_two_terms_avoid_word() -> None:
+    glossary = Glossary(
+        terms=[_avoiding('Guest', 'Customer'), _avoiding('Clerk', 'customer')]
+    )
+    [finding] = _avoided_findings(glossary, _worded_scenario('a Customer'))
+    assert finding.message == _step_message('Customer', "'Guest' or 'Clerk'")
+
+
+def test_no_glossary_no_findings() -> None:
+    assert _avoided_findings(None, _worded_scenario('a Customer')) == []
+
+
+def test_avoided_word_with_punctuation() -> None:
+    glossary = _avoid_glossary('C++', 'e.g.')
+    uses = _worded_scenario('it uses C++ daily, e.g. here')
+    assert [f.message for f in _avoided_findings(glossary, uses)] == [
+        _step_message('C++'),
+        _step_message('e.g.'),
+    ]
+    assert _avoided_findings(glossary, _worded_scenario('it uses C++x daily')) == []
+
+
+@pytest.mark.parametrize('words', ['the check in desk', 'the check-in desk'])
+def test_avoided_word_hyphen_or_space_finding(words) -> None:
+    glossary = _avoid_glossary('check-in desk')
+    [finding] = _avoided_findings(glossary, _worded_scenario(words))
+    assert finding.message == _step_message('check-in desk')

@@ -20,6 +20,7 @@ Each rule has a default severity. A `warn` lint finding is printed in the termin
 | `tag-shadows-term` | `warn` | A scenario tag that matches a glossary term, so the same concept has two names. |
 | `dead-term` | `off` | A glossary term that no step, scenario title, or story sentence uses. Turn this on if every glossary term should be used. |
 | `unresolved-definition-ref` | `warn` | A bold span in a glossary definition that names no term of the glossary, often left behind when a term is renamed. Fix the name, or use italics for emphasis. An entry for this rule names the term's id instead of a test: `unresolved-definition-ref: handle`. |
+| `avoided-word` | `warn` | A word a glossary term lists as avoided, used in the plain text of a step, a scenario title or a story sentence. Use a term ref to the preferred term, or reword. An entry for this rule names the scenario or story: `avoided-word: *::test_booking`. |
 
 ## Configuration
 

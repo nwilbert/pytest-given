@@ -25,6 +25,7 @@ UNUSED_INTERPOLATION = RuleId('unused-interpolation')
 TAG_SHADOWS_TERM = RuleId('tag-shadows-term')
 DEAD_TERM = RuleId('dead-term')
 UNRESOLVED_DEFINITION_REF = RuleId('unresolved-definition-ref')
+AVOIDED_WORD = RuleId('avoided-word')
 
 # Pseudo-rule for ignore-list entries that suppressed nothing; always an
 # error, never configurable or ignorable — so it is absent from DEFAULTS.
@@ -43,6 +44,7 @@ DEFAULTS: dict[RuleId, Level] = {
     TAG_SHADOWS_TERM: 'warn',
     DEAD_TERM: 'off',
     UNRESOLVED_DEFINITION_REF: 'warn',
+    AVOIDED_WORD: 'warn',
 }
 
 

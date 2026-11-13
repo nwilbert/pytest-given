@@ -555,3 +555,51 @@ def test_a_lint_failure_is_reported_and_keeps_the_written_report(pytester):
         assert result.ret == pytest.ExitCode.TESTS_FAILED
     with then('the report that was already written is still there'):
         assert (pytester.path / 'report.html').is_file()
+
+
+AVOIDING_GLOSSARY_CONFTEST = """
+from pytest_given import Glossary
+
+g = Glossary()
+guest = g.actor('Guest', avoid=['Customer'])
+"""
+
+AVOIDING_SUITE = """
+from pytest_given import scenario, given, when, then
+
+@scenario("Booking")
+def test_booking():
+    with given("a Customer"):
+        x = 1
+    with when("doubling"):
+        x = x * 2
+    with then("it is two"):
+        assert x == 2
+"""
+
+
+def test_avoided_word_printed(pytester):
+    pytester.makeconftest(AVOIDING_GLOSSARY_CONFTEST)
+    result = _run(pytester, AVOIDING_SUITE, '--given-lint')
+    result.assert_outcomes(passed=1)
+    result.stdout.fnmatch_lines(
+        [
+            (
+                "*WARN*avoided-word*test_booking*step text uses 'Customer', "
+                "which the glossary avoids in favour of 'Guest'*"
+            )
+        ]
+    )
+
+
+def test_avoided_word_ignored(pytester):
+    pytester.makeconftest(AVOIDING_GLOSSARY_CONFTEST)
+    result = _run(
+        pytester,
+        AVOIDING_SUITE,
+        '--given-lint',
+        '-o',
+        'given_lint_ignore=avoided-word: *::test_booking',
+    )
+    assert 'avoided-word' not in result.stdout.str()
+    assert 'stale-ignore' not in result.stdout.str()

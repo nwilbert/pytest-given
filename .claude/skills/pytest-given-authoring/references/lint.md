@@ -14,6 +14,7 @@ The narration lint enforces the structural part of the rules in [scenarios.md](s
 | `tag-shadows-term` | warn | A scenario tag whose slug duplicates a glossary term. |
 | `dead-term` | off | A glossary term that no scenario title, no step and no story sentence references. Off by default, because an unreferenced term is normal. Turn it on where every glossary term is meant to be used. |
 | `unresolved-definition-ref` | warn | A bold span in a glossary definition that names no term. Fix the name if the term was renamed. Put an example word in a code span or quotes, and use italics for emphasis. Ignore one with `unresolved-definition-ref: <term-id glob>`. Linting part of a suite can flag a ref to a term that another test module declares in code. |
+| `avoided-word` | warn | A word a glossary term lists as avoided, used in the plain text of a step, a scenario title or a story sentence. Use a term ref to the preferred term, or reword. Ignore one with `avoided-word: <node-id glob>`, or the story id for a story sentence. |
 
 You can override each rule's severity with the `given_lint_rules` ini. That and the rest of the setup are in the project documentation at <https://nwilbert.github.io/pytest-given/latest/configuration/narration-lint/>.
 

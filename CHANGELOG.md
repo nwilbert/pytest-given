@@ -17,6 +17,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 - Glossary sections: `Glossary.section(name)` and a file glossary's headings group terms, and the Glossary tab groups and filters by them.
 - Avoided words: `avoid=` on a term declaration, a `TableGlossary`'s `avoid_column` and a `ParagraphGlossary`'s `_Avoid_:` line list a term's rejected synonyms, shown on the term's card.
+- The `avoided-word` lint rule, `warn` by default, flags a term's avoided word in a step, a scenario title or a story sentence.
 - `ParagraphGlossary` loads a `GLOSSARY.md` written as `**Term**:` paragraphs with optional `_Avoid_:` lines.
 - `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary.
 - A term citation written as a `<details markdown="1">` block carries the term's definition, which `citations update` writes and `citations check` holds to the report.
