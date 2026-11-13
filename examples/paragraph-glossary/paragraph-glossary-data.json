@@ -1,0 +1,764 @@
+{
+  "metadata": {
+    "project": "pytest-given",
+    "timestamp": "2026-11-13T07:36:28.195137+00:00",
+    "pytest_version": "9.2.0",
+    "plugin_version": "0.5.2",
+    "commit_sha": "965780fb061b6a4cbea6c419c97dfcf992eba531",
+    "title": "Paragraph Glossary Example",
+    "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html"
+  },
+  "scenarios": [
+    {
+      "id": "examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item",
+      "narration": {
+        "text": "A Member borrows an Item for a Loan",
+        "parts": []
+      },
+      "module": "test_paragraph_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Member and an Item",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "member",
+                "display": "Member",
+                "expression": "g[\"Member\"]"
+              },
+              {
+                "value": " and an "
+              },
+              {
+                "term_id": "item",
+                "display": "Item",
+                "expression": "g[\"Item\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the library lends the Item",
+            "parts": [
+              {
+                "value": "the library "
+              },
+              {
+                "term_id": "lend",
+                "display": "lends",
+                "expression": "g[\"lend\"].s"
+              },
+              {
+                "value": " the "
+              },
+              {
+                "term_id": "item",
+                "display": "Item",
+                "expression": "g[\"Item\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Loan ends on its Due Date",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "loan",
+                "display": "Loan",
+                "expression": "g[\"Loan\"]"
+              },
+              {
+                "value": " ends on its "
+              },
+              {
+                "term_id": "due-date",
+                "display": "Due Date",
+                "expression": "g[\"Due Date\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
+        "line": 57
+      },
+      "story_ids": [
+        "lend-an-item"
+      ],
+      "pins": null
+    },
+    {
+      "id": "examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal",
+      "narration": {
+        "text": "A Renewal moves the Due Date later",
+        "parts": []
+      },
+      "module": "test_paragraph_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Loan of an Item",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "loan",
+                "display": "Loan",
+                "expression": "g[\"Loan\"]"
+              },
+              {
+                "value": " of an "
+              },
+              {
+                "term_id": "item",
+                "display": "Item",
+                "expression": "g[\"Item\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Member asks for a Renewal",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "member",
+                "display": "Member",
+                "expression": "g[\"Member\"]"
+              },
+              {
+                "value": " asks for a "
+              },
+              {
+                "term_id": "renewal",
+                "display": "Renewal",
+                "expression": "g[\"Renewal\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Due Date moves three weeks later",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "due-date",
+                "display": "Due Date",
+                "expression": "g[\"Due Date\"]"
+              },
+              {
+                "value": " moves three weeks later"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
+        "line": 67
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return",
+      "narration": {
+        "text": "A late return costs a Fine",
+        "parts": []
+      },
+      "module": "test_paragraph_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Loan that is past its Due Date",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "loan",
+                "display": "Loan",
+                "expression": "g[\"Loan\"]"
+              },
+              {
+                "value": " that is past its "
+              },
+              {
+                "term_id": "due-date",
+                "display": "Due Date",
+                "expression": "g[\"Due Date\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Member returns the Item four days late",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "member",
+                "display": "Member",
+                "expression": "g[\"Member\"]"
+              },
+              {
+                "value": " returns the "
+              },
+              {
+                "term_id": "item",
+                "display": "Item",
+                "expression": "g[\"Item\"]"
+              },
+              {
+                "value": " four days late"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Member owes a Fine",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "member",
+                "display": "Member",
+                "expression": "g[\"Member\"]"
+              },
+              {
+                "value": " owes a "
+              },
+              {
+                "term_id": "fine",
+                "display": "Fine",
+                "expression": "g[\"Fine\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
+        "line": 78
+      },
+      "story_ids": [],
+      "pins": null
+    },
+    {
+      "id": "examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return",
+      "narration": {
+        "text": "A timely return costs no Fine",
+        "parts": []
+      },
+      "module": "test_paragraph_glossary",
+      "tags": [],
+      "status": "passed",
+      "duration_ms": 0,
+      "steps": [
+        {
+          "phase": "given",
+          "narration": {
+            "text": "a Loan that is not yet past its Due Date",
+            "parts": [
+              {
+                "value": "a "
+              },
+              {
+                "term_id": "loan",
+                "display": "Loan",
+                "expression": "g[\"Loan\"]"
+              },
+              {
+                "value": " that is not yet past its "
+              },
+              {
+                "term_id": "due-date",
+                "display": "Due Date",
+                "expression": "g[\"Due Date\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "when",
+          "narration": {
+            "text": "the Member returns the Item",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "member",
+                "display": "Member",
+                "expression": "g[\"Member\"]"
+              },
+              {
+                "value": " returns the "
+              },
+              {
+                "term_id": "item",
+                "display": "Item",
+                "expression": "g[\"Item\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        },
+        {
+          "phase": "then",
+          "narration": {
+            "text": "the Member owes no Fine",
+            "parts": [
+              {
+                "value": "the "
+              },
+              {
+                "term_id": "member",
+                "display": "Member",
+                "expression": "g[\"Member\"]"
+              },
+              {
+                "value": " owes no "
+              },
+              {
+                "term_id": "fine",
+                "display": "Fine",
+                "expression": "g[\"Fine\"]"
+              }
+            ]
+          },
+          "children": [],
+          "attachments": [],
+          "pins": null,
+          "fixture_name": null
+        }
+      ],
+      "parameters": null,
+      "error": null,
+      "skip_reason": null,
+      "xfail_reason": null,
+      "source": {
+        "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
+        "line": 89
+      },
+      "story_ids": [],
+      "pins": null
+    }
+  ],
+  "glossary": {
+    "terms": [
+      {
+        "id": "member",
+        "kind": "actor",
+        "canonical": "Member",
+        "definition": {
+          "text": "A person registered to borrow from the library.",
+          "parts": [
+            {
+              "value": "A person registered to borrow from the library."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 9
+        },
+        "section": "Lending",
+        "avoid": [
+          "Patron",
+          "Customer"
+        ]
+      },
+      {
+        "id": "item",
+        "kind": "object",
+        "canonical": "Item",
+        "definition": {
+          "text": "A single physical copy that a **Member** can borrow.",
+          "parts": [
+            {
+              "value": "A single physical copy that a "
+            },
+            {
+              "term_id": "member",
+              "display": "Member",
+              "expression": ""
+            },
+            {
+              "value": " can borrow."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 13
+        },
+        "section": "Lending",
+        "avoid": [
+          "Book (items include DVDs and games)"
+        ]
+      },
+      {
+        "id": "loan",
+        "kind": null,
+        "canonical": "Loan",
+        "definition": {
+          "text": "The period in which a **Member** holds an **Item**.",
+          "parts": [
+            {
+              "value": "The period in which a "
+            },
+            {
+              "term_id": "member",
+              "display": "Member",
+              "expression": ""
+            },
+            {
+              "value": " holds an "
+            },
+            {
+              "term_id": "item",
+              "display": "Item",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 17
+        },
+        "section": "Lending",
+        "avoid": [
+          "Checkout",
+          "Rental (in billing exports only)"
+        ]
+      },
+      {
+        "id": "lend",
+        "kind": "activity",
+        "canonical": "lend",
+        "definition": {
+          "text": "Hand an **Item** to a **Member** as a **Loan**.",
+          "parts": [
+            {
+              "value": "Hand an "
+            },
+            {
+              "term_id": "item",
+              "display": "Item",
+              "expression": ""
+            },
+            {
+              "value": " to a "
+            },
+            {
+              "term_id": "member",
+              "display": "Member",
+              "expression": ""
+            },
+            {
+              "value": " as a "
+            },
+            {
+              "term_id": "loan",
+              "display": "Loan",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 21
+        },
+        "section": "Lending",
+        "avoid": []
+      },
+      {
+        "id": "due-date",
+        "kind": null,
+        "canonical": "Due Date",
+        "definition": {
+          "text": "The day a **Loan** ends, after which a **Fine** accrues.",
+          "parts": [
+            {
+              "value": "The day a "
+            },
+            {
+              "term_id": "loan",
+              "display": "Loan",
+              "expression": ""
+            },
+            {
+              "value": " ends, after which a "
+            },
+            {
+              "term_id": "fine",
+              "display": "Fine",
+              "expression": ""
+            },
+            {
+              "value": " accrues."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 24
+        },
+        "section": "Lending",
+        "avoid": []
+      },
+      {
+        "id": "fine",
+        "kind": null,
+        "canonical": "Fine",
+        "definition": {
+          "text": "A charge on a **Member** for keeping a **Loan** past its **Due Date**.",
+          "parts": [
+            {
+              "value": "A charge on a "
+            },
+            {
+              "term_id": "member",
+              "display": "Member",
+              "expression": ""
+            },
+            {
+              "value": " for keeping a "
+            },
+            {
+              "term_id": "loan",
+              "display": "Loan",
+              "expression": ""
+            },
+            {
+              "value": " past its "
+            },
+            {
+              "term_id": "due-date",
+              "display": "Due Date",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 29
+        },
+        "section": "Penalties",
+        "avoid": [
+          "Penalty",
+          "Late Fee"
+        ]
+      },
+      {
+        "id": "renewal",
+        "kind": null,
+        "canonical": "Renewal",
+        "definition": {
+          "text": "An extension of a **Loan**, which moves its **Due Date** later.",
+          "parts": [
+            {
+              "value": "An extension of a "
+            },
+            {
+              "term_id": "loan",
+              "display": "Loan",
+              "expression": ""
+            },
+            {
+              "value": ", which moves its "
+            },
+            {
+              "term_id": "due-date",
+              "display": "Due Date",
+              "expression": ""
+            },
+            {
+              "value": " later."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/paragraph-glossary/GLOSSARY.md",
+          "line": 35
+        },
+        "section": "Q&A",
+        "avoid": []
+      }
+    ]
+  },
+  "stories": [
+    {
+      "id": "lend-an-item",
+      "title": "Lend an Item",
+      "sentences": [
+        {
+          "id": 1,
+          "clauses": [
+            {
+              "parts": [
+                {
+                  "term_id": "member",
+                  "display": "Member"
+                },
+                {
+                  "term_id": "lend",
+                  "display": "lends"
+                },
+                {
+                  "term_id": "item",
+                  "display": "Item"
+                }
+              ]
+            }
+          ],
+          "name": null
+        },
+        {
+          "id": 2,
+          "clauses": [
+            {
+              "parts": [
+                {
+                  "term_id": "member",
+                  "display": "Member"
+                },
+                {
+                  "text": "returns"
+                },
+                {
+                  "term_id": "item",
+                  "display": "Item"
+                }
+              ]
+            }
+          ],
+          "name": null
+        }
+      ],
+      "source": {
+        "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
+        "line": 30
+      }
+    }
+  ],
+  "coverage": [
+    {
+      "story_id": "lend-an-item",
+      "sentence_id": 1,
+      "tracked": true,
+      "scenario_ids": []
+    },
+    {
+      "story_id": "lend-an-item",
+      "sentence_id": 2,
+      "tracked": true,
+      "scenario_ids": [
+        "examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item"
+      ]
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-12T18:54:56.362658+00:00",
+    "timestamp": "2026-11-13T07:36:27.728773+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "bec336b5707b0621c5f7cc4029e3e282e3abe36e",
+    "commit_sha": "965780fb061b6a4cbea6c419c97dfcf992eba531",
     "title": "File Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html"
   },
@@ -139,7 +139,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 60
+        "line": 61
       },
       "story_ids": [
         "book-a-room"
@@ -243,7 +243,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 77
+        "line": 78
       },
       "story_ids": [
         "book-a-room"
@@ -275,8 +275,32 @@
         },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 7
-        }
+          "line": 9
+        },
+        "section": "People and places",
+        "avoid": [
+          "Customer",
+          "Client"
+        ]
+      },
+      {
+        "id": "room",
+        "kind": "object",
+        "canonical": "Room",
+        "definition": {
+          "text": "A bookable hotel room.",
+          "parts": [
+            {
+              "value": "A bookable hotel room."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
+          "line": 10
+        },
+        "section": "People and places",
+        "avoid": []
       },
       {
         "id": "book",
@@ -300,25 +324,10 @@
         },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 8
-        }
-      },
-      {
-        "id": "room",
-        "kind": "object",
-        "canonical": "Room",
-        "definition": {
-          "text": "A bookable hotel room.",
-          "parts": [
-            {
-              "value": "A bookable hotel room."
-            }
-          ]
+          "line": 16
         },
-        "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 9
-        }
+        "section": "Reservations",
+        "avoid": []
       },
       {
         "id": "confirmation",
@@ -334,8 +343,12 @@
         },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 10
-        }
+          "line": 17
+        },
+        "section": "Reservations",
+        "avoid": [
+          "Receipt"
+        ]
       },
       {
         "id": "cancellation-policy",
@@ -359,8 +372,12 @@
         },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 11
-        }
+          "line": 18
+        },
+        "section": "Reservations",
+        "avoid": [
+          "Refund Rules (in partner contracts only)"
+        ]
       },
       {
         "id": "overbooking",
@@ -384,8 +401,10 @@
         },
         "source": {
           "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 12
-        }
+          "line": 19
+        },
+        "section": "Reservations",
+        "avoid": []
       }
     ]
   },
@@ -460,7 +479,7 @@
       ],
       "source": {
         "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 42
+        "line": 43
       }
     }
   ],

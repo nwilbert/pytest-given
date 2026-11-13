@@ -66,6 +66,7 @@ A design spec or a README can [cite](guide/citations.md) scenarios, tags, storie
 - **[Coffeeshop](examples/coffeeshop.html){ target=_blank }**: a tour of the core features.
 - **[Hotel booking](examples/hotel-booking.html){ target=_blank }**: a glossary and domain stories, with story coverage.
 - **[File glossary](examples/file-glossary-booking.html){ target=_blank }**: the same, with the glossary kept in a Markdown file.
+- **[Paragraph glossary](examples/paragraph-glossary.html){ target=_blank }**: the glossary kept as `**Term**:` paragraphs, with sections and avoided words.
 - **[Self-report](examples/self-report.html){ target=_blank }**: pytest-given's own test suite.
 
 The [Examples](examples.md) page links the test code behind each report.

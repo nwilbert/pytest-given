@@ -1559,6 +1559,13 @@ span.param-highlight {
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 
+.section-title { color: var(--text-primary); }
+
+
+.sidebar > .glossary-grouping:first-child { margin-top: 0; padding-top: 0; }
+.glossary-grouping + .search-box { margin-top: var(--space-lg); }
+
+
 
 
 .term-name {
@@ -1589,6 +1596,9 @@ span.param-highlight {
   grid-template-columns: subgrid;
 }
 .kind-header { grid-column: 1 / -1; }
+
+
+.entry-slot { display: contents; }
 
 .entry { position: relative; }
 .entry::before {
@@ -1629,6 +1639,11 @@ span.param-highlight {
 .entry-name-sizer .term-name { display: block; }
 .entry-body { display: flex; align-items: flex-start; gap: var(--space-sm); }
 .entry-def { flex: 1; font-size: var(--font-size-md); color: var(--text-narration); }
+.entry-avoid {
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
 .entry-def-badge {
   display: inline-block;
   font-size: 0.75rem;
@@ -1756,6 +1771,7 @@ span.param-highlight {
 .anchor-link svg { display: block; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
+.kind-header:hover .anchor-link,
 .header:hover .anchor-link { opacity: 0.6; }
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
@@ -2015,7 +2031,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L201">examples/hotel-booking/test_hotel_booking.py:201</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L217">examples/hotel-booking/test_hotel_booking.py:217</a></div>
       
     </div>
     </div>
@@ -2074,7 +2090,7 @@ span.param-highlight {
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L223">examples/hotel-booking/test_hotel_booking.py:223</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L239">examples/hotel-booking/test_hotel_booking.py:239</a></div>
       
     </div>
     </div>
@@ -2097,7 +2113,7 @@ span.param-highlight {
         
         
         <span class="scenario-status failed">✗ failed</span>
-        <span class="scenario-duration">45ms</span>
+        <span class="scenario-duration">44ms</span>
       </span>
     </div>
 
@@ -2222,7 +2238,7 @@ span.param-highlight {
   
   - partial balance
   + unsupported payment method</div><div class="error-frames"><div class="error-frame">
-            <div class="error-frame-loc">examples/hotel-booking/test_hotel_booking.py:297: in test_payment_declined</div>
+            <div class="error-frame-loc">examples/hotel-booking/test_hotel_booking.py:313: in test_payment_declined</div>
             <pre class="error-frame-code">    assert response == decline_reason</pre>
           </div></div><pre class="error-tail">E   AssertionError: assert &#39;unsupported payment method&#39; == &#39;partial balance&#39;
 E     
@@ -2245,7 +2261,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L262">examples/hotel-booking/test_hotel_booking.py:262</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L278">examples/hotel-booking/test_hotel_booking.py:278</a></div>
       
     </div>
     </div>
@@ -2292,7 +2308,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L316">examples/hotel-booking/test_hotel_booking.py:316</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L332">examples/hotel-booking/test_hotel_booking.py:332</a></div>
       
     </div>
     </div>
@@ -2337,17 +2353,17 @@ E     + unsupported payment method</pre>
       
       <div class="error-block xfailed">
       <div class="error-message">rebooking a cancelled booking is not supported yet</div><div class="error-frames"><div class="error-frame">
-            <div class="error-frame-loc">examples/hotel-booking/test_hotel_booking.py:344: in test_rebook_cancelled_booking</div>
+            <div class="error-frame-loc">examples/hotel-booking/test_hotel_booking.py:360: in test_rebook_cancelled_booking</div>
             <pre class="error-frame-code">    rebook_cancelled_booking(stay)</pre>
           </div><div class="error-frame">
-            <div class="error-frame-loc">examples/hotel-booking/test_hotel_booking.py:332: in rebook_cancelled_booking</div>
+            <div class="error-frame-loc">examples/hotel-booking/test_hotel_booking.py:348: in rebook_cancelled_booking</div>
             <pre class="error-frame-code">    raise NotImplementedError(&#39;rebooking a cancelled booking is not supported yet&#39;)</pre>
           </div></div><pre class="error-tail">E   NotImplementedError: rebooking a cancelled booking is not supported yet</pre>
     </div>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L335">examples/hotel-booking/test_hotel_booking.py:335</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L351">examples/hotel-booking/test_hotel_booking.py:351</a></div>
       
     </div>
     </div>
@@ -2406,7 +2422,7 @@ E     + unsupported payment method</pre>
       
 
       
-      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L355">examples/hotel-booking/test_hotel_booking.py:355</a></div>
+      <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L371">examples/hotel-booking/test_hotel_booking.py:371</a></div>
       
     </div>
     </div>
@@ -2798,7 +2814,7 @@ E     + unsupported payment method</pre>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L122">examples/hotel-booking/test_hotel_booking.py:122</a></div>
         
       </div>
       <div data-story-id="cancel-a-booking" x-show="selectedStory === $el.dataset.storyId"
@@ -2994,18 +3010,30 @@ E     + unsupported payment method</pre>
           </div>
         </div>
         
-        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L149">examples/hotel-booking/test_hotel_booking.py:149</a></div>
+        <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L165">examples/hotel-booking/test_hotel_booking.py:165</a></div>
         
       </div>
       
     </div>
   </div>
   
-  </div>
-  <div id="view-glossary" role="tabpanel" aria-labelledby="tab-glossary" x-show="mainView === 'glossary'" x-cloak>
+  </div><div id="view-glossary" role="tabpanel" aria-labelledby="tab-glossary" data-grouping="section" x-show="mainView === 'glossary'" x-cloak>
+  
+  
+  
+  
   
   <div class="view-layout">
     <div class="sidebar">
+      
+      <div class="sidebar-section glossary-grouping">
+        <div class="sidebar-label">Group by</div>
+        <div class="seg-toggle" role="group" aria-label="Group by">
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryGrouping === 'section' }" :aria-pressed="glossaryGrouping === 'section'" @click="setGlossaryGrouping('section')">Section</button>
+          <button type="button" class="btn-reset seg-btn" :class="{ active: glossaryGrouping === 'kind' }" :aria-pressed="glossaryGrouping === 'kind'" @click="setGlossaryGrouping('kind')">Kind</button>
+        </div>
+      </div>
+      
       <label class="search-box">
         <svg class="search-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input type="text" placeholder="Search terms..." x-model="glossarySearch">
@@ -3014,10 +3042,47 @@ E     + unsupported payment method</pre>
         </button>
       </label>
 
+      <div class="sidebar-section" x-show="glossaryGrouping === 'section'">
+        <div class="sidebar-label">Sections</div>
+        
+        <div class="nav-group" data-section="Booking"
+             :class="{ 'nav-group-active': sectionFilters.includes($el.dataset.section) }"
+             @click="toggleSectionFilter($el.dataset.section)">
+          <button type="button" class="btn-reset nav-group-select" data-section="Booking"
+                  :aria-pressed="sectionFilters.includes($el.dataset.section)"
+                  @click.stop="toggleSectionFilter($el.dataset.section)">
+            <span class="nav-group-name">Booking</span>
+          </button>
+          <span class="nav-group-count">5</span>
+        </div>
+        
+        <div class="nav-group" data-section="Payment"
+             :class="{ 'nav-group-active': sectionFilters.includes($el.dataset.section) }"
+             @click="toggleSectionFilter($el.dataset.section)">
+          <button type="button" class="btn-reset nav-group-select" data-section="Payment"
+                  :aria-pressed="sectionFilters.includes($el.dataset.section)"
+                  @click.stop="toggleSectionFilter($el.dataset.section)">
+            <span class="nav-group-name">Payment</span>
+          </button>
+          <span class="nav-group-count">3</span>
+        </div>
+        
+        <div class="nav-group" data-section="Other"
+             :class="{ 'nav-group-active': sectionFilters.includes($el.dataset.section) }"
+             @click="toggleSectionFilter($el.dataset.section)">
+          <button type="button" class="btn-reset nav-group-select" data-section="Other"
+                  :aria-pressed="sectionFilters.includes($el.dataset.section)"
+                  @click.stop="toggleSectionFilter($el.dataset.section)">
+            <span class="nav-group-name">Other</span>
+          </button>
+          <span class="nav-group-count">6</span>
+        </div>
+        
+      </div>
       
+
       
-      
-      <div class="sidebar-section">
+      <div class="sidebar-section" x-show="glossaryGrouping === 'kind'">
         <div class="sidebar-label">Show kinds</div>
         
         <label class="kind-filter-row">
@@ -3084,268 +3149,19 @@ E     + unsupported payment method</pre>
 
       <div class="glossary-entries">
       
-      
-      <div class="kind-group" x-show="glossaryKindFilter.actor && visibleTermCount('actor') > 0">
-        
+      <div class="kind-group" data-section="Booking"
+           x-show="glossaryGrouping === 'section' && sectionShown($el.dataset.section) && visibleTermCount('section', $el.dataset.section) > 0">
         <div class="kind-header">
-          <span class="kind-title kind-actor">Actors</span>
-          <span class="kind-meta" x-text="visibleTermLabel('actor')"></span>
+          <span class="kind-title section-title">Booking</span><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;section=Booking" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
+          <span class="kind-meta" data-section="Booking" x-text="visibleTermLabel('section', $el.dataset.section)"></span>
         </div>
-        
-        <div class="entry-list kind-actor">
-        
+        <div class="entry-list">
         
         
         
         
-        
-        <div class="entry" id="term-organizer"
-             data-search="organizer"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="organizer" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="organizer"
-                    aria-controls="term-refs-organizer"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="organizer" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Organizer<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=organizer" data-citation-kind="term" data-citation-key="organizer" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Person booking accommodation on behalf of a group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>1 other form</span><span>1 story</span><span>3 scenarios</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-organizer" data-term-id="organizer" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
-                  
-                </div>
-                
-                
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  
-                  <span class="use-chip use-chip--static">Carol</span>
-                  
-                </div>
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="organizer"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 3 scenarios using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L79">examples/hotel-booking/test_hotel_booking.py:79</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-guest"
-             data-search="guest"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="guest" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="guest"
-                    aria-controls="term-refs-guest"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Guest<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=guest" data-citation-kind="term" data-citation-key="guest" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Individual traveler in the group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>2 other forms</span><span>2 stories</span><span>5 scenarios</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-guest" data-term-id="guest" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
-                  
-                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
-                  
-                </div>
-                
-                
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  
-                  <span class="use-chip use-chip--static">Alice</span>
-                  
-                  <span class="use-chip use-chip--static">Bob</span>
-                  
-                </div>
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="guest"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 5 scenarios using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L80">examples/hotel-booking/test_hotel_booking.py:80</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-booking-system"
-             data-search="booking system"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="booking-system" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="booking-system"
-                    aria-controls="term-refs-booking-system"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="booking-system" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Booking System<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=booking-system" data-citation-kind="term" data-citation-key="booking-system" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Automated reservation back-end.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-booking-system" data-term-id="booking-system" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
-                  
-                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
-                  
-                </div>
-                
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="booking-system"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 3 scenarios using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L81">examples/hotel-booking/test_hotel_booking.py:81</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        </div>
-      </div>
-      
-      
-      <div class="kind-group" x-show="glossaryKindFilter.object && visibleTermCount('object') > 0">
-        
-        <div class="kind-header">
-          <span class="kind-title kind-object">Work Objects</span>
-          <span class="kind-meta" x-text="visibleTermLabel('object')"></span>
-        </div>
-        
-        <div class="entry-list kind-object">
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-room"
-             data-search="room"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="room" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="room"
-                    aria-controls="term-refs-room"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Room<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=room" data-citation-kind="term" data-citation-key="room" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>1 other form</span><span>1 story</span><span>3 scenarios</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-room" data-term-id="room" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
-                  
-                </div>
-                
-                
-                <div class="refs-line">
-                  <span class="refs-label">Other forms:</span>
-                  
-                  <span class="use-chip use-chip--static">Deluxe Suite</span>
-                  
-                </div>
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="room"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 3 scenarios using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L83">examples/hotel-booking/test_hotel_booking.py:83</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-booking"
-             data-search="booking"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+        <div class="entry kind-object" id="term-booking" data-term-id="booking"
+             x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="booking" @click="toggleTerm($el.dataset.termId)">
             <button type="button" class="disclosure-btn" data-term-id="booking"
                     aria-controls="term-refs-booking"
@@ -3356,7 +3172,7 @@ E     + unsupported payment method</pre>
               <span class="term-name">Booking<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=booking" data-citation-kind="term" data-citation-key="booking" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">A reservation for one or more <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">rooms</span>.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-def">A claim on one or more <span class="term-ref-object term-ref--link has-term-tip" data-term-id="room">rooms</span> for given dates.<span class="entry-def-badge" style="display:none">Undefined</span><div class="entry-avoid">Avoid: Reservation (in partner APIs only)</div></div>
               <div class="entry-summary meta-list"><span>2 stories</span><span>5 scenarios</span></div>
             </div>
           </div>
@@ -3384,7 +3200,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L84">examples/hotel-booking/test_hotel_booking.py:84</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L93">examples/hotel-booking/test_hotel_booking.py:93</a></div>
                 
               </div>
             </div>
@@ -3394,64 +3210,8 @@ E     + unsupported payment method</pre>
         
         
         
-        
-        
-        <div class="entry" id="term-payment"
-             data-search="payment"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="payment" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="payment"
-                    aria-controls="term-refs-payment"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="payment" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">Payment<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=payment" data-citation-kind="term" data-citation-key="payment" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Money transferred for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span>.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-payment" data-term-id="payment" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
-                  
-                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
-                  
-                </div>
-                
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="payment"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 3 scenarios using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-confirmation"
-             data-search="confirmation"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+        <div class="entry kind-object" id="term-confirmation" data-term-id="confirmation"
+             x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="confirmation" @click="toggleTerm($el.dataset.termId)">
             <button type="button" class="disclosure-btn" data-term-id="confirmation"
                     aria-controls="term-refs-confirmation"
@@ -3462,7 +3222,7 @@ E     + unsupported payment method</pre>
               <span class="term-name">Confirmation<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=confirmation" data-citation-kind="term" data-citation-key="confirmation" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
             <div class="entry-body">
-              <div class="entry-def">Notification of a successful <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span>.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-def">Notification of a successful <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span>.<span class="entry-def-badge" style="display:none">Undefined</span><div class="entry-avoid">Avoid: Receipt</div></div>
               <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
             </div>
           </div>
@@ -3490,7 +3250,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L86">examples/hotel-booking/test_hotel_booking.py:86</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L98">examples/hotel-booking/test_hotel_booking.py:98</a></div>
                 
               </div>
             </div>
@@ -3500,69 +3260,8 @@ E     + unsupported payment method</pre>
         
         
         
-        
-        
-        <div class="entry" id="term-loyalty-points"
-             data-search="loyalty points"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === true) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="loyalty-points" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="loyalty-points"
-                    aria-controls="term-refs-loyalty-points"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="loyalty-points" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">loyalty points<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=loyalty-points" data-citation-kind="term" data-citation-key="loyalty-points" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def"><span class="entry-def-badge" >Undefined</span></div>
-              <div class="entry-summary meta-list"><span>1 story</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-loyalty-points" data-term-id="loyalty-points" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
-                  
-                </div>
-                
-                
-                
-                <div class="refs-line refs-none">No scenario uses this term.</div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L134">examples/hotel-booking/test_hotel_booking.py:134</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        </div>
-      </div>
-      
-      
-      <div class="kind-group" x-show="glossaryKindFilter.activity && visibleTermCount('activity') > 0">
-        
-        <div class="kind-header">
-          <span class="kind-title kind-activity">Activities</span>
-          <span class="kind-meta" x-text="visibleTermLabel('activity')"></span>
-        </div>
-        
-        <div class="entry-list kind-activity">
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-confirm"
-             data-search="confirm"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+        <div class="entry kind-activity" id="term-confirm" data-term-id="confirm"
+             x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="confirm" @click="toggleTerm($el.dataset.termId)">
             <button type="button" class="disclosure-btn" data-term-id="confirm"
                     aria-controls="term-refs-confirm"
@@ -3599,7 +3298,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L90">examples/hotel-booking/test_hotel_booking.py:90</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L101">examples/hotel-booking/test_hotel_booking.py:101</a></div>
                 
               </div>
             </div>
@@ -3609,55 +3308,8 @@ E     + unsupported payment method</pre>
         
         
         
-        
-        
-        <div class="entry" id="term-decline"
-             data-search="decline"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="decline" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="decline"
-                    aria-controls="term-refs-decline"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="decline" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">decline<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=decline" data-citation-kind="term" data-citation-key="decline" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Refuse a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">payment</span>, leaving its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span> pending.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>1 scenario</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-decline" data-term-id="decline" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="decline"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 1 scenario using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L95">examples/hotel-booking/test_hotel_booking.py:95</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-cancel"
-             data-search="cancel"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+        <div class="entry kind-activity" id="term-cancel" data-term-id="cancel"
+             x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="cancel" @click="toggleTerm($el.dataset.termId)">
             <button type="button" class="disclosure-btn" data-term-id="cancel"
                     aria-controls="term-refs-cancel"
@@ -3694,7 +3346,7 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L99">examples/hotel-booking/test_hotel_booking.py:99</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L105">examples/hotel-booking/test_hotel_booking.py:105</a></div>
                 
               </div>
             </div>
@@ -3704,62 +3356,8 @@ E     + unsupported payment method</pre>
         
         
         
-        
-        
-        <div class="entry" id="term-refund"
-             data-search="refund"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
-          <div class="entry-head" data-term-id="refund" @click="toggleTerm($el.dataset.termId)">
-            <button type="button" class="disclosure-btn" data-term-id="refund"
-                    aria-controls="term-refs-refund"
-                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
-                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
-                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="refund" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
-            <span class="entry-name">
-              <span class="term-name">refund<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=refund" data-citation-kind="term" data-citation-key="refund" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
-            </span>
-            <div class="entry-body">
-              <div class="entry-def">Return the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">payment</span> for a cancelled <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span>.<span class="entry-def-badge" style="display:none">Undefined</span></div>
-              <div class="entry-summary meta-list"><span>1 story</span><span>1 scenario</span></div>
-            </div>
-          </div>
-          <div class="refs scenario-body" id="term-refs-refund" data-term-id="refund" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
-            <div class="refs-inner scenario-body-inner">
-              <div class="refs-content">
-                
-                <div class="refs-line">
-                  <span class="refs-label">Stories:</span>
-                  
-                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
-                  
-                </div>
-                
-                
-                
-                
-                <div class="refs-line">
-                  <a class="use-chip" href="#" data-term-id="refund"
-                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
-                    Show 1 scenario using this term
-                  </a>
-                </div>
-                
-                
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L100">examples/hotel-booking/test_hotel_booking.py:100</a></div>
-                
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        
-        
-        
-        
-        
-        <div class="entry" id="term-rebook"
-             data-search="rebook"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === false) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+        <div class="entry kind-activity" id="term-rebook" data-term-id="rebook"
+             x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="rebook" @click="toggleTerm($el.dataset.termId)">
             <button type="button" class="disclosure-btn" data-term-id="rebook"
                     aria-controls="term-refs-rebook"
@@ -3803,7 +3401,68 @@ E     + unsupported payment method</pre>
                 </div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L101">examples/hotel-booking/test_hotel_booking.py:101</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L106">examples/hotel-booking/test_hotel_booking.py:106</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        </div>
+      </div>
+      
+      <div class="kind-group" data-section="Payment"
+           x-show="glossaryGrouping === 'section' && sectionShown($el.dataset.section) && visibleTermCount('section', $el.dataset.section) > 0">
+        <div class="kind-header">
+          <span class="kind-title section-title">Payment</span><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;section=Payment" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
+          <span class="kind-meta" data-section="Payment" x-text="visibleTermLabel('section', $el.dataset.section)"></span>
+        </div>
+        <div class="entry-list">
+        
+        
+        
+        
+        <div class="entry kind-object" id="term-payment" data-term-id="payment"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="payment" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="payment"
+                    aria-controls="term-refs-payment"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="payment" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Payment<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=payment" data-citation-kind="term" data-citation-key="payment" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Money transferred for a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span>.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-payment" data-term-id="payment" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
+                  
+                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
+                  
+                </div>
+                
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="payment"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 3 scenarios using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L111">examples/hotel-booking/test_hotel_booking.py:111</a></div>
                 
               </div>
             </div>
@@ -3813,11 +3472,327 @@ E     + unsupported payment method</pre>
         
         
         
+        <div class="entry kind-activity" id="term-decline" data-term-id="decline"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="decline" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="decline"
+                    aria-controls="term-refs-decline"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="decline" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">decline<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=decline" data-citation-kind="term" data-citation-key="decline" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Refuse a <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">payment</span>, leaving its <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span> pending.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-summary meta-list"><span>1 scenario</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-decline" data-term-id="decline" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="decline"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 1 scenario using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L114">examples/hotel-booking/test_hotel_booking.py:114</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
         
         
-        <div class="entry" id="term-redeems"
-             data-search="redeems"
-             x-show="(glossaryDefinitionFilter === 'all' || (glossaryDefinitionFilter === 'undefined') === true) && (!glossarySearch || $el.dataset.search.includes(glossarySearch.toLowerCase()))">
+        
+        
+        <div class="entry kind-activity" id="term-refund" data-term-id="refund"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="refund" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="refund"
+                    aria-controls="term-refs-refund"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="refund" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">refund<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=refund" data-citation-kind="term" data-citation-key="refund" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Return the <span class="term-ref-object term-ref--link has-term-tip" data-term-id="payment">payment</span> for a cancelled <span class="term-ref-object term-ref--link has-term-tip" data-term-id="booking">booking</span>.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-summary meta-list"><span>1 story</span><span>1 scenario</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-refund" data-term-id="refund" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
+                  
+                </div>
+                
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="refund"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 1 scenario using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L117">examples/hotel-booking/test_hotel_booking.py:117</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        </div>
+      </div>
+      
+      <div class="kind-group" data-section="Other"
+           x-show="glossaryGrouping === 'section' && sectionShown($el.dataset.section) && visibleTermCount('section', $el.dataset.section) > 0">
+        <div class="kind-header">
+          <span class="kind-title section-title">Other</span><button type="button" class="anchor-link" title="Copy link" data-anchor="view=glossary&amp;section=Other" @click.stop="copyAnchor($el)" aria-label="Copy link"><svg width="14" height="14" aria-hidden="true"><use href="#icon-link"/></svg></button>
+          <span class="kind-meta" data-section="Other" x-text="visibleTermLabel('section', $el.dataset.section)"></span>
+        </div>
+        <div class="entry-list">
+        
+        
+        
+        
+        <div class="entry kind-actor" id="term-organizer" data-term-id="organizer"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="organizer" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="organizer"
+                    aria-controls="term-refs-organizer"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="organizer" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Organizer<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=organizer" data-citation-kind="term" data-citation-key="organizer" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Person booking accommodation on behalf of a group.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-summary meta-list"><span>1 other form</span><span>1 story</span><span>3 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-organizer" data-term-id="organizer" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
+                  
+                </div>
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  
+                  <span class="use-chip use-chip--static">Carol</span>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="organizer"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 3 scenarios using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L84">examples/hotel-booking/test_hotel_booking.py:84</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        
+        <div class="entry kind-actor" id="term-guest" data-term-id="guest"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="guest" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="guest"
+                    aria-controls="term-refs-guest"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Guest<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=guest" data-citation-kind="term" data-citation-key="guest" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Individual traveler in the group.<span class="entry-def-badge" style="display:none">Undefined</span><div class="entry-avoid">Avoid: Customer, Client</div></div>
+              <div class="entry-summary meta-list"><span>2 other forms</span><span>2 stories</span><span>5 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-guest" data-term-id="guest" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
+                  
+                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
+                  
+                </div>
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  
+                  <span class="use-chip use-chip--static">Alice</span>
+                  
+                  <span class="use-chip use-chip--static">Bob</span>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="guest"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 5 scenarios using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L85">examples/hotel-booking/test_hotel_booking.py:85</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        
+        <div class="entry kind-actor" id="term-booking-system" data-term-id="booking-system"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="booking-system" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="booking-system"
+                    aria-controls="term-refs-booking-system"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="booking-system" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Booking System<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=booking-system" data-citation-kind="term" data-citation-key="booking-system" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">Automated back-end for stays.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-summary meta-list"><span>2 stories</span><span>3 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-booking-system" data-term-id="booking-system" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
+                  
+                  <a class="use-chip" href="#" data-story-id="cancel-a-booking" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">cancel-a-booking</a>
+                  
+                </div>
+                
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="booking-system"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 3 scenarios using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L88">examples/hotel-booking/test_hotel_booking.py:88</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        
+        <div class="entry kind-object" id="term-room" data-term-id="room"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="room" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="room"
+                    aria-controls="term-refs-room"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">Room<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=room" data-citation-kind="term" data-citation-key="room" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def">A bookable hotel room.<span class="entry-def-badge" style="display:none">Undefined</span></div>
+              <div class="entry-summary meta-list"><span>1 other form</span><span>1 story</span><span>3 scenarios</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-room" data-term-id="room" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
+                  
+                </div>
+                
+                
+                <div class="refs-line">
+                  <span class="refs-label">Other forms:</span>
+                  
+                  <span class="use-chip use-chip--static">Deluxe Suite</span>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line">
+                  <a class="use-chip" href="#" data-term-id="room"
+                     @click.prevent="filterScenariosByTerm($el.dataset.termId)">
+                    Show 3 scenarios using this term
+                  </a>
+                </div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L90">examples/hotel-booking/test_hotel_booking.py:90</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        
+        <div class="entry kind-activity" id="term-redeems" data-term-id="redeems"
+             x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="redeems" @click="toggleTerm($el.dataset.termId)">
             <button type="button" class="disclosure-btn" data-term-id="redeems"
                     aria-controls="term-refs-redeems"
@@ -3848,7 +3823,49 @@ E     + unsupported payment method</pre>
                 <div class="refs-line refs-none">No scenario uses this term.</div>
                 
                 
-                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/e7afb8299e69da4fadb76b1052e2d4c7f59fd190/examples/hotel-booking/test_hotel_booking.py#L133">examples/hotel-booking/test_hotel_booking.py:133</a></div>
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L149">examples/hotel-booking/test_hotel_booking.py:149</a></div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        
+        
+        <div class="entry kind-object" id="term-loyalty-points" data-term-id="loyalty-points"
+             x-show="termShown($el.dataset.termId)">
+          <div class="entry-head" data-term-id="loyalty-points" @click="toggleTerm($el.dataset.termId)">
+            <button type="button" class="disclosure-btn" data-term-id="loyalty-points"
+                    aria-controls="term-refs-loyalty-points"
+                    :aria-expanded="!!expandedTerms[$el.dataset.termId]"
+                    :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
+                    @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="loyalty-points" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            <span class="entry-name">
+              <span class="term-name">loyalty points<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=loyalty-points" data-citation-kind="term" data-citation-key="loyalty-points" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
+            </span>
+            <div class="entry-body">
+              <div class="entry-def"><span class="entry-def-badge" >Undefined</span></div>
+              <div class="entry-summary meta-list"><span>1 story</span></div>
+            </div>
+          </div>
+          <div class="refs scenario-body" id="term-refs-loyalty-points" data-term-id="loyalty-points" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
+            <div class="refs-inner scenario-body-inner">
+              <div class="refs-content">
+                
+                <div class="refs-line">
+                  <span class="refs-label">Stories:</span>
+                  
+                  <a class="use-chip" href="#" data-story-id="book-a-group-trip" @click.prevent="mainView = 'stories'; selectStory($el.dataset.storyId)">book-a-group-trip</a>
+                  
+                </div>
+                
+                
+                
+                <div class="refs-line refs-none">No scenario uses this term.</div>
+                
+                
+                <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b/examples/hotel-booking/test_hotel_booking.py#L150">examples/hotel-booking/test_hotel_booking.py:150</a></div>
                 
               </div>
             </div>
@@ -3857,7 +3874,91 @@ E     + unsupported payment method</pre>
         
         </div>
       </div>
-      <div class="entry-name entry-name-sizer" aria-hidden="true"><span class="term-name">Organizer</span><span class="term-name">Guest</span><span class="term-name">Booking System</span><span class="term-name">Room</span><span class="term-name">Booking</span><span class="term-name">Payment</span><span class="term-name">Confirmation</span><span class="term-name">confirm</span><span class="term-name">decline</span><span class="term-name">cancel</span><span class="term-name">refund</span><span class="term-name">rebook</span><span class="term-name">redeems</span><span class="term-name">loyalty points</span></div>
+      
+      
+      
+      
+      <div class="kind-group" x-show="glossaryGrouping !== 'section' && glossaryKindFilter.actor && visibleTermCount('kind', 'actor') > 0">
+        
+        <div class="kind-header">
+          <span class="kind-title kind-actor">Actors</span>
+          <span class="kind-meta" x-text="visibleTermLabel('kind', 'actor')"></span>
+        </div>
+        
+        <div class="entry-list kind-actor">
+        
+        <div class="entry-slot" data-term-clone-of="organizer"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="guest"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="booking-system"></div>
+        
+        
+        </div>
+      </div>
+      
+      
+      <div class="kind-group" x-show="glossaryGrouping !== 'section' && glossaryKindFilter.object && visibleTermCount('kind', 'object') > 0">
+        
+        <div class="kind-header">
+          <span class="kind-title kind-object">Work Objects</span>
+          <span class="kind-meta" x-text="visibleTermLabel('kind', 'object')"></span>
+        </div>
+        
+        <div class="entry-list kind-object">
+        
+        <div class="entry-slot" data-term-clone-of="room"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="booking"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="confirmation"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="payment"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="loyalty-points"></div>
+        
+        
+        </div>
+      </div>
+      
+      
+      <div class="kind-group" x-show="glossaryGrouping !== 'section' && glossaryKindFilter.activity && visibleTermCount('kind', 'activity') > 0">
+        
+        <div class="kind-header">
+          <span class="kind-title kind-activity">Activities</span>
+          <span class="kind-meta" x-text="visibleTermLabel('kind', 'activity')"></span>
+        </div>
+        
+        <div class="entry-list kind-activity">
+        
+        <div class="entry-slot" data-term-clone-of="confirm"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="cancel"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="rebook"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="decline"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="refund"></div>
+        
+        
+        <div class="entry-slot" data-term-clone-of="redeems"></div>
+        
+        
+        </div>
+      </div>
+      
+      <div class="entry-name entry-name-sizer" aria-hidden="true"><span class="term-name">Organizer</span><span class="term-name">Guest</span><span class="term-name">Booking System</span><span class="term-name">Room</span><span class="term-name">Booking</span><span class="term-name">Confirmation</span><span class="term-name">confirm</span><span class="term-name">cancel</span><span class="term-name">rebook</span><span class="term-name">Payment</span><span class="term-name">decline</span><span class="term-name">refund</span><span class="term-name">redeems</span><span class="term-name">loyalty points</span></div>
       </div>
       <div class="glossary-empty" x-show="!anyTermsVisible" x-cloak>No terms match this filter.</div>
     </div>
@@ -3912,7 +4013,7 @@ E     + unsupported payment method</pre>
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-08T20:45:38.597765+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\"},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\"},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated reservation back-end.\",\"definition_html\":\"Automated reservation back-end.\"},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\"},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A reservation for one or more **rooms**.\",\"definition_html\":\"A reservation for one or more <strong>rooms<\/strong>.\"},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a **booking**.\",\"definition_html\":\"Money transferred for a <strong>booking<\/strong>.\"},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful **booking**.\",\"definition_html\":\"Notification of a successful <strong>booking<\/strong>.\"},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid **booking** so its **rooms** are held for arrival.\",\"definition_html\":\"Guarantee a paid <strong>booking<\/strong> so its <strong>rooms<\/strong> are held for arrival.\"},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a **payment**, leaving its **booking** pending.\",\"definition_html\":\"Refuse a <strong>payment<\/strong>, leaving its <strong>booking<\/strong> pending.\"},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a **booking** before arrival.\",\"definition_html\":\"Withdraw a <strong>booking<\/strong> before arrival.\"},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the **payment** for a cancelled **booking**.\",\"definition_html\":\"Return the <strong>payment<\/strong> for a cancelled <strong>booking<\/strong>.\"},{\"id\":\"rebook\",\"canonical\":\"rebook\",\"kind\":\"activity\",\"definition\":\"Restore a cancelled **booking** for the same **rooms** and dates.\",\"definition_html\":\"Restore a cancelled <strong>booking<\/strong> for the same <strong>rooms<\/strong> and dates.\"},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\"},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\"}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A search offers only the available rooms\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A paid booking is confirmed to every guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\",\"ticket/HB-17\"],\"status\":\"failed\",\"search_text\":\"A declined payment leaves the booking pending\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Cancelling a paid booking refunds it and notifies the guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"xfailed\",\"search_text\":\"Rebooking restores a cancelled booking\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\"],\"status\":\"passed\",\"search_text\":\"A booking can be cancelled only before its guest checks in\"}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"payment\",\"confirmation\",\"confirm\",\"decline\",\"cancel\",\"refund\",\"rebook\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"rebook\":[\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\":{\"cancel-a-booking\":[4]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\",\"cancel-a-booking:4\":\"Cancel a Booking, sentence 4: Alice asks to rebook Booking\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/rebook_cancelled_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"A search offers only the available rooms\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"A paid booking is confirmed to every guest\"],[\"\\u274c\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined\",\"A declined payment leaves the booking pending\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"Cancelling a paid booking refunds it and notifies the guest\"],[\"\\ud83d\\udd35\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"Rebooking restores a cancelled booking\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"A booking can be cancelled only before its guest checks in\"]],\"tag\":{\"error-handling\":[\"\\u274c\",\"tag=error-handling\",\"error-handling\",\" (1 \\u2705 \\u00b7 1 \\u274c)\"],\"ticket\":[\"\\u274c\",\"tag=ticket\",\"ticket\",\" (1 \\u274c)\"],\"ticket/HB-17\":[\"\\u274c\",\"tag=ticket/HB-17\",\"ticket/HB-17\",\" (1 \\u274c)\"]},\"story\":{\"book-a-group-trip\":[\"\\u274c\",\"view=stories&story=book-a-group-trip\",\"Book a Group Trip\",\" (3 \\u2705 \\u00b7 1 \\u274c)\"],\"cancel-a-booking\":[\"\\ud83d\\udd35\",\"view=stories&story=cancel-a-booking\",\"Cancel a Booking\",\" (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"]},\"term\":{\"organizer\":[\"\\u274c\",\"view=glossary&term=organizer\",\"Organizer\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"guest\":[\"\\u274c\",\"view=glossary&term=guest\",\"Guest\",\" (3 \\u2705 \\u00b7 1 \\u274c \\u00b7 1 \\ud83d\\udd35)\"],\"booking-system\":[\"\\u274c\",\"view=glossary&term=booking-system\",\"Booking System\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"room\":[\"\\u2705\",\"view=glossary&term=room\",\"Room\",\" (3 \\u2705)\"],\"booking\":[\"\\u274c\",\"view=glossary&term=booking\",\"Booking\",\" (3 \\u2705 \\u00b7 1 \\u274c \\u00b7 1 \\ud83d\\udd35)\"],\"payment\":[\"\\u274c\",\"view=glossary&term=payment\",\"Payment\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"confirmation\":[\"\\u274c\",\"view=glossary&term=confirmation\",\"Confirmation\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"confirm\":[\"\\u2705\",\"view=glossary&term=confirm\",\"confirm\",\" (1 \\u2705)\"],\"decline\":[\"\\u274c\",\"view=glossary&term=decline\",\"decline\",\" (1 \\u274c)\"],\"cancel\":[\"\\u2705\",\"view=glossary&term=cancel\",\"cancel\",\" (2 \\u2705)\"],\"refund\":[\"\\u2705\",\"view=glossary&term=refund\",\"refund\",\" (1 \\u2705)\"],\"rebook\":[\"\\ud83d\\udd35\",\"view=glossary&term=rebook\",\"rebook\",\" (1 \\ud83d\\udd35)\"],\"redeems\":[\"\\ud83d\\udfe0\",\"view=glossary&term=redeems\",\"redeems\",\" (no scenarios)\"],\"loyalty-points\":[\"\\ud83d\\udfe0\",\"view=glossary&term=loyalty-points\",\"loyalty points\",\" (no scenarios)\"]}},\"cited_scenario_ids\":{\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-13T11:28:40.129552+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"organizer\",\"canonical\":\"Organizer\",\"kind\":\"actor\",\"definition\":\"Person booking accommodation on behalf of a group.\",\"definition_html\":\"Person booking accommodation on behalf of a group.\",\"section_key\":\"Other\",\"avoid\":[]},{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"Individual traveler in the group.\",\"definition_html\":\"Individual traveler in the group.\",\"section_key\":\"Other\",\"avoid\":[\"Customer\",\"Client\"]},{\"id\":\"booking-system\",\"canonical\":\"Booking System\",\"kind\":\"actor\",\"definition\":\"Automated back-end for stays.\",\"definition_html\":\"Automated back-end for stays.\",\"section_key\":\"Other\",\"avoid\":[]},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":\"Other\",\"avoid\":[]},{\"id\":\"booking\",\"canonical\":\"Booking\",\"kind\":\"object\",\"definition\":\"A claim on one or more **rooms** for given dates.\",\"definition_html\":\"A claim on one or more <strong>rooms<\/strong> for given dates.\",\"section_key\":\"Booking\",\"avoid\":[\"Reservation\"]},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"Notification of a successful **booking**.\",\"definition_html\":\"Notification of a successful <strong>booking<\/strong>.\",\"section_key\":\"Booking\",\"avoid\":[\"Receipt\"]},{\"id\":\"confirm\",\"canonical\":\"confirm\",\"kind\":\"activity\",\"definition\":\"Guarantee a paid **booking** so its **rooms** are held for arrival.\",\"definition_html\":\"Guarantee a paid <strong>booking<\/strong> so its <strong>rooms<\/strong> are held for arrival.\",\"section_key\":\"Booking\",\"avoid\":[]},{\"id\":\"cancel\",\"canonical\":\"cancel\",\"kind\":\"activity\",\"definition\":\"Withdraw a **booking** before arrival.\",\"definition_html\":\"Withdraw a <strong>booking<\/strong> before arrival.\",\"section_key\":\"Booking\",\"avoid\":[]},{\"id\":\"rebook\",\"canonical\":\"rebook\",\"kind\":\"activity\",\"definition\":\"Restore a cancelled **booking** for the same **rooms** and dates.\",\"definition_html\":\"Restore a cancelled <strong>booking<\/strong> for the same <strong>rooms<\/strong> and dates.\",\"section_key\":\"Booking\",\"avoid\":[]},{\"id\":\"payment\",\"canonical\":\"Payment\",\"kind\":\"object\",\"definition\":\"Money transferred for a **booking**.\",\"definition_html\":\"Money transferred for a <strong>booking<\/strong>.\",\"section_key\":\"Payment\",\"avoid\":[]},{\"id\":\"decline\",\"canonical\":\"decline\",\"kind\":\"activity\",\"definition\":\"Refuse a **payment**, leaving its **booking** pending.\",\"definition_html\":\"Refuse a <strong>payment<\/strong>, leaving its <strong>booking<\/strong> pending.\",\"section_key\":\"Payment\",\"avoid\":[]},{\"id\":\"refund\",\"canonical\":\"refund\",\"kind\":\"activity\",\"definition\":\"Return the **payment** for a cancelled **booking**.\",\"definition_html\":\"Return the <strong>payment<\/strong> for a cancelled <strong>booking<\/strong>.\",\"section_key\":\"Payment\",\"avoid\":[]},{\"id\":\"redeems\",\"canonical\":\"redeems\",\"kind\":\"activity\",\"definition\":null,\"definition_html\":\"\",\"section_key\":\"Other\",\"avoid\":[]},{\"id\":\"loyalty-points\",\"canonical\":\"loyalty points\",\"kind\":\"object\",\"definition\":null,\"definition_html\":\"\",\"section_key\":\"Other\",\"avoid\":[]}]},\"scenarios\":[{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A search offers only the available rooms\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A paid booking is confirmed to every guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\",\"ticket/HB-17\"],\"status\":\"failed\",\"search_text\":\"A declined payment leaves the booking pending\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"Cancelling a paid booking refunds it and notifies the guest\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"module\":\"test_hotel_booking\",\"tags\":[],\"status\":\"xfailed\",\"search_text\":\"Rebooking restores a cancelled booking\"},{\"id\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"module\":\"test_hotel_booking\",\"tags\":[\"error-handling\"],\"status\":\"passed\",\"search_text\":\"A booking can be cancelled only before its guest checks in\"}],\"story_ids\":[\"book-a-group-trip\",\"cancel-a-booking\"],\"term_ids\":[\"organizer\",\"guest\",\"booking-system\",\"room\",\"booking\",\"confirmation\",\"confirm\",\"cancel\",\"rebook\",\"payment\",\"decline\",\"refund\",\"redeems\",\"loyalty-points\"],\"term_scenarios\":{\"organizer\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"room\":[\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"guest\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"booking\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"payment\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"booking-system\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"confirm\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\"],\"confirmation\":[\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"decline\":[\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"],\"cancel\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"],\"refund\":[\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\"],\"rebook\":[\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\"]},\"scenario_sentences\":{\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\":{\"book-a-group-trip\":[1,2]},\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\":{\"book-a-group-trip\":[2,3,4,5,6,8]},\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\":{\"book-a-group-trip\":[3,4]},\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\":{\"cancel-a-booking\":[1,2,3]},\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\":{\"cancel-a-booking\":[4]},\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\":{\"book-a-group-trip\":[8],\"cancel-a-booking\":[1]}},\"sentence_labels\":{\"book-a-group-trip:1\":\"Book a Group Trip, sentence 1: Carol searches for Room\",\"book-a-group-trip:2\":\"Book a Group Trip, sentence 2: Carol selects Deluxe Suite\",\"book-a-group-trip:3\":\"Book a Group Trip, sentence 3: Carol adds Alice to Booking \\u00b7 Carol adds Bob to Booking\",\"book-a-group-trip:4\":\"Book a Group Trip, sentence 4: Carol submits Payment for Booking\",\"book-a-group-trip:5\":\"Book a Group Trip, sentence 5: Booking System confirms Booking\",\"book-a-group-trip:6\":\"Book a Group Trip, sentence 6: Booking System sends Confirmation to Alice \\u00b7 Booking System sends Confirmation to Bob\",\"book-a-group-trip:7\":\"Book a Group Trip, sentence 7: Carol redeems loyalty points\",\"book-a-group-trip:8\":\"Book a Group Trip, sentence 8: Alice checks in to Deluxe Suite \\u00b7 Bob checks in to Deluxe Suite\",\"cancel-a-booking:1\":\"Cancel a Booking, sentence 1: Alice cancels Booking\",\"cancel-a-booking:2\":\"Cancel a Booking, sentence 2: Booking System refunds Payment for Booking\",\"cancel-a-booking:3\":\"Cancel a Booking, sentence 3: Booking System sends Confirmation to Alice\",\"cancel-a-booking:4\":\"Cancel a Booking, sentence 4: Alice asks to rebook Booking\"},\"scenario_slugs\":{\"hotel_booking/pick_suite\":\"examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"hotel_booking/complete_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"hotel_booking/payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\",\"hotel_booking/cancel_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"hotel_booking/rebook_cancelled_booking\":\"examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"hotel_booking/check_in_then_cancel\":\"examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_pick_suite\",\"A search offers only the available rooms\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_complete_booking\",\"A paid booking is confirmed to every guest\"],[\"\\u274c\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_payment_declined\",\"A declined payment leaves the booking pending\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_cancel_booking\",\"Cancelling a paid booking refunds it and notifies the guest\"],[\"\\ud83d\\udd35\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_rebook_cancelled_booking\",\"Rebooking restores a cancelled booking\"],[\"\\u2705\",\"scenario=examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel\",\"A booking can be cancelled only before its guest checks in\"]],\"tag\":{\"error-handling\":[\"\\u274c\",\"tag=error-handling\",\"error-handling\",\" (1 \\u2705 \\u00b7 1 \\u274c)\"],\"ticket\":[\"\\u274c\",\"tag=ticket\",\"ticket\",\" (1 \\u274c)\"],\"ticket/HB-17\":[\"\\u274c\",\"tag=ticket/HB-17\",\"ticket/HB-17\",\" (1 \\u274c)\"]},\"story\":{\"book-a-group-trip\":[\"\\u274c\",\"view=stories&story=book-a-group-trip\",\"Book a Group Trip\",\" (3 \\u2705 \\u00b7 1 \\u274c)\"],\"cancel-a-booking\":[\"\\ud83d\\udd35\",\"view=stories&story=cancel-a-booking\",\"Cancel a Booking\",\" (2 \\u2705 \\u00b7 1 \\ud83d\\udd35)\"]},\"term\":{\"organizer\":[\"\\u274c\",\"view=glossary&term=organizer\",\"Organizer\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"guest\":[\"\\u274c\",\"view=glossary&term=guest\",\"Guest\",\" (3 \\u2705 \\u00b7 1 \\u274c \\u00b7 1 \\ud83d\\udd35)\"],\"booking-system\":[\"\\u274c\",\"view=glossary&term=booking-system\",\"Booking System\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"room\":[\"\\u2705\",\"view=glossary&term=room\",\"Room\",\" (3 \\u2705)\"],\"booking\":[\"\\u274c\",\"view=glossary&term=booking\",\"Booking\",\" (3 \\u2705 \\u00b7 1 \\u274c \\u00b7 1 \\ud83d\\udd35)\"],\"confirmation\":[\"\\u274c\",\"view=glossary&term=confirmation\",\"Confirmation\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"confirm\":[\"\\u2705\",\"view=glossary&term=confirm\",\"confirm\",\" (1 \\u2705)\"],\"cancel\":[\"\\u2705\",\"view=glossary&term=cancel\",\"cancel\",\" (2 \\u2705)\"],\"rebook\":[\"\\ud83d\\udd35\",\"view=glossary&term=rebook\",\"rebook\",\" (1 \\ud83d\\udd35)\"],\"payment\":[\"\\u274c\",\"view=glossary&term=payment\",\"Payment\",\" (2 \\u2705 \\u00b7 1 \\u274c)\"],\"decline\":[\"\\u274c\",\"view=glossary&term=decline\",\"decline\",\" (1 \\u274c)\"],\"refund\":[\"\\u2705\",\"view=glossary&term=refund\",\"refund\",\" (1 \\u2705)\"],\"redeems\":[\"\\ud83d\\udfe0\",\"view=glossary&term=redeems\",\"redeems\",\" (no scenarios)\"],\"loyalty-points\":[\"\\ud83d\\udfe0\",\"view=glossary&term=loyalty-points\",\"loyalty points\",\" (no scenarios)\"]}},\"cited_scenario_ids\":{\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined\":\"examples/hotel-booking/test_hotel_booking.py::test_payment_declined[credit card-insufficient funds]\"}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -4084,6 +4185,15 @@ function reportApp() {
 
 
   const termsById = new Map(glossaryTerms.map((t) => [t.id, t]));
+
+
+  const termHaystacks = new Map(glossaryTerms.map(
+    t => [t.id, [t.canonical, ...t.avoid].join('\n').toLowerCase()],
+  ));
+
+
+  const knownSections = new Set(glossaryTerms.map(t => t.section_key).filter(Boolean));
+  const sectioned = knownSections.size > 0;
   const termScenarios = data.term_scenarios || {};
 
   const scenarioTerms = {};
@@ -4168,6 +4278,11 @@ function reportApp() {
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
+
+
+    glossaryGrouping: document.getElementById('view-glossary').dataset.grouping || 'kind',
+
+    sectionFilters: [],
     expandedTerms: {},
     shownStatuses: allStatusesShown(),
     expandedGroups: {},
@@ -4261,36 +4376,79 @@ function reportApp() {
     },
 
 
-
-    visibleTermCount(kind) {
-      return this._termCounts()[kind] || 0;
+    termShown(id) {
+      return this._termMatches(termsById.get(id));
     },
+    _termMatches(term) {
+      if (this.glossaryDefinitionFilter !== 'all'
+          && (this.glossaryDefinitionFilter === 'undefined')
+            !== (term.definition === null || term.definition === undefined)) return false;
+      const query = this.glossarySearch.toLowerCase();
+      return !query || termHaystacks.get(term.id).includes(query);
+    },
+
+
+
+
+    visibleTermCount(grouping, key) {
+      const counts = this._termCounts();
+      return (grouping === 'section' ? counts.section.get(key) : counts.kind[key]) || 0;
+    },
+
 
 
     _termCounts() {
       const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
-      const q = this.glossarySearch.toLowerCase();
-      const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
-      const counts = {};
+      const counts = { kind: {}, section: new Map() };
       for (const t of glossaryTerms) {
-        if (this.glossaryDefinitionFilter !== 'all'
-            && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
-        if (q && !t.canonical.toLowerCase().includes(q)) continue;
+        if (!this._termMatches(t)) continue;
         const kind = t.kind || 'kindless';
-        counts[kind] = (counts[kind] || 0) + 1;
+        counts.kind[kind] = (counts.kind[kind] || 0) + 1;
+        if (t.section_key) counts.section.set(t.section_key, (counts.section.get(t.section_key) || 0) + 1);
       }
       termCountCache = { key, value: counts };
       return counts;
     },
-    visibleTermLabel(kind) {
-      const n = this.visibleTermCount(kind);
+    visibleTermLabel(grouping, key) {
+      const n = this.visibleTermCount(grouping, key);
       return n + (n === 1 ? ' term' : ' terms');
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
+      if (this.glossaryGrouping === 'section') {
+        return [...counts.section.keys()].some(key => this.sectionShown(key));
+      }
       return ['actor', 'object', 'activity', 'kindless']
-        .some(k => this.glossaryKindFilter[k] && counts[k] > 0);
+        .some(k => this.glossaryKindFilter[k] && counts.kind[k] > 0);
+    },
+    sectionShown(key) {
+      return !this.sectionFilters.length || this.sectionFilters.includes(key);
+    },
+    toggleSectionFilter(key) {
+      this.sectionFilters = this.sectionFilters.includes(key)
+        ? this.sectionFilters.filter(other => other !== key)
+        : [...this.sectionFilters, key];
+    },
+
+
+
+    setGlossaryGrouping(grouping) {
+      this.glossaryGrouping = grouping;
+      if (grouping === 'kind' && this.sectionFilters.length) this.sectionFilters = [];
+    },
+
+
+
+
+    fillKindCards() {
+      if (this.glossaryGrouping !== 'kind') return;
+      for (const slot of document.querySelectorAll('#view-glossary [data-term-clone-of]:not([data-filled])')) {
+        const card = document.getElementById('term-' + slot.dataset.termCloneOf).cloneNode(true);
+        this._prepareClone(card, 'kind-');
+        slot.append(card);
+        slot.dataset.filled = '';
+      }
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -4568,20 +4726,33 @@ function reportApp() {
       if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
-      this.$nextTick(() => {
-        const el = document.getElementById('term-' + id);
-        if (!el) return;
-        const scroll = () => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (el.getClientRects().length) return scroll();
 
-        this._resetTermFilters();
-        this.$nextTick(scroll);
+
+      if (this._termFiltered(id)) this._resetTermFilters();
+      this.$nextTick(() => {
+
+        const prefix = sectioned && this.glossaryGrouping === 'kind' ? 'kind-' : '';
+        const el = document.getElementById(prefix + 'term-' + id);
+
+
+        const scrollWhenShown = (frames) => {
+          if (el.getClientRects().length) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          else if (frames) requestAnimationFrame(() => scrollWhenShown(frames - 1));
+        };
+        if (el) scrollWhenShown(3);
       });
+    },
+    _termFiltered(id) {
+      const term = termsById.get(id);
+      if (!this._termMatches(term)) return true;
+      if (this.glossaryGrouping === 'section') return !this.sectionShown(term.section_key);
+      return !this.glossaryKindFilter[term.kind || 'kindless'];
     },
     _resetTermFilters() {
       this.glossarySearch = '';
       this.glossaryDefinitionFilter = 'all';
       this.glossaryKindFilter = { actor: true, object: true, activity: true, kindless: true };
+      this.sectionFilters = [];
     },
     filterScenariosByTerm(id) {
 
@@ -4876,7 +5047,7 @@ function reportApp() {
 
 
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses', 'sectionFilters'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       ['mainView', 'selectedStory'].forEach(key => {
@@ -4888,6 +5059,7 @@ function reportApp() {
 
 
       this.$nextTick(() => this.fillStoryCards());
+      this.$watch('glossaryGrouping', () => this.fillKindCards());
 
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
@@ -5089,6 +5261,11 @@ function reportApp() {
         id => id === NO_TERMS || Object.hasOwn(termNames, id));
       this.sentenceFilter = keep('story sentence', first('sentence-filter'),
         key => Object.hasOwn(sentenceLabels, key))[0] ?? null;
+
+
+      this.sectionFilters = keep('glossary section', params.getAll('section').filter(Boolean),
+        key => knownSections.has(key));
+      if (this.sectionFilters.length) this.glossaryGrouping = 'section';
       if (params.has('status')) {
         const named = params.get('status').split(',').filter(Boolean);
         const shown = new Set(keep('status', named, s => STATUSES.includes(s)));
@@ -5151,6 +5328,7 @@ function reportApp() {
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       for (const termId of this.termFilters) params.append('term-filter', termId);
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
+      for (const key of this.sectionFilters) params.append('section', key);
 
       const shownInReport = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shownInReport.length !== statusesPresent.length) {

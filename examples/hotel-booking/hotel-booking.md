@@ -44,7 +44,7 @@
 
 - **gift card, partial balance** — failed:
     > assert 'unsupported payment method' == 'partial balance'
-    > test_hotel_booking.py:297 in test_payment_declined
+    > test_hotel_booking.py:313 in test_payment_declined
 
 ## ✓ Cancelling a paid booking refunds it and notifies the guest
 `examples/hotel-booking/test_hotel_booking.py::test_cancel_booking`
@@ -63,7 +63,7 @@
 - **when** «Alice» «rebooks» the «Booking»
 
 > rebooking a cancelled booking is not supported yet
-> test_hotel_booking.py:332 in rebook_cancelled_booking
+> test_hotel_booking.py:348 in rebook_cancelled_booking
 
 ## ✓ A booking can be cancelled only before its guest checks in
 `examples/hotel-booking/test_hotel_booking.py::test_check_in_then_cancel` · error-handling

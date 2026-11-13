@@ -76,30 +76,46 @@ from pytest_given import (
 # Ubiquitous language for group bookings.
 g = Glossary()
 
+# Terms are declared through sections, which the report's Glossary tab can
+# group by. `Organizer`, `Guest`, `Booking System` and `Room` stay outside any
+# section.
+# `avoid=` names words the team does not use for a term; the narration lint
+# flags them.
 organizer = g.actor('Organizer', 'Person booking accommodation on behalf of a group.')
-guest = g.actor('Guest', 'Individual traveler in the group.')
-booking_system = g.actor('Booking System', 'Automated reservation back-end.')
+guest = g.actor(
+    'Guest', 'Individual traveler in the group.', avoid=['Customer', 'Client']
+)
+booking_system = g.actor('Booking System', 'Automated back-end for stays.')
 
 room = g.work_object('Room', 'A bookable hotel room.')
-booking = g.work_object('Booking', 'A reservation for one or more **rooms**.')
-payment = g.work_object('Payment', 'Money transferred for a **booking**.')
-confirmation = g.work_object(
-    'Confirmation', 'Notification of a successful **booking**.'
-)
 
-confirm = g.activity(
+booking_terms = g.section('Booking')
+booking = booking_terms.work_object(
+    'Booking',
+    'A claim on one or more **rooms** for given dates.',
+    avoid=['Reservation (in partner APIs only)'],
+)
+confirmation = booking_terms.work_object(
+    'Confirmation', 'Notification of a successful **booking**.', avoid=['Receipt']
+)
+confirm = booking_terms.activity(
     'confirm', 'Guarantee a paid **booking** so its **rooms** are held for arrival.'
 )
+# Vocabulary for the second Story.
+cancel = booking_terms.activity('cancel', 'Withdraw a **booking** before arrival.')
+rebook = booking_terms.activity(
+    'rebook', 'Restore a cancelled **booking** for the same **rooms** and dates.'
+)
+
+payment_terms = g.section('Payment')
+payment = payment_terms.work_object('Payment', 'Money transferred for a **booking**.')
 # `decline` is in the ubiquitous language but no Story sentence uses it yet —
 # it surfaces in the Glossary tab and powers the error-path scenario.
-decline = g.activity(
+decline = payment_terms.activity(
     'decline', 'Refuse a **payment**, leaving its **booking** pending.'
 )
-# Vocabulary for the second Story.
-cancel = g.activity('cancel', 'Withdraw a **booking** before arrival.')
-refund = g.activity('refund', 'Return the **payment** for a cancelled **booking**.')
-rebook = g.activity(
-    'rebook', 'Restore a cancelled **booking** for the same **rooms** and dates.'
+refund = payment_terms.activity(
+    'refund', 'Return the **payment** for a cancelled **booking**.'
 )
 
 

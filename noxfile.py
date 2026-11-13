@@ -403,6 +403,11 @@ _EXAMPLES = (
         'file-glossary-booking',
         'File Glossary Example',
     ),
+    _Example(
+        'examples/paragraph-glossary/test_paragraph_glossary.py',
+        'paragraph-glossary',
+        'Paragraph Glossary Example',
+    ),
 )
 _EXAMPLE_REPORTS = (*(example.slug for example in _EXAMPLES), 'self-report')
 # The reports a document cites: `pytest-given citations` refuses one that no
@@ -467,7 +472,7 @@ def reports_current(session: nox.Session) -> None:
 
 @nox.session
 def examples(session: nox.Session) -> None:
-    """Regenerate coffeeshop, hotel-booking, and file-glossary-booking reports."""
+    """Regenerate the example reports."""
     _sync(session, include_project=True)
     _regenerate_examples(session)
 

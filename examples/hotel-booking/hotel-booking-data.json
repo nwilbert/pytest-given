@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-12T18:54:55.599090+00:00",
+    "timestamp": "2026-11-13T11:28:40.129552+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "bec336b5707b0621c5f7cc4029e3e282e3abe36e",
+    "commit_sha": "a30376a2bf8c7004cdddd164d28e8ebf4ee3f85b",
     "title": "Hotel Booking Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/hotel-booking.html"
   },
@@ -176,7 +176,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 201
+        "line": 217
       },
       "story_ids": [
         "book-a-group-trip"
@@ -489,7 +489,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 223
+        "line": 239
       },
       "story_ids": [
         "book-a-group-trip"
@@ -508,7 +508,7 @@
         "ticket/HB-17"
       ],
       "status": "failed",
-      "duration_ms": 41,
+      "duration_ms": 44,
       "steps": [
         {
           "phase": "given",
@@ -795,17 +795,17 @@
             ],
             "status": "failed",
             "error": {
-              "message": "assert 'unsupported payment method' == 'partial balance'\n  \n  \u001b[0m\u001b[91m- partial balance\u001b[39;49;00m\u001b[90m\u001b[39;49;00m\n  \u001b[92m+ unsupported payment method\u001b[39;49;00m\u001b[90m\u001b[39;49;00m",
+              "message": "assert 'unsupported payment method' == 'partial balance'\n  \n  - partial balance\n  + unsupported payment method",
               "frames": [
                 {
                   "path": "examples/hotel-booking/test_hotel_booking.py",
-                  "lineno": 297,
+                  "lineno": 313,
                   "func": "test_payment_declined",
                   "code": "    assert response == decline_reason",
                   "is_internal": false
                 }
               ],
-              "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     \u001b[0m\u001b[91m- partial balance\u001b[39;49;00m\u001b[90m\u001b[39;49;00m\nE     \u001b[92m+ unsupported payment method\u001b[39;49;00m\u001b[90m\u001b[39;49;00m",
+              "error_tail": "E   AssertionError: assert 'unsupported payment method' == 'partial balance'\nE     \nE     - partial balance\nE     + unsupported payment method",
               "causes": []
             },
             "custom_id": false
@@ -817,7 +817,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 262
+        "line": 278
       },
       "story_ids": [
         "book-a-group-trip"
@@ -1003,7 +1003,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 316
+        "line": 332
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1106,14 +1106,14 @@
         "frames": [
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 344,
+            "lineno": 360,
             "func": "test_rebook_cancelled_booking",
             "code": "    rebook_cancelled_booking(stay)",
             "is_internal": false
           },
           {
             "path": "examples/hotel-booking/test_hotel_booking.py",
-            "lineno": 332,
+            "lineno": 348,
             "func": "rebook_cancelled_booking",
             "code": "    raise NotImplementedError('rebooking a cancelled booking is not supported yet')",
             "is_internal": false
@@ -1126,7 +1126,7 @@
       "xfail_reason": "rebooking is not implemented yet",
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 335
+        "line": 351
       },
       "story_ids": [
         "cancel-a-booking"
@@ -1303,7 +1303,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 355
+        "line": 371
       },
       "story_ids": [
         "cancel-a-booking",
@@ -1328,8 +1328,10 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 79
-        }
+          "line": 84
+        },
+        "section": null,
+        "avoid": []
       },
       {
         "id": "guest",
@@ -1345,25 +1347,32 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 80
-        }
+          "line": 85
+        },
+        "section": null,
+        "avoid": [
+          "Customer",
+          "Client"
+        ]
       },
       {
         "id": "booking-system",
         "kind": "actor",
         "canonical": "Booking System",
         "definition": {
-          "text": "Automated reservation back-end.",
+          "text": "Automated back-end for stays.",
           "parts": [
             {
-              "value": "Automated reservation back-end."
+              "value": "Automated back-end for stays."
             }
           ]
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 81
-        }
+          "line": 88
+        },
+        "section": null,
+        "avoid": []
       },
       {
         "id": "room",
@@ -1379,18 +1388,20 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 83
-        }
+          "line": 90
+        },
+        "section": null,
+        "avoid": []
       },
       {
         "id": "booking",
         "kind": "object",
         "canonical": "Booking",
         "definition": {
-          "text": "A reservation for one or more **rooms**.",
+          "text": "A claim on one or more **rooms** for given dates.",
           "parts": [
             {
-              "value": "A reservation for one or more "
+              "value": "A claim on one or more "
             },
             {
               "term_id": "room",
@@ -1398,39 +1409,18 @@
               "expression": ""
             },
             {
-              "value": "."
+              "value": " for given dates."
             }
           ]
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 84
-        }
-      },
-      {
-        "id": "payment",
-        "kind": "object",
-        "canonical": "Payment",
-        "definition": {
-          "text": "Money transferred for a **booking**.",
-          "parts": [
-            {
-              "value": "Money transferred for a "
-            },
-            {
-              "term_id": "booking",
-              "display": "booking",
-              "expression": ""
-            },
-            {
-              "value": "."
-            }
-          ]
+          "line": 93
         },
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 85
-        }
+        "section": "Booking",
+        "avoid": [
+          "Reservation (in partner APIs only)"
+        ]
       },
       {
         "id": "confirmation",
@@ -1454,8 +1444,12 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 86
-        }
+          "line": 98
+        },
+        "section": "Booking",
+        "avoid": [
+          "Receipt"
+        ]
       },
       {
         "id": "confirm",
@@ -1487,41 +1481,10 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 90
-        }
-      },
-      {
-        "id": "decline",
-        "kind": "activity",
-        "canonical": "decline",
-        "definition": {
-          "text": "Refuse a **payment**, leaving its **booking** pending.",
-          "parts": [
-            {
-              "value": "Refuse a "
-            },
-            {
-              "term_id": "payment",
-              "display": "payment",
-              "expression": ""
-            },
-            {
-              "value": ", leaving its "
-            },
-            {
-              "term_id": "booking",
-              "display": "booking",
-              "expression": ""
-            },
-            {
-              "value": " pending."
-            }
-          ]
+          "line": 101
         },
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 95
-        }
+        "section": "Booking",
+        "avoid": []
       },
       {
         "id": "cancel",
@@ -1545,41 +1508,10 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 99
-        }
-      },
-      {
-        "id": "refund",
-        "kind": "activity",
-        "canonical": "refund",
-        "definition": {
-          "text": "Return the **payment** for a cancelled **booking**.",
-          "parts": [
-            {
-              "value": "Return the "
-            },
-            {
-              "term_id": "payment",
-              "display": "payment",
-              "expression": ""
-            },
-            {
-              "value": " for a cancelled "
-            },
-            {
-              "term_id": "booking",
-              "display": "booking",
-              "expression": ""
-            },
-            {
-              "value": "."
-            }
-          ]
+          "line": 105
         },
-        "source": {
-          "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 100
-        }
+        "section": "Booking",
+        "avoid": []
       },
       {
         "id": "rebook",
@@ -1611,8 +1543,107 @@
         },
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 101
-        }
+          "line": 106
+        },
+        "section": "Booking",
+        "avoid": []
+      },
+      {
+        "id": "payment",
+        "kind": "object",
+        "canonical": "Payment",
+        "definition": {
+          "text": "Money transferred for a **booking**.",
+          "parts": [
+            {
+              "value": "Money transferred for a "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
+          "line": 111
+        },
+        "section": "Payment",
+        "avoid": []
+      },
+      {
+        "id": "decline",
+        "kind": "activity",
+        "canonical": "decline",
+        "definition": {
+          "text": "Refuse a **payment**, leaving its **booking** pending.",
+          "parts": [
+            {
+              "value": "Refuse a "
+            },
+            {
+              "term_id": "payment",
+              "display": "payment",
+              "expression": ""
+            },
+            {
+              "value": ", leaving its "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": " pending."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
+          "line": 114
+        },
+        "section": "Payment",
+        "avoid": []
+      },
+      {
+        "id": "refund",
+        "kind": "activity",
+        "canonical": "refund",
+        "definition": {
+          "text": "Return the **payment** for a cancelled **booking**.",
+          "parts": [
+            {
+              "value": "Return the "
+            },
+            {
+              "term_id": "payment",
+              "display": "payment",
+              "expression": ""
+            },
+            {
+              "value": " for a cancelled "
+            },
+            {
+              "term_id": "booking",
+              "display": "booking",
+              "expression": ""
+            },
+            {
+              "value": "."
+            }
+          ]
+        },
+        "source": {
+          "relpath": "examples/hotel-booking/test_hotel_booking.py",
+          "line": 117
+        },
+        "section": "Payment",
+        "avoid": []
       },
       {
         "id": "redeems",
@@ -1621,8 +1652,10 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 133
-        }
+          "line": 149
+        },
+        "section": null,
+        "avoid": []
       },
       {
         "id": "loyalty-points",
@@ -1631,8 +1664,10 @@
         "definition": null,
         "source": {
           "relpath": "examples/hotel-booking/test_hotel_booking.py",
-          "line": 134
-        }
+          "line": 150
+        },
+        "section": null,
+        "avoid": []
       }
     ]
   },
@@ -1894,7 +1929,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 106
+        "line": 122
       }
     },
     {
@@ -2005,7 +2040,7 @@
       ],
       "source": {
         "relpath": "examples/hotel-booking/test_hotel_booking.py",
-        "line": 149
+        "line": 165
       }
     }
   ],
