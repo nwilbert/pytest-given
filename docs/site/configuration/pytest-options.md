@@ -43,7 +43,7 @@ Mind `-k`: it matches any part of a test's keywords, and a scenario's include `p
 
 ## pytest-xdist
 
-**pytest-given can't write a report or lint under `pytest-xdist`.** With `-n`, tests run in worker processes, and their steps never reach the main process. So a `-n` run that asks for a report (`--given-json`, `--given-html`, `--given-md`) or the narration lint (`--given-lint`, or `given_lint = true`) stops with a usage error before it collects. Generate reports and lint from a run without `-n`, or with `-n 0`. A `-n` run that asks for neither runs as usual. Pass `--no-given-lint` to one in a project that turns the lint on in its ini.
+**pytest-given writes reports and runs the narration lint under `pytest-xdist` with `--dist loadfile`.** Grouping a parametrized scenario needs all of its cases on one worker, and `loadfile` sends whole files to a worker. So when a `-n` run asks for a report (`--given-json`, `--given-html`, `--given-md`) or the narration lint (`--given-lint`, or `given_lint = true`), pytest-given switches a bare `-n` to `--dist loadfile`. Any other `--dist`, `-d` or a `--dist` in `addopts` included, stops with a usage error before collection. Each worker sends its scenarios to the main process, which writes the report and runs the lint as a run without `-n` does. If a worker crashes, its scenarios are lost, so the run fails and writes no report. A `-n` run interrupted before every worker sent its scenarios keeps the previous report. A `-n` run that asks for neither keeps the mode it was given.
 
 ## Ini settings
 

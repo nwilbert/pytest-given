@@ -21,6 +21,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - Term citations: `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary, a `<details markdown="1">` one carrying the term's definition, and a Glossary term row in the HTML report gets the copy button with **Copy citation** and **Copy defining citation**.
 - A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term, and the `unresolved-definition-ref` lint rule, `warn` by default, flags a bold span that names no term.
 - A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
+- A pytest-xdist run (`-n`) writes reports and runs the narration lint, choosing `--dist loadfile` when no `--dist` is given; any other `--dist` still stops with a usage error.
 
 ### Changed
 

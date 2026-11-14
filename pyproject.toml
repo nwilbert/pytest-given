@@ -57,7 +57,7 @@ lint = ["ruff>=0.15.13"]
 nox = ["nox>=2026.4.10"]
 typecheck = ["mypy>=2.1.0", { include-group = "nox" }]
 coverage = ["coverage>=7.14.0"]
-# The suite's own: the xdist refusal runs inner pytester runs with `-n`.
+# The suite's own: the xdist tests run inner pytester runs with `-n`.
 test = ["pytest-xdist>=3.8.0"]
 audit = ["pip-audit>=2.10.0"]
 # only for the example:

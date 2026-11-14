@@ -93,7 +93,15 @@ from .schema import (
     param_id,
     rolled_up_status,
 )
-from .serde import JsonObject, read_report_json, report_from_dict, report_to_dict
+from .serde import (
+    JsonObject,
+    read_report_json,
+    report_from_dict,
+    report_to_dict,
+    session_capture_from_dict,
+    session_capture_to_dict,
+)
+from .session_capture import SessionCapture, merge_captures
 from .step_tree import (
     PartIndex,
     StepPath,
@@ -162,6 +170,7 @@ __all__ = [
     'Sentence',
     'SentenceId',
     'SentenceName',
+    'SessionCapture',
     'SourceLocation',
     'Status',
     'Step',
@@ -184,6 +193,7 @@ __all__ = [
     'iter_narrations',
     'iter_steps',
     'location_suffix',
+    'merge_captures',
     'name_key',
     'name_keys',
     'narration_of',
@@ -205,6 +215,8 @@ __all__ = [
     'resolve_report_url',
     'rolled_up_status',
     's_form',
+    'session_capture_from_dict',
+    'session_capture_to_dict',
     'snapshot_param_value',
     'spanned_part',
     'walk_steps',

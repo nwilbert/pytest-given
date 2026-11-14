@@ -1019,21 +1019,6 @@
 - **then** the test passes
 - **then** the page declares dark as its default «theme»
 
-## ✓ Under pytest-xdist, a run that writes a «report» or runs the «narration lint» stops before it collects · 4 cases
-`tests/integration/test_plugin.py::test_a_report_or_lint_under_xdist_fails_before_the_suite_runs` · validation
-
-- **given** a suite that would otherwise pass
-- **when** the suite runs on {workers} xdist workers with {option}
-- **then** it exits {exit_code}
-- **then** the suite {runs / does not run}
-
-| case ID | workers | option | exit_code | ran |
-|---|---|---|---|---|
-| report | 2 | --given-json=report.json | 4 | False |
-| lint | 2 | --given-lint | 4 | False |
-| neither | 2 | --no-given-lint | 0 | True |
-| serial-report | 0 | --given-json=report.json | 0 | True |
-
 ## ✓ A Markdown «report» printed to stdout is UTF-8, whatever the console's code page
 `tests/integration/test_plugin.py::test_md_on_stdout_is_utf8_on_a_codepage_console`
 
@@ -1455,6 +1440,42 @@
 - **when** the suite runs with an HTML report
 - **then** the failure is summarized as the lint's, rather than raised as a traceback or titled as a report that was not written
 - **then** the report that was already written is still there
+
+## ✓ Under pytest-xdist, a «report» or the «narration lint» runs on --dist loadfile, which pytest-given picks when no --dist is given · 3 cases
+`tests/integration/test_plugin_xdist.py::test_a_report_or_lint_under_xdist_runs_on_loadfile` · spec/xdist-reports
+
+- **given** a suite that would otherwise pass
+- **when** pytest starts with {args}
+- **then** the run settles on --dist {dist}
+
+| case ID | args | dist |
+|---|---|---|
+| bare | -n 2 --given-json=report.json | loadfile |
+| loadfile | -n 2 --dist loadfile --given-lint | loadfile |
+| neither | -n 2 --no-given-lint | load |
+
+## ✓ Under pytest-xdist, a «report» or the «narration lint» stops before it collects when another --dist is chosen · 3 cases
+`tests/integration/test_plugin_xdist.py::test_a_report_or_lint_under_another_dist_stops` · validation, spec/xdist-reports
+
+- **given** a suite that would otherwise pass
+- **when** the suite runs with {args}
+- **then** it stops with a usage error, before any test runs
+
+| case ID | args |
+|---|---|
+| load | -n 2 --dist load --given-json=report.json |
+| worksteal | -n 2 --dist worksteal --given-lint |
+| distload | -n 2 -d --given-json=report.json |
+
+## ✓ Under pytest-xdist, the «report» and the «narration lint» see the same «scenario»s, «story»s and «glossary» as a serial run
+`tests/integration/test_plugin_xdist.py::test_an_xdist_run_reports_and_lints_like_a_serial_one` · spec/xdist-reports
+
+- **given** two test files, one declaring a story and its glossary
+- **given** an ignore entry for test_a.py and an empty step in test_b.py
+- **when** the suite runs with --given-lint without -n, and on 2 xdist workers
+- **then** each file ran on a worker of its own
+- **then** both reports hold the same scenarios, stories and glossary
+- **then** both runs flag the empty step in test_b.py, and neither finds the ignore entry stale
 
 ## ✓ A «scenario» records under its «node ID»
 `tests/unit/capture/test_collector.py::test_start_and_finish_scenario`

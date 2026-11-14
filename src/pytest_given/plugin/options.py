@@ -6,7 +6,7 @@ name, a theme or, on an HTML run, a source-link preset is a `UsageError` up
 front rather than a surprise after the last test. The preset is resolved only
 for an HTML run because the `github` one shells out to `git remote`. It also
 registers the `pytest_given` mark, since the package exports one
-`pytest_configure`.
+`pytest_configure`, and settles a pytest-xdist run's distribution mode.
 """
 
 import argparse
@@ -227,23 +227,35 @@ def pytest_configure(config: pytest.Config) -> None:
         report_url=report_url,
         all_frames=bool(config.getoption('given_all_frames')),
     )
-    if _distributed_by_xdist(config) and (
-        given.sinks.writes_anything() or given.lint_enabled
-    ):
-        raise pytest.UsageError(
-            'pytest-given cannot write a report or run the narration lint under '
-            'pytest-xdist: each worker records the scenarios it runs, and none '
-            'of them reach the main process. Run without -n (or with -n 0).'
-        )
+    if given.writes_or_lints:
+        _settle_xdist_dist(config)
     store_given_config(config, given)
 
 
-def _distributed_by_xdist(config: pytest.Config) -> bool:
-    """xdist turns `-n N` into `--dist load` before configure, and leaves
-    `-n 0` at `no`; without xdist installed there is no such option."""
+def _settle_xdist_dist(config: pytest.Config) -> None:
+    """A report or the lint needs each test's parametrize cases on one worker,
+    which only `--dist loadfile` guarantees. xdist reads `dist` again when it
+    builds its scheduler, after collection, so rewriting it here takes effect;
+    a worker arrives with `dist` at `no`. Without xdist there is no such option.
+
+    Whether the user chose a mode is read from the arguments as given: xdist's
+    `pytest_cmdline_main` has already turned a bare `-n` into `--dist load`.
+    """
     dist = config.getoption('dist', 'no')
     assert isinstance(dist, str)
-    return dist != 'no'
+    if dist in ('no', 'loadfile') or not config.getoption('tx', None):
+        return
+    given = config.known_args_namespace
+    chosen = getattr(given, 'dist', 'no') != 'no' or getattr(given, 'distload', False)
+    if dist == 'load' and not chosen:
+        config.option.dist = 'loadfile'
+        return
+    raise pytest.UsageError(
+        'pytest-given can write a report or run the narration lint under '
+        "pytest-xdist only with --dist loadfile, which keeps a test's parametrize "
+        f'cases on one worker, not with --dist {dist}. Pass --dist loadfile, or '
+        'leave out --dist for pytest-given to choose it.'
+    )
 
 
 def _cli_over_ini[T](config: pytest.Config, name: str, kind: type[T]) -> T:

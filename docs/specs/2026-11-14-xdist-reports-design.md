@@ -1,5 +1,7 @@
 # Reports and Lint under pytest-xdist — Design Spec
 
+✅ [spec/xdist-reports](https://nwilbert.github.io/pytest-given/dev/examples/self-report.html#tag=spec/xdist-reports) (4 ✅)
+
 ## Goal
 
 A `pytest -n N` run writes the same report and runs the same narration lint as a serial run. Today
@@ -46,7 +48,7 @@ The other modes do not:
 When a run writes a report or lints (the condition the usage error checks today):
 
 - **No `--dist` given** — a bare `-n N`, which xdist would turn into `load`: pytest-given switches
-  it to `loadfile`. xdist prints `scheduling tests via LoadFileScheduling`, so the switch is visible.
+  it to `loadfile`. Under `-v`, xdist prints `scheduling tests via LoadFileScheduling`.
 - **`--dist loadfile` given** — runs as given.
 - **Any other `--dist` given** (including `-d` / `--distload`, and a `--dist` in `addopts`) — a
   usage error before collection, naming `--dist loadfile` and that dropping `--dist` selects it.
@@ -54,16 +56,16 @@ When a run writes a report or lints (the condition the usage error checks today)
 A run that asks for neither is untouched, whatever its mode.
 
 **Detecting "no `--dist` given".** xdist rewrites `dist` from `no` to `load` in its own
-`pytest_cmdline_main`. A `pytest_cmdline_main` hook wrapper sees the option before any
-implementation runs, so it records whether the user chose a mode; `pytest_configure`, once the
-options are resolved, rewrites `load` to `loadfile` only when the user did not. xdist reads `dist`
-again when it builds the scheduler at the end of collection, so the rewrite takes effect. pytest-given
-does not import xdist for any of this.
+`pytest_cmdline_main`, but `config.known_args_namespace` keeps the arguments as given, `addopts`
+included. `pytest_configure` rewrites `load` to `loadfile` only when they hold no `--dist` and no
+`-d`. xdist reads `dist` again when it builds the scheduler at the end of collection, so the rewrite
+takes effect. A `--dist` without workers (no `-n` and no `--tx`) runs serially and is left alone.
+pytest-given does not import xdist for any of this.
 
 ## Data flow
 
 **On a worker** (`hasattr(config, 'workerinput')`), session finish groups the worker's scenarios as
-it does today, then — only when the run writes a report or lints — puts a JSON-shaped payload into
+it does today, then — only when the run writes a report or lints — puts a payload into
 `config.workeroutput` instead of writing sinks or linting:
 
 - the grouped scenarios, *including* `Step.source`, each with its collection index for the
@@ -71,11 +73,14 @@ it does today, then — only when the run writes a report or lints — puts a JS
 - the registered stories and the resolved glossary;
 - or, when grouping refused, the error message instead of the scenarios.
 
+The capture travels as JSON text, not as a dict: execnet refuses a `str` or `int` subclass, such as
+an enum tag or parametrize value, which a dict would carry through to it.
+
 xdist's own session-finish wrapper sends `workeroutput` to the main process after pytest-given's hook
 has run.
 
-**On the main process**, an `optionalhook` implementation of `pytest_testnodedown(node, error)`
-keeps each worker's payload. Session finish then merges them and continues down the existing path —
+**On the main process**, `optionalhook` implementations of `pytest_testnodeready(node)` and
+`pytest_testnodedown(node, error)` track which workers are up and keep each worker's payload. Session finish then merges them (`merge_captures`) and continues down the existing path —
 the undeclared-story warning, `ReportData`, `emit_sinks`, `run_lint` — unchanged:
 
 - scenarios from all workers, sorted by the report order above;
@@ -91,6 +96,9 @@ The report's metadata is built on the main process, as today.
 - **A worker went down without a payload** (a crash, or `pytest_testnodedown` with an `error`) — the
   report would miss its scenarios, so the main process refuses to write it: a report error naming
   the crashed worker, the run fails, and a previous report is discarded as for any report error.
+- **An interrupted run that lacks a payload** — on Ctrl-C the main process stops reading the
+  workers' events, so a worker still up never sends its payload. The report is withheld with a note,
+  as for `--collect-only`: the previous report stays, and the lint does not run.
 - **"No test was selected"** is read from `session.testscollected` instead of `session.items`.
   xdist sets it on the main process from the workers' collections, whose `session.items` is always
   empty there; a serial run sets it to the same count.
@@ -121,10 +129,10 @@ spec already describes it.
 
 ## Touch points
 
-- `plugin/options.py` — the cmdline wrapper, the `load` → `loadfile` rewrite, the narrowed refusal.
-- A new `plugin/` module for the worker payload and the main-process merge, and
+- `plugin/options.py` — the `load` → `loadfile` rewrite and the narrowed refusal.
+- A new `plugin/` module for the worker payload and the main-process bookkeeping, and
   `plugin/session.py` calling it.
-- `model/session_capture.py` and `model/serde.py` — the capture and its pair.
+- `model/session_capture.py` and `model/serde.py` — the capture, its merge, and its pair.
 - `docs/site/configuration/pytest-options.md` (the pytest-xdist section), the citing skill's
   "without xdist's `-n`" line, `TODO.md`, and `CHANGELOG.md` under Unreleased: an Added entry for
   this feature (it relaxes the refusal 0.5.1 shipped, so it is not breaking) and a Changed entry

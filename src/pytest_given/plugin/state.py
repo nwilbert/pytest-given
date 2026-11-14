@@ -15,6 +15,7 @@ adds only the `.function` hop — reading the marker itself is `capture`'s.
 """
 
 from dataclasses import dataclass, field
+from typing import TypedDict
 
 import pytest
 
@@ -40,6 +41,10 @@ class GivenConfig:
     report_url: ReportUrl | None
     all_frames: bool
 
+    @property
+    def writes_or_lints(self) -> bool:
+        return self.sinks.writes_anything() or self.lint_enabled
+
 
 @dataclass(kw_only=True)
 class SessionOutcome:
@@ -52,6 +57,16 @@ class SessionOutcome:
     report_note: str | None = None
     # None when the lint did not run, so a clean run can still say it ran.
     findings: list[LintFinding] | None = None
+
+
+class WorkerOutput(TypedDict):
+    """What a pytest-xdist worker leaves in its `workeroutput`: its session
+    capture as JSON text, or the message its grouping refused with. Text, since
+    execnet refuses a `str` or `int` subclass, such as an enum parameter, that
+    a dict would carry through."""
+
+    capture: str | None
+    refusal: str | None
 
 
 @dataclass(kw_only=True)
@@ -78,6 +93,9 @@ class SessionState:
         default_factory=dict
     )
     collection_order: dict[NodeId, int] = field(default_factory=dict)
+    # The main process of a pytest-xdist run: each worker that came up, by id,
+    # with its output, or None until it sends one.
+    workers: dict[str, WorkerOutput | None] = field(default_factory=dict)
 
 
 # Private, so "one writer each" is a property of this module rather than a

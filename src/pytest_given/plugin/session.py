@@ -7,6 +7,7 @@ report, the sinks, the lint, and the terminal summary.
 import warnings
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from functools import partial
 from importlib.metadata import version
 from pathlib import Path
 from types import ModuleType
@@ -30,6 +31,7 @@ from ..model import (
     PytestGivenWarning,
     ReportData,
     Scenario,
+    SessionCapture,
     Story,
     in_report_order,
     iter_steps,
@@ -49,6 +51,13 @@ from .state import (
     session_collector,
     session_outcome,
     session_state,
+)
+from .workers import (
+    interrupted_before_capture,
+    is_xdist_controller,
+    is_xdist_worker,
+    merged_capture,
+    ship_capture,
 )
 
 
@@ -119,10 +128,9 @@ class _SessionReport:
     """A finished session's report: what the lint reads, and the serialized
     report the sinks are rendered from.
 
-    `scenarios` is the grouped list as built, *before* the serde round-trip —
-    `Step.source` is deliberately not serialized, and the AST lint rules have
-    nothing to anchor to without it. `report_dict` is None on a run with no
-    sink configured, which skips serializing entirely.
+    `scenarios` keep `Step.source`, which the report leaves out and the AST
+    lint rules anchor to. `report_dict` is None on a run with no sink
+    configured, which skips serializing entirely.
     """
 
     scenarios: list[Scenario]
@@ -149,18 +157,33 @@ def pytest_sessionfinish(session: pytest.Session) -> None:
     The lint runs outside that handler: by then the sinks are written, and the
     lint neither writes them nor owns them, so a failure in it must not delete
     a report that is on disk and correct.
+
+    A pytest-xdist worker only sends its capture; the main process, which runs
+    no test, merges the workers' captures and goes on as a serial run does.
     """
     config = session.config
-    mode = _mode_running_no_test(config)
+    if is_xdist_worker(config):
+        ship_capture(config, partial(_local_capture, session))
+        return
+    mode = _mode_running_no_test(config) or interrupted_before_capture(session)
     # An empty report would discard the previous run's, so none is written.
-    withheld = mode or (None if session.items else 'no test was selected to run')
+    # `testscollected` rather than `session.items`, which under xdist is
+    # always empty on the main process.
+    withheld = mode or (
+        None if session.testscollected else 'no test was selected to run'
+    )
     if withheld is not None and given_config(config).sinks.writes_anything():
         session_outcome(config).report_note = withheld
     if mode is not None:
         # Its scenarios never finish, so there is nothing for the lint either.
         return
     try:
-        built = _build_report(session, write=withheld is None)
+        capture = (
+            merged_capture(config)
+            if is_xdist_controller(config)
+            else _local_capture(session)
+        )
+        built = _build_report(session, capture, write=withheld is None)
         if built.report_dict is not None:
             rendered = emit_sinks(built.report_dict, given_config(config).sinks)
             if rendered.md_stdout is not None:
@@ -205,23 +228,16 @@ def _fail_run(session: pytest.Session) -> None:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
-def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
-    """Group, resolve, and serialize — everything that can fail before a sink
-    is touched.
-
-    Grouping and the glossary passes run on every run — each refuses its own
-    authoring forms. Everything after them is sink-only work, so a run writing no
-    sink skips it and keeps just what the lint reads.
-    """
+def _local_capture(session: pytest.Session) -> SessionCapture:
+    """Group and resolve what this process recorded — everything that can fail
+    before a report is built. Grouping and the glossary passes run on every
+    run, since each refuses its own authoring forms."""
     config = session.config
-    given = given_config(config)
-    collector = session_collector(config)
-    scenarios = in_report_order(
-        group_parametrized(collector.scenarios, session_state(config).param_info),
-        session_state(config).collection_order,
+    scenarios = group_parametrized(
+        session_collector(config).scenarios, session_state(config).param_info
     )
+    order = session_state(config).collection_order
     stories = registered_stories()
-    _warn_of_undeclared_stories(scenarios, stories)
     # Registered plugins include class instances; only modules can declare a
     # conftest glossary, so the filter is the caller's and `session_glossary`
     # keeps a precise signature.
@@ -230,7 +246,27 @@ def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
         for plugin in config.pluginmanager.get_plugins()
         if isinstance(plugin, ModuleType)
     ]
-    glossary = session_glossary(stories, conftests)
+    return SessionCapture(
+        scenarios=scenarios,
+        collection_index={
+            scenario.id: order[scenario.id]
+            for scenario in scenarios
+            if scenario.id in order
+        },
+        stories=stories,
+        glossary=session_glossary(stories, conftests),
+    )
+
+
+def _build_report(
+    session: pytest.Session, capture: SessionCapture, *, write: bool
+) -> _SessionReport:
+    """Order and serialize. Serializing is sink-only work, so a run writing no
+    sink skips it and keeps just what the lint reads."""
+    config = session.config
+    given = given_config(config)
+    scenarios = in_report_order(capture.scenarios, capture.collection_index)
+    _warn_of_undeclared_stories(scenarios, capture.stories)
     report_dict = None
     if write and given.sinks.writes_anything():
         report = ReportData(
@@ -244,14 +280,14 @@ def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
                 report_url=given.report_url,
             ),
             scenarios=scenarios,
-            stories=stories,
-            glossary=glossary,
+            stories=capture.stories,
+            glossary=capture.glossary,
         )
         report_dict = report_to_dict(report)
     return _SessionReport(
         scenarios=scenarios,
-        glossary=glossary,
-        stories=stories,
+        glossary=capture.glossary,
+        stories=capture.stories,
         report_dict=report_dict,
     )
 

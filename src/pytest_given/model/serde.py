@@ -4,7 +4,9 @@
 out the two kinds of field that stay out of the report: underscore-prefixed
 ones (e.g. `_by_id` on `Glossary`, `_glossaries` on the story tree) and any
 field marked `metadata={'serde_exclude': True}` — which is how `Step.source`
-opts out while keeping a name the lint call sites can read.
+opts out while keeping a name the lint call sites can read. The session
+capture a pytest-xdist worker sends keeps the excluded fields, since the lint
+on the main process reads `Step.source`.
 `report_from_dict` is the inverse; the renderer reads the JSON, calls it
 once, and operates on typed dataclasses from there.
 
@@ -66,6 +68,7 @@ from .schema import (
     TermKind,
     TracebackFrame,
 )
+from .session_capture import SessionCapture
 
 
 def report_to_dict(report: ReportData) -> JsonObject:
@@ -74,17 +77,35 @@ def report_to_dict(report: ReportData) -> JsonObject:
     return result
 
 
-def _asdict_filtered(obj: Any) -> Any:
+def session_capture_to_dict(capture: SessionCapture) -> JsonObject:
+    result = _asdict_filtered(capture, keep_excluded=True)
+    assert isinstance(result, dict)
+    return result
+
+
+def session_capture_from_dict(d: dict[str, Any]) -> SessionCapture:
+    return SessionCapture(
+        scenarios=[_scenario_from_dict(s) for s in d['scenarios']],
+        collection_index={
+            NodeId(node_id): index for node_id, index in d['collection_index'].items()
+        },
+        stories=[_story_from_dict(s) for s in d['stories']],
+        glossary=_glossary_from_dict(d['glossary']),
+    )
+
+
+def _asdict_filtered(obj: Any, *, keep_excluded: bool = False) -> Any:
     """Recursively convert dataclasses to dicts, skipping underscore fields
-    and fields marked ``metadata={'serde_exclude': True}``."""
+    and, unless `keep_excluded`, fields marked ``metadata={'serde_exclude': True}``."""
     if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
         return {
-            f.name: _asdict_filtered(getattr(obj, f.name))
+            f.name: _asdict_filtered(getattr(obj, f.name), keep_excluded=keep_excluded)
             for f in dataclasses.fields(obj)
-            if not f.name.startswith('_') and not f.metadata.get('serde_exclude')
+            if not f.name.startswith('_')
+            and (keep_excluded or not f.metadata.get('serde_exclude'))
         }
     if isinstance(obj, (list, tuple)):
-        return [_asdict_filtered(x) for x in obj]
+        return [_asdict_filtered(x, keep_excluded=keep_excluded) for x in obj]
     return obj
 
 
@@ -262,6 +283,8 @@ def _step_from_dict(d: dict[str, Any]) -> Step:
         attachments=[_step_attachment_from_dict(a) for a in d.get('attachments', [])],
         pins=_pins_from_list(d.get('pins')),
         fixture_name=d.get('fixture_name'),
+        # Only a session capture carries it; a JSON report never does.
+        source=_source_from_dict(d.get('source')),
     )
 
 

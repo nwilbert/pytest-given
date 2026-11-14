@@ -26,6 +26,7 @@ from .session import (
     pytest_sessionstart,
     pytest_terminal_summary,
 )
+from .workers import pytest_testnodedown, pytest_testnodeready
 
 __all__ = [
     'pytest_addoption',
@@ -41,4 +42,6 @@ __all__ = [
     'pytest_sessionfinish',
     'pytest_sessionstart',
     'pytest_terminal_summary',
+    'pytest_testnodedown',
+    'pytest_testnodeready',
 ]
