@@ -541,7 +541,7 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
     """Stage the files the site embeds, then build it strictly.
 
     The staged files are single-sourced elsewhere in the repo: the full-size
-    diagram the Home page links to (the README copy, see `diagram`), every
+    diagram the Home page links to (derived like the README's, see `diagram`), every
     example's report — rendered from its JSON, so its copy buttons link the
     `docs_version` being built rather than the committed HTML's `/dev/` —
     the two upright font faces the report package embeds (the site's italic
@@ -553,7 +553,6 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
     """
     _sync(session, 'docs', include_project=True)
     staged = [
-        (_DIAGRAM_README_COPY, _DOCS_SITE / 'assets' / 'pytest-given-diagram-full.svg'),
         *(
             (font, _DOCS_SITE / 'assets' / 'fonts' / font.name)
             for font in sorted(_REPORT_FONTS.glob('*.woff2'))
@@ -564,6 +563,13 @@ def _build_docs(session: nox.Session, docs_version: str) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
         session.log(f'staged {source} -> {target}')
+    # The site has a theme switch, so its full-size view follows the colour scheme.
+    _DIAGRAM_FULL_SIZE.write_text(
+        _standalone_diagram(_DIAGRAM_TOKENS_LIGHT, _DIAGRAM_TOKENS_DARK),
+        encoding='utf-8',
+        newline='\n',
+    )
+    session.log(f'wrote {_DIAGRAM_FULL_SIZE}')
     for slug in _EXAMPLE_REPORTS:
         session.run(
             'pytest-given',
@@ -587,11 +593,16 @@ def docs_build(session: nox.Session) -> None:
 
 _DIAGRAM_SOURCE = _DOCS_SITE / 'assets' / 'pytest-given-diagram.svg'
 _DIAGRAM_FONT = _REPORT_FONTS / 'source-sans-3-latin-wght-normal.woff2'
-_DIAGRAM_README_COPY = Path('docs/pytest-given-diagram.svg')
+# The README shows the light copy (the path the released READMEs on PyPI link)
+# and, through a <picture> <source>, the dark one. PyPI strips <source>, and its
+# page stays light whatever the reader's colour scheme.
+_DIAGRAM_README_LIGHT = Path('docs/pytest-given-diagram.svg')
+_DIAGRAM_README_DARK = Path('docs/pytest-given-diagram-dark.svg')
+_DIAGRAM_FULL_SIZE = _DOCS_SITE / 'assets' / 'pytest-given-diagram-full.svg'
 
 # The site defines these tokens from the theme's variables (stylesheets/extra.css);
-# the README copy has no theme, so it carries the resolved values, light first and
-# dark under a prefers-color-scheme query. Keep in step with extra.css.
+# the standalone copies have no theme, so they carry the resolved values. Keep in
+# step with extra.css.
 _DIAGRAM_TOKENS_LIGHT = {
     'bg': '#fff',
     'line': 'rgba(0, 0, 0, 0.55)',
@@ -614,24 +625,40 @@ _DIAGRAM_TOKENS_DARK = {
 }
 
 
-def _token_block(tokens: dict[str, str], indent: str) -> str:
-    return ''.join(
-        f'{indent}  --pg-diagram-{name}: {value};\n' for name, value in tokens.items()
-    )
-
-
 @nox.session(venv_backend='none')
 def diagram(session: nox.Session) -> None:
-    """Derive the README's standalone diagram from the site's inline SVG.
+    """Derive the README's light and dark diagrams from the site's inline SVG.
+
+    Rerun after editing the source SVG or the token lists above, and commit the
+    result.
+    """
+    for path, tokens in (
+        (_DIAGRAM_README_LIGHT, _DIAGRAM_TOKENS_LIGHT),
+        (_DIAGRAM_README_DARK, _DIAGRAM_TOKENS_DARK),
+    ):
+        path.write_text(_standalone_diagram(tokens), encoding='utf-8', newline='\n')
+        session.log(f'wrote {path}')
+
+
+def _standalone_diagram(
+    tokens: dict[str, str], dark_tokens: dict[str, str] | None = None
+) -> str:
+    """The site's SVG made standalone, with `dark_tokens` under prefers-color-scheme.
 
     On the site the SVG is inlined, so page CSS supplies the font and the colour
-    tokens; GitHub and PyPI render the README copy as an image, so it embeds the
-    Source Sans 3 subset the site already ships and resolves the tokens itself. A pure
-    text transform: same inputs, same bytes. Rerun after editing the source SVG
-    or the token lists above, and commit the result.
+    tokens; an SVG shown as an image gets neither, so this embeds the Source Sans 3
+    subset the site already ships and resolves the tokens. A pure text transform:
+    same inputs, same bytes.
     """
     source = _DIAGRAM_SOURCE.read_text(encoding='utf-8')
     font = base64.b64encode(_DIAGRAM_FONT.read_bytes()).decode('ascii')
+    dark_query = (
+        ''
+        if dark_tokens is None
+        else '    @media (prefers-color-scheme: dark) {\n'
+        '      svg {\n' + _token_block(dark_tokens, '      ') + '      }\n'
+        '    }\n'
+    )
     standalone_style = (
         '  <style>\n'
         '    @font-face {\n'
@@ -641,12 +668,10 @@ def diagram(session: nox.Session) -> None:
         '    }\n'
         '    svg {\n'
         '      font-family: "Source Sans 3", system-ui, sans-serif;\n'
-        + _token_block(_DIAGRAM_TOKENS_LIGHT, '    ')
+        + _token_block(tokens, '    ')
         + '    }\n'
-        '    @media (prefers-color-scheme: dark) {\n'
-        '      svg {\n' + _token_block(_DIAGRAM_TOKENS_DARK, '      ') + '      }\n'
-        '    }\n'
-        '  </style>\n'
+        + dark_query
+        + '  </style>\n'
     )
     header = (
         '<!-- Generated by `nox -s diagram` from '
@@ -655,7 +680,7 @@ def diagram(session: nox.Session) -> None:
     open_tag_end = source.index('>\n') + 2
     artwork_style_end = '  </style>\n'
     assert source.count(artwork_style_end) == 1
-    standalone = (
+    return (
         header
         + source[:open_tag_end].replace(
             '<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ', 1
@@ -668,8 +693,12 @@ def diagram(session: nox.Session) -> None:
             + '  <rect width="1000" height="1000" fill="var(--pg-diagram-bg)"/>\n',
         )
     )
-    _DIAGRAM_README_COPY.write_text(standalone, encoding='utf-8', newline='\n')
-    session.log(f'wrote {_DIAGRAM_README_COPY}')
+
+
+def _token_block(tokens: dict[str, str], indent: str) -> str:
+    return ''.join(
+        f'{indent}  --pg-diagram-{name}: {value};\n' for name, value in tokens.items()
+    )
 
 
 @nox.session

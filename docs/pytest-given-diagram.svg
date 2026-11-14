@@ -17,18 +17,6 @@
       --pg-diagram-artifact-fill: #5b2c6f;
       --pg-diagram-artifact-ink: #fff;
     }
-    @media (prefers-color-scheme: dark) {
-      svg {
-        --pg-diagram-bg: #0b0c0f;
-        --pg-diagram-line: hsla(225, 15%, 90%, 0.56);
-        --pg-diagram-panel: hsla(225, 20%, 10%, 1);
-        --pg-diagram-panel-edge: hsla(225, 15%, 90%, 0.32);
-        --pg-diagram-people-fill: #352e3c;
-        --pg-diagram-people-ink: #e4d3ec;
-        --pg-diagram-artifact-fill: #c9a6dc;
-        --pg-diagram-artifact-ink: #0b0c0f;
-      }
-    }
   </style>
   <title id="pg-diagram-title">A loop between people, agents, and artifacts</title>
   <desc id="pg-diagram-desc">Developers instruct AI agents, which write annotated tests and code. The tests verify the code and generate a report, which domain experts validate. Developers review all the artifacts, feeding back to the agents.</desc>
