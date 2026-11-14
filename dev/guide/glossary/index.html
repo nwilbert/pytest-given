@@ -1308,19 +1308,10 @@
 <li><strong>Several terms may avoid the same word.</strong> The lint then names each of them, and you pick the one the step means.</li>
 </ul>
 <h2 id="discovery">Discovery<a class="headerlink" href="#discovery" title="Permanent link">&para;</a></h2>
-<p>pytest-given finds your glossary in one of two ways:</p>
-<ol>
-<li>Through a story: each <code>story(...)</code> remembers the glossary its terms come from.</li>
-<li>Otherwise, by looking for a <code>Glossary</code>, <code>TableGlossary</code> or <code>ParagraphGlossary</code> object among the names defined in your <code>conftest.py</code> files.</li>
-</ol>
-<p>So if you use a glossary without stories, import the glossary object itself into a <code>conftest.py</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># conftest.py</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.glossary</span><span class="w"> </span><span class="kn">import</span> <span class="n">g</span>  <span class="c1"># noqa: F401 — plugin discovery</span>
-</code></pre></div>
-<p><code>import tests.glossary</code> does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.</p>
-<p>A test suite can have only one glossary. If your stories reach two different glossary objects, or your <code>conftest.py</code> files hold two, pytest-given raises <code>PytestGivenError</code>. A <code>conftest.py</code> glossary other than the one your stories use is ignored, so keep one glossary object and import it everywhere.</p>
+<p>pytest-given finds your glossary wherever you construct it: in a <code>conftest.py</code>, in a test module, or in a module they import.</p>
+<p>A test suite can have only one glossary. If the modules pytest imports construct two <code>Glossary</code>, <code>TableGlossary</code> or <code>ParagraphGlossary</code> objects, pytest-given raises <code>PytestGivenError</code> and names where each was constructed. So construct the glossary once, in one module, and import it everywhere. A glossary a test constructs while it runs doesn't count.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
-<p>The hotel-booking, file-glossary-booking and paragraph-glossary <a href="../../examples/">examples</a> show a glossary in use. All three have glossary sections and avoided words.</p>
+<p>The hotel-booking, table-glossary and paragraph-glossary <a href="../../examples/">examples</a> show a glossary in use. All three have avoided words. Hotel-booking and paragraph-glossary also have glossary sections.</p>
 
 
 

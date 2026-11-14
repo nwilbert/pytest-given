@@ -1194,6 +1194,7 @@
 <li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
 <li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
 <li>The report lists scenarios by file and then by line, whatever order the tests ran in.</li>
+<li><strong>Breaking.</strong> pytest-given finds a glossary wherever the suite's modules construct it, not only through a story or a <code>conftest.py</code>, and raises <code>PytestGivenError</code> when they construct two. Construct the glossary once and import it wherever it is used.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
