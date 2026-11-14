@@ -367,7 +367,6 @@ def test_story_glossary_pin_excluded_from_repr_and_equality() -> None:
     s1 = Story(id=StoryId('x'), title='X', sentences=(a,))
     s2 = Story(id=StoryId('x'), title='X', sentences=(a,))
     assert s1 == s2
-    assert '_glossaries' not in repr(s1)
 
 
 def test_a_glossary_is_identified_by_object_not_by_value() -> None:

@@ -75,15 +75,26 @@ def capture_caller_source() -> SourceLocation | None:
     when the stack never leaves it or that frame lies outside rootdir.
 
     Walks out rather than counting a fixed depth, so a wrapper added anywhere
-    in the call chain cannot shift the anchor into this package.
+    in the call chain cannot shift the anchor into this package. A synthetic
+    frame (`<string>`, such as a dataclass's generated `__init__`) has no file
+    to link, so it is walked past too.
     """
     frame: types.FrameType | None = sys._getframe(1)
-    while frame is not None and frame.f_code.co_filename.startswith(PACKAGE_ROOT):
+    while frame is not None and frame.f_code.co_filename.startswith(
+        (PACKAGE_ROOT, '<')
+    ):
         frame = frame.f_back
     if frame is None:
         return None
     abs_path = _co_filename_to_path(frame.f_code.co_filename)
     return file_source(abs_path, frame.f_lineno)
+
+
+def site_text(source: SourceLocation | None) -> str:
+    """A declaration site as an error message names it; None outside rootdir."""
+    if source is None:
+        return 'an unknown location'
+    return f'{source.relpath}:{source.line}'
 
 
 def code_source(code: types.CodeType) -> SourceLocation | None:

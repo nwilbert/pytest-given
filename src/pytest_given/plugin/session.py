@@ -10,7 +10,6 @@ from datetime import UTC, datetime
 from functools import partial
 from importlib.metadata import version
 from pathlib import Path
-from types import ModuleType
 
 import pytest
 
@@ -238,14 +237,6 @@ def _local_capture(session: pytest.Session) -> SessionCapture:
     )
     order = session_state(config).collection_order
     stories = registered_stories()
-    # Registered plugins include class instances; only modules can declare a
-    # conftest glossary, so the filter is the caller's and `session_glossary`
-    # keeps a precise signature.
-    conftests = [
-        plugin
-        for plugin in config.pluginmanager.get_plugins()
-        if isinstance(plugin, ModuleType)
-    ]
     return SessionCapture(
         scenarios=scenarios,
         collection_index={
@@ -254,7 +245,7 @@ def _local_capture(session: pytest.Session) -> SessionCapture:
             if scenario.id in order
         },
         stories=stories,
-        glossary=session_glossary(stories, conftests),
+        glossary=session_glossary(stories, session_state(config).glossaries),
     )
 
 

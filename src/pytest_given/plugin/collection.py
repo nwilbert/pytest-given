@@ -12,6 +12,7 @@ import pytest
 
 from ..capture import (
     Template,
+    registered_glossaries,
 )
 from ..model import (
     NodeId,
@@ -64,6 +65,10 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
             _validate_scenario_marker(item)
     except PytestGivenError as error:
         raise pytest.UsageError(str(error)) from error
+
+
+def pytest_collection_finish(session: pytest.Session) -> None:
+    session_state(session.config).glossaries = registered_glossaries()
 
 
 def _validate_scenario_marker(item: pytest.Item) -> None:

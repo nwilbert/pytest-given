@@ -4,7 +4,7 @@ import difflib
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import cache
 
 from ..model import (
@@ -31,12 +31,14 @@ class LookupGlossary(BaseGlossary):
     """A glossary that reads a term back by name, as `g['Guest']`.
 
     Both user-facing glossaries do this, and a repeated lookup hands back the
-    *same* handle.
+    *same* handle. Constructing one registers it as a candidate for the
+    suite's glossary.
     """
 
     def __post_init__(self) -> None:
         super().__post_init__()
         self._handles: dict[TermId, TermHandle] = {}
+        _GLOSSARY_REGISTRY[self] = capture_caller_source()
 
     def __getitem__(self, name: str) -> TermHandle:
         """Name-based, case-insensitive get-only lookup. Raises
@@ -51,7 +53,7 @@ class LookupGlossary(BaseGlossary):
             )
             hint = f' Did you mean: {", ".join(close)}?' if close else ''
             raise PytestGivenLookupError(f'no glossary term named {name!r}.{hint}')
-        handle = TermHandle(_term=term, _glossary=self)
+        handle = TermHandle(_term=term)
         self._handles[term_id] = handle
         return handle
 
@@ -121,7 +123,7 @@ class Glossary(LookupGlossary, _TermDeclarations):
         term = _register_kind(
             self, kind, name, definition, section, avoid, capture_caller_source()
         )
-        return TermHandle(_term=term, _glossary=self)
+        return TermHandle(_term=term)
 
 
 @dataclass(frozen=True)
@@ -167,10 +169,6 @@ class TermHandleBase(ABC):
 
     @property
     @abstractmethod
-    def glossary(self) -> BaseGlossary: ...
-
-    @property
-    @abstractmethod
     def display(self) -> str: ...
 
     @property
@@ -204,7 +202,7 @@ class TermHandleBase(ABC):
 
 @dataclass(frozen=True)
 class TermHandle(TermHandleBase):
-    """A `GlossaryTerm` plus a back-ref to its owning `Glossary`.
+    """What a glossary hands back for a `GlossaryTerm`.
 
     One type for every kind and every accessor: the registration methods differ
     in what they register, not in what they hand back, and the kind is read off
@@ -212,9 +210,6 @@ class TermHandle(TermHandleBase):
     """
 
     _term: GlossaryTerm
-    # Out of the identity: a handle *is* its term, so two handles for the same
-    # term compare equal across the glossaries they came from.
-    _glossary: BaseGlossary = field(compare=False)
 
     def __call__(self, display: str) -> TermInstance:
         """This term as one call site reads it (``guest('Alice')``).
@@ -232,10 +227,6 @@ class TermHandle(TermHandleBase):
     @property
     def term(self) -> GlossaryTerm:
         return self._term
-
-    @property
-    def glossary(self) -> BaseGlossary:
-        return self._glossary
 
     @property
     def canonical(self) -> str:
@@ -259,10 +250,6 @@ class TermInstance(TermHandleBase):
     @property
     def term(self) -> GlossaryTerm:
         return self.handle.term
-
-    @property
-    def glossary(self) -> BaseGlossary:
-        return self.handle.glossary
 
     @property
     def display(self) -> str:
@@ -418,3 +405,21 @@ def register_or_conflict(
     check_avoided_words(glossary, term)
     glossary.register(term)
     return term
+
+
+# Every user-facing glossary this process has constructed, with where: the
+# candidates for the suite's glossary. Process-global like the story registry,
+# so `process_state` swaps it around a nested in-process run.
+_GLOSSARY_REGISTRY: dict[BaseGlossary, SourceLocation | None] = {}
+
+
+def registered_glossaries() -> dict[BaseGlossary, SourceLocation | None]:
+    return dict(_GLOSSARY_REGISTRY)
+
+
+def restore_glossary_registry(
+    snapshot: dict[BaseGlossary, SourceLocation | None],
+) -> None:
+    """Reinstate a `registered_glossaries()` snapshot; `{}` clears it."""
+    _GLOSSARY_REGISTRY.clear()
+    _GLOSSARY_REGISTRY.update(snapshot)

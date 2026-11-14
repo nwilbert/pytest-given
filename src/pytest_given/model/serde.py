@@ -2,7 +2,7 @@
 
 `report_to_dict` serializes a `ReportData` to a JSON-shaped dict, filtering
 out the two kinds of field that stay out of the report: underscore-prefixed
-ones (e.g. `_by_id` on `Glossary`, `_glossaries` on the story tree) and any
+ones (e.g. `_by_id` on `Glossary`) and any
 field marked `metadata={'serde_exclude': True}` — which is how `Step.source`
 opts out while keeping a name the lint call sites can read. The session
 capture a pytest-xdist worker sends keeps the excluded fields, since the lint

@@ -1,7 +1,7 @@
-"""Story / Sentence / Clause constructors, the glossaries they carry, and the
-sentence handles a story hands out."""
+"""Story / Sentence / Clause constructors, and the sentence handles a story
+hands out."""
 
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 
 from ..model import (
@@ -9,21 +9,19 @@ from ..model import (
     ClausePart,
     ClauseTermRef,
     ClauseWord,
-    Glossary,
     Pin,
     PytestGivenError,
     PytestGivenLookupError,
     Sentence,
     SentenceId,
     SentenceName,
-    SourceLocation,
     StoryId,
     id_derive,
 )
 from ..model import Story as BaseStory
 from .glossary import TermHandleBase
 from .kind_inference import ROLE_ACCEPTS, Slot, slot_for
-from .source import capture_caller_source
+from .source import capture_caller_source, site_text
 
 # What every slot accepts structurally: a glossary reference of some sort, or a
 # bare connective. Which *kind* fits a given position is `_check_position`'s.
@@ -31,30 +29,7 @@ type _ClauseArg = TermHandleBase | str
 
 
 @dataclass(frozen=True, kw_only=True)
-class _GlossaryCarrier:
-    """The live `Glossary` objects a story-tree node's subtree references.
-
-    `clause()` / `sentence()` / `story()` carry them at construction so
-    `glossary_resolution.resolve_glossary` can pick the suite's glossary off the
-    stories it is handed.
-
-    A capture-side mixin rather than a field on the schema: the report model
-    neither carries this nor serializes it, and `model/` is the leaf — it may
-    not reach into `capture` for the `Glossary` these actually are. Underscored
-    all the same, so the reflective serializer drops it if one of these ever
-    does reach serde.
-    """
-
-    _glossaries: frozenset[Glossary] = frozenset()
-
-
-@dataclass(frozen=True, kw_only=True)
-class _CarrierClause(Clause, _GlossaryCarrier):
-    pass
-
-
-@dataclass(frozen=True, kw_only=True)
-class UnnumberedSentence(_GlossaryCarrier):
+class UnnumberedSentence:
     """What `sentence()` builds: a sentence before `story()` gives it its
     number. Not a model `Sentence` — it has no id until `story()` assigns
     one by position."""
@@ -64,7 +39,7 @@ class UnnumberedSentence(_GlossaryCarrier):
 
 
 @dataclass(frozen=True, kw_only=True)
-class Story(BaseStory, _GlossaryCarrier):
+class Story(BaseStory):
     """The story `story()` returns: the model's storage plus sentence lookup,
     as the capture `Glossary` adds term lookup to the model's."""
 
@@ -170,16 +145,6 @@ def _items(value: object, kind: type) -> tuple[object, ...]:
     return tuple(value)
 
 
-def carried_glossaries(node: object) -> frozenset[Glossary]:
-    """The glossaries carried on a story-tree node.
-
-    Empty for a node that did not come from `clause()` / `sentence()` /
-    `story()` — a deserialized report's, most of all, which carries its
-    glossary as a serialized field instead.
-    """
-    return node._glossaries if isinstance(node, _GlossaryCarrier) else frozenset()
-
-
 def clause(*parts: _ClauseArg) -> Clause:
     """Build a Clause as a node/edge alternation, so it maps directly
     onto a Domain Storytelling graph. Even positions (0, 2, ...) are
@@ -200,18 +165,7 @@ def clause(*parts: _ClauseArg) -> Clause:
         if isinstance(part, str):
             continue  # a bare word carries no role; valid at any position
         _check_position(part, position, slot_for(position), parts)
-    schema_parts = tuple(_to_part(part) for part in parts)
-    # Carry the live Glossary objects the clause references; the enclosing
-    # sentence and story union them upwards, which is what enforces the v1
-    # "one glossary per story" invariant at construction time.
-    glossaries = frozenset(
-        owner for part in parts if (owner := _glossary_of(part)) is not None
-    )
-    return _CarrierClause(parts=schema_parts, _glossaries=glossaries)
-
-
-def _glossary_of(value: object) -> Glossary | None:
-    return value.glossary if isinstance(value, TermHandleBase) else None
+    return Clause(parts=tuple(_to_part(part) for part in parts))
 
 
 def sentence(
@@ -235,7 +189,6 @@ def sentence(
         clauses = tuple(p for p in parts_or_clauses if isinstance(p, Clause))
     else:
         clauses = (clause(*parts_or_clauses),)  # type: ignore[arg-type]
-    glossaries = union_glossaries(carried_glossaries(one) for one in clauses)
     if name is not None and (
         not isinstance(name, str) or not name or name != name.strip()
     ):
@@ -246,13 +199,7 @@ def sentence(
     return UnnumberedSentence(
         clauses=clauses,
         name=SentenceName(name) if name is not None else None,
-        _glossaries=glossaries,
     )
-
-
-def union_glossaries(carried: Iterable[frozenset[Glossary]]) -> frozenset[Glossary]:
-    """The distinct glossaries a group of carriers reaches."""
-    return frozenset[Glossary]().union(*carried)
 
 
 # Every story this process has declared, in declaration order: the report's
@@ -286,37 +233,27 @@ def _register_story(built: Story) -> None:
     if claimed is not None:
         raise PytestGivenError(
             f'story {built.title!r} (id {built.id!r}) already declared at '
-            f'{_site_text(claimed.source)}; declaring it again at '
-            f'{_site_text(built.source)}.'
+            f'{site_text(claimed.source)}; declaring it again at '
+            f'{site_text(built.source)}.'
         )
     _STORY_REGISTRY[built.id] = built
 
 
-def _site_text(source: SourceLocation | None) -> str:
-    """The declaration site a collision message names; None outside rootdir."""
-    if source is None:
-        return 'an unknown location'
-    return f'{source.relpath}:{source.line}'
-
-
 def story(title: str, sentences: Sequence[UnnumberedSentence] = ()) -> Story:
     """Construct and register a Story: numbers its sentences by position, and
-    enforces unique sentence names and v1's single-glossary invariant. A story
-    that fails a check is not registered, so a corrected one may take its id."""
+    enforces unique sentence names. A story that fails a check is not
+    registered, so a corrected one may take its id."""
     unnumbered = tuple(sentences)
     numbered = tuple(
         Sentence(id=SentenceId(position), clauses=one.clauses, name=one.name)
         for position, one in enumerate(unnumbered, start=1)
     )
     _check_unique_names(title, numbered)
-    glossaries = union_glossaries(carried_glossaries(one) for one in unnumbered)
-    _check_single_glossary(title, glossaries)
     built = Story(
         id=StoryId(id_derive(title)),
         title=title,
         sentences=numbered,
         source=capture_caller_source(),
-        _glossaries=glossaries,
     )
     _register_story(built)
     return built
@@ -334,14 +271,6 @@ def _check_unique_names(title: str, sentences: tuple[Sentence, ...]) -> None:
                 f'unique within its story.'
             )
         first_with[one.name] = one.id
-
-
-def _check_single_glossary(title: str, glossaries: frozenset[Glossary]) -> None:
-    if len(glossaries) > 1:
-        raise PytestGivenError(
-            f'story {title!r} spans multiple glossaries ({len(glossaries)}); '
-            f'v1 supports at most one glossary per story.'
-        )
 
 
 _KIND_LABEL = {

@@ -815,6 +815,69 @@
 - **then** the «scenario» keeps its rootdir-relative source
 - **then** pytest's warnings summary says it loaded too late to prepare capture
 
+## ✓ A «glossary» declared in a test module reaches the «report» without a «story»
+`tests/integration/test_plugin.py::test_glossary_in_a_test_module_is_discovered_without_a_story`
+
+- **given** a test module that declares a «glossary», with no «story» and no conftest
+    - 📎 test_module.py:
+        ```
+        from pytest_given import Glossary, scenario, when
+
+        g = Glossary()
+        guest = g.actor('Guest')
+
+
+        @scenario('A guest arrives')
+        def test_guest_arrives():
+            with when(t'the {guest} arrives'):
+                pass
+        ```
+- **when** the suite runs with --given-json
+- **then** the «report» carries the «glossary»
+
+## ✓ A «glossary» a test constructs while it runs is not the suite's «glossary»
+`tests/integration/test_plugin.py::test_a_glossary_constructed_in_a_test_does_not_count`
+
+- **given** a test module with a «glossary», whose test constructs another one
+    - 📎 test_module.py:
+        ```
+        from pytest_given import Glossary, scenario
+
+        g = Glossary()
+        g.actor('Guest')
+
+
+        @scenario('x')
+        def test_x():
+            Glossary().actor('Host')
+        ```
+- **when** the suite runs with --given-json
+- **then** the «report» carries the module's «glossary»
+
+## ✓ A suite's modules may construct only one «glossary»
+`tests/integration/test_plugin.py::test_two_glossaries_raise_naming_where_each_was_constructed` · validation
+
+- **given** a conftest and a test module that each construct a «glossary»
+    - 📎 conftest.py:
+        ```
+        from pytest_given import Glossary
+
+        g1 = Glossary()
+        ```
+    - 📎 test_module.py:
+        ```
+        from pytest_given import Glossary, scenario
+
+        g2 = Glossary()
+
+
+        @scenario('x')
+        def test_x():
+            pass
+        ```
+- **when** the suite runs with --given-json
+- **then** the run fails without a «report», naming where each «glossary» was constructed
+
 ## ✓ A `Template` «given annotation» on an unparametrized «scenario» fails that «scenario»
 `tests/integration/test_plugin.py::test_a_template_given_annotation_without_parametrize_fails_the_scenario` · parametrization, validation
 
@@ -2609,16 +2672,6 @@
 - **given** a human-readable story title
 - **when** a «story» is built from it
 - **then** its id is the slugified title
-
-## ✓ A «story» may span only one «glossary»
-`tests/unit/capture/test_story.py::test_story_rejects_two_glossaries` · validation
-
-- **given** a Guest actor
-- **given** a search activity
-- **given** a Room work object
-- **given** two sentences that reach two different glossaries
-- **when** a «story» is built spanning both glossaries
-- **then** a PytestGivenError says a story spans multiple glossaries
 
 ## ✓ A «sentence» «handle» is looked up by name or by number
 `tests/unit/capture/test_story.py::test_story_hands_out_a_sentence_by_name_and_by_number`

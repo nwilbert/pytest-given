@@ -1,11 +1,11 @@
 """The process-global state `capture` keeps, and the one way to swap it.
 
-Three globals back a recording run: the rootdir `source` relativizes paths
-against, the story registry that catches a story declared twice, and the
-ContextVar naming the collector currently recording. All three are
-process-wide, so a nested in-process run (pytester, `pytest.main`) has to
-displace every one of them on the way in and put every one back on the way
-out.
+Four globals back a recording run: the rootdir `source` relativizes paths
+against, the story registry that catches a story declared twice, the glossary
+registry the suite's glossary is picked from, and the ContextVar naming the
+collector currently recording. All four are process-wide, so a nested
+in-process run (pytester, `pytest.main`) has to displace every one of them on
+the way in and put every one back on the way out.
 
 They are saved and restored together rather than a call site at a time because
 missing one is a silent bug the *outer* session pays for: a stranded rootdir
@@ -19,8 +19,9 @@ cache and the path-form folding that keeps it correct (see `source.py`).
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..model import StoryId
+from ..model import Glossary, SourceLocation, StoryId
 from .collector import Collector, get_active_collector, set_active_collector
+from .glossary import registered_glossaries, restore_glossary_registry
 from .source import current_rootdir, restore_rootdir, set_rootdir
 from .story import Story, restore_story_registry, snapshot_story_registry
 
@@ -31,6 +32,7 @@ class CaptureState:
 
     rootdir: Path | None
     stories: dict[StoryId, Story]
+    glossaries: dict[Glossary, SourceLocation | None]
     collector: Collector | None
 
 
@@ -38,6 +40,7 @@ def capture_snapshot() -> CaptureState:
     return CaptureState(
         rootdir=current_rootdir(),
         stories=snapshot_story_registry(),
+        glossaries=registered_glossaries(),
         collector=get_active_collector(),
     )
 
@@ -50,12 +53,13 @@ def restore_capture_state(state: CaptureState) -> None:
     """
     restore_rootdir(state.rootdir)
     restore_story_registry(state.stories)
+    restore_glossary_registry(state.glossaries)
     set_active_collector(state.collector)
 
 
 def begin_capture_session(rootdir: Path, *, clear_registry: bool = True) -> None:
     """Point capture at a session's rootdir with no collector active, and on
-    a cleared story registry unless `clear_registry` is false.
+    cleared story and glossary registries unless `clear_registry` is false.
 
     Take a `capture_snapshot` first when the caller may be nested inside
     another run, and `restore_capture_state` when this one is done. The
@@ -65,4 +69,5 @@ def begin_capture_session(rootdir: Path, *, clear_registry: bool = True) -> None
     set_rootdir(rootdir)
     if clear_registry:
         restore_story_registry({})
+        restore_glossary_registry({})
     set_active_collector(None)

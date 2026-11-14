@@ -71,30 +71,12 @@ def _term(kind, name='X'):
     return GlossaryTerm(id=TermId('x'), kind=kind, canonical=name)
 
 
-def test_actor_carries_term_and_glossary_back_ref():
-    g = Glossary()
+def test_a_handle_reads_its_term():
     t = _term('actor')
-    a = TermHandle(_term=t, _glossary=g)
+    a = TermHandle(_term=t)
     assert a.term is t
-    assert a.glossary is g
     assert a.canonical == 'X'
     assert a.id == 'x'
-
-
-def test_work_object_carries_term_and_glossary_back_ref():
-    g = Glossary()
-    t = _term('object')
-    w = TermHandle(_term=t, _glossary=g)
-    assert w.term is t
-    assert w.glossary is g
-
-
-def test_activity_carries_term_and_glossary_back_ref():
-    g = Glossary()
-    t = _term('activity')
-    v = TermHandle(_term=t, _glossary=g)
-    assert v.term is t
-    assert v.glossary is g
 
 
 @scenario(
@@ -102,9 +84,8 @@ def test_activity_carries_term_and_glossary_back_ref():
 )
 def test_actor_call_returns_instance_with_distinct_display():
     with given(t'an {pg["Actor"].l} handle for Guest'):
-        g = Glossary()
         t = GlossaryTerm(id=TermId('guest'), kind='actor', canonical='Guest')
-        a = TermHandle(_term=t, _glossary=g)
+        a = TermHandle(_term=t)
     with when(t'the {pg["Actor"].l} is called with a name'):
         inst = a('Alice')
     with then(t'an {pg["Instance"].l} with a distinct display is returned'):
@@ -114,9 +95,8 @@ def test_actor_call_returns_instance_with_distinct_display():
 
 
 def test_work_object_call_returns_instance_with_distinct_display():
-    g = Glossary()
     t = GlossaryTerm(id=TermId('room'), kind='object', canonical='Room')
-    w = TermHandle(_term=t, _glossary=g)
+    w = TermHandle(_term=t)
     inst = w('Deluxe Suite')
     assert isinstance(inst, TermInstance)
     assert inst.handle is w
@@ -129,9 +109,8 @@ def test_work_object_call_returns_instance_with_distinct_display():
 )
 def test_activity_call_returns_inflection_sharing_term_identity():
     with given(t'an {pg["Activity"].l} handle for confirm'):
-        g = Glossary()
         t = GlossaryTerm(id=TermId('confirm'), kind='activity', canonical='confirm')
-        v = TermHandle(_term=t, _glossary=g)
+        v = TermHandle(_term=t)
     with when(t'the {pg["Activity"].l} is called with a surface form'):
         infl = v('confirms')
     with then(t'an {pg["Inflection"].l} sharing the activity identity is returned'):

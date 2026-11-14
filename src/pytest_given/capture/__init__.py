@@ -16,7 +16,7 @@ from .collector import (
     set_active_collector,
 )
 from .file_glossary import ParagraphGlossary, TableGlossary
-from .glossary import Glossary, GlossarySection
+from .glossary import Glossary, GlossarySection, registered_glossaries
 from .glossary_resolution import session_glossary
 from .process_state import (
     begin_capture_session,
@@ -72,6 +72,7 @@ __all__ = [
     'is_internal_path',
     'item_source',
     'parse_short_repr',
+    'registered_glossaries',
     'registered_stories',
     'resolved_placeholder_part',
     'restore_capture_state',

@@ -180,21 +180,9 @@ A `TableGlossary` reads them from its `avoid_column`, a `ParagraphGlossary` from
 
 ## Discovery
 
-pytest-given finds your glossary in one of two ways:
+pytest-given finds your glossary wherever you construct it: in a `conftest.py`, in a test module, or in a module they import.
 
-1. Through a story: each `story(...)` remembers the glossary its terms come from.
-2. Otherwise, by looking for a `Glossary`, `TableGlossary` or `ParagraphGlossary` object among the names defined in your `conftest.py` files.
-
-So if you use a glossary without stories, import the glossary object itself into a `conftest.py`:
-
-```python
-# conftest.py
-from tests.glossary import g  # noqa: F401 — plugin discovery
-```
-
-`import tests.glossary` does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.
-
-A test suite can have only one glossary. If your stories reach two different glossary objects, or your `conftest.py` files hold two, pytest-given raises `PytestGivenError`. A `conftest.py` glossary other than the one your stories use is ignored, so keep one glossary object and import it everywhere.
+A test suite can have only one glossary. If the modules pytest imports construct two `Glossary`, `TableGlossary` or `ParagraphGlossary` objects, pytest-given raises `PytestGivenError` and names where each was constructed. So construct the glossary once, in one module, and import it everywhere. A glossary a test constructs while it runs doesn't count.
 
 ## Examples
 

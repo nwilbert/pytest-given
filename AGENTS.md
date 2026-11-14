@@ -106,7 +106,7 @@ Before merging changes to narrated tests, run the `pytest-given-reviewing` skill
 
 What is specific to this repo's self-report:
 
-- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `TableGlossary` in `tests/conftest.py` via `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions); regeneration and lint gating under [Quality gates](#quality-gates).
+- The glossary handle is `pg` — `GLOSSARY.md` loaded as a `TableGlossary` in `tests/ubiquitous_language.py`. Term-rename mechanics live under [Conventions](#conventions); regeneration and lint gating under [Quality gates](#quality-gates).
 - **New or changed user-facing behavior needs a scenario, not just a test** — otherwise the behavior is invisible in the report. Decorate the test that best *states* the rule, one per rule, not per branch; the edge cases around it stay plain. Two gaps to check for: a rule the [CHANGELOG](CHANGELOG.md) announces that no scenario names, and a [GLOSSARY.md](GLOSSARY.md) row *asserting* behavior (`Templatize`, `Parameter table`) that no scenario demonstrates.
 
 ## Conventions

@@ -40,16 +40,9 @@ book = g.activity('book', definition='Reserve a room for a stay.')
 
 Either way, **give the language a public home.** Define the glossary, and the stories once there are some, in one dedicated module with a public name, such as `tests/ubiquitous_language.py`. That module *is* the suite's ubiquitous language, not a private helper, so don't prefix its name with an underscore. Test modules import their handles from it. A glossary without stories is fine: you get the Glossary tab without writing any stories.
 
-**The plugin finds the glossary in one of two ways.** First, it reads the glossary from any `story(...)` that references it. A story records its glossary when it is built, so a suite with bound stories needs no further wiring. Otherwise, the plugin scans the attributes of `conftest.py` modules for a `Glossary`, `TableGlossary` or `ParagraphGlossary` instance. So a suite without stories has to bind the instance *by name*:
+**The plugin finds the glossary wherever it is constructed**, so it needs no wiring, with stories or without.
 
-```python
-# conftest.py
-from tests.ubiquitous_language import g  # noqa: F401 — plugin discovery
-```
-
-`import tests.ubiquitous_language` binds a module, not a glossary. The scan then finds nothing, and the Glossary tab is empty. Binding the glossary by name is a good habit even with stories: it costs one line, and it keeps working after a later refactor removes the last story.
-
-**One glossary per suite.** Stories that reach two different `Glossary` instances raise `PytestGivenError`, and so do two glossaries in conftests. But once the stories reach one glossary, a different glossary in a conftest is silently ignored. Keep one instance and import it everywhere.
+**One glossary per suite.** Two glossaries constructed while pytest imports the suite raise `PytestGivenError`. Keep one instance and import it everywhere. A glossary a test constructs while it runs doesn't count.
 
 ## Using terms in narration
 

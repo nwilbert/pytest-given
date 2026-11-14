@@ -28,7 +28,7 @@ from ..capture import (
     scenario_marker as capture_scenario_marker,
 )
 from ..lint import LintConfig, LintFinding
-from ..model import NodeId, ParamInfo, ReportUrl
+from ..model import Glossary, NodeId, ParamInfo, ReportUrl, SourceLocation
 from ..report import SinkConfig
 
 
@@ -84,7 +84,9 @@ class SessionState:
     insertion-ordered by setup time, which is what lets the graft take them in
     dependency order: `item.fixturenames` can list a dependent before its
     dependency. `collection_order` is each item's position as collected, before
-    a reordering plugin rearranges `session.items`.
+    a reordering plugin rearranges `session.items`. `glossaries` are the ones
+    registered by the end of collection: one a test constructs while it runs is
+    not the suite's.
     """
 
     param_info: ParamInfo = field(default_factory=dict)
@@ -93,6 +95,7 @@ class SessionState:
         default_factory=dict
     )
     collection_order: dict[NodeId, int] = field(default_factory=dict)
+    glossaries: dict[Glossary, SourceLocation | None] = field(default_factory=dict)
     # The main process of a pytest-xdist run: each worker that came up, by id,
     # with its output, or None until it sends one.
     workers: dict[str, WorkerOutput | None] = field(default_factory=dict)

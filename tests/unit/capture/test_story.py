@@ -15,7 +15,6 @@ from pytest_given import (
 from pytest_given.capture import source as source_mod
 from pytest_given.capture.story import (
     UnnumberedSentence,
-    carried_glossaries,
     clause,
     registered_stories,
     restore_story_registry,
@@ -377,27 +376,6 @@ def test_story_derives_id_from_title():
         assert s.id == StoryId('book-a-room')
 
 
-@scenario(
-    t'A {pg["Story"].l} may span only one {pg["Glossary"].l}',
-    tags=['validation'],
-)
-def test_story_rejects_two_glossaries(guest, search, room):
-    with given('two sentences that reach two different glossaries'):
-        other = Glossary()
-        other_search = other.activity('search')
-    with (
-        when_then(
-            t'a {pg["Story"].l} is built spanning both glossaries',
-            'a PytestGivenError says a story spans multiple glossaries',
-        ),
-        pytest.raises(PytestGivenError, match='spans multiple glossaries'),
-    ):
-        story(
-            'Book',
-            [sentence(guest, search, room), sentence(guest, other_search, room)],
-        )
-
-
 def test_story_empty_title_raises():
     with pytest.raises(PytestGivenError, match='derived id is empty'):
         story('---', [])
@@ -459,7 +437,6 @@ def test_iterating_a_story_yields_its_sentence_handles(guest, search, room):
 def test_story_reads_a_one_shot_iterable_of_sentences_once(guest, search, room):
     built = story('Generated', (sentence(guest, search, room) for _ in range(2)))
     assert [one.id for one in built.sentences] == [1, 2]
-    assert carried_glossaries(built) == frozenset({guest.glossary})
 
 
 def test_a_story_that_fails_its_checks_leaves_its_id_free(guest, search, room):
@@ -623,29 +600,6 @@ def test_story_id_collision_does_not_fire_after_registry_clear():
     story('Book', [])
     restore_story_registry({})
     story('Book', [])
-
-
-def test_clause_records_single_glossary(guest, search, room):
-    """The live Glossary the clause references is pinned so the single-glossary
-    invariant can be enforced at story construction and the plugin can resolve
-    the report glossary from the story tree."""
-    built = clause(guest, search, room)
-    assert carried_glossaries(built) == frozenset({guest.glossary})
-
-
-def test_sentence_unions_glossaries_across_clauses(g, guest, search, room):
-    # Two clauses, same glossary — the pin must dedup by identity, not double-count.
-    first = clause(guest, search, room)
-    second = clause(guest('Alice'), search, room)
-    a = sentence(first, second)
-    assert carried_glossaries(a) == frozenset({g})
-
-
-def test_story_stashes_its_glossary(guest, search, room):
-    """story() carries the referenced Glossary on the Story tree so
-    plugin._resolve_glossary can pick it without any session-global."""
-    s = story('Book', [sentence(guest, search, room)])
-    assert carried_glossaries(s) == frozenset({guest.glossary})
 
 
 # --- Additional grammar/constructor cases (kept as plain unit checks) ---

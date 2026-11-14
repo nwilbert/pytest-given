@@ -3123,7 +3123,10 @@ def test_a_conftest_registered_plugin_warns_instead_of_degrading_silently(
         pytester.makepyfile(_SUITE)
         json_path = tmp_path / 'report.json'
     with when('the suite runs with plugin autoload disabled'):
-        result = pytester.runpytest(
+        # In a subprocess, like every late-load test: a late-loaded plugin
+        # keeps the registries it finds, and in-process those hold the outer
+        # session's glossaries.
+        result = pytester.runpytest_subprocess(
             '--disable-plugin-autoload', f'--given-json={json_path}'
         )
     with then('the run passes and the report is still written'):
@@ -3153,7 +3156,7 @@ def test_a_p_flag_registration_needs_no_late_bootstrap(pytester, tmp_path):
 def test_the_late_load_warning_obeys_filterwarnings(pytester):
     pytester.makeconftest("pytest_plugins = ['pytest_given.plugin']")
     pytester.makepyfile(_SUITE)
-    result = pytester.runpytest(
+    result = pytester.runpytest_subprocess(
         '--disable-plugin-autoload',
         '-W',
         'ignore::pytest_given.PytestGivenWarning',
@@ -3177,8 +3180,7 @@ def test_session_finish_with_no_stories_leaves_glossary_none(pytester):
 
 
 def test_report_json_excludes_underscore_fields(pytester):
-    """`_by_id` on Glossary and `_glossaries` on the story tree must not
-    appear in the JSON output."""
+    """`_by_id` on Glossary must not appear in the JSON output."""
     pytester.makepyfile("""
         from pytest_given import Glossary, scenario, sentence, story
 
@@ -3195,76 +3197,124 @@ def test_report_json_excludes_underscore_fields(pytester):
     pytester.runpytest('--given-json=report.json')
     raw = pytester.path.joinpath('report.json').read_text()
     assert '_by_id' not in raw
-    assert '_glossaries' not in raw
 
 
-# --- Glossary discovery: the conftest-scan fallback ---
+# --- Glossary discovery: every glossary registers when constructed ---
 
 
-def test_glossary_only_in_conftest_is_discovered(pytester):
-    pytester.makeconftest("""
-        from pytest_given import Glossary
-        g = Glossary()
-        g.actor('Guest')
-        g.activity('search')
-    """)
-    pytester.makepyfile("""
-        from pytest_given import scenario
+GLOSSARY_IN_TEST_MODULE = """
+from pytest_given import Glossary, scenario, when
 
-        @scenario('x')
-        def test_x():
-            pass
-    """)
-    pytester.runpytest('--given-json=report.json')
-    data = json.loads(pytester.path.joinpath('report.json').read_text())
-    assert data['glossary'] is not None
-    term_ids = {t['id'] for t in data['glossary']['terms']}
-    assert term_ids == {'guest', 'search'}
+g = Glossary()
+guest = g.actor('Guest')
 
 
-def test_glossary_in_regular_module_not_discovered_without_story(pytester):
-    pytester.makepyfile(
-        domain="""
-        from pytest_given import Glossary
-        g = Glossary()
-        g.actor('Guest')
-    """
-    )
-    pytester.makepyfile("""
-        from pytest_given import scenario
-        import domain
-
-        @scenario('x')
-        def test_x():
-            assert domain.g is not None
-    """)
-    pytester.runpytest('--given-json=report.json')
-    data = json.loads(pytester.path.joinpath('report.json').read_text())
-    assert data['glossary'] is None
+@scenario('A guest arrives')
+def test_guest_arrives():
+    with when(t'the {guest} arrives'):
+        pass
+"""
 
 
-def test_multiple_glossaries_in_conftests_raises(pytester):
-    pytester.makeconftest("""
-        from pytest_given import Glossary
-        g1 = Glossary()
-        g1.actor('Foo')
-        g2 = Glossary()
-        g2.actor('Bar')
-    """)
-    pytester.makepyfile("""
-        from pytest_given import scenario
+@scenario(
+    t'A {pg["Glossary"].l} declared in a test module reaches the {pg["Report"].l} '
+    t'without a {pg["Story"].l}'
+)
+def test_glossary_in_a_test_module_is_discovered_without_a_story(pytester):
+    with given(
+        t'a test module that declares a {pg["Glossary"].l}, with no '
+        t'{pg["Story"].l} and no conftest'
+    ):
+        pytester.makepyfile(GLOSSARY_IN_TEST_MODULE)
+        attach('test_module.py', GLOSSARY_IN_TEST_MODULE.strip())
+    with when('the suite runs with --given-json'):
+        pytester.runpytest('--given-json=report.json')
+    with then(t'the {pg["Report"].l} carries the {pg["Glossary"].l}'):
+        data = json.loads(pytester.path.joinpath('report.json').read_text())
+        assert [term['id'] for term in data['glossary']['terms']] == ['guest']
 
-        @scenario('x')
-        def test_x():
-            pass
-    """)
-    result = pytester.runpytest('--given-json=report.json')
+
+GLOSSARY_BUILT_IN_A_TEST = """
+from pytest_given import Glossary, scenario
+
+g = Glossary()
+g.actor('Guest')
+
+
+@scenario('x')
+def test_x():
+    Glossary().actor('Host')
+"""
+
+
+@scenario(
+    t"A {pg['Glossary'].l} a test constructs while it runs is not the suite's "
+    t'{pg["Glossary"].l}'
+)
+def test_a_glossary_constructed_in_a_test_does_not_count(pytester):
+    with given(
+        t'a test module with a {pg["Glossary"].l}, whose test constructs another one'
+    ):
+        pytester.makepyfile(GLOSSARY_BUILT_IN_A_TEST)
+        attach('test_module.py', GLOSSARY_BUILT_IN_A_TEST.strip())
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest('--given-json=report.json')
+    with then(t"the {pg['Report'].l} carries the module's {pg['Glossary'].l}"):
+        assert result.ret == pytest.ExitCode.OK
+        data = json.loads(pytester.path.joinpath('report.json').read_text())
+        assert [term['id'] for term in data['glossary']['terms']] == ['guest']
+
+
+TWO_GLOSSARIES_CONFTEST = """
+from pytest_given import Glossary
+
+g1 = Glossary()
+"""
+
+TWO_GLOSSARIES_TEST_MODULE = """
+from pytest_given import Glossary, scenario
+
+g2 = Glossary()
+
+
+@scenario('x')
+def test_x():
+    pass
+"""
+
+
+@scenario(
+    t"A suite's modules may construct only one {pg['Glossary'].l}",
+    tags=['validation'],
+)
+def test_two_glossaries_raise_naming_where_each_was_constructed(pytester):
+    with given(
+        t'a conftest and a test module that each construct a {pg["Glossary"].l}'
+    ):
+        pytester.makeconftest(TWO_GLOSSARIES_CONFTEST)
+        pytester.makepyfile(TWO_GLOSSARIES_TEST_MODULE)
+        attach('conftest.py', TWO_GLOSSARIES_CONFTEST.strip())
+        attach('test_module.py', TWO_GLOSSARIES_TEST_MODULE.strip())
+    with when('the suite runs with --given-json'):
+        result = pytester.runpytest('--given-json=report.json')
     # Reported through the terminal summary and the exit code, not as a bare
     # traceback out of console_main: the tests themselves all passed, and the
     # run has to say what went wrong with the report instead of dumping a stack.
-    assert result.ret == pytest.ExitCode.TESTS_FAILED
-    result.stdout.fnmatch_lines(['*report not written*', '*multiple Glossary*'])
-    assert not (pytester.path / 'report.json').exists()
+    with then(
+        t'the run fails without a {pg["Report"].l}, naming where each '
+        t'{pg["Glossary"].l} was constructed'
+    ):
+        assert result.ret == pytest.ExitCode.TESTS_FAILED
+        result.stdout.fnmatch_lines(
+            [
+                '*report not written*',
+                (
+                    '*2 distinct glossaries*conftest.py:3*'
+                    'test_two_glossaries_raise_naming_where_each_was_constructed.py:3*'
+                ),
+            ]
+        )
+        assert not (pytester.path / 'report.json').exists()
 
 
 # --- Annotated[..., given(...)] on a parameter ---

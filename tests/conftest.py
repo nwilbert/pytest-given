@@ -1,10 +1,7 @@
-# Expose the pytest-given TableGlossary at conftest module level so the plugin
-# discovers it and renders the Glossary tab for the self-documenting scenarios.
 import pytest
 
 from pytest_given.capture.source import current_rootdir, restore_rootdir
 from pytest_given.capture.story import restore_story_registry, snapshot_story_registry
-from tests.ubiquitous_language import pg  # noqa: F401
 
 
 @pytest.fixture(autouse=True)

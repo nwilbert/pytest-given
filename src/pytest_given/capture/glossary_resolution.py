@@ -1,81 +1,34 @@
-"""Finding the one `Glossary` a suite speaks.
-
-Two places can name it — a story that references it, or a conftest that
-declares one — and v1 admits exactly one per suite. Kept out of the plugin
-because neither question is pytest's: the first reads the live `Story` objects
-the run collected, the second reads plain module objects the caller supplies.
+"""Finding the one `Glossary` a suite speaks: every user-facing glossary
+registers itself when constructed, and v1 admits exactly one per suite.
 """
 
-from collections.abc import Iterable
-from pathlib import Path
-from types import ModuleType
+from collections.abc import Mapping
 
-from ..model import Glossary, PytestGivenError, Story
+from ..model import Glossary, PytestGivenError, SourceLocation, Story
 from .definition_refs import resolve_definition_refs
 from .kind_inference import infer_glossary_kinds
-from .story import carried_glossaries, union_glossaries
+from .source import site_text
 
 
 def session_glossary(
-    stories: list[Story], modules: Iterable[ModuleType]
+    stories: list[Story], registered: Mapping[Glossary, SourceLocation | None]
 ) -> Glossary | None:
     """The suite's glossary as the report carries it: found, its kinds
     inferred, its definition refs resolved."""
-    glossary = resolve_glossary(stories, modules)
+    glossary = resolve_glossary(registered)
     if glossary is None:
         return None
     return resolve_definition_refs(infer_glossary_kinds(glossary, stories))
 
 
 def resolve_glossary(
-    stories: list[Story], modules: Iterable[ModuleType]
+    registered: Mapping[Glossary, SourceLocation | None],
 ) -> Glossary | None:
-    """Pick the report's glossary: off the story tree, else off the conftests.
-
-    A story that references a `Glossary` is the authoritative answer — `story()`
-    stashes the owning object on the tree at construction. The stash does not
-    survive JSON; a saved report carries the serialized `glossary` field
-    instead.
-
-    With no stories — or stories referencing none — the conftest scan catches
-    the suite that declares a glossary and only ever uses term refs in
-    narrations.
-    """
-    reaching = union_glossaries(carried_glossaries(story) for story in stories)
-    if len(reaching) > 1:
+    if len(registered) > 1:
+        sites = ', '.join(site_text(site) for site in registered.values())
         raise PytestGivenError(
-            f'stories reach {len(reaching)} distinct Glossary instances; '
-            f'v1 supports at most one.'
+            f'found {len(registered)} distinct glossaries, constructed at {sites}; '
+            f'v1 supports one per suite. Construct it once and import it '
+            f'wherever it is used.'
         )
-    if reaching:
-        return next(iter(reaching))
-    return _glossary_from_modules(modules)
-
-
-def _glossary_from_modules(modules: Iterable[ModuleType]) -> Glossary | None:
-    """The single `Glossary` declared across the given conftest modules.
-
-    Deduped by object identity, so one glossary imported into several conftests
-    is still one glossary.
-    """
-    distinct: dict[Glossary, str] = {}
-    for module in modules:
-        module_file = getattr(module, '__file__', None)
-        if module_file is None or Path(module_file).name != 'conftest.py':
-            continue
-        for attr_name in dir(module):
-            attr = getattr(module, attr_name, None)
-            if isinstance(attr, Glossary):
-                distinct.setdefault(attr, module_file)
-    if len(distinct) > 1:
-        details = ', '.join(
-            f'{path} ({len(glossary.terms)} term(s))'
-            for glossary, path in distinct.items()
-        )
-        raise PytestGivenError(
-            f'multiple Glossary instances found in conftests ({len(distinct)}): '
-            f'{details}. v1 supports at most one glossary per suite.'
-        )
-    if distinct:
-        return next(iter(distinct))
-    return None
+    return next(iter(registered), None)
