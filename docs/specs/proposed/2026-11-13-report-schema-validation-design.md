@@ -70,7 +70,7 @@ Refusing unknown keys costs no compatibility between versions. The version pre-c
 
 `$schema` and `coverage` are optional on read and their values unused. A session validates its dict before either is added, and `coverage` is derived again on every write.
 
-The public names stay: `report_from_dict`, `delta_from_dict`, `read_report_json`, `report_to_dict`, `delta_to_dict`. Call sites in `cli/`, `report/`, `plugin/` do not change.
+The public names stay: `report_from_dict`, `delta_from_dict`, `read_report_json`, `report_to_dict`, `delta_to_dict`, and the session capture's pair (see [The session capture](#the-session-capture)). Call sites in `cli/`, `report/`, `plugin/` do not change.
 
 ### Unions
 
@@ -88,17 +88,25 @@ Pydantic's smart-mode union picks the variant. Each variant has required keys no
 
 A malformed member matches no variant, and Pydantic then reports every variant's errors. A narration literal whose `value` is a number gives seven lines: the one about `value`, and a `Field required` for each required key of the other three variants. The message lists them as they come.
 
+### The session capture
+
+Under pytest-xdist, each worker sends what its session captured to the main process: a `SessionCapture` (`model/session_capture.py`) holding the worker's grouped scenarios, their collection index, the stories and the glossary. `session_capture_to_dict` and `session_capture_from_dict` in `model/serde.py` convert it, and the dict travels in xdist's `workeroutput` as JSON text, since execnet refuses a `str` or `int` subclass such as an enum value. It is never written to disk, and the same installation writes and reads it within one run.
+
+- The document-types module gains `SessionCaptureDocument`, a `BaseModel` whose fields are `SessionCapture`'s, under the same configuration as the report's. `session_capture_from_dict` shrinks to validation through it, plus the `ValidationError` conversion, and its hand-written readers go with the report's.
+- It carries no `schema_version`, no `$schema`, no pre-check and no committed schema file: it is no contract with anything outside one run.
+- It carries `Step.source`, which the report leaves out. `Step.source` is an ordinary dataclass field, so validation accepts it. The predicate that skips `serde_exclude` fields (see [Writing](#writing)) is for the report's writer and the schema generator, never for validation. The report reader therefore accepts a step `source` that no report writer emits, an instance of the reader accepting slightly more than the schema.
+
 ## Writing
 
 The writer stays `asdict_filtered` — reflective, no Pydantic — and every written JSON gains the top-level `$schema` key with the current version's URL. *Builder's call:* whether `report_to_dict` / `delta_to_dict` or the JSON sinks add it.
 
-`asdict_filtered` skips `_`-prefixed fields and fields marked `serde_exclude`. The schema generator skips the same fields, by one predicate both call, so the `Glossary` indexes and `Step.source` are in neither the JSON nor the schema.
+`asdict_filtered` skips `_`-prefixed fields and fields marked `serde_exclude`. The schema generator skips the same fields, by one predicate both call, so the `Glossary` indexes and `Step.source` are in neither the JSON nor the schema. `session_capture_to_dict` keeps the `serde_exclude` fields through a flag on `asdict_filtered`, and still skips the `_`-prefixed ones.
 
 A session that writes any report validates: `render_sinks` reads its own dict back through `report_from_dict` before rendering HTML and Markdown. So every report-writing run checks what it wrote against the reader, and imports Pydantic. Validating costs about what the hand-written reader does: 7.0 ms against 6.3 ms for the self-report's 313 scenarios. The new cost is at start-up, importing Pydantic and building the document type's validator, about 0.1 s together once the files are cached. Run `uv run nox -s benchmark` before and after and compare the session's wall time, not only the rendering.
 
 The written report is `ReportData` plus the derived `coverage` section that `render_json` adds, and `$schema`. `ReportDocument` describes exactly that. `CoverageRecord`, a `TypedDict` in `report/story_view.py` holding only ids and a boolean, moves to `model/` so the document type can name it.
 
-Defining a `BaseModel` imports Pydantic, which is why the document types have a module of their own. The serde modules list that module in `__lazy_modules__`, and it lists `pydantic` in its own. The lazy-import test (`tests/integration/test_lazy_imports.py`) holds a run that writes no report to not importing Pydantic.
+Defining a `BaseModel` imports Pydantic, which is why the document types have a module of their own. The serde modules list that module in `__lazy_modules__`, and it lists `pydantic` in its own. The lazy-import test (`tests/integration/test_lazy_imports.py`) holds a run that writes no report to not importing Pydantic. An xdist run that lints without writing a report imports it on the main process, which reads the workers' captures through validation.
 
 ## Committed schemas
 
@@ -140,7 +148,7 @@ Zensical copies non-Markdown files under `docs/site/` as they are. Confirm with 
 
 ## Done when
 
-- `report_from_dict` and `delta_from_dict` validate through the document types, and the hand-written per-class readers are gone.
+- `report_from_dict`, `delta_from_dict` and `session_capture_from_dict` validate through the document types, and the hand-written per-class readers are gone.
 - A malformed report fails with the dotted path of each problem, an unknown key included. A report of another schema version gets the one-line mismatch message, from `pytest-given report` and `pytest-given citations` as from `pytest-given delta`.
 - `report-v1.schema.json` and `delta-v1.schema.json` are committed, served from the docs site, and held to the types by the committed-schema test, which replaced the fingerprint test.
 - Every written report and delta carries `$schema`, and the written-JSON test validates both against their committed schemas.
