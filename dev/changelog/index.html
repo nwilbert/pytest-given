@@ -1184,6 +1184,7 @@
 <li>Term citations: <code>citations check</code> and <code>update</code> read <code>#view=glossary&amp;term=&lt;id&gt;</code> or <code>#term=&lt;id&gt;</code> as a citation of a term, with a tag's glyph and summary, a <code>&lt;details markdown="1"&gt;</code> one carrying the term's definition, and a Glossary term row in the HTML report gets the copy button with <strong>Copy citation</strong> and <strong>Copy defining citation</strong>.</li>
 <li>A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term, and the <code>unresolved-definition-ref</code> lint rule, <code>warn</code> by default, flags a bold span that names no term.</li>
 <li>A format spec <code>{flag:true phrase|false phrase}</code> words a Boolean in a step while the parameter table keeps the Boolean.</li>
+<li><code>pytest-given report --glossary-only</code> renders an HTML report with only the Glossary tab.</li>
 <li>A pytest-xdist run (<code>-n</code>) writes reports and runs the narration lint, choosing <code>--dist loadfile</code> when no <code>--dist</code> is given; any other <code>--dist</code> still stops with a usage error.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
@@ -1194,6 +1195,7 @@
 <li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
 <li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
 <li>The report lists scenarios by file and then by line, whatever order the tests ran in.</li>
+<li>The HTML report leaves out the Scenarios tab when the report has no scenarios, and opens on its first remaining view.</li>
 <li><strong>Breaking.</strong> pytest-given finds a glossary wherever the suite's modules construct it, not only through a story or a <code>conftest.py</code>, and raises <code>PytestGivenError</code> when they construct two. Construct the glossary once and import it wherever it is used.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>

@@ -1126,7 +1126,9 @@ span.param-highlight {
   padding-bottom: calc(var(--space-sm) / 2);
 }
 .scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
-.refs-content > .scenario-source {
+
+
+.refs-content > .refs-scenarios + .scenario-source {
   position: absolute;
   right: 0;
   bottom: var(--space-md);
@@ -1617,6 +1619,8 @@ span.param-highlight {
   cursor: pointer;
   user-select: none;
 }
+
+.entry-head-static { cursor: auto; user-select: auto; }
 .entry-head .disclosure-btn { margin-top: 2px; }
 
 
@@ -1845,10 +1849,12 @@ span.param-highlight {
     </svg>
   <header class="topbar"><div class="topbar-title" title="Paragraph Glossary Example">Paragraph Glossary Example</div>
     <nav class="frame-nav" role="tablist" aria-label="Report views">
+      
       <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
               :class="{ 'nav-tab-active': mainView === 'scenarios' }"
               :aria-selected="mainView === 'scenarios'"
               @click="mainView = 'scenarios'">Scenarios</button>
+      
       
       
       <button class="nav-tab" role="tab" id="tab-glossary" aria-controls="view-glossary"
@@ -1869,6 +1875,7 @@ span.param-highlight {
     </div>
   </header>
 
+  
   <div id="view-scenarios" role="tabpanel" aria-labelledby="tab-scenarios" x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
@@ -2152,6 +2159,7 @@ span.param-highlight {
   </div>
   </div>
   </div>
+  
 
   <div id="view-stories" role="tabpanel" aria-labelledby="tab-stories" x-show="mainView === 'stories'" x-cloak>
   
@@ -2232,10 +2240,12 @@ span.param-highlight {
           <div class="header-context meta-list">
             <span>7 terms</span>
           </div>
+          
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
             <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
           </button>
+          
         </div>
       </div>
 
@@ -2255,11 +2265,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-member" data-term-id="member"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="member" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="member"
                     aria-controls="term-refs-member"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="member" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Member<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=member" data-citation-kind="term" data-citation-key="member" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2268,6 +2280,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>4 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-member" data-term-id="member" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2281,7 +2294,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="member"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 4 scenarios using this term
@@ -2294,6 +2307,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2302,11 +2316,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-item" data-term-id="item"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="item" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="item"
                     aria-controls="term-refs-item"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="item" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Item<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=item" data-citation-kind="term" data-citation-key="item" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2315,6 +2331,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>4 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-item" data-term-id="item" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2328,7 +2345,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="item"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 4 scenarios using this term
@@ -2341,6 +2358,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2349,11 +2367,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-loan" data-term-id="loan"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="loan" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="loan"
                     aria-controls="term-refs-loan"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="loan" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Loan<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=loan" data-citation-kind="term" data-citation-key="loan" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2362,6 +2382,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>4 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-loan" data-term-id="loan" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2375,7 +2396,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="loan"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 4 scenarios using this term
@@ -2388,6 +2409,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2396,11 +2418,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-lend" data-term-id="lend"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="lend" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="lend"
                     aria-controls="term-refs-lend"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="lend" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">lend<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=lend" data-citation-kind="term" data-citation-key="lend" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2409,6 +2433,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 scenario</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-lend" data-term-id="lend" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2417,7 +2442,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="lend"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 1 scenario using this term
@@ -2430,6 +2455,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2438,11 +2464,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-due-date" data-term-id="due-date"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="due-date" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="due-date"
                     aria-controls="term-refs-due-date"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="due-date" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Due Date<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=due-date" data-citation-kind="term" data-citation-key="due-date" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2451,6 +2479,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>4 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-due-date" data-term-id="due-date" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2459,7 +2488,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="due-date"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 4 scenarios using this term
@@ -2472,6 +2501,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         </div>
@@ -2491,11 +2521,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-fine" data-term-id="fine"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="fine" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="fine"
                     aria-controls="term-refs-fine"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="fine" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Fine<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=fine" data-citation-kind="term" data-citation-key="fine" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2504,6 +2536,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>2 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-fine" data-term-id="fine" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2517,7 +2550,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="fine"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
@@ -2530,6 +2563,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         </div>
@@ -2549,11 +2583,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-renewal" data-term-id="renewal"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="renewal" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="renewal"
                     aria-controls="term-refs-renewal"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="renewal" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Renewal<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=renewal" data-citation-kind="term" data-citation-key="renewal" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2562,6 +2598,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 scenario</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-renewal" data-term-id="renewal" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2570,7 +2607,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="renewal"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 1 scenario using this term
@@ -2583,6 +2620,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         </div>
@@ -2643,7 +2681,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-14T15:47:15.630513+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"member\",\"canonical\":\"Member\",\"kind\":null,\"definition\":\"A person registered to borrow from the library.\",\"definition_html\":\"A person registered to borrow from the library.\",\"section_key\":\"Lending\",\"avoid\":[\"Patron\",\"Customer\"]},{\"id\":\"item\",\"canonical\":\"Item\",\"kind\":null,\"definition\":\"A single physical copy that a **Member** can borrow.\",\"definition_html\":\"A single physical copy that a <strong>Member<\/strong> can borrow.\",\"section_key\":\"Lending\",\"avoid\":[\"Book\"]},{\"id\":\"loan\",\"canonical\":\"Loan\",\"kind\":null,\"definition\":\"The period in which a **Member** holds an **Item**.\",\"definition_html\":\"The period in which a <strong>Member<\/strong> holds an <strong>Item<\/strong>.\",\"section_key\":\"Lending\",\"avoid\":[\"Checkout\",\"Rental\"]},{\"id\":\"lend\",\"canonical\":\"lend\",\"kind\":null,\"definition\":\"Hand an **Item** to a **Member** as a **Loan**.\",\"definition_html\":\"Hand an <strong>Item<\/strong> to a <strong>Member<\/strong> as a <strong>Loan<\/strong>.\",\"section_key\":\"Lending\",\"avoid\":[]},{\"id\":\"due-date\",\"canonical\":\"Due Date\",\"kind\":null,\"definition\":\"The day a **Loan** ends, after which a **Fine** accrues.\",\"definition_html\":\"The day a <strong>Loan<\/strong> ends, after which a <strong>Fine<\/strong> accrues.\",\"section_key\":\"Lending\",\"avoid\":[]},{\"id\":\"fine\",\"canonical\":\"Fine\",\"kind\":null,\"definition\":\"A charge on a **Member** for keeping a **Loan** past its **Due Date**.\",\"definition_html\":\"A charge on a <strong>Member<\/strong> for keeping a <strong>Loan<\/strong> past its <strong>Due Date<\/strong>.\",\"section_key\":\"Penalties\",\"avoid\":[\"Penalty\",\"Late Fee\"]},{\"id\":\"renewal\",\"canonical\":\"Renewal\",\"kind\":null,\"definition\":\"An extension of a **Loan**, which moves its **Due Date** later.\",\"definition_html\":\"An extension of a <strong>Loan<\/strong>, which moves its <strong>Due Date<\/strong> later.\",\"section_key\":\"Q&A\",\"avoid\":[]}]},\"scenarios\":[{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Member borrows an Item for a Loan\"},{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Renewal moves the Due Date later\"},{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A late return costs a Fine\"},{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A timely return costs no Fine\"}],\"story_ids\":[],\"term_ids\":[\"member\",\"item\",\"loan\",\"lend\",\"due-date\",\"fine\",\"renewal\"],\"term_scenarios\":{\"member\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"item\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"lend\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\"],\"loan\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"due-date\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"renewal\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\"],\"fine\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"]},\"scenario_sentences\":{\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\":{},\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\":{},\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\":{},\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"paragraph_glossary/lend_an_item\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"paragraph_glossary/renewal\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"paragraph_glossary/fine_for_late_return\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"paragraph_glossary/no_fine_for_timely_return\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"A Member borrows an Item for a Loan\"],[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"A Renewal moves the Due Date later\"],[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"A late return costs a Fine\"],[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\",\"A timely return costs no Fine\"]],\"tag\":{},\"story\":{},\"term\":{\"member\":[\"\\u2705\",\"view=glossary&term=member\",\"Member\",\" (4 \\u2705)\"],\"item\":[\"\\u2705\",\"view=glossary&term=item\",\"Item\",\" (4 \\u2705)\"],\"loan\":[\"\\u2705\",\"view=glossary&term=loan\",\"Loan\",\" (4 \\u2705)\"],\"lend\":[\"\\u2705\",\"view=glossary&term=lend\",\"lend\",\" (1 \\u2705)\"],\"due-date\":[\"\\u2705\",\"view=glossary&term=due-date\",\"Due Date\",\" (4 \\u2705)\"],\"fine\":[\"\\u2705\",\"view=glossary&term=fine\",\"Fine\",\" (2 \\u2705)\"],\"renewal\":[\"\\u2705\",\"view=glossary&term=renewal\",\"Renewal\",\" (1 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-14T15:47:15.630513+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"member\",\"canonical\":\"Member\",\"kind\":null,\"definition\":\"A person registered to borrow from the library.\",\"definition_html\":\"A person registered to borrow from the library.\",\"section_key\":\"Lending\",\"avoid\":[\"Patron\",\"Customer\"]},{\"id\":\"item\",\"canonical\":\"Item\",\"kind\":null,\"definition\":\"A single physical copy that a **Member** can borrow.\",\"definition_html\":\"A single physical copy that a <strong>Member<\/strong> can borrow.\",\"section_key\":\"Lending\",\"avoid\":[\"Book\"]},{\"id\":\"loan\",\"canonical\":\"Loan\",\"kind\":null,\"definition\":\"The period in which a **Member** holds an **Item**.\",\"definition_html\":\"The period in which a <strong>Member<\/strong> holds an <strong>Item<\/strong>.\",\"section_key\":\"Lending\",\"avoid\":[\"Checkout\",\"Rental\"]},{\"id\":\"lend\",\"canonical\":\"lend\",\"kind\":null,\"definition\":\"Hand an **Item** to a **Member** as a **Loan**.\",\"definition_html\":\"Hand an <strong>Item<\/strong> to a <strong>Member<\/strong> as a <strong>Loan<\/strong>.\",\"section_key\":\"Lending\",\"avoid\":[]},{\"id\":\"due-date\",\"canonical\":\"Due Date\",\"kind\":null,\"definition\":\"The day a **Loan** ends, after which a **Fine** accrues.\",\"definition_html\":\"The day a <strong>Loan<\/strong> ends, after which a <strong>Fine<\/strong> accrues.\",\"section_key\":\"Lending\",\"avoid\":[]},{\"id\":\"fine\",\"canonical\":\"Fine\",\"kind\":null,\"definition\":\"A charge on a **Member** for keeping a **Loan** past its **Due Date**.\",\"definition_html\":\"A charge on a <strong>Member<\/strong> for keeping a <strong>Loan<\/strong> past its <strong>Due Date<\/strong>.\",\"section_key\":\"Penalties\",\"avoid\":[\"Penalty\",\"Late Fee\"]},{\"id\":\"renewal\",\"canonical\":\"Renewal\",\"kind\":null,\"definition\":\"An extension of a **Loan**, which moves its **Due Date** later.\",\"definition_html\":\"An extension of a <strong>Loan<\/strong>, which moves its <strong>Due Date<\/strong> later.\",\"section_key\":\"Q&A\",\"avoid\":[]}]},\"scenarios\":[{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Member borrows an Item for a Loan\"},{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Renewal moves the Due Date later\"},{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A late return costs a Fine\"},{\"id\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\",\"module\":\"test_paragraph_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A timely return costs no Fine\"}],\"views\":[\"scenarios\",\"glossary\"],\"story_ids\":[],\"expandable_term_ids\":[\"member\",\"item\",\"loan\",\"lend\",\"due-date\",\"fine\",\"renewal\"],\"term_scenarios\":{\"member\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"item\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"lend\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\"],\"loan\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"due-date\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"],\"renewal\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\"],\"fine\":[\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"]},\"scenario_sentences\":{\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\":{},\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\":{},\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\":{},\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\":{}},\"sentence_labels\":{},\"scenario_slugs\":{\"paragraph_glossary/lend_an_item\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"paragraph_glossary/renewal\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"paragraph_glossary/fine_for_late_return\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"paragraph_glossary/no_fine_for_timely_return\":\"examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item\",\"A Member borrows an Item for a Loan\"],[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_renewal\",\"A Renewal moves the Due Date later\"],[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_fine_for_late_return\",\"A late return costs a Fine\"],[\"\\u2705\",\"scenario=examples/paragraph-glossary/test_paragraph_glossary.py::test_no_fine_for_timely_return\",\"A timely return costs no Fine\"]],\"tag\":{},\"story\":{},\"term\":{\"member\":[\"\\u2705\",\"view=glossary&term=member\",\"Member\",\" (4 \\u2705)\"],\"item\":[\"\\u2705\",\"view=glossary&term=item\",\"Item\",\" (4 \\u2705)\"],\"loan\":[\"\\u2705\",\"view=glossary&term=loan\",\"Loan\",\" (4 \\u2705)\"],\"lend\":[\"\\u2705\",\"view=glossary&term=lend\",\"lend\",\" (1 \\u2705)\"],\"due-date\":[\"\\u2705\",\"view=glossary&term=due-date\",\"Due Date\",\" (4 \\u2705)\"],\"fine\":[\"\\u2705\",\"view=glossary&term=fine\",\"Fine\",\" (2 \\u2705)\"],\"renewal\":[\"\\u2705\",\"view=glossary&term=renewal\",\"Renewal\",\" (1 \\u2705)\"]}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -2661,21 +2699,16 @@ function serializeHash(params, mode = 'push') {
 }
 
 
-function hasStories() {
-  return (window.__REPORT_DATA__.story_ids || []).length > 0;
-}
 
-function hasTerms() {
-  return (window.__REPORT_DATA__.term_ids || []).length > 0;
+function reportViews() {
+  return window.__REPORT_DATA__.views;
 }
 
 function deserializeView(params) {
 
 
   const v = params.get('view');
-  if (v === 'stories' && hasStories()) return 'stories';
-  if (v === 'glossary' && hasTerms()) return 'glossary';
-  return 'scenarios';
+  return reportViews().includes(v) ? v : reportViews()[0];
 }
 
 function deserializeStory(params) {
@@ -2807,6 +2840,7 @@ function reportApp() {
   const scenarioSentences = data.scenario_sentences || {};
   const sentenceLabels = data.sentence_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
+  const expandableTermIds = new Set(data.expandable_term_ids || []);
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
 
   const termNames = {};
@@ -2893,7 +2927,7 @@ function reportApp() {
 
 
     view: 'modules',
-    mainView: 'scenarios',
+    mainView: reportViews()[0],
 
 
     sortBy: 'name',
@@ -3085,9 +3119,9 @@ function reportApp() {
     },
     toggleAllTerms() {
       const expand = !this.anyTermsExpanded;
-      const ids = window.__REPORT_DATA__.term_ids || [];
+
       if (expand) {
-        ids.forEach(id => { this.expandedTerms[id] = true; });
+        expandableTermIds.forEach(id => { this.expandedTerms[id] = true; });
       } else {
         this.expandedTerms = {};
       }
@@ -3355,7 +3389,7 @@ function reportApp() {
 
       if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
-      this.expandedTerms[id] = true;
+      if (expandableTermIds.has(id)) this.expandedTerms[id] = true;
 
 
       if (this._termFiltered(id)) this._resetTermFilters();
@@ -3952,7 +3986,7 @@ function reportApp() {
     },
     _writeHash(mode = 'push') {
       const params = new URLSearchParams();
-      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView !== reportViews()[0]) params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       for (const tag of this.tagFilters) params.append('tag', tag);
       if (this.moduleFilter) params.set('module', this.moduleFilter);

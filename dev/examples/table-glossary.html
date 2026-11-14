@@ -1126,7 +1126,9 @@ span.param-highlight {
   padding-bottom: calc(var(--space-sm) / 2);
 }
 .scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
-.refs-content > .scenario-source {
+
+
+.refs-content > .refs-scenarios + .scenario-source {
   position: absolute;
   right: 0;
   bottom: var(--space-md);
@@ -1617,6 +1619,8 @@ span.param-highlight {
   cursor: pointer;
   user-select: none;
 }
+
+.entry-head-static { cursor: auto; user-select: auto; }
 .entry-head .disclosure-btn { margin-top: 2px; }
 
 
@@ -1845,10 +1849,12 @@ span.param-highlight {
     </svg>
   <header class="topbar"><div class="topbar-title" title="Table Glossary Example">Table Glossary Example</div>
     <nav class="frame-nav" role="tablist" aria-label="Report views">
+      
       <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
               :class="{ 'nav-tab-active': mainView === 'scenarios' }"
               :aria-selected="mainView === 'scenarios'"
               @click="mainView = 'scenarios'">Scenarios</button>
+      
       
       <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
               :class="{ 'nav-tab-active': mainView === 'stories' }"
@@ -1874,6 +1880,7 @@ span.param-highlight {
     </div>
   </header>
 
+  
   <div id="view-scenarios" role="tabpanel" aria-labelledby="tab-scenarios" x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
@@ -2073,6 +2080,7 @@ span.param-highlight {
   </div>
   </div>
   </div>
+  
 
   <div id="view-stories" role="tabpanel" aria-labelledby="tab-stories" x-show="mainView === 'stories'" x-cloak>
   
@@ -2322,10 +2330,12 @@ span.param-highlight {
             <span>1 activity</span>
             <span>2 uncategorized</span>
           </div>
+          
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
             <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
           </button>
+          
         </div>
       </div>
 
@@ -2350,11 +2360,13 @@ span.param-highlight {
         <div class="entry kind-actor" id="term-guest" data-term-id="guest"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="guest" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="guest"
                     aria-controls="term-refs-guest"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="guest" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Guest<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=guest" data-citation-kind="term" data-citation-key="guest" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2363,6 +2375,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 story</span><span>2 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-guest" data-term-id="guest" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2383,7 +2396,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="guest"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
@@ -2396,6 +2409,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2419,11 +2433,13 @@ span.param-highlight {
         <div class="entry kind-object" id="term-room" data-term-id="room"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="room" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="room"
                     aria-controls="term-refs-room"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="room" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Room<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=room" data-citation-kind="term" data-citation-key="room" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2432,6 +2448,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 story</span><span>2 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-room" data-term-id="room" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2447,7 +2464,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="room"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
@@ -2460,6 +2477,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2470,11 +2488,13 @@ span.param-highlight {
         <div class="entry kind-object" id="term-confirmation" data-term-id="confirmation"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="confirmation" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="confirmation"
                     aria-controls="term-refs-confirmation"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="confirmation" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Confirmation<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=confirmation" data-citation-kind="term" data-citation-key="confirmation" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2483,6 +2503,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 story</span><span>2 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-confirmation" data-term-id="confirmation" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2503,7 +2524,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="confirmation"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
@@ -2516,6 +2537,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2539,11 +2561,13 @@ span.param-highlight {
         <div class="entry kind-activity" id="term-book" data-term-id="book"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="book" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="book"
                     aria-controls="term-refs-book"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="book" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">book<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=book" data-citation-kind="term" data-citation-key="book" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2552,6 +2576,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 story</span><span>2 scenarios</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-book" data-term-id="book" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2567,7 +2592,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="book"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 2 scenarios using this term
@@ -2580,6 +2605,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2603,11 +2629,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-cancellation-policy" data-term-id="cancellation-policy"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="cancellation-policy" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="cancellation-policy"
                     aria-controls="term-refs-cancellation-policy"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="cancellation-policy" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Cancellation Policy<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=cancellation-policy" data-citation-kind="term" data-citation-key="cancellation-policy" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2616,6 +2644,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"><span>1 scenario</span></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-cancellation-policy" data-term-id="cancellation-policy" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2629,7 +2658,7 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line">
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="cancellation-policy"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show 1 scenario using this term
@@ -2642,6 +2671,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2652,11 +2682,13 @@ span.param-highlight {
         <div class="entry kind-kindless" id="term-overbooking" data-term-id="overbooking"
              x-show="termShown($el.dataset.termId)">
           <div class="entry-head" data-term-id="overbooking" @click="toggleTerm($el.dataset.termId)">
+            
             <button type="button" class="disclosure-btn" data-term-id="overbooking"
                     aria-controls="term-refs-overbooking"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="overbooking" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            
             <span class="entry-name">
               <span class="term-name">Overbooking<button type="button" class="anchor-link copy-menu-trigger" title="Copy link or citation" aria-label="Copy link or citation" aria-haspopup="menu" aria-expanded="false" data-anchor="view=glossary&amp;term=overbooking" data-citation-kind="term" data-citation-key="overbooking" @click.stop="toggleCopyMenu($el)"><svg width="14" height="14" aria-hidden="true"><use href="#icon-copy"/></svg></button></span>
             </span>
@@ -2665,6 +2697,7 @@ span.param-highlight {
               <div class="entry-summary meta-list"></div>
             </div>
           </div>
+          
           <div class="refs scenario-body" id="term-refs-overbooking" data-term-id="overbooking" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
@@ -2672,7 +2705,8 @@ span.param-highlight {
                 
                 
                 
-                <div class="refs-line refs-none">No scenario uses this term.</div>
+                
+                <div class="refs-line refs-scenarios refs-none">No scenario uses this term.</div>
                 
                 
                 <div class="scenario-source"><a href="https://github.com/nwilbert/pytest-given/blob/5bf67439234c7253e0c64f4dfe13c06bdb7efd9d/examples/table-glossary/GLOSSARY.md#L12">examples/table-glossary/GLOSSARY.md:12</a></div>
@@ -2680,6 +2714,7 @@ span.param-highlight {
               </div>
             </div>
           </div>
+          
         </div>
         
         
@@ -2741,7 +2776,7 @@ span.param-highlight {
 </div>
 
 <script>
-window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-14T15:47:15.142701+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a **room** reservation.\",\"definition_html\":\"A person making a <strong>room<\/strong> reservation.\",\"section_key\":null,\"avoid\":[\"Customer\",\"Client\"]},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a **Room** for a given stay.\",\"definition_html\":\"Reserve a <strong>Room<\/strong> for a given stay.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\",\"section_key\":null,\"avoid\":[\"Receipt\"]},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing *how* and *when* a booking may be cancelled.<br>Applies to every **Room** rate, such as `flexible` or `non-refundable`.\",\"definition_html\":\"The rules governing <em>how<\/em> and <em>when<\/em> a booking may be cancelled.<br>Applies to every <strong>Room<\/strong> rate, such as <code>flexible<\/code> or <code>non-refundable<\/code>.\",\"section_key\":null,\"avoid\":[\"Refund Rules\"]},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are **rooms** available.\",\"definition_html\":\"Accepting more reservations than there are <strong>rooms<\/strong> available.\",\"section_key\":null,\"avoid\":[]}]},\"scenarios\":[{\"id\":\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"module\":\"test_table_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\",\"module\":\"test_table_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"story_ids\":[\"book-a-room\"],\"term_ids\":[\"guest\",\"room\",\"book\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"guest\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"book\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/table-glossary/test_table_glossary.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"table_glossary/book_available_room\":\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"table_glossary/book_unavailable_room\":\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705\",\"view=stories&story=book-a-room\",\"Book a Room\",\" (2 \\u2705)\"]},\"term\":{\"guest\":[\"\\u2705\",\"view=glossary&term=guest\",\"Guest\",\" (2 \\u2705)\"],\"room\":[\"\\u2705\",\"view=glossary&term=room\",\"Room\",\" (2 \\u2705)\"],\"book\":[\"\\u2705\",\"view=glossary&term=book\",\"book\",\" (2 \\u2705)\"],\"confirmation\":[\"\\u2705\",\"view=glossary&term=confirmation\",\"Confirmation\",\" (2 \\u2705)\"],\"cancellation-policy\":[\"\\u2705\",\"view=glossary&term=cancellation-policy\",\"Cancellation Policy\",\" (1 \\u2705)\"],\"overbooking\":[\"\\ud83d\\udfe0\",\"view=glossary&term=overbooking\",\"Overbooking\",\" (no scenarios)\"]}},\"cited_scenario_ids\":{}}");
+window.__REPORT_DATA__ = JSON.parse("{\"metadata\":{\"timestamp\":\"2026-11-14T15:47:15.142701+00:00\"},\"status_labels\":{\"passed\":\"passed\",\"failed\":\"failed\",\"skipped\":\"skipped\",\"xfailed\":\"expected failure\"},\"glossary\":{\"terms\":[{\"id\":\"guest\",\"canonical\":\"Guest\",\"kind\":\"actor\",\"definition\":\"A person making a **room** reservation.\",\"definition_html\":\"A person making a <strong>room<\/strong> reservation.\",\"section_key\":null,\"avoid\":[\"Customer\",\"Client\"]},{\"id\":\"room\",\"canonical\":\"Room\",\"kind\":\"object\",\"definition\":\"A bookable hotel room.\",\"definition_html\":\"A bookable hotel room.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"book\",\"canonical\":\"book\",\"kind\":\"activity\",\"definition\":\"Reserve a **Room** for a given stay.\",\"definition_html\":\"Reserve a <strong>Room<\/strong> for a given stay.\",\"section_key\":null,\"avoid\":[]},{\"id\":\"confirmation\",\"canonical\":\"Confirmation\",\"kind\":\"object\",\"definition\":\"A notification acknowledging a successful reservation.\",\"definition_html\":\"A notification acknowledging a successful reservation.\",\"section_key\":null,\"avoid\":[\"Receipt\"]},{\"id\":\"cancellation-policy\",\"canonical\":\"Cancellation Policy\",\"kind\":null,\"definition\":\"The rules governing *how* and *when* a booking may be cancelled.<br>Applies to every **Room** rate, such as `flexible` or `non-refundable`.\",\"definition_html\":\"The rules governing <em>how<\/em> and <em>when<\/em> a booking may be cancelled.<br>Applies to every <strong>Room<\/strong> rate, such as <code>flexible<\/code> or <code>non-refundable<\/code>.\",\"section_key\":null,\"avoid\":[\"Refund Rules\"]},{\"id\":\"overbooking\",\"canonical\":\"Overbooking\",\"kind\":null,\"definition\":\"Accepting more reservations than there are **rooms** available.\",\"definition_html\":\"Accepting more reservations than there are <strong>rooms<\/strong> available.\",\"section_key\":null,\"avoid\":[]}]},\"scenarios\":[{\"id\":\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"module\":\"test_table_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest booking an available room receives a Confirmation\"},{\"id\":\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\",\"module\":\"test_table_glossary\",\"tags\":[],\"status\":\"passed\",\"search_text\":\"A Guest cannot book an unavailable room\"}],\"views\":[\"scenarios\",\"stories\",\"glossary\"],\"story_ids\":[\"book-a-room\"],\"expandable_term_ids\":[\"guest\",\"room\",\"book\",\"confirmation\",\"cancellation-policy\",\"overbooking\"],\"term_scenarios\":{\"room\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"guest\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"book\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"confirmation\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"],\"cancellation-policy\":[\"examples/table-glossary/test_table_glossary.py::test_book_available_room\"]},\"scenario_sentences\":{\"examples/table-glossary/test_table_glossary.py::test_book_available_room\":{\"book-a-room\":[2,3]},\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\":{\"book-a-room\":[2]}},\"sentence_labels\":{\"book-a-room:1\":\"Sentence 1: Guest browses listings\",\"book-a-room:2\":\"Sentence 2: Guest books Room\",\"book-a-room:3\":\"Sentence 3: Guest receives Confirmation\"},\"scenario_slugs\":{\"table_glossary/book_available_room\":\"examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"table_glossary/book_unavailable_room\":\"examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\"},\"citations\":{\"templates\":{\"citation\":[\"\",\"glyph\",\" [\",\"title\",\"](https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html#\",\"fragment\",\")\",\"summary\",\"\"],\"narrated\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a><\/summary>\\n\\n<\/details>\"],\"defining\":[\"<details markdown=\\\"1\\\">\\n<summary>\",\"glyph\",\" <a href=\\\"https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html#\",\"fragment\",\"\\\">\",\"html_title\",\"<\/a>\",\"summary\",\"<\/summary>\\n\\n<\/details>\"]},\"scenario\":[[\"\\u2705\",\"scenario=examples/table-glossary/test_table_glossary.py::test_book_available_room\",\"A Guest booking an available room receives a Confirmation\"],[\"\\u2705\",\"scenario=examples/table-glossary/test_table_glossary.py::test_book_unavailable_room\",\"A Guest cannot book an unavailable room\"]],\"tag\":{},\"story\":{\"book-a-room\":[\"\\u2705\",\"view=stories&story=book-a-room\",\"Book a Room\",\" (2 \\u2705)\"]},\"term\":{\"guest\":[\"\\u2705\",\"view=glossary&term=guest\",\"Guest\",\" (2 \\u2705)\"],\"room\":[\"\\u2705\",\"view=glossary&term=room\",\"Room\",\" (2 \\u2705)\"],\"book\":[\"\\u2705\",\"view=glossary&term=book\",\"book\",\" (2 \\u2705)\"],\"confirmation\":[\"\\u2705\",\"view=glossary&term=confirmation\",\"Confirmation\",\" (2 \\u2705)\"],\"cancellation-policy\":[\"\\u2705\",\"view=glossary&term=cancellation-policy\",\"Cancellation Policy\",\" (1 \\u2705)\"],\"overbooking\":[\"\\ud83d\\udfe0\",\"view=glossary&term=overbooking\",\"Overbooking\",\" (no scenarios)\"]}},\"cited_scenario_ids\":{}}");
 
 function parseHash() {
   return new URLSearchParams(window.location.hash.slice(1));
@@ -2759,21 +2794,16 @@ function serializeHash(params, mode = 'push') {
 }
 
 
-function hasStories() {
-  return (window.__REPORT_DATA__.story_ids || []).length > 0;
-}
 
-function hasTerms() {
-  return (window.__REPORT_DATA__.term_ids || []).length > 0;
+function reportViews() {
+  return window.__REPORT_DATA__.views;
 }
 
 function deserializeView(params) {
 
 
   const v = params.get('view');
-  if (v === 'stories' && hasStories()) return 'stories';
-  if (v === 'glossary' && hasTerms()) return 'glossary';
-  return 'scenarios';
+  return reportViews().includes(v) ? v : reportViews()[0];
 }
 
 function deserializeStory(params) {
@@ -2905,6 +2935,7 @@ function reportApp() {
   const scenarioSentences = data.scenario_sentences || {};
   const sentenceLabels = data.sentence_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
+  const expandableTermIds = new Set(data.expandable_term_ids || []);
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
 
   const termNames = {};
@@ -2991,7 +3022,7 @@ function reportApp() {
 
 
     view: 'modules',
-    mainView: 'scenarios',
+    mainView: reportViews()[0],
 
 
     sortBy: 'name',
@@ -3183,9 +3214,9 @@ function reportApp() {
     },
     toggleAllTerms() {
       const expand = !this.anyTermsExpanded;
-      const ids = window.__REPORT_DATA__.term_ids || [];
+
       if (expand) {
-        ids.forEach(id => { this.expandedTerms[id] = true; });
+        expandableTermIds.forEach(id => { this.expandedTerms[id] = true; });
       } else {
         this.expandedTerms = {};
       }
@@ -3453,7 +3484,7 @@ function reportApp() {
 
       if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
-      this.expandedTerms[id] = true;
+      if (expandableTermIds.has(id)) this.expandedTerms[id] = true;
 
 
       if (this._termFiltered(id)) this._resetTermFilters();
@@ -4050,7 +4081,7 @@ function reportApp() {
     },
     _writeHash(mode = 'push') {
       const params = new URLSearchParams();
-      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView !== reportViews()[0]) params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       for (const tag of this.tagFilters) params.append('tag', tag);
       if (this.moduleFilter) params.set('module', this.moduleFilter);
