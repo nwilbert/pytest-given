@@ -1,21 +1,21 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-13T15:27:48.251774+00:00",
+    "timestamp": "2026-11-14T15:47:15.142701+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "7044f0e95c80b50436c86e090ff35f85b88da1a0",
-    "title": "Markdown Glossary Example",
-    "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/file-glossary-booking.html"
+    "commit_sha": "5bf67439234c7253e0c64f4dfe13c06bdb7efd9d",
+    "title": "Table Glossary Example",
+    "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/table-glossary.html"
   },
   "scenarios": [
     {
-      "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room",
+      "id": "examples/table-glossary/test_table_glossary.py::test_book_available_room",
       "narration": {
         "text": "A Guest booking an available room receives a Confirmation",
         "parts": []
       },
-      "module": "test_file_glossary_booking",
+      "module": "test_table_glossary",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -138,8 +138,8 @@
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
-        "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 61
+        "relpath": "examples/table-glossary/test_table_glossary.py",
+        "line": 62
       },
       "story_ids": [
         "book-a-room"
@@ -147,12 +147,12 @@
       "pins": null
     },
     {
-      "id": "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room",
+      "id": "examples/table-glossary/test_table_glossary.py::test_book_unavailable_room",
       "narration": {
         "text": "A Guest cannot book an unavailable room",
         "parts": []
       },
-      "module": "test_file_glossary_booking",
+      "module": "test_table_glossary",
       "tags": [],
       "status": "passed",
       "duration_ms": 0,
@@ -242,8 +242,8 @@
       "skip_reason": null,
       "xfail_reason": null,
       "source": {
-        "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 78
+        "relpath": "examples/table-glossary/test_table_glossary.py",
+        "line": 79
       },
       "story_ids": [
         "book-a-room"
@@ -274,10 +274,10 @@
           ]
         },
         "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 9
+          "relpath": "examples/table-glossary/GLOSSARY.md",
+          "line": 7
         },
-        "section": "People and places",
+        "section": null,
         "avoid": [
           "Customer",
           "Client"
@@ -296,10 +296,10 @@
           ]
         },
         "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 10
+          "relpath": "examples/table-glossary/GLOSSARY.md",
+          "line": 8
         },
-        "section": "People and places",
+        "section": null,
         "avoid": []
       },
       {
@@ -323,10 +323,10 @@
           ]
         },
         "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 16
+          "relpath": "examples/table-glossary/GLOSSARY.md",
+          "line": 9
         },
-        "section": "Reservations",
+        "section": null,
         "avoid": []
       },
       {
@@ -342,10 +342,10 @@
           ]
         },
         "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 17
+          "relpath": "examples/table-glossary/GLOSSARY.md",
+          "line": 10
         },
-        "section": "Reservations",
+        "section": null,
         "avoid": [
           "Receipt"
         ]
@@ -371,10 +371,10 @@
           ]
         },
         "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 18
+          "relpath": "examples/table-glossary/GLOSSARY.md",
+          "line": 11
         },
-        "section": "Reservations",
+        "section": null,
         "avoid": [
           "Refund Rules (in partner contracts only)"
         ]
@@ -400,10 +400,10 @@
           ]
         },
         "source": {
-          "relpath": "examples/file-glossary-booking/GLOSSARY.md",
-          "line": 19
+          "relpath": "examples/table-glossary/GLOSSARY.md",
+          "line": 12
         },
-        "section": "Reservations",
+        "section": null,
         "avoid": []
       }
     ]
@@ -478,8 +478,8 @@
         }
       ],
       "source": {
-        "relpath": "examples/file-glossary-booking/test_file_glossary_booking.py",
-        "line": 43
+        "relpath": "examples/table-glossary/test_table_glossary.py",
+        "line": 44
       }
     }
   ],
@@ -495,8 +495,8 @@
       "sentence_id": 2,
       "tracked": true,
       "scenario_ids": [
-        "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room",
-        "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room"
+        "examples/table-glossary/test_table_glossary.py::test_book_available_room",
+        "examples/table-glossary/test_table_glossary.py::test_book_unavailable_room"
       ]
     },
     {
@@ -504,7 +504,7 @@
       "sentence_id": 3,
       "tracked": true,
       "scenario_ids": [
-        "examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room"
+        "examples/table-glossary/test_table_glossary.py::test_book_available_room"
       ]
     }
   ]

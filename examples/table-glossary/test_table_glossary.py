@@ -1,9 +1,10 @@
-"""File-backed glossary booking example.
+"""Table glossary example: a hotel booking.
 
-Demonstrates TableGlossary loading a Markdown glossary file (headings over its
-tables become sections, its Avoid column the avoided words), using the resulting
-handles in story sentences and t-string steps, and how term kinds are inferred
-from clause-slot positions at session finish.
+Demonstrates TableGlossary loading a Markdown glossary file (a single table
+under no heading, so the glossary has no sections, and an Avoid column for the
+avoided words), using the resulting handles in story sentences and t-string
+steps, and how term kinds are inferred from clause-slot positions at session
+finish.
 
 Key behaviours shown:
 - g['Guest'] (slot 0 in a story sentence) → kind inferred as actor.
@@ -16,7 +17,7 @@ Key behaviours shown:
   sentence, so its kind stays None (kindless) and it renders with a neutral pill.
 - 'Overbooking' is in the glossary file but referenced by no story and no step.
   It still appears in the generated glossary — every file term is included
-  regardless of usage — under the neutral 'Other' section of the Glossary tab.
+  regardless of usage.
 """
 
 from pathlib import Path
@@ -32,7 +33,7 @@ from pytest_given import (
 )
 
 # Load the glossary from the Markdown file alongside this module.
-# Module-level declaration registers it with the plugin for kind inference.
+# The plugin finds it through the story below, which also infers its kinds.
 g = TableGlossary(Path(__file__).parent / 'GLOSSARY.md', avoid_column='Avoid')
 
 # Story: Guest → book (slot 1, activity) → Room (slot 2, object).

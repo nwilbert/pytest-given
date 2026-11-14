@@ -198,4 +198,4 @@ A test suite can have only one glossary. If your stories reach two different glo
 
 ## Examples
 
-The hotel-booking, file-glossary-booking and paragraph-glossary [examples](../examples.md) show a glossary in use. All three have glossary sections and avoided words.
+The hotel-booking, table-glossary and paragraph-glossary [examples](../examples.md) show a glossary in use. All three have avoided words. Hotel-booking and paragraph-glossary also have glossary sections.

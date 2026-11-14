@@ -1,4 +1,4 @@
-"""Post-collection inference of file-glossary term kinds from story usage.
+"""Post-collection inference of Markdown glossary term kinds from story usage.
 
 A term referenced by a clause gets a kind from the slot positions it
 appears in across all stories: 0 → actor, odd → verb (an activity), even ≥ 2

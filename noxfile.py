@@ -399,9 +399,9 @@ _EXAMPLES = (
         'Hotel Booking Example',
     ),
     _Example(
-        'examples/file-glossary-booking/test_file_glossary_booking.py',
-        'file-glossary-booking',
-        'Markdown Glossary Example',
+        'examples/table-glossary/test_table_glossary.py',
+        'table-glossary',
+        'Table Glossary Example',
     ),
     _Example(
         'examples/paragraph-glossary/test_paragraph_glossary.py',
@@ -513,7 +513,7 @@ def _regenerate_examples(session: nox.Session) -> None:
         'rendering (coffeeshop: test_failing; hotel-booking: gift-card decline case). '
         'coffeeshop uses --given-all-frames to demonstrate the internal-frames '
         'toggle; hotel-booking uses the default filter. '
-        'file-glossary-booking has no intentional failures.'
+        'table-glossary has no intentional failures.'
     )
 
 

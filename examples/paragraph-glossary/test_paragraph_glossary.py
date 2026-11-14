@@ -10,30 +10,15 @@ Key behaviours shown:
 - `## Relationships` and `## Flagged ambiguities` are not term text, so the
   reader skips them.
 - Definition refs (`**Member**` inside a definition) link terms to each other.
+- No story places the terms in a sentence, so every term stays kindless, and
+  `conftest.py` imports the glossary object so the plugin finds it.
 """
 
 from datetime import date, timedelta
-from pathlib import Path
 
-from pytest_given import (
-    ParagraphGlossary,
-    given,
-    scenario,
-    sentence,
-    story,
-    then,
-    when,
-)
+from library_glossary import g
 
-g = ParagraphGlossary(Path(__file__).parent / 'GLOSSARY.md')
-
-lend_an_item = story(
-    'Lend an Item',
-    [
-        sentence(g['Member'], g['lend'].s, g['Item']),
-        sentence(g['Member'], 'returns', g['Item']),
-    ],
-)
+from pytest_given import given, scenario, then, when
 
 
 class Library:
@@ -54,7 +39,7 @@ class Library:
         return max(days_late, 0) * 10
 
 
-@scenario('A Member borrows an Item for a Loan', stories=lend_an_item)
+@scenario('A Member borrows an Item for a Loan')
 def test_lend_an_item():
     with given(t'a {g["Member"]} and an {g["Item"]}'):
         member, item = 'Ada', 'Dune'

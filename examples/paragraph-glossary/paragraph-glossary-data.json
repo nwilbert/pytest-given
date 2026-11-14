@@ -1,10 +1,10 @@
 {
   "metadata": {
     "project": "pytest-given",
-    "timestamp": "2026-11-13T07:36:28.195137+00:00",
+    "timestamp": "2026-11-14T15:47:15.630513+00:00",
     "pytest_version": "9.2.0",
     "plugin_version": "0.5.2",
-    "commit_sha": "965780fb061b6a4cbea6c419c97dfcf992eba531",
+    "commit_sha": "5bf67439234c7253e0c64f4dfe13c06bdb7efd9d",
     "title": "Paragraph Glossary Example",
     "report_url": "https://nwilbert.github.io/pytest-given/dev/examples/paragraph-glossary.html"
   },
@@ -111,11 +111,9 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
-        "line": 57
+        "line": 42
       },
-      "story_ids": [
-        "lend-an-item"
-      ],
+      "story_ids": [],
       "pins": null
     },
     {
@@ -215,7 +213,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
-        "line": 67
+        "line": 52
       },
       "story_ids": [],
       "pins": null
@@ -325,7 +323,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
-        "line": 78
+        "line": 63
       },
       "story_ids": [],
       "pins": null
@@ -432,7 +430,7 @@
       "xfail_reason": null,
       "source": {
         "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
-        "line": 89
+        "line": 74
       },
       "story_ids": [],
       "pins": null
@@ -442,7 +440,7 @@
     "terms": [
       {
         "id": "member",
-        "kind": "actor",
+        "kind": null,
         "canonical": "Member",
         "definition": {
           "text": "A person registered to borrow from the library.",
@@ -464,7 +462,7 @@
       },
       {
         "id": "item",
-        "kind": "object",
+        "kind": null,
         "canonical": "Item",
         "definition": {
           "text": "A single physical copy that a **Member** can borrow.",
@@ -531,7 +529,7 @@
       },
       {
         "id": "lend",
-        "kind": "activity",
+        "kind": null,
         "canonical": "lend",
         "definition": {
           "text": "Hand an **Item** to a **Member** as a **Loan**.",
@@ -690,75 +688,6 @@
       }
     ]
   },
-  "stories": [
-    {
-      "id": "lend-an-item",
-      "title": "Lend an Item",
-      "sentences": [
-        {
-          "id": 1,
-          "clauses": [
-            {
-              "parts": [
-                {
-                  "term_id": "member",
-                  "display": "Member"
-                },
-                {
-                  "term_id": "lend",
-                  "display": "lends"
-                },
-                {
-                  "term_id": "item",
-                  "display": "Item"
-                }
-              ]
-            }
-          ],
-          "name": null
-        },
-        {
-          "id": 2,
-          "clauses": [
-            {
-              "parts": [
-                {
-                  "term_id": "member",
-                  "display": "Member"
-                },
-                {
-                  "text": "returns"
-                },
-                {
-                  "term_id": "item",
-                  "display": "Item"
-                }
-              ]
-            }
-          ],
-          "name": null
-        }
-      ],
-      "source": {
-        "relpath": "examples/paragraph-glossary/test_paragraph_glossary.py",
-        "line": 30
-      }
-    }
-  ],
-  "coverage": [
-    {
-      "story_id": "lend-an-item",
-      "sentence_id": 1,
-      "tracked": true,
-      "scenario_ids": []
-    },
-    {
-      "story_id": "lend-an-item",
-      "sentence_id": 2,
-      "tracked": true,
-      "scenario_ids": [
-        "examples/paragraph-glossary/test_paragraph_glossary.py::test_lend_an_item"
-      ]
-    }
-  ]
+  "stories": [],
+  "coverage": []
 }

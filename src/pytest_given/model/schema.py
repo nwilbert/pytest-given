@@ -209,7 +209,7 @@ class GlossaryTerm:
 class ClauseTermRef:
     """Reference to a glossary term in a clause. Kind resolved via
     glossary[term_id].kind — mirrors NarrationTermRef. Used for both
-    code-defined handles and file-glossary handles (whose kind may be
+    code-defined handles and Markdown glossary handles (whose kind may be
     inferred post-collection)."""
 
     term_id: TermId

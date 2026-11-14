@@ -126,4 +126,4 @@ Pins also work for sentences with fewer than two glossary terms, which narration
 
 ## Examples
 
-The hotel-booking and file-glossary-booking [examples](../examples.md) show stories and coverage in use.
+The hotel-booking and table-glossary [examples](../examples.md) show stories and coverage in use.

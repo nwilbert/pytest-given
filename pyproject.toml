@@ -99,7 +99,7 @@ packages = ["src/pytest_given"]
 # string literals), browsable on GitHub instead.
 [tool.hatch.build.targets.sdist]
 # Patterns are gitignore-style: a leading slash anchors to the project root.
-# Without it, "GLOSSARY.md" also matches examples/file-glossary-booking/GLOSSARY.md.
+# Without it, "GLOSSARY.md" also matches examples/table-glossary/GLOSSARY.md.
 include = [
     "/src",
     "/tests",

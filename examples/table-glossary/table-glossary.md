@@ -1,7 +1,7 @@
-# pytest-given — Markdown Glossary Example
+# pytest-given — Table Glossary Example
 
 ## ✓ A Guest booking an available room receives a Confirmation
-`examples/file-glossary-booking/test_file_glossary_booking.py::test_book_available_room`
+`examples/table-glossary/test_table_glossary.py::test_book_available_room`
 
 - **given** the «Room» is available
 - **when** «Guest» «books» the «Room»
@@ -9,7 +9,7 @@
 - **then** the «Cancellation Policy» applies to the «Room»
 
 ## ✓ A Guest cannot book an unavailable room
-`examples/file-glossary-booking/test_file_glossary_booking.py::test_book_unavailable_room`
+`examples/table-glossary/test_table_glossary.py::test_book_unavailable_room`
 
 - **given** no «Room» is available
 - **when** «Guest» «books» a «Room»
