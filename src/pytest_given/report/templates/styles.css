@@ -1077,8 +1077,8 @@ span.param-highlight {
 /* In a scenario card the link stays in flow: anchored to the corner it
    fought every full-width last element,
    covering a parameter table's rightmost cells and needing its own chip to
-   stay legible over an error box. A refs panel ends in short chip lines that
-   never reach the corner, so there the anchor still pays for itself. */
+   stay legible over an error box. A refs panel's scenario line is short and
+   never reaches the corner, so beside it the anchor still pays for itself. */
 /* After narration the link shares the last line when the steps leave room for
    it, and wraps under them only when they don't. A flex line breaks on the
    steps' widest line, collapsed sub-steps included, so a fit never overlaps. */
@@ -1094,7 +1094,9 @@ span.param-highlight {
   padding-bottom: calc(var(--space-sm) / 2);
 }
 .scenario-body-inner > .steps + .scenario-source { flex: 0 0 auto; margin-left: auto; }
-.refs-content > .scenario-source {
+/* Beside the scenario line only: that line is short, where an Avoid line or
+   a row of chips can wrap under the link. Elsewhere it takes its own line. */
+.refs-content > .refs-scenarios + .scenario-source {
   position: absolute;
   right: 0;
   bottom: var(--space-md);
@@ -1585,6 +1587,8 @@ span.param-highlight {
   cursor: pointer;
   user-select: none;
 }
+/* A card with no references panel has nothing for a click to open. */
+.entry-head-static { cursor: auto; user-select: auto; }
 .entry-head .disclosure-btn { margin-top: 2px; }
 /* The padding is the gap before the definition, wide enough for the copy-link
    button to sit in beside even the widest name. A floor, so a glossary of

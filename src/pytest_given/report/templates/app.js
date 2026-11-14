@@ -14,22 +14,17 @@ function serializeHash(params, mode = 'push') {
   else history.pushState(null, '', url);
 }
 
-// Mirrors `tab_visibility`: these are the reports that render each tab.
-function hasStories() {
-  return (window.__REPORT_DATA__.story_ids || []).length > 0;
-}
-
-function hasTerms() {
-  return (window.__REPORT_DATA__.term_ids || []).length > 0;
+// The report's views in tab order, as `tab_visibility` decides them; the
+// page opens on the first.
+function reportViews() {
+  return window.__REPORT_DATA__.views;
 }
 
 function deserializeView(params) {
-  // Gated on the tab existing: a stale `#view=glossary` would otherwise hide
-  // the Scenarios view behind an empty one, with no tab bar left to leave by.
+  // Gated on the tab existing: a stale `#view=glossary` would otherwise open
+  // a view the report doesn't have, with no tab bar left to leave by.
   const v = params.get('view');
-  if (v === 'stories' && hasStories()) return 'stories';
-  if (v === 'glossary' && hasTerms()) return 'glossary';
-  return 'scenarios';
+  return reportViews().includes(v) ? v : reportViews()[0];
 }
 
 function deserializeStory(params) {
@@ -161,6 +156,7 @@ function reportApp() {
   const scenarioSentences = data.scenario_sentences || {};
   const sentenceLabels = data.sentence_labels || {};
   const hasGlossary = glossaryTerms.length > 0;
+  const expandableTermIds = new Set(data.expandable_term_ids || []);
   const allModules = [...new Set(data.scenarios.map(s => s.module))];
   // Term id -> canonical display name, for the Terms browse axis.
   const termNames = {};
@@ -247,7 +243,7 @@ function reportApp() {
     // no glossary, but every scenario has a module. So it leads the segments
     // and opens by default, and no report can open on an empty browse tree.
     view: 'modules',
-    mainView: 'scenarios',
+    mainView: reportViews()[0],
     // How the browse tree orders its groups. Ephemeral like `view` above —
     // the hash carries filters, which change what you see, not the order.
     sortBy: 'name',
@@ -439,9 +435,9 @@ function reportApp() {
     },
     toggleAllTerms() {
       const expand = !this.anyTermsExpanded;
-      const ids = window.__REPORT_DATA__.term_ids || [];
+      // A card without a references panel has nothing to open.
       if (expand) {
-        ids.forEach(id => { this.expandedTerms[id] = true; });
+        expandableTermIds.forEach(id => { this.expandedTerms[id] = true; });
       } else {
         this.expandedTerms = {};
       }
@@ -709,7 +705,7 @@ function reportApp() {
       // A stale `#term=` link would otherwise open an empty Glossary tab.
       if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
-      this.expandedTerms[id] = true;
+      if (expandableTermIds.has(id)) this.expandedTerms[id] = true;
       // Navigation, not refinement: Glossary filters that hide the term give
       // way. Read off the state, not the card, which a hidden tab hides too.
       if (this._termFiltered(id)) this._resetTermFilters();
@@ -1306,7 +1302,7 @@ function reportApp() {
     },
     _writeHash(mode = 'push') {
       const params = new URLSearchParams();
-      if (this.mainView !== 'scenarios') params.set('view', this.mainView);
+      if (this.mainView !== reportViews()[0]) params.set('view', this.mainView);
       if (this.mainView === 'stories' && this.selectedStory) params.set('story', this.selectedStory);
       for (const tag of this.tagFilters) params.append('tag', tag);
       if (this.moduleFilter) params.set('module', this.moduleFilter);

@@ -17,6 +17,7 @@ from pytest_given.model import (
     Scenario,
     Sentence,
     SentenceId,
+    SourceLocation,
     Step,
     Story,
     StoryId,
@@ -25,6 +26,7 @@ from pytest_given.model import (
 )
 from pytest_given.report.glossary_view import (
     OTHER_SECTION,
+    TermEntry,
     build_glossary_view,
     build_term_crossrefs,
 )
@@ -694,3 +696,93 @@ def test_a_term_reaches_the_view_with_its_section_and_avoided_words() -> None:
     assert [group.label for group in view.section_groups] == ['People', 'Places']
     [entry] = view.section_groups[0].entries
     assert entry.term.avoid == ('Customer (too broad)', '**Client**')
+
+
+def _entries(report: ReportData) -> dict[TermId, TermEntry]:
+    view = build_glossary_view(report)
+    return {
+        entry.term.id: entry for group in view.kind_groups for entry in group.entries
+    }
+
+
+def test_term_entry_has_references_when_the_report_has_scenarios() -> None:
+    """Its panel says that no scenario uses the term."""
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t::a'), narration=Narration(text='a'), module='m', steps=[step]
+    )
+    entries = _entries(ReportData(metadata=_meta(), scenarios=[scn], glossary=_g()))
+    assert entries[TermId('room')].scenario_ids == []
+    assert entries[TermId('room')].has_references is True
+
+
+def test_term_entry_has_no_references_in_a_report_without_scenarios() -> None:
+    report = ReportData(metadata=_meta(), glossary=_g())
+    assert _entries(report)[TermId('room')].has_references is False
+    assert build_glossary_view(report).expandable_term_ids == []
+
+
+def test_term_entry_has_references_with_only_an_avoid_list() -> None:
+    glossary = Glossary()
+    glossary.register(
+        GlossaryTerm(
+            id=TermId('guest'), kind='actor', canonical='Guest', avoid=('Visitor',)
+        )
+    )
+    glossary.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    report = ReportData(metadata=_meta(), glossary=glossary)
+    assert _entries(report)[TermId('guest')].has_references is True
+    assert _entries(report)[TermId('room')].has_references is False
+    assert build_glossary_view(report).expandable_term_ids == [TermId('guest')]
+
+
+def test_term_entry_flags_each_references_panel_line() -> None:
+    glossary = Glossary()
+    glossary.register(
+        GlossaryTerm(
+            id=TermId('guest'),
+            kind='actor',
+            canonical='Guest',
+            avoid=('Visitor',),
+            source=SourceLocation(relpath='GLOSSARY.md', line=3),
+        )
+    )
+    glossary.register(GlossaryTerm(id=TermId('room'), kind='object', canonical='Room'))
+    sentence = Sentence(
+        id=SentenceId(1), clauses=(Clause(parts=(_ent('guest', 'Guest'),)),)
+    )
+    story = Story(id=StoryId('book'), title='Book', sentences=(sentence,))
+    step = Step(
+        phase='when',
+        narration=Narration(
+            text='x',
+            parts=(NarrationTermRef(term_id=TermId('guest'), display='Guest'),),
+        ),
+    )
+    scn = Scenario(
+        id=NodeId('t::a'), narration=Narration(text='a'), module='m', steps=[step]
+    )
+    entries = _entries(
+        ReportData(
+            metadata=_meta(), scenarios=[scn], stories=[story], glossary=glossary
+        )
+    )
+    guest, room = entries[TermId('guest')], entries[TermId('room')]
+    assert (guest.show_avoid, guest.show_stories, guest.show_source) == (
+        True,
+        True,
+        True,
+    )
+    assert (guest.show_scenario_link, guest.show_no_scenario_note) == (True, False)
+    assert (room.show_avoid, room.show_stories, room.show_source) == (
+        False,
+        False,
+        False,
+    )
+    assert (room.show_scenario_link, room.show_no_scenario_note) == (False, True)

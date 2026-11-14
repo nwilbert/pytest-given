@@ -15,7 +15,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict
+from typing import Literal, TypedDict
 
 import jinja2
 from markupsafe import Markup, escape
@@ -96,23 +96,41 @@ class CitationData(TypedDict):
     term: dict[str, list[str]]
 
 
+type ReportView = Literal['scenarios', 'stories', 'glossary']
+
+
 @dataclass(frozen=True)
 class TabVisibility:
     """Which browse tabs a report has anything to show in."""
 
+    scenarios: bool
     stories: bool
     glossary: bool
 
     @property
+    def views(self) -> tuple[ReportView, ...]:
+        """The shown views in tab order. The first is the one the page opens on."""
+        shown: tuple[tuple[ReportView, bool], ...] = (
+            ('scenarios', self.scenarios),
+            ('stories', self.stories),
+            ('glossary', self.glossary),
+        )
+        return tuple(view for view, visible in shown if visible)
+
+    @property
     def visible_count(self) -> int:
-        """Scenarios is always one of them, so the other two are the count."""
-        return 1 + self.stories + self.glossary
+        return len(self.views)
 
 
 def tab_visibility(report: ReportData) -> TabVisibility:
+    stories = bool(report.stories)
+    glossary = bool(report.glossary is not None and report.glossary.terms)
+    # A report with nothing at all keeps its empty Scenarios view, so the page
+    # is never blank.
     return TabVisibility(
-        stories=bool(report.stories),
-        glossary=bool(report.glossary is not None and report.glossary.terms),
+        scenarios=bool(report.scenarios) or not (stories or glossary),
+        stories=stories,
+        glossary=glossary,
     )
 
 
@@ -278,7 +296,7 @@ def _render_context(
         {story_id: rollup.scenarios for story_id, rollup in story_rollups.items()},
         glossary_view.term_scenarios,
     )
-    term_ids = [term.id for term in report.glossary.terms] if report.glossary else []
+    visibility = tab_visibility(report)
     return {
         'metadata': report.metadata,
         'theme_default': theme,
@@ -286,7 +304,7 @@ def _render_context(
         'stories': report.stories,
         'glossary': report.glossary,
         'glossary_view': glossary_view,
-        'tab_visibility': tab_visibility(report),
+        'tab_visibility': visibility,
         'story_rollups': story_rollups,
         'scn_covers': scn_covers,
         'scenario_index': {scn.id: index for index, scn in enumerate(report.scenarios)},
@@ -306,8 +324,9 @@ def _render_context(
         'app_data_js': _script_json_parse(
             _app_data(report)
             | {
+                'views': list(visibility.views),
                 'story_ids': [story.id for story in report.stories],
-                'term_ids': term_ids,
+                'expandable_term_ids': glossary_view.expandable_term_ids,
                 'term_scenarios': glossary_view.term_scenarios,
                 'scenario_sentences': scn_covers,
                 'sentence_labels': sentence_labels,

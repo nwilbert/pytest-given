@@ -60,16 +60,38 @@ class GlossaryAggregation:
 
 @dataclass(frozen=True)
 class TermEntry:
-    """One row of the Glossary view."""
+    """One row of the Glossary view.
+
+    Each `show_*` flag decides one line of the card's references panel, and
+    the template renders a line only under its flag, so whether the panel has
+    anything to expand is decided here, once.
+    """
 
     term: GlossaryTerm
     aggregation: GlossaryAggregation
     scenario_ids: list[NodeId]
+    show_avoid: bool
+    show_stories: bool
     show_instances: bool
     show_forms: bool
+    show_scenario_link: bool
+    show_no_scenario_note: bool
+    show_source: bool
     # The counts a term is summarized by, each its own phrase — the template
     # spaces them, so no separator glyph is baked into the text.
     summary: tuple[str, ...]
+
+    @property
+    def has_references(self) -> bool:
+        return (
+            self.show_avoid
+            or self.show_stories
+            or self.show_instances
+            or self.show_forms
+            or self.show_scenario_link
+            or self.show_no_scenario_note
+            or self.show_source
+        )
 
 
 # A term's kind as the Glossary view keys on it: the model's three, plus the
@@ -116,6 +138,8 @@ class GlossaryView:
     all_uncategorized: bool
     default_grouping: Grouping
     show_grouping_switch: bool
+    # The terms whose card has a references panel to expand.
+    expandable_term_ids: list[TermId]
 
 
 class _KindRow(NamedTuple):
@@ -162,7 +186,8 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
         by_kind[term.kind or 'kindless'].append(term)
     counts = {key: len(group) for key, group in by_kind.items()}
     # One entry per term, which both groupings list.
-    entries = {term.id: _term_entry(term, crossrefs) for term in terms}
+    has_scenarios = bool(report.scenarios)
+    entries = {term.id: _term_entry(term, crossrefs, has_scenarios) for term in terms}
     groups = [
         KindGroup(
             label=row.label,
@@ -189,6 +214,9 @@ def build_glossary_view(report: ReportData) -> GlossaryView:
             'section' if sectioned else 'flat' if all_uncategorized else 'kind'
         ),
         show_grouping_switch=sectioned and not all_uncategorized,
+        expandable_term_ids=[
+            term_id for term_id, entry in entries.items() if entry.has_references
+        ],
     )
 
 
@@ -257,7 +285,9 @@ def _kind_tallies(counts: dict[KindKey, int]) -> list[KindTally]:
     ]
 
 
-def _term_entry(term: GlossaryTerm, crossrefs: TermCrossRefs) -> TermEntry:
+def _term_entry(
+    term: GlossaryTerm, crossrefs: TermCrossRefs, has_scenarios: bool
+) -> TermEntry:
     kind_key = term.kind or 'kindless'
     aggregation = crossrefs.aggregations.get(term.id, GlossaryAggregation())
     scenario_ids = crossrefs.term_scenarios.get(term.id, [])
@@ -276,8 +306,14 @@ def _term_entry(term: GlossaryTerm, crossrefs: TermCrossRefs) -> TermEntry:
         term=term,
         aggregation=aggregation,
         scenario_ids=scenario_ids,
+        show_avoid=bool(term.avoid),
+        show_stories=bool(aggregation.stories),
         show_instances=show_instances,
         show_forms=show_forms,
+        show_scenario_link=bool(scenario_ids),
+        # Only a report with scenarios says that none of them uses the term.
+        show_no_scenario_note=has_scenarios and not scenario_ids,
+        show_source=term.source is not None,
         summary=tuple(
             part
             for part in (

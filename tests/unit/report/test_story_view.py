@@ -56,10 +56,32 @@ def _meta() -> Metadata:
     return Metadata(project='p', timestamp='t', pytest_version='8', plugin_version='0')
 
 
-def test_tab_visibility_only_scenarios_visible_with_empty_report() -> None:
+def test_tab_visibility_keeps_scenarios_when_nothing_else_shows() -> None:
     rd = ReportData(metadata=_meta())
-    assert tab_visibility(rd) == TabVisibility(stories=False, glossary=False)
+    assert tab_visibility(rd) == TabVisibility(
+        scenarios=True, stories=False, glossary=False
+    )
+    assert tab_visibility(rd).views == ('scenarios',)
     assert tab_visibility(rd).visible_count == 1
+
+
+def test_tab_visibility_hides_scenarios_when_a_report_has_none() -> None:
+    rd = ReportData(metadata=_meta(), glossary=_g())
+    assert tab_visibility(rd).views == ('glossary',)
+    assert tab_visibility(rd).visible_count == 1
+
+
+def test_tab_visibility_orders_views_scenarios_stories_glossary() -> None:
+    scn = Scenario(id=NodeId('t::a'), narration=Narration(text='a'), module='m')
+    full = ReportData(
+        metadata=_meta(),
+        scenarios=[scn],
+        stories=[_one_sentence_story('s')],
+        glossary=_g(),
+    )
+    assert tab_visibility(full).views == ('scenarios', 'stories', 'glossary')
+    no_scenarios = dataclasses.replace(full, scenarios=[])
+    assert tab_visibility(no_scenarios).views == ('stories', 'glossary')
 
 
 def test_tab_visibility_stories_visible_when_stories_non_empty() -> None:

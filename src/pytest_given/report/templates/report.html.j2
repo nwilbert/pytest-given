@@ -76,10 +76,12 @@
     {#- The class paints the active tab; `aria-selected` announces it. No roving
         tabindex: three tabs do not earn the arrow-key handling. -#}
     <nav class="frame-nav" role="tablist" aria-label="Report views">
+      {% if tab_visibility.scenarios %}
       <button class="nav-tab" role="tab" id="tab-scenarios" aria-controls="view-scenarios"
               :class="{ 'nav-tab-active': mainView === 'scenarios' }"
               :aria-selected="mainView === 'scenarios'"
               @click="mainView = 'scenarios'">Scenarios</button>
+      {% endif %}
       {% if tab_visibility.stories %}
       <button class="nav-tab" role="tab" id="tab-stories" aria-controls="view-stories"
               :class="{ 'nav-tab-active': mainView === 'stories' }"
@@ -108,6 +110,7 @@
     </div>
   </header>
 
+  {% if tab_visibility.scenarios %}
   <div id="view-scenarios" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-scenarios"{% endif %} x-show="mainView === 'scenarios'">
   <div class="view-layout">
   <div class="sidebar">
@@ -404,6 +407,7 @@
   </div>{# end .view-main #}
   </div>{# end .view-layout #}
   </div>{# end #view-scenarios #}
+  {% endif %}
 
   <div id="view-stories" {% if visible_count > 1 %}role="tabpanel" aria-labelledby="tab-stories"{% endif %} x-show="mainView === 'stories'" x-cloak>
   {% if stories %}
@@ -531,12 +535,16 @@
         {% set scn_ids = entry.scenario_ids %}
         <div class="entry kind-{{ term.kind or 'kindless' }}" id="term-{{ term.id }}" data-term-id="{{ term.id }}"
              x-show="termShown($el.dataset.termId)">
-          <div class="entry-head" data-term-id="{{ term.id }}" @click="toggleTerm($el.dataset.termId)">
+          <div class="entry-head{{ '' if entry.has_references else ' entry-head-static' }}" data-term-id="{{ term.id }}"{% if entry.has_references %} @click="toggleTerm($el.dataset.termId)"{% endif %}>
+            {% if entry.has_references %}
             <button type="button" class="disclosure-btn" data-term-id="{{ term.id }}"
                     aria-controls="term-refs-{{ term.id }}"
                     :aria-expanded="!!expandedTerms[$el.dataset.termId]"
                     :aria-label="(expandedTerms[$el.dataset.termId] ? 'Collapse' : 'Expand') + ' references'"
                     @click.stop="toggleTerm($el.dataset.termId)"><span class="scenario-chevron" data-term-id="{{ term.id }}" :class="{ 'scenario-chevron-open': expandedTerms[$el.dataset.termId] }"></span></button>
+            {% else %}
+            <span class="disclosure-btn" aria-hidden="true"></span>
+            {% endif %}
             <span class="entry-name">
               <span class="term-name">{{ term.canonical }}{{ copy_button('term', term.id, 'view=glossary&term=' ~ term.id) }}</span>
             </span>
@@ -545,16 +553,17 @@
               <div class="entry-summary meta-list">{% for part in entry.summary %}<span>{{ part }}</span>{% endfor %}</div>
             </div>
           </div>
+          {% if entry.has_references %}
           <div class="refs scenario-body" id="term-refs-{{ term.id }}" data-term-id="{{ term.id }}" :class="{ expanded: expandedTerms[$el.dataset.termId] }">
             <div class="refs-inner scenario-body-inner">
               <div class="refs-content">
-                {% if term.avoid %}
+                {% if entry.show_avoid %}
                 <div class="refs-line">
                   <span class="refs-label">Avoid:</span>
                   <span class="refs-avoid">{{ term | avoid_html }}</span>
                 </div>
                 {% endif %}
-                {% if agg.stories %}
+                {% if entry.show_stories %}
                 <div class="refs-line">
                   <span class="refs-label">Stories:</span>
                   {% for sid in agg.stories %}
@@ -578,24 +587,23 @@
                   {% endfor %}
                 </div>
                 {% endif %}
-                {% if scn_ids %}
-                <div class="refs-line">
+                {% if entry.show_scenario_link %}
+                <div class="refs-line refs-scenarios">
                   <a class="use-chip" href="#" data-term-id="{{ term.id }}"
                      @click.prevent="filterScenariosByTerm($el.dataset.termId)">
                     Show {{ scn_ids | length | plural('scenario') }} using this term
                   </a>
                 </div>
-                {% else %}
-                {#- Also what keeps an otherwise empty entry open: the source
-                    link alone is out of flow, so the panel would clip it. -#}
-                <div class="refs-line refs-none">No scenario uses this term.</div>
+                {% elif entry.show_no_scenario_note %}
+                <div class="refs-line refs-scenarios refs-none">No scenario uses this term.</div>
                 {% endif %}
-                {% if term.source %}
+                {% if entry.show_source %}
                 <div class="scenario-source">{{ source_link(term.source) }}</div>
                 {% endif %}
               </div>
             </div>
           </div>
+          {% endif %}
         </div>
   {%- endmacro -%}
   {#- `data-grouping` is the grouping the tab opens in, read once by `reportApp`. -#}
@@ -681,10 +689,12 @@
             <span>{{ glossary.terms | length | plural('term') }}</span>{% if not all_uncategorized %}{% for kind in glossary_view.kinds %}
             <span>{{ kind.summary }}</span>{% endfor %}{% endif %}
           </div>
+          {% if glossary_view.expandable_term_ids %}
           <button class="collapse-all-btn" @click="toggleAllTerms()">
             <span x-text="anyTermsExpanded ? 'Collapse all references' : 'Expand all references'"></span>
             <span class="collapse-chevron" :class="{ 'collapse-chevron-up': anyTermsExpanded }"></span>
           </button>
+          {% endif %}
         </div>
       </div>
 

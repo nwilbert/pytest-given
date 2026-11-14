@@ -31,6 +31,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
 - A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
 - The report lists scenarios by file and then by line, whatever order the tests ran in.
+- The HTML report leaves out the Scenarios tab when the report has no scenarios, and opens on its first remaining view.
 - **Breaking.** pytest-given finds a glossary wherever the suite's modules construct it, not only through a story or a `conftest.py`, and raises `PytestGivenError` when they construct two. Construct the glossary once and import it wherever it is used.
 
 ### Fixed

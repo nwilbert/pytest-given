@@ -870,7 +870,6 @@ def test_render_includes_terms_browse_segment(tmp_path: Path) -> None:
     assert term['canonical'] == 'Guest'
     assert term['kind'] == 'actor'
     assert term['definition'] == 'A person staying over.'
-    assert embedded_app_data(content)['term_ids'] == ['guest']
 
 
 def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
@@ -880,7 +879,49 @@ def test_render_omits_terms_segment_without_a_glossary(tmp_path: Path) -> None:
     assert '>Terms<' not in content
     assert '>Tags<' in content
     assert '>Modules<' in content
-    assert embedded_app_data(content)['term_ids'] == []
+
+
+@scenario(
+    t'A {pg["Report"].l} without {pg["Scenario"].l.s} leaves out the '
+    t'Scenarios tab and opens on its {pg["Glossary"].l}',
+)
+def test_a_report_without_scenarios_opens_on_its_glossary() -> None:
+    with given(t'a {pg["Report"].l} with {pg["Term"].l.s} and no {pg["Scenario"].l.s}'):
+        report = _report(
+            {
+                'glossary': {
+                    'terms': [
+                        {'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'},
+                    ]
+                }
+            }
+        )
+    with when('it is rendered as HTML'):
+        content = render_html_string(report, source_link_template=None)
+    with then(t'the {pg["Glossary"].l} is its only view'):
+        assert embedded_app_data(content)['views'] == ['glossary']
+
+
+def test_only_terms_with_references_are_expandable() -> None:
+    """`app.js` expands these alone, so expanding all, or following a term ref,
+    never marks open a card that has no references panel."""
+    report = _report(
+        {
+            'glossary': {
+                'terms': [
+                    {
+                        'id': 'guest',
+                        'kind': 'actor',
+                        'canonical': 'Guest',
+                        'avoid': ['Visitor'],
+                    },
+                    {'id': 'room', 'kind': 'object', 'canonical': 'Room'},
+                ]
+            }
+        }
+    )
+    content = render_html_string(report, source_link_template=None)
+    assert embedded_app_data(content)['expandable_term_ids'] == ['guest']
 
 
 def test_render_shows_a_skipped_scenarios_reason(tmp_path: Path) -> None:
