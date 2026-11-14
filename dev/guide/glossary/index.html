@@ -682,10 +682,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#file-glossary" class="md-nav__link">
+  <a href="#markdown-glossary" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        File glossary
+        Markdown glossary
       </span>
     </span>
   </a>
@@ -708,6 +708,28 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Undefined terms
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glossary-sections" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Glossary sections
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#avoided-words" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Avoided words
       </span>
     </span>
   </a>
@@ -1186,47 +1208,119 @@
 <li><strong><code>guest('Alice')</code></strong> shows any other text: an irregular form (<code>person('people')</code>), another verb form (<code>search('searches for')</code>), or a specific instance (<code>guest('Alice')</code>). Don't write <code>guest('Guest')</code>, <code>guest('guest')</code> or <code>room('rooms')</code>; use <code>{guest}</code>, <code>{guest.l}</code> or <code>{room.l.s}</code> instead. The Glossary tab lists every called form of a term under <em>Other forms</em>, whether it names an instance or is another form of the word.</li>
 </ul>
 <p><code>.l</code> and <code>.s</code> chain and also apply to the called form: <code>{room.l.s}</code> reads <em>rooms</em>, <code>{room('suite').s}</code> reads <em>suites</em>. All forms work on every handle, including handles you look up by name.</p>
-<h2 id="file-glossary">File glossary<a class="headerlink" href="#file-glossary" title="Permanent link">&para;</a></h2>
-<p>Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a <code>GLOSSARY.md</code>. Load the file with <code>FileGlossary</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileGlossary</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">g</span> <span class="o">=</span> <span class="n">FileGlossary</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'GLOSSARY.md'</span><span class="p">)</span>
-</code></pre></div>
-<p>The file needs at least one Markdown table (a GFM pipe table). pytest-given reads the tables a GFM renderer shows, including one in a blockquote or a list but not one in a code or HTML block, and a cell missing from a row reads as empty. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass <code>term_column</code>, <code>definition_column</code>, or <code>kind_column</code>. Each takes a column number (starting at 0) or a header name (case-insensitive):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">g</span> <span class="o">=</span> <span class="n">FileGlossary</span><span class="p">(</span><span class="s1">'GLOSSARY.md'</span><span class="p">,</span> <span class="n">term_column</span><span class="o">=</span><span class="s1">'Term'</span><span class="p">,</span> <span class="n">definition_column</span><span class="o">=</span><span class="s1">'Meaning'</span><span class="p">,</span> <span class="n">kind_column</span><span class="o">=</span><span class="s1">'Kind'</span><span class="p">)</span>
-</code></pre></div>
-<p>A term or kind cell may be formatted: <code>**Guest**</code> reads as <code>Guest</code>. The definition keeps its <a href="../step-text/#formatting">formatting</a>.</p>
+<h2 id="markdown-glossary">Markdown glossary<a class="headerlink" href="#markdown-glossary" title="Permanent link">&para;</a></h2>
+<p>Instead of declaring terms in Python, you can keep your glossary in a Markdown file. People and AI agents can read and edit it without touching code, and your project may already have a <code>GLOSSARY.md</code>. pytest-given reads two formats: terms in tables with <code>TableGlossary</code>, and term paragraphs with <code>ParagraphGlossary</code>. Loading a file with the wrong class raises an error that names the other one.</p>
 <p>Look up a term by name with <code>g['Guest']</code> (case-insensitive). The result is a handle like any other:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="sa">t</span><span class="s1">'</span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">"Guest"</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">"book"</span><span class="p">]</span><span class="o">.</span><span class="n">s</span><span class="si">}</span><span class="s1"> a </span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">"Room"</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">):</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">with</span> <span class="n">when</span><span class="p">(</span><span class="sa">t</span><span class="s1">'</span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">"Guest"</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">"book"</span><span class="p">]</span><span class="o">.</span><span class="n">s</span><span class="si">}</span><span class="s1"> a </span><span class="si">{</span><span class="n">g</span><span class="p">[</span><span class="s2">"Room"</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="o">...</span>
 </code></pre></div>
-<p>A file glossary is a <strong>closed vocabulary</strong>: you add new terms only as rows in the file. Both <code>g['foo']</code> and <code>g('foo')</code> only look up a term, and raise an error if it doesn't exist.</p>
+<p>A Markdown glossary is a <strong>closed vocabulary</strong>: you add new terms only in the file. Both <code>g['foo']</code> and <code>g('foo')</code> only look up a term, and raise an error if it doesn't exist.</p>
+<h3 id="tables">Tables<a class="headerlink" href="#tables" title="Permanent link">&para;</a></h3>
+<p><code>TableGlossary</code> reads the Markdown tables of a file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableGlossary</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">g</span> <span class="o">=</span> <span class="n">TableGlossary</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'GLOSSARY.md'</span><span class="p">)</span>
+</code></pre></div>
+<p>The file needs at least one Markdown table (a GFM pipe table). pytest-given reads the tables a GFM renderer shows, including one in a blockquote or a list but not one in a code or HTML block, and a cell missing from a row reads as empty. Every table is read, except one whose header lacks a column you select by name. By default, the first column is the term and the second is its definition. To use other columns, pass <code>term_column</code>, <code>definition_column</code>, <code>kind_column</code> or <code>avoid_column</code>. Each takes a column number (starting at 0) or a header name (case-insensitive):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">g</span> <span class="o">=</span> <span class="n">TableGlossary</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s1">'GLOSSARY.md'</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">term_column</span><span class="o">=</span><span class="s1">'Term'</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">definition_column</span><span class="o">=</span><span class="s1">'Meaning'</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">kind_column</span><span class="o">=</span><span class="s1">'Kind'</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">avoid_column</span><span class="o">=</span><span class="s1">'Avoid'</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
+</code></pre></div>
+<p>A term or kind cell may be formatted: <code>**Guest**</code> reads as <code>Guest</code>. The definition keeps its <a href="../step-text/#formatting">formatting</a>. An avoid cell lists the term's <a href="#avoided-words">avoided words</a>, separated by commas. A comma inside parentheses doesn't separate them.</p>
+<h3 id="term-paragraphs">Term paragraphs<a class="headerlink" href="#term-paragraphs" title="Permanent link">&para;</a></h3>
+<p><code>ParagraphGlossary</code> reads the <code>GLOSSARY.md</code> format of Matt Pocock's <a href="https://github.com/mattpocock/skills">skills</a>, where each term is a paragraph of its own, a <strong>term paragraph</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gh"># Ordering</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Receives and tracks customer orders.
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="gu">## Language</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="gs">**Order**</span>:
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>A customer's request for goods, placed in one checkout.
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="ge">_Avoid_</span>: Purchase, transaction
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="gs">**Invoice**</span>:
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>A request for payment sent to a customer after delivery, for one <span class="gs">**Order**</span>.
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="ge">_Avoid_</span>: Bill, payment request
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="gu">## Relationships</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="k">-</span><span class="w"> </span>An <span class="gs">**Order**</span> produces one <span class="gs">**Invoice**</span>.
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pytest_given</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParagraphGlossary</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">g</span> <span class="o">=</span> <span class="n">ParagraphGlossary</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">'GLOSSARY.md'</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><strong>A term paragraph starts with a term line:</strong> a line that opens with the term's name in bold, followed directly by a colon, as in <code>**Order**:</code>. In <code>**Order:**</code> the colon sits inside the bold, so the line is no term line. The term paragraph ends at the next term line or at the end of the paragraph, so two terms with no blank line between them are still two terms.</li>
+<li><strong>The definition</strong> is the rest of the term paragraph. It starts on the term line after the colon or on the next line. Its line breaks become spaces, as GitHub shows them. A <code>&lt;br&gt;</code>, or a backslash or two spaces at the end of a line, is a line break.</li>
+<li><strong>An avoid line</strong> starts with <code>_Avoid_:</code> or <code>*Avoid*:</code> and lists the term's <a href="#avoided-words">avoided words</a>, separated by commas. A list too long for one line can wrap onto the term paragraph's next lines.</li>
+<li><strong>Everything else is prose</strong>, which pytest-given ignores: the title, the description under it, any text before a paragraph's first term line, lists and blockquotes. A heading reading <code>Relationships</code> or <code>Flagged ambiguities</code> starts a part that is ignored too, up to the next heading of the same or a higher level.</li>
+</ul>
+<p>The format has no place for a kind, so a term in it gets its kind from <a href="../domain-storytelling/#kind-inference">kind inference</a> or stays kindless.</p>
 <h2 id="kinds">Kinds<a class="headerlink" href="#kinds" title="Permanent link">&para;</a></h2>
 <p>A term can have a kind, which sets its color in the report. The kinds come from <a href="../domain-storytelling/">Domain Storytelling</a>: <strong>actor</strong>, <strong>work object</strong>, and <strong>activity</strong>. To declare a kind, use <code>g.actor(...)</code>, <code>g.work_object(...)</code>, or <code>g.activity(...)</code> instead of <code>g(...)</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">guest</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">actor</span><span class="p">(</span><span class="s1">'Guest'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Person booking accommodation.'</span><span class="p">)</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">room</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">work_object</span><span class="p">(</span><span class="s1">'Room'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'A bookable hotel room.'</span><span class="p">)</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">book</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="s1">'book'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Reserve a room for a stay.'</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">guest</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">actor</span><span class="p">(</span><span class="s1">'Guest'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Person booking accommodation.'</span><span class="p">)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">room</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">work_object</span><span class="p">(</span><span class="s1">'Room'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'A bookable hotel room.'</span><span class="p">)</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">book</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="s1">'book'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Reserve a room for a stay.'</span><span class="p">)</span>
 </code></pre></div>
-<p>In a file glossary, the kinds come from the column you pass as <code>kind_column</code>.</p>
-<p>If you don't declare a kind, pytest-given <a href="../domain-storytelling/#kind-inference">infers it</a> from the story sentences that use the term. A term that gets no kind either way is <strong>kindless</strong>. The report shows it in a neutral color and lists it under <strong>Uncategorized</strong> in the Glossary tab.</p>
+<p>In a <code>TableGlossary</code>, the kinds come from the column you pass as <code>kind_column</code>.</p>
+<p>If you don't declare a kind, pytest-given <a href="../domain-storytelling/#kind-inference">infers it</a> from the story sentences that use the term. A term that gets no kind either way is <strong>kindless</strong>. The report shows it in a neutral color and lists it under <strong>Uncategorized</strong> when the Glossary tab groups terms by kind.</p>
 <h2 id="undefined-terms">Undefined terms<a class="headerlink" href="#undefined-terms" title="Permanent link">&para;</a></h2>
 <p>A term without a <code>definition=</code> is <strong>undefined</strong>. The Glossary tab marks it with an <em>Undefined</em> badge and can filter for these terms.</p>
 <p>Every declared term appears in the report, whether a test uses it or not.</p>
+<h2 id="glossary-sections">Glossary sections<a class="headerlink" href="#glossary-sections" title="Permanent link">&para;</a></h2>
+<p>A <strong>glossary section</strong> is a named group of terms. The Glossary tab of the <a href="../../html-report/#stories-and-glossary">HTML report</a> groups terms by section and filters by them.</p>
+<p>In code, declare terms through <code>g.section(name)</code>. A section has the glossary's <code>actor</code>, <code>work_object</code>, <code>activity</code> and call form, and puts each term it declares into the glossary with that section:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">booking</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">section</span><span class="p">(</span><span class="s1">'Booking'</span><span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">guest</span> <span class="o">=</span> <span class="n">booking</span><span class="o">.</span><span class="n">actor</span><span class="p">(</span><span class="s1">'Guest'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Person booking accommodation.'</span><span class="p">)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">room</span> <span class="o">=</span> <span class="n">booking</span><span class="o">.</span><span class="n">work_object</span><span class="p">(</span><span class="s1">'Room'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'A bookable hotel room.'</span><span class="p">)</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">payment</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">section</span><span class="p">(</span><span class="s1">'Payment'</span><span class="p">)</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">refund</span> <span class="o">=</span> <span class="n">payment</span><span class="o">.</span><span class="n">activity</span><span class="p">(</span><span class="s1">'refund'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Return the money a **guest** paid for a cancelled stay.'</span><span class="p">)</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">clerk</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">actor</span><span class="p">(</span><span class="s1">'Clerk'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Staff at the front desk.'</span><span class="p">)</span>  <span class="c1"># no section</span>
+</code></pre></div>
+<p>Look up a term on the glossary, whatever its section: <code>g['Guest']</code>. Calling <code>g.section('Booking')</code> again, in the same module or another, adds to the same section. Section names are compared as written, so <code>Booking</code> and <code>booking</code> are two sections.</p>
+<p>In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph, at any level, with its formatting removed. A heading inside a list or a blockquote doesn't count. Two kinds of heading name no section:</p>
+<ul>
+<li><strong>The title:</strong> a file's only level-1 heading. A file with several level-1 headings has no title, and each of them names a section.</li>
+<li><strong><code>Language</code> and <code>Terms</code></strong> in a <code>ParagraphGlossary</code>, in any case. They hold the terms rather than group them.</li>
+</ul>
+<p>A term above every qualifying heading has no section. Two headings with the same text name one section.</p>
+<p>A term belongs to one section. Declaring a term again in another section raises an error, and so does the same term in two sections of a file, even in two identical rows.</p>
+<h2 id="avoided-words">Avoided words<a class="headerlink" href="#avoided-words" title="Permanent link">&para;</a></h2>
+<p>An <strong>avoided word</strong> is a synonym of a term that the team has decided not to use. List a term's avoided words with <code>avoid=</code>, on the glossary or on a section:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">guest</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">actor</span><span class="p">(</span><span class="s1">'Guest'</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="s1">'Person booking accommodation.'</span><span class="p">,</span> <span class="n">avoid</span><span class="o">=</span><span class="p">[</span><span class="s1">'Customer'</span><span class="p">,</span> <span class="s1">'Client'</span><span class="p">])</span>
+</code></pre></div>
+<p>A <code>TableGlossary</code> reads them from its <code>avoid_column</code>, a <code>ParagraphGlossary</code> from a term's avoid line. The term's card in the Glossary tab shows them when expanded, and the Glossary search finds the term by them. The <a href="../../configuration/narration-lint/"><code>avoided-word</code></a> lint rule flags an avoided word used in a step, a scenario title or a story sentence.</p>
+<ul>
+<li><strong>An entry may end with a note</strong> in parentheses, as in <code>Reservation (in partner APIs only)</code>. The card shows the whole entry, and the lint matches only the text before the note. An entry that is only a note raises an error.</li>
+<li><strong>An entry shows its <a href="../step-text/#formatting">formatting</a></strong> on the card, but a bold word in it links no term.</li>
+<li><strong>An entry is dropped</strong> when its avoided word repeats an earlier entry's of the same term, in any case and with a hyphen or a space between its words, even if the notes differ.</li>
+<li><strong>An avoided word may not name a term</strong> of the same glossary, by its name or its <a href="#term-refs">S-form</a>, in any case. A glossary that avoids <code>Booking</code> while it defines <code>Booking</code> or <code>Bookings</code> raises an error.</li>
+<li><strong>Several terms may avoid the same word.</strong> The lint then names each of them, and you pick the one the step means.</li>
+</ul>
 <h2 id="discovery">Discovery<a class="headerlink" href="#discovery" title="Permanent link">&para;</a></h2>
 <p>pytest-given finds your glossary in one of two ways:</p>
 <ol>
 <li>Through a story: each <code>story(...)</code> remembers the glossary its terms come from.</li>
-<li>Otherwise, by looking for a <code>Glossary</code> or <code>FileGlossary</code> object among the names defined in your <code>conftest.py</code> files.</li>
+<li>Otherwise, by looking for a <code>Glossary</code>, <code>TableGlossary</code> or <code>ParagraphGlossary</code> object among the names defined in your <code>conftest.py</code> files.</li>
 </ol>
 <p>So if you use a glossary without stories, import the glossary object itself into a <code>conftest.py</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># conftest.py</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.glossary</span><span class="w"> </span><span class="kn">import</span> <span class="n">g</span>  <span class="c1"># noqa: F401 — plugin discovery</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># conftest.py</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tests.glossary</span><span class="w"> </span><span class="kn">import</span> <span class="n">g</span>  <span class="c1"># noqa: F401 — plugin discovery</span>
 </code></pre></div>
 <p><code>import tests.glossary</code> does not work: it imports the module, not the glossary object. pytest-given then finds nothing, and the Glossary tab stays empty.</p>
 <p>A test suite can have only one glossary. If your stories reach two different glossary objects, or your <code>conftest.py</code> files hold two, pytest-given raises <code>PytestGivenError</code>. A <code>conftest.py</code> glossary other than the one your stories use is ignored, so keep one glossary object and import it everywhere.</p>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
-<p>The hotel-booking and file-glossary-booking <a href="../../examples/">examples</a> show a glossary in use.</p>
+<p>The hotel-booking, file-glossary-booking and paragraph-glossary <a href="../../examples/">examples</a> show a glossary in use. All three have glossary sections and avoided words.</p>
 
 
 

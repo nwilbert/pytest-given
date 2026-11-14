@@ -1135,7 +1135,7 @@
 <h3 id="sentences">Sentences<a class="headerlink" href="#sentences" title="Permanent link">&para;</a></h3>
 <p>A sentence reads left to right: actor, activity, work object. Connecting words like <code>'to'</code> can go in between.</p>
 <p>Each part can be a glossary handle or a plain string. Use plain strings for generic verbs like <em>searches for</em>. Only words with a specific meaning in your domain need a glossary entry.</p>
-<p>Handles from a <a href="../glossary/#file-glossary">file glossary</a> work the same way: <code>sentence(g['Guest'], g['book'].s, g['Room'])</code>.</p>
+<p>Handles from a <a href="../glossary/#markdown-glossary">Markdown glossary</a> work the same way: <code>sentence(g['Guest'], g['book'].s, g['Room'])</code>.</p>
 <p>To be matched against your tests, a sentence needs at least two different glossary terms. The report marks a sentence with fewer as "not coverage-tracked". You can still cover it with a <a href="#pins">pin</a>.</p>
 <h3 id="clauses">Clauses<a class="headerlink" href="#clauses" title="Permanent link">&para;</a></h3>
 <p>Sometimes one sentence has more than one arrow: an actor hands a work object to two people, or two actors do something at the same time. Write one <code>clause(...)</code> per arrow chain:</p>
@@ -1154,7 +1154,7 @@
 <li>any other position (3rd, 5th, …): <strong>work object</strong></li>
 </ul>
 <p>If a term's kind is declared, pytest-given checks the kind against the term's position when the sentence is created. A term in the wrong position raises <code>PytestGivenError</code>, naming the term and its kind.</p>
-<p>If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a <code>kind_column</code> to your file glossary) to fix it.</p>
+<p>If a term without a declared kind appears both in an activity position and in another position, inference fails with an error at the end of the session. Declare the term's kind (or add a <code>kind_column</code> to your Markdown glossary) to fix it.</p>
 <h2 id="linking-scenarios-to-stories">Linking scenarios to stories<a class="headerlink" href="#linking-scenarios-to-stories" title="Permanent link">&para;</a></h2>
 <p>Tell pytest-given which story a scenario belongs to with <code>stories=</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@scenario</span><span class="p">(</span><span class="s1">'Carol selects a suite'</span><span class="p">,</span> <span class="n">stories</span><span class="o">=</span><span class="n">book_a_group_trip</span><span class="p">)</span>

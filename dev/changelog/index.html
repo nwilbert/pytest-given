@@ -1178,26 +1178,29 @@
 <h2 id="unreleased"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.2...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <h3 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>citations check</code> and <code>update</code> read <code>#view=glossary&amp;term=&lt;id&gt;</code> or <code>#term=&lt;id&gt;</code> as a citation of a term, with a tag's glyph and summary.</li>
-<li>A term citation written as a <code>&lt;details markdown="1"&gt;</code> block carries the term's definition, which <code>citations update</code> writes and <code>citations check</code> holds to the report.</li>
-<li>A Glossary term row in the HTML report gets the copy button, which offers <strong>Copy citation</strong> and <strong>Copy defining citation</strong> when the report has a URL.</li>
+<li>Glossary sections: <code>Glossary.section(name)</code> and a Markdown glossary's headings group terms, and the Glossary tab groups and filters by them.</li>
+<li><code>ParagraphGlossary</code> loads a <code>GLOSSARY.md</code> written as <code>**Term**:</code> paragraphs with optional <code>_Avoid_:</code> lines.</li>
+<li>Avoided words: <code>avoid=</code> on a term declaration, a <code>TableGlossary</code>'s <code>avoid_column</code> and a <code>ParagraphGlossary</code>'s <code>_Avoid_:</code> line list a term's rejected synonyms, which the term's card shows and the <code>avoided-word</code> lint rule, <code>warn</code> by default, flags in a step, a scenario title or a story sentence.</li>
+<li>Term citations: <code>citations check</code> and <code>update</code> read <code>#view=glossary&amp;term=&lt;id&gt;</code> or <code>#term=&lt;id&gt;</code> as a citation of a term, with a tag's glyph and summary, a <code>&lt;details markdown="1"&gt;</code> one carrying the term's definition, and a Glossary term row in the HTML report gets the copy button with <strong>Copy citation</strong> and <strong>Copy defining citation</strong>.</li>
+<li>A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term, and the <code>unresolved-definition-ref</code> lint rule, <code>warn</code> by default, flags a bold span that names no term.</li>
 <li>A format spec <code>{flag:true phrase|false phrase}</code> words a Boolean in a step while the parameter table keeps the Boolean.</li>
-<li>A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term.</li>
-<li>The <code>unresolved-definition-ref</code> lint rule, <code>warn</code> by default, flags a bold span in a glossary definition that names no term.</li>
+<li>A pytest-xdist run (<code>-n</code>) writes reports and runs the narration lint, choosing <code>--dist loadfile</code> when no <code>--dist</code> is given; any other <code>--dist</code> still stops with a usage error.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
-<li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
-<li><strong>Breaking.</strong> A glossary term's <code>definition</code> in the JSON report is now an object, which holds the string it used to be in <code>text</code> and its definition refs in <code>parts</code>. A script reading <code>.definition</code> must read <code>.definition.text</code>.</li>
+<li><strong>Breaking.</strong> <code>FileGlossary</code> is renamed <code>TableGlossary</code>, and a term repeated under two headings of a Markdown glossary now raises, identical rows included. Rename the import and the constructor call, and keep one row of a repeated term.</li>
 <li><strong>Breaking.</strong> <code>pytest-given report</code> and <code>pytest-given skills install</code> now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.</li>
+<li><strong>Breaking.</strong> A glossary term's <code>definition</code> in the JSON report is now an object, which holds the string it used to be in <code>text</code> and its definition refs in <code>parts</code>. A script reading <code>.definition</code> must read <code>.definition.text</code>.</li>
+<li><strong>Breaking.</strong> A format spec with one <code>|</code> and text on both sides now only accepts a <code>bool</code>, so <code>{when:%H|%M}</code> on a <code>datetime</code> raises <code>PytestGivenError</code>. Assign the text to a local variable and interpolate that instead.</li>
+<li>A plain report link to a glossary term is now checked, so a dead one fails <code>citations check</code>.</li>
+<li>The report lists scenarios by file and then by line, whatever order the tests ran in.</li>
 </ul>
 <h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
 <ul>
-<li>A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which <code>citations update</code> rewrites.</li>
-<li>Following a term ref to the HTML report's Glossary tab clears the tab's search and filters when they hide the term, instead of landing on a hidden entry.</li>
+<li>Following a term ref to the HTML report's Glossary tab scrolls to the term, clearing the tab's search and filters when they hide it.</li>
 <li>A report link whose <code>#status=</code> names only statuses the report doesn't know now shows every scenario instead of none.</li>
 <li>A failure raised while rendering a step's interpolation, such as a bad format spec, no longer shows a pytest-given frame in the report's traceback.</li>
+<li>A narrated citation of a scenario with no steps now has an empty body instead of blank lines, which <code>citations update</code> rewrites.</li>
 </ul>
 <h2 id="052-2026-11-07"><a href="https://github.com/nwilbert/pytest-given/compare/v0.5.1...v0.5.2">0.5.2</a> - 2026-11-07<a class="headerlink" href="#052-2026-11-07" title="Permanent link">&para;</a></h2>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>

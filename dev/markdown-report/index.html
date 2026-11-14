@@ -1142,7 +1142,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pytest<span class="w"> </span>--given-md<span class="w">              </span><span class="c1"># print it to stdout</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pytest<span class="w"> </span>--given-md<span class="o">=</span>report.md<span class="w">    </span><span class="c1"># write it to a file</span>
 </code></pre></div>
-<p>Printed to stdout, the report sits between <code>&lt;!-- pytest-given:md:start --&gt;</code> and <code>&lt;!-- pytest-given:md:end --&gt;</code> markers, which separate it from pytest's own output. The report covers whatever the run selected, so pytest's <code>-k</code>, <code>--lf</code> and node IDs narrow it as usual.</p>
+<p>Printed to stdout, the report sits between <code>&lt;!-- pytest-given:md:start --&gt;</code> and <code>&lt;!-- pytest-given:md:end --&gt;</code> markers, which separate it from pytest's own output. The report covers whatever the run selected, so pytest's <code>-k</code>, <code>--lf</code> and node IDs narrow it as usual. It lists the scenarios by file, then by where each test is defined in its file, whatever order the tests ran in.</p>
 <p>To render it from a saved JSON report instead, without running the tests, use the <a href="../cli/">standalone CLI</a>: <code>pytest-given report report-data.json --format md</code>.</p>
 <h2 id="reading-it">Reading it<a class="headerlink" href="#reading-it" title="Permanent link">&para;</a></h2>
 <ul>

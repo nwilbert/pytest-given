@@ -1559,6 +1559,13 @@ span.param-highlight {
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 
+.section-title { color: var(--text-primary); }
+
+
+.sidebar > .glossary-grouping:first-child { margin-top: 0; padding-top: 0; }
+.glossary-grouping + .search-box { margin-top: var(--space-lg); }
+
+
 
 
 .term-name {
@@ -1589,6 +1596,9 @@ span.param-highlight {
   grid-template-columns: subgrid;
 }
 .kind-header { grid-column: 1 / -1; }
+
+
+.entry-slot { display: contents; }
 
 .entry { position: relative; }
 .entry::before {
@@ -1670,6 +1680,11 @@ span.param-highlight {
   color: var(--text-muted);
   font-weight: 500;
   white-space: nowrap;
+}
+
+.refs-avoid {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 .refs-none {
   font-size: var(--font-size-sm);
@@ -1756,6 +1771,7 @@ span.param-highlight {
 .anchor-link svg { display: block; }
 .scenario-header:hover .anchor-link,
 .entry-head:hover .anchor-link,
+.kind-header:hover .anchor-link,
 .header:hover .anchor-link { opacity: 0.6; }
 .anchor-link:hover { opacity: 1 !important; }
 .anchor-link.anchor-copied { opacity: 1 !important; color: var(--color-passed); }
@@ -3425,8 +3441,7 @@ Total:        $2.00</pre></div>
 
   <div id="view-stories"  x-show="mainView === 'stories'" x-cloak>
   
-  </div>
-  <div id="view-glossary"  x-show="mainView === 'glossary'" x-cloak>
+  </div><div id="view-glossary"  x-show="mainView === 'glossary'" x-cloak>
   
   </div>
 
@@ -3649,6 +3664,15 @@ function reportApp() {
 
 
   const termsById = new Map(glossaryTerms.map((t) => [t.id, t]));
+
+
+  const termHaystacks = new Map(glossaryTerms.map(
+    t => [t.id, [t.canonical, ...t.avoid].join('\n').toLowerCase()],
+  ));
+
+
+  const knownSections = new Set(glossaryTerms.map(t => t.section_key).filter(Boolean));
+  const sectioned = knownSections.size > 0;
   const termScenarios = data.term_scenarios || {};
 
   const scenarioTerms = {};
@@ -3733,6 +3757,11 @@ function reportApp() {
     glossarySearch: '',
     glossaryKindFilter: { actor: true, object: true, activity: true, kindless: true },
     glossaryDefinitionFilter: 'all',
+
+
+    glossaryGrouping: document.getElementById('view-glossary').dataset.grouping || 'kind',
+
+    sectionFilters: [],
     expandedTerms: {},
     shownStatuses: allStatusesShown(),
     expandedGroups: {},
@@ -3826,36 +3855,79 @@ function reportApp() {
     },
 
 
-
-    visibleTermCount(kind) {
-      return this._termCounts()[kind] || 0;
+    termShown(id) {
+      return this._termMatches(termsById.get(id));
     },
+    _termMatches(term) {
+      if (this.glossaryDefinitionFilter !== 'all'
+          && (this.glossaryDefinitionFilter === 'undefined')
+            !== (term.definition === null || term.definition === undefined)) return false;
+      const query = this.glossarySearch.toLowerCase();
+      return !query || termHaystacks.get(term.id).includes(query);
+    },
+
+
+
+
+    visibleTermCount(grouping, key) {
+      const counts = this._termCounts();
+      return (grouping === 'section' ? counts.section.get(key) : counts.kind[key]) || 0;
+    },
+
 
 
     _termCounts() {
       const key = this.glossarySearch + '\u0000' + this.glossaryDefinitionFilter;
       if (termCountCache && termCountCache.key === key) return termCountCache.value;
-      const q = this.glossarySearch.toLowerCase();
-      const wantUndefined = this.glossaryDefinitionFilter === 'undefined';
-      const counts = {};
+      const counts = { kind: {}, section: new Map() };
       for (const t of glossaryTerms) {
-        if (this.glossaryDefinitionFilter !== 'all'
-            && wantUndefined !== (t.definition === null || t.definition === undefined)) continue;
-        if (q && !t.canonical.toLowerCase().includes(q)) continue;
+        if (!this._termMatches(t)) continue;
         const kind = t.kind || 'kindless';
-        counts[kind] = (counts[kind] || 0) + 1;
+        counts.kind[kind] = (counts.kind[kind] || 0) + 1;
+        if (t.section_key) counts.section.set(t.section_key, (counts.section.get(t.section_key) || 0) + 1);
       }
       termCountCache = { key, value: counts };
       return counts;
     },
-    visibleTermLabel(kind) {
-      const n = this.visibleTermCount(kind);
+    visibleTermLabel(grouping, key) {
+      const n = this.visibleTermCount(grouping, key);
       return n + (n === 1 ? ' term' : ' terms');
     },
     get anyTermsVisible() {
       const counts = this._termCounts();
+      if (this.glossaryGrouping === 'section') {
+        return [...counts.section.keys()].some(key => this.sectionShown(key));
+      }
       return ['actor', 'object', 'activity', 'kindless']
-        .some(k => this.glossaryKindFilter[k] && counts[k] > 0);
+        .some(k => this.glossaryKindFilter[k] && counts.kind[k] > 0);
+    },
+    sectionShown(key) {
+      return !this.sectionFilters.length || this.sectionFilters.includes(key);
+    },
+    toggleSectionFilter(key) {
+      this.sectionFilters = this.sectionFilters.includes(key)
+        ? this.sectionFilters.filter(other => other !== key)
+        : [...this.sectionFilters, key];
+    },
+
+
+
+    setGlossaryGrouping(grouping) {
+      this.glossaryGrouping = grouping;
+      if (grouping === 'kind' && this.sectionFilters.length) this.sectionFilters = [];
+    },
+
+
+
+
+    fillKindCards() {
+      if (this.glossaryGrouping !== 'kind') return;
+      for (const slot of document.querySelectorAll('#view-glossary [data-term-clone-of]:not([data-filled])')) {
+        const card = document.getElementById('term-' + slot.dataset.termCloneOf).cloneNode(true);
+        this._prepareClone(card, 'kind-');
+        slot.append(card);
+        slot.dataset.filled = '';
+      }
     },
     get anyTermsExpanded() {
       return Object.keys(this.expandedTerms).length > 0;
@@ -4133,20 +4205,33 @@ function reportApp() {
       if (!Object.hasOwn(termNames, id)) return;
       this.mainView = 'glossary';
       this.expandedTerms[id] = true;
-      this.$nextTick(() => {
-        const el = document.getElementById('term-' + id);
-        if (!el) return;
-        const scroll = () => el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (el.getClientRects().length) return scroll();
 
-        this._resetTermFilters();
-        this.$nextTick(scroll);
+
+      if (this._termFiltered(id)) this._resetTermFilters();
+      this.$nextTick(() => {
+
+        const prefix = sectioned && this.glossaryGrouping === 'kind' ? 'kind-' : '';
+        const el = document.getElementById(prefix + 'term-' + id);
+
+
+        const scrollWhenShown = (frames) => {
+          if (el.getClientRects().length) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          else if (frames) requestAnimationFrame(() => scrollWhenShown(frames - 1));
+        };
+        if (el) scrollWhenShown(3);
       });
+    },
+    _termFiltered(id) {
+      const term = termsById.get(id);
+      if (!this._termMatches(term)) return true;
+      if (this.glossaryGrouping === 'section') return !this.sectionShown(term.section_key);
+      return !this.glossaryKindFilter[term.kind || 'kindless'];
     },
     _resetTermFilters() {
       this.glossarySearch = '';
       this.glossaryDefinitionFilter = 'all';
       this.glossaryKindFilter = { actor: true, object: true, activity: true, kindless: true };
+      this.sectionFilters = [];
     },
     filterScenariosByTerm(id) {
 
@@ -4441,7 +4526,7 @@ function reportApp() {
 
 
       this.$watch('search', () => { if (!this._suppressHashWrite) this._writeHash('replace'); });
-      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses'].forEach(key => {
+      ['tagFilters', 'termFilters', 'moduleFilter', 'sentenceFilter', 'shownStatuses', 'sectionFilters'].forEach(key => {
         this.$watch(key, () => { if (!this._suppressHashWrite) this._writeHash('push'); });
       });
       ['mainView', 'selectedStory'].forEach(key => {
@@ -4453,6 +4538,7 @@ function reportApp() {
 
 
       this.$nextTick(() => this.fillStoryCards());
+      this.$watch('glossaryGrouping', () => this.fillKindCards());
 
       window.addEventListener('hashchange', () => this._readHash());
       window.addEventListener('popstate', () => this._readHash());
@@ -4654,6 +4740,11 @@ function reportApp() {
         id => id === NO_TERMS || Object.hasOwn(termNames, id));
       this.sentenceFilter = keep('story sentence', first('sentence-filter'),
         key => Object.hasOwn(sentenceLabels, key))[0] ?? null;
+
+
+      this.sectionFilters = keep('glossary section', params.getAll('section').filter(Boolean),
+        key => knownSections.has(key));
+      if (this.sectionFilters.length) this.glossaryGrouping = 'section';
       if (params.has('status')) {
         const named = params.get('status').split(',').filter(Boolean);
         const shown = new Set(keep('status', named, s => STATUSES.includes(s)));
@@ -4716,6 +4807,7 @@ function reportApp() {
       if (this.moduleFilter) params.set('module', this.moduleFilter);
       for (const termId of this.termFilters) params.append('term-filter', termId);
       if (this.sentenceFilter) params.set('sentence-filter', this.sentenceFilter);
+      for (const key of this.sectionFilters) params.append('section', key);
 
       const shownInReport = statusesPresent.filter(s => this.shownStatuses[s]);
       if (shownInReport.length !== statusesPresent.length) {
