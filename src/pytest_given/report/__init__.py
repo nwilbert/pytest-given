@@ -26,6 +26,7 @@ from .sinks import (
     RenderedSinks,
     SinkConfig,
     emit_sinks,
+    require_glossary_terms,
     sink_failure,
 )
 from .slugs import build_scenario_slug_index
@@ -62,6 +63,7 @@ __all__ = [
     'html_link_text',
     'link_text',
     'report_fragment',
+    'require_glossary_terms',
     'resolve_source_link_template',
     'resolve_theme',
     'sink_failure',

@@ -534,3 +534,84 @@ def test_cli_refuses_an_unknown_theme_with_the_plugin_wording(
     err = capsys.readouterr().err
     assert "Unknown --theme value 'Dark'" in err
     assert 'Traceback' not in err
+
+
+def _report_with_a_glossary() -> dict:
+    report = _minimal_report()
+    report['scenarios'] = [_scenario_with_source(node_id='tests/x.py::test_hidden')]
+    report['glossary'] = {
+        'terms': [{'id': 'guest', 'kind': 'actor', 'canonical': 'Guest'}]
+    }
+    return report
+
+
+@scenario(
+    t'`pytest-given report --glossary-only` renders only the {pg["Glossary"].l}',
+)
+def test_cli_glossary_only_renders_just_the_glossary(tmp_path: Path) -> None:
+    with given(
+        t'a saved {pg["Report"].l} with a {pg["Scenario"].l} and a {pg["Glossary"].l}'
+    ):
+        json_path = tmp_path / 'data.json'
+        json_path.write_text(json.dumps(_report_with_a_glossary()))
+        saved = json_path.read_bytes()
+    with when('it is re-rendered with `--glossary-only`'):
+        html_path = tmp_path / 'out.html'
+        rc = main(['report', str(json_path), '-o', str(html_path), '--glossary-only'])
+    with then('the command succeeds'):
+        assert rc == 0
+    with then(t'the page shows only the {pg["Glossary"].l}, and no {pg["Scenario"].l}'):
+        content = html_path.read_text(encoding='utf-8')
+        app_data = embedded_app_data(content)
+        assert app_data['views'] == ['glossary']
+        assert app_data['scenarios'] == []
+        assert 'test_hidden' not in content
+    with then(t'the JSON {pg["Report"].l} is unchanged'):
+        assert json_path.read_bytes() == saved
+
+
+@pytest.mark.parametrize('output', [['--format', 'md'], ['-o', 'out.md']])
+def test_cli_glossary_only_refuses_markdown(
+    tmp_path: Path, capsys, monkeypatch, output: list[str]
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_report_with_a_glossary()))
+    assert main(['report', str(json_path), '--glossary-only', *output]) == 2
+    assert '--glossary-only' in capsys.readouterr().err
+
+
+def test_cli_glossary_only_refuses_a_report_url(tmp_path: Path, capsys) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_report_with_a_glossary()))
+    args = ['report', str(json_path), '-o', str(tmp_path / 'out.html')]
+    url = ['--report-url', 'https://example.org/r.html']
+    assert main([*args, '--glossary-only', *url]) == 2
+    err = capsys.readouterr().err
+    assert '--glossary-only' in err
+    assert '--report-url' in err
+
+
+def test_cli_glossary_only_refuses_a_report_without_a_glossary(
+    tmp_path: Path, capsys
+) -> None:
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()))
+    html_path = tmp_path / 'out.html'
+    assert (
+        main(['report', str(json_path), '-o', str(html_path), '--glossary-only']) == 2
+    )
+    assert 'glossary' in capsys.readouterr().err
+    assert not html_path.exists()
+
+
+def test_cli_glossary_only_refusal_keeps_the_previous_report(tmp_path: Path) -> None:
+    """A refused input is no failed render: the report already there stays."""
+    json_path = tmp_path / 'data.json'
+    json_path.write_text(json.dumps(_minimal_report()))
+    html_path = tmp_path / 'out.html'
+    html_path.write_text('previous', encoding='utf-8')
+    assert (
+        main(['report', str(json_path), '-o', str(html_path), '--glossary-only']) == 2
+    )
+    assert html_path.read_text(encoding='utf-8') == 'previous'

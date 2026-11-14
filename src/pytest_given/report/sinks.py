@@ -29,7 +29,7 @@ from ..model import (
     report_from_dict,
 )
 from .function_source import read_function_sources
-from .html_renderer import render_html_string
+from .html_renderer import render_html_string, tab_visibility
 from .md_renderer import render_md
 from .staged_write import write_all_or_none
 from .story_view import build_coverage_records
@@ -55,6 +55,8 @@ class SinkConfig:
     is the rootdir a live run's source paths are relative to; None for a saved
     report, which does not carry it. `report_url` replaces the report's own in
     the HTML, for a saved report re-rendered to be served elsewhere.
+    `html_glossary_only` renders the HTML without scenarios, stories or report
+    URL: a term citation counts its scenarios, so a copied one would be stale.
     `md_source` reads the test functions from under `source_root`, so only a
     live run sets it.
     """
@@ -69,11 +71,20 @@ class SinkConfig:
     source_root: Path | None = None
     theme: Theme = DEFAULT_THEME
     report_url: ReportUrl | None = None
+    html_glossary_only: bool = False
 
     def __post_init__(self) -> None:
         _require_suffix('JSON', self.json_path, ('.json',))
         _require_suffix('HTML', self.html_path, ('.html', '.htm'))
         _require_suffix('Markdown', self.md_path, MD_SUFFIXES)
+        if self.html_glossary_only and self.html_path is None:
+            raise PytestGivenError(
+                'A glossary-only report is HTML, but no HTML path is set.'
+            )
+        if self.html_glossary_only and self.report_url is not None:
+            raise PytestGivenError(
+                'A glossary-only report has no citations, so it takes no report URL.'
+            )
 
     def file_paths(self) -> list[Path]:
         """The paths this run would write, in sink order. Only real files —
@@ -168,6 +179,8 @@ def render_sinks(
             html_report = replace(
                 report, metadata=replace(report.metadata, report_url=config.report_url)
             )
+        if config.html_glossary_only:
+            html_report = _glossary_only(html_report)
         files.append(
             RenderedFile(
                 config.html_path,
@@ -191,6 +204,28 @@ def render_sinks(
         if config.md_path is not None:
             files.append(RenderedFile(config.md_path, md))
     return RenderedSinks(files=files, md_stdout=md_stdout)
+
+
+def require_glossary_terms(report: ReportData) -> None:
+    """Refuse a glossary-only render with nothing to show.
+
+    Public so a caller can refuse before `emit_sinks`, which takes a refusal
+    inside it for a failed render and discards the previous report.
+    """
+    if not tab_visibility(report).glossary:
+        raise PytestGivenError(
+            'A glossary-only report needs glossary terms, but the report has none.'
+        )
+
+
+def _glossary_only(report: ReportData) -> ReportData:
+    require_glossary_terms(report)
+    return replace(
+        report,
+        scenarios=[],
+        stories=[],
+        metadata=replace(report.metadata, report_url=None),
+    )
 
 
 def render_json(report_dict: JsonObject, report: ReportData) -> str:

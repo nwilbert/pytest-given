@@ -17,13 +17,15 @@ The CLI takes its settings from flags only, never from your pytest config, and i
 
 `--report-url` sets the URL the citations copied from the report link to, like `--given-report-url`, in place of the one stored in the JSON file: render a report this way for each place it is served from.
 
+`--glossary-only` renders an HTML report with only the Glossary tab, for readers who need the vocabulary and not the tests. Scenarios and stories are left out, and so are the other forms of a term collected from them. The citation copy menus are left out too, since a term citation counts the term's scenarios. The JSON file is not changed.
+
 Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md` or `.markdown` file name: `-o report.md` needs no `--format`.
 
 `--no-lines` leaves the line out of each Markdown scenario anchor, like `--no-given-md-lines`. Render both sides of a diff this way.
 
 With `--format md` and no `-o`, the Markdown is printed to stdout. Unlike the pytest plugin's output, it has no `<!-- pytest-given:md:start -->` markers; the plugin only adds them to separate the report from pytest's own output.
 
-`pytest-given report` exits 2 when it cannot read the JSON file, or cannot render or write the report. It also exits 2 when an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL.
+`pytest-given report` exits 2 when it cannot read the JSON file, or cannot render or write the report. It also exits 2 when an option value is invalid, such as an unknown `--theme` or `--source-link` preset, or a `--report-url` that is not an absolute http(s) URL. With `--glossary-only`, it exits 2 for Markdown output, for a `--report-url`, and for a report without glossary terms.
 
 ## Citations
 

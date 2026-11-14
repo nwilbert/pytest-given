@@ -4,8 +4,6 @@
 
 ## Next
 
-- [ ] add CLI option to generate a report containing only the glossary
-
 ## Later
 
 - [ ] continue work on the story-diagrams branch

@@ -4,7 +4,13 @@ import argparse
 import sys
 from pathlib import Path
 
-from ..model import PytestGivenError, ReportUrl, read_report_json, resolve_report_url
+from ..model import (
+    PytestGivenError,
+    ReportUrl,
+    read_report_json,
+    report_from_dict,
+    resolve_report_url,
+)
 from ..report import (
     DEFAULT_HTML_PATH,
     DEFAULT_JSON_PATH,
@@ -14,6 +20,7 @@ from ..report import (
     THEME_HELP,
     SinkConfig,
     emit_sinks,
+    require_glossary_terms,
     resolve_source_link_template,
     resolve_theme,
 )
@@ -74,6 +81,14 @@ def add_report_parser(
         ),
     )
     report_parser.add_argument(
+        '--glossary-only',
+        action='store_true',
+        help=(
+            'Render only the Glossary tab, leaving out scenarios and stories '
+            '(HTML only).'
+        ),
+    )
+    report_parser.add_argument(
         '--format',
         choices=['html', 'md'],
         default=None,
@@ -99,8 +114,12 @@ def run_report(args: argparse.Namespace) -> int:
             args.theme,
             args.lines,
             resolve_report_url(args.report_url, '--report-url'),
+            args.glossary_only,
         )
-        rendered = emit_sinks(read_report_json(json_file), config, json_file.as_posix())
+        report_dict = read_report_json(json_file)
+        if args.glossary_only:
+            require_glossary_terms(report_from_dict(report_dict, json_file.as_posix()))
+        rendered = emit_sinks(report_dict, config, json_file.as_posix())
     except (PytestGivenError, OSError) as error:
         print(f'Error: {error}', file=sys.stderr)
         return 2
@@ -118,6 +137,7 @@ def _sink_config(
     theme: str,
     lines: bool,
     report_url: ReportUrl | None,
+    glossary_only: bool,
 ) -> SinkConfig:
     """The one sink this invocation writes.
 
@@ -131,13 +151,21 @@ def _sink_config(
     """
     source_link_template = resolve_source_link_template(source_link, '--source-link')
     resolved_theme = resolve_theme(theme, '--theme')
-    if (fmt or _infer_format(output)) == 'md':
+    is_md = (fmt or _infer_format(output)) == 'md'
+    if glossary_only and is_md:
+        raise PytestGivenError('--glossary-only renders HTML only, not Markdown.')
+    if glossary_only and report_url is not None:
+        raise PytestGivenError(
+            '--glossary-only leaves citations out, so --report-url has nothing to set.'
+        )
+    if is_md:
         return SinkConfig(md_path=output, md_to_stdout=output is None, md_lines=lines)
     return SinkConfig(
         html_path=output or DEFAULT_HTML_PATH,
         source_link_template=source_link_template,
         theme=resolved_theme,
         report_url=report_url,
+        html_glossary_only=glossary_only,
     )
 
 

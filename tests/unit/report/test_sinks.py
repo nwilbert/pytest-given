@@ -1,6 +1,7 @@
 """Unit tests for the sink render/write/discard split (`report/sinks.py`)."""
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -11,11 +12,16 @@ from pytest_given.model import (
     ClausePart,
     ClauseTermRef,
     ClauseWord,
+    Definition,
+    Glossary,
+    GlossaryTerm,
     Metadata,
     Narration,
+    NarrationLiteral,
     NarrationTermRef,
     NodeId,
     ReportData,
+    ReportUrl,
     Scenario,
     Sentence,
     SentenceId,
@@ -29,6 +35,7 @@ from pytest_given.model import (
 from pytest_given.report import sinks
 from pytest_given.report.sinks import SinkConfig, discard_stale_sinks
 from tests.ubiquitous_language import pg
+from tests.unit.report.app_data import embedded_app_data
 
 
 def test_discard_stale_sinks_removes_the_paths_this_run_would_have_written(
@@ -289,3 +296,102 @@ def test_md_source_reads_the_test_files_under_the_source_root(tmp_path: Path) ->
 
     assert rendered.md_stdout is not None
     assert '1  def test_a():\n2      assert True\n```' in rendered.md_stdout
+
+
+def _glossary_report(*, definitions: bool = True) -> ReportData:
+    """`_story_report` with a glossary of its three anchors and a report URL."""
+    glossary = Glossary()
+    for term_id, kind in (
+        ('guest', 'actor'),
+        ('search', 'activity'),
+        ('room', 'object'),
+    ):
+        glossary.register(
+            GlossaryTerm(
+                id=TermId(term_id),
+                kind=kind,
+                canonical=term_id,
+                definition=(
+                    Definition(
+                        text=f'The {term_id}.',
+                        parts=(NarrationLiteral(value=f'The {term_id}.'),),
+                    )
+                    if definitions
+                    else None
+                ),
+            )
+        )
+    report = _story_report()
+    return replace(
+        report,
+        glossary=glossary,
+        metadata=replace(
+            report.metadata, report_url=ReportUrl('https://example.org/report.html')
+        ),
+    )
+
+
+def test_glossary_only_html_drops_scenarios_stories_and_report_url(
+    tmp_path: Path,
+) -> None:
+    report = _glossary_report()
+    rendered = sinks.render_sinks(
+        report_to_dict(report),
+        SinkConfig(
+            json_path=tmp_path / 'report.json',
+            html_path=tmp_path / 'report.html',
+            html_glossary_only=True,
+        ),
+    )
+    json_file, html_file = rendered.files
+    app_data = embedded_app_data(html_file.text)
+    assert app_data['views'] == ['glossary']
+    assert app_data['scenarios'] == []
+    assert app_data['story_ids'] == []
+    assert app_data['citations'] is None
+    assert 'A demo scenario' not in html_file.text
+    assert [scn['id'] for scn in json.loads(json_file.text)['scenarios']] == [
+        'tests/test_demo.py::test_demo'
+    ]
+
+
+@pytest.mark.parametrize('glossary', [None, Glossary()], ids=['none', 'no-terms'])
+def test_glossary_only_refuses_a_report_without_glossary_terms(
+    tmp_path: Path, glossary: Glossary | None
+) -> None:
+    report = replace(_story_report(), glossary=glossary)
+    with pytest.raises(PytestGivenError, match='glossary'):
+        sinks.render_sinks(
+            report_to_dict(report),
+            SinkConfig(html_path=tmp_path / 'report.html', html_glossary_only=True),
+        )
+
+
+def test_glossary_only_renders_a_glossary_without_definitions(tmp_path: Path) -> None:
+    report = _glossary_report(definitions=False)
+    [html_file] = sinks.render_sinks(
+        report_to_dict(report),
+        SinkConfig(html_path=tmp_path / 'report.html', html_glossary_only=True),
+    ).files
+    assert embedded_app_data(html_file.text)['views'] == ['glossary']
+
+
+@pytest.mark.parametrize(
+    ('config', 'message'),
+    [
+        (
+            {
+                'html_path': Path('r.html'),
+                'report_url': ReportUrl('https://e.org/r.html'),
+            },
+            'report URL',
+        ),
+        ({'json_path': Path('r.json')}, 'HTML'),
+    ],
+    ids=['with-report-url', 'without-html'],
+)
+def test_a_glossary_only_config_that_cannot_render_is_refused(
+    config: dict, message: str
+) -> None:
+    with pytest.raises(PytestGivenError, match=message):
+        SinkConfig(html_glossary_only=True, **config)

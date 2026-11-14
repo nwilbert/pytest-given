@@ -8,6 +8,15 @@
 - **then** the command succeeds
 - **then** the copy buttons' «citations» link the `/1.0/` URL
 
+## ✓ `pytest-given report --glossary-only` renders only the «glossary»
+`tests/integration/test_cli.py::test_cli_glossary_only_renders_just_the_glossary`
+
+- **given** a saved «report» with a «scenario» and a «glossary»
+- **when** it is re-rendered with `--glossary-only`
+- **then** the command succeeds
+- **then** the page shows only the «glossary», and no «scenario»
+- **then** the JSON «report» is unchanged
+
 ## ✓ The `citations` exit code says whether a «citation finding» remains, so CI can gate on it · 5 cases
 `tests/integration/test_cli_citations.py::test_the_citations_exit_code_says_whether_a_finding_remains` · spec/citations, versions/0.5.0
 
@@ -4144,6 +4153,13 @@
 - **when** the «renderer» renders the HTML page
 - **then** the grouped step shows its placeholder, keyed to the euros column
 - **then** each column header carries its own column key
+
+## ✓ A «report» without «scenarios» leaves out the Scenarios tab and opens on its «glossary»
+`tests/unit/report/test_html_renderer.py::test_a_report_without_scenarios_opens_on_its_glossary`
+
+- **given** a «report» with «terms» and no «scenarios»
+- **when** it is rendered as HTML
+- **then** the «glossary» is its only view
 
 ## ✓ The «renderer» treats a «parameter table» column narrated with !r or !a as a repr column · 4 cases
 `tests/unit/report/test_html_renderer.py::test_a_column_narrated_with_r_or_a_is_a_repr_column` · parametrization

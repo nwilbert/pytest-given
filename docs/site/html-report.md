@@ -7,7 +7,7 @@ pytest --given-html              # writes given-report/report.html
 pytest --given-html=report.html  # or a path of your own
 ```
 
-The report has up to three views, switched in the top bar: **Scenarios**, **Stories** if you declare [domain stories](guide/domain-storytelling.md), and **Glossary** if you register a [glossary](guide/glossary.md). The top bar also switches the theme (see `--given-theme` under [pytest options](configuration/pytest-options.md#flags)).
+The report has up to three views, switched in the top bar: **Scenarios**, **Stories** if you declare [domain stories](guide/domain-storytelling.md), and **Glossary** if you register a [glossary](guide/glossary.md). A report without scenarios leaves out **Scenarios** and opens on the first view it has. `pytest-given report --glossary-only` renders a report with only the Glossary tab (see [CLI](cli.md)). The top bar also switches the theme (see `--given-theme` under [pytest options](configuration/pytest-options.md#flags)).
 
 ## Scenarios
 
