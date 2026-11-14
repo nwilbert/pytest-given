@@ -31,14 +31,12 @@ class LookupGlossary(BaseGlossary):
     """A glossary that reads a term back by name, as `g['Guest']`.
 
     Both user-facing glossaries do this, and a repeated lookup hands back the
-    *same* handle. Constructing one registers it as a candidate for the
-    suite's glossary.
+    *same* handle.
     """
 
     def __post_init__(self) -> None:
         super().__post_init__()
         self._handles: dict[TermId, TermHandle] = {}
-        _GLOSSARY_REGISTRY[self] = capture_caller_source()
 
     def __getitem__(self, name: str) -> TermHandle:
         """Name-based, case-insensitive get-only lookup. Raises
@@ -103,6 +101,10 @@ class Glossary(LookupGlossary, _TermDeclarations):
     anything else, a definition supplied only the first time included.
     Re-reading a term declared elsewhere is `g[name]`, which never registers.
     """
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        register_glossary(self)
 
     def section(self, name: str) -> GlossarySection:
         """A group of terms declared into this glossary under the heading
@@ -411,6 +413,12 @@ def register_or_conflict(
 # candidates for the suite's glossary. Process-global like the story registry,
 # so `process_state` swaps it around a nested in-process run.
 _GLOSSARY_REGISTRY: dict[BaseGlossary, SourceLocation | None] = {}
+
+
+def register_glossary(glossary: BaseGlossary) -> None:
+    """Make a fully constructed glossary a candidate for the suite's: called
+    last, so one whose construction raises never registers."""
+    _GLOSSARY_REGISTRY[glossary] = capture_caller_source()
 
 
 def registered_glossaries() -> dict[BaseGlossary, SourceLocation | None]:

@@ -355,23 +355,9 @@ def test_sentence_holds_id_and_clauses() -> None:
     assert act.clauses == (p,)
 
 
-def test_story_glossary_pin_excluded_from_repr_and_equality() -> None:
-    p = Clause(
-        parts=(
-            ClauseTermRef(term_id=TermId('g'), display='G'),
-            ClauseTermRef(term_id=TermId('s'), display='s'),
-            ClauseTermRef(term_id=TermId('o'), display='O'),
-        )
-    )
-    a = Sentence(id=SentenceId(1), clauses=(p,))
-    s1 = Story(id=StoryId('x'), title='X', sentences=(a,))
-    s2 = Story(id=StoryId('x'), title='X', sentences=(a,))
-    assert s1 == s2
-
-
 def test_a_glossary_is_identified_by_object_not_by_value() -> None:
-    """Nothing compares two glossaries by value, and several places collect the
-    distinct ones a story tree reaches — which needs them hashable."""
+    """Nothing compares two glossaries by value, and the glossary registry keys
+    on them, which needs them hashable."""
     one = Glossary(terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')])
     same_terms = Glossary(
         terms=[GlossaryTerm(id=TermId('a'), kind='actor', canonical='A')]

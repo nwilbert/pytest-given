@@ -264,9 +264,8 @@ class Glossary:
     needs the caller's source location — capture's business, not the leaf's.
 
     `eq=False` keeps identity equality and, with it, hashability. Nothing
-    compares two glossaries by value, while several places do need to collect
-    the distinct ones a story tree reaches — which is a `frozenset` only if
-    this is hashable.
+    compares two glossaries by value, while the glossary registry keys on
+    them.
     """
 
     # Public and mutable because the reflective serializer reads it by name.

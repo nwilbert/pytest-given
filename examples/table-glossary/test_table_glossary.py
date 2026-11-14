@@ -33,7 +33,7 @@ from pytest_given import (
 )
 
 # Load the glossary from the Markdown file alongside this module.
-# The plugin finds it through the story below, which also infers its kinds.
+# The story below infers its terms' kinds.
 g = TableGlossary(Path(__file__).parent / 'GLOSSARY.md', avoid_column='Avoid')
 
 # Story: Guest → book (slot 1, activity) → Room (slot 2, object).

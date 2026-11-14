@@ -16,6 +16,7 @@ from .glossary import (
     LookupGlossary,
     TermHandle,
     normalize_definition,
+    register_glossary,
     register_or_conflict,
     unique_avoid,
 )
@@ -70,6 +71,7 @@ class _MarkdownFileGlossary(LookupGlossary):
             raise PytestGivenError(f'{self._path}: {exc}{suffix}') from exc
         for row in rows:
             self._add_row(row)
+        register_glossary(self)
 
     def _add_row(self, row: GlossaryRow) -> None:
         try:

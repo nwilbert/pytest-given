@@ -77,3 +77,12 @@ def test_the_session_glossary_has_its_kinds_inferred_and_its_refs_resolved() -> 
 
 def test_no_glossary_is_no_session_glossary() -> None:
     assert session_glossary([], {}) is None
+
+
+def test_a_markdown_glossary_that_fails_to_load_is_not_registered(
+    tmp_path: Path,
+) -> None:
+    before = registered_glossaries()
+    with pytest.raises(PytestGivenError, match='not found'):
+        TableGlossary(tmp_path / 'missing.md')
+    assert registered_glossaries() == before
