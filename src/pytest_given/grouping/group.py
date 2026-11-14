@@ -31,29 +31,16 @@ def group_parametrized(
     scenarios: list[Scenario], param_info: ParamInfo
 ) -> list[Scenario]:
     """Group parametrized scenarios into single scenarios with parameter tables.
-
-    A group takes the place of its *first* case, so the report keeps listing
-    scenarios in the order the file declares them. Collecting the groups and
-    appending them afterwards would sort every parametrized scenario to the end.
-    """
-    groups: dict[GroupKey, list[Scenario]] = {}
-    order: list[Scenario | GroupKey] = []
-    for scenario in scenarios:
-        if scenario.id not in param_info:
-            order.append(scenario)
-            continue
-        key = (node_base(scenario.id), scenario.narration.text)
-        if key not in groups:
-            groups[key] = []
-            order.append(key)
-        groups[key].append(scenario)
-
+    The result is in no particular order: the report sorts it."""
     result: list[Scenario] = []
-    for entry in order:
-        if isinstance(entry, Scenario):
-            result.append(entry)
-            continue
-        cases = groups[entry]
+    groups: dict[GroupKey, list[Scenario]] = {}
+    for scenario in scenarios:
+        if scenario.id in param_info:
+            key = (node_base(scenario.id), scenario.narration.text)
+            groups.setdefault(key, []).append(scenario)
+        else:
+            result.append(scenario)
+    for cases in groups.values():
         if param_info[cases[0].id].group:
             result.append(_grouped_scenario(cases, param_info))
         else:

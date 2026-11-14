@@ -33,6 +33,7 @@ from .raw_params import (
     RawParamValue,
     snapshot_param_value,
 )
+from .report_order import in_report_order
 from .report_url import ReportUrl, resolve_report_url
 from .schema import (
     CONTENT_TYPES,
@@ -179,6 +180,7 @@ __all__ = [
     'definition_ref_text',
     'derived_id',
     'id_derive',
+    'in_report_order',
     'iter_narrations',
     'iter_steps',
     'location_suffix',

@@ -191,6 +191,14 @@
 - **then** both scenarios fail
 - **then** each failure ends on its own test function
 
+## ✓ The «report» lists «scenario»s by file, then by line, whatever order pytest ran them in
+`tests/integration/test_plugin.py::test_the_report_lists_scenarios_by_file_and_line` · spec/xdist-reports
+
+- **given** test_b.py with one scenario
+- **given** test_a.py with a scenario method above a scenario function
+- **when** the suite runs with test_b.py named before test_a.py
+- **then** test_a.py's scenarios come first, in the order the file declares them
+
 ## ✓ A test without `@scenario` stays out of the «report»
 `tests/integration/test_plugin.py::test_unannotated_test_not_in_report`
 
@@ -3387,7 +3395,7 @@
 `tests/unit/grouping/test_grouping.py::test_group_parametrized_keeps_source_order` · parametrization
 
 - **given** a plain «scenario» between two parametrized ones
-- **when** the «grouping» pass runs
+- **when** the «grouping» pass runs and the «report» orders its result
 - **then** the «report» lists them in the order the file declares
 
 ## ✓ Same-named «parametrized scenarios» on different test functions stay apart

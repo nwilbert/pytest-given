@@ -14,10 +14,11 @@ from ..capture import (
     Template,
 )
 from ..model import (
+    NodeId,
     PytestGivenError,
     placeholder_mismatch,
 )
-from .state import scenario_marker
+from .state import scenario_marker, session_state
 
 _PYTEST_GIVEN_MARK = 'pytest_given'
 
@@ -31,9 +32,12 @@ def register_pytest_given_mark(config: pytest.Config) -> None:
 
 
 def pytest_itemcollected(item: pytest.Item) -> None:
-    """Translate `@scenario` into the marker. Here rather than in `capture`,
-    which stays free of pytest; and early enough, since `-m` deselects in
-    `pytest_collection_modifyitems`."""
+    """Translate `@scenario` into the marker, and note the item's place for
+    the report order. Here rather than in `capture`, which stays free of
+    pytest; and before `pytest_collection_modifyitems`, where `-m` deselects
+    and a reordering plugin rearranges."""
+    order = session_state(item.config).collection_order
+    order.setdefault(NodeId(item.nodeid), len(order))
     if scenario_marker(item) is not None:
         item.add_marker(_PYTEST_GIVEN_MARK)
 

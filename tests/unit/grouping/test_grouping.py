@@ -47,6 +47,7 @@ from pytest_given.model import (
     StepPath,
     StoryId,
     TermId,
+    in_report_order,
     narration_of,
     narration_text,
     walk_steps,
@@ -294,22 +295,29 @@ def test_group_parametrized_mixed_pass_skip_groups_as_passed() -> None:
 )
 def test_group_parametrized_keeps_source_order() -> None:
     with given(t'a plain {pg["Scenario"].l} between two parametrized ones'):
-        first, mid, last = NodeId('t::a[1]'), NodeId('t::b'), NodeId('t::c[1]')
+        first, mid, last = NodeId('t.py::a[1]'), NodeId('t.py::b'), NodeId('t.py::c[1]')
         scenarios = [
-            Scenario(id=first, narration=Narration(text='a'), module='m'),
-            Scenario(id=mid, narration=Narration(text='b'), module='m'),
-            Scenario(id=last, narration=Narration(text='c'), module='m'),
+            Scenario(
+                id=node_id,
+                narration=Narration(text=node_id),
+                module='m',
+                source=SourceLocation(relpath='t.py', line=line),
+            )
+            for node_id, line in [(first, 1), (mid, 5), (last, 9)]
         ]
         param_info = {
             first: ParamSpec(names=['n'], values=[1]),
             last: ParamSpec(names=['n'], values=[1]),
         }
     with when(
-        t'the {pg["Group"]("grouping")} pass runs', pins=adopt_pytest_given['group']
+        t'the {pg["Group"]("grouping")} pass runs and the {pg["Report"].l} '
+        t'orders its result',
+        pins=adopt_pytest_given['group'],
     ):
         grouped = group_parametrized(scenarios, param_info)
+        ordered = in_report_order(grouped, {first: 0, mid: 1, last: 2})
     with then(t'the {pg["Report"].l} lists them in the order the file declares'):
-        assert [s.id for s in grouped] == [first, mid, last]
+        assert [s.id for s in ordered] == [first, mid, last]
 
 
 @scenario(

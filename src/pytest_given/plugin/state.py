@@ -68,7 +68,8 @@ class SessionState:
     def, so that is the one its cached value came from — and is
     insertion-ordered by setup time, which is what lets the graft take them in
     dependency order: `item.fixturenames` can list a dependent before its
-    dependency.
+    dependency. `collection_order` is each item's position as collected, before
+    a reordering plugin rearranges `session.items`.
     """
 
     param_info: ParamInfo = field(default_factory=dict)
@@ -76,6 +77,7 @@ class SessionState:
     fixture_recordings: dict[pytest.FixtureDef[object], FixtureRecording] = field(
         default_factory=dict
     )
+    collection_order: dict[NodeId, int] = field(default_factory=dict)
 
 
 # Private, so "one writer each" is a property of this module rather than a

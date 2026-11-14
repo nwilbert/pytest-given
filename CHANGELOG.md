@@ -29,6 +29,7 @@ form `## [x.y.z] - YYYY-MM-DD`.
 - **Breaking.** A glossary term's `definition` in the JSON report is now an object, which holds the string it used to be in `text` and its definition refs in `parts`. A script reading `.definition` must read `.definition.text`.
 - **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
 - A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
+- The report lists scenarios by file and then by line, whatever order the tests ran in.
 
 ### Fixed
 

@@ -254,6 +254,114 @@ def test_refusal_frame_points_at_the_test(
         assert [frame['func'] for frame in innermost] == ['test_nest', 'test_lookup']
 
 
+_CLASS_ABOVE_FUNCTION = """
+    from pytest_given import scenario, then
+
+    class TestX:
+        @scenario('Method declared first')
+        def test_m(self):
+            with then('it passes'):
+                assert True
+
+    @scenario('Function declared second')
+    def test_f():
+        with then('it passes'):
+            assert True
+"""
+
+
+@scenario(
+    t'The {pg["Report"].l} lists {pg["Scenario"].l}s by file, then by line, '
+    t'whatever order pytest ran them in',
+    tags=['spec/xdist-reports'],
+)
+def test_the_report_lists_scenarios_by_file_and_line(pytester, tmp_path):
+    with given('test_b.py with one scenario'):
+        pytester.makepyfile(
+            test_b="""
+                from pytest_given import scenario, then
+
+                @scenario('In the second file')
+                def test_g():
+                    with then('it passes'):
+                        assert True
+            """
+        )
+    with given('test_a.py with a scenario method above a scenario function'):
+        pytester.makepyfile(test_a=_CLASS_ABOVE_FUNCTION)
+    with when('the suite runs with test_b.py named before test_a.py'):
+        json_path = tmp_path / 'report.json'
+        pytester.runpytest('test_b.py', 'test_a.py', f'--given-json={json_path}')
+        scenarios = json.loads(json_path.read_text())['scenarios']
+    with then("test_a.py's scenarios come first, in the order the file declares them"):
+        assert [scenario['id'] for scenario in scenarios] == [
+            'test_a.py::TestX::test_m',
+            'test_a.py::test_f',
+            'test_b.py::test_g',
+        ]
+
+
+def test_a_reordering_plugin_leaves_the_order_of_shared_lines(pytester, tmp_path):
+    pytester.makeconftest(
+        """
+        def pytest_collection_modifyitems(items):
+            items.reverse()
+        """
+    )
+    pytester.makepyfile(
+        """
+        import pytest
+        from pytest_given import scenario, then
+
+        @scenario('Case', group_parametrized=False)
+        @pytest.mark.parametrize('n', [1, 2, 3])
+        def test_case(n):
+            with then('it passes'):
+                assert n
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=3)
+    scenarios = json.loads(json_path.read_text())['scenarios']
+    assert [scenario['id'].split('::')[1] for scenario in scenarios] == [
+        'test_case[1]',
+        'test_case[2]',
+        'test_case[3]',
+    ]
+
+
+def test_an_item_a_plugin_adds_after_collection_sorts_last_among_ties(
+    pytester, tmp_path
+):
+    pytester.makeconftest(
+        """
+        import pytest
+
+        def pytest_collection_modifyitems(items):
+            items.insert(0, pytest.Function.from_parent(
+                items[0].parent, name='test_case[added]', callobj=items[0].obj,
+            ))
+        """
+    )
+    pytester.makepyfile(
+        """
+        from pytest_given import scenario, then
+
+        @scenario('Case')
+        def test_case():
+            with then('it passes'):
+                assert True
+        """
+    )
+    json_path = tmp_path / 'report.json'
+    pytester.runpytest(f'--given-json={json_path}').assert_outcomes(passed=2)
+    scenarios = json.loads(json_path.read_text())['scenarios']
+    assert [scenario['id'].split('::')[1] for scenario in scenarios] == [
+        'test_case',
+        'test_case[added]',
+    ]
+
+
 @scenario(t'A test without `@scenario` stays out of the {pg["Report"].l}')
 def test_unannotated_test_not_in_report(pytester, tmp_path):
     with given('a suite whose only test is undecorated'):

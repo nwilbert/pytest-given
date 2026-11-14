@@ -9,7 +9,7 @@ pytest --given-md              # print it to stdout
 pytest --given-md=report.md    # write it to a file
 ```
 
-Printed to stdout, the report sits between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers, which separate it from pytest's own output. The report covers whatever the run selected, so pytest's `-k`, `--lf` and node IDs narrow it as usual.
+Printed to stdout, the report sits between `<!-- pytest-given:md:start -->` and `<!-- pytest-given:md:end -->` markers, which separate it from pytest's own output. The report covers whatever the run selected, so pytest's `-k`, `--lf` and node IDs narrow it as usual. It lists the scenarios by file, then by where each test is defined in its file, whatever order the tests ran in.
 
 To render it from a saved JSON report instead, without running the tests, use the [standalone CLI](cli.md): `pytest-given report report-data.json --format md`.
 

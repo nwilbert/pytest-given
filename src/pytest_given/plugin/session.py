@@ -31,6 +31,7 @@ from ..model import (
     ReportData,
     Scenario,
     Story,
+    in_report_order,
     iter_steps,
     report_to_dict,
 )
@@ -215,8 +216,9 @@ def _build_report(session: pytest.Session, *, write: bool) -> _SessionReport:
     config = session.config
     given = given_config(config)
     collector = session_collector(config)
-    scenarios = group_parametrized(
-        collector.scenarios, session_state(config).param_info
+    scenarios = in_report_order(
+        group_parametrized(collector.scenarios, session_state(config).param_info),
+        session_state(config).collection_order,
     )
     stories = registered_stories()
     _warn_of_undeclared_stories(scenarios, stories)
