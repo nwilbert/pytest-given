@@ -1526,6 +1526,15 @@ span.param-highlight {
   font-weight: 700;
   color: var(--kind-ink);
 }
+/* The flex gap already spaces the copy button, so its own margin is taken
+   back to keep a header's 8px between the title and the icon. Baseline
+   alignment rests the icon's bottom on the baseline; the offset lowers it to
+   the letters' centre. */
+.kind-header > .anchor-link {
+  margin-left: calc(-1 * var(--space-xs));
+  position: relative;
+  top: 2.5px;
+}
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 /* A section names no kind, so its header takes the text ink; its cards keep
    their own kind marks. */
@@ -1593,14 +1602,15 @@ span.param-highlight {
 /* The padding is the gap before the definition, wide enough for the copy-link
    button to sit in beside even the widest name. A floor, so a glossary of
    short names does not crowd its definitions against them. */
-.entry-name { min-width: 6rem; padding-right: var(--space-lg); }
+.entry-name { min-width: 6rem; padding-right: calc(var(--space-lg) + var(--space-sm)); }
 .entry-name .term-name { position: relative; display: inline-block; }
+/* On the first line, so a name that wraps keeps its icon level with the
+   chevron and the definition's first line. The 1px drops the icon from the
+   line box's centre to the letters' centre, which sits lower. */
 .entry-name .anchor-link {
   position: absolute;
   left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: 0;
+  top: calc((1lh - 22px) / 2 + 1px);
 }
 .entry-name-sizer {
   grid-column: 2;
