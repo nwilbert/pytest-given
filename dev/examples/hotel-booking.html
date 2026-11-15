@@ -1558,6 +1558,15 @@ span.param-highlight {
   font-weight: 700;
   color: var(--kind-ink);
 }
+
+
+
+
+.kind-header > .anchor-link {
+  margin-left: calc(-1 * var(--space-xs));
+  position: relative;
+  top: 2.5px;
+}
 .kind-meta { font-size: var(--font-size-sm); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 
@@ -1625,14 +1634,15 @@ span.param-highlight {
 
 
 
-.entry-name { min-width: 6rem; padding-right: var(--space-lg); }
+.entry-name { min-width: 6rem; padding-right: calc(var(--space-lg) + var(--space-sm)); }
 .entry-name .term-name { position: relative; display: inline-block; }
+
+
+
 .entry-name .anchor-link {
   position: absolute;
   left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: 0;
+  top: calc((1lh - 22px) / 2 + 1px);
 }
 .entry-name-sizer {
   grid-column: 2;
