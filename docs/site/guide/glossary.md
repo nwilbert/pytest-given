@@ -76,6 +76,8 @@ g = TableGlossary(
 
 A term or kind cell may be formatted: `**Guest**` reads as `Guest`. The definition keeps its [formatting](step-text.md#formatting). An avoid cell lists the term's [avoided words](#avoided-words), separated by commas. A comma inside parentheses doesn't separate them.
 
+The table-glossary example reads its [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/examples/table-glossary/GLOSSARY.md) this way and shows it in its [report](../examples/table-glossary.html){ target=_blank }.
+
 ### Term paragraphs
 
 `ParagraphGlossary` reads the `GLOSSARY.md` format of Matt Pocock's [skills](https://github.com/mattpocock/skills), where each term is a paragraph of its own, a **term paragraph**:
@@ -113,6 +115,8 @@ g = ParagraphGlossary(Path(__file__).parent / 'GLOSSARY.md')
 - **Everything else is prose**, which pytest-given ignores: the title, the description under it, any text before a paragraph's first term line, lists and blockquotes. A heading reading `Relationships` or `Flagged ambiguities` starts a part that is ignored too, up to the next heading of the same or a higher level.
 
 The format has no place for a kind, so a term in it gets its kind from [kind inference](domain-storytelling.md#kind-inference) or stays kindless.
+
+The paragraph-glossary example reads its [`GLOSSARY.md`](https://github.com/nwilbert/pytest-given/blob/main/examples/paragraph-glossary/GLOSSARY.md) this way and shows it in its [report](../examples/paragraph-glossary.html){ target=_blank }.
 
 ## Kinds
 
@@ -153,12 +157,15 @@ clerk = g.actor('Clerk', definition='Staff at the front desk.')  # no section
 
 Look up a term on the glossary, whatever its section: `g['Guest']`. Calling `g.section('Booking')` again, in the same module or another, adds to the same section. Section names are compared as written, so `Booking` and `booking` are two sections.
 
-In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph, at any level, with its formatting removed. A heading inside a list or a blockquote doesn't count. Two kinds of heading name no section:
+In a Markdown glossary, a term's section is the nearest heading above its table or term paragraph, with its formatting removed. A heading is a line starting with `#` to `######`, or a line underlined with `===` or `---`. A heading inside a list or a blockquote doesn't count. These headings name no section:
 
 - **The title:** a file's only level-1 heading. A file with several level-1 headings has no title, and each of them names a section.
 - **`Language` and `Terms`** in a `ParagraphGlossary`, in any case. They hold the terms rather than group them.
+- **An empty heading**, such as a lone `##`.
 
 A term above every qualifying heading has no section. Two headings with the same text name one section.
+
+The [paragraph-glossary example](https://github.com/nwilbert/pytest-given/blob/main/examples/paragraph-glossary/GLOSSARY.md) puts its terms under `###` sections inside `## Language`, and the hotel-booking example declares its sections in [code](https://github.com/nwilbert/pytest-given/blob/main/examples/hotel-booking/test_hotel_booking.py). Their reports group the Glossary tab by section: [paragraph-glossary](../examples/paragraph-glossary.html){ target=_blank }, [hotel-booking](../examples/hotel-booking.html){ target=_blank }.
 
 A term belongs to one section. Declaring a term again in another section raises an error, and so does the same term in two sections of a file, even in two identical rows.
 
