@@ -58,7 +58,7 @@ def test_pin(pinned):
         ...
 ```
 
-The step shows `a step that {pins it / does not pin it}`, and the parameter table keeps `True` and `False`. Hovering a row in the HTML report puts that row's phrase into the sentence. A local variable that differs between cases gets a column of its own, holding `True` and `False`, and steps wording the same values share that column. One that is the same in every case, or a test that isn't parametrized, shows its one phrase.
+The step shows `a step that {pins it / does not pin it}`, and the parameter table keeps `True` and `False`. Hovering a row in the HTML report puts that row's phrase into the sentence.
 
 This works in a t-string and in a `Template`. The two phrases should complete the same sentence and word what the column's name says.
 

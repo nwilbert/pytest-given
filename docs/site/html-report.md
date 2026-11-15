@@ -31,12 +31,10 @@ The Glossary view lists the terms, with a search and a filter for undefined term
 
 The view groups the terms by section or by kind:
 
-- **By section**, for a glossary with [glossary sections](guide/glossary.md#glossary-sections). The sections come in the order the glossary first names each one. A section named **Other**, in any case, comes last, and the terms with no section join it. When no section has that name, the terms with no section form an **Other** group of their own. The sidebar lists the sections with their term counts. Click a section to show only its terms, and click more to show the terms of any of them. With none selected, every section shows.
+- **By section**, for a glossary whose terms name at least two [glossary sections](guide/glossary.md#glossary-sections). Sections come in the order the glossary first names them. A section named **Other**, in any case, comes last, and terms with no section join it, or form an **Other** group of their own. The sidebar lists the sections with their term counts. Click sections to show only their terms. With none selected, every section shows.
 - **By kind**, for a glossary whose terms have kinds. The sidebar has a checkbox per kind to show or hide its terms.
 
-A glossary with sections opens grouped by section. When at least one of its terms has a kind, a *Group by* switch at the top of the sidebar changes between *Section* and *Kind*, and switching to *Kind* clears the section selection. A glossary with neither sections nor kinds lists its terms without groups.
-
-A glossary counts as having sections only when its terms name at least two. A glossary under a single heading shows no sections.
+A glossary with sections opens grouped by section. When at least one of its terms has a kind, a *Group by* switch at the top of the sidebar changes between *Section* and *Kind*. A glossary with neither sections nor kinds lists its terms without groups.
 
 ## Links
 

@@ -17,7 +17,7 @@ The CLI takes its settings from flags only, never from your pytest config, and i
 
 `--report-url` sets the URL the citations copied from the report link to, like `--given-report-url`, in place of the one stored in the JSON file: render a report this way for each place it is served from.
 
-`--glossary-only` renders an HTML report with only the Glossary tab, for readers who need the vocabulary and not the tests. Scenarios and stories are left out, and so are the other forms of a term collected from them. The citation copy menus are left out too, since a term citation counts the term's scenarios. The JSON file is not changed.
+`--glossary-only` renders an HTML report with only the Glossary tab, for readers who need the vocabulary and not the tests. Scenarios and stories are left out, and so is each term's *Other forms* list, since it comes from them. The citation copy menus are left out too, since a term citation counts the term's scenarios. The JSON file is not changed.
 
 Pass `--format md` to get Markdown instead of HTML. You can also just use a `.md` or `.markdown` file name: `-o report.md` needs no `--format`.
 

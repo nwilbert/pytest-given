@@ -138,7 +138,7 @@ Every declared term appears in the report, whether a test uses it or not.
 
 A **glossary section** is a named group of terms. The Glossary tab of the [HTML report](../html-report.md#stories-and-glossary) groups terms by section and filters by them.
 
-In code, declare terms through `g.section(name)`. A section has the glossary's `actor`, `work_object`, `activity` and call form, and puts each term it declares into the glossary with that section:
+In code, declare terms through `g.section(name)`. A section offers the glossary's `actor`, `work_object` and `activity` methods and can be called like it, as in `booking('Guest', …)`. Each term declared through it gets that section:
 
 ```python
 booking = g.section('Booking')
@@ -174,7 +174,7 @@ A `TableGlossary` reads them from its `avoid_column`, a `ParagraphGlossary` from
 
 - **An entry may end with a note** in parentheses, as in `Reservation (in partner APIs only)`. The card shows the whole entry, and the lint matches only the text before the note. An entry that is only a note raises an error.
 - **An entry shows its [formatting](step-text.md#formatting)** on the card, but a bold word in it links no term.
-- **An entry is dropped** when its avoided word repeats an earlier entry's of the same term, in any case and with a hyphen or a space between its words, even if the notes differ.
+- **A repeated entry is dropped.** Two entries of one term repeat when their words match, ignoring case, notes, and a hyphen in place of a space.
 - **An avoided word may not name a term** of the same glossary, by its name or its [S-form](#term-refs), in any case. A glossary that avoids `Booking` while it defines `Booking` or `Bookings` raises an error.
 - **Several terms may avoid the same word.** The lint then names each of them, and you pick the one the step means.
 
