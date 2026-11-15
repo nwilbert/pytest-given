@@ -15,21 +15,21 @@ form `## [x.y.z] - YYYY-MM-DD`.
 
 ### Added
 
+- A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
 - Glossary sections: `Glossary.section(name)` and a Markdown glossary's headings group terms, and the Glossary tab groups and filters by them.
 - `ParagraphGlossary` loads a `GLOSSARY.md` written as `**Term**:` paragraphs with optional `_Avoid_:` lines.
 - Avoided words: `avoid=` on a term declaration, a `TableGlossary`'s `avoid_column` and a `ParagraphGlossary`'s `_Avoid_:` line list a term's rejected synonyms, which the term's card shows and the `avoided-word` lint rule, `warn` by default, flags in a step, a scenario title or a story sentence.
 - Term citations: `citations check` and `update` read `#view=glossary&term=<id>` or `#term=<id>` as a citation of a term, with a tag's glyph and summary, a `<details markdown="1">` one carrying the term's definition, and a Glossary term row in the HTML report gets the copy button with **Copy citation** and **Copy defining citation**.
 - A bold term name in a glossary definition is a definition ref, which the HTML report's Glossary tab renders as a term ref that opens the named term, and the `unresolved-definition-ref` lint rule, `warn` by default, flags a bold span that names no term.
-- A format spec `{flag:true phrase|false phrase}` words a Boolean in a step while the parameter table keeps the Boolean.
 - `pytest-given report --glossary-only` renders an HTML report with only the Glossary tab.
 - A pytest-xdist run (`-n`) writes reports and runs the narration lint, choosing `--dist loadfile` when no `--dist` is given; any other `--dist` still stops with a usage error.
 
 ### Changed
 
+- **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
 - **Breaking.** `FileGlossary` is renamed `TableGlossary`, and a term repeated under two headings of a Markdown glossary now raises, identical rows included. Rename the import and the constructor call, and keep one row of a repeated term.
 - **Breaking.** `pytest-given report` and `pytest-given skills install` now exit 2, not 1, when they cannot do their job, such as an unreadable JSON file or an unwritable destination. A script that tests for exit code 1 on such a failure must test for 2.
 - **Breaking.** A glossary term's `definition` in the JSON report is now an object, which holds the string it used to be in `text` and its definition refs in `parts`. A script reading `.definition` must read `.definition.text`.
-- **Breaking.** A format spec with one `|` and text on both sides now only accepts a `bool`, so `{when:%H|%M}` on a `datetime` raises `PytestGivenError`. Assign the text to a local variable and interpolate that instead.
 - A plain report link to a glossary term is now checked, so a dead one fails `citations check`.
 - The report lists scenarios by file and then by line, whatever order the tests ran in.
 - The HTML report leaves out the Scenarios tab when the report has no scenarios, and opens on its first remaining view.
